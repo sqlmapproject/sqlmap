@@ -2868,7 +2868,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 1 to 10 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2879,7 +2879,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[CHAR]</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -2890,7 +2890,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query (NULL) - 1 to 10 columns</title>
+        <title>MySQL UNION query (NULL) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -2901,7 +2901,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -2912,7 +2912,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([RANDNUM]) - 1 to 10 columns</title>
+        <title>MySQL UNION query ([RANDNUM]) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -2923,7 +2923,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[RANDNUM]</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -2934,7 +2934,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 11 to 20 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -2945,7 +2945,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[CHAR]</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -2956,7 +2956,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query (NULL) - 11 to 20 columns</title>
+        <title>MySQL UNION query (NULL) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -2967,7 +2967,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -2978,7 +2978,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([RANDNUM]) - 11 to 20 columns</title>
+        <title>MySQL UNION query ([RANDNUM]) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -2989,7 +2989,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[RANDNUM]</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3000,7 +3000,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 21 to 30 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3011,7 +3011,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[CHAR]</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3022,7 +3022,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query (NULL) - 21 to 30 columns</title>
+        <title>MySQL UNION query (NULL) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3033,7 +3033,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3044,7 +3044,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([RANDNUM]) - 21 to 30 columns</title>
+        <title>MySQL UNION query ([RANDNUM]) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3055,7 +3055,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[RANDNUM]</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3066,7 +3066,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 31 to 40 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3077,7 +3077,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[CHAR]</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3088,7 +3088,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query (NULL) - 31 to 40 columns</title>
+        <title>MySQL UNION query (NULL) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3099,7 +3099,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3110,7 +3110,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([RANDNUM]) - 31 to 40 columns</title>
+        <title>MySQL UNION query ([RANDNUM]) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3121,7 +3121,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[RANDNUM]</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3132,7 +3132,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([CHAR]) - 41 to 50 columns</title>
+        <title>MySQL UNION query ([CHAR]) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3143,7 +3143,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[CHAR]</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3154,7 +3154,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query (NULL) - 41 to 50 columns</title>
+        <title>MySQL UNION query (NULL) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3165,7 +3165,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>NULL</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3176,7 +3176,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL UNION query ([RANDNUM]) - 41 to 50 columns</title>
+        <title>MySQL UNION query ([RANDNUM]) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3187,7 +3187,7 @@ Formats:
             <payload/>
             <comment>#</comment>
             <char>[RANDNUM]</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3255,7 +3255,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 1 to 10 columns</title>
+        <title>Generic UNION query ([CHAR]) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -3266,7 +3266,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[CHAR]</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -3274,7 +3274,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NULL) - 1 to 10 columns</title>
+        <title>Generic UNION query (NULL) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
@@ -3285,7 +3285,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>NULL</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -3293,7 +3293,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([RANDNUM]) - 1 to 10 columns</title>
+        <title>Generic UNION query ([RANDNUM]) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3304,7 +3304,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[RANDNUM]</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -3312,7 +3312,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 11 to 20 columns</title>
+        <title>Generic UNION query ([CHAR]) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3323,7 +3323,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[CHAR]</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3331,7 +3331,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NULL) - 11 to 20 columns</title>
+        <title>Generic UNION query (NULL) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3342,7 +3342,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>NULL</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3350,7 +3350,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([RANDNUM]) - 11 to 20 columns</title>
+        <title>Generic UNION query ([RANDNUM]) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3361,7 +3361,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[RANDNUM]</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3369,7 +3369,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 21 to 30 columns</title>
+        <title>Generic UNION query ([CHAR]) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3380,7 +3380,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[CHAR]</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3388,7 +3388,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NULL) - 21 to 30 columns</title>
+        <title>Generic UNION query (NULL) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3399,7 +3399,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>NULL</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3407,7 +3407,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([RANDNUM]) - 21 to 30 columns</title>
+        <title>Generic UNION query ([RANDNUM]) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3418,7 +3418,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[RANDNUM]</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3426,7 +3426,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 31 to 40 columns</title>
+        <title>Generic UNION query ([CHAR]) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3437,7 +3437,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[CHAR]</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3445,7 +3445,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NULL) - 31 to 40 columns</title>
+        <title>Generic UNION query (NULL) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3456,7 +3456,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>NULL</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3464,7 +3464,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([RANDNUM]) - 31 to 40 columns</title>
+        <title>Generic UNION query ([RANDNUM]) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3475,7 +3475,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[RANDNUM]</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3483,7 +3483,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([CHAR]) - 41 to 50 columns</title>
+        <title>Generic UNION query ([CHAR]) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3494,14 +3494,14 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[CHAR]</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
         </response>
     </test>
     <test>
-        <title>Generic UNION query (NULL) - 41 to 50 columns</title>
+        <title>Generic UNION query (NULL) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3512,7 +3512,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>NULL</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3520,7 +3520,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query ([RANDNUM]) - 41 to 50 columns</title>
+        <title>Generic UNION query ([RANDNUM]) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3531,7 +3531,7 @@ Formats:
             <payload/>
             <comment>-- </comment>
             <char>[RANDNUM]</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3596,7 +3596,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([CHAR]) - 1 to 10 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3607,7 +3607,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[CHAR]</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -3615,7 +3615,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) (NULL) - 1 to 10 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>2</level>
         <risk>1</risk>
@@ -3626,7 +3626,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>NULL</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -3634,7 +3634,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 1 to 10 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 1 to 15 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3645,7 +3645,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[RANDNUM]</char>
-            <columns>1-10</columns>
+            <columns>1-15</columns>
         </request>
         <response>
             <union/>
@@ -3653,7 +3653,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([CHAR]) - 11 to 20 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3664,7 +3664,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[CHAR]</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3672,7 +3672,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) (NULL) - 11 to 20 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3683,7 +3683,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>NULL</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3691,7 +3691,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 11 to 20 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 16 to 30 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3702,7 +3702,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[RANDNUM]</char>
-            <columns>11-20</columns>
+            <columns>16-30</columns>
         </request>
         <response>
             <union/>
@@ -3710,7 +3710,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([CHAR]) - 21 to 30 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3721,7 +3721,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[CHAR]</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3729,7 +3729,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) (NULL) - 21 to 30 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>4</level>
         <risk>1</risk>
@@ -3740,7 +3740,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>NULL</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3748,7 +3748,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 21 to 30 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 31 to 45 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3759,7 +3759,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[RANDNUM]</char>
-            <columns>21-30</columns>
+            <columns>31-45</columns>
         </request>
         <response>
             <union/>
@@ -3767,7 +3767,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([CHAR]) - 31 to 40 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3778,7 +3778,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[CHAR]</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3786,7 +3786,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) (NULL) - 31 to 40 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3797,7 +3797,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>NULL</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3805,7 +3805,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 31 to 40 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 46 to 60 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3816,7 +3816,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[RANDNUM]</char>
-            <columns>31-40</columns>
+            <columns>46-60</columns>
         </request>
         <response>
             <union/>
@@ -3824,7 +3824,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([CHAR]) - 41 to 50 columns</title>
+        <title>Generic UNION query (NUL comment) ([CHAR]) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3835,7 +3835,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[CHAR]</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3843,7 +3843,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) (NULL) - 41 to 50 columns</title>
+        <title>Generic UNION query (NUL comment) (NULL) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3854,7 +3854,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>NULL</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
@@ -3862,7 +3862,7 @@ Formats:
     </test>
 
     <test>
-        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 41 to 50 columns</title>
+        <title>Generic UNION query (NUL comment) ([RANDNUM]) - 61 to 75 columns</title>
         <stype>3</stype>
         <level>5</level>
         <risk>1</risk>
@@ -3873,7 +3873,7 @@ Formats:
             <payload/>
             <comment>%00</comment>
             <char>[RANDNUM]</char>
-            <columns>41-50</columns>
+            <columns>61-75</columns>
         </request>
         <response>
             <union/>
