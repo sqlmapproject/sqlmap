@@ -190,19 +190,23 @@ def cmdLineParser():
                              help="Force back-end DBMS operating system "
                                   "to this value")
 
+        injection.add_option("--invalid-bignum", dest="invalidBignum",
+                             action="store_true",
+                             help="Use big numbers for invalidating values")
+
+        injection.add_option("--invalid-logical", dest="invalidLogical",
+                             action="store_true",
+                             help="Use logical operations for invalidating values")
+
+        injection.add_option("--no-cast", dest="noCast",
+                             action="store_true",
+                             help="Turn off payload casting mechanism")
+
         injection.add_option("--prefix", dest="prefix",
                              help="Injection payload prefix string")
 
         injection.add_option("--suffix", dest="suffix",
                              help="Injection payload suffix string")
-
-        injection.add_option("--logical-negate", dest="logicalNegate",
-                             action="store_true",
-                             help="Use logic operation(s) for negating values")
-
-        injection.add_option("--no-cast", dest="noCast",
-                             action="store_true",
-                             help="Turn off payload casting mechanism")
 
         injection.add_option("--skip", dest="skip",
                              help="Skip testing for given parameter(s)")

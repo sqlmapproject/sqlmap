@@ -87,15 +87,17 @@ class Agent:
             if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue
             elif where == PAYLOAD.WHERE.NEGATIVE:
-                if not conf.logicalNegate:
+                if conf.invalidLogical:
+                    match = re.search(r'\A[^ ]+', newValue)
+                    newValue = newValue[len(match.group() if match else ""):]
+                    value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", randomInt(2), randomInt(2))
+                elif conf.invalidBignum:
+                    value = "%d.%d" % (randomInt(6), randomInt(1))
+                else:
                     if newValue.startswith("-"):
                         value = ""
                     else:
                         value = "-%s" % randomInt()
-                else:
-                    match = re.search(r'\A[^ ]+', newValue)
-                    newValue = newValue[len(match.group() if match else ""):]
-                    value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", randomInt(2), randomInt(2))
             elif where == PAYLOAD.WHERE.REPLACE:
                 value = ""
             else:

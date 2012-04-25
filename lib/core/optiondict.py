@@ -63,9 +63,10 @@ optDict = {
                                "testParameter":     "string",
                                "dbms":              "string",
                                "os":                "string",
+                               "invalidBignum":     "boolean",
+                               "invalidLogical":     "boolean",
                                "prefix":            "string",
                                "suffix":            "string",
-                               "logicalNegate":     "boolean",
                                "skip":              "string",
                                "tamper":            "string"
                              },
