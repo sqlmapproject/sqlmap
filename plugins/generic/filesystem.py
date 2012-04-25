@@ -18,6 +18,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.convert import hexdecode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
@@ -36,11 +37,6 @@ class Filesystem:
         self.fileTblName = "sqlmapfile"
         self.tblField = "data"
 
-    def __unbase64String(self, base64Str):
-        unbase64Str = "%s\n" % base64Str.decode("base64")
-
-        return unbase64Str
-
     def __unhexString(self, hexStr):
         if len(hexStr) % 2 != 0:
             errMsg = "for some reason(s) sqlmap retrieved an odd-length "
@@ -51,48 +47,12 @@ class Filesystem:
             return hexStr
 
         try:
-            cleanStr = binascii.unhexlify(hexStr)
+            cleanStr = hexdecode(hexStr)
         except TypeError, e:
             logger.critical("unable to unhex the string ('%s')" % e)
             return None
 
         return cleanStr
-
-    def __binDataToScr(self, binaryData, chunkName):
-        """
-        Called by Microsoft SQL Server plugin to write a binary file on the
-        back-end DBMS underlying file system
-        """
-
-        fileLines = []
-        fileSize = len(binaryData)
-        lineAddr = 0x100
-        lineLen = 20
-
-        fileLines.append("n %s" % chunkName)
-        fileLines.append("rcx")
-        fileLines.append("%x" % fileSize)
-        fileLines.append("f 0100 %x 00" % fileSize)
-
-        for fileLine in xrange(0, len(binaryData), lineLen):
-            scrString = ""
-
-            for lineChar in binaryData[fileLine:fileLine+lineLen]:
-                strLineChar = binascii.hexlify(lineChar)
-
-                if not scrString:
-                    scrString = "e %x %s" % (lineAddr, strLineChar)
-                else:
-                    scrString += " %s" % strLineChar
-
-                lineAddr += len(lineChar)
-
-            fileLines.append(scrString)
-
-        fileLines.append("w")
-        fileLines.append("q")
-
-        return fileLines
 
     def __checkWrittenFile(self, wFile, dFile, fileType):
         if Backend.isDbms(DBMS.MYSQL):
@@ -113,6 +73,7 @@ class Filesystem:
 
         logger.debug("checking if the %s file has been written" % fileType)
         dFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+        sameFile = None
 
         if isNumPosStrValue(dFileSize):
             infoMsg = "the file has been successfully written and "
@@ -121,17 +82,22 @@ class Filesystem:
             dFileSize = long(dFileSize)
 
             if wFileSize == dFileSize:
+                sameFile = True
                 infoMsg += ", same size as the local file '%s'" % wFile
             else:
+                sameFile = False
                 infoMsg += ", but the size differs from the local "
                 infoMsg += "file '%s' (%d bytes)" % (wFile, wFileSize)
 
             logger.info(infoMsg)
         else:
+            sameFile = False
             warnMsg = "it looks like the file has not been written, this "
             warnMsg += "can occur if the DBMS process' user has no write "
             warnMsg += "privileges in the destination path"
             logger.warn(warnMsg)
+
+        return sameFile
 
     def fileToSqlQueries(self, fcEncodedList):
         """
@@ -190,47 +156,6 @@ class Filesystem:
 
         return fcEncodedList
 
-    def updateBinChunk(self, binaryData, tmpPath):
-        """
-        Called by Microsoft SQL Server plugin to write a binary file on the
-        back-end DBMS underlying file system
-        """
-
-        randScr = "tmpf%s.scr" % randomStr(lowercase=True)
-        chunkName = randomStr(lowercase=True)
-        fileScrLines = self.__binDataToScr(binaryData, chunkName)
-        forgedScrLines = []
-        cmd = ""
-        charCounter = 0
-        maxLen = 512
-
-        logger.debug("generating binary file %s\%s, please wait.." % (tmpPath, chunkName))
-
-        for scrLine in fileScrLines:
-            forgedScrLine = "echo %s " % scrLine
-            forgedScrLine += ">> \"%s\%s\"" % (tmpPath, randScr)
-            forgedScrLines.append(forgedScrLine)
-
-        for forgedScrLine in forgedScrLines:
-            cmd += "%s & " % forgedScrLine
-            charCounter += len(forgedScrLine)
-
-            if charCounter >= maxLen:
-                self.execCmd(cmd)
-
-                cmd = ""
-                charCounter = 0
-
-        if cmd:
-            self.execCmd(cmd)
-
-        commands = ( "cd %s" % tmpPath, "debug < %s" % randScr, "del /F /Q %s" % randScr )
-        complComm = " & ".join(command for command in commands)
-
-        self.execCmd(complComm, silent=True)
-
-        return chunkName
-
     def askCheckWrittenFile(self, wFile, dFile, fileType):
         message = "do you want confirmation that the file '%s' " % dFile
         message += "has been successfully written on the back-end DBMS "
@@ -238,7 +163,9 @@ class Filesystem:
         output = readInput(message, default="Y")
 
         if not output or output in ("y", "Y"):
-            self.__checkWrittenFile(wFile, dFile, fileType)
+            return self.__checkWrittenFile(wFile, dFile, fileType)
+
+        return True
 
     def unionReadFile(self, rFile):
         errMsg = "'unionReadFile' method must be defined "

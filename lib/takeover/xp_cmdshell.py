@@ -120,6 +120,35 @@ class xp_cmdshell:
 
         threadData.disableStdOut = popValue()
 
+    def xpCmdshellWriteFile(self, fileContent, tmpPath, randDestFile):
+        echoedLines = []
+        cmd = ""
+        charCounter = 0
+        maxLen = 512
+
+        if isinstance(fileContent, (set, list, tuple)):
+            lines = fileContent
+        else:
+            lines = fileContent.split("\n")
+
+        for line in lines:
+            echoedLine = "echo %s " % line
+            echoedLine += ">> \"%s\%s\"" % (tmpPath, randDestFile)
+            echoedLines.append(echoedLine)
+
+        for echoedLine in echoedLines:
+            cmd += "%s & " % echoedLine
+            charCounter += len(echoedLine)
+
+            if charCounter >= maxLen:
+                self.xpCmdshellExecCmd(cmd)
+
+                cmd = ""
+                charCounter = 0
+
+        if cmd:
+            self.xpCmdshellExecCmd(cmd)
+
     def xpCmdshellForgeCmd(self, cmd):
         self.__randStr = randomStr(lowercase=True)
         self.__cmd = unescaper.unescape("'%s'" % cmd)
