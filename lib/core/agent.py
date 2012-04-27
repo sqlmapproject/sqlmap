@@ -199,7 +199,7 @@ class Agent:
         if where == PAYLOAD.WHERE.REPLACE:
             pass
 
-        elif any([kb.injection.suffix, suffix]):
+        elif any([kb.injection.suffix, suffix]) and not (comment and not conf.suffix):
             expression += " %s" % (kb.injection.suffix or suffix)
 
         return re.sub(r"(?s);\W*;", ";", expression)
