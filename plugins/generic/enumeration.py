@@ -840,8 +840,8 @@ class Enumeration:
 
                 return kb.data.cachedTables
 
-            message = "do you want to use common table existence check? [Y/n/q]"
-            test = readInput(message, default="Y")
+            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            test = readInput(message, default="Y" if "Y" in message else "N")
 
             if test[0] in ("n", "N"):
                 return
@@ -1060,8 +1060,8 @@ class Enumeration:
 
                 return kb.data.cachedColumns
 
-            message = "do you want to use common columns existence check? [Y/n/q]"
-            test = readInput(message, default="Y")
+            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            test = readInput(message, default="Y" if "Y" in message else "N")
 
             if test[0] in ("n", "N"):
                 return
@@ -1979,8 +1979,8 @@ class Enumeration:
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common table existence check? [Y/n/q]"
-            test = readInput(message, default="Y")
+            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            test = readInput(message, default="Y" if "Y" in message else "N")
 
             if test[0] in ("n", "N"):
                 return
@@ -2130,8 +2130,8 @@ class Enumeration:
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common columns existence check? [Y/n/q]"
-            test = readInput(message, default="Y")
+            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            test = readInput(message, default="Y" if "Y" in message else "N")
 
             if test[0] in ("n", "N"):
                 return
