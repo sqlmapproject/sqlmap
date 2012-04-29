@@ -1113,7 +1113,7 @@ class Enumeration:
                     query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
-                                                      conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                                                      conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                     query += condQuery.replace("[DB]", conf.db)
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.inband.query % tbl
@@ -1182,9 +1182,9 @@ class Enumeration:
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl.upper())
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in DBMS.MSSQL:
+                elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.blind.count % (conf.db, conf.db, \
-                        unsafeSQLIdentificatorNaming(tbl))
+                        unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                     query += condQuery.replace("[DB]", conf.db)
 
                 elif Backend.isDbms(DBMS.FIREBIRD):
@@ -1221,9 +1221,9 @@ class Enumeration:
                         query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl.upper())
                         query += condQuery
                         field = None
-                    elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                    elif Backend.isDbms(DBMS.MSSQL):
                         query = rootQuery.blind.query % (conf.db, conf.db, conf.db, conf.db,
-                                                         conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                                                         conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                         query += condQuery.replace("[DB]", conf.db)
                         field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
@@ -1242,7 +1242,7 @@ class Enumeration:
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
                             elif Backend.isDbms(DBMS.MSSQL):
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
-                                                                conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                                                                conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                             elif Backend.isDbms(DBMS.FIREBIRD):
                                 query = rootQuery.blind.query2 % (tbl, column)
 
