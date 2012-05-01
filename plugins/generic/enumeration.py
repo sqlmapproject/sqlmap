@@ -1608,7 +1608,8 @@ class Enumeration:
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                        query = rootQuery.inband.query % (colString, conf.db, tbl, sorted(colList, key=len)[0])
+                        _ = sorted(sorted(colList, key=len), lambda x, y: -1 if x and "id" in x.lower() else 1 if y and "id" in y.lower() else 0)
+                        query = rootQuery.inband.query % (colString, conf.db, tbl, _[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 
