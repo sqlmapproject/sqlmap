@@ -358,7 +358,8 @@ class Dump:
         fields = len(tableValues) - 1
 
         columns = tableValues.keys()
-        columns.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+        _ = lambda x: x and "id" in x.lower()
+        columns = sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
 
         for column in columns:
             if column != "__infos__":
