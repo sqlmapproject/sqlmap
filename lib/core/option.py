@@ -721,18 +721,6 @@ def __setTechnique():
 
         conf.tech = _
 
-    if len(conf.tech) > 0:
-        # TODO: consider MySQL/PHP/ASP/web backdoor case where stacked
-        # queries is technically not necessary
-        if any(map(lambda x: conf.__getitem__(x), ['rFile', 'wFile', \
-           'osCmd', 'osShell', 'osPwn', 'osSmb', 'osBof', 'regRead', \
-           'regAdd', 'regDel'])) and PAYLOAD.TECHNIQUE.STACKED not in conf.tech:
-            errMsg = "value for --technique must include stacked queries "
-            errMsg += "technique (S) when you want to access the file "
-            errMsg += "system, takeover the operating system or access "
-            errMsg += "Windows registry hives"
-            raise sqlmapSyntaxException, errMsg
-
 def __setDBMS():
     """
     Force the back-end DBMS option.
