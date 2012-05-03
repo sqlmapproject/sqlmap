@@ -26,6 +26,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import parsePasswordHash
 from lib.core.common import parseSqliteTableSchema
 from lib.core.common import popValue
+from lib.core.common import prioritySortColumns
 from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -1608,9 +1609,7 @@ class Enumeration:
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                        _ = lambda x: x and "id" in x.lower()
-                        orderby = sorted(sorted(colList, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)[0]
-                        query = rootQuery.inband.query % (colString, conf.db, tbl, orderby)
+                        query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 

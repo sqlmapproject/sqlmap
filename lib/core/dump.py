@@ -19,6 +19,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
+from lib.core.common import prioritySortColumns
 from lib.core.common import restoreDumpMarkedChars
 from lib.core.common import safeCSValue
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -357,9 +358,7 @@ class Dump:
         field = 1
         fields = len(tableValues) - 1
 
-        columns = tableValues.keys()
-        _ = lambda x: x and "id" in x.lower()
-        columns = sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
+        columns = prioritySortColumns(tableValues.keys())
 
         for column in columns:
             if column != "__infos__":

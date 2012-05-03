@@ -3207,3 +3207,6 @@ def resetCookieJar(cookieJar):
             errMsg += "cookies file ('%s')" % msg
             raise sqlmapGenericException, errMsg
 
+def prioritySortColumns(columns):
+    _ = lambda x: x and "id" in x.lower()
+    return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
