@@ -366,7 +366,7 @@
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
         <current_db/>
-        <inference query="ASC(MID((%s),%d,1)) > %d"/>
+        <inference query="ASCW(MID((%s),%d,1)) > %d"/>
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->
