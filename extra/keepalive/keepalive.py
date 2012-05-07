@@ -203,6 +203,7 @@ class HTTPHandler(urllib2.HTTPHandler):
             resp.msg = r.reason
             return resp;
         else:
+            r.code = r.status
             return self.parent.error('http', req, r, r.status, r.reason, r.msg)
 
     def http_open(self, req):
