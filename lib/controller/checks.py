@@ -83,6 +83,7 @@ def checkSqlInjection(place, parameter, value):
             title = test.title
             stype = test.stype
             clause = test.clause
+            unionExtended = False
 
             if stype == PAYLOAD.TECHNIQUE.UNION:
                 configUnion(test.request.char)
@@ -114,11 +115,7 @@ def checkSqlInjection(place, parameter, value):
                     lower, upper = int(match.group(1)), int(match.group(2))
                     for _ in (lower, upper):
                         if _ > 1:
-                            infoMsg = "automatically extending ranges "
-                            infoMsg += "for further UNION query injection technique tests as "
-                            infoMsg += "there is at least one other injection technique found"
-                            singleTimeLogMessage(infoMsg)
-
+                            unionExtended = True
                             test.request.columns = re.sub(r"\b%d\b" % _, str(2 * _), test.request.columns)
                             title = re.sub(r"\b%d\b" % _, str(2 * _), title)
                             test.title = re.sub(r"\b%d\b" % _, str(2 * _), test.title)
@@ -436,6 +433,12 @@ def checkSqlInjection(place, parameter, value):
                                 warnMsg += "explicitly set it using the --dbms "
                                 warnMsg += "option"
                                 singleTimeWarnMessage(warnMsg)
+
+                            if unionExtended:
+                                infoMsg = "automatically extending ranges "
+                                infoMsg += "for UNION query injection technique tests as "
+                                infoMsg += "there is at least one other injection technique found"
+                                singleTimeLogMessage(infoMsg)
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
