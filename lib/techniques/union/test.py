@@ -263,7 +263,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
                     warnMsg += "usage of option '--union-char' "
                     warnMsg += "(e.g. --union-char=1) "
                 else:
-                    conf.uChar = str(randomInt(2))
+                    kb.uChar = str(randomInt(2))
                     validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
 
             if not conf.dbms:
