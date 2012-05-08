@@ -241,7 +241,6 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
     validPayload = None
     vector = None
-    query = agent.prefixQuery("UNION ALL SELECT %s" % kb.uChar)
 
     # In case that user explicitly stated number of columns affected
     if conf.uColsStop == conf.uColsStart:
@@ -250,15 +249,6 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if isNullValue(kb.uChar) else PAYLOAD.WHERE.NEGATIVE)
 
     if count:
-        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and query.endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
-            query = query[:-len(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()])]
-
-        if count:
-            query += ", %s" % kb.uChar
-
-        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE:
-            query += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
-
         validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
 
         if not all([validPayload, vector]) and not all([conf.uChar, conf.dbms]):
