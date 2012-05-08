@@ -40,7 +40,7 @@ def action():
         if htmlParsed:
             errMsg += ", but from the HTML error page it was "
             errMsg += "possible to determinate that the "
-            errMsg += "back-end DBMS is %s" % htmlParsed
+            errMsg += "back-end DBMS is '%s'" % htmlParsed
 
         if htmlParsed and htmlParsed.lower() in SUPPORTED_DBMS:
             errMsg += ". Do not specify the back-end DBMS manually, "

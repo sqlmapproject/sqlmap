@@ -91,4 +91,8 @@
         <error regexp="Ingres\W.*Driver"/>
     </dbms>
 
+    <!-- Frontbase -->
+    <dbms value="Frontbase">
+        <error regexp="Exception (condition )?\d+. Transaction rollback."/>
+    </dbms>
 </root>
