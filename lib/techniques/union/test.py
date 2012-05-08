@@ -256,8 +256,8 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
             warnMsg = "if UNION based SQL injection is not detected, "
             warnMsg += "please consider "
 
-            if not conf.uChar:
-                message = "injection not exploitable with NULL values. Do you want to try with a random integer value for '--union-char'? [Y/n] "
+            if not conf.uChar and count > 1:
+                message = "injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] "
                 test = readInput(message, default="Y")
                 if test[0] not in ("y", "Y"):
                     warnMsg += "usage of option '--union-char' "
