@@ -486,12 +486,12 @@ class Dump:
 
         if conf.replicate:
             rtable.endTransaction()
-            logger.info("Table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
+            logger.info("table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
 
         else:
             dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
-            logger.info("Table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
+            logger.info("table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         for column in dbColumnsDict.keys():

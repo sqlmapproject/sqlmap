@@ -23,7 +23,9 @@ except (ImportError, OSError):
 else:
     _multiprocessing = multiprocessing
 
+import os
 import re
+import tempfile
 import time
 
 from hashlib import md5
@@ -549,6 +551,7 @@ def dictionaryAttack(attack_dict):
     results = []
     resumes = []
     processException = False
+    user_hash = []
 
     for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
@@ -597,6 +600,7 @@ def dictionaryAttack(attack_dict):
                         resumed = hashDBRetrieve(hash_)
                         if not resumed:
                             attack_info.append(item)
+                            user_hash.append(item[0])
                         else:
                             infoMsg = "resuming password '%s' for hash '%s'" % (resumed, hash_)
                             if user and not user.startswith(DUMMY_USER_PREFIX):
@@ -816,6 +820,21 @@ def dictionaryAttack(attack_dict):
                 clearConsoleLine()
 
     results.extend(resumes)
+
+    fp = None
+    for user, hash_ in user_hash:
+        if not any(_[1] == hash_ for _ in results):
+            if fp is None:
+                handle, filename = tempfile.mkstemp(suffix=".txt")
+                os.close(handle)
+                fp = open(filename, "w+")
+                singleTimeLogMessage("writing uncracked hashes to '%s' for eventual further processing" % filename)
+            if user and not user.startswith(DUMMY_USER_PREFIX):
+                fp.write("%s:%s\n" % (user, hash_))
+            else:
+                fp.write("%s\n" % hash_)
+    if fp:
+        fp.close()
 
     if len(hash_regexes) == 0:
         warnMsg = "unknown hash format. "
