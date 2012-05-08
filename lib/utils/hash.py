@@ -828,7 +828,7 @@ def dictionaryAttack(attack_dict):
                 handle, filename = tempfile.mkstemp(suffix=".txt")
                 os.close(handle)
                 fp = open(filename, "w+")
-                singleTimeLogMessage("writing uncracked hashes to '%s' for eventual further processing" % filename)
+                singleTimeLogMessage("writing uncracked hashes to file '%s' for eventual further processing" % filename)
             if user and not user.startswith(DUMMY_USER_PREFIX):
                 fp.write("%s:%s\n" % (user, hash_))
             else:
