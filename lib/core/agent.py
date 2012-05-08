@@ -582,7 +582,12 @@ class Agent:
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]
 
-        inbandQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
+        limitOriginal = ""
+        if where == PAYLOAD.WHERE.ORIGINAL:
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, ):
+                limitOriginal = "%s " % (queries[Backend.getIdentifiedDbms()].limit.query % (1, 1))
+
+        inbandQuery = self.prefixQuery("%sUNION ALL SELECT " % limitOriginal, prefix=prefix)
 
         if limited:
             inbandQuery += ",".join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
