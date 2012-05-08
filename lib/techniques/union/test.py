@@ -19,6 +19,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
@@ -254,16 +255,26 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
         if not all([validPayload, vector]) and not all([conf.uChar, conf.dbms]):
             warnMsg = "if UNION based SQL injection is not detected, "
             warnMsg += "please consider "
+
             if not conf.uChar:
-                warnMsg += "usage of option '--union-char' "
-                warnMsg += "(e.g. --union-char=1) "
+                message = "injection not exploitable with NULL values. Do you want to try with a random integer value for '--union-char'? [Y/n] "
+                test = readInput(message, default="Y")
+                if test[0] not in ("y", "Y"):
+                    warnMsg += "usage of option '--union-char' "
+                    warnMsg += "(e.g. --union-char=1) "
+                else:
+                    conf.uChar = str(randomInt(2))
+                    validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
+
             if not conf.dbms:
                 if not conf.uChar:
                     warnMsg += "and/or try to force the "
                 else:
                     warnMsg += "forcing the "
                 warnMsg += "back-end DBMS (e.g. --dbms=mysql) "
-            singleTimeWarnMessage(warnMsg)
+
+            if not all([validPayload, vector]):
+                singleTimeWarnMessage(warnMsg)
 
     return validPayload, vector
 
