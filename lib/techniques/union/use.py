@@ -88,6 +88,8 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
             # Special case when DBMS is Microsoft SQL Server and error message is used as a result of inband injection
             if Backend.isDbms(DBMS.MSSQL) and wasLastRequestDBMSError():
                 retVal = htmlunescape(retVal).replace("<br>", "\n")
+
+            hashDBWrite("%s%s" % (conf.hexConvert, expression), retVal)
         else:
             trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
                     or extractRegexResult(trimcheck, removeReflectiveValues(listToStrValue(headers.headers \
@@ -97,8 +99,6 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
                 warnMsg = "possible server trimmed output detected (due to its length): "
                 warnMsg += trimmed
                 logger.warn(warnMsg)
-
-        hashDBWrite("%s%s" % (conf.hexConvert, expression), retVal)
 
     return retVal
 
