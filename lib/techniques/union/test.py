@@ -208,7 +208,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
             unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
 
-            if unionErrorCase:
+            if unionErrorCase and count > 1:
                 warnMsg = "combined UNION/error-based SQL injection case found on "
                 warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
                 warnMsg += "column with better characteristics"
@@ -273,7 +273,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
                     warnMsg += "forcing the "
                 warnMsg += "back-end DBMS (e.g. --dbms=mysql) "
 
-            if not all([validPayload, vector]):
+            if not all([validPayload, vector]) and not warnMsg.endswith("consider "):
                 singleTimeWarnMessage(warnMsg)
 
     return validPayload, vector

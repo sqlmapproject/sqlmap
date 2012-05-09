@@ -131,7 +131,7 @@ def __formatInjection(inj):
         title = sdata.title
         vector = sdata.vector
         if stype == PAYLOAD.TECHNIQUE.UNION:
-            count = re.sub(r"\(.+\)", "", sdata.payload).count(",") + 1
+            count = re.sub(r"(?i)(\(.+\))|(\blimit[^A-Za-z]+)", "", sdata.payload).count(',') + 1
             title = re.sub(r"\d+ to \d+", str(count), title)
             vector = agent.forgeInbandQuery("[QUERY]", vector[0], vector[1], vector[2], None, None, vector[5], vector[6])
             if count == 1:
