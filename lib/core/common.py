@@ -1178,27 +1178,27 @@ def getLimitRange(count, dump=False, plusOne=False):
 
     return retVal
 
-def parseUnionPage(output, unique=True):
+def parseUnionPage(page, unique=True):
     """
     Returns resulting items from inband query inside provided page content
     """
 
-    if output is None:
+    if page is None:
         return None
 
-    if output.startswith(kb.chars.start) and output.endswith(kb.chars.stop):
-        if len(output) > LARGE_OUTPUT_THRESHOLD:
+    if page.startswith(kb.chars.start) and page.endswith(kb.chars.stop):
+        if len(page) > LARGE_OUTPUT_THRESHOLD:
             warnMsg = "large output detected. This might take a while"
             logger.warn(warnMsg)
 
         data = BigArray()
         _ = []
 
-        regExpr = '%s(.*?)%s' % (kb.chars.start, kb.chars.stop)
-        output = re.finditer(regExpr, output, re.DOTALL | re.IGNORECASE)
+        for match in re.finditer("%s(.*?)%s" % (kb.chars.start, kb.chars.stop), page, re.DOTALL | re.IGNORECASE):
+            entry = match.group(1)
 
-        for entry in output:
-            entry = entry.group(1)
+            if kb.chars.start in entry:
+                entry = entry.split(kb.chars.start)[-1]
 
             if unique:
                 key = entry.lower()
@@ -1219,7 +1219,7 @@ def parseUnionPage(output, unique=True):
 
             data.append(entry[0] if len(entry) == 1 else entry)
     else:
-        data = output
+        data = page
 
     if len(data) == 1 and isinstance(data[0], basestring):
         data = data[0]
