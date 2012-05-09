@@ -337,11 +337,11 @@ def __goBooleanProxy(expression):
 
     output = hashDBRetrieve(expression)
 
-    if not output:
+    if output is None:
         output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare, raise404=False)
 
-    if output is not None:
-        hashDBWrite(expression, output)
+        if output is not None:
+            hashDBWrite(expression, output)
 
     return output
 
