@@ -263,7 +263,8 @@ def unionUse(expression, unpack=True, dump=False):
                     warnMsg = "the SQL query provided does not "
                     warnMsg += "return any output"
                     logger.warn(warnMsg)
-
+                else:
+                    value = []  # for empty tables
                 return value
 
             threadData = getCurrentThreadData()

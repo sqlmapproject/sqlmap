@@ -304,7 +304,8 @@ def errorUse(expression, expected=None, dump=False):
                     warnMsg = "the SQL query provided does not "
                     warnMsg += "return any output"
                     logger.warn(warnMsg)
-
+                else:
+                    outputs = []  # for empty tables
                 return outputs
 
             if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
