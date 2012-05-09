@@ -8,8 +8,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
-from lib.core.common import popValue
-from lib.core.common import pushValue
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.settings import MSSQL_ALIASES
@@ -50,7 +48,7 @@ def setHandler():
     management system.
     """
 
-    dbmses = (
+    items = (
                   ("MySQL", MYSQL_ALIASES, MySQLMap, MySQLConn),
                   ("Oracle", ORACLE_ALIASES, OracleMap, OracleConn),
                   ("PostgreSQL", PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
@@ -63,12 +61,12 @@ def setHandler():
                   ("IBM DB2", DB2_ALIASES, DB2Map, DB2Conn)
                 )
 
-    _ = max(_ if Backend.getIdentifiedDbms() in _[1] else None for _ in dbmses)
+    _ = max(_ if Backend.getIdentifiedDbms() in _[1] else None for _ in items)
     if _:
-        dbmses.remove(_)
-        dbmses.insert(0, _)
+        items.remove(_)
+        items.insert(0, _)
 
-    for name, aliases, Handler, Connector in dbmses:
+    for name, aliases, Handler, Connector in items:
         if conf.dbms and conf.dbms not in aliases:
             debugMsg = "skipping test for %s" % name
             logger.debug(debugMsg)
