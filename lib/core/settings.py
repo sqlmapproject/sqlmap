@@ -484,3 +484,6 @@ MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 
 # Mark used for trimming unnecessary content in large chunks
 LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
+
+# Generic SQL comment formation
+GENERIC_SQL_COMMENT = "-- "

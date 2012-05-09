@@ -27,6 +27,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import FROM_DUMMY_TABLE
+from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.unescaper import unescaper
 
@@ -187,6 +188,9 @@ class Agent:
             return self.payloadDirect(expression)
 
         expression = self.cleanupPayload(expression)
+
+        if Backend.getIdentifiedDbms() == DBMS.ACCESS and comment == GENERIC_SQL_COMMENT:
+            comment = "%00"
 
         if comment is not None:
             expression += comment
