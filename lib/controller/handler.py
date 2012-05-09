@@ -50,54 +50,40 @@ def setHandler():
     management system.
     """
 
-    count = 0
-    dbmsNames = ( "MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server", "SQLite", "Microsoft Access", "Firebird", "SAP MaxDB", "Sybase", "IBM DB2" )
-    dbmsObj = [
-                  ( MYSQL_ALIASES, MySQLMap, MySQLConn ),
-                  ( ORACLE_ALIASES, OracleMap, OracleConn ),
-                  ( PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn ),
-                  ( MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn ),
-                  ( SQLITE_ALIASES, SQLiteMap, SQLiteConn ),
-                  ( ACCESS_ALIASES, AccessMap, AccessConn ),
-                  ( FIREBIRD_ALIASES, FirebirdMap, FirebirdConn ),
-                  ( MAXDB_ALIASES, MaxDBMap, MaxDBConn ),
-                  ( SYBASE_ALIASES, SybaseMap, SybaseConn ),
-                  ( DB2_ALIASES, DB2Map, DB2Conn )
-                ]
+    dbmses = (
+                  ("MySQL", MYSQL_ALIASES, MySQLMap, MySQLConn),
+                  ("Oracle", ORACLE_ALIASES, OracleMap, OracleConn),
+                  ("PostgreSQL", PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
+                  ("Microsoft SQL Server", MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn),
+                  ("SQLite", SQLITE_ALIASES, SQLiteMap, SQLiteConn),
+                  ("Microsoft Access", ACCESS_ALIASES, AccessMap, AccessConn),
+                  ("Firebird", FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
+                  ("SAP MaxDB", MAXDB_ALIASES, MaxDBMap, MaxDBConn),
+                  ("Sybase", SYBASE_ALIASES, SybaseMap, SybaseConn),
+                  ("IBM DB2", DB2_ALIASES, DB2Map, DB2Conn)
+                )
 
-    if Backend.getIdentifiedDbms() is not None:
-        for i in xrange(len(dbmsObj)):
-            dbmsAliases, _, _ = dbmsObj[i]
+    _ = max(_ if Backend.getIdentifiedDbms() in _[1] else None for _ in dbmses)
+    if _:
+        dbmses.remove(_)
+        dbmses.insert(0, _)
 
-            if Backend.getIdentifiedDbms().lower() in dbmsAliases:
-                if i > 0:
-                    pushValue(dbmsObj[i])
-                    dbmsObj.remove(dbmsObj[i])
-                    dbmsObj.insert(0, popValue())
-
-                break
-
-    for dbmsAliases, dbmsMap, dbmsConn in dbmsObj:
-        if conf.dbms and conf.dbms not in dbmsAliases:
-            debugMsg = "skipping test for %s" % dbmsNames[count]
+    for name, aliases, Handler, Connector in dbmses:
+        if conf.dbms and conf.dbms not in aliases:
+            debugMsg = "skipping test for %s" % name
             logger.debug(debugMsg)
-
-            count += 1
-
             continue
 
-        handler = dbmsMap()
-        conf.dbmsConnector = dbmsConn()
+        handler = Handler()
+        conf.dbmsConnector = Connector()
 
         if conf.direct:
             logger.debug("forcing timeout to 10 seconds")
             conf.timeout = 10
-
             conf.dbmsConnector.connect()
 
         if handler.checkDbms():
             conf.dbmsHandler = handler
-
             break
         else:
             conf.dbmsConnector = None
