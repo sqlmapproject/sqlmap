@@ -59,7 +59,7 @@ class Agent:
         if conf.direct:
             return self.payloadDirect(newValue)
 
-        retValue = ""
+        retVal = ""
 
         if where is None and isTechniqueAvailable(kb.technique):
             where = kb.injection.data[kb.technique].where
@@ -115,16 +115,16 @@ class Agent:
             for child in iterator:
                 child.text = self.addPayloadDelimiters(newValue)
 
-            retValue = ET.tostring(root)
+            retVal = ET.tostring(root)
         elif place in (PLACE.URI, PLACE.CUSTOM_POST):
-            retValue = paramString.replace("%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue))
+            retVal = paramString.replace("%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue))
         elif place in (PLACE.UA, PLACE.REFERER, PLACE.HOST):
-            retValue = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
+            retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
-            retValue = paramString.replace("%s=%s" % (parameter, origValue),
+            retVal = paramString.replace("%s=%s" % (parameter, origValue),
                                            "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
 
-        return retValue
+        return retVal
 
     def fullPayload(self, query):
         if conf.direct:
@@ -792,48 +792,29 @@ class Agent:
         """
         Adds payload delimiters around the input string
         """
-        retVal = inpStr
 
-        if inpStr:
-            retVal = "%s%s%s" % (PAYLOAD_DELIMITER, inpStr, PAYLOAD_DELIMITER)
-
-        return retVal
+        return "%s%s%s" % (PAYLOAD_DELIMITER, inpStr, PAYLOAD_DELIMITER) if inpStr else inpStr
 
     def removePayloadDelimiters(self, inpStr):
         """
         Removes payload delimiters from inside the input string
         """
-        retVal = inpStr
 
-        if inpStr:
-            retVal = retVal.replace(PAYLOAD_DELIMITER, '')
-
-        return retVal
+        return inpStr.replace(PAYLOAD_DELIMITER, '') if inpStr else inpStr
 
     def extractPayload(self, inpStr):
         """
         Extracts payload from inside of the input string
         """
-        retVal = None
 
-        if inpStr:
-            match = re.search("%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr, re.S)
-
-            if match:
-                retVal = match.group("result")
-
-        return retVal
+        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr)
 
     def replacePayload(self, inpStr, payload):
         """
         Replaces payload inside the input string with a given payload
         """
-        retVal = inpStr
 
-        if inpStr:
-            retVal = re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), "%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr)
-
-        return retVal
+        return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), "%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr) if inpStr else inpStr
 
 # SQL agent
 agent = Agent()
