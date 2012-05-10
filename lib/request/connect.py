@@ -553,26 +553,26 @@ class Connect:
 
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
 
-        if place == PLACE.COOKIE and conf.cookieUrlencode:
-            value = agent.removePayloadDelimiters(value)
-            value = urlEncodeCookieValues(value)
-
-        elif place:
             if place in (PLACE.GET, PLACE.POST, PLACE.URI, PLACE.CUSTOM_POST):
                 # payloads in GET and/or POST need to be urlencoded
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
                 if place != PLACE.URI or (value and payload and '?' in value and value.find('?') < value.find(payload)):
-                    payload = urlencode(payload, "%", False, True)
+                    payload = urlencode(payload, '%', False, True)
                     value = agent.replacePayload(value, payload)
+
             elif place == PLACE.SOAP:
                 # payloads in SOAP should have chars > and < replaced
                 # with their HTML encoded counterparts
-                payload = payload.replace('>', '&gt;').replace('<', '&lt;')
+                payload = payload.replace('>', "&gt;").replace('<', "&lt;")
                 value = agent.replacePayload(value, payload)
 
+        if place:
             value = agent.removePayloadDelimiters(value)
+
+            if place == PLACE.COOKIE and conf.cookieUrlencode:
+                value = urlEncodeCookieValues(value)
 
         if conf.checkPayload:
             checkPayload(value)
