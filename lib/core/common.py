@@ -2367,7 +2367,7 @@ def setOptimize():
     #conf.predictOutput = True
     conf.keepAlive = True
     conf.threads = 3 if conf.threads < 3 else conf.threads
-    conf.nullConnection = not any([conf.data, conf.textOnly, conf.titles, conf.string, conf.regexp])
+    conf.nullConnection = not any([conf.data, conf.textOnly, conf.titles, conf.string, conf.regexp, conf.tor])
 
     if not conf.nullConnection:
         debugMsg = "turning off --null-connection switch used indirectly by switch -o"
