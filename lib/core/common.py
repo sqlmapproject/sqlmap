@@ -101,6 +101,7 @@ from lib.core.settings import SITE
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import PRINTABLE_CHAR_REGEX
 from lib.core.settings import DUMP_DEL_MARKER
@@ -3193,7 +3194,10 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
     """
 
     _ = "%s%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key, HASHDB_MILESTONE_VALUE)
-    return conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
+    _ = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
+    if not kb.inferenceMode and _ and PARTIAL_VALUE_MARKER in _:
+        _ = None
+    return _
 
 def resetCookieJar(cookieJar):
     if not conf.loC:
