@@ -1779,9 +1779,11 @@ def __setTorHttpProxySettings():
         raise sqlmapConnectionException, errMsg
 
     if not conf.checkTor:
-        warnMsg = "please use regularly switch '--check-tor' for your own security when using "
-        warnMsg += "default HTTP proxy settings (option '--tor-type') for accessing Tor anonymizing "
-        warnMsg += "network because of known issues with default settings of various 'bundles' (e.g. Vidalia/Polipo)"
+        warnMsg = "please use regularly switch '--check-tor' "
+        warnMsg += "at your own convenience when using "
+        warnMsg += "default HTTP proxy type (option '--tor-type') "
+        warnMsg += "for accessing Tor anonymizing network because of "
+        warnMsg += "known issues with default settings of various 'bundles'"
         logger.warn(warnMsg)
 
 def __setTorSocksProxySettings():
