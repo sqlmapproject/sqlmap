@@ -77,7 +77,7 @@ def urldecode(value, encoding=None):
             result = urllib.unquote_plus(value)
 
     if isinstance(result, str):
-        result = unicode(result, encoding or UNICODE_ENCODING, errors="replace")
+        result = unicode(result, encoding or UNICODE_ENCODING, "replace")
 
     return result
 

@@ -1886,7 +1886,10 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
         if isinstance(value, unicode):
             return value
         elif isinstance(value, basestring):
-            return unicode(value, encoding or UNICODE_ENCODING, errors="replace")
+            try:
+                return unicode(value, encoding or kb.pageEncoding)
+            except:
+                return unicode(value, UNICODE_ENCODING, "replace")
         else:
             return unicode(value)  # encoding ignored for non-basestring instances
     else:
@@ -2511,7 +2514,7 @@ def openFile(filename, mode='r'):
     """
 
     try:
-        return codecs.open(filename, mode, UNICODE_ENCODING, errors="replace")
+        return codecs.open(filename, mode, UNICODE_ENCODING, "replace")
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
         errMsg += "Please check %s permissions on a file " % ("write" if \

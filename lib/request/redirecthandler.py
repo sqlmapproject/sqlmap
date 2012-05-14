@@ -78,7 +78,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         redurl = self._get_header_redirect(headers)
 
         if not urlparse.urlsplit(redurl).netloc:
-            redurl = urlparse.urljoin(conf.url, redurl)
+            redurl = urlparse.urljoin(req.get_full_url(), redurl)
 
         self._infinite_loop_check(req)
         self._ask_redirect_choice(code, redurl)
