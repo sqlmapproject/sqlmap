@@ -2681,6 +2681,11 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     warnMsg = "reflective value(s) found and filtering out"
                     singleTimeWarnMessage(warnMsg)
 
+                if re.search(r"FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal, re.I):
+                    warnMsg = "frames detected containing attacked parameter values. Please be sure to "
+                    warnMsg += "test those separately in case that attack on this page fails"
+                    singleTimeWarnMessage(warnMsg)
+
             elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
                 kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
                 if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
