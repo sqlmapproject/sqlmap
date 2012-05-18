@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import isNumPosStrValue
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
