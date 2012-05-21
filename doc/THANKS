@@ -325,6 +325,8 @@ David McNab <david@conscious.co.nz>
 
 Spencer J. McIntyre <smcintyre@securestate.com>
     for reporting a minor bug
+    for contributing a patch for OS fingerprinting on DB2
+    for contributing a patch with LIKE wildcard payload boundaries
 
 Brad Merrell <bradmer12@gmail.com>
     for reporting a minor bug
