@@ -446,6 +446,42 @@ Formats:
         <prefix>"</prefix>
         <suffix>AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%')</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%'))</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%')))</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%'</prefix>
+        <suffix></suffix>
+    </boundary>
     <!-- End of WHERE/HAVING clause boundaries -->
 
 
@@ -456,7 +492,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>') WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- AND ('[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix>-- </suffix>
     </boundary>
 
     <boundary>
@@ -465,7 +501,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>") WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- AND ("[RANDSTR]"="[RANDSTR]</suffix>
+        <suffix>-- </suffix>
     </boundary>
 
     <boundary>
@@ -474,7 +510,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>) WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- AND ([RANDNUM1]=[RANDNUM1]</suffix>
+        <suffix>-- </suffix>
     </boundary>
 
     <boundary>
@@ -483,7 +519,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- AND '[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix>-- </suffix>
     </boundary>
 
     <boundary>
@@ -492,7 +528,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>" WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- AND "[RANDSTR]"="[RANDSTR]</suffix>
+        <suffix>-- </suffix>
     </boundary>
 
     <boundary>
@@ -501,7 +537,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix> WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- AND [RANDNUM1]=[RANDNUM1]</suffix>
+        <suffix>-- </suffix>
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
