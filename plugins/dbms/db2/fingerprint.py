@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import DB2_ALIASES
 from lib.request import inject
@@ -110,3 +111,61 @@ class Fingerprint(GenericFingerprint):
             logger.warn(warnMsg)
 
             return False
+
+    def checkDbmsOs(self, detailed=False):
+        if Backend.getOs():
+            return
+
+        infoMsg = "fingerprinting the back-end DBMS operating system "
+        infoMsg += "version and service pack"
+        logger.info(infoMsg)
+
+        query = "(SELECT LENGTH(OS_NAME) FROM SYSIBMADM.ENV_SYS_INFO WHERE OS_NAME LIKE '%WIN%')>0"
+        result = inject.checkBooleanExpression(query)
+
+        if not result:
+            Backend.setOs(OS.LINUX)
+        else:
+            Backend.setOs(OS.WINDOWS)
+
+        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+
+        if result:
+            versions = { "2003": ("5.2", (2, 1)),
+                "2008": ("7.0", (1,)),
+                "2000": ("5.0", (4, 3, 2, 1)),
+                "7": ("6.1", (1, 0)),
+                "XP": ("5.1", (2, 1)),
+                "NT": ("4.0", (6, 5, 4, 3, 2, 1)) }
+
+            # Get back-end DBMS underlying operating system version
+            for version, data in versions.items():
+                query = "(SELECT LENGTH(OS_VERSION) FROM SYSIBMADM.ENV_SYS_INFO WHERE OS_VERSION = '%s')>0" % data[0]
+                result = inject.checkBooleanExpression(query)
+
+                if result:
+                    Backend.setOsVersion(version)
+                    infoMsg += " %s" % Backend.getOsVersion()
+                    break
+
+            if not Backend.getOsVersion():
+                return
+
+            # Get back-end DBMS underlying operating system service pack
+            for sp in versions[Backend.getOsVersion()][1]:
+                query = "(SELECT LENGTH(OS_RELEASE) FROM SYSIBMADM.ENV_SYS_INFO WHERE OS_RELEASE LIKE '%Service Pack " + str(sp) + "%')>0"
+                result = inject.checkBooleanExpression(query)
+
+                if result:
+                    Backend.setOsServicePack(sp)
+                    break
+
+            if not Backend.getOsServicePack():
+                Backend.setOsServicePack(0)
+                debugMsg = "assuming the operating system has no service pack"
+                logger.debug(debugMsg)
+
+            if Backend.getOsVersion():
+                infoMsg += " Service Pack %d" % Backend.getOsServicePack()
+
+            logger.info(infoMsg)
