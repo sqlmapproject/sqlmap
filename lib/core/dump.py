@@ -526,11 +526,11 @@ class Dump:
     def query(self, query, queryRes):
         self.string(query, queryRes)
 
-    def rFile(self,filePath,fileData):
-        self.string("%s file saved to" % filePath,fileData,sort=False)
+    def rFile(self, filePath, fileData):
+        self.string("%s file saved to" % filePath, fileData, sort=False)
 
-    def registerValue(self,registerData):
-        self.string("Registry key value data", registerData,sort=False)
+    def registerValue(self, registerData):
+        self.string("Registry key value data", registerData, sort=False)
 
 # object to manage how to print the retrieved queries output to
 # standard output and sessions file
