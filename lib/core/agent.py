@@ -212,19 +212,18 @@ class Agent:
         if payload is None:
             return
 
-        randInt = randomInt()
-        randInt1 = randomInt()
-        randInt2 = randomInt()
-        randStr = randomStr()
-        randStr1 = randomStr()
-
         _ = (
-                ("[RANDNUM]", str(randInt)), ("[RANDNUM1]", str(randInt1)), ("[RANDNUM2]", str(randInt2)), ("[RANDSTR]", randStr),\
-                ("[RANDSTR1]", randStr1), ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
+                ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
                 ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
                 ("[HASH_REPLACE]", kb.chars.hash_)
             )
         payload = reduce(lambda x, y: x.replace(y[0], y[1]), _, payload)
+
+        for _ in set(re.findall(r"\[RANDNUM(?:\d+)?\]", payload, re.I)):
+            payload = payload.replace(_, str(randomInt()))
+
+        for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
+            payload = payload.replace(_, randomStr())
 
         if origValue is not None:
             payload = payload.replace("[ORIGVALUE]", origValue)
@@ -249,12 +248,15 @@ class Agent:
 
         return payload
 
-    def adjustSleepTime(self, payload):
+    def adjustLateValues(self, payload):
         """
-        Returns payload with a replaced tag for SLEEPTIME
+        Returns payload with a replaced late tags (e.g. SLEEPTIME)
         """
 
-        return payload.replace("[SLEEPTIME]", str(conf.timeSec)) if payload else payload
+        if payload:
+            payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+
+        return payload
 
     def getComment(self, request):
         """

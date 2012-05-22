@@ -138,7 +138,7 @@ def __formatInjection(inj):
                 title = title.replace("columns", "column")
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
-        data += "    Payload: %s\n" % (sdata.payload if stype not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) else sdata.payload.replace("[SLEEPTIME]", str(conf.timeSec)))
+        data += "    Payload: %s\n" % agent.adjustLateValues(sdata.payload)
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data

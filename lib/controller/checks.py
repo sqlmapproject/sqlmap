@@ -488,9 +488,6 @@ def checkSqlInjection(place, parameter, value):
                         if vector is None and "vector" in test and test.vector is not None:
                             vector = "%s%s" % (test.vector, comment or "")
 
-                        if method == PAYLOAD.METHOD.TIME:
-                            reqPayload = reqPayload.replace(test.request.payload.replace("[SLEEPTIME]", str(conf.timeSec)), test.request.payload)
-
                         injection.data[stype] = AttribDict()
                         injection.data[stype].title = title
                         injection.data[stype].payload = agent.removePayloadDelimiters(reqPayload)
