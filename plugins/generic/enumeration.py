@@ -852,7 +852,7 @@ class Enumeration:
                 return tableExists(paths.COMMON_TABLES)
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
+        infoMsg += "%s: '%s'" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
@@ -1781,7 +1781,7 @@ class Enumeration:
             errMsg += "back-end DBMS is MySQL < 5.0"
             raise sqlmapUnsupportedFeatureException, errMsg
 
-        infoMsg = "sqlmap will dump entries of all databases' tables now"
+        infoMsg = "sqlmap will dump entries of all tables from all databases now"
         logger.info(infoMsg)
 
         conf.tbl = None
@@ -1791,7 +1791,7 @@ class Enumeration:
 
         if kb.data.cachedTables:
             if isinstance(kb.data.cachedTables, list):
-                kb.data.cachedTables = {None : kb.data.cachedTables}
+                kb.data.cachedTables = { None: kb.data.cachedTables }
 
             for db, tables in kb.data.cachedTables.items():
                 conf.db = db

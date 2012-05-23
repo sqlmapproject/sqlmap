@@ -48,7 +48,7 @@ def setHandler():
     management system.
     """
 
-    items = (
+    items = [
                   ("MySQL", MYSQL_ALIASES, MySQLMap, MySQLConn),
                   ("Oracle", ORACLE_ALIASES, OracleMap, OracleConn),
                   ("PostgreSQL", PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
@@ -59,9 +59,9 @@ def setHandler():
                   ("SAP MaxDB", MAXDB_ALIASES, MaxDBMap, MaxDBConn),
                   ("Sybase", SYBASE_ALIASES, SybaseMap, SybaseConn),
                   ("IBM DB2", DB2_ALIASES, DB2Map, DB2Conn)
-                )
+            ]
 
-    _ = max(_ if Backend.getIdentifiedDbms() in _[1] else None for _ in items)
+    _ = max(_ if (Backend.getIdentifiedDbms() or "").lower() in _[1] else None for _ in items)
     if _:
         items.remove(_)
         items.insert(0, _)
