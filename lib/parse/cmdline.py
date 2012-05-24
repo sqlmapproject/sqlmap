@@ -149,6 +149,10 @@ def cmdLineParser():
         request.add_option("--safe-freq", dest="saFreq", type="int",
                            help="Test requests between two visits to a given safe url")
 
+        request.add_option("--skip-urlencode", dest="skipUrlEncode",
+                           action="store_true",
+                           help="Skip URL encoding of POST data")
+
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 

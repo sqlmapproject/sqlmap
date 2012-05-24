@@ -48,6 +48,7 @@ optDict = {
                                "scope":             "string",
                                "safUrl":            "string",
                                "saFreq":            "integer",
+                               "skipUrlEncode":     "boolean",
                                "evalCode":          "string"
                              },
 
