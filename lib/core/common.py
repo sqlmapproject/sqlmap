@@ -3056,7 +3056,9 @@ def getHostHeader(url):
 
     retVal = urlparse.urlparse(url).netloc
 
-    if any(retVal.endswith(':%d' % _) for _ in [80, 443]):
+    if re.search("http(s)?://\[.+\]", url, re.I):
+        retVal = extractRegexResult("http(s)?://\[(?P<result>.+)\]", url)
+    elif any(retVal.endswith(':%d' % _) for _ in [80, 443]):
         retVal = retVal.split(':')[0]
 
     return retVal
