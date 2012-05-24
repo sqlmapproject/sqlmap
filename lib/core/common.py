@@ -1067,6 +1067,11 @@ def parseTargetUrl():
     if not conf.url:
         return
 
+    if re.search("\[.+\]", conf.url) and not socket.has_ipv6:
+        errMsg = "IPv6 addressing is not supported "
+        errMsg += "on this platform"
+        raise sqlmapGenericException, errMsg
+
     if not re.search("^http[s]*://", conf.url):
         if ":443/" in conf.url:
             conf.url = "https://" + conf.url
@@ -1077,7 +1082,7 @@ def parseTargetUrl():
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     __urlSplit = urlparse.urlsplit(conf.url)
-    __hostnamePort = __urlSplit[1].split(":")
+    __hostnamePort = __urlSplit[1].split(":") if not re.search("\[.+\]", __urlSplit[1]) else filter(None, (re.search("\[.+\]", __urlSplit[1]).group(0), re.search("\](:(?P<port>\d+))?", __urlSplit[1]).group("port")))
 
     conf.scheme = __urlSplit[0].strip() if not conf.forceSSL else "https"
     conf.path = __urlSplit[2].strip()
