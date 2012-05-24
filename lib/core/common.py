@@ -2564,7 +2564,7 @@ def maskSensitiveData(msg):
     retVal = msg
 
     for item in filter(None, map(lambda x: conf.get(x), ("hostname", "googleDork", "aCred", "pCred", "tbl", "db", "col", "user", "cookie", "proxy"))):
-        regex = SENSITIVE_DATA_REGEX % item
+        regex = SENSITIVE_DATA_REGEX % re.sub("(\W)", r"\\\1", item)
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
             retVal = retVal.replace(value, '*' * len(value))
