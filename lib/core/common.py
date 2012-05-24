@@ -1086,7 +1086,7 @@ def parseTargetUrl():
 
     conf.scheme = __urlSplit[0].strip().lower() if not conf.forceSSL else "https"
     conf.path = __urlSplit[2].strip()
-    conf.hostname = __hostnamePort[0].strip()
+    conf.hostname = __hostnamePort[0].strip().strip("[]")
 
     try:
         _ = conf.hostname.encode("idna")
@@ -1111,7 +1111,7 @@ def parseTargetUrl():
     if __urlSplit[3]:
         conf.parameters[PLACE.GET] = urldecode(__urlSplit[3]) if __urlSplit[3] and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in __urlSplit[3] else __urlSplit[3]
 
-    conf.url = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, conf.path)
+    conf.url = "%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if __hostnamePort[0].strip("[]") != __hostnamePort[0] else conf.hostname, conf.port, conf.path)
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
     if not conf.referer and intersect(REFERER_ALIASES, conf.testParameter, True):
