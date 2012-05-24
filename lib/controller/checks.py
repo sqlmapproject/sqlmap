@@ -981,6 +981,14 @@ def checkNullConnection():
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
+    if conf.ipv6:
+        warnMsg = "always check connection to a provided "
+        warnMsg += "IPv6 address with a tool like ping6 "
+        warnMsg += "(e.g. 'ping6 fe80::20c:29ff:fea8:6bf1%vmnet8') "
+        warnMsg += "prior to running sqlmap to avoid "
+        warnMsg += "any addressing issues"
+        singleTimeWarnMessage(warnMsg)
+
     if not any([conf.proxy, conf.tor]):
         try:
             socket.getaddrinfo(conf.hostname, None)
@@ -993,12 +1001,6 @@ def checkConnection(suppressOutput=False):
         logger.info(infoMsg)
 
     try:
-        if conf.ipv6:
-            warnMsg = "always check connection to provided "
-            warnMsg += "IPv6 address with a tool like ping6 "
-            warnMsg += "(e.g. 'ping6 fe80::20c:29ff:fea8:6bf1%vmnet8')"
-            singleTimeWarnMessage(warnMsg)
-
         page, _ = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
 
