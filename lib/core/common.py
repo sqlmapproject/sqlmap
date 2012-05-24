@@ -1072,7 +1072,7 @@ def parseTargetUrl():
         errMsg += "on this platform"
         raise sqlmapGenericException, errMsg
 
-    if not re.search("^http[s]*://", conf.url):
+    if not re.search("^http[s]*://", conf.url, re.I):
         if ":443/" in conf.url:
             conf.url = "https://" + conf.url
         else:
@@ -1084,7 +1084,7 @@ def parseTargetUrl():
     __urlSplit = urlparse.urlsplit(conf.url)
     __hostnamePort = __urlSplit[1].split(":") if not re.search("\[.+\]", __urlSplit[1]) else filter(None, (re.search("\[.+\]", __urlSplit[1]).group(0), re.search("\](:(?P<port>\d+))?", __urlSplit[1]).group("port")))
 
-    conf.scheme = __urlSplit[0].strip() if not conf.forceSSL else "https"
+    conf.scheme = __urlSplit[0].strip().lower() if not conf.forceSSL else "https"
     conf.path = __urlSplit[2].strip()
     conf.hostname = __hostnamePort[0].strip()
 
