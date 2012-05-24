@@ -1388,6 +1388,7 @@ def __setConfAttributes():
     conf.hashDBFile = None
     conf.httpHeaders = []
     conf.hostname = None
+    conf.ipv6 = False
     conf.multipleTargets = False
     conf.outputPath = None
     conf.paramDict = {}
