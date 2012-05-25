@@ -539,20 +539,21 @@ def paramToDict(place, parameters=None):
 
                 if condition:
                     testableParameters[parameter] = "=".join(elem[1:])
-                    if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
-                      or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
-                        warnMsg = "it appears that you have provided tainted parameter values "
-                        warnMsg += "('%s') with most probably leftover " % element
-                        warnMsg += "chars from manual sql injection "
-                        warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
-                        warnMsg += "Please, always use only valid parameter values "
-                        warnMsg += "so sqlmap could be able to properly run "
-                        logger.warn(warnMsg)
+                    if not conf.multipleTargets:
+                        if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
+                          or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
+                            warnMsg = "it appears that you have provided tainted parameter values "
+                            warnMsg += "('%s') with most probably leftover " % element
+                            warnMsg += "chars from manual sql injection "
+                            warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
+                            warnMsg += "Please, always use only valid parameter values "
+                            warnMsg += "so sqlmap could be able to properly run "
+                            logger.warn(warnMsg)
 
-                        message = "Are you sure you want to continue? [y/N] "
-                        test = readInput(message, default="N")
-                        if test[0] not in ("y", "Y"):
-                            raise sqlmapSilentQuitException
+                            message = "Are you sure you want to continue? [y/N] "
+                            test = readInput(message, default="N")
+                            if test[0] not in ("y", "Y"):
+                                raise sqlmapSilentQuitException
 
     else:
         root = ET.XML(parameters)
