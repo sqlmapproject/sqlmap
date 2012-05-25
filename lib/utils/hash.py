@@ -326,13 +326,13 @@ def attackDumpedTable():
         logger.info(infoMsg)
 
         found = False
-        colUser = ''
-        colPasswords = set()
+        col_user = ''
+        col_passwords = set()
         attack_dict = {}
 
         for column in columns:
             if column and column.lower() in COMMON_USER_COLUMNS:
-                colUser = column
+                col_user = column
                 break
 
         for i in xrange(count):
@@ -340,7 +340,7 @@ def attackDumpedTable():
                 break
 
             for column in columns:
-                if column == colUser or column == '__infos__':
+                if column == col_user or column == '__infos__':
                     continue
 
                 if len(table[column]['values']) <= i:
@@ -351,19 +351,19 @@ def attackDumpedTable():
                 if hashRecognition(value):
                     found = True
 
-                    if colUser and i < len(table[colUser]['values']):
-                        if table[colUser]['values'][i] not in attack_dict:
-                            attack_dict[table[colUser]['values'][i]] = []
+                    if col_user and i < len(table[col_user]['values']):
+                        if table[col_user]['values'][i] not in attack_dict:
+                            attack_dict[table[col_user]['values'][i]] = []
 
-                        attack_dict[table[colUser]['values'][i]].append(value)
+                        attack_dict[table[col_user]['values'][i]].append(value)
                     else:
                         attack_dict['%s%d' % (DUMMY_USER_PREFIX, i)] = [value]
 
-                    colPasswords.add(column)
+                    col_passwords.add(column)
 
         if attack_dict:
-            message = "recognized possible password hashes in column%s " % ("s" if len(colPasswords) > 1 else "")
-            message += "'%s'. Do you want to " % ", ".join(col for col in colPasswords)
+            message = "recognized possible password hashes in column%s " % ("s" if len(col_passwords) > 1 else "")
+            message += "'%s'. Do you want to " % ", ".join(col for col in col_passwords)
             message += "crack them via a dictionary-based attack? [Y/n/q]"
             test = readInput(message, default="Y")
 
@@ -384,7 +384,7 @@ def attackDumpedTable():
 
             for i in xrange(count):
                 for column in columns:
-                    if not (column == colUser or column == '__infos__' or len(table[column]['values']) <= i):
+                    if not (column == col_user or column == '__infos__' or len(table[column]['values']) <= i):
                         value = table[column]['values'][i]
 
                         if value and value.lower() in lut:
