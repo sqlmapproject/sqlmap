@@ -304,7 +304,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     if timeBasedCompare:
                                         kb.timeValidCharsRun += 1
                                         if not kb.adjustTimeDelay and kb.timeValidCharsRun > VALID_TIME_CHARS_RUN_THRESHOLD:
-                                            dbgMsg = "turning on time auto-adjustment mechanism"
+                                            dbgMsg = "turning back on time auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = True
                                     
