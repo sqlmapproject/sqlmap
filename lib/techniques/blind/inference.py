@@ -43,6 +43,7 @@ from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
 from lib.core.settings import PARTIAL_VALUE_MARKER
+from lib.core.settings import VALID_TIME_CHARS_RUN_THRESHOLD
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
@@ -282,13 +283,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
+                                        kb.timeValidCharsRun = 0
                                         conf.timeSec += 1
 
                                         warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
                                         logger.warn(warnMsg)
 
                                         if kb.adjustTimeDelay:
-                                            dbgMsg = "turning off auto-adjustment mechanism"
+                                            dbgMsg = "turning off time auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = False
 
@@ -299,6 +301,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         conf.timeSec = kb.originalTimeDelay
                                         return decodeIntToUnicode(retVal)
                                 else:
+                                    if timeBasedCompare:
+                                        kb.timeValidCharsRun += 1
+                                        if not kb.adjustTimeDelay and kb.timeValidCharsRun > VALID_TIME_CHARS_RUN_THRESHOLD:
+                                            dbgMsg = "turning on time auto-adjustment mechanism"
+                                            logger.debug(dbgMsg)
+                                            kb.adjustTimeDelay = True
+                                    
                                     return decodeIntToUnicode(retVal)
                             else:
                                 return None
