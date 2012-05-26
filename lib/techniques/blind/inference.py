@@ -279,11 +279,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     if not kb.originalTimeDelay:
                                         kb.originalTimeDelay = conf.timeSec
 
+                                    kb.timeValidCharsRun = 0
                                     if (conf.timeSec - kb.originalTimeDelay) < MAX_TIME_REVALIDATION_STEPS:
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
-                                        kb.timeValidCharsRun = 0
                                         conf.timeSec += 1
 
                                         warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
