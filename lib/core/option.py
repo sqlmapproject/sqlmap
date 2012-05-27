@@ -1730,8 +1730,13 @@ def __setDNSServer():
     isAdmin = runningAsAdmin()
 
     if isAdmin:
-        conf.dnsServer = DNSServer()
-        conf.dnsServer.run()
+        try:
+            conf.dnsServer = DNSServer()
+            conf.dnsServer.run()
+        except socket.error, msg:
+            errMsg = "there was an error while setting up "
+            errMsg += "DNS server instance ('%s')" % msg
+            raise sqlmapGenericException, errMsg
     else:
         errMsg = "you need to run sqlmap as an administrator "
         errMsg += "if you want to perform a DNS data exfiltration attack "
