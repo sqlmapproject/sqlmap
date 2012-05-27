@@ -46,11 +46,15 @@ class DNSQuery:
         retVal = ""
 
         if self._query:
-            retVal += self._raw[:2] + "\x81\x80"
+            retVal += self._raw[:2]                                             # Transaction ID
+            retVal += "\x84\x00"                                                # Flags (Standard query response, No error)
             retVal += self._raw[4:6] + self._raw[4:6] + "\x00\x00\x00\x00"      # Questions and Answers Counts
-            retVal += self._raw[12:]                                            # Original Domain Name Question
+            retVal += self._raw[12:(12 + self._raw[12:].find("\x00") + 5)]      # Original Domain Name Query
             retVal += "\xc0\x0c"                                                # Pointer to domain name
-            retVal += "\x00\x01\x00\x01\x00\x00\x00\x3c\x00\x04"                # Response type, ttl and resource data length -> 4 bytes
+            retVal += "\x00\x01"                                                # Type A
+            retVal += "\x00\x01"                                                # Class IN
+            retVal += "\x00\x00\x01\x2c"                                        # TTL
+            retVal += "\x00\x04"                                                # Data length
             retVal += "".join(chr(int(_)) for _ in resolution.split('.'))       # 4 bytes of IP
 
         return retVal
