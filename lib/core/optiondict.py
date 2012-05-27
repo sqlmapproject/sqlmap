@@ -86,7 +86,8 @@ optDict = {
                                "tech":              "string",
                                "timeSec":           "integer",
                                "uCols":             "string",
-                               "uChar":             "string"
+                               "uChar":             "string",
+                               "dnsDomain":         "string"
                              },
 
             "Fingerprint":   {
