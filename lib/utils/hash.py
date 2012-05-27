@@ -830,9 +830,9 @@ def dictionaryAttack(attack_dict):
                 fp = open(filename, "w+")
                 singleTimeLogMessage("writing uncracked hashes to file '%s' for eventual further processing" % filename)
             if user and not user.startswith(DUMMY_USER_PREFIX):
-                fp.write("%s:%s\n" % (user, hash_))
+                fp.write("%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING)))
             else:
-                fp.write("%s\n" % hash_)
+                fp.write("%s\n" % hash_.encode(UNICODE_ENCODING))
     if fp:
         fp.close()
 
