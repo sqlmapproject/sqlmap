@@ -562,7 +562,7 @@ class Connect:
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
                 if place != PLACE.URI or (value and payload and '?' in value and value.find('?') < value.find(payload)):
-                    payload = urlencode(payload, '%', False, True) if not place == PLACE.POST and conf.skipUrlEncode else payload
+                    payload = urlencode(payload, '%', False, True) if not place in (PLACE.POST, PLACE.CUSTOM_POST) and conf.skipUrlEncode else payload
                     value = agent.replacePayload(value, payload)
 
             elif place == PLACE.SOAP:
@@ -656,7 +656,7 @@ class Connect:
                             get += "%s%s=%s" % (delimiter, name, value)
 
         get = urlencode(get, limit=True)
-        if post and place not in (PLACE.POST, PLACE.SOAP) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
+        if post and place not in (PLACE.POST, PLACE.SOAP, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
             post = getattr(post, UNENCODED_ORIGINAL_VALUE)
         elif not conf.skipUrlEncode and place not in (PLACE.SOAP,):
             post = urlencode(post)
