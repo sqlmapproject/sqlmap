@@ -54,7 +54,7 @@ class DNSQuery:
             retVal += "\xc0\x0c"                                                # Pointer to domain name
             retVal += "\x00\x01"                                                # Type A
             retVal += "\x00\x01"                                                # Class IN
-            retVal += "\x00\x00\x00\x05"                                        # TTL
+            retVal += "\x00\x00\x00\x00"                                        # TTL (don't cache)
             retVal += "\x00\x04"                                                # Data length
             retVal += "".join(chr(int(_)) for _ in resolution.split('.'))       # 4 bytes of IP
 
