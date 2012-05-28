@@ -1721,7 +1721,7 @@ def __setTrafficOutputFP():
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
 def __setDNSServer():
-    if not conf.dnsDomain:
+    if not conf.dName:
         return
 
     infoMsg = "setting up DNS server instance"

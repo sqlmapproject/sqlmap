@@ -272,7 +272,7 @@ def cmdLineParser():
         techniques.add_option("--union-char", dest="uChar",
                               help="Character to use for bruteforcing number of columns")
 
-        techniques.add_option("--dns-domain", dest="dnsDomain",
+        techniques.add_option("--dns-domain", dest="dName",
                               help="Domain name used for DNS exfiltration attack")
 
         # Fingerprint options

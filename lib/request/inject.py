@@ -84,7 +84,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 def __goDns(payload, expression):
     value = None
 
-    if conf.dnsDomain and kb.dnsTest is not False:
+    if conf.dName and kb.dnsTest is not False:
         if kb.dnsTest is None:
             dnsTest(payload)
 
