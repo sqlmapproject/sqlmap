@@ -21,6 +21,7 @@ from lib.core.common import getPublicTypeMembers
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import initTechnique
+from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
@@ -66,18 +67,19 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
     if value is None:
         timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
-        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
-            _, length, _ = queryOutputLength(expression, payload)
-        else:
-            length = None
+        if not (timeBasedCompare and kb.dnsTest):
+            if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
+                _, length, _ = queryOutputLength(expression, payload)
+            else:
+                length = None
 
-        kb.inferenceMode = True
-        count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
-        kb.inferenceMode = False
+            kb.inferenceMode = True
+            count, value = bisection(payload, expression, length, charsetType, firstChar, lastChar, dump)
+            kb.inferenceMode = False
 
-        if not kb.bruteMode:
-            debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
-            logger.debug(debugMsg)
+            if not kb.bruteMode:
+                debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
+                logger.debug(debugMsg)
 
     return value
 
@@ -317,9 +319,8 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
         expression += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
     outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
-    returnValue = ", ".join(output for output in outputs)
 
-    return returnValue
+    return ", ".join(output for output in outputs) if not isNoneValue(outputs) else None
 
 def __goBooleanProxy(expression):
     """
