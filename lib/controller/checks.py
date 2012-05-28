@@ -791,7 +791,7 @@ def checkStability():
             logger.info(infoMsg)
         else:
             errMsg = "there was an error checking the stability of page "
-            errMsg += "because of lack of content. please check the "
+            errMsg += "because of lack of content. Please check the "
             errMsg += "page request results (and probable errors) by "
             errMsg += "using higher verbosity levels"
             logger.error(errMsg)
