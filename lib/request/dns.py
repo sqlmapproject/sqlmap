@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import random
 import re
 import socket
 import threading
@@ -47,13 +48,13 @@ class DNSQuery:
 
         if self._query:
             retVal += self._raw[:2]                                             # Transaction ID
-            retVal += "\x84\x00"                                                # Flags (Standard query response, No error)
+            retVal += "\x85\x80"                                                # Flags (Standard query response, No error)
             retVal += self._raw[4:6] + self._raw[4:6] + "\x00\x00\x00\x00"      # Questions and Answers Counts
             retVal += self._raw[12:(12 + self._raw[12:].find("\x00") + 5)]      # Original Domain Name Query
             retVal += "\xc0\x0c"                                                # Pointer to domain name
             retVal += "\x00\x01"                                                # Type A
             retVal += "\x00\x01"                                                # Class IN
-            retVal += "\x00\x00\x01\x2c"                                        # TTL
+            retVal += "\x00\x00\x00\x05"                                        # TTL
             retVal += "\x00\x04"                                                # Data length
             retVal += "".join(chr(int(_)) for _ in resolution.split('.'))       # 4 bytes of IP
 
@@ -96,7 +97,7 @@ class DNSServer:
                 while True:
                     data, addr = self._socket.recvfrom(1024)
                     _ = DNSQuery(data)
-                    self._socket.sendto(_.response("127.0.0.1"), addr)
+                    self._socket.sendto(_.response("127.%s" % ".".join(str(random.randint(1, 255)) for _ in xrange(3))), addr)
 
                     with self._lock:
                         self._requests.append(_._query)
