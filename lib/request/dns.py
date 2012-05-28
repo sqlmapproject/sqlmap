@@ -97,7 +97,7 @@ class DNSServer:
                 while True:
                     data, addr = self._socket.recvfrom(1024)
                     _ = DNSQuery(data)
-                    self._socket.sendto(_.response("127.%s" % ".".join(str(random.randint(1, 255)) for _ in xrange(3))), addr)
+                    self._socket.sendto(_.response("127.0.0.1"), addr)
 
                     with self._lock:
                         self._requests.append(_._query)
