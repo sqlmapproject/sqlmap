@@ -171,12 +171,12 @@ class Miscellaneous:
         message += "[1] as LIKE %s names (default)\n" % what
         message += "[2] as exact %s names" % what
 
-        choice = readInput(message, default="1")
+        choice = readInput(message, default='1') if not conf.exact else '2'
 
-        if not choice or choice == "1":
-            choice = "1"
+        if not choice or choice == '1':
+            choice = '1'
             condParam = " LIKE '%%%s%%'"
-        elif choice == "2":
+        elif choice == '2':
             condParam = "='%s'"
         else:
             errMsg = "invalid value"

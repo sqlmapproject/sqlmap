@@ -596,6 +596,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Check for missing sqlmap dependencies")
 
+        miscellaneous.add_option("--exact", dest="exact",
+                                  action="store_true",
+                                  help="Prefer usage of exact names for provided identificators")
+
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
 
