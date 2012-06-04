@@ -121,6 +121,7 @@ from lib.request.dns import DNSServer
 from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
+from lib.request.httpshandler import HTTPSHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
@@ -130,6 +131,7 @@ from lib.utils.google import Google
 from xml.etree.ElementTree import ElementTree
 
 authHandler = urllib2.BaseHandler()
+httpsHandler = HTTPSHandler()
 keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.BaseHandler()
 redirectHandler = SmartRedirectHandler()
@@ -140,16 +142,10 @@ def __urllib2Opener():
     This function creates the urllib2 OpenerDirector.
     """
 
-    global authHandler
-    global keepAliveHandler
-    global proxyHandler
-    global rangeHandler
-    global redirectHandler
-
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
 
-    handlers = [proxyHandler, authHandler, redirectHandler, rangeHandler]
+    handlers = [proxyHandler, authHandler, redirectHandler, rangeHandler, httpsHandler]
 
     if not conf.dropSetCookie:
         if not conf.loC:
