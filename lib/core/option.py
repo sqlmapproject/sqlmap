@@ -1017,17 +1017,16 @@ def __setHTTPAuthentication():
         if not aCredRegExp:
             raise sqlmapSyntaxException, errMsg
 
-        authUsername = aCredRegExp.group(1)
-        authPassword = aCredRegExp.group(2)
+        conf.authUsername = aCredRegExp.group(1)
+        conf.authPassword = aCredRegExp.group(2)
 
-        passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-        passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), authUsername, authPassword)
+        kb.passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
 
         if aTypeLower == "basic":
-            authHandler = SmartHTTPBasicAuthHandler(passwordMgr)
+            authHandler = SmartHTTPBasicAuthHandler(kb.passwordMgr)
 
         elif aTypeLower == "digest":
-            authHandler = urllib2.HTTPDigestAuthHandler(passwordMgr)
+            authHandler = urllib2.HTTPDigestAuthHandler(kb.passwordMgr)
 
         elif aTypeLower == "ntlm":
             try:
@@ -1038,7 +1037,7 @@ def __setHTTPAuthentication():
                 errMsg += "http://code.google.com/p/python-ntlm/"
                 raise sqlmapMissingDependence, errMsg
 
-            authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(passwordMgr)
+            authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
     else:
         debugMsg = "setting the HTTP(s) authentication certificate"
         logger.debug(debugMsg)
@@ -1374,6 +1373,8 @@ def __setConfAttributes():
     debugMsg = "initializing the configuration"
     logger.debug(debugMsg)
 
+    conf.authUsername = None
+    conf.authPassword = None
     conf.boundaries = []
     conf.cj = None
     conf.dbmsConnector = None
@@ -1522,6 +1523,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     if flushAll:
         kb.headerPaths = {}
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
+        kb.passwordMgr = None
         kb.scanOnlyGoogleGETs = None
         kb.tamperFunctions = []
         kb.targetUrls = oset()
