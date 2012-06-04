@@ -21,7 +21,7 @@ try:
 except ImportError:
     pass
 
-_protocols = [ssl.PROTOCOL_SSLv3, ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_TLSv1]
+_protocols = [ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, ssl.PROTOCOL_TLSv1]
 
 class HTTPSConnection(httplib.HTTPSConnection):
     """
@@ -42,6 +42,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
             return sock
 
         success = False
+
         for protocol in _protocols:
             try:
                 sock = create_sock()
