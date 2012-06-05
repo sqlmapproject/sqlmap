@@ -34,7 +34,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.dump import dumper
 from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import sqlmapSilentQuitException
@@ -122,8 +121,6 @@ def main():
                 conf.hashDB.flush(True)
             except KeyboardInterrupt:
                 pass
-
-        dumper.flush()
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if conf.get("threads", 0) > 1 or conf.get("dnsServer", None):

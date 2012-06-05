@@ -30,7 +30,6 @@ from lib.core.enums import DBMS
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import BLANK
-from lib.core.settings import BUFFERED_LOG_SIZE
 from lib.core.settings import NULL
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
@@ -45,7 +44,6 @@ class Dump:
     def __init__(self):
         self._outputFile = None
         self._outputFP = None
-        self._outputBP = None
         self._lock = threading.Lock()
 
     def _write(self, data, n=True, console=True):
@@ -56,21 +54,12 @@ class Dump:
         if kb.get("multiThreadMode"):
             self._lock.acquire()
 
-        self._outputBP.write(text)
-
-        if self._outputBP.tell() > BUFFERED_LOG_SIZE:
-            self.flush()
+        self._outputFP.write(text)
 
         if kb.get("multiThreadMode"):
             self._lock.release()
 
         kb.dataOutputFlag = True
-
-    def flush(self):
-        if self._outputBP and self._outputFP and self._outputBP.tell() > 0:
-            _ = self._outputBP.getvalue()
-            self._outputBP.truncate(0)
-            self._outputFP.write(_)
 
     def _formatString(self, inpStr):
         return restoreDumpMarkedChars(getUnicode(inpStr))
@@ -78,19 +67,14 @@ class Dump:
     def setOutputFile(self):
         self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
         self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
-        self._outputBP = StringIO.StringIO()
 
     def getOutputFile(self):
-        self.flush()
         return self._outputFile
 
     def string(self, header, data, sort=True):
         if isinstance(data, (list, tuple, set)):
             self.lister(header, data, sort)
-
-            return
-
-        if data:
+        elif data:
             data = self._formatString(getUnicode(data))
 
             if data[-1] == '\n':
