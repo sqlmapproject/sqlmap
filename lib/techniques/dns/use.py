@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 import time
+import string
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
@@ -59,7 +60,7 @@ def dnsUse(payload, expression):
 
             while True:
                 count += 1
-                prefix, suffix = ("%s" % randomStr(3) for _ in xrange(2))
+                prefix, suffix = ("%s" % randomStr(length=3, alphabet=re.sub("[a-fA-F]", "", string.letters)) for _ in xrange(2))
                 chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)
