@@ -598,7 +598,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--exact", dest="exact",
                                   action="store_true",
-                                  help="Prefer usage of exact names for provided identificators")
+                                  help="Prefer usage of exactly provided identificator names")
 
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
