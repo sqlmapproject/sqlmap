@@ -511,7 +511,8 @@ class Dump:
         self.string(query, queryRes)
 
     def rFile(self, filePath, fileData):
-        self.string("%s file saved to" % filePath, fileData, sort=False)
+        if fileData:
+            self.string("%s file saved to" % filePath, fileData, sort=False)
 
     def registerValue(self, registerData):
         self.string("Registry key value data", registerData, sort=False)
