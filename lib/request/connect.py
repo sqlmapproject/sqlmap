@@ -700,6 +700,8 @@ class Connect:
         start = time.time()
 
         if kb.nullConnection and not content and not response and not timeBasedCompare:
+            noteResponseTime = False
+
             if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
             elif kb.nullConnection == NULLCONNECTION.RANGE:
