@@ -2538,7 +2538,7 @@ def decodeIntToUnicode(value):
     """
     try:
         # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,) or conf.charset:
             return struct.pack('B' if value < 256 else '<H', value).decode(kb.pageEncoding or UNICODE_ENCODING)
         else:
             return unichr(value)
