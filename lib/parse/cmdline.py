@@ -642,9 +642,6 @@ def cmdLineParser():
         parser.add_option("--run-case", dest="runCase", type="int",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--group-concat", dest="groupConcat", action="store_true",
-                           help=SUPPRESS_HELP)
-
         parser.add_option("--test-filter", dest="testFilter",
                            help=SUPPRESS_HELP)
 

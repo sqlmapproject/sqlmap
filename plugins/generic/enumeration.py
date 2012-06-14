@@ -1579,20 +1579,6 @@ class Enumeration:
                     entries = []
                     query = None
 
-                    if all([Backend.isDbms(DBMS.MYSQL), isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR), conf.groupConcat]):
-                        randStr, randStr2 = randomStr(), randomStr()
-                        filterFunction = "REPLACE(REPLACE(IFNULL(%s, ' '),'%s','%s'),'%s','%s')"\
-                          % ('%s', CONCAT_VALUE_DELIMITER, randStr, CONCAT_ROW_DELIMITER, randStr2)
-                        concats = ",".join("CONCAT(%s, '|')" % (filterFunction % _) for _ in colList[:-1])
-                        concats += ",%s" % (filterFunction % colList[-1])
-                        query = "SELECT GROUP_CONCAT(%s) FROM %s.%s" % (concats, conf.db, tbl)
-                        value = inject.getValue(query, blind=False)
-                        if isinstance(value, basestring):
-                            for line in value.split(CONCAT_ROW_DELIMITER):
-                                row = line.split(CONCAT_VALUE_DELIMITER)
-                                row = map(lambda x: x.replace(randStr, CONCAT_VALUE_DELIMITER).replace(randStr2, CONCAT_ROW_DELIMITER), row)
-                                entries.append(row)
-
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB):
