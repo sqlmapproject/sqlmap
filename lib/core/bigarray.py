@@ -69,7 +69,7 @@ class BigArray(list):
             self.chunks[self.cache.index] = filename
         if not (self.cache and self.cache.index == index):
             with open(self.chunks[index], "rb") as fp:
-                self.cache = (index, pickle.load(fp), False)
+                self.cache = Cache(index, pickle.load(fp), False)
 
     def __getitem__(self, y):
         index = y / BIGARRAY_CHUNK_LENGTH
