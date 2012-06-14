@@ -17,6 +17,7 @@ from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
+from lib.core.common import isListLike
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
@@ -72,7 +73,7 @@ class Dump:
         return self._outputFile
 
     def string(self, header, data, sort=True):
-        if isinstance(data, (list, tuple, set)):
+        if isListLike(data):
             self.lister(header, data, sort)
         elif data:
             data = self._formatString(getUnicode(data))
@@ -102,7 +103,7 @@ class Dump:
         for element in elements:
             if isinstance(element, basestring):
                 self._write("[*] %s" % element)
-            elif isinstance(element, (list, tuple, set)):
+            elif isListLike(element):
                 self._write("[*] " + ", ".join(getUnicode(e) for e in element))
 
         if elements:
@@ -173,7 +174,7 @@ class Dump:
 
             for tables in dbTables.values():
                 for table in tables:
-                    if isinstance(table, (list, tuple, set)):
+                    if table and isListLike(table):
                         table = table[0]
 
                     maxlength = max(maxlength, len(normalizeUnicode(table) or str(table)))
@@ -193,7 +194,7 @@ class Dump:
                 self._write("+%s+" % lines)
 
                 for table in tables:
-                    if isinstance(table, (list, tuple, set)):
+                    if table and isListLike(table):
                         table = table[0]
 
                     blank = " " * (maxlength - len(normalizeUnicode(table) or str(table)))

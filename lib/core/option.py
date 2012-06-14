@@ -35,6 +35,7 @@ from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
+from lib.core.common import isListLike
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
@@ -1630,7 +1631,7 @@ def __saveCmdline():
         optionData.sort()
 
         for option, value, datatype in optionData:
-            if isinstance(datatype, (list, tuple, set)):
+            if datatype and isListLike(datatype):
                 datatype = datatype[0]
 
             if value is None:

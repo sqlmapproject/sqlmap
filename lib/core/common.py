@@ -788,7 +788,7 @@ def readInput(message, default=None, checkBatch=True):
         message += " "
 
     if checkBatch and conf.batch:
-        if isinstance(default, (list, tuple, set)):
+        if isListLike(default):
             options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
         elif default:
             options = getUnicode(default, UNICODE_ENCODING)
@@ -1888,7 +1888,7 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
     if noneToNull and value is None:
         return NULL
 
-    if isinstance(value, (list, tuple)):
+    if isListLike(value):
         value = list(getUnicode(_, encoding, system, noneToNull) for _ in value)
         return value
 
@@ -2425,7 +2425,7 @@ def arrayizeValue(value):
     Makes a list out of value if it is not already a list or tuple itself
     """
 
-    if not isinstance(value, (list, tuple)):
+    if not isListLike(value):
         value = [value]
 
     return value
@@ -2435,7 +2435,7 @@ def unArrayizeValue(value):
     Makes a value out of iterable if it is a list or tuple itself
     """
 
-    if isinstance(value, (list, tuple)):
+    if isListLike(value):
         value = value[0] if len(value) > 0 else None
 
     return value
@@ -2446,11 +2446,18 @@ def flattenValue(value):
     """
 
     for i in iter(value):
-        if isinstance(i, (list, tuple)):
+        if isListLike(i):
             for j in flattenValue(i):
                 yield j
         else:
             yield i
+
+def isListLike(value):
+    """
+    Returns True if the given value is a list-like instance
+    """
+
+    return isinstance(value, (list, tuple, set, BigArray))
 
 def getSortedInjectionTests():
     """
@@ -2784,7 +2791,7 @@ def isNoneValue(value):
 
     if isinstance(value, basestring):
         return value in ("None", "")
-    elif isinstance(value, (list, tuple)):
+    elif isListLike(value):
         return all(isNoneValue(_) for _ in value)
     elif isinstance(value, dict):
         return not any(value)
@@ -3127,7 +3134,7 @@ def applyFunctionRecursively(value, function):
     Applies function recursively through list-like structures
     """
 
-    if isinstance(value, (list, tuple, set, BigArray)):
+    if isListLike(value):
         retVal = [applyFunctionRecursively(_, function) for _ in value]
     else:
         retVal = function(value)

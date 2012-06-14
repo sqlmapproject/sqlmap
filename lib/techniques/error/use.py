@@ -23,6 +23,7 @@ from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
+from lib.core.common import isListLike
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
@@ -367,7 +368,7 @@ def errorUse(expression, expected=None, dump=False):
     if not outputs and not abortedFlag:
         outputs = __errorFields(expression, expressionFields, expressionFieldsList)
 
-    if outputs and isinstance(outputs, list) and len(outputs) == 1 and isinstance(outputs[0], basestring):
+    if outputs and isListLike(outputs) and len(outputs) == 1 and isinstance(outputs[0], basestring):
         outputs = outputs[0]
 
     duration = calculateDeltaSeconds(start)

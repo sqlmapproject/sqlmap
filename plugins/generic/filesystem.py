@@ -15,6 +15,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import Backend
 from lib.core.common import isNumPosStrValue
+from lib.core.common import isListLike
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -213,11 +214,11 @@ class Filesystem:
             self.cleanup(onlyFileTbl=True)
 
             return
-        elif isinstance(fileContent, (list, tuple, set)):
+        elif isListLike(fileContent):
             newFileContent = ""
 
             for chunk in fileContent:
-                if isinstance(chunk, (list, tuple, set)):
+                if isListLike(chunk):
                     if len(chunk) > 0:
                         chunk = chunk[0]
                     else:

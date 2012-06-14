@@ -17,6 +17,7 @@ from lib.core.common import getCurrentThreadData
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
+from lib.core.common import isListLike
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -61,7 +62,7 @@ def direct(query, content=True):
     if not output:
         return output
     elif content:
-        if output and isinstance(output, (list, tuple)):
+        if output and isListLike(output):
             if len(output[0]) == 1:
                 if len(output) > 1:
                     output = map(lambda _: _[0], output)

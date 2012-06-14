@@ -20,6 +20,7 @@ from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
 from lib.core.common import getUnicode
 from lib.core.common import isInferenceAvailable
+from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -879,7 +880,7 @@ class Enumeration:
             if not isNoneValue(value):
                 value = filter(None, arrayizeValue(value))
 
-                if len(value) > 0 and not isinstance(value[0], (list, tuple)):
+                if len(value) > 0 and not isListLike(value[0]):
                     value = map(lambda x: (dbs[0], x), value)
 
                 for db, table in filterPairValues(value):
@@ -1620,7 +1621,7 @@ class Enumeration:
                         entries = []
                     elif isinstance(entries, basestring):
                         entries = [entries]
-                    elif not isinstance(entries, (list, tuple)):
+                    elif not isListLike(entries):
                         entries = []
 
                     entriesCount = len(entries)
@@ -1630,7 +1631,7 @@ class Enumeration:
                         colLen = len(column)
 
                         if column not in kb.data.dumpedTable:
-                            kb.data.dumpedTable[column] = {"length": colLen, "values": []}
+                            kb.data.dumpedTable[column] = {"length": colLen, "values": BigArray()}
 
                         for entry in entries:
                             if entry is None or len(entry) == 0:
