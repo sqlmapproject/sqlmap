@@ -619,6 +619,9 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Conduct through tests only if positive heuristic(s)")
 
+        miscellaneous.add_option("--test-filter", dest="tstF",
+                                  help="Select tests by payloads and/or titles (e.g. ROW)")
+
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
                                   help="Simple wizard interface for beginner users")
@@ -641,9 +644,6 @@ def cmdLineParser():
 
         parser.add_option("--run-case", dest="runCase", type="int",
                           help=SUPPRESS_HELP)
-
-        parser.add_option("--test-filter", dest="testFilter",
-                           help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)

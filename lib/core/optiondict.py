@@ -193,6 +193,7 @@ optDict = {
                                "mobile":            "boolean",
                                "pageRank":          "boolean",
                                "smart":             "boolean",
+                               "tstF":              "string",
                                "wizard":            "boolean",
                                "verbose":           "integer"
                              },
