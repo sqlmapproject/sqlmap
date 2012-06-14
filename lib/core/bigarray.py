@@ -13,9 +13,19 @@ import tempfile
 
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 
+class Cache:
+    """
+    Auxiliary class used for storing cached chunks
+    """
+
+    def __init__(self, index, data, dirty):
+        self.index = index
+        self.data = data
+        self.dirty = dirty
+
 class BigArray(list):
     """
-    List-like object used for storing large amounts of data (disk cached)
+    List-like class used for storing large amounts of data (disk cached)
     """
 
     def __init__(self):
@@ -35,7 +45,7 @@ class BigArray(list):
     def pop(self):
         if len(self.chunks[-1]) < 1:
             self.chunks.pop()
-            with open(self.chunks[-1], 'rb') as fp:
+            with open(self.chunks[-1], "rb") as fp:
                 self.chunks[-1] = pickle.load(fp)
         return self.chunks[-1].pop()
 
@@ -49,16 +59,16 @@ class BigArray(list):
         handle, filename = tempfile.mkstemp()
         self.filenames.add(filename)
         os.close(handle)
-        with open(filename, 'w+b') as fp:
+        with open(filename, "w+b") as fp:
             pickle.dump(value, fp)
         return filename
 
     def _checkcache(self, index):
-        if (self.cache and self.cache[0] != index and self.cache[2]):
-            filename = self._dump(self.cache[1])
-            self.chunks[self.cache[0]] = filename
-        if not (self.cache and self.cache[0] == index):
-            with open(self.chunks[index], 'rb') as fp:
+        if (self.cache and self.cache.index != index and self.cache.dirty):
+            filename = self._dump(self.cache.data)
+            self.chunks[self.cache.index] = filename
+        if not (self.cache and self.cache.index == index):
+            with open(self.chunks[index], "rb") as fp:
                 self.cache = (index, pickle.load(fp), False)
 
     def __getitem__(self, y):
@@ -69,7 +79,7 @@ class BigArray(list):
             return chunk[offset]
         else:
             self._checkcache(index)
-            return self.cache[1][offset]
+            return self.cache.data[offset]
 
     def __setitem__(self, y, value):
         index = y / BIGARRAY_CHUNK_LENGTH
@@ -79,8 +89,8 @@ class BigArray(list):
             chunk[offset] = value
         else:
             self._checkcache(index)
-            self.cache[1][offset] = value
-            self.cache[2] = True # dirty flag
+            self.cache.data[offset] = value
+            self.cache.dirty = True
 
     def __repr__(self):
         return "%s%s" % ("..." if len(self.chunks) > 1 else "", self.chunks[-1].__repr__())
