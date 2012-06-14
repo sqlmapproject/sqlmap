@@ -42,13 +42,11 @@ class Crawler:
                 threadData = getCurrentThreadData()
 
                 while kb.threadContinue:
-                    kb.locks.limits.acquire()
-                    if threadData.shared.unprocessed:
-                        current = threadData.shared.unprocessed.pop()
-                        kb.locks.limits.release()
-                    else:
-                        kb.locks.limits.release()
-                        break
+                    with kb.locks.limits:
+                        if threadData.shared.unprocessed:
+                            current = threadData.shared.unprocessed.pop()
+                        else:
+                            break
 
                     content = None
                     try:
@@ -83,11 +81,10 @@ class Crawler:
                                         continue
 
                                     if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
-                                        kb.locks.outputs.acquire()
-                                        threadData.shared.deeper.add(url)
-                                        if re.search(r"(.*?)\?(.+)", url):
-                                            threadData.shared.outputs.add(url)
-                                        kb.locks.outputs.release()
+                                        with kb.locks.outputs:
+                                            threadData.shared.deeper.add(url)
+                                            if re.search(r"(.*?)\?(.+)", url):
+                                                threadData.shared.outputs.add(url)
                         except UnicodeEncodeError: # for non-HTML files
                             pass
                         finally:

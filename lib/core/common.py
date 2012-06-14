@@ -1645,15 +1645,12 @@ def readCachedFileContent(filename, mode='rb'):
     """
 
     if filename not in kb.cache.content:
-        kb.locks.cache.acquire()
-
-        if filename not in kb.cache.content:
-            checkFile(filename)
-            with codecs.open(filename, mode, UNICODE_ENCODING) as f:
-                content = f.read()
-                kb.cache.content[filename] = content
-
-        kb.locks.cache.release()
+        with kb.locks.cache:
+            if filename not in kb.cache.content:
+                checkFile(filename)
+                with codecs.open(filename, mode, UNICODE_ENCODING) as f:
+                    content = f.read()
+                    kb.cache.content[filename] = content
 
     return kb.cache.content[filename]
 
@@ -2113,13 +2110,10 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     if not conf.trafficFile:
         return
 
-    kb.locks.log.acquire()
-
-    dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
-    dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
-    dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
-
-    kb.locks.log.release()
+    with kb.locks.log:
+        dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
+        dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
+        dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
 def getPageTemplate(payload, place):
     """
