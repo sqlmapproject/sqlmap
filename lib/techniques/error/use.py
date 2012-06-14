@@ -333,13 +333,11 @@ def errorUse(expression, expected=None, dump=False):
                     threadData = getCurrentThreadData()
 
                     while kb.threadContinue:
-                        kb.locks.limits.acquire()
-                        try:
-                            num = threadData.shared.limits.next()
-                        except StopIteration:
-                            break
-                        finally:
-                            kb.locks.limits.release()
+                        with kb.locks.limits:
+                            try:
+                                num = threadData.shared.limits.next()
+                            except StopIteration:
+                                break
 
                         output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num)
 
@@ -349,9 +347,8 @@ def errorUse(expression, expected=None, dump=False):
                         if output and isinstance(output, list) and len(output) == 1:
                             output = output[0]
 
-                        kb.locks.outputs.acquire()
-                        threadData.shared.outputs.append(output)
-                        kb.locks.outputs.release()
+                        with kb.locks.outputs:
+                            threadData.shared.outputs.append(output)
 
                 runThreads(numThreads, errorThread)
 

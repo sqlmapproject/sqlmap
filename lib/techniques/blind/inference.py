@@ -147,9 +147,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         hintlock = threading.Lock()
 
         def tryHint(idx):
-            hintlock.acquire()
-            hintValue = kb.hintValue
-            hintlock.release()
+            with hintlock:
+                hintValue = kb.hintValue
 
             if hintValue is not None and len(hintValue) >= idx:
                 if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
@@ -164,9 +163,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if result:
                     return hintValue[idx-1]
 
-            hintlock.acquire()
-            kb.hintValue = None
-            hintlock.release()
+            with hintlock:
+                kb.hintValue = None
 
             return None
 
@@ -373,10 +371,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         else:
                             break
 
-                        kb.locks.value.acquire()
-                        threadData.shared.value[curidx - 1] = val
-                        currentValue = list(threadData.shared.value)
-                        kb.locks.value.release()
+                        with kb.locks.value:
+                            threadData.shared.value[curidx - 1] = val
+                            currentValue = list(threadData.shared.value)
 
                         if kb.threadContinue:
                             if showEta:

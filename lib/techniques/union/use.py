@@ -283,13 +283,11 @@ def unionUse(expression, unpack=True, dump=False):
                     threadData = getCurrentThreadData()
 
                     while kb.threadContinue:
-                        kb.locks.limits.acquire()
-                        try:
-                            num = threadData.shared.limits.next()
-                        except StopIteration:
-                            break
-                        finally:
-                            kb.locks.limits.release()
+                        with kb.locks.limits:
+                            try:
+                                num = threadData.shared.limits.next()
+                            except StopIteration:
+                                break
 
                         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                             field = expressionFieldsList[0]
@@ -309,10 +307,9 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = parseUnionPage(output)
                                 if isNoneValue(items):
                                     continue
-                                kb.locks.value.acquire()
-                                for item in arrayizeValue(items):
-                                    threadData.shared.value.append(item)
-                                kb.locks.value.release()
+                                with kb.locks.value:
+                                    for item in arrayizeValue(items):
+                                        threadData.shared.value.append(item)
                             else:
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
