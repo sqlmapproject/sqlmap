@@ -356,7 +356,7 @@ def __goError(expression, expected=None, dump=False):
 
     return output
 
-def __goInband(expression, expected=None, unique=True, unpack=True, dump=False):
+def __goInband(expression, expected=None, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
     injection vulnerability on the affected parameter.
@@ -364,11 +364,11 @@ def __goInband(expression, expected=None, unique=True, unpack=True, dump=False):
 
     output = unionUse(expression, unpack=unpack, dump=dump)
     if isinstance(output, basestring):
-        output = parseUnionPage(output, unique)
+        output = parseUnionPage(output)
 
     return output
 
-def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, unique=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
+def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
     affected parameter. It can call a function to retrieve the output
@@ -413,9 +413,9 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
 
                 if expected == EXPECTED.BOOL:
-                    value = __goInband(forgeCaseExpression, expected, unique, unpack, dump)
+                    value = __goInband(forgeCaseExpression, expected, unpack, dump)
                 else:
-                    value = __goInband(query, expected, unique, unpack, dump)
+                    value = __goInband(query, expected, unpack, dump)
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE

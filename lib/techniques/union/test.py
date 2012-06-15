@@ -186,7 +186,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
         if content and phrase in content:
             validPayload = payload
-            vector = (position, count, comment, prefix, suffix, kb.uChar, where)
+            vector = (position, count, comment, prefix, suffix, kb.uChar, where, content.count(phrase) > 1)
 
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters

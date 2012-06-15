@@ -1512,6 +1512,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadException = False
     kb.timeValidCharsRun = 0
     kb.uChar = NULL
+    kb.unionDuplicates = False
     kb.xpCmdshellAvailable = False
 
     kb.chars = AttribDict()

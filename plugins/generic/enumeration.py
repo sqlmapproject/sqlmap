@@ -1611,9 +1611,8 @@ class Enumeration:
                         entries = []
 
                     entriesCount = len(entries)
-                    index = 0
 
-                    for column in colList:
+                    for index, column in enumerate(colList):
                         colLen = len(column)
 
                         if column not in kb.data.dumpedTable:
@@ -1626,7 +1625,7 @@ class Enumeration:
                             if isinstance(entry, basestring):
                                 colEntry = entry
                             else:
-                                colEntry = entry[index] if index < len(entry) else u''
+                                colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
 
                             colEntryLen = len({" ": NULL, "": BLANK}.get(getUnicode(colEntry), getUnicode(colEntry)))
                             maxLen = max(colLen, colEntryLen)
@@ -1635,8 +1634,6 @@ class Enumeration:
                                 kb.data.dumpedTable[column]["length"] = maxLen
 
                             kb.data.dumpedTable[column]["values"].append(colEntry)
-
-                        index += 1
 
                 if not kb.data.dumpedTable and isInferenceAvailable() and not conf.direct:
                     infoMsg = "fetching number of "

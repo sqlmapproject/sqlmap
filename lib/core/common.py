@@ -1189,7 +1189,7 @@ def getLimitRange(count, dump=False, plusOne=False):
 
     return retVal
 
-def parseUnionPage(page, unique=True):
+def parseUnionPage(page):
     """
     Returns resulting items from inband query inside provided page content
     """
@@ -1211,7 +1211,7 @@ def parseUnionPage(page, unique=True):
             if kb.chars.start in entry:
                 entry = entry.split(kb.chars.start)[-1]
 
-            if unique:
+            if kb.unionDuplicates:
                 key = entry.lower()
                 if key not in _:
                     _.append(key)
