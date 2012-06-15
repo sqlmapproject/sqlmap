@@ -58,7 +58,7 @@ def tableExists(tableFile, regex=None):
         errMsg += "to distinguish errornous results)"
         raise sqlmapDataException, errMsg
 
-    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS), unique=True)
+    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
