@@ -105,14 +105,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             expressionUnescaped = unescaper.unescape(expression)
 
-        if length and not isinstance(length, int) and length.isdigit():
+        if length and isinstance(length, basestring) and length.isdigit():
             length = int(length)
 
         if length == 0:
             return 0, ""
 
         if lastChar > 0 and length > ( lastChar - firstChar ):
-            length = ( lastChar - firstChar )
+            length = lastChar - firstChar
 
         showEta = conf.eta and isinstance(length, int)
         numThreads = min(conf.threads, length)

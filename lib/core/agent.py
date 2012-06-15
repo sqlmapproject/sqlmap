@@ -420,7 +420,7 @@ class Agent:
             fieldsToCastStr = fieldsSelectFrom.groups()[0]
         elif fieldsSelect:
             fieldsToCastStr = fieldsSelect.groups()[0]
-        elif fieldsNoSelect:
+        else:
             fieldsToCastStr = fieldsNoSelect
 
         # Function
