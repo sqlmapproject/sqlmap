@@ -480,7 +480,7 @@ def checkSqlInjection(place, parameter, value):
                                         injection.dbms = Backend.setDbms(dValue)
                                     else:
                                         Backend.forceDbms(dValue[0], True)
-                                elif dKey == "dbms_version" and injection.dbms_version is None:
+                                elif dKey == "dbms_version" and injection.dbms_version is None and not conf.tstF:
                                     injection.dbms_version = Backend.setVersion(dValue)
                                 elif dKey == "os" and injection.os is None:
                                     injection.os = Backend.setOs(dValue)
