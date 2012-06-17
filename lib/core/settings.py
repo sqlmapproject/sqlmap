@@ -456,7 +456,7 @@ DEFAULT_COOKIE_DELIMITER = ';'
 HASHDB_FLUSH_THRESHOLD = 32
 
 # Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
-HASHDB_MILESTONE_VALUE = "ZTuyinSUvN"  # r5125 "".join(random.sample(string.letters, 10))
+HASHDB_MILESTONE_VALUE = "cAWxkLYCQT"  # r5129 "".join(random.sample(string.letters, 10))
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024**2
