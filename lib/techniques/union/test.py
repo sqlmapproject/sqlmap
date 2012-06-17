@@ -186,7 +186,8 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
         if content and phrase in content:
             validPayload = payload
-            vector = (position, count, comment, prefix, suffix, kb.uChar, where, content.count(phrase) > 1)
+            kb.unionDuplicates = content.count(phrase) > 1
+            vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates)
 
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
@@ -204,7 +205,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
                 content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
                 if not all(_ in content for _ in (phrase, phrase2)):
-                    vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE)
+                    vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
 
             unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
 
