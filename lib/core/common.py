@@ -544,7 +544,7 @@ def paramToDict(place, parameters=None):
                           or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
                             warnMsg = "it appears that you have provided tainted parameter values "
                             warnMsg += "('%s') with most probably leftover " % element
-                            warnMsg += "chars from manual sql injection "
+                            warnMsg += "chars from manual SQL injection "
                             warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
                             warnMsg += "Please, always use only valid parameter values "
                             warnMsg += "so sqlmap could be able to properly run "
@@ -1966,7 +1966,7 @@ def wasLastRequestDelayed():
     Returns True if the last web request resulted in a time-delay
     """
 
-    # 99.9999999997440% of all non time-based sql injection affected
+    # 99.9999999997440% of all non time-based SQL injection affected
     # response times should be inside +-7*stdev([normal response times])
     # Math reference: http://www.answers.com/topic/standard-deviation
 

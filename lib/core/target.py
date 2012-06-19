@@ -251,7 +251,7 @@ def __setOutputResume():
     if not conf.sessionFile:
         conf.sessionFile = "%s%ssession" % (conf.outputPath, os.sep)
 
-    logger.info("using '%s' as session file" % conf.sessionFile)
+    logger.info("using '%s' as a session file" % conf.sessionFile)
 
     if os.path.exists(conf.sessionFile):
         if not conf.flushSession:

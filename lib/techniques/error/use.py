@@ -83,7 +83,7 @@ def __oneShotErrorUse(expression, field):
             incrementCounter(PAYLOAD.TECHNIQUE.ERROR)
 
             # Parse the returned page to get the exact error-based
-            # sql injection output
+            # SQL injection output
             output = reduce(lambda x, y: x if x is not None else y, [ \
                     extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
                     extractRegexResult(check, listToStrValue(headers.headers \

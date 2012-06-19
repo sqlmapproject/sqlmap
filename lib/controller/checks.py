@@ -72,7 +72,7 @@ def checkSqlInjection(place, parameter, value):
     # Localized thread data needed for some methods
     threadData = getCurrentThreadData()
 
-    # Set the flag for sql injection test mode
+    # Set the flag for SQL injection test mode
     kb.testMode = True
 
     for test in getSortedInjectionTests():
@@ -647,7 +647,7 @@ def heuristicCheckSqlInjection(place, parameter):
 def simpletonCheckSqlInjection(place, parameter, value):
     """
     This is a function for the quickest and simplest
-    sql injection check (e.g. AND 1=1) - only works
+    SQL injection check (e.g. AND 1=1) - only works
     with integer parameters
     """
 

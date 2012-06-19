@@ -76,7 +76,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
         # Parse the returned page to get the exact union-based
-        # sql injection output
+        # SQL injection output
         retVal = reduce(lambda x, y: x if x is not None else y, ( \
                 extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
                 extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \

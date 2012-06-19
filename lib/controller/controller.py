@@ -465,7 +465,7 @@ def start():
                                     logger.info(infoMsg)
                                     continue
 
-                            infoMsg = "testing sql injection on %s " % place
+                            infoMsg = "testing for SQL injection on %s " % place
                             infoMsg += "parameter '%s'" % parameter
                             logger.info(infoMsg)
 
