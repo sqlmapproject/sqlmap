@@ -119,10 +119,6 @@ def resumeConfKb(expression, url, value):
         dbms = dbms.lower()
         dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
-        infoMsg = "resuming back-end DBMS '%s' " % dbms
-        infoMsg += "from session file"
-        logger.info(infoMsg)
-
         firstRegExp = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
         dbmsRegExp = re.search("%s ([\d\.]+)" % firstRegExp, dbms)
 
@@ -143,6 +139,10 @@ def resumeConfKb(expression, url, value):
                 Backend.setDbms(dbms)
                 Backend.setVersionList(dbmsVersion)
         else:
+            infoMsg = "resuming back-end DBMS '%s' " % dbms
+            infoMsg += "from session file"
+            logger.info(infoMsg)
+
             Backend.setDbms(dbms)
             Backend.setVersionList(dbmsVersion)
 
