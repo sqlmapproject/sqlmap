@@ -126,7 +126,6 @@ def liveTest():
 
         name = None
         log = []
-        session = []
         switches = dict(global_)
 
         if case.hasAttribute("name"):
@@ -143,14 +142,9 @@ def liveTest():
                 if item.hasAttribute("value"):
                     log.append(replaceVars(item.getAttribute("value"), vars_))
 
-        if case.getElementsByTagName("session"):
-            for item in case.getElementsByTagName("session")[0].getElementsByTagName("item"):
-                if item.hasAttribute("value"):
-                    session.append(replaceVars(item.getAttribute("value"), vars_))
-
         msg = "running live test case '%s' (%d/%d)" % (name, count, length)
         logger.info(msg)
-        result = runCase(switches, log, session)
+        result = runCase(switches, log)
         if result:
             logger.info("test passed")
         else:
@@ -178,7 +172,6 @@ def initCase(switches=None):
             if key in cmdLineOptions.__dict__:
                 cmdLineOptions.__dict__[key] = value
 
-    conf.sessionFile = None
     init(cmdLineOptions, True)
     __setVerbosity()
 
@@ -190,26 +183,13 @@ def cleanCase():
     conf.verbose = 1
     __setVerbosity()
 
-def runCase(switches=None, log=None, session=None):
+def runCase(switches=None, log=None):
     retVal = True
     initCase(switches)
 
     result = start()
     if result == False: #if None ignore
         retVal = False
-
-    if session and retVal:
-        ifile = open(conf.sessionFile, 'r')
-        content = ifile.read()
-        ifile.close()
-        for item in session:
-            if item.startswith("r'") and item.endswith("'"):
-                if not re.search(item[2:-1], content, re.DOTALL):
-                    retVal = False
-                    break
-            elif content.find(item) < 0:
-                retVal = False
-                break
 
     if log and retVal:
         ifile = open(conf.dumper.getOutputFile(), 'r')

@@ -738,13 +738,6 @@ def dataToStdout(data, forceOutput=False):
                     logging._releaseLock()
                 setFormatterPrependFlag(len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
 
-def dataToSessionFile(data):
-    if not conf.sessionFile or kb.suppressSession:
-        return
-
-    conf.sessionFP.write(data)
-    conf.sessionFP.flush()
-
 def dataToTrafficFile(data):
     if not conf.trafficFile:
         return

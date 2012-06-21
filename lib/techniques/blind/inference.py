@@ -7,12 +7,14 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
 import threading
 import time
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import decodeIntToUnicode
@@ -24,6 +26,7 @@ from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
+from lib.core.common import randomStr
 from lib.core.common import safeStringFormat
 from lib.core.common import setFormatterPrependFlag
 from lib.core.common import singleTimeWarnMessage
@@ -31,6 +34,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapThreadException
@@ -546,3 +550,56 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     _ = finalValue or partialValue
     return getCounter(kb.technique), safecharencode(_) if kb.safeCharEncode else _
+
+def queryOutputLength(expression, payload):
+    """
+    Returns the query output length.
+    """
+
+    lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
+    select = re.search("\ASELECT\s+", expression, re.I)
+    selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
+    selectDistinctExpr = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
+    selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
+    selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
+    miscExpr = re.search("\A(.+)", expression, re.I)
+
+    if selectTopExpr or selectDistinctExpr or selectFromExpr or selectExpr:
+        if selectTopExpr:
+            regExpr = selectTopExpr.groups()[0]
+        elif selectDistinctExpr:
+            regExpr = selectDistinctExpr.groups()[0]
+        elif selectFromExpr:
+            regExpr = selectFromExpr.groups()[0]
+        elif selectExpr:
+            regExpr = selectExpr.groups()[0]
+    elif miscExpr:
+        regExpr = miscExpr.groups()[0]
+
+    if ( select and re.search("\A(COUNT|LTRIM)\(", regExpr, re.I) ) or len(regExpr) <= 1:
+        return None, None, None
+
+    if selectDistinctExpr:
+        lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % regExpr, expression)
+
+        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            lengthExpr += " AS %s" % randomStr(lowercase=True)
+    elif select:
+        lengthExpr = expression.replace(regExpr, lengthQuery % regExpr, 1)
+    else:
+        lengthExpr = lengthQuery % expression
+
+    infoMsg = "retrieving the length of query output"
+    logger.info(infoMsg)
+
+    start = time.time()
+    lengthExprUnescaped = unescaper.unescape(lengthExpr)
+    count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
+
+    debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
+    logger.debug(debugMsg)
+
+    if length == " ":
+        length = 0
+
+    return count, length, regExpr

@@ -14,7 +14,7 @@ import re
 import tempfile
 import time
 
-from lib.core.common import dataToSessionFile
+from lib.core.common import Backend
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
 from lib.core.common import paramToDict
@@ -37,14 +37,15 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import authHandler
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
-from lib.core.session import resumeConfKb
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_REGEX
+from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.utils.hashdb import HashDB
@@ -243,78 +244,79 @@ def __resumeHashDBValues():
                 if injection not in kb.injections:
                     kb.injections.append(injection)
 
-def __setOutputResume():
+    __resumeDBMS()
+    __resumeOS()
+
+def __resumeDBMS():
     """
-    Check and set the output text file and the resume functionality.
+    Resume stored DBMS information from HashDB
     """
 
-    if not conf.sessionFile:
-        conf.sessionFile = "%s%ssession" % (conf.outputPath, os.sep)
+    value = hashDBRetrieve(HASHDB_KEYS.DBMS)
 
-    logger.info("using '%s' as a session file" % conf.sessionFile)
+    if not value:
+        return
 
-    if os.path.exists(conf.sessionFile):
-        if not conf.flushSession:
-            try:
-                readSessionFP = codecs.open(conf.sessionFile, "r", UNICODE_ENCODING, 'replace')
-                __url_cache = set()
-                __expression_cache = {}
+    dbms = value.lower()
+    dbmsVersion = [UNKNOWN_DBMS_VERSION]
+    _ = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
+    _ = re.search("%s ([\d\.]+)" % _, dbms, re.I)
 
-                for line in readSessionFP.readlines(): # xreadlines doesn't return unicode strings when codec.open() is used
-                    if line.count("][") == 4:
-                        line = line.split("][")
+    if _:
+        dbms = _.group(1).lower()
+        dbmsVersion = [_.group(2)]
 
-                        if len(line) != 5:
-                            continue
+    if conf.dbms:
+        if conf.dbms.lower() != dbms:
+            message = "you provided '%s' as back-end DBMS, " % conf.dbms
+            message += "but from a past scan information on the target URL "
+            message += "sqlmap assumes the back-end DBMS is %s. " % dbms
+            message += "Do you really want to force the back-end "
+            message += "DBMS value? [y/N] "
+            test = readInput(message, default="N")
 
-                        url, _, _, expression, value = line
+            if not test or test[0] in ("n", "N"):
+                conf.dbms = None
+                Backend.setDbms(dbms)
+                Backend.setVersionList(dbmsVersion)
+    else:
+        infoMsg = "resuming back-end DBMS '%s' " % dbms
+        logger.info(infoMsg)
 
-                        if not value:
-                            continue
+        Backend.setDbms(dbms)
+        Backend.setVersionList(dbmsVersion)
 
-                        if url[0] == "[":
-                            url = url[1:]
+def __resumeOS():
+    """
+    Resume stored OS information from HashDB
+    """
 
-                        value = value.rstrip('\r\n') # Strips both chars independently
+    value = hashDBRetrieve(HASHDB_KEYS.OS)
 
-                        if url not in ( conf.url, conf.hostname ):
-                            continue
+    if not value:
+        return
 
-                        if url not in __url_cache:
-                            kb.resumedQueries[url] = {}
-                            kb.resumedQueries[url][expression] = value
-                            __url_cache.add(url)
-                            __expression_cache[url] = set(expression)
+    os = value
 
-                        resumeConfKb(expression, url, value)
+    if os and os != 'None':
+        infoMsg = "resuming back-end DBMS operating system '%s' " % os
+        logger.info(infoMsg)
 
-                        if expression not in __expression_cache[url]:
-                            kb.resumedQueries[url][expression] = value
-                            __expression_cache[url].add(value)
-                        elif len(value) >= len(kb.resumedQueries[url][expression]):
-                            kb.resumedQueries[url][expression] = value
+        if conf.os and conf.os.lower() != os.lower():
+            message = "you provided '%s' as back-end DBMS operating " % conf.os
+            message += "system, but from a past scan information on the "
+            message += "target URL sqlmap assumes the back-end DBMS "
+            message += "operating system is %s. " % os
+            message += "Do you really want to force the back-end DBMS "
+            message += "OS value? [y/N] "
+            test = readInput(message, default="N")
 
-                if kb.injection.place is not None and kb.injection.parameter is not None:
-                    kb.injections.append(kb.injection)
-            except IOError, msg:
-                errMsg = "unable to properly open the session file (%s)" % msg
-                raise sqlmapFilePathException, errMsg
-            else:
-                readSessionFP.close()
+            if not test or test[0] in ("n", "N"):
+                conf.os = os
         else:
-            try:
-                os.remove(conf.sessionFile)
-                logger.info("flushing session file")
-            except OSError, msg:
-                errMsg = "unable to flush the session file (%s)" % msg
-                raise sqlmapFilePathException, errMsg
+            conf.os = os
 
-    try:
-        conf.sessionFP = codecs.open(conf.sessionFile, "a", UNICODE_ENCODING)
-        dataToSessionFile("\n[%s]\n" % time.strftime("%X %x"))
-    except IOError:
-        errMsg = "unable to write on the session file specified"
-        raise sqlmapFilePathException, errMsg
+        Backend.setOs(conf.os)
 
 def __setResultsFile():
     """
@@ -435,7 +437,6 @@ def initTargetEnv():
 
         conf.paramDict = {}
         conf.parameters = {}
-        conf.sessionFile = None
         conf.hashDBFile = None
 
         __setKnowledgeBaseAttributes(False)
@@ -445,7 +446,6 @@ def initTargetEnv():
 def setupTargetEnv():
     __createTargetDirs()
     __setRequestParams()
-    __setOutputResume()
     __setHashDB()
     __resumeHashDBValues()
     __setResultsFile()
