@@ -163,7 +163,6 @@ optDict = {
 
             "General":       {
                                #"xmlFile":           "string",
-                               "sessionFile":       "string",
                                "trafficFile":       "string",
                                "batch":             "boolean",
                                "charset":           "string",

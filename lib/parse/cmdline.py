@@ -496,10 +496,6 @@ def cmdLineParser():
         #general.add_option("-x", dest="xmlFile",
         #                    help="Dump the data into an XML file")
 
-        general.add_option("-s", dest="sessionFile",
-                            help="Save and resume all data retrieved "
-                            "on a session file")
-
         general.add_option("-t", dest="trafficFile",
                             help="Log all HTTP traffic into a "
                             "textual file")
