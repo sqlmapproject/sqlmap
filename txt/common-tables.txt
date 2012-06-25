@@ -3352,3 +3352,17 @@ pw_memberinfo
 aliastype
 mymps_mail_sendlist
 mymps_navurl
+
+# List provided by Pedrito Perez (0ark1ang3l@gmail.com)
+adminstbl
+admintbl
+affiliateUsers
+hsa_user
+tblmanager
+tblmanagers
+tblproduct
+tblproducts
+tuser
+tusers
+userstbl
+usertbl
