@@ -163,7 +163,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         if not kb.threadContinue:
             return None
 
-        if output is not None:
+        if output is not None and not (threadData.resumed and kb.suppressResumeInfo):
             dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
 
         if isinstance(num, int):

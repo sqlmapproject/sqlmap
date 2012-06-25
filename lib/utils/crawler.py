@@ -129,4 +129,3 @@ class Crawler:
             else:
                 for url in threadData.shared.outputs:
                     kb.targetUrls.add(( url, None, None, None ))
-            kb.suppressResumeInfo = False

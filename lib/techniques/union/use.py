@@ -314,7 +314,7 @@ def unionUse(expression, unpack=True, dump=False):
                             else:
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
-                            if conf.verbose == 1:
+                            if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo):
                                 status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items)))))
 
                                 if len(status) > width:
