@@ -116,6 +116,8 @@ def checkCharEncoding(encoding):
         encoding = encoding.replace("8559", "8859") # iso-8559 -> iso-8859
     elif "5889" in encoding:
         encoding = encoding.replace("5889", "8859") # iso-5889 -> iso-8859
+    elif "5589" in encoding:
+        encoding = encoding.replace("5589", "8859") # iso-5589 -> iso-8859
     elif "2313" in encoding:
         encoding = encoding.replace("2313", "2312") # gb2313 -> gb2312
     elif "x-euc" in encoding:
