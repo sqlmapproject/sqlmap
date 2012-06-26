@@ -742,11 +742,11 @@ name="Source zip compressed">.
 
 <p>
 You can also checkout the latest development version from the
-<htmlurl url="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/" name="subversion">
+<htmlurl url="https://github.com/sqlmapproject/sqlmap" name="git">
 repository:
 
 <tscreen><verb>
-$ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
+$ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 </verb></tscreen>
 
 <p>
@@ -759,7 +759,7 @@ $ python sqlmap.py --update
 Or:
 
 <tscreen><verb>
-$ svn update
+$ git pull
 </verb></tscreen>
 
 <p>
@@ -3134,12 +3134,11 @@ version directly from the subversion repository. You obviously need
 Internet access.
 
 <p>
-If, for any reason, this operation fails, run <tt>svn update</tt> from
+If, for any reason, this operation fails, run <tt>git pull</tt> from
 your sqlmap working copy. It will perform the exact same operation of
 switch <tt>-</tt><tt>-update</tt>.
-If you are running sqlmap on Windows, you can use the TartoiseSVN client
-by right-clicking in Windows Explorer into your sqlmap working copy and
-clicking on <tt>Update</tt>.
+If you are running sqlmap on Windows, you can use the <htmlurl name="SmartGit"
+url="http://www.syntevo.com/smartgit/index.html"> client.
 
 <p>
 This is strongly recommended <bf>before</bf> reporting any bug to the

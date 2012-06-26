@@ -820,12 +820,12 @@ It is available in two formats:</P>
 </P>
 
 <P>You can also checkout the latest development version from the
-<A HREF="https://svn.sqlmap.org/sqlmap/trunk/sqlmap/">subversion</A>
+<A HREF="https://github.com/sqlmapproject/sqlmap">git</A>
 repository:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ svn checkout https://svn.sqlmap.org/sqlmap/trunk/sqlmap sqlmap-dev
+$ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -842,7 +842,7 @@ $ python sqlmap.py --update
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ svn update
+$ git pull
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -3024,12 +3024,11 @@ counts the number of retrieved output characters.</P>
 version directly from the subversion repository. You obviously need
 Internet access.</P>
 
-<P>If, for any reason, this operation fails, run <CODE>svn update</CODE> from
+<P>If, for any reason, this operation fails, run <CODE>git pull</CODE> from
 your sqlmap working copy. It will perform the exact same operation of
 switch <CODE>-</CODE><CODE>-update</CODE>.
-If you are running sqlmap on Windows, you can use the TartoiseSVN client
-by right-clicking in Windows Explorer into your sqlmap working copy and
-clicking on <CODE>Update</CODE>.</P>
+If you are running sqlmap on Windows, you can use the 
+<A HREF="http://www.syntevo.com/smartgit/index.html">SmartGit</A> client.</P>
 
 <P>This is strongly recommended <B>before</B> reporting any bug to the
 <A HREF="http://www.sqlmap.org/#ml">mailing lists</A>.</P>
