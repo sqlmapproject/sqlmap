@@ -173,6 +173,7 @@ optDict = {
                                "flushSession":      "boolean",
                                "forms":             "boolean",
                                "freshQueries":      "boolean",
+                               "rfmt":              "string",
                                "hexConvert":        "boolean",
                                "parseErrors":       "boolean",
                                "replicate":         "boolean",

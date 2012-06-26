@@ -328,7 +328,11 @@ def __setResultsFile():
         return
 
     if not conf.resultsFP:
-        conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, time.strftime(RESULTS_FILE_FORMAT).lower())
+        if conf.rfmt:
+            conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, conf.rfmt)
+        else:
+            conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, time.strftime(RESULTS_FILE_FORMAT).lower())
+
         conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING)
         conf.resultsFP.writelines("Target url,Place,Parameter,Techniques%s" % os.linesep)
 
