@@ -535,6 +535,9 @@ def cmdLineParser():
                             action="store_true",
                             help="Ignores query results stored in session file")
 
+        general.add_option("--result-file", dest="rfmt",
+                              help="Result file name (time.strftime format string)")
+
         general.add_option("--hex", dest="hexConvert",
                             action="store_true",
                             help="Uses DBMS hex function(s) for data retrieval")
