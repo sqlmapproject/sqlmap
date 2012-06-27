@@ -16,6 +16,17 @@ sqlmap is an open source penetration testing tool that automates the process of 
 * Support to **establish an out-of-band stateful TCP connection between the attacker machine and the database server** underlying operating system. This channel can be an interactive command prompt, a Meterpreter session or a graphical user interface (VNC) session as per user's choice.
 * Support for **database process' user privilege escalation** via Metasploit's Meterpreter `getsystem` command.
 
+# Download
+
+You can download the latest tarball by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master).
+
+Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
+```
+git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+```
+
+This is strongly recommended before reporting any bug to the [mailing list](#mailing-list).
+
 # Documentation
 
 * sqlmap [user's manual](https://github.com/sqlmapproject/sqlmap/raw/master/doc/README.pdf).
@@ -27,17 +38,6 @@ sqlmap is an open source penetration testing tool that automates the process of 
 * *sqlmap - security development in python* [slides](http://www.slideshare.net/stamparm/euro-python-2011miroslavstamparsqlmapsecuritydevelopmentinpython) presented by Miroslav at [EuroPython 2011](http://ep2011.europython.eu/) in Firenze (Italy) on June 23, 2011.
 * *It all starts with the ' (SQL injection from attacker's point of view)* [slides](http://www.slideshare.net/stamparm/f-sec-2011miroslavstamparitallstartswiththesinglequote-9311238) presented by Miroslav at [FSec - FOI Security Symposium](http://fsec.foi.hr/) in Varazdin (Croatia) on September 23, 2011.
 * *DNS exfiltration using sqlmap* [slides](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281) and accompaining [whitepaper](http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper) titled *Data Retrieval over DNS in SQL Injection Attacks* presented by Miroslav at [PHDays 2012](http://www.phdays.com/) in Moscow (Russia) on May 31, 2012.
-
-# Download
-
-You can download the latest tarball by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master).
-
-Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
-```
-git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
-```
-
-This is strongly recommended before reporting any bug to the [mailing list](#mailing-list).
 
 # Mailing list
 
