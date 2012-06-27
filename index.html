@@ -4,6 +4,18 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="./twitter.min.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8">
+    getTwitters('tweet', { 
+      id: 'sqlmap', 
+      count: 6, 
+      enableLinks: true, 
+      ignoreReplies: true, 
+      clearContents: true,
+      template: '<strong><a href="http://twitter.com/%user_screen_name%/statuses/%id_str%/">%time%</a></strong> - %text%'
+    });
+    </script>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
@@ -28,6 +40,11 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
+          <h1>News</h1>
+
+<a href="https://twitter.com/sqlmap"><img src="images/twitter.jpg" alt="Follow sqlmap on Twitter" width="90" height="90" class="left"></a>
+<div id="tweet">Loading news.. if you can not wait, click <a href="http://twitter.com/sqlmap">here</a>.</div>
+
           <h1>Introduction</h1>
 
 <p>sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.</p>
