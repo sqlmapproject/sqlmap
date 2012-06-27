@@ -18,19 +18,19 @@ sqlmap is an open source penetration testing tool that automates the process of 
 
 # Documentation
 
-* sqlmap (user's manual)[https://github.com/sqlmapproject/sqlmap/raw/master/doc/README.pdf].
-* sqlmap (ChangeLog)[https://raw.github.com/sqlmapproject/sqlmap/master/doc/ChangeLog].
-* *SQL injection: Not only AND 1=1* (slides)[http://www.slideshare.net/inquis/sql-injection-not-only-and-11-updated] presented by Bernardo at the 2nd Digital Security Forum in Lisbon (Portugal) on June 27, 2009.
-* **Advanced SQL injection to operating system full control** (whitepaper)[http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857] and (slides)[http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-slides] presented by Bernardo at (Black Hat Europe 2009)[https://www.blackhat.com/html/bh-europe-09/bh-eu-09-main.html] in Amsterdam (The Netherlands) on April 16, 2009.
-* **Expanding the control over the operating system from the database** (slides)[http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database] presented by Bernardo at (SOURCE Conference)[http://www.sourceconference.com/archive/] 2009 in Barcelona (Spain) on September 21, 2009.
-* **Got database access? Own the network!** (slides)[http://www.slideshare.net/inquis/ath-con-2010bernardodamelegotdbownnet] presented by Bernardo at (AthCon 2010)[http://www.athcon.org/archive.php] in Athens (Greece) on June 3, 2010.
-* **sqlmap - security development in python** (slides)[http://www.slideshare.net/stamparm/euro-python-2011miroslavstamparsqlmapsecuritydevelopmentinpython] presented by Miroslav at (EuroPython 2011)[http://ep2011.europython.eu/] in Firenze (Italy) on June 23, 2011.
-* **It all starts with the ' (SQL injection from attacker's point of view)** (slides)[http://www.slideshare.net/stamparm/f-sec-2011miroslavstamparitallstartswiththesinglequote-9311238] presented by Miroslav at (FSec - FOI Security Symposium)[http://fsec.foi.hr/] in Varazdin (Croatia) on September 23, 2011.
-* **DNS exfiltration using sqlmap** (slides)[http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281] and accompaining (whitepaper)[http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper] titled **Data Retrieval over DNS in SQL Injection Attacks** presented by Miroslav at (PHDays 2012)[http://www.phdays.com/] in Moscow (Russia) on May 31, 2012.
+* sqlmap [user's manual](https://github.com/sqlmapproject/sqlmap/raw/master/doc/README.pdf).
+* sqlmap [ChangeLog](https://raw.github.com/sqlmapproject/sqlmap/master/doc/ChangeLog).
+* *SQL injection: Not only AND 1=1* [slides](http://www.slideshare.net/inquis/sql-injection-not-only-and-11-updated) presented by Bernardo at the 2nd Digital Security Forum in Lisbon (Portugal) on June 27, 2009.
+* **Advanced SQL injection to operating system full control** [whitepaper](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857) and [slides](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-slides) presented by Bernardo at [Black Hat Europe 2009](https://www.blackhat.com/html/bh-europe-09/bh-eu-09-main.html) in Amsterdam (The Netherlands) on April 16, 2009.
+* **Expanding the control over the operating system from the database** [slides](http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database) presented by Bernardo at [SOURCE Conference](http://www.sourceconference.com/archive/) 2009 in Barcelona (Spain) on September 21, 2009.
+* **Got database access? Own the network!** [slides](http://www.slideshare.net/inquis/ath-con-2010bernardodamelegotdbownnet) presented by Bernardo at [AthCon 2010](http://www.athcon.org/archive.php) in Athens (Greece) on June 3, 2010.
+* **sqlmap - security development in python** [slides](http://www.slideshare.net/stamparm/euro-python-2011miroslavstamparsqlmapsecuritydevelopmentinpython) presented by Miroslav at [EuroPython 2011](http://ep2011.europython.eu/) in Firenze (Italy) on June 23, 2011.
+* **It all starts with the ' (SQL injection from attacker's point of view)** [slides](http://www.slideshare.net/stamparm/f-sec-2011miroslavstamparitallstartswiththesinglequote-9311238) presented by Miroslav at [FSec - FOI Security Symposium](http://fsec.foi.hr/) in Varazdin (Croatia) on September 23, 2011.
+* **DNS exfiltration using sqlmap** [slides](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281) and accompaining [whitepaper](http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper) titled **Data Retrieval over DNS in SQL Injection Attacks** presented by Miroslav at [PHDays 2012](http://www.phdays.com/) in Moscow (Russia) on May 31, 2012.
 
 # Download
 
-You can download the latest tarball by clicking (here)[https://github.com/sqlmapproject/sqlmap/tarball/master].
+You can download the latest tarball by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master).
 
 Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
 ```
@@ -55,7 +55,7 @@ You can contact the development team by writing to dev@sqlmap.org.
 
 We are constantly seeking for people who can write some clean Python code, are up to do security research, know about web application security, database assessment and takeover, software refactoring and are motivated to join the development team.
 
-If this sounds interesting to you, send us your (pull requests)[https://github.com/sqlmapproject/sqlmap/pulls]!
+If this sounds interesting to you, send us your (pull requests](https://github.com/sqlmapproject/sqlmap/pulls]!
 
 # Donate
 
