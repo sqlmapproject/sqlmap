@@ -1975,9 +1975,10 @@ class Enumeration:
                 regex = "|".join(conf.tbl.split(","))
                 return tableExists(paths.COMMON_TABLES, regex)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         foundTbls = {}
         tblList = conf.tbl.split(",")
+
+        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
         whereDbsQuery = ""
