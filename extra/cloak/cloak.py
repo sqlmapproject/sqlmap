@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """
-$Id$
-
 cloak.py - Simple file encryption/compression utility
 
 Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)

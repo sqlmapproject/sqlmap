@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """
-$Id$
-
 safe2bin.py - Simple safe(hex) to binary format converter
 
 Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)

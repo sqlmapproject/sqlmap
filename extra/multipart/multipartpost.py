@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """
-$Id$
-
 02/2006 Will Holcomb <wholcomb@gmail.com>
 
 Reference: http://odin.himinbi.org/MultipartPostHandler.py

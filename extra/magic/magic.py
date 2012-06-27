@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """
-$Id$
-
 Adam Hupp <adam@hupp.org>
 
 Reference: http://hupp.org/adam/hg/python-magic
