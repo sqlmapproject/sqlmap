@@ -55,7 +55,7 @@ You can contact the development team by writing to `dev@sqlmap.org`.
 
 We are constantly seeking for people who can write some clean Python code, are up to do security research, know about web application security, database assessment and takeover, software refactoring and are motivated to join the development team.
 
-If this sounds interesting to you, send us your (pull requests](https://github.com/sqlmapproject/sqlmap/pulls]!
+If this sounds interesting to you, send us your [pull requests](https://github.com/sqlmapproject/sqlmap/pulls)!
 
 # Donate
 
