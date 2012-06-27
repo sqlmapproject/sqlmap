@@ -23,8 +23,8 @@ The mailing list is archived online on [SourceForge](http://sourceforge.net/mail
 
 # Developers
 
-* [Bernardo Damele A. G.](bernardo@sqlmap.org) - [@inquisb](https://twitter.com/inquisb)
-* [Miroslav Stampar](miroslav@sqlmap.org) - [@stamparm](https://twitter.com/stamparm)
+[Bernardo Damele A. G.](bernardo@sqlmap.org) - [@inquisb](https://twitter.com/inquisb)<BR>
+[Miroslav Stampar](miroslav@sqlmap.org) - [@stamparm](https://twitter.com/stamparm)
 
 You can contact the development team by writing to dev@sqlmap.org.
 
