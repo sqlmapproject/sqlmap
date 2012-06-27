@@ -328,13 +328,13 @@ blockquote {
 }
 
 ul li {
-	float: left;
-	margin: 0 18px 18px 0;
+  list-style: disc inside;
+/*  padding-left: 20px; */
 }
 
 ol li {
-	float: left;
-	margin: 0 18px 18px 0;
+  list-style: decimal inside;
+/*  padding-left: 3px; */
 }
 
 dl dd {
