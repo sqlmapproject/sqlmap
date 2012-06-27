@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>sqlmap by sqlmapproject</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>sqlmap</h1>
+        <h2>Automatic SQL injection and database takeover tool</h2>
+        <a href="https://github.com/sqlmapproject/sqlmap" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>Introduction</h1>
+
+<p>sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.</p>
+
+<h1>Features</h1>
+
+<ul>
+<li>Full support for <strong>MySQL, Oracle, PostgreSQL, Microsoft SQL Server, Microsoft Access, SQLite, Firebird, Sybase and SAP MaxDB</strong> database management systems.</li>
+<li>Full support for six SQL injection techniques: <strong>boolean-based blind, time-based blind, error-based, UNION query, stacked queries and out-of-band</strong>.</li>
+<li>Support to <strong>directly connect to the database</strong> without passing via a SQL injection, by providing DBMS credentials, IP address, port and database name.</li>
+<li>Support to enumerate <strong>database users, users' password hashes, users' privileges, users' roles, databases, tables and columns</strong>.</li>
+<li>Automatic recognition of password hashes format and support to <strong>crack them with a dictionary-based attack</strong>.</li>
+<li>Support to <strong>dump database tables</strong> entirely, a range of entries or specific columns as per user's choice. The user can also choose to dump only a range of characters from each column's entry.</li>
+<li>Support to <strong>search for specific database names, specific tables across all databases or specific columns across all databases' tables</strong>. This is useful, for instance, to identify tables containing custom application credentials where relevant columns' names contain string like name and pass.</li>
+<li>Support to <strong>download and upload any file</strong> from the database server underlying file system when the database software is MySQL, PostgreSQL or Microsoft SQL Server.</li>
+<li>Support to <strong>execute arbitrary commands and retrieve their standard output</strong> on the database server underlying operating system when the database software is MySQL, PostgreSQL or Microsoft SQL Server.</li>
+<li>Support to <strong>establish an out-of-band stateful TCP connection between the attacker machine and the database server</strong> underlying operating system. This channel can be an interactive command prompt, a Meterpreter session or a graphical user interface (VNC) session as per user's choice.</li>
+<li>Support for <strong>database process' user privilege escalation</strong> via Metasploit's Meterpreter <code>getsystem</code> command.</li>
+</ul><h1>Download</h1>
+
+<p>You can download the latest tarball by clicking <a href="https://github.com/sqlmapproject/sqlmap/tarball/master">here</a>.</p>
+
+<p>Preferably, you can download sqlmap by cloning the <a href="https://github.com/sqlmapproject/sqlmap">Git</a> repository:</p>
+
+<pre><code>git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+</code></pre>
+
+<p>This is strongly recommended before reporting any bug to the <a href="#mailing-list">mailing list</a>.</p>
+
+<h1>Documentation</h1>
+
+<ul>
+<li>sqlmap <a href="https://github.com/sqlmapproject/sqlmap/raw/master/doc/README.pdf">user's manual</a>.</li>
+<li>sqlmap <a href="https://raw.github.com/sqlmapproject/sqlmap/master/doc/ChangeLog">ChangeLog</a>.</li>
+<li>
+<em>SQL injection: Not only AND 1=1</em> <a href="http://www.slideshare.net/inquis/sql-injection-not-only-and-11-updated">slides</a> presented by Bernardo at the 2nd Digital Security Forum in Lisbon (Portugal) on June 27, 2009.</li>
+<li>
+<em>Advanced SQL injection to operating system full control</em> <a href="http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857">whitepaper</a> and <a href="http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-slides">slides</a> presented by Bernardo at <a href="https://www.blackhat.com/html/bh-europe-09/bh-eu-09-main.html">Black Hat Europe 2009</a> in Amsterdam (The Netherlands) on April 16, 2009.</li>
+<li>
+<em>Expanding the control over the operating system from the database</em> <a href="http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database">slides</a> presented by Bernardo at <a href="http://www.sourceconference.com/archive/">SOURCE Conference</a> 2009 in Barcelona (Spain) on September 21, 2009.</li>
+<li>
+<em>Got database access? Own the network!</em> <a href="http://www.slideshare.net/inquis/ath-con-2010bernardodamelegotdbownnet">slides</a> presented by Bernardo at <a href="http://www.athcon.org/archive.php">AthCon 2010</a> in Athens (Greece) on June 3, 2010.</li>
+<li>
+<em>sqlmap - security development in python</em> <a href="http://www.slideshare.net/stamparm/euro-python-2011miroslavstamparsqlmapsecuritydevelopmentinpython">slides</a> presented by Miroslav at <a href="http://ep2011.europython.eu/">EuroPython 2011</a> in Firenze (Italy) on June 23, 2011.</li>
+<li>
+<em>It all starts with the ' (SQL injection from attacker's point of view)</em> <a href="http://www.slideshare.net/stamparm/f-sec-2011miroslavstamparitallstartswiththesinglequote-9311238">slides</a> presented by Miroslav at <a href="http://fsec.foi.hr/">FSec - FOI Security Symposium</a> in Varazdin (Croatia) on September 23, 2011.</li>
+<li>
+<em>DNS exfiltration using sqlmap</em> <a href="http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281">slides</a> and accompaining <a href="http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper">whitepaper</a> titled <em>Data Retrieval over DNS in SQL Injection Attacks</em> presented by Miroslav at <a href="http://www.phdays.com/">PHDays 2012</a> in Moscow (Russia) on May 31, 2012.</li>
+</ul><h1>Demo</h1>
+
+<p></p>
+
+<p>Watch more videos on (YouTube)[<a href="http://www.youtube.com/inquisb#g/u">http://www.youtube.com/inquisb#g/u</a>].</p>
+
+<h1>Mailing list</h1>
+
+<p>The <code>sqlmap-users@lists.sourceforge.net</code> mailing list is the preferred way to ask questions, report bugs, suggest new features and discuss with other users, <a href="https://github.com/sqlmapproject/sqlmap/blob/master/doc/THANKS">contributors</a> and the <a href="#developers">developers</a>. To subscribe use the <a href="https://lists.sourceforge.net/lists/listinfo/sqlmap-users">online web form</a>.
+The mailing list is archived online on <a href="http://sourceforge.net/mailarchive/forum.php?forum_name=sqlmap-users">SourceForge</a>, <a href="http://news.gmane.org/gmane.comp.security.sqlmap">Gmane</a> and is available also via Gmane <a href="http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap">RSS feed</a>.</p>
+
+<h1>Developers</h1>
+
+<p><a href="mailto:bernardo@sqlmap.org">Bernardo Damele A. G.</a> - <a href="https://twitter.com/inquisb">@inquisb</a><br><a href="mailto:miroslav@sqlmap.org">Miroslav Stampar</a> - <a href="https://twitter.com/stamparm">@stamparm</a></p>
+
+<p>You can contact the development team by writing to <code>dev@sqlmap.org</code>.</p>
+
+<h1>Contribute</h1>
+
+<p>We are constantly seeking for people who can write some clean Python code, are up to do security research, know about web application security, database assessment and takeover, software refactoring and are motivated to join the development team.</p>
+
+<p>If this sounds interesting to you, send us your <a href="https://github.com/sqlmapproject/sqlmap/pulls">pull requests</a>!</p>
+
+<h1>Donate</h1>
+
+<p>sqlmap is the result of numerous hours of passionated work from a small team of computer security enthusiasts. If you appreciated our work and you want to see sqlmap kept being developed, please consider making a small donation to our efforts.</p>
+
+<h1>License</h1>
+
+<p>sqlmap is released under the terms of the <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">General Public License v2</a>.<br>
+sqlmap is copyrighted by its <a href="#developers">developers</a>.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/sqlmapproject/sqlmap/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/sqlmapproject/sqlmap/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/sqlmapproject/sqlmap"></a> is maintained by <a href="https://github.com/sqlmapproject">sqlmapproject</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-5076660-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
