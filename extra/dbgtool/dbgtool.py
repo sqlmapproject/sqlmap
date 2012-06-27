@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """
-$Id$
-
 dbgtool.py - Portable executable to ASCII debug script converter
 
 Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
