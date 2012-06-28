@@ -46,7 +46,7 @@ class Google:
         HTTP addresses
         """
 
-        retVal = re.findall(GOOGLE_REGEX, page, re.I | re.S)
+        retVal = [match.group(1) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
 
         return retVal
 

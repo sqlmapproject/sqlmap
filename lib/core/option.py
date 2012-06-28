@@ -1154,14 +1154,14 @@ def __setHTTPUserAgent():
         conf.httpHeaders.append(("User-Agent", conf.agent))
 
     elif not conf.randomAgent:
-        addDefaultUserAgent = True
+        _ = True
 
         for header, _ in conf.httpHeaders:
             if header == "User-Agent":
-                addDefaultUserAgent = False
+                _ = False
                 break
 
-        if addDefaultUserAgent:
+        if _:
             conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
 
     else:
