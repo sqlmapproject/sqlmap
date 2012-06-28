@@ -590,7 +590,7 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Check for missing sqlmap dependencies")
 
-        miscellaneous.add_option("--disable-cracking", dest="disableCracking",
+        miscellaneous.add_option("--disable-hash", dest="disableHash",
                                   action="store_true",
                                   help="Disable password hash cracking mechanism")
 

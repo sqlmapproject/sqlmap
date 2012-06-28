@@ -185,7 +185,7 @@ optDict = {
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",
-                               "disableCracking":   "boolean",
+                               "disableHash":       "boolean",
                                "disableLike":       "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
