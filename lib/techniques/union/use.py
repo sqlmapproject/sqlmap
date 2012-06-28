@@ -55,7 +55,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
     if retVal is None:
         check = "(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop)
-        trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
+        trimcheck = "%s(?P<result>.*?)<" % (kb.chars.start)
 
         # Prepare expression with delimiters
         injExpression = unescaper.unescape(agent.concatQuery(expression, unpack))

@@ -590,9 +590,13 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Check for missing sqlmap dependencies")
 
-        miscellaneous.add_option("--exact", dest="exact",
+        miscellaneous.add_option("--disable-cracking", dest="disableCracking",
                                   action="store_true",
-                                  help="Prefer usage of exactly provided identificator names")
+                                  help="Disable password hash cracking mechanism")
+
+        miscellaneous.add_option("--disable-like", dest="disableLike",
+                                  action="store_true",
+                                  help="Disable LIKE search of identificator names")
 
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")

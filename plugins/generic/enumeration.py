@@ -1033,7 +1033,7 @@ class Enumeration:
                 logger.error(errMsg)
                 bruteForce = True
 
-        if bruteForce or colList and conf.exact:
+        if bruteForce or colList and conf.disableLike:
             resumeAvailable = False
 
             for tbl in tblList:
