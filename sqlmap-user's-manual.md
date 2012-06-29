@@ -150,16 +150,16 @@ Also, the stored procedure is re-enabled if disabled or created from scratch if 
 sqlmap relies on Metasploit to create the shellcode and implements four different techniques to execute it on the database server. These techniques are:
 * Database **in-memory execution of the Metasploit's shellcode** via sqlmap own user-defined function `sys_bineval()`. Supported on MySQL and PostgreSQL.
 * Upload and execution of a Metasploit's **stand-alone payload stager** via sqlmap own user-defined function `sys_exec()` on MySQL and PostgreSQL or via `xp_cmdshell()` on Microsoft SQL Server.
-* Execution of Metasploit's shellcode by performing a **SMB reflection attack** (
-[MS08-068](http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx) with a UNC path request from the database server to the attacker's machine where the Metasploit `smb_relay` server exploit listens. Supported when running sqlmap with high privileges (`uid=0`) on Linux/Unix and the target DBMS runs as Administrator on Windows.
-* Database in-memory execution of the Metasploit's shellcode by exploiting **Microsoft SQL Server 2000 and 2005 `sp_replwritetovarbin` stored procedure heap-based buffer overflow** (
-[MS09-004](http://www.microsoft.com/technet/security/bulletin/ms09-004.mspx)). sqlmap has its own exploit to trigger the vulnerability with automatic DEP memory protection bypass, but it relies on Metasploit to generate the shellcode to get executed upon successful exploitation.
+* Execution of Metasploit's shellcode by performing a **SMB reflection attack** ([MS08-068](http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx) with a UNC path request from the database server to the attacker's machine where the Metasploit `smb_relay` server exploit listens. Supported when running sqlmap with high privileges (`uid=0`) on Linux/Unix and the target DBMS runs as Administrator on Windows.
+* Database in-memory execution of the Metasploit's shellcode by exploiting **Microsoft SQL Server 2000 and 2005 `sp_replwritetovarbin` stored procedure heap-based buffer overflow** ([MS09-004](http://www.microsoft.com/technet/security/bulletin/ms09-004.mspx)). sqlmap has its own exploit to trigger the vulnerability with automatic DEP memory protection bypass, but it relies on Metasploit to generate the shellcode to get executed upon successful exploitation.
 * Support for **database process' user privilege escalation** via Metasploit's `getsystem` command which include, among others, the 
-[kitrap0d](http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html) technique (
-[MS10-015](http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx)).
+[kitrap0d](http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html) technique ([MS10-015](http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx)).
 * Support to access (read/add/delete) Windows registry hives.
 
 # History
+
+## 2012
+* **May 31**, Miroslav [presents](http://phdays.com/program/conference/) his research **DNS exfiltration using sqlmap** ([slides](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281)) with accompanying [whitepaper](http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper) **Data Retrieval over DNS in SQL Injection Attacks** at PHDays 2012 in Moscow, Russia.
 
 ## 2011
 * **September 23**, Miroslav [presents](http://fsec.foi.hr/index.php/Miroslav_Stampar_-_It_all_starts_with_the_%27_-_SQL_injection_from_attackers_point_of_view) **It all starts with the ' (SQL injection from attacker's point of view)** ([slides](http://www.slideshare.net/stamparm/f-sec-2011miroslavstamparitallstartswiththesinglequote-9311238)) talking about methods attackers use in SQL injection attacks at FSec - FOI Security Symposium in Varazdin, Croatia.
@@ -173,7 +173,7 @@ a talk titled **Got database access? Own the network!** at AthCon 2010 in Athens
 * **March 14**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release stable version of 
 sqlmap **0.8** featuring many features. Amongst these, support to enumerate and dump all databases' tables containing user provided column(s), stabilization and enhancements to the takeover functionalities, updated integration with Metasploit 3.3.3 and a lot of minor features and bug fixes.
 * **March**, sqlmap demo videos have been [published](http://www.youtube.com/inquisb).
-* **January**, Bernardo is [invited](http://www.athcon.org/speakers/) to present at [AthCon]http://www.athcon.org/archives/2010-2/) conference in Greece on June 2010.
+* **January**, Bernardo is [invited](http://www.athcon.org/speakers/) to present at [AthCon](http://www.athcon.org/archives/2010-2/) conference in Greece on June 2010.
 
 ## 2009
 * **December 18**, [Miroslav Stampar](http://unconciousmind.blogspot.com/) replies to the call for developers. Along with Bernardo, he actively develops sqlmap from version **0.8 release candidate 2**.
