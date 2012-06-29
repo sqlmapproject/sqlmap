@@ -15,17 +15,16 @@ sqlmap relies on the [Metasploit Framework](http://metasploit.com) for some of i
 
 If you are willing to connect directly to a database server (switch `-d`), without passing through the web application, you need to install Python bindings for the database management system that you are going to attack:
 
-* Firebird: <htmlurl name="python-kinterbasdb" url="http://kinterbasdb.sourceforge.net/">
-* Microsoft Access: <htmlurl name="python-pyodbc" url="http://pyodbc.googlecode.com/">
-* Microsoft SQL Server: <htmlurl name="python-pymssql" url="http://pymssql.sourceforge.net/">
-* MySQL: <htmlurl name="python pymysql" url="http://code.google.com/p/pymysql/">
-* Oracle: <htmlurl name="python cx_Oracle" url="http://cx-oracle.sourceforge.net/">
-* PostgreSQL: <htmlurl name="python-psycopg2" url="http://initd.org/psycopg/">
-* SQLite: <htmlurl name="python-pysqlite2" url="http://pysqlite.googlecode.com/">
-* Sybase: <htmlurl name="python-pymssql" url="http://pymssql.sourceforge.net/">
+* Firebird: [python-kinterbasdb](http://kinterbasdb.sourceforge.net/)
+* Microsoft Access: [python-pyodbc](http://pyodbc.googlecode.com/)
+* Microsoft SQL Server: [python-pymssql](http://pymssql.sourceforge.net/)
+* MySQL: [python pymysql](http://code.google.com/p/pymysql/)
+* Oracle: [python cx_Oracle](http://cx-oracle.sourceforge.net/)
+* PostgreSQL: [python-psycopg2](http://initd.org/psycopg/)
+* SQLite: [python-pysqlite2](http://pysqlite.googlecode.com/)
+* Sybase: [python-pymssql](http://pymssql.sourceforge.net/)
 
-If you plan to attack a web application behind NTLM authentication or use the sqlmap update functionality (`--update` switch) you need to install respectively (http://code.google.com/p/python-ntlm/"
-name="python-ntlm"> and (http://pysvn.tigris.org/" name="python-svn"> libraries respectively.
+If you plan to attack a web application behind NTLM authentication or use the sqlmap update functionality (switch `--update`) you need to install respectively [python-ntlm](http://code.google.com/p/python-ntlm/) and [python-svn](http://pysvn.tigris.org/) libraries respectively.
 
 Optionally, if you are running sqlmap on Windows, you may wish to install the [PyReadline](http://ipython.scipy.org/moin/PyReadline/Intro) library in order to take advantage of the sqlmap TAB completion and history support features in the SQL shell and OS shell. Note that these functionalities are available natively via the standard Python [readline](http://docs.python.org/library/readline.html) library on other operating systems.
 
