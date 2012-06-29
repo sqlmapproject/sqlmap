@@ -229,241 +229,338 @@ limited support for MySQL added.
 
 
 # Download and update
-sqlmap can be downloaded from its (http://sourceforge.net/projects/sqlmap/files/ "SourceForge File List page). It is available in two formats:
-* (http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz"
-name="Source gzip compressed).
-* (http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip"
-name="Source zip compressed).
+sqlmap can be downloaded from its [SourceForge File List page](http://sourceforge.net/projects/sqlmap/files/). It is available in two formats:
+* [Source gzip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz)
+* [Source zip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip)
 
-You can also checkout the latest development version from the (https://github.com/sqlmapproject/sqlmap "git)
+You can also checkout the latest development version from the [Git](https://github.com/sqlmapproject/sqlmap)
 repository:
+
 ```$ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev```
 
 You can update it at any time to the latest development version by running:
+
 ```$ python sqlmap.py --update```
 
 Or:
+
 ```$ git pull```
 
 This is strongly recommended **before** reporting any bug to the [mailing list](http://www.sqlmap.org/#ml).
 
 # Usage
+    $ python sqlmap.py -h
+
+        sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+        http://www.sqlmap.org
+
+    [!] legal disclaimer: usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Authors assume no liability and are not responsible for any misuse or damage caused by this program
+
+    Usage: python sqlmap.py [options]
+
+    Options:
+    --version             show program's version number and exit
+    -h, --help            show this help message and exit
+    -v VERBOSE            Verbosity level: 0-6 (default 1)
+
+    Target:
+        At least one of these options has to be specified to set the source to get target urls from
+
+        -d DIRECT           Direct connection to the database
+        -u URL, --url=URL   Target url
+        -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
+        -m BULKFILE         Scan multiple targets enlisted in a given textual file
+        -r REQUESTFILE      Load HTTP request from a file
+        -g GOOGLEDORK       Process Google dork results as target urls
+        -c CONFIGFILE       Load options from a configuration INI file
+
+    Request:
+        These options can be used to specify how to connect to the target url
+
+        --data=DATA         Data string to be sent through POST
+        --param-del=PDEL    Character used for splitting parameter values
+        --cookie=COOKIE     HTTP Cookie header
+        --load-cookies=LOC  File containing cookies in Netscape/wget format
+        --cookie-urlencode  URL Encode generated cookie injections
+        --drop-set-cookie   Ignore Set-Cookie header from response
+        --user-agent=AGENT  HTTP User-Agent header
+        --random-agent      Use randomly selected HTTP User-Agent header
+        --randomize=RPARAM  Randomly change value for given parameter(s)
+        --force-ssl         Force usage of SSL/HTTPS requests
+        --host=HOST         HTTP Host header
+        --referer=REFERER   HTTP Referer header
+        --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
+        --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
+        --auth-cred=ACRED   HTTP authentication credentials (name:password)
+        --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
+        --proxy=PROXY       Use a HTTP proxy to connect to the target url
+        --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
+        --ignore-proxy      Ignore system default HTTP proxy
+        --delay=DELAY       Delay in seconds between each HTTP request
+        --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
+        --retries=RETRIES   Retries when the connection timeouts (default 3)
+        --scope=SCOPE       Regexp to filter targets from provided proxy log
+        --safe-url=SAFURL   Url address to visit frequently during testing
+        --safe-freq=SAFREQ  Test requests between two visits to a given safe url
+        --skip-urlencode    Skip URL encoding of POST data
+        --eval=EVALCODE     Evaluate provided Python code before the request (e.g. "import hashlib;id2=hashlib.md5(id).hexdigest()")
+
+    Optimization:
+        These options can be used to optimize the performance of sqlmap
+
+        -o                  Turn on all optimization switches
+        --predict-output    Predict common queries output
+        --keep-alive        Use persistent HTTP(s) connections
+        --null-connection   Retrieve page length without actual HTTP response body
+        --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
+
+    Injection:
+        These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts
+
+        -p TESTPARAMETER    Testable parameter(s)
+        --dbms=DBMS         Force back-end DBMS to this value
+        --os=OS             Force back-end DBMS operating system to this value
+        --invalid-bignum    Use big numbers for invalidating values
+        --invalid-logical   Use logical operations for invalidating values
+        --no-cast           Turn off payload casting mechanism
+        --prefix=PREFIX     Injection payload prefix string
+        --suffix=SUFFIX     Injection payload suffix string
+        --skip=SKIP         Skip testing for given parameter(s)
+        --tamper=TAMPER     Use given script(s) for tampering injection data
+
+    Detection:
+        These options can be used to specify how to parse and compare page content from HTTP responses when using blind SQL injection technique
+
+        --level=LEVEL       Level of tests to perform (1-5, default 1)
+        --risk=RISK         Risk of tests to perform (0-3, default 1)
+        --string=STRING     String to match in the response when query is valid
+        --regexp=REGEXP     Regexp to match in the response when query is valid
+        --code=CODE         HTTP response code to match when the query is valid
+        --text-only         Compare pages based only on the textual content
+        --titles            Compare pages based only on their titles
+
+    Techniques:
+        These options can be used to tweak testing of specific SQL injection techniques
+
+        --technique=TECH    SQL injection techniques to test for (default "BEUST")
+        --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
+        --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
+        --union-char=UCHAR  Character to use for bruteforcing number of columns
+        --dns-domain=DNAME  Domain name used for DNS exfiltration attack
+
+    Fingerprint:
+        -f, --fingerprint   Perform an extensive DBMS version fingerprint
+
+    Enumeration:
+        These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements
+
+        -b, --banner        Retrieve DBMS banner
+        --current-user      Retrieve DBMS current user
+        --current-db        Retrieve DBMS current database
+        --is-dba            Detect if the DBMS current user is DBA
+        --users             Enumerate DBMS users
+        --passwords         Enumerate DBMS users password hashes
+        --privileges        Enumerate DBMS users privileges
+        --roles             Enumerate DBMS users roles
+        --dbs               Enumerate DBMS databases
+        --tables            Enumerate DBMS database tables
+        --columns           Enumerate DBMS database table columns
+        --schema            Enumerate DBMS schema
+        --count             Retrieve number of entries for table(s)
+        --dump              Dump DBMS database table entries
+        --dump-all          Dump all DBMS databases tables entries
+        --search            Search column(s), table(s) and/or database name(s)
+        -D DB               DBMS database to enumerate
+        -T TBL              DBMS database table to enumerate
+        -C COL              DBMS database table column to enumerate
+        -U USER             DBMS user to enumerate
+        --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
+        --start=LIMITSTART  First query output entry to retrieve
+        --stop=LIMITSTOP    Last query output entry to retrieve
+        --first=FIRSTCHAR   First query output word character to retrieve
+        --last=LASTCHAR     Last query output word character to retrieve
+        --sql-query=QUERY   SQL statement to be executed
+        --sql-shell         Prompt for an interactive SQL shell
+
+    Brute force:
+        These options can be used to run brute force checks
+
+        --common-tables     Check existence of common tables
+        --common-columns    Check existence of common columns
+
+    User-defined function injection:
+        These options can be used to create custom user-defined functions
+
+        --udf-inject        Inject custom user-defined functions
+        --shared-lib=SHLIB  Local path of the shared library
+
+    File system access:
+        These options can be used to access the back-end database management system underlying file system
+
+        --file-read=RFILE   Read a file from the back-end DBMS file system
+        --file-write=WFILE  Write a local file on the back-end DBMS file system
+        --file-dest=DFILE   Back-end DBMS absolute filepath to write to
+
+    Operating system access:
+        These options can be used to access the back-end database management system underlying operating system
+
+        --os-cmd=OSCMD      Execute an operating system command
+        --os-shell          Prompt for an interactive operating system shell
+        --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
+        --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
+        --os-bof            Stored procedure buffer overflow exploitation
+        --priv-esc          Database process' user privilege escalation
+        --msf-path=MSFPATH  Local path where Metasploit Framework is installed
+        --tmp-path=TMPPATH  Remote absolute path of temporary files directory
+
+    Windows registry access:
+        These options can be used to access the back-end database management system Windows registry
+
+        --reg-read          Read a Windows registry key value
+        --reg-add           Write a Windows registry key value data
+        --reg-del           Delete a Windows registry key value
+        --reg-key=REGKEY    Windows registry key
+        --reg-value=REGVAL  Windows registry key value
+        --reg-data=REGDATA  Windows registry key value data
+        --reg-type=REGTYPE  Windows registry key value type
+
+    General:
+        These options can be used to set some general working parameters
+
+        -t TRAFFICFILE      Log all HTTP traffic into a textual file
+        --batch             Never ask for user input, use the default behaviour
+        --charset=CHARSET   Force character encoding used for data retrieval
+        --check-tor         Check to see if Tor is used properly
+        --crawl=CRAWLDEPTH  Crawl the website starting from the target url
+        --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
+        --eta               Display for each output the estimated time of arrival
+        --flush-session     Flush session file for current target
+        --forms             Parse and test forms on target url
+        --fresh-queries     Ignores query results stored in session file
+        --hex               Uses DBMS hex function(s) for data retrieval
+        --parse-errors      Parse and display DBMS error messages from responses
+        --replicate         Replicate dumped data into a sqlite3 database
+        --save              Save options to a configuration INI file
+        --tor               Use Tor anonymity network
+        --tor-port=TORPORT  Set Tor proxy port other than default
+        --tor-type=TORTYPE  Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)
+        --update            Update sqlmap
+
+    Miscellaneous:
+        -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
+        --beep              Sound alert when SQL injection found
+        --check-payload     Offline WAF/IPS/IDS payload detection testing
+        --check-waf         Check for existence of WAF/IPS/IDS protection
+        --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
+        --dependencies      Check for missing sqlmap dependencies
+        --disable-hash      Disable password hash cracking mechanism
+        --disable-like      Disable LIKE search of identificator names
+        --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+        --mobile            Imitate smartphone through HTTP User-Agent header
+        --page-rank         Display page rank (PR) for Google dork results
+        --purge-output      Safely remove all content from output directory
+        --smart             Conduct through tests only if positive heuristic(s)
+        --test-filter=TSTF  Select tests by payloads and/or titles (e.g. ROW)
+        --wizard            Simple wizard interface for beginner users
+
+## Output verbosity
+Switch: `-v`
+
+This switch can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.
+
+* **0**: Show only Python tracebacks, error and critical messages.
+* **1**: Show also information and warning messages.
+* **2**: Show also debug messages.
+* **3**: Show also payloads injected.
+* **4**: Show also HTTP requests.
+* **5**: Show also HTTP responses' headers.
+* **6**: Show also HTTP responses' page content.
+
+A reasonable level of verbosity to further understand what sqlmap does under the hood is level **2**, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level **3** is your best choice. In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level **4** or above. This level is recommended to be used when you feed the developers with a bug report too.
+
+## Target
+At least one of these options has to be provided.
+
+### Target URL
+
+Switch: `-u` or `--url`
+Run sqlmap against a single target URL. This switch requires an argument which is the target URL in the form `http(s)://targeturl[:port]/[...]`.
+
+### Parse targets from Burp or WebScarab proxy logs
+
+Switch: `-l`
+
+Rather than providing a single target URL, it is possible to test and inject against HTTP requests proxied through [Burp proxy](http://portswigger.net/suite/) or 
+[WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This switch requires an argument which is the proxy's HTTP requests log file.
+
+### Load HTTP request from a file
+
+Switch: `-r`
+
+One of the possibilities of sqlmap is loading of complete HTTP request from a textual file. That way you can skip usage of bunch of other options (e.g. setting of cookies, POSTed data, etc).
+
+Sample content of a HTTP request file provided as argument to this switch:
 
 ```
-$ python sqlmap.py -h
+POST /sqlmap/mysql/post_int.php HTTP/1.1
+Host: 192.168.136.131
+User-Agent: Mozilla/4.0
 
-
-    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
-    http://www.sqlmap.org
-
-[!] legal disclaimer: usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Authors assume no liability and are not responsible for any misuse or damage caused by this program
-
-[*] starting at 16:38:25
-
-Usage: python sqlmap.py [options]
-
-Options:
-  --version             show program's version number and exit
-  -h, --help            show this help message and exit
-  -v VERBOSE            Verbosity level: 0-6 (default 1)
-
-  Target:
-    At least one of these options has to be specified to set the source to get target urls from
-
-    -d DIRECT           Direct connection to the database
-    -u URL, --url=URL   Target url
-    -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
-    -m BULKFILE         Scan multiple targets enlisted in a given textual file
-    -r REQUESTFILE      Load HTTP request from a file
-    -g GOOGLEDORK       Process Google dork results as target urls
-    -c CONFIGFILE       Load options from a configuration INI file
-
-  Request:
-    These options can be used to specify how to connect to the target url
-
-    --data=DATA         Data string to be sent through POST
-    --param-del=PDEL    Character used for splitting parameter values
-    --cookie=COOKIE     HTTP Cookie header
-    --load-cookies=LOC  File containing cookies in Netscape/wget format
-    --cookie-urlencode  URL Encode generated cookie injections
-    --drop-set-cookie   Ignore Set-Cookie header from response
-    --user-agent=AGENT  HTTP User-Agent header
-    --random-agent      Use randomly selected HTTP User-Agent header
-    --randomize=RPARAM  Randomly change value for given parameter(s)
-    --force-ssl         Force usage of SSL/HTTPS requests
-    --host=HOST         HTTP Host header
-    --referer=REFERER   HTTP Referer header
-    --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
-    --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
-    --auth-cred=ACRED   HTTP authentication credentials (name:password)
-    --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
-    --proxy=PROXY       Use a HTTP proxy to connect to the target url
-    --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
-    --ignore-proxy      Ignore system default HTTP proxy
-    --delay=DELAY       Delay in seconds between each HTTP request
-    --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
-    --retries=RETRIES   Retries when the connection timeouts (default 3)
-    --scope=SCOPE       Regexp to filter targets from provided proxy log
-    --safe-url=SAFURL   Url address to visit frequently during testing
-    --safe-freq=SAFREQ  Test requests between two visits to a given safe url
-    --skip-urlencode    Skip URL encoding of POST data
-    --eval=EVALCODE     Evaluate provided Python code before the request (e.g. "import hashlib;id2=hashlib.md5(id).hexdigest()")
-
-  Optimization:
-    These options can be used to optimize the performance of sqlmap
-
-    -o                  Turn on all optimization switches
-    --predict-output    Predict common queries output
-    --keep-alive        Use persistent HTTP(s) connections
-    --null-connection   Retrieve page length without actual HTTP response body
-    --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
-
-  Injection:
-    These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts
-
-    -p TESTPARAMETER    Testable parameter(s)
-    --dbms=DBMS         Force back-end DBMS to this value
-    --os=OS             Force back-end DBMS operating system to this value
-    --invalid-bignum    Use big numbers for invalidating values
-    --invalid-logical   Use logical operations for invalidating values
-    --no-cast           Turn off payload casting mechanism
-    --prefix=PREFIX     Injection payload prefix string
-    --suffix=SUFFIX     Injection payload suffix string
-    --skip=SKIP         Skip testing for given parameter(s)
-    --tamper=TAMPER     Use given script(s) for tampering injection data
-
-  Detection:
-    These options can be used to specify how to parse and compare page content from HTTP responses when using blind SQL injection technique
-
-    --level=LEVEL       Level of tests to perform (1-5, default 1)
-    --risk=RISK         Risk of tests to perform (0-3, default 1)
-    --string=STRING     String to match in the response when query is valid
-    --regexp=REGEXP     Regexp to match in the response when query is valid
-    --code=CODE         HTTP response code to match when the query is valid
-    --text-only         Compare pages based only on the textual content
-    --titles            Compare pages based only on their titles
-
-  Techniques:
-    These options can be used to tweak testing of specific SQL injection techniques
-
-    --technique=TECH    SQL injection techniques to test for (default "BEUST")
-    --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
-    --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
-    --union-char=UCHAR  Character to use for bruteforcing number of columns
-    --dns-domain=DNAME  Domain name used for DNS exfiltration attack
-
-  Fingerprint:
-    -f, --fingerprint   Perform an extensive DBMS version fingerprint
-
-  Enumeration:
-    These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements
-
-    -b, --banner        Retrieve DBMS banner
-    --current-user      Retrieve DBMS current user
-    --current-db        Retrieve DBMS current database
-    --is-dba            Detect if the DBMS current user is DBA
-    --users             Enumerate DBMS users
-    --passwords         Enumerate DBMS users password hashes
-    --privileges        Enumerate DBMS users privileges
-    --roles             Enumerate DBMS users roles
-    --dbs               Enumerate DBMS databases
-    --tables            Enumerate DBMS database tables
-    --columns           Enumerate DBMS database table columns
-    --schema            Enumerate DBMS schema
-    --count             Retrieve number of entries for table(s)
-    --dump              Dump DBMS database table entries
-    --dump-all          Dump all DBMS databases tables entries
-    --search            Search column(s), table(s) and/or database name(s)
-    -D DB               DBMS database to enumerate
-    -T TBL              DBMS database table to enumerate
-    -C COL              DBMS database table column to enumerate
-    -U USER             DBMS user to enumerate
-    --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
-    --start=LIMITSTART  First query output entry to retrieve
-    --stop=LIMITSTOP    Last query output entry to retrieve
-    --first=FIRSTCHAR   First query output word character to retrieve
-    --last=LASTCHAR     Last query output word character to retrieve
-    --sql-query=QUERY   SQL statement to be executed
-    --sql-shell         Prompt for an interactive SQL shell
-
-  Brute force:
-    These options can be used to run brute force checks
-
-    --common-tables     Check existence of common tables
-    --common-columns    Check existence of common columns
-
-  User-defined function injection:
-    These options can be used to create custom user-defined functions
-
-    --udf-inject        Inject custom user-defined functions
-    --shared-lib=SHLIB  Local path of the shared library
-
-  File system access:
-    These options can be used to access the back-end database management system underlying file system
-
-    --file-read=RFILE   Read a file from the back-end DBMS file system
-    --file-write=WFILE  Write a local file on the back-end DBMS file system
-    --file-dest=DFILE   Back-end DBMS absolute filepath to write to
-
-  Operating system access:
-    These options can be used to access the back-end database management system underlying operating system
-
-    --os-cmd=OSCMD      Execute an operating system command
-    --os-shell          Prompt for an interactive operating system shell
-    --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
-    --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
-    --os-bof            Stored procedure buffer overflow exploitation
-    --priv-esc          Database process' user privilege escalation
-    --msf-path=MSFPATH  Local path where Metasploit Framework is installed
-    --tmp-path=TMPPATH  Remote absolute path of temporary files directory
-
-  Windows registry access:
-    These options can be used to access the back-end database management system Windows registry
-
-    --reg-read          Read a Windows registry key value
-    --reg-add           Write a Windows registry key value data
-    --reg-del           Delete a Windows registry key value
-    --reg-key=REGKEY    Windows registry key
-    --reg-value=REGVAL  Windows registry key value
-    --reg-data=REGDATA  Windows registry key value data
-    --reg-type=REGTYPE  Windows registry key value type
-
-  General:
-    These options can be used to set some general working parameters
-
-    -t TRAFFICFILE      Log all HTTP traffic into a textual file
-    --batch             Never ask for user input, use the default behaviour
-    --charset=CHARSET   Force character encoding used for data retrieval
-    --check-tor         Check to see if Tor is used properly
-    --crawl=CRAWLDEPTH  Crawl the website starting from the target url
-    --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
-    --eta               Display for each output the estimated time of arrival
-    --flush-session     Flush session file for current target
-    --forms             Parse and test forms on target url
-    --fresh-queries     Ignores query results stored in session file
-    --hex               Uses DBMS hex function(s) for data retrieval
-    --parse-errors      Parse and display DBMS error messages from responses
-    --replicate         Replicate dumped data into a sqlite3 database
-    --save              Save options to a configuration INI file
-    --tor               Use Tor anonymity network
-    --tor-port=TORPORT  Set Tor proxy port other than default
-    --tor-type=TORTYPE  Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)
-    --update            Update sqlmap
-
-  Miscellaneous:
-    -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
-    --beep              Sound alert when SQL injection found
-    --check-payload     Offline WAF/IPS/IDS payload detection testing
-    --check-waf         Check for existence of WAF/IPS/IDS protection
-    --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
-    --dependencies      Check for missing sqlmap dependencies
-    --disable-hash      Disable password hash cracking mechanism
-    --disable-like      Disable LIKE search of identificator names
-    --gpage=GOOGLEPAGE  Use Google dork results from specified page number
-    --mobile            Imitate smartphone through HTTP User-Agent header
-    --page-rank         Display page rank (PR) for Google dork results
-    --purge-output      Safely remove all content from output directory
-    --smart             Conduct through tests only if positive heuristic(s)
-    --test-filter=TSTF  Select tests by payloads and/or titles (e.g. ROW)
-    --wizard            Simple wizard interface for beginner users
+id=1
 ```
+
+### Process Google dork results as target addresses
+
+Switch: `-g`
+
+It is also possible to test and inject on `GET` parameters on the results of your Google dork.
+
+This option makes sqlmap negotiate with the search engine its session cookie to be able to perform a search, then sqlmap will retrieve Google first 100 results for the Google dork expression with `GET` parameters asking you if you want to test and inject on each possible affected URL.
+
+### Load options from a configuration INI file
+
+Switch: `-c`
+
+It is possible to pass user's options from a configuration INI file, an example is `sqlmap.conf`.
+
+Note that if you also provide other options from command line, those are evaluated when running sqlmap and overwrite those provided in the configuration file.
+
+## Request
+
+These options can be used to specify how to connect to the target url.
+
+### HTTP data
+
+Option: `--data`
+
+By default the HTTP method used to perform HTTP requests is `GET`, but you can implicitly change it to `POST` by providing the data to be sent in the `POST` requests. Such data, being those parameters, are tested for SQL injection as well as any provided `GET` parameters.
+
+### HTTP `Cookie` header
+
+Switches: `--cookie`, `--drop-set-cookie` and `--cookie-urlencode` 
+
+This feature can be useful in two ways:
+
+* The web application requires authentication based upon cookies and you have such data.
+* You want to detect and exploit SQL injection on such header values.
+
+Either reason brings you to need to send cookies with sqlmap requests, the steps to go through are the following:
+
+* Login to the application with your favourite browser.
+* Get the HTTP Cookie from the browser's preferences or from the HTTP proxy screen and copy to the clipboard.
+* Go back to your shell and run sqlmap by pasting your clipboard as the argument of the `--cookie` switch.
+
+
+Note that the HTTP `Cookie` header values are usually separated by a `;` character, **not** by an `&amp;`. sqlmap can recognize these as separate sets of `parameter=value` too, as well as GET and POST parameters.
+
+If at any time during the communication, the web application responds with `Set-Cookie` headers, sqlmap will automatically use its value in all further HTTP requests as the `Cookie` header. sqlmap will also automatically test those values for SQL injection. This can be avoided by providing the switch `--drop-set-cookie` - sqlmap will ignore any coming `Set-Cookie` header.
+
+Vice versa, if you provide a HTTP `Cookie` header with `--cookie` switch and the target URL sends an HTTP
+`Set-Cookie` header at any time, sqlmap will ask you which set of cookies to use for the following HTTP requests.
+
+sqlmap by default does **not** URL-encode generated cookie payloads, but you can force it by using the `--cookie-urlencode` switch. Cookie content encoding is not declared by HTTP protocol standard in any way, so it is solely the matter of web application's behaviour.
+
+Note that also the HTTP `Cookie` header is tested against SQL injection if the `--level` is set to **2** or above. Read below for details.
+
+### HTTP `User-Agent` header
+[TODO]
