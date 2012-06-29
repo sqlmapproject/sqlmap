@@ -162,6 +162,7 @@ sqlmap relies on Metasploit to create the shellcode and implements four differen
 # History
 
 ## 2011
+* **June 23**, Miroslav [presents](https://ep2012.europython.eu/conference/talks/sqlmap-security-developing-in-python) sqlmap - security development in Python ([slides](http://www.slideshare.net/stamparm/euro-python-2011miroslavstamparsqlmapsecuritydevelopmentinpython)) at EuroPython 2011 in Firenze, Italy.
 * **April 10**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release sqlmap **0.9** featuring a totally rewritten and powerful SQL injection detection engine, the possibility to connect directly to a database server, support for time-based blind SQL injection and error-based SQL injection, support for four new database management systems and much more.
 
 ## 2010
@@ -174,7 +175,7 @@ sqlmap **0.8** featuring many features. Amongst these, support to enumerate and 
 * **January**, Bernardo is [invited](http://www.athcon.org/speakers/) to present at [AthCon]http://www.athcon.org/archives/2010-2/) conference in Greece on June 2010.
 
 ## 2009
-* **December 18**, Miroslav Stampar replies to the call for developers. Along with Bernardo, he actively develops sqlmap from version **0.8 release candidate 2**.
+* **December 18**, [Miroslav Stampar](http://unconciousmind.blogspot.com/) replies to the call for developers. Along with Bernardo, he actively develops sqlmap from version **0.8 release candidate 2**.
 * **December 12**, Bernardo writes to the mailing list a post titled [sqlmap state of art - 3 years later](http://bernardodamele.blogspot.com/2009/12/sqlmap-state-of-art-3-years-later.html) highlighting the goals
 achieved during these first three years of the project and launches a call for developers.
 * **December 4**, sqlmap-devel mailing list has been merged into sqlmap-users [mailing list](http://www.sqlmap.org/#ml).
