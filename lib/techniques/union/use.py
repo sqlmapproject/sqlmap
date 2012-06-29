@@ -54,9 +54,6 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
     threadData.resumed = retVal is not None
 
     if retVal is None:
-        check = "(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop)
-        trimcheck = "%s(?P<result>.*?)<" % (kb.chars.start)
-
         # Prepare expression with delimiters
         injExpression = unescaper.unescape(agent.concatQuery(expression, unpack))
 
@@ -75,11 +72,20 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
         # Parse the returned page to get the exact union-based
         # SQL injection output
-        retVal = reduce(lambda x, y: x if x is not None else y, ( \
-                extractRegexResult(check, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
-                extractRegexResult(check, removeReflectiveValues(listToStrValue(headers.headers \
-                if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), \
-                None)
+        def _(regex):
+            return reduce(lambda x, y: x if x is not None else y, ( \
+                    extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
+                    extractRegexResult(regex, removeReflectiveValues(listToStrValue(headers.headers \
+                    if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), \
+                    None)
+
+        # Automatically patching last char trimming cases
+        if kb.chars.stop not in page and kb.chars.stop[:-1] in page:
+            warnMsg = "automatically patching last char trimming output"
+            singleTimeWarnMessage(warnMsg)
+            page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
+
+        retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
@@ -90,12 +96,10 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
             hashDBWrite("%s%s" % (conf.hexConvert, expression), retVal)
         else:
-            trimmed = extractRegexResult(trimcheck, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE) \
-                    or extractRegexResult(trimcheck, removeReflectiveValues(listToStrValue(headers.headers \
-                    if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
+            trimmed = _("%s(?P<result>.*?)<" % (kb.chars.start))
 
             if trimmed:
-                warnMsg = "possible server trimmed output detected (due to its length): "
+                warnMsg = "possible server trimmed output detected (probably due to its length): "
                 warnMsg += trimmed
                 logger.warn(warnMsg)
 
