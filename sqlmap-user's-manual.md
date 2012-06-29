@@ -236,19 +236,19 @@ sqlmap can be downloaded from its [SourceForge File List page](http://sourceforg
 You can also checkout the latest development version from the [Git](https://github.com/sqlmapproject/sqlmap)
 repository:
 
-```$ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev```
+    $ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 You can update it at any time to the latest development version by running:
 
-```$ python sqlmap.py --update```
+    $ python sqlmap.py --update
 
 Or:
-
-```$ git pull```
+    $ git pull
 
 This is strongly recommended **before** reporting any bug to the [mailing list](http://www.sqlmap.org/#ml).
 
 # Usage
+
     $ python sqlmap.py -h
 
         sqlmap/1.0-dev - automatic SQL injection and database takeover tool
@@ -501,13 +501,11 @@ One of the possibilities of sqlmap is loading of complete HTTP request from a te
 
 Sample content of a HTTP request file provided as argument to this switch:
 
-```
-POST /sqlmap/mysql/post_int.php HTTP/1.1
-Host: 192.168.136.131
-User-Agent: Mozilla/4.0
-
-id=1
-```
+    POST /sqlmap/mysql/post_int.php HTTP/1.1
+    Host: 192.168.136.131
+    User-Agent: Mozilla/4.0
+    
+    id=1
 
 ### Process Google dork results as target addresses
 
