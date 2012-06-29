@@ -484,6 +484,7 @@ At least one of these options has to be provided.
 ### Target URL
 
 Switch: `-u` or `--url`
+
 Run sqlmap against a single target URL. This switch requires an argument which is the target URL in the form `http(s)://targeturl[:port]/[...]`.
 
 ### Parse targets from Burp or WebScarab proxy logs
