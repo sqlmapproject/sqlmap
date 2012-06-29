@@ -92,7 +92,7 @@ sqlmap is able to detect and exploit five different SQL injection **types**:
 parameter in the HTTP request, a semi-colon (`;`) followed by the SQL statement to be executed. This technique is useful to run SQL statements other than `SELECT`, like for instance, **data definition** or **data manipulation** statements, possibly leading to file system read and write access and operating system command execution depending on the underlying back-end database management system and the session user privileges.
 
 ## Demo
-You can watch several demo videos, they are hosted on [YouTube](http://www.youtube.com/user/inquisb).
+You can watch several demo videos on [YouTube](http://www.youtube.com/user/inquisb). Also, you can find lots of examples against publicly available vulnerable web applications made for legal web assessment [here](http://unconciousmind.blogspot.com/search/label/sqlmap).
 
 # Features
 Features implemented in sqlmap include:
