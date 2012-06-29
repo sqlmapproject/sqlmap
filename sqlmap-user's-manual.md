@@ -243,6 +243,7 @@ You can update it at any time to the latest development version by running:
     $ python sqlmap.py --update
 
 Or:
+
     $ git pull
 
 This is strongly recommended **before** reporting any bug to the [mailing list](http://www.sqlmap.org/#ml).
