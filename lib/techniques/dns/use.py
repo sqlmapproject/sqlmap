@@ -29,6 +29,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.settings import DNS_BOUNDARIES_ALPHABET
 from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
@@ -58,7 +59,7 @@ def dnsUse(payload, expression):
 
             while True:
                 count += 1
-                prefix, suffix = ("%s" % randomStr(length=3, alphabet=re.sub("[a-fA-F]", "", string.letters)) for _ in xrange(2))
+                prefix, suffix = ("%s" % randomStr(length=3, alphabet=DNS_BOUNDARIES_ALPHABET) for _ in xrange(2))
                 chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)

@@ -7,7 +7,9 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import os
+import re
 import subprocess
+import string
 import sys
 
 from lib.core.enums import CUSTOM_LOGGING
@@ -43,12 +45,6 @@ FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.WARN)
-
-# dump markers
-DUMP_NEWLINE_MARKER = "__NEWLINE__"
-DUMP_CR_MARKER = "__CARRIAGE_RETURN__"
-DUMP_TAB_MARKER = "__TAB__"
-DUMP_DEL_MARKER = "__DEL__"
 
 # markers for special cases when parameter values contain html encoded characters
 PARAMETER_AMP_MARKER = "__AMP__"
@@ -474,6 +470,9 @@ MAX_TOTAL_REDIRECTIONS = 10
 
 # Reference: http://www.tcpipguide.com/free/t_DNSLabelsNamesandSyntaxRules.htm
 MAX_DNS_LABEL = 63
+
+# Alphabet used for prefix and suffix strings of name resolution requests in DNS technique (excluding hexadecimal chars for not mixing with inner content)
+DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.letters)
 
 # Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION/inband injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
