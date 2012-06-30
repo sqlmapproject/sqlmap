@@ -751,15 +751,12 @@ def dataToOutFile(data):
     if not data:
         return "No data retrieved"
 
-    rFile = filePathToString(conf.rFile)
-    rFilePath = "%s%s%s" % (conf.filePath, os.sep, rFile)
-    rFileFP = codecs.open(rFilePath, "wb")
+    retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToString(conf.rFile))
 
-    rFileFP.write(data)
-    rFileFP.flush()
-    rFileFP.close()
+    with codecs.open(retVal, "wb") as f:
+        f.write(data)
 
-    return rFilePath
+    return retVal
 
 def strToHex(value):
     """
@@ -825,13 +822,13 @@ def randomStr(length=4, lowercase=False, alphabet=None):
     """
 
     if alphabet:
-        rndStr = "".join(random.choice(alphabet) for _ in xrange(0, length))
+        retVal = "".join(random.choice(alphabet) for _ in xrange(0, length))
     elif lowercase:
-        rndStr = "".join(random.choice(string.lowercase) for _ in xrange(0, length))
+        retVal = "".join(random.choice(string.lowercase) for _ in xrange(0, length))
     else:
-        rndStr = "".join(random.choice(string.letters) for _ in xrange(0, length))
+        retVal = "".join(random.choice(string.letters) for _ in xrange(0, length))
 
-    return rndStr
+    return retVal
 
 def sanitizeStr(value):
     """
@@ -899,7 +896,7 @@ def parsePasswordHash(password):
     return password
 
 def cleanQuery(query):
-    upperQuery = query
+    retVal = query
 
     for sqlStatements in SQL_STATEMENTS.values():
         for sqlStatement in sqlStatements:
@@ -907,9 +904,9 @@ def cleanQuery(query):
             queryMatch = re.search("(%s)" % sqlStatementEsc, query, re.I)
 
             if queryMatch and "sys_exec" not in query:
-                upperQuery = upperQuery.replace(queryMatch.group(1), sqlStatement.upper())
+                retVal = retVal.replace(queryMatch.group(1), sqlStatement.upper())
 
-    return upperQuery
+    return retVal
 
 def setPaths():
     """
@@ -1247,6 +1244,7 @@ def parseFilePaths(page):
 
 def getLocalIP():
     retVal = None
+
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((conf.hostname, conf.port))
@@ -1309,41 +1307,40 @@ def getCharset(charsetType=None):
     return asciiTbl
 
 def searchEnvPath(filename):
-    result = None
+    retVal = None
     path = os.environ.get("PATH", "")
     paths = path.split(";") if IS_WIN else path.split(":")
 
     for _ in paths:
         _ = _.replace(";", "")
-        result = os.path.exists(os.path.normpath(os.path.join(_, filename)))
+        retVal = os.path.exists(os.path.normpath(os.path.join(_, filename)))
 
-        if result:
+        if retVal:
             break
 
-    return result
+    return retVal
 
 def urlEncodeCookieValues(cookieStr):
     if cookieStr:
-        result = ""
+        retVal = ""
 
         for part in cookieStr.split(';'):
             index = part.find('=') + 1
-
             if index > 0:
                 name = part[:index - 1].strip()
                 value = urlencode(part[index:], convall=True)
-                result += "; %s=%s" % (name, value)
+                retVal += "; %s=%s" % (name, value)
             elif part.strip().lower() != "secure":
-                result += "%s%s" % ("%3B", urlencode(part, convall=True))
+                retVal += "%s%s" % ("%3B", urlencode(part, convall=True))
             else:
-                result += "; secure"
+                retVal += "; secure"
 
-        if result.startswith('; '):
-            result = result[2:]
-        elif result.startswith('%3B'):
-            result = result[3:]
+        if retVal.startswith('; '):
+            retVal = retVal[2:]
+        elif retVal.startswith('%3B'):
+            retVal = retVal[3:]
 
-        return result
+        return retVal
     else:
         return None
 
@@ -1351,8 +1348,6 @@ def directoryPath(filepath):
     """
     Returns directory path for a given filepath
     """
-
-    retVal = None
 
     if isWindowsDriveLetterPath(filepath):
         retVal = ntpath.dirname(filepath)
@@ -1365,8 +1360,6 @@ def normalizePath(filepath):
     """
     Returns normalized string representation of a given filepath
     """
-
-    retVal = None
 
     if isWindowsDriveLetterPath(filepath):
         retVal = ntpath.normpath(filepath)
@@ -1487,8 +1480,8 @@ def decloakToNamedTemporaryFile(filepath, name=None):
 def decloakToMkstemp(filepath, **kwargs):
     handle, name = mkstemp(**kwargs)
 
-    fptr = os.fdopen(handle)
-    fptr.close()  # close low level handle (causing problems latter)
+    _ = os.fdopen(handle)
+    _.close()  # close low level handle (causing problems latter)
 
     retVal = open(name, 'w+b')
 
@@ -1598,9 +1591,8 @@ def parseXmlFile(xmlFile, handler):
     Parses XML file by a given handler
     """
 
-    stream = StringIO(readCachedFileContent(xmlFile))
-    parse(stream, handler)
-    stream.close()
+    with StringIO(readCachedFileContent(xmlFile)) as stream:
+        parse(stream, handler)
 
 def getSPQLSnippet(dbms, name, **variables):
     """
@@ -2270,8 +2262,10 @@ def filterStringValue(value, regex, replacement=""):
     """
 
     retVal = value
+
     if value:
         retVal = re.sub(regex.replace("[", "[^") if "[^" not in regex else regex.replace("[^", "["), replacement, value)
+
     return retVal
 
 def filterControlChars(value):
