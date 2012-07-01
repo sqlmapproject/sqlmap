@@ -91,9 +91,8 @@ class xp_cmdshell:
         inject.goStacked(cmd)
 
     def __xpCmdshellCheck(self):
-        cmd = self.xpCmdshellForgeCmd("ping -n %d 127.0.0.1" % (conf.timeSec * 2))
-
-        inject.goStacked(cmd)
+        cmd = "ping -n %d 127.0.0.1" % (conf.timeSec * 2)
+        self.xpCmdshellExecCmd(cmd)
 
         return wasLastRequestDelayed()
 
