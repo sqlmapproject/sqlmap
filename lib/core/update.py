@@ -16,11 +16,17 @@ from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import pollProcess
 
 def update():
+    errMsg = "sqlmap is now hosted on GitHub at https://github.com/sqlmapproject/sqlmap. "
+    errMsg += "The --update switch is currently outdated and not working. Please, "
+    errMsg += "update sqlmap running 'git pull' for the time being"
+    raise sqlmapUnsupportedFeatureException, errMsg
+
     if not conf.updateAll:
         return
 
