@@ -19,7 +19,6 @@ from lib.core.common import isListLike
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
-from lib.core.common import restoreDumpMarkedChars
 from lib.core.common import safeCSValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -60,9 +59,6 @@ class Dump:
 
         kb.dataOutputFlag = True
 
-    def _formatString(self, inpStr):
-        return restoreDumpMarkedChars(getUnicode(inpStr))
-
     def setOutputFile(self):
         self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
         self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
@@ -74,7 +70,7 @@ class Dump:
         if isListLike(data):
             self.lister(header, data, sort)
         elif data:
-            data = self._formatString(getUnicode(data))
+            data = getUnicode(data)
 
             if data[-1] == '\n':
                 data = data[:-1]

@@ -833,17 +833,6 @@ def checkFile(filename):
     if not os.path.exists(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
 
-def restoreDumpMarkedChars(value, onlyNewlineTab=False):
-    retVal = value
-
-    if isinstance(retVal, basestring):
-        retVal = retVal.replace(DUMP_NEWLINE_MARKER, "\n").replace(DUMP_CR_MARKER, "\r").replace(DUMP_TAB_MARKER, "\t")
-
-        if not onlyNewlineTab:
-            retVal = retVal.replace(DUMP_DEL_MARKER, ", ")
-
-    return retVal
-
 def banner():
     """
     This function prints sqlmap banner with its version

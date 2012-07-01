@@ -12,7 +12,6 @@ from xml.parsers.expat import ExpatError
 
 from extra.prettyprint import prettyprint
 from lib.core.common import getUnicode
-from lib.core.common import restoreDumpMarkedChars
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -125,7 +124,7 @@ class XMLDump:
         if data is None :
             return self.__doc.createTextNode(u'')
         else :
-            escaped_data = saxutils.escape(self.__formatString(data), ENTITIES)
+            escaped_data = saxutils.escape(data, ENTITIES)
             return self.__doc.createTextNode(escaped_data)
 
     def __createAttribute(self,attrName,attrValue):
@@ -139,9 +138,6 @@ class XMLDump:
         else :
             attr.nodeValue = getUnicode(attrValue)
         return attr
-
-    def __formatString(self, inpStr):
-        return restoreDumpMarkedChars(getUnicode(inpStr))
 
     def string(self, header, data, sort=True):
         '''
