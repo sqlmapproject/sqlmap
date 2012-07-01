@@ -80,7 +80,7 @@ class ICMPsh:
         if web:
             self.webFileUpload(self.__icmpslave, self.__icmpslaveRemote, self.webDirectory)
         else:
-            self.writeFile(self.__icmpslave, self.__icmpslaveRemote, "binary", False)
+            self.writeFile(self.__icmpslave, self.__icmpslaveRemote, "binary")
 
     def icmpPwn(self):
         self.__prepareIngredients()

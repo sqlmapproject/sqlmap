@@ -554,7 +554,7 @@ class Metasploit:
         if web:
             self.webFileUpload(self.shellcodeexecLocal, self.shellcodeexecRemote, self.webDirectory)
         else:
-            self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary", False)
+            self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary")
 
     def pwn(self, goUdf=False):
         if goUdf:

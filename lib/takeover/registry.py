@@ -65,7 +65,7 @@ class Registry:
         logger.debug("creating batch file '%s'" % self.__batPathRemote)
 
         self.__createLocalBatchFile()
-        self.writeFile(self.__batPathLocal, self.__batPathRemote, "text", False)
+        self.writeFile(self.__batPathLocal, self.__batPathRemote, "text")
 
         os.unlink(self.__batPathLocal)
 

@@ -164,7 +164,7 @@ class Filesystem(GenericFilesystem):
 
         return result
 
-    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def unionWriteFile(self, wFile, dFile, fileType):
         errMsg = "Microsoft SQL Server does not support file upload with "
         errMsg += "UNION query SQL injection technique"
         raise sqlmapUnsupportedFeatureException(errMsg)
@@ -332,7 +332,7 @@ class Filesystem(GenericFilesystem):
 
         self.execCmd(complComm)
 
-    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def stackedWriteFile(self, wFile, dFile, fileType):
         # NOTE: this is needed here because we use xp_cmdshell extended
         # procedure to write a file on the back-end Microsoft SQL Server
         # file system

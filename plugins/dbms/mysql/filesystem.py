@@ -59,7 +59,7 @@ class Filesystem(GenericFilesystem):
             warnMsg += "file '%s'" % rFile
 
             if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                warnMsg += ", going to fall-back to simpler technique"
+                warnMsg += ", going to fall-back to simpler UNION technique"
                 logger.warn(warnMsg)
                 result = self.unionReadFile(rFile)
             else:
@@ -80,7 +80,7 @@ class Filesystem(GenericFilesystem):
 
         return result
 
-    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def unionWriteFile(self, wFile, dFile, fileType):
         logger.debug("encoding file to its hexadecimal string value")
 
         fcEncodedList = self.fileEncode(wFile, "hex", True)
@@ -100,14 +100,13 @@ class Filesystem(GenericFilesystem):
         sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
         unionUse(sqlQuery, unpack=False)
 
-        if confirm:
-            self.askCheckWrittenFile(wFile, dFile, fileType)
+        self.askCheckWrittenFile(wFile, dFile, fileType)
 
         warnMsg = "expect junk characters inside the "
         warnMsg += "file as a leftover from UNION query"
         singleTimeWarnMessage(warnMsg)
 
-    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def stackedWriteFile(self, wFile, dFile, fileType):
         debugMsg = "creating a support table to write the hexadecimal "
         debugMsg += "encoded file to"
         logger.debug(debugMsg)
@@ -134,5 +133,4 @@ class Filesystem(GenericFilesystem):
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
         inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile), silent=True)
 
-        if confirm:
-            self.askCheckWrittenFile(wFile, dFile, fileType)
+        self.askCheckWrittenFile(wFile, dFile, fileType)

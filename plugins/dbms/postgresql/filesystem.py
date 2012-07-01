@@ -33,12 +33,12 @@ class Filesystem(GenericFilesystem):
 
         return self.udfEvalCmd(cmd=rFile, udfName="sys_fileread")
 
-    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def unionWriteFile(self, wFile, dFile, fileType):
         errMsg = "PostgreSQL does not support file upload with UNION "
         errMsg += "query SQL injection technique"
         raise sqlmapUnsupportedFeatureException, errMsg
 
-    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def stackedWriteFile(self, wFile, dFile, fileType):
         wFileSize = os.path.getsize(wFile)
 
         if wFileSize > 8192:
@@ -115,7 +115,6 @@ class Filesystem(GenericFilesystem):
         # (pg_largeobject 'data' field)
         inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile), silent=True)
 
-        if confirm:
-            self.askCheckWrittenFile(wFile, dFile, fileType)
+        self.askCheckWrittenFile(wFile, dFile, fileType)
 
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)

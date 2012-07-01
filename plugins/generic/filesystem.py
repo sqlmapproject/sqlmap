@@ -176,12 +176,12 @@ class Filesystem:
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
-    def unionWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def unionWriteFile(self, wFile, dFile, fileType):
         errMsg = "'unionWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
-    def stackedWriteFile(self, wFile, dFile, fileType, confirm=True):
+    def stackedWriteFile(self, wFile, dFile, fileType):
         errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
@@ -235,7 +235,7 @@ class Filesystem:
 
         return rFilePath
 
-    def writeFile(self, wFile, dFile, fileType=None, confirm=True):
+    def writeFile(self, wFile, dFile, fileType=None):
         self.checkDbmsOs()
 
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
@@ -244,14 +244,14 @@ class Filesystem:
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
 
-            self.stackedWriteFile(wFile, dFile, fileType, confirm)
+            self.stackedWriteFile(wFile, dFile, fileType)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to upload the %s file with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 
-            self.unionWriteFile(wFile, dFile, fileType, confirm)
+            self.unionWriteFile(wFile, dFile, fileType)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to write files to the underlying file "

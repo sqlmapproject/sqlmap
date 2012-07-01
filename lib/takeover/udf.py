@@ -156,7 +156,7 @@ class UDF:
 
         if len(self.udfToCreate) > 0:
             self.udfSetRemotePath()
-            self.writeFile(self.udfLocalFile, self.udfRemoteFile, "binary", False)
+            self.writeFile(self.udfLocalFile, self.udfRemoteFile, "binary")
 
         for udf, inpRet in udfDict.items():
             if udf in self.udfToCreate and udf not in self.createdUdf:
