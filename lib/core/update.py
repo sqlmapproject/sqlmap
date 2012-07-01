@@ -22,13 +22,13 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import pollProcess
 
 def update():
+    if not conf.updateAll:
+        return
+
     errMsg = "sqlmap is now hosted on GitHub at https://github.com/sqlmapproject/sqlmap. "
     errMsg += "The --update switch is currently outdated and not working. Please, "
     errMsg += "update sqlmap running 'git pull' for the time being"
     raise sqlmapUnsupportedFeatureException, errMsg
-
-    if not conf.updateAll:
-        return
 
     rootDir = paths.SQLMAP_ROOT_PATH
 
