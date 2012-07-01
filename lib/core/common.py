@@ -126,6 +126,11 @@ from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.threads import getCurrentThreadData
 
+from lib.core.settings import DUMP_NEWLINE_MARKER
+from lib.core.settings import DUMP_CR_MARKER
+from lib.core.settings import DUMP_TAB_MARKER
+from lib.core.settings import DUMP_DEL_MARKER
+
 class UnicodeRawConfigParser(RawConfigParser):
     """
     RawConfigParser with unicode writing support
