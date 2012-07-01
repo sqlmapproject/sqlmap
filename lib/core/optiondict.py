@@ -167,6 +167,7 @@ optDict = {
                                "checkTor":          "boolean",
                                "crawlDepth":        "integer",
                                "csvDel":            "string",
+                               "dCred":             "string",
                                "eta":               "boolean",
                                "flushSession":      "boolean",
                                "forms":             "boolean",

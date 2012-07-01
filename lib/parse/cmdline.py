@@ -516,10 +516,13 @@ def cmdLineParser():
                                   help="Delimiting character used in CSV output "
                                   "(default \"%s\")" % defaults.csvDel)
 
+        general.add_option("--dbms-cred", dest="dCred",
+                            help="DBMS authentication credentials (user:password)")
+
         general.add_option("--eta", dest="eta",
                             action="store_true",
                             help="Display for each output the "
-                                      "estimated time of arrival")
+                                 "estimated time of arrival")
 
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true",

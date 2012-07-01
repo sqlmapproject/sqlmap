@@ -558,6 +558,28 @@ def __findPageForms():
 
     findPageForms(page, conf.url, True, True)
 
+def __setDBMSAuthentication():
+    """
+    Check and set the DBMS authentication credentials to run statements as
+    another user, not the session user
+    """
+
+    if not conf.dCred:
+        return
+
+    debugMsg = "setting the DBMS authentication credentials"
+    logger.debug(debugMsg)
+
+    dCredRegExp = re.search("^(.+?):(.*?)$", conf.dCred)
+
+    if not dCredRegExp:
+        errMsg = "DBMS authentication credentials value must be in format "
+        errMsg += "username:password"
+        raise sqlmapSyntaxException, errMsg
+
+    conf.dbmsUsername = dCredRegExp.group(1)
+    conf.dbmsPassword = dCredRegExp.group(2)
+
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
         return
@@ -1992,7 +2014,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     __setOS()
     __setWriteFile()
     __setMetasploit()
-
+    __setDBMSAuthentication()
     loadPayloads()
     __setPrefixSuffix()
     update()
