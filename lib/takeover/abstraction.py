@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
+from lib.core.common import getSPQLSnippet
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -16,6 +17,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
+from lib.request import inject
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import xp_cmdshell
@@ -139,7 +141,39 @@ class Abstraction(Web, UDF, xp_cmdshell):
 
             self.runCmd(command)
 
+    def __initRunAs(self):
+        if not conf.dCred:
+            return
+
+        if not conf.direct and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+            errMsg = "stacked queries is not supported hence sqlmap cannot "
+            errMsg += "execute statements as another user. The execution "
+            errMsg += "will continue and the DBMS credentials provided "
+            errMsg += "will simply be ignored"
+            logger.error(errMsg)
+
+            return
+
+        if Backend.isDbms(DBMS.MSSQL):
+            msg = "on Microsoft SQL Server 2005 and 2008, OPENROWSET function "
+            msg += "is disabled by default. This function is needed to execute "
+            msg += "statements as another DBMS user since you provided the "
+            msg += "--dbms-creds switch. If you are DBA, you can enable it. "
+            msg += "Do you want to enable it? [Y/n] "
+            choice = readInput(msg, default="Y")
+
+            if not choice or choice in ("y", "Y"):
+                expression = getSPQLSnippet(DBMS.MSSQL, "configure_openrowset", ENABLE="1")
+                inject.goStacked(expression)
+
+        # TODO: add support for PostgreSQL
+        #elif Backend.isDbms(DBMS.PGSQL):
+        #    expression = getSPQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
+        #    inject.goStacked(expression)
+
     def initEnv(self, mandatory=True, detailed=False, web=False):
+        self.__initRunAs()
+
         if self.envInitialized:
             return
 

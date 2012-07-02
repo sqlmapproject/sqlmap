@@ -45,8 +45,8 @@ def direct(query, content=True):
     logger.log(9, query)
 
     output = hashDBRetrieve(query, True, True)
-
     start = time.time()
+
     if not select and "EXEC " not in query:
         _ = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif not (output and "sqlmapoutput" not in query and "sqlmapfile" not in query):

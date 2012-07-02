@@ -1,3 +1,3 @@
-Files in this folder represent SPL/SQL snippets used
-by sqlmap on the target system. They are licensed under the terms of
-the GNU Lesser General Public License.
+Files in this folder represent SPL/SQL snippets used by sqlmap on the target
+system. They are licensed under the terms of the GNU Lesser General Public
+License.

