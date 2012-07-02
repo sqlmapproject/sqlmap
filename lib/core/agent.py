@@ -11,6 +11,7 @@ from xml.etree import ElementTree as ET
 
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
+from lib.core.common import getSPQLSnippet
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
@@ -27,6 +28,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import SQL_STATEMENTS
 from lib.core.unescaper import unescaper
 
 class Agent:
@@ -815,6 +817,21 @@ class Agent:
         """
 
         return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), "%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr) if inpStr else inpStr
+
+    def runAsDBMSUser(self, query):
+        if conf.dCred and "Ad Hoc Distributed Queries" not in query:
+            for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
+                for sqlStatement in sqlStatements:
+                    if query.lower().startswith(sqlStatement):
+                        sqlType = sqlTitle
+                        break
+
+            if sqlType and "SELECT" not in sqlType:
+                query = "SELECT %d;%s" % (randomInt(), query)
+
+            query = getSPQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
+
+        return query
 
 # SQL agent
 agent = Agent()
