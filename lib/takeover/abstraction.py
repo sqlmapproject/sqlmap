@@ -10,7 +10,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import getSPQLSnippet
 from lib.core.common import isTechniqueAvailable
-from lib.core.common import randomInt
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
