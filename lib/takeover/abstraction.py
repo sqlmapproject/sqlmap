@@ -16,7 +16,6 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.request import inject
 from lib.takeover.udf import UDF
@@ -37,21 +36,6 @@ class Abstraction(Web, UDF, xp_cmdshell):
         UDF.__init__(self)
         Web.__init__(self)
         xp_cmdshell.__init__(self)
-
-    def runAsDBMSUser(self, query):
-        if conf.dCred:
-            for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
-                for sqlStatement in sqlStatements:
-                    if query.lower().startswith(sqlStatement):
-                        sqlType = sqlTitle
-                        break
-
-            if sqlType and "SELECT" not in sqlType:
-                query = "SELECT 1;%s" % query
-
-            query = getSPQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
-
-        return query
 
     def execCmd(self, cmd, silent=False):
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
@@ -201,6 +185,13 @@ class Abstraction(Web, UDF, xp_cmdshell):
             if mandatory and not self.isDba():
                 warnMsg = "the functionality requested might not work because "
                 warnMsg += "the session user is not a database administrator"
+
+                if not conf.dCred and Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.PGSQL ):
+                    warnMsg += ". You can try to provide --dbms-cred switch "
+                    warnMsg += "to execute statements as a DBA user if you "
+                    warnMsg += "were able to extract and crack a DBA "
+                    warnMsg += "password by any mean"
+
                 logger.warn(warnMsg)
 
             if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):

