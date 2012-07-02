@@ -58,14 +58,15 @@ def main():
 
     try:
         paths.SQLMAP_ROOT_PATH = modulePath()
-        setPaths()
+        options = cmdLineParser()
+        setPaths(options)
         banner()
 
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
         # Store original command line options for possible later restoration
-        cmdLineOptions.update(cmdLineParser().__dict__)
+        cmdLineOptions.update(options.__dict__)
 
         init(cmdLineOptions)
 
