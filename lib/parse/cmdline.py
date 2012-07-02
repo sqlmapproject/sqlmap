@@ -566,6 +566,10 @@ def cmdLineParser():
                             action="store_true",
                             help="Update sqlmap")
 
+        general.add_option("--output-dir", dest="output_dir",
+                            action="store",
+                            help="Directory to store output files in.")
+
         # Miscellaneous options
         miscellaneous = OptionGroup(parser, "Miscellaneous")
 
