@@ -73,17 +73,6 @@ def checkDependencies():
         logger.warn(warnMsg)
         missing_libraries.add('python-ntlm')
 
-    try:
-        import pysvn
-        debugMsg = "'python-svn' third-party library is found"
-        logger.debug(debugMsg)
-    except ImportError, _:
-        warnMsg = "sqlmap requires 'python-svn' third-party library for "
-        warnMsg += "if you want to use the sqlmap update functionality. "
-        warnMsg += "Download from http://pysvn.tigris.org/"
-        logger.warn(warnMsg)
-        missing_libraries.add('python-svn')
-
     if IS_WIN:
         try:
             import pyreadline
