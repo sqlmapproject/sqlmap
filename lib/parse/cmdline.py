@@ -540,6 +540,10 @@ def cmdLineParser():
                             action="store_true",
                             help="Uses DBMS hex function(s) for data retrieval")
 
+        general.add_option("--output-dir", dest="oDir",
+                            action="store",
+                            help="Custom output directory path")
+
         general.add_option("--parse-errors", dest="parseErrors",
                                   action="store_true",
                                   help="Parse and display DBMS error messages from responses")

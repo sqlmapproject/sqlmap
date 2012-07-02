@@ -173,6 +173,7 @@ optDict = {
                                "forms":             "boolean",
                                "freshQueries":      "boolean",
                                "hexConvert":        "boolean",
+                               "oDir":              "string",
                                "parseErrors":       "boolean",
                                "replicate":         "boolean",
                                "updateAll":         "boolean",

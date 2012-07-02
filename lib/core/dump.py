@@ -25,6 +25,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import BLANK
@@ -61,7 +62,11 @@ class Dump:
 
     def setOutputFile(self):
         self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
-        self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
+        try:
+            self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
+        except IOError, ex:
+            errMsg = "error occurred while opening log file ('%s')" % ex
+            raise sqlmapGenericException, errMsg
 
     def getOutputFile(self):
         return self._outputFile

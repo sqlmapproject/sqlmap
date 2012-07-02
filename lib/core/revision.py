@@ -12,6 +12,10 @@ from subprocess import PIPE
 from subprocess import Popen as execute
 
 def getRevisionNumber():
+    """
+    Returns revision number in a GitHub style
+    """
+
     retVal = None
     filePath = None
 

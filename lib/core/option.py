@@ -1374,6 +1374,9 @@ def __cleanupOptions():
     if conf.torType:
         conf.torType = conf.torType.upper()
 
+    if conf.oDir:
+        paths.SQLMAP_OUTPUT_PATH = conf.oDir
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
