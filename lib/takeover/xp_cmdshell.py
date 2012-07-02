@@ -76,10 +76,9 @@ class xp_cmdshell:
         logger.debug(debugMsg)
 
         if mode == 1:
-            cmd = "EXEC master..sp_addextendedproc 'xp_cmdshell', "
-            cmd += "@dllname='xplog70.dll'"
+            cmd = getSPQLSnippet(DBMS.MSSQL, "enable_xp_cmdshell_2000", ENABLE=str(mode))
         else:
-            cmd = "EXEC master..sp_dropextendedproc 'xp_cmdshell'"
+            cmd = getSPQLSnippet(DBMS.MSSQL, "disable_xp_cmdshell_2000", ENABLE=str(mode))
 
         return cmd
 
