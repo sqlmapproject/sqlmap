@@ -696,7 +696,12 @@ def cmdLineParser():
                     if not found:
                         parser.option_groups.remove(group)
 
-        (args, _) = parser.parse_args(args)
+        try:
+            (args, _) = parser.parse_args(args)
+        except SystemExit:
+            if '-h' in sys.argv:
+                print "\n[!] to see full list of options run with '-hh'"
+            raise
 
         # Expand given mnemonic options (e.g. -z "ign,flu,bat")
         for i in xrange(len(sys.argv) - 1):
