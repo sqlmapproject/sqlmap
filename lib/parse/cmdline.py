@@ -672,11 +672,12 @@ def cmdLineParser():
         parser.add_option_group(miscellaneous)
 
         # Dirty hack for making a short option -hh
-        _ = parser.get_option("--hh")
-        _._short_opts = ["-hh"]
-        _._long_opts = []
+        option = parser.get_option("--hh")
+        option._short_opts = ["-hh"]
+        option._long_opts = []
 
         args = []
+        advancedHelp = True
 
         for arg in sys.argv:
             args.append(getUnicode(arg, system=True))
@@ -686,6 +687,7 @@ def cmdLineParser():
             if sys.argv[i] == '-hh':
                 sys.argv[i] = '-h'
             elif sys.argv[i] == '-h':
+                advancedHelp = False
                 for group in parser.option_groups[:]:
                     found = False
                     for option in group.option_list:
@@ -699,7 +701,7 @@ def cmdLineParser():
         try:
             (args, _) = parser.parse_args(args)
         except SystemExit:
-            if '-h' in sys.argv:
+            if '-h' in sys.argv and not advancedHelp:
                 print "\n[!] to see full list of options run with '-hh'"
             raise
 
