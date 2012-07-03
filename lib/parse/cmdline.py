@@ -16,6 +16,7 @@ from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.defaults import defaults
+from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import IS_WIN
 from lib.core.settings import VERSION_STRING
 
@@ -30,6 +31,10 @@ def cmdLineParser():
     parser = OptionParser(usage=usage, version=VERSION_STRING)
 
     try:
+        parser.add_option("--hh", dest="advancedHelp",
+                          action="store_true",
+                          help="Show advanced help")
+
         parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
 
@@ -666,22 +671,42 @@ def cmdLineParser():
         parser.add_option_group(general)
         parser.add_option_group(miscellaneous)
 
+        # Dirty hack for making a short option -hh
+        _ = parser.get_option("--hh")
+        _._short_opts = ["-hh"]
+        _._long_opts = []
+
         args = []
 
         for arg in sys.argv:
             args.append(getUnicode(arg, system=True))
 
+        # Hide non-basic options in basic help case
+        for i in xrange(len(sys.argv)):
+            if sys.argv[i] == '-hh':
+                sys.argv[i] = '-h'
+            elif sys.argv[i] == '-h':
+                for group in parser.option_groups[:]:
+                    found = False
+                    for option in group.option_list:
+                        if option.dest not in BASIC_HELP_ITEMS:
+                            option.help = SUPPRESS_HELP
+                        else:
+                            found = True
+                    if not found:
+                        parser.option_groups.remove(group)
+
         (args, _) = parser.parse_args(args)
 
-        for i in xrange(len(sys.argv)-1):
+        # Expand given mnemonic options (e.g. -z "ign,flu,bat")
+        for i in xrange(len(sys.argv) - 1):
             if sys.argv[i] == '-z':
                 expandMnemonics(sys.argv[i+1], parser, args)
-                break
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.realTest, args.wizard, args.dependencies, args.purgeOutput)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update, --purge-output or --dependencies), "
-            errMsg += "use -h for help"
+            errMsg += "use -h for basic help and -hh for advanced help"
             parser.error(errMsg)
 
         return args

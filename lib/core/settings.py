@@ -247,6 +247,40 @@ SQL_STATEMENTS = {
                              "rollback ",       ),
                      }
 
+# items displayed in basic help (-h) output
+BASIC_HELP_ITEMS = (
+                        "url",
+                        "googleDork",
+                        "data",
+                        "cookie",
+                        "randomAgent",
+                        "proxy",
+                        "testParameter",
+                        "dbms",
+                        "level",
+                        "risk",
+                        "tech",
+                        "getBanner",
+                        "getCurrentUser",
+                        "getCurrentDb",
+                        "getPasswordHashes",
+                        "getTables",
+                        "getColumns",
+                        "getSchema",
+                        "dumpTable",
+                        "dumpAll",
+                        "db",
+                        "tbl",
+                        "col",
+                        "osShell",
+                        "osPwn",
+                        "batch",
+                        "checkTor",
+                        "flushSession",
+                        "tor",
+                        "wizard"
+                   )
+
 # string representation for NULL value
 NULL = "NULL"
 
