@@ -22,7 +22,7 @@ VERSION = "1.0-dev"
 REVISION = getRevisionNumber()
 VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "")
 DESCRIPTION = "automatic SQL injection and database takeover tool"
-SITE = "http://www.sqlmap.org"
+SITE = "http://sqlmap.org"
 ML = "sqlmap-users@lists.sourceforge.net"
 
 # minimum distance of ratio from kb.matchRatio to result in True
