@@ -1067,7 +1067,7 @@ def parseTargetUrl():
     if urlSplit[3]:
         conf.parameters[PLACE.GET] = urldecode(urlSplit[3]) if urlSplit[3] and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit[3] else urlSplit[3]
 
-    conf.url = "%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path)
+    conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
     if not conf.referer and intersect(REFERER_ALIASES, conf.testParameter, True):

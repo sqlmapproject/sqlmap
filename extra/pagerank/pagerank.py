@@ -7,20 +7,22 @@
 #  this version was adapted from http://www.djangosnippets.org/snippets/221/
 #  by Corey Goldberg - 2010
 #
+#  important update (http://www.seroundtable.com/google-pagerank-change-14132.html)
+#  by Miroslav Stampar - 2012
+#
 #  Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
 import urllib
 
 def get_pagerank(url):
-    hsh = check_hash(hash_url(url))
-    gurl = 'http://www.google.com/search?client=navclient-auto&features=Rank:&q=info:%s&ch=%s' % (urllib.quote(url), hsh)
+    _ = 'http://toolbarqueries.google.com/tbr?client=navclient-auto&features=Rank&ch=%s&q=info:%s' % (check_hash(hash_url(url)), urllib.quote(url))
     try:
-        f = urllib.urlopen(gurl)
+        f = urllib.urlopen(_)
         rank = f.read().strip()[9:]
     except Exception:
         rank = 'N/A'
-    if rank == '':
-        rank = '0'
+    else:
+        rank = '0' if not rank or not rank.isdigit() else rank
     return rank
 
 def int_str(string_, integer, factor):
@@ -28,6 +30,7 @@ def int_str(string_, integer, factor):
         integer *= factor
         integer &= 0xFFFFFFFF
         integer += ord(string_[i])
+
     return integer
 
 def hash_url(string_):
