@@ -28,7 +28,7 @@ def cmdLineParser():
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % sys.argv[0] if " " in sys.argv[0] else sys.argv[0])
 
-    parser = OptionParser(usage=usage, version=VERSION_STRING)
+    parser = OptionParser(usage=usage)
 
     try:
         parser.add_option("--hh", dest="advancedHelp",
@@ -676,10 +676,9 @@ def cmdLineParser():
         option._short_opts = ["-hh"]
         option._long_opts = []
 
-        # Dirty hack for inherent help messages of switches --version and -h
-        for option in ('-h', '--version'):
-            _ = parser.get_option(option)
-            _.help = _.help.capitalize().replace("this help", "basic help")
+        # Dirty hack for inherent help message of switch -h
+        option = parser.get_option("-h")
+        option.help = option.help.capitalize().replace("this help", "basic help")
 
         args = []
         advancedHelp = True
