@@ -20,7 +20,7 @@ from lib.core.revision import getRevisionNumber
 # sqlmap version and site
 VERSION = "1.0-dev"
 REVISION = getRevisionNumber()
-VERSION_STRING = "sqlmap/%s%s" % (VERSION, " (%s)" % REVISION if REVISION else "")
+VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "")
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://www.sqlmap.org"
 ML = "sqlmap-users@lists.sourceforge.net"

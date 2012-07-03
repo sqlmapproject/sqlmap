@@ -2489,7 +2489,7 @@ def unhandledExceptionMessage():
     errMsg += "and any information required to reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you.\n"
-    errMsg += "sqlmap version: %s%s\n" % (VERSION, " (%s)" % REVISION if REVISION else "")
+    errMsg += "sqlmap version: %s%s\n" % (VERSION, "-%s" % REVISION if REVISION else "")
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
     errMsg += "Command line: %s\n" % " ".join(sys.argv)

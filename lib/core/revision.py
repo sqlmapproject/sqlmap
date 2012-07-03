@@ -13,7 +13,7 @@ from subprocess import Popen as execute
 
 def getRevisionNumber():
     """
-    Returns revision number in a GitHub style
+    Returns abbreviated commit hash number as retrieved with "git rev-parse --short HEAD"
     """
 
     retVal = None
@@ -41,4 +41,4 @@ def getRevisionNumber():
         match = re.search(r"(?i)[0-9a-f]{32}", stdout or "")
         retVal = match.group(0) if match else None
 
-    return retVal[:10] if retVal else None
+    return retVal[:7] if retVal else None
