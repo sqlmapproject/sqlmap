@@ -764,6 +764,26 @@ class Enumeration:
                     if db:
                         kb.data.cachedDbs.append(safeSQLIdentificatorNaming(db))
 
+        if not kb.data.cachedDbs and Backend.isDbms(DBMS.MSSQL):
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
+                blinds = (False, True)
+            else:
+                blinds = (True,)
+
+            for blind in blinds:
+                count = 0
+                kb.data.cachedDbs = []
+                while True:
+                    query = rootQuery.inband.query2 % count
+                    value = inject.getValue(query, blind=blind)
+                    if not value:
+                        break
+                    else:
+                        kb.data.cachedDbs.append(unArrayizeValue(value))
+                        count += 1
+                if kb.data.cachedDbs:
+                    break
+
         if not kb.data.cachedDbs:
             infoMsg = "falling back to current database"
             logger.info(infoMsg)

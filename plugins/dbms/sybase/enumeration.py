@@ -36,9 +36,9 @@ class Enumeration(GenericEnumeration):
         query = rootQuery.inband.query
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
-            blinds = [False, True]
+            blinds = (False, True)
         else:
-            blinds = [True]
+            blinds = (True,)
 
         for blind in blinds:
             retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)

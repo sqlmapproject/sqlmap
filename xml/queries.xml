@@ -183,7 +183,7 @@
         <privileges/>
         <roles/>
         <dbs>
-            <inband query="SELECT name FROM master..sysdatabases"/>
+            <inband query="SELECT name FROM master..sysdatabases" query2="SELECT DB_NAME(%d)"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
