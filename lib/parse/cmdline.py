@@ -33,7 +33,7 @@ def cmdLineParser():
     try:
         parser.add_option("--hh", dest="advancedHelp",
                           action="store_true",
-                          help="Show advanced help")
+                          help="Show advanced help message and exit")
 
         parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
@@ -675,6 +675,11 @@ def cmdLineParser():
         option = parser.get_option("--hh")
         option._short_opts = ["-hh"]
         option._long_opts = []
+
+        # Dirty hack for inherent help messages of switches --version and -h
+        for option in ('-h', '--version'):
+            _ = parser.get_option(option)
+            _.help = _.help.capitalize().replace("this help", "basic help")
 
         args = []
         advancedHelp = True
