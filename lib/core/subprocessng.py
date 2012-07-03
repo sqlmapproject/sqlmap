@@ -71,7 +71,7 @@ def setNonBlocking(fd):
         flags = flags | os.O_NONBLOCK
         fcntl.fcntl(fd, FCNTL.F_SETFL, flags)
 
-def pollProcess(process):
+def pollProcess(process, suppress_errors=False):
     while True:
         dataToStdout(".")
         time.sleep(1)
@@ -79,11 +79,12 @@ def pollProcess(process):
         returncode = process.poll()
 
         if returncode is not None:
-            if returncode == 0:
-                dataToStdout(" done\n")
-            elif returncode < 0:
-                dataToStdout(" process terminated by signal %d\n" % returncode)
-            elif returncode > 0:
-                dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
+            if not suppress_errors:
+                if returncode == 0:
+                    dataToStdout(" done\n")
+                elif returncode < 0:
+                    dataToStdout(" process terminated by signal %d\n" % returncode)
+                elif returncode > 0:
+                    dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
 
             break

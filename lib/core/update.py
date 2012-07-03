@@ -35,15 +35,21 @@ def update():
     logger.debug(debugMsg)
 
     dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
-    process = execute("git pull %s" % rootDir, shell=True, stdout=PIPE, stderr=PIPE)
-    pollProcess(process)
-    stdout, _ = process.communicate()
+    process = execute("gita pull %s" % rootDir, shell=True, stdout=PIPE, stderr=PIPE)
+    pollProcess(process, True)
+    stdout, stderr = process.communicate()
 
     if not process.returncode:
         logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", REVISION))
+    else:
+        logger.error("update could not be completed (%s)" % repr(stderr))
 
-    if IS_WIN:
-        infoMsg = "for Windows platform it's recommended "
-        infoMsg += "to use a GitHub for Windows client for updating "
-        infoMsg += "purposes (http://windows.github.com/)"
+        if IS_WIN:
+            infoMsg = "for Windows platform it's recommended "
+            infoMsg += "to use a GitHub for Windows client for updating "
+            infoMsg += "purposes (http://windows.github.com/)"
+        else:
+            infoMsg = "for Linux platform it's recommended "
+            infoMsg += "to use a standard 'git' package (e.g.: 'sudo apt-get install git')"
+
         logger.info(infoMsg)
