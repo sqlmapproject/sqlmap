@@ -91,6 +91,7 @@ from lib.core.settings import FORMATTER
 from lib.core.settings import NULL
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import IS_WIN
+from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import PLATFORM
 from lib.core.settings import PYVERSION
 from lib.core.settings import VERSION
@@ -2485,7 +2486,7 @@ def unhandledExceptionMessage():
     errMsg = "unhandled exception in %s, retry your " % VERSION_STRING
     errMsg += "run with the latest development version from the Subversion "
     errMsg += "repository. If the exception persists, please send by e-mail "
-    errMsg += "to %s the following text " % ML
+    errMsg += "to '%s' or open a new issue at '%s' with the following text " % (ML, ISSUES_PAGE)
     errMsg += "and any information required to reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you.\n"

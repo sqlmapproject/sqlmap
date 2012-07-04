@@ -531,7 +531,7 @@ def cmdLineParser():
 
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true",
-                            help="Flush session file for current target")
+                            help="Flush session files for current target")
 
         general.add_option("--forms", dest="forms",
                                   action="store_true",
