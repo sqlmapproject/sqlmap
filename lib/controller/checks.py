@@ -343,11 +343,11 @@ def checkSqlInjection(place, parameter, value):
                             kb.matchRatio = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             Request.queryPage(genCmpPayload(), place, raise404=False)
-                            falsePage = threadData.lastComparisonPage
+                            falsePage = threadData.lastComparisonPage or ""
 
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
-                            truePage = threadData.lastComparisonPage
+                            truePage = threadData.lastComparisonPage or ""
 
                             if trueResult:
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
