@@ -9,6 +9,7 @@ import cookielib
 import httplib
 import re
 import socket
+import urllib
 import urllib2
 
 from lib.core.common import getUnicode
@@ -46,7 +47,7 @@ class Google:
         HTTP addresses
         """
 
-        retVal = [match.group(1) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
+        retVal = [urllib.unquote(match.group(1)) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
 
         return retVal
 
