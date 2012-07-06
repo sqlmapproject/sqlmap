@@ -125,7 +125,7 @@ def __oneShotErrorUse(expression, field):
                         break
 
                     if kb.fileReadMode and output:
-                        dataToStdout(__formatPartialContent(output).replace(r"\n", "\n"))
+                        dataToStdout(__formatPartialContent(output).replace(r"\n", "\n").replace(r"\t", "\t"))
                 else:
                     retVal = output
                     break
