@@ -80,11 +80,6 @@ class Filesystem(GenericFilesystem):
 
         return chunkName
 
-    def unionReadFile(self, rFile):
-        errMsg = "Microsoft SQL Server does not support file reading "
-        errMsg += "with UNION query SQL injection technique"
-        raise sqlmapUnsupportedFeatureException(errMsg)
-
     def stackedReadFile(self, rFile):
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)

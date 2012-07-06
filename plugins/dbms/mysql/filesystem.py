@@ -25,7 +25,7 @@ class Filesystem(GenericFilesystem):
     def __init__(self):
         GenericFilesystem.__init__(self)
 
-    def unionReadFile(self, rFile):
+    def nonStackedReadFile(self, rFile):
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)
 
@@ -61,7 +61,7 @@ class Filesystem(GenericFilesystem):
             if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                 warnMsg += ", going to fall-back to simpler UNION technique"
                 logger.warn(warnMsg)
-                result = self.unionReadFile(rFile)
+                result = self.nonStackedReadFile(rFile)
             else:
                 raise sqlmapNoneDataException, warnMsg
         else:

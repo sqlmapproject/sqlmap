@@ -20,11 +20,6 @@ class Filesystem(GenericFilesystem):
 
         GenericFilesystem.__init__(self)
 
-    def unionReadFile(self, rFile):
-        errMsg = "PostgreSQL does not support file reading with UNION "
-        errMsg += "query SQL injection technique"
-        raise sqlmapUnsupportedFeatureException, errMsg
-
     def stackedReadFile(self, rFile):
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)

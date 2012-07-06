@@ -167,8 +167,8 @@ class Filesystem:
 
         return True
 
-    def unionReadFile(self, rFile):
-        errMsg = "'unionReadFile' method must be defined "
+    def nonStackedReadFile(self, rFile):
+        errMsg = "'nonStackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise sqlmapUndefinedMethod, errMsg
 
@@ -202,7 +202,11 @@ class Filesystem:
 
             fileContent = self.stackedReadFile(rFile)
         elif Backend.isDbms(DBMS.MYSQL):
-            fileContent = self.unionReadFile(rFile)
+            debugMsg = "going to read the file with UNION query SQL "
+            debugMsg += "injection technique"
+            logger.debug(debugMsg)
+
+            fileContent = self.nonStackedReadFile(rFile)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to read files from the underlying file "
