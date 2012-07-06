@@ -81,7 +81,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if partialValue:
             firstChar = len(partialValue)
-        elif "LENGTH(" in expression or "LEN(" in expression:
+        elif "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
             firstChar = 0
         elif dump and conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
             firstChar = int(conf.firstChar) - 1
@@ -90,7 +90,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         elif ( isinstance(firstChar, basestring) and firstChar.isdigit() ) or isinstance(firstChar, int):
             firstChar = int(firstChar) - 1
 
-        if "LENGTH(" in expression or "LEN(" in expression:
+        if "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
             lastChar = 0
         elif dump and conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
             lastChar = int(conf.lastChar)
@@ -342,7 +342,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         # Go multi-threading (--threads > 1)
         if conf.threads > 1 and isinstance(length, int) and length > 1:
-            value = []
             threadData = getCurrentThreadData()
 
             threadData.shared.value = [ None ] * length
@@ -560,30 +559,29 @@ def queryOutputLength(expression, payload):
     selectDistinctExpr = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
     selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
     selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
-    miscExpr = re.search("\A(.+)", expression, re.I)
 
-    if selectTopExpr or selectDistinctExpr or selectFromExpr or selectExpr:
+    if any((selectTopExpr, selectDistinctExpr, selectFromExpr, selectExpr)):
         if selectTopExpr:
-            regExpr = selectTopExpr.groups()[0]
+            query = selectTopExpr.group(1)
         elif selectDistinctExpr:
-            regExpr = selectDistinctExpr.groups()[0]
+            query = selectDistinctExpr.group(1)
         elif selectFromExpr:
-            regExpr = selectFromExpr.groups()[0]
+            query = selectFromExpr.group(1)
         elif selectExpr:
-            regExpr = selectExpr.groups()[0]
-    elif miscExpr:
-        regExpr = miscExpr.groups()[0]
+            query = selectExpr.group(1)
+    else:
+        query = expression
 
-    if ( select and re.search("\A(COUNT|LTRIM)\(", regExpr, re.I) ) or len(regExpr) <= 1:
+    if ( select and re.search("\A(COUNT|LTRIM)\(", query, re.I) ) or len(query) <= 1:
         return None, None, None
 
     if selectDistinctExpr:
-        lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % regExpr, expression)
+        lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % query, expression)
 
         if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
             lengthExpr += " AS %s" % randomStr(lowercase=True)
     elif select:
-        lengthExpr = expression.replace(regExpr, lengthQuery % regExpr, 1)
+        lengthExpr = expression.replace(query, lengthQuery % query, 1)
     else:
         lengthExpr = lengthQuery % expression
 
@@ -600,4 +598,4 @@ def queryOutputLength(expression, payload):
     if length == " ":
         length = 0
 
-    return count, length, regExpr
+    return count, length, query
