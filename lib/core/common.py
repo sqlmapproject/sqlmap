@@ -3147,7 +3147,7 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
 
     _ = "%s%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key, HASHDB_MILESTONE_VALUE)
     _ = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any([conf.flushSession, conf.freshQueries])) else None
-    if not kb.inferenceMode and _ and PARTIAL_VALUE_MARKER in _:
+    if not kb.inferenceMode and not kb.fileReadMode and _ and PARTIAL_VALUE_MARKER in _:
         _ = None
     return _
 

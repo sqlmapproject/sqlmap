@@ -35,6 +35,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
+from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
@@ -44,90 +45,93 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
 def __oneShotErrorUse(expression, field):
+    offset = 1
+    partialValue = None
+    threadData = getCurrentThreadData()
     retVal = hashDBRetrieve(expression, checkConf=True)
 
-    threadData = getCurrentThreadData()
-    threadData.resumed = retVal is not None
+    if retVal and PARTIAL_VALUE_MARKER in retVal:
+        partialValue = retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
+        dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), __formatPartialContent(partialValue)))
+        offset += len(partialValue)
 
-    offset = 1
+    threadData.resumed = retVal is not None and not partialValue
     chunk_length = None
 
-    if retVal is None:
-        while True:
-            check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-            trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
+    if retVal is None or partialValue:
+        try:
+            while True:
+                check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
+                trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
-            nulledCastedField = agent.nullAndCastField(field)
+                nulledCastedField = agent.nullAndCastField(field)
 
-            if Backend.isDbms(DBMS.MYSQL):
-                chunk_length = MYSQL_ERROR_CHUNK_LENGTH
-                nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, chunk_length)
-            elif Backend.isDbms(DBMS.MSSQL):
-                chunk_length = MSSQL_ERROR_CHUNK_LENGTH
-                nulledCastedField = queries[DBMS.MSSQL].substring.query % (nulledCastedField, offset, chunk_length)
+                if Backend.isDbms(DBMS.MYSQL):
+                    chunk_length = MYSQL_ERROR_CHUNK_LENGTH
+                    nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, chunk_length)
+                elif Backend.isDbms(DBMS.MSSQL):
+                    chunk_length = MSSQL_ERROR_CHUNK_LENGTH
+                    nulledCastedField = queries[DBMS.MSSQL].substring.query % (nulledCastedField, offset, chunk_length)
 
-            # Forge the error-based SQL injection request
-            vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
-            query = agent.prefixQuery(vector)
-            query = agent.suffixQuery(query)
-            injExpression = expression.replace(field, nulledCastedField, 1)
-            injExpression = unescaper.unescape(injExpression)
-            injExpression = query.replace("[QUERY]", injExpression)
-            payload = agent.payload(newValue=injExpression)
+                # Forge the error-based SQL injection request
+                vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
+                query = agent.prefixQuery(vector)
+                query = agent.suffixQuery(query)
+                injExpression = expression.replace(field, nulledCastedField, 1)
+                injExpression = unescaper.unescape(injExpression)
+                injExpression = query.replace("[QUERY]", injExpression)
+                payload = agent.payload(newValue=injExpression)
 
-            # Perform the request
-            page, headers = Request.queryPage(payload, content=True)
+                # Perform the request
+                page, headers = Request.queryPage(payload, content=True)
 
-            incrementCounter(PAYLOAD.TECHNIQUE.ERROR)
+                incrementCounter(PAYLOAD.TECHNIQUE.ERROR)
 
-            # Parse the returned page to get the exact error-based
-            # SQL injection output
-            output = reduce(lambda x, y: x if x is not None else y, [ \
-                    extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
-                    extractRegexResult(check, listToStrValue(headers.headers \
-                    if headers else None), re.DOTALL | re.IGNORECASE), \
-                    extractRegexResult(check, threadData.lastRedirectMsg[1] \
-                    if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                    threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)], \
-                    None)
+                # Parse the returned page to get the exact error-based
+                # SQL injection output
+                output = reduce(lambda x, y: x if x is not None else y, [ \
+                        extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
+                        extractRegexResult(check, listToStrValue(headers.headers \
+                        if headers else None), re.DOTALL | re.IGNORECASE), \
+                        extractRegexResult(check, threadData.lastRedirectMsg[1] \
+                        if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)], \
+                        None)
 
-            if output is not None:
-                output = getUnicode(output, kb.pageEncoding)
-            else:
-                trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
-                    or extractRegexResult(trimcheck, listToStrValue(headers.headers \
-                    if headers else None), re.DOTALL | re.IGNORECASE) \
-                    or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
-                    if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                    threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+                if output is not None:
+                    output = getUnicode(output, kb.pageEncoding)
+                else:
+                    trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
+                        or extractRegexResult(trimcheck, listToStrValue(headers.headers \
+                        if headers else None), re.DOTALL | re.IGNORECASE) \
+                        or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
+                        if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
+                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
-                if trimmed:
-                    warnMsg = "possible server trimmed output detected (due to its length): "
-                    warnMsg += trimmed
-                    logger.warn(warnMsg)
+                    if trimmed:
+                        warnMsg = "possible server trimmed output detected (due to its length): "
+                        warnMsg += trimmed
+                        logger.warn(warnMsg)
 
-            if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
-                if offset == 1:
+                if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
+                    if offset == 1:
+                        retVal = output
+                    else:
+                        retVal += output if output else ''
+
+                    if output and len(output) >= chunk_length:
+                        offset += chunk_length
+                    else:
+                        break
+
+                    if kb.fileReadMode and output:
+                        dataToStdout(__formatPartialContent(output).replace(r"\n", "\n"))
+                else:
                     retVal = output
-                else:
-                    retVal += output if output else ''
-
-                if output and len(output) >= chunk_length:
-                    offset += chunk_length
-                else:
                     break
-
-                if kb.fileReadMode and output:
-                    _ = output
-                    try:
-                        _ = safecharencode(output.decode("hex")).replace(r"\n", "\n")
-                    except:
-                        pass
-                    finally:
-                        dataToStdout(_)
-            else:
-                retVal = output
-                break
+        except:
+            hashDBWrite(expression, "%s%s" % (retVal, PARTIAL_VALUE_MARKER))
+            raise
 
         retVal = decodeHexValue(retVal) if conf.hexConvert else retVal
 
@@ -193,6 +197,20 @@ def __errorReplaceChars(value):
         retVal = retVal.replace(kb.chars.space, " ").replace(kb.chars.dollar, "$").replace(kb.chars.at, "@").replace(kb.chars.hash_, "#")
 
     return retVal
+
+def __formatPartialContent(value):
+    """
+    Prepares (possibly hex) partial content for safe console output
+    """
+
+    if value and isinstance(value, basestring):
+        try:
+            value = value.decode("hex")
+        except:
+            pass
+        finally:
+            value = safecharencode(value)
+    return value
 
 def errorUse(expression, expected=None, dump=False):
     """
