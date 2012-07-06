@@ -202,8 +202,8 @@ class Filesystem:
 
             fileContent = self.stackedReadFile(rFile)
         elif Backend.isDbms(DBMS.MYSQL):
-            debugMsg = "going to read the file with UNION query SQL "
-            debugMsg += "injection technique"
+            debugMsg = "going to read the file with a non-stacked query "
+            debugMsg += "SQL injection technique"
             logger.debug(debugMsg)
 
             fileContent = self.nonStackedReadFile(rFile)
