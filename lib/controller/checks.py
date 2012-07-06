@@ -138,8 +138,8 @@ def checkSqlInjection(place, parameter, value):
 
             # Skip tests if title is not included by the given filter
             if conf.tstF:
-                if not any(re.search(conf.tstF, str(item), re.I) for item in [test.title, test.vector,\
-                test.details.dbms if "details" in test and "dbms" in test.details else ""]):
+                if not any(re.search(conf.tstF, str(item), re.I) for item in (test.title, test.vector,\
+                test.details.dbms if "details" in test and "dbms" in test.details else "")):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "its name/vector/dbms is not included by the given filter"
                     logger.debug(debugMsg)

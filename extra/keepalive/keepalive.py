@@ -324,7 +324,7 @@ class HTTPConnection(httplib.HTTPConnection):
         else:
             raise CannotSendHeader()
 
-        for header in ['Host', 'Accept-Encoding']:
+        for header in ('Host', 'Accept-Encoding'):
             if header in self._headers:
                 str = '%s: %s' % (header, self._headers[header])
                 self._output(str)

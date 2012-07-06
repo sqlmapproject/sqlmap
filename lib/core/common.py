@@ -2273,12 +2273,7 @@ def getTechniqueData(technique=None):
     Returns injection data for technique specified
     """
 
-    retVal = None
-
-    if technique and technique in kb.injection.data:
-        retVal = kb.injection.data[technique]
-
-    return retVal
+    return kb.injection.data.get(technique)
 
 def isTechniqueAvailable(technique):
     """
@@ -2645,10 +2640,7 @@ def normalizeUnicode(value):
     Reference: http://www.peterbe.com/plog/unicode-to-ascii
     """
 
-    retVal = value
-    if isinstance(value, unicode):
-        retVal = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    return retVal
+    return unicodedata.normalize('NFKD', value).encode('ascii', 'ignore') if isinstance(value, unicode) else value
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
@@ -2911,6 +2903,7 @@ def asciifyUrl(url, forceQuote=False):
         if password:
             netloc = ':' + password + netloc
         netloc = username + netloc
+
     if parts.port:
         netloc += ':' + str(parts.port)
 
@@ -2942,7 +2935,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
-        warnMsg = "badly formed HTML at the given url ('%s'). Will try to filter it" % url
+        warnMsg = "badly formed HTML at the given url ('%s'). Going to filter it" % url
         logger.warning(warnMsg)
         response.seek(0)
         filtered = _("".join(re.findall(r"<form(?!.+<form).+?</form>", response.read(), re.I | re.S)), response.geturl())
@@ -3001,7 +2994,7 @@ def getHostHeader(url):
 
     if re.search("http(s)?://\[.+\]", url, re.I):
         retVal = extractRegexResult("http(s)?://\[(?P<result>.+)\]", url)
-    elif any(retVal.endswith(':%d' % _) for _ in [80, 443]):
+    elif any(retVal.endswith(':%d' % _) for _ in (80, 443)):
         retVal = retVal.split(':')[0]
 
     return retVal

@@ -39,7 +39,7 @@ class Fingerprint(GenericFingerprint):
 
         minor, major = None, None
 
-        for version in [6, 7]:
+        for version in (6, 7):
             result = inject.checkBooleanExpression("%d=(SELECT MAJORVERSION FROM SYSINFO.VERSION)" % version)
 
             if result:

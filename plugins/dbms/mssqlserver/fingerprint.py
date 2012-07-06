@@ -92,9 +92,9 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.MSSQL
             logger.info(infoMsg)
 
-            for version, check in [ ("2000", "HOST_NAME()=HOST_NAME()"), \
+            for version, check in ( ("2000", "HOST_NAME()=HOST_NAME()"), \
                                     ("2005", "XACT_STATE()=XACT_STATE()"), \
-                                    ("2008", "SYSDATETIME()=SYSDATETIME()") ]:
+                                    ("2008", "SYSDATETIME()=SYSDATETIME()") ):
                 result = inject.checkBooleanExpression(check)
 
                 if result:

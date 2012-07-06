@@ -617,7 +617,7 @@ class Connect:
                 return retVal
 
             for randomParameter in conf.rParam:
-                for item in [PLACE.GET, PLACE.POST, PLACE.COOKIE]:
+                for item in (PLACE.GET, PLACE.POST, PLACE.COOKIE):
                     if item in conf.parameters:
                         if item == PLACE.GET and get:
                             get = _randomizeParameter(get, randomParameter)

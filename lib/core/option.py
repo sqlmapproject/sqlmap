@@ -611,7 +611,7 @@ def __setMetasploit():
     if conf.msfPath:
         condition = False
 
-        for path in [conf.msfPath, os.path.join(conf.msfPath, 'bin')]:
+        for path in (conf.msfPath, os.path.join(conf.msfPath, 'bin')):
             condition = os.path.exists(normalizePath(path))
             condition &= os.path.exists(normalizePath(os.path.join(path, "msfcli")))
             condition &= os.path.exists(normalizePath(os.path.join(path, "msfconsole")))

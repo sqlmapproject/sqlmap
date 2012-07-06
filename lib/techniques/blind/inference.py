@@ -57,9 +57,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     on an affected host
     """
 
+    abortedFlag = False
     partialValue = u""
     finalValue = None
-    abortedFlag = False
     asciiTbl = getCharset(charsetType)
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
     retVal = hashDBRetrieve(expression, checkConf=True)

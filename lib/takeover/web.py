@@ -117,6 +117,7 @@ class Web:
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
         page = Request.queryPage(payload)
+
         return page
 
     def webInit(self):
@@ -196,7 +197,7 @@ class Web:
                 directory = directories[j]
                 uriPath = ""
 
-                if not all(isinstance(item, basestring) for item in [docRoot, directory]):
+                if not all(isinstance(item, basestring) for item in (docRoot, directory)):
                     continue
 
                 directory = ntToPosixSlashes(normalizePath(directory)).replace("//", "/").rstrip('/')
