@@ -609,20 +609,16 @@ def __setMetasploit():
             raise sqlmapMissingPrivileges, errMsg
 
     if conf.msfPath:
-        found = False
-
         for path in (conf.msfPath, os.path.join(conf.msfPath, 'bin')):
             if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
-                found = True
+                msfEnvPathExists = True
                 conf.msfPath = path
                 break
 
-        if found:
+        if msfEnvPathExists:
             debugMsg = "provided Metasploit Framework path "
             debugMsg += "'%s' is valid" % conf.msfPath
             logger.debug(debugMsg)
-
-            msfEnvPathExists = True
         else:
             warnMsg = "the provided Metasploit Framework path "
             warnMsg += "'%s' is not valid. The cause could " % conf.msfPath
@@ -1071,10 +1067,7 @@ def __setHTTPMethod():
     Check and set the HTTP method to perform HTTP requests through.
     """
 
-    if conf.data:
-        conf.method = HTTPMETHOD.POST
-    else:
-        conf.method = HTTPMETHOD.GET
+    conf.method = HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET
 
     debugMsg = "setting the HTTP method to %s" % conf.method
     logger.debug(debugMsg)
@@ -1434,6 +1427,12 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.regex = {}
     kb.cache.stdev = {}
 
+    kb.chars = AttribDict()
+    kb.chars.delimiter = randomStr(length=6, lowercase=True)
+    kb.chars.start = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.chars.stop = ":%s:" % randomStr(length=3, lowercase=True)
+    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = (":%s:" % _ for _ in randomStr(length=4, lowercase=True))
+
     kb.commonOutputs = None
     kb.counters = {}
     kb.data = AttribDict()
@@ -1466,7 +1465,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.ignoreTimeout = False
     kb.injection = InjectionDict()
     kb.injections = []
-
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
@@ -1521,13 +1519,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.uChar = NULL
     kb.unionDuplicates = False
     kb.xpCmdshellAvailable = False
-
-    kb.chars = AttribDict()
-    kb.chars.delimiter = randomStr(length=6, lowercase=True)
-    kb.chars.start = ":%s:" % randomStr(length=3, lowercase=True)
-    kb.chars.stop = ":%s:" % randomStr(length=3, lowercase=True)
-
-    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = (":%s:" % _ for _ in randomStr(length=4, lowercase=True))
 
     if flushAll:
         kb.headerPaths = {}
