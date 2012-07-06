@@ -116,6 +116,7 @@ def __oneShotErrorUse(expression, field):
                     offset += chunk_length
                 else:
                     break
+
                 if kb.fileReadMode and output:
                     _ = output
                     try:
@@ -169,7 +170,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         if not kb.threadContinue:
             return None
 
-        if kb.fileReadMode:
+        if kb.fileReadMode and output and output.strip():
             print
         elif output is not None and not (threadData.resumed and kb.suppressResumeInfo):
             dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
