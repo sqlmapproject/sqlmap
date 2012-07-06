@@ -120,7 +120,7 @@ def __oneShotErrorUse(expression, field):
                 if kb.fileReadMode and output:
                     _ = output
                     try:
-                        _ = safecharencode(output.decode("hex")).replace(r"\n", "\n")
+                        _ = safecharencode(output.decode("hex")).replace(r"\n", "\n").replace(r"\t", "    ");
                     except:
                         pass
                     finally:
