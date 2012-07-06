@@ -1469,6 +1469,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.endDetection = False
     kb.explicitSettings = set()
     kb.errorIsNone = True
+    kb.fileReadMode = False
     kb.forcedDbms = None
     kb.headersFp = {}
     kb.heuristicTest = None

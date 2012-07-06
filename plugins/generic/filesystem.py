@@ -19,6 +19,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.convert import hexdecode
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import CHARSET_TYPE
@@ -191,6 +192,8 @@ class Filesystem:
 
         self.checkDbmsOs()
 
+        kb.fileReadMode = True
+
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
                 debugMsg = "going to read the file with stacked query SQL "
@@ -207,6 +210,8 @@ class Filesystem:
             logger.error(errMsg)
 
             return None
+
+        kb.fileReadMode = False
 
         if fileContent in ( None, "" ) and not Backend.isDbms(DBMS.PGSQL):
             self.cleanup(onlyFileTbl=True)

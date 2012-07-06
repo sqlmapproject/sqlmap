@@ -106,7 +106,7 @@ def __oneShotErrorUse(expression, field):
                     warnMsg += trimmed
                     logger.warn(warnMsg)
 
-            if any(map(lambda dbms: Backend.isDbms(dbms), [DBMS.MYSQL, DBMS.MSSQL])):
+            if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
                 if offset == 1:
                     retVal = output
                 else:
@@ -116,6 +116,14 @@ def __oneShotErrorUse(expression, field):
                     offset += chunk_length
                 else:
                     break
+                if kb.fileReadMode and output:
+                    _ = output
+                    try:
+                        _ = safecharencode(output.decode("hex")).replace(r"\n", "\n")
+                    except:
+                        pass
+                    finally:
+                        dataToStdout(_)
             else:
                 retVal = output
                 break
@@ -161,7 +169,9 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         if not kb.threadContinue:
             return None
 
-        if output is not None and not (threadData.resumed and kb.suppressResumeInfo):
+        if kb.fileReadMode:
+            print
+        elif output is not None and not (threadData.resumed and kb.suppressResumeInfo):
             dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
 
         if isinstance(num, int):
