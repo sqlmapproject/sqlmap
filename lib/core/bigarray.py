@@ -69,6 +69,14 @@ class BigArray(list):
             with open(self.chunks[index], "rb") as fp:
                 self.cache = Cache(index, pickle.load(fp), False)
 
+    def __getslice__(self, i, j):
+        retval = BigArray()
+        i = max(0, len(self) + i if i < 0 else i)
+        j = min(len(self), len(self) + j if j < 0 else j)
+        for _ in xrange(i, j):
+            retval.append(self[_])
+        return retval
+
     def __getitem__(self, y):
         index = y / BIGARRAY_CHUNK_LENGTH
         offset = y % BIGARRAY_CHUNK_LENGTH

