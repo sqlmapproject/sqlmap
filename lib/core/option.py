@@ -570,15 +570,15 @@ def __setDBMSAuthentication():
     debugMsg = "setting the DBMS authentication credentials"
     logger.debug(debugMsg)
 
-    dCredRegExp = re.search("^(.+?):(.*?)$", conf.dCred)
+    match = re.search("^(.+?):(.*?)$", conf.dCred)
 
-    if not dCredRegExp:
+    if not match:
         errMsg = "DBMS authentication credentials value must be in format "
         errMsg += "username:password"
         raise sqlmapSyntaxException, errMsg
 
-    conf.dbmsUsername = dCredRegExp.group(1)
-    conf.dbmsPassword = dCredRegExp.group(2)
+    conf.dbmsUsername = match.group(1)
+    conf.dbmsPassword = match.group(2)
 
 def __setMetasploit():
     if not conf.osPwn and not conf.osSmb and not conf.osBof:
@@ -609,20 +609,15 @@ def __setMetasploit():
             raise sqlmapMissingPrivileges, errMsg
 
     if conf.msfPath:
-        condition = False
+        found = False
 
         for path in (conf.msfPath, os.path.join(conf.msfPath, 'bin')):
-            condition = os.path.exists(normalizePath(path))
-            condition &= os.path.exists(normalizePath(os.path.join(path, "msfcli")))
-            condition &= os.path.exists(normalizePath(os.path.join(path, "msfconsole")))
-            condition &= os.path.exists(normalizePath(os.path.join(path, "msfencode")))
-            condition &= os.path.exists(normalizePath(os.path.join(path, "msfpayload")))
-
-            if condition:
+            if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
+                found = True
                 conf.msfPath = path
                 break
 
-        if condition:
+        if found:
             debugMsg = "provided Metasploit Framework path "
             debugMsg += "'%s' is valid" % conf.msfPath
             logger.debug(debugMsg)
@@ -646,22 +641,12 @@ def __setMetasploit():
         warnMsg += "installation into the environment paths"
         logger.warn(warnMsg)
 
-        envPaths = os.environ["PATH"]
-
-        if IS_WIN:
-            envPaths = envPaths.split(";")
-        else:
-            envPaths = envPaths.split(":")
+        envPaths = os.environ.get("PATH", "").split(";" if IS_WIN else ":")
 
         for envPath in envPaths:
             envPath = envPath.replace(";", "")
-            condition = os.path.exists(normalizePath(envPath))
-            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfcli")))
-            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfconsole")))
-            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfencode")))
-            condition &= os.path.exists(normalizePath(os.path.join(envPath, "msfpayload")))
 
-            if condition:
+            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
                 infoMsg = "Metasploit Framework has been found "
                 infoMsg += "installed in the '%s' path" % envPath
                 logger.info(infoMsg)
