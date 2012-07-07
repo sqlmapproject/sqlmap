@@ -78,6 +78,8 @@ class BigArray(list):
         return retval
 
     def __getitem__(self, y):
+        if y < 0:
+            y += len(self)
         index = y / BIGARRAY_CHUNK_LENGTH
         offset = y % BIGARRAY_CHUNK_LENGTH
         chunk = self.chunks[index]
