@@ -844,8 +844,8 @@ Options:
 
     --level=LEVEL       Level of tests to perform (1-5, default 1)
     --risk=RISK         Risk of tests to perform (0-3, default 1)
-    --string=STRING     String to match in page when the query is valid
-    --regexp=REGEXP     Regexp to match in page when the query is valid
+    --string=STRING     String to match when query is evaluated to True
+    --regexp=REGEXP     Regexp to match when query is evaluated to True
     --text-only         Compare pages based only on the textual content
 
   Techniques:
