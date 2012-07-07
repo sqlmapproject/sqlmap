@@ -204,15 +204,15 @@ def __setHashDB():
     """
 
     if not conf.hashDBFile:
-        conf.hashDBFile = "%s%shashdb" % (conf.outputPath, os.sep)
+        conf.hashDBFile = "%s%ssession.sqlite" % (conf.outputPath, os.sep)
 
     if os.path.exists(conf.hashDBFile):
         if conf.flushSession:
             try:
                 os.remove(conf.hashDBFile)
-                logger.info("flushing query storage file")
+                logger.info("flushing session file")
             except OSError, msg:
-                errMsg = "unable to flush the hashdb file (%s)" % msg
+                errMsg = "unable to flush the session file (%s)" % msg
                 raise sqlmapFilePathException, errMsg
 
     conf.hashDB = HashDB(conf.hashDBFile)
