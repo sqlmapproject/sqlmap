@@ -2479,8 +2479,8 @@ def unhandledExceptionMessage():
     """
 
     errMsg = "unhandled exception in %s, retry your " % VERSION_STRING
-    errMsg += "run with the latest development version from the Subversion "
-    errMsg += "repository. If the exception persists, please send by e-mail "
+    errMsg += "run with the latest development version from github."
+    errMsg += "If the exception persists, please send by e-mail "
     errMsg += "to '%s' or open a new issue at '%s' with the following text " % (ML, ISSUES_PAGE)
     errMsg += "and any information required to reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "
