@@ -200,7 +200,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
         else:
             limitCond = True
 
-        # I assume that only queries NOT containing a "LIMIT #, 1"
+        # We assume that only queries NOT containing a "LIMIT #, 1"
         # (or similar depending on the back-end DBMS) can return
         # multiple entries
         if limitCond:
