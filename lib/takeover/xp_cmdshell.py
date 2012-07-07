@@ -172,9 +172,8 @@ class xp_cmdshell:
             inject.goStacked("INSERT INTO %s EXEC %s '%s'" % (self.cmdTblName, self.xpCmdshellStr, cmd))
             output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False)
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
-
             if output and isListLike(output):
-                output = output[0]
+                output = output[1:]
 
         return output
 
