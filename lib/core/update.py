@@ -17,6 +17,7 @@ from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.settings import GIT_REPOSITORY
 from lib.core.settings import IS_WIN
 from lib.core.settings import REVISION
 from lib.core.settings import UNICODE_ENCODING
@@ -42,7 +43,7 @@ def update():
         logger.debug(debugMsg)
 
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
-        process = execute("git pull %s" % rootDir, shell=True, stdout=PIPE, stderr=PIPE)
+        process = execute("git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
         pollProcess(process, True)
         stdout, stderr = process.communicate()
         success = not process.returncode
