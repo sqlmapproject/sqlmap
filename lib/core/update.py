@@ -42,7 +42,7 @@ def update():
         logger.debug(debugMsg)
 
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
-        process = execute("git pull %s" % rootDir, shell=True, stdout=PIPE, stderr=PIPE)
+        process = execute("git pull git://github.com/sqlmapproject/sqlmap.git HEAD", shell=True, stdout=PIPE, stderr=PIPE)
         pollProcess(process, True)
         stdout, stderr = process.communicate()
         success = not process.returncode
