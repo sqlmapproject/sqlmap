@@ -103,7 +103,7 @@ class xp_cmdshell:
         threadData.disableStdOut = True
 
         logger.info("testing if xp_cmdshell extended procedure is usable")
-        output = self.evalCmd("echo 1")
+        output = self.xpCmdshellEvalCmd("echo 1")
 
         if isNoneValue(output):
             errMsg = "it seems that the temporary directory ('%s') used for " % self.getRemoteTempPath()
@@ -179,15 +179,18 @@ class xp_cmdshell:
         else:
             inject.goStacked(self.xpCmdshellForgeCmd(cmd, self.cmdTblName))
             query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
+
+            if conf.direct or any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)):
                 output = inject.getValue(query, resumeValue=False, blind=False)
             else:
                 output = []
                 count = inject.getValue("SELECT COUNT(*) FROM %s" % self.cmdTblName, resumeValue=False, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
                 if isNumPosStrValue(count):
                     for index in getLimitRange(count):
                         query = agent.limitQuery(index, query, self.tblField)
                         output.append(inject.getValue(query, inband=False, error=False, resumeValue=False))
+
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isListLike(output) and len(output) > 1:
@@ -195,6 +198,8 @@ class xp_cmdshell:
                     output = output[1:]
                 elif not output[-1].strip():
                     output = output[:-1]
+
+                output = "\n".join(line for line in output)
 
         return output
 
