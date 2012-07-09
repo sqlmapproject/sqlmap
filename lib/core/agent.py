@@ -820,15 +820,6 @@ class Agent:
 
     def runAsDBMSUser(self, query):
         if conf.dCred and "Ad Hoc Distributed Queries" not in query:
-            for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
-                for sqlStatement in sqlStatements:
-                    if query.lower().startswith(sqlStatement):
-                        sqlType = sqlTitle
-                        break
-
-            if sqlType and "SELECT" not in sqlType:
-                query = "SELECT %d;%s" % (randomInt(), query)
-
             query = getSPQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
 
         return query

