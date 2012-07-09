@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
-from lib.core.common import getSPQLSnippet
+from lib.core.common import getSQLSnippet
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -163,12 +163,12 @@ class Abstraction(Web, UDF, xp_cmdshell):
             choice = readInput(msg, default="Y")
 
             if not choice or choice in ("y", "Y"):
-                expression = getSPQLSnippet(DBMS.MSSQL, "configure_openrowset", ENABLE="1")
+                expression = getSQLSnippet(DBMS.MSSQL, "configure_openrowset", ENABLE="1")
                 inject.goStacked(expression)
 
         # TODO: add support for PostgreSQL
         #elif Backend.isDbms(DBMS.PGSQL):
-        #    expression = getSPQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
+        #    expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
         #    inject.goStacked(expression)
 
     def initEnv(self, mandatory=True, detailed=False, web=False):

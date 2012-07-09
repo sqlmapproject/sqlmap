@@ -1543,15 +1543,15 @@ def parseXmlFile(xmlFile, handler):
     with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
         parse(stream, handler)
 
-def getSPQLSnippet(dbms, name, **variables):
+def getSQLSnippet(dbms, sfile, **variables):
     """
-    Returns content of SP(Q)L snippet located inside "procs" directory
+    Returns content of SQL snippet located inside 'procs/' directory
     """
 
-    filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], "%s.txt" % name)
+    filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], sfile if sfile.endswith('.sql') else "%s.sql" % sfile)
     checkFile(filename)
-    retVal = readCachedFileContent(filename)
 
+    retVal = readCachedFileContent(filename)
     retVal = re.sub(r"#.+", "", retVal)
     retVal = re.sub(r"(?s);\s+", "; ", retVal).strip()
 
@@ -1565,8 +1565,9 @@ def getSPQLSnippet(dbms, name, **variables):
         retVal = retVal.replace(_, randomInt())
 
     _ = re.search(r"%(\w+)%", retVal, re.I)
+
     if _:
-        errMsg = "unresolved variable '%s' in SPL snippet '%s'" % (_.group(1), name)
+        errMsg = "unresolved variable '%s' in SQL file '%s'" % (_.group(1), sfile)
         raise sqlmapGenericException, errMsg
 
     return retVal

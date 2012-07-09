@@ -16,7 +16,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
-from lib.core.common import getSPQLSnippet
+from lib.core.common import getSQLSnippet
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
@@ -67,7 +67,7 @@ def dnsUse(payload, expression):
                 nulledCastedField = agent.hexConvertField(nulledCastedField)
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
 
-                expressionRequest = getSPQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dName)
+                expressionRequest = getSQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dName)
                 expressionUnescaped = unescaper.unescape(expressionRequest)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):

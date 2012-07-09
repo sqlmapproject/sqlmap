@@ -11,7 +11,7 @@ from xml.etree import ElementTree as ET
 
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
-from lib.core.common import getSPQLSnippet
+from lib.core.common import getSQLSnippet
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
@@ -820,7 +820,7 @@ class Agent:
 
     def runAsDBMSUser(self, query):
         if conf.dCred and "Ad Hoc Distributed Queries" not in query:
-            query = getSPQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
+            query = getSQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
 
         return query
 

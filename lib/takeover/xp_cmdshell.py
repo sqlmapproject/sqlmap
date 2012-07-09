@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import getLimitRange
-from lib.core.common import getSPQLSnippet
+from lib.core.common import getSQLSnippet
 from lib.core.common import hashDBWrite
 from lib.core.common import isListLike
 from lib.core.common import isNoneValue
@@ -48,14 +48,14 @@ class xp_cmdshell:
         if Backend.isVersionWithin(("2005", "2008")):
             logger.debug("activating sp_OACreate")
 
-            cmd = getSPQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
+            cmd = getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
             inject.goStacked(agent.runAsDBMSUser(cmd))
 
         self.__randStr = randomStr(lowercase=True)
         self.__xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
         self.xpCmdshellStr = "master..%s" % self.__xpCmdshellNew
 
-        cmd = getSPQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self.__randStr, XP_CMDSHELL_NEW=self.__xpCmdshellNew)
+        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self.__randStr, XP_CMDSHELL_NEW=self.__xpCmdshellNew)
 
         if Backend.isVersionWithin(("2005", "2008")):
             cmd += ";RECONFIGURE WITH OVERRIDE"
@@ -67,7 +67,7 @@ class xp_cmdshell:
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
 
-        cmd = getSPQLSnippet(DBMS.MSSQL, "configure_xp_cmdshell", ENABLE=str(mode))
+        cmd = getSQLSnippet(DBMS.MSSQL, "configure_xp_cmdshell", ENABLE=str(mode))
 
         return cmd
 
@@ -77,9 +77,9 @@ class xp_cmdshell:
         logger.debug(debugMsg)
 
         if mode == 1:
-            cmd = getSPQLSnippet(DBMS.MSSQL, "enable_xp_cmdshell_2000", ENABLE=str(mode))
+            cmd = getSQLSnippet(DBMS.MSSQL, "enable_xp_cmdshell_2000", ENABLE=str(mode))
         else:
-            cmd = getSPQLSnippet(DBMS.MSSQL, "disable_xp_cmdshell_2000", ENABLE=str(mode))
+            cmd = getSQLSnippet(DBMS.MSSQL, "disable_xp_cmdshell_2000", ENABLE=str(mode))
 
         return cmd
 
