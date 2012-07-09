@@ -383,6 +383,9 @@ def cmdLineParser():
                                action="store_true",
                                help="Prompt for an interactive SQL shell")
 
+        enumeration.add_option("--sql-file", dest="sqlFile",
+                               help="Execute SQL statements from given file(s)")
+
         # User-defined function options
         brute = OptionGroup(parser, "Brute force", "These "
                           "options can be used to run brute force "

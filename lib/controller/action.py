@@ -118,6 +118,9 @@ def action():
     if conf.sqlShell:
         conf.dbmsHandler.sqlShell()
 
+    if conf.sqlFile:
+        conf.dbmsHandler.sqlFile()
+
     # User-defined function options
     if conf.udfInject:
         conf.dbmsHandler.udfInjectCustom()

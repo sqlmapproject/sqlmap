@@ -16,6 +16,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
+from lib.core.common import getSQLSnippet
 from lib.core.common import getUnicode
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isListLike
@@ -2463,3 +2464,16 @@ class Enumeration:
 
             elif output != "Quit":
                 dataToStdout("No output\n")
+
+    def sqlFile(self):
+        infoMsg = "executing SQL statements from given file(s)"
+        logger.info(infoMsg)
+
+        for sfile in re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):
+            found = False
+            sfile = sfile.strip()
+
+            if not sfile:
+                continue
+
+            self.sqlQuery(getSQLSnippet(Backend.getDbms(), sfile))
