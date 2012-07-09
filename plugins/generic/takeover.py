@@ -53,6 +53,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             errMsg += "the back-end DBMS"
             raise sqlmapNotVulnerableException(errMsg)
 
+        self.getRemoteTempPath()
         self.initEnv(web=web)
 
         if not web or (web and self.webBackdoorUrl is not None):
@@ -75,6 +76,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             errMsg += "stacked queries SQL injection is not supported"
             raise sqlmapNotVulnerableException(errMsg)
 
+        self.getRemoteTempPath()
         self.initEnv(web=web)
 
         if not web or (web and self.webBackdoorUrl is not None):
