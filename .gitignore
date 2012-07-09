@@ -1,2 +1,3 @@
 *.pyc
 output/
+.sqlmap_history
