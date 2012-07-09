@@ -1548,8 +1548,11 @@ def getSQLSnippet(dbms, sfile, **variables):
     Returns content of SQL snippet located inside 'procs/' directory
     """
 
-    filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], sfile if sfile.endswith('.sql') else "%s.sql" % sfile)
-    checkFile(filename)
+    if os.path.exists(sfile):
+        filename = sfile
+    else:
+        filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], sfile if sfile.endswith('.sql') else "%s.sql" % sfile)
+        checkFile(filename)
 
     retVal = readCachedFileContent(filename)
     retVal = re.sub(r"#.+", "", retVal)
@@ -1564,10 +1567,10 @@ def getSQLSnippet(dbms, sfile, **variables):
     for _ in re.findall(r"%RANDINT\d+%", retVal, re.I):
         retVal = retVal.replace(_, randomInt())
 
-    _ = re.search(r"%(\w+)%", retVal, re.I)
+    _ = re.findall(r"%(\w+)%", retVal, re.I)
 
     if _:
-        errMsg = "unresolved variable '%s' in SQL file '%s'" % (_.group(1), sfile)
+        errMsg = "unresolved variable%s '%s' in SQL file '%s'" % ("s" if len(_) > 1 else "", ", ".join(_), sfile)
         raise sqlmapGenericException, errMsg
 
     return retVal

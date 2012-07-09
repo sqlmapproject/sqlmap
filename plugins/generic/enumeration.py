@@ -62,6 +62,7 @@ from lib.core.settings import CONCAT_VALUE_DELIMITER
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import MAX_INT
 from lib.core.settings import NULL
+from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.core.threads import getCurrentThreadData
@@ -2476,4 +2477,9 @@ class Enumeration:
             if not sfile:
                 continue
 
-            self.sqlQuery(getSQLSnippet(Backend.getDbms(), sfile))
+            queries = getSQLSnippet(Backend.getDbms(), sfile)
+
+            infoMsg = "executing SQL statements from file '%s'" % sfile
+            logger.info(infoMsg)
+
+            self.sqlQuery(queries)

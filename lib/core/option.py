@@ -799,7 +799,7 @@ def __setTamperingFunctions():
             try:
                 module = __import__(filename[:-3])
             except ImportError, msg:
-                raise sqlmapSyntaxException, "can not import tamper script '%s' (%s)" % (filename[:-3], msg)
+                raise sqlmapSyntaxException, "cannot import tamper script '%s' (%s)" % (filename[:-3], msg)
 
             priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
 
