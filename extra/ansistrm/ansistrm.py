@@ -20,7 +20,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
     #levels to (background, foreground, bold/intense)
     if os.name == 'nt':
         level_map = {
-            logging.DEBUG: (None, 'cyan', False),
+            logging.DEBUG: (None, 'blue', False),
             logging.INFO: (None, 'green', False),
             logging.WARNING: (None, 'yellow', False),
             logging.ERROR: (None, 'red', True),
@@ -28,7 +28,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
         }
     else:
         level_map = {
-            logging.DEBUG: (None, 'cyan', False),
+            logging.DEBUG: (None, 'blue', False),
             logging.INFO: (None, 'green', False),
             logging.WARNING: (None, 'yellow', False),
             logging.ERROR: (None, 'red', True),
