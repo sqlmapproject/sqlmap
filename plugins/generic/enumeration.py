@@ -2397,32 +2397,31 @@ class Enumeration:
                     sqlType = sqlTitle
                     break
 
-        if not sqlType or 'SELECT' in sqlType:
+        if 'OPENROWSET' not in query.upper() and (not sqlType or 'SELECT' in sqlType):
             infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             logger.info(infoMsg)
 
             output = inject.getValue(query, fromUser=True)
 
             return output
-        else:
-            if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
                 warnMsg = "execution of custom SQL queries is only "
                 warnMsg += "available when stacked queries are supported"
                 logger.warn(warnMsg)
                 return None
+        else:
+            if sqlType:
+                infoMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             else:
-                if sqlType:
-                    infoMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)
-                else:
-                    infoMsg = "executing unknown SQL type query: '%s'" % query
-                logger.info(infoMsg)
+                infoMsg = "executing unknown SQL type query: '%s'" % query
+            logger.info(infoMsg)
 
-                inject.goStacked(query)
+            inject.goStacked(query)
 
-                infoMsg = "done"
-                logger.info(infoMsg)
+            infoMsg = "done"
+            logger.info(infoMsg)
 
-                output = False
+            output = False
 
         return output
 
@@ -2467,19 +2466,24 @@ class Enumeration:
                 dataToStdout("No output\n")
 
     def sqlFile(self):
+        conf.unescape = False
+
         infoMsg = "executing SQL statements from given file(s)"
         logger.info(infoMsg)
 
+        print "re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):", re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile)
+
         for sfile in re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):
-            found = False
             sfile = sfile.strip()
 
             if not sfile:
                 continue
 
-            queries = getSQLSnippet(Backend.getDbms(), sfile)
+            query = getSQLSnippet(Backend.getDbms(), sfile)
 
-            infoMsg = "executing SQL statements from file '%s'" % sfile
+            infoMsg = "executing SQL statement%s from file '%s'" % ("s" if ";" in query else "", sfile)
             logger.info(infoMsg)
 
-            self.sqlQuery(queries)
+            conf.dumper.query(query, self.sqlQuery(query))
+
+        conf.unescape = True
