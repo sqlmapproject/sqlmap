@@ -74,7 +74,7 @@ class Dump:
     def string(self, header, data, sort=True):
         if isListLike(data):
             self.lister(header, data, sort)
-        elif data:
+        elif data is not None:
             data = getUnicode(data)
 
             if data[-1] == '\n':
