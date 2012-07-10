@@ -2466,7 +2466,7 @@ class Enumeration:
                 dataToStdout("No output\n")
 
     def sqlFile(self):
-        conf.unescape = False
+        kb.unescape = False
 
         infoMsg = "executing SQL statements from given file(s)"
         logger.info(infoMsg)
@@ -2484,4 +2484,4 @@ class Enumeration:
 
             conf.dumper.query(query, self.sqlQuery(query))
 
-        conf.unescape = True
+        kb.unescape = True

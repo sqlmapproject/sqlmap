@@ -1402,7 +1402,6 @@ def __setConfAttributes():
     conf.tests = []
     conf.trafficFP = None
     conf.wFileType = None
-    conf.unescape = True
 
 def __setKnowledgeBaseAttributes(flushAll=True):
     """
@@ -1518,6 +1517,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.threadException = False
     kb.timeValidCharsRun = 0
     kb.uChar = NULL
+    kb.unescape = True
     kb.unionDuplicates = False
     kb.xpCmdshellAvailable = False
 
