@@ -5,14 +5,12 @@ Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import logging
 import os
 import re
 import subprocess
 import string
 import sys
 
-from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.revision import getRevisionNumber
@@ -34,19 +32,6 @@ CONSTANT_RATIO = 0.9
 # lower and upper values for match ratio in case of stable page
 LOWER_RATIO_BOUND = 0.02
 UPPER_RATIO_BOUND = 0.98
-
-# sqlmap logger
-logging.addLevelName(CUSTOM_LOGGING.PAYLOAD, "PAYLOAD")
-logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_OUT, "TRAFFIC OUT")
-logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_IN, "TRAFFIC IN")
-
-LOGGER = logging.getLogger("sqlmapLog")
-LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
-FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
-
-LOGGER_HANDLER.setFormatter(FORMATTER)
-LOGGER.addHandler(LOGGER_HANDLER)
-LOGGER.setLevel(logging.WARN)
 
 # markers for special cases when parameter values contain html encoded characters
 PARAMETER_AMP_MARKER = "__AMP__"

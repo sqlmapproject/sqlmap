@@ -75,6 +75,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.log import FORMATTER
 from lib.core.optiondict import optDict
 from lib.core.purge import purge
 from lib.core.settings import CODECS_LIST_PAGE
@@ -83,7 +84,6 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
-from lib.core.settings import FORMATTER
 from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
 from lib.core.settings import PYVERSION

@@ -6,7 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.datatype import AttribDict
-from lib.core.settings import LOGGER
+from lib.core.log import LOGGER
 
 # sqlmap paths
 paths = AttribDict()

@@ -76,6 +76,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.log import FORMATTER
 from lib.core.optiondict import optDict
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
@@ -87,7 +88,6 @@ from lib.core.settings import DBMS_DICT
 from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
-from lib.core.settings import FORMATTER
 from lib.core.settings import NULL
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import IS_WIN
