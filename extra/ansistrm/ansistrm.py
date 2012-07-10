@@ -61,7 +61,6 @@ class ColorizingStreamHandler(logging.StreamHandler):
         def output_colorized(self, message):
             self.stream.write(message)
     else:
-        import ctypes
         import re
         ansi_esc = re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
 
@@ -77,6 +76,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
         }
 
         def output_colorized(self, message):
+            import ctypes
+
             parts = self.ansi_esc.split(message)
             write = self.stream.write
             h = None
