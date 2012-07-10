@@ -17,8 +17,13 @@ logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_OUT, "TRAFFIC OUT")
 logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_IN, "TRAFFIC IN")
 
 LOGGER = logging.getLogger("sqlmapLog")
-#LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
-LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
+
+try:
+    import ctypes
+    LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
+except ImportError:
+    LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
+
 FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
 
 LOGGER_HANDLER.setFormatter(FORMATTER)
