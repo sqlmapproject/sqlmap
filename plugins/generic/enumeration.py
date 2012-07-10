@@ -2411,15 +2411,15 @@ class Enumeration:
                 return None
         else:
             if sqlType:
-                infoMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)
+                debugMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             else:
-                infoMsg = "executing unknown SQL type query: '%s'" % query
-            logger.info(infoMsg)
+                debugMsg = "executing unknown SQL type query: '%s'" % query
+            logger.debug(debugMsg)
 
             inject.goStacked(query)
 
-            infoMsg = "done"
-            logger.info(infoMsg)
+            debugMsg = "done"
+            logger.debug(debugMsg)
 
             output = False
 
@@ -2470,8 +2470,6 @@ class Enumeration:
 
         infoMsg = "executing SQL statements from given file(s)"
         logger.info(infoMsg)
-
-        print "re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):", re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile)
 
         for sfile in re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):
             sfile = sfile.strip()
