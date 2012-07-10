@@ -1567,11 +1567,20 @@ def getSQLSnippet(dbms, sfile, **variables):
     for _ in re.findall(r"%RANDINT\d+%", retVal, re.I):
         retVal = retVal.replace(_, randomInt())
 
-    _ = re.findall(r"%(\w+)%", retVal, re.I)
+    variables = re.findall(r"%(\w+)%", retVal, re.I)
 
-    if _:
-        errMsg = "unresolved variable%s '%s' in SQL file '%s'" % ("s" if len(_) > 1 else "", ", ".join(_), sfile)
-        raise sqlmapGenericException, errMsg
+    if variables:
+        errMsg = "unresolved variable%s '%s' in SQL file '%s'" % ("s" if len(variables) > 1 else "", ", ".join(variables), sfile)
+        logger.error(errMsg)
+
+        msg = "do you want to provide the substitution values? [y/N] "
+        choice = readInput(msg, default="N")
+
+        if choice and choice[0].lower() == "y":
+            for var in variables:
+                msg = "insert value for variable '%s': " % var
+                val = readInput(msg)
+                retVal = retVal.replace(r"%%%s%%" % var, val)
 
     return retVal
 
