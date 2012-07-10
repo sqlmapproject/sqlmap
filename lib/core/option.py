@@ -1402,6 +1402,7 @@ def __setConfAttributes():
     conf.tests = []
     conf.trafficFP = None
     conf.wFileType = None
+    conf.unescape = True
 
 def __setKnowledgeBaseAttributes(flushAll=True):
     """

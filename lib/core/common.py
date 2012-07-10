@@ -1548,8 +1548,10 @@ def getSQLSnippet(dbms, sfile, **variables):
     Returns content of SQL snippet located inside 'procs/' directory
     """
 
-    if os.path.exists(sfile):
+    if sfile.endswith('.sql') and os.path.exists(sfile):
         filename = sfile
+    elif not sfile.endswith('.sql') and os.path.exists("%s.sql" % sfile):
+        filename = "%s.sql" % sfile
     else:
         filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], sfile if sfile.endswith('.sql') else "%s.sql" % sfile)
         checkFile(filename)
