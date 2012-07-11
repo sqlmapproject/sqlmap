@@ -700,7 +700,7 @@ def setCurrentMessage(message):
     if logMsg:
         kb.currentMessage = logMsg.group(0)
 
-def setColour(message):
+def setColour(message, bold=False):
     if not hasattr(kb, "currentMessage"):
         return message
 
@@ -717,12 +717,9 @@ def setColour(message):
         "TRAFFIC IN": "grey"
     }
 
-    if kb.currentMessage:
-        return colored(message, color_map[kb.currentMessage], on_color='on_red' if kb.currentMessage == "CRITICAL" else None, attrs=['bold'] if kb.currentMessage == "CRITICAL" else None)
-    else:
-        return message
+    return colored(message, color_map[kb.currentMessage] if kb.currentMessage else None, on_color='on_red' if kb.currentMessage == "CRITICAL" else None, attrs=['bold'] if (kb.currentMessage == "CRITICAL" or bold) else None)
 
-def dataToStdout(data, forceOutput=False):
+def dataToStdout(data, forceOutput=False, bold=False):
     """
     Writes text to the stdout (console) stream
     """
@@ -754,7 +751,7 @@ def dataToStdout(data, forceOutput=False):
             except:
                 message = data.encode(UNICODE_ENCODING)
 
-            sys.stdout.write(setColour(message))
+            sys.stdout.write(setColour(message, bold))
             sys.stdout.flush()
 
             if kb.get("multiThreadMode"):
@@ -796,6 +793,8 @@ def readInput(message, default=None, checkBatch=True):
     Reads input from terminal
     """
 
+    kb.currentMessage = None
+
     if "\n" in message:
         message += "%s> " % ("\n" if message.count("\n") > 1 else "")
     elif message[-1] == ']':
@@ -818,7 +817,7 @@ def readInput(message, default=None, checkBatch=True):
         data = default
     else:
         logging._acquireLock()
-        dataToStdout("\r%s" % message, True)
+        dataToStdout("\r%s" % message, forceOutput=True, bold=True)
         data = raw_input() or default
         #data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
         logging._releaseLock()
