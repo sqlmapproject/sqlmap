@@ -21,6 +21,8 @@ LOGGER = logging.getLogger("sqlmapLog")
 try:
     import ctypes
     LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
+    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC OUT")] = (None, "cyan", True)
+    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC IN")] = (None, "grey", True)
 except ImportError:
     LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
 
