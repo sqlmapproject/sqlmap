@@ -695,45 +695,30 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         logger.log(level, message)
 
 def setCurrentMessage(message):
-    if "[CRITICAL]" in message:
-        kb.currentMessage = "CRITICAL"
-    elif "[ERROR]" in message:
-        kb.currentMessage = "ERROR"
-    elif "[WARNING]" in message:
-        kb.currentMessage = "WARNING"
-    elif "[INFO]" in message:
-        kb.currentMessage = "INFO"
-    elif "[DEBUG]" in message:
-        kb.currentMessage = "DEBUG"
-    elif "[PAYLOAD]" in message:
-        kb.currentMessage = "PAYLOAD"
-    elif "[TRAFFIC OUT]" in message:
-        kb.currentMessage = "TRAFFIC OUT"
-    elif "[TRAFFIC IN]" in message:
-        kb.currentMessage = "TRAFFIC IN"
+    logMsg = re.search("(CRITICAL|ERROR|WARNING|INFO|DEBUG|PAYLOAD|TRAFFIC OUT|TRAFFIC IN)", message)
+
+    if logMsg:
+        kb.currentMessage = logMsg.group(0)
 
 def setColour(message):
-    setCurrentMessage(message)
-
     if not hasattr(kb, "currentMessage"):
         return message
 
-    if kb.currentMessage == "CRITICAL":
-        return colored(message, 'white', on_color='on_red', attrs=['bold'])
-    elif kb.currentMessage == "ERROR":
-        return colored(message, 'red', attrs=['bold'])
-    elif kb.currentMessage == "WARNING":
-        return colored(message, 'yellow')
-    elif kb.currentMessage == "INFO":
-        return colored(message, 'green')
-    elif kb.currentMessage == "DEBUG":
-        return colored(message, 'blue')
-    elif kb.currentMessage == "PAYLOAD":
-        return colored(message, 'magenta')
-    elif kb.currentMessage == "TRAFFIC OUT":
-        return colored(message, 'cyan')
-    elif kb.currentMessage == "TRAFFIC IN":
-        return colored(message, 'grey')
+    setCurrentMessage(message)
+
+    color_map = {
+        "CRITICAL": "white",
+        "ERROR": "red",
+        "WARNING": "yellow",
+        "INFO": "green",
+        "DEBUG": "blue",
+        "PAYLOAD": "magenta",
+        "TRAFFIC OUT": "cyan",
+        "TRAFFIC IN": "grey"
+    }
+
+    if kb.currentMessage:
+        return colored(message, color_map[kb.currentMessage], on_color='on_red' if kb.currentMessage == "CRITICAL" else None, attrs=['bold'] if kb.currentMessage == "CRITICAL" else None)
     else:
         return message
 
