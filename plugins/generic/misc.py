@@ -88,14 +88,14 @@ class Miscellaneous:
         kb.bannerFp["dbmsVersion"] = inject.getValue(query)
         kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(",", "").replace("-", "").replace(" ", "")
 
-    def delRemoteFile(self, tempFile):
+    def delRemoteFile(self, filename):
         self.checkDbmsOs()
 
         if Backend.isOs(OS.WINDOWS):
-            tempFile = posixToNtSlashes(tempFile)
-            cmd = "del /F /Q %s" % tempFile
+            filename = posixToNtSlashes(filename)
+            cmd = "del /F /Q %s" % filename
         else:
-            cmd = "rm -f %s" % tempFile
+            cmd = "rm -f %s" % filename
 
         self.execCmd(cmd, silent=True)
 
