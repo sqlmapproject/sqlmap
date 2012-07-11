@@ -1566,7 +1566,6 @@ class Enumeration:
             conf.tbl = tbl
             kb.data.dumpedTable = {}
 
-
             if foundData is None:
                 kb.data.cachedColumns = {}
                 self.getColumns(onlyColNames=True)
