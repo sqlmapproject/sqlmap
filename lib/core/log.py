@@ -11,7 +11,6 @@ import sys
 from extra.ansistrm.ansistrm import ColorizingStreamHandler
 from lib.core.enums import CUSTOM_LOGGING
 
-# sqlmap logger
 logging.addLevelName(CUSTOM_LOGGING.PAYLOAD, "PAYLOAD")
 logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_OUT, "TRAFFIC OUT")
 logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_IN, "TRAFFIC IN")
@@ -21,8 +20,9 @@ LOGGER = logging.getLogger("sqlmapLog")
 try:
     import ctypes
     LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
-    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC OUT")] = (None, "cyan", True)
-    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC IN")] = (None, "grey", True)
+    LOGGER_HANDLER.level_map[logging.getLevelName("PAYLOAD")] = (None, "cyan", False)
+    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC OUT")] = (None, "magenta", False)
+    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC IN")] = ("magenta", None, False)
 except ImportError:
     LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
 
