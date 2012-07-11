@@ -3,6 +3,7 @@
 #
 import logging
 import os
+import re
 
 class ColorizingStreamHandler(logging.StreamHandler):
     # color names to indices
@@ -119,8 +120,13 @@ class ColorizingStreamHandler(logging.StreamHandler):
             if bold:
                 params.append('1')
             if params:
-                message = ''.join((self.csi, ';'.join(params),
-                                   'm', message, self.reset))
+                if message.lstrip() != message:
+                    prefix = re.search(r"\s+", message).group(0)
+                    message = message[len(prefix):]
+                else:
+                    prefix = ""
+                message = "%s%s" % (prefix, ''.join((self.csi, ';'.join(params),
+                                   'm', message, self.reset)))
         return message
 
     def format(self, record):
