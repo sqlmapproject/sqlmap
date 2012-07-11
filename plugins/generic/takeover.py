@@ -60,7 +60,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.runCmd(conf.osCmd)
 
         if not conf.osShell and not conf.osPwn and not conf.cleanup:
-            self.cleanup()
+            self.cleanup(web=web)
 
     def osShell(self):
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
@@ -83,7 +83,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.shell()
 
         if not conf.osPwn and not conf.cleanup:
-            self.cleanup()
+            self.cleanup(web=web)
 
     def osPwn(self):
         goUdf = False
@@ -239,7 +239,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 self.pwn(goUdf)
 
         if not conf.cleanup:
-            self.cleanup()
+            self.cleanup(web=web)
 
     def osSmb(self):
         self.checkDbmsOs()

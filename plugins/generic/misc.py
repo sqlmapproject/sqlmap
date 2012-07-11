@@ -103,10 +103,17 @@ class Miscellaneous:
         inject.goStacked("DROP TABLE %s" % tblName, silent=True)
         inject.goStacked("CREATE TABLE %s(%s %s)" % (tblName, tblField, tblType))
 
-    def cleanup(self, onlyFileTbl=False, udfDict=None):
+    def cleanup(self, onlyFileTbl=False, udfDict=None, web=False):
         """
-        Cleanup database from sqlmap create tables and functions
+        Cleanup file system and database from sqlmap create files, tables
+        and functions
         """
+
+        if web:
+            logger.info("cleaning up the web files uploaded")
+
+            self.delRemoteFile(self.webStagerFilePath)
+            self.delRemoteFile(self.webBackdoorFilePath)
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             return
