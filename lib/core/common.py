@@ -697,10 +697,13 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
 
 def setColor(message, bold=False):
     retVal = message
-    level = extractRegexResult(r"\A\s*\[(?P<result>[A-Z ]+)\]", message)
+    level = extractRegexResult(r"\[(?P<result>[A-Z ]+)\]", message)
 
-    if hasattr(LOGGER_HANDLER, "level_map"):
-        _ = LOGGER_HANDLER.level_map.get(logging.getLevelName(level))
+    if level:
+        kb.currentMessage = level
+
+    if hasattr(LOGGER_HANDLER, "level_map") and hasattr(kb, "currentMessage") and kb.currentMessage:
+        _ = LOGGER_HANDLER.level_map.get(logging.getLevelName(kb.currentMessage))
         if _:
             background, foreground, bold = _
             retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
