@@ -34,6 +34,7 @@ from lib.core.settings import MIN_RATIO
 from lib.core.settings import MAX_RATIO
 from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
+from lib.core.settings import NULL
 from lib.core.settings import ORDER_BY_STEP
 from lib.core.unescaper import unescaper
 from lib.request.comparison import comparison
@@ -255,14 +256,14 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
             warnMsg = "if UNION based SQL injection is not detected, "
             warnMsg += "please consider "
 
-            if not conf.uChar and count > 1:
+            if not conf.uChar and count > 1 and kb.uChar == NULL:
                 message = "injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] "
                 test = readInput(message, default="Y")
                 if test[0] not in ("y", "Y"):
                     warnMsg += "usage of option '--union-char' "
                     warnMsg += "(e.g. --union-char=1) "
                 else:
-                    kb.uChar = str(randomInt(2))
+                    conf.uChar = kb.uChar = str(randomInt(2))
                     validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
 
             if not conf.dbms:
