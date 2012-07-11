@@ -29,7 +29,7 @@ class Filesystem(GenericFilesystem):
         infoMsg = "fetching file: '%s'" % rFile
         logger.info(infoMsg)
 
-        result = inject.getValue("SELECT HEX(LOAD_FILE('%s'))" % rFile)
+        result = inject.getValue("SELECT HEX(LOAD_FILE('%s'))" % rFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
         return result
 

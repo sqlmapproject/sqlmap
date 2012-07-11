@@ -163,7 +163,7 @@ class Enumeration:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
         query = agent.forgeCaseStatement(query)
-        kb.data.isDba = unArrayizeValue(inject.getValue(query, charsetType=CHARSET_TYPE.BINARY))
+        kb.data.isDba = unArrayizeValue(inject.getValue(query, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY))
 
         return kb.data.isDba == "1"
 
@@ -928,6 +928,7 @@ class Enumeration:
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(db)
+
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
@@ -1423,11 +1424,7 @@ class Enumeration:
             logger.info(infoMsg)
 
             query = dumpNode.count2 % (column, table)
-
-            if blind:
-                value = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-            else:
-                value = inject.getValue(query, blind=False, expected=EXPECTED.INT)
+            value = inject.getValue(query, blind=blind, inband=not blind, error=not blind, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if isNumPosStrValue(value):
                 validColumnList = True
@@ -1472,10 +1469,7 @@ class Enumeration:
                     else:
                         query = dumpNode.query2 % (column, table, colList[0], pivotValue)
 
-                    if blind:
-                        value = inject.getValue(query, inband=False, error=False)
-                    else:
-                        value = inject.getValue(query, blind=False)
+                    value = inject.getValue(query, blind=blind, inband=not blind, error=not blind)
 
                     if column == colList[0]:
                         if isNoneValue(value):

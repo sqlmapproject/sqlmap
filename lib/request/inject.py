@@ -233,7 +233,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
                     countedExpression = countedExpression[:untilOrderChar]
 
                 if not stopLimit:
-                    count = __goInference(payload, countedExpression, CHARSET_TYPE.DIGITS, firstChar, lastChar)
+                    count = __goInference(payload, countedExpression, charsetType=CHARSET_TYPE.DIGITS, firstChar=firstChar, lastChar=lastChar)
 
                     if isNumPosStrValue(count):
                         count = int(count)
@@ -485,4 +485,4 @@ def goStacked(expression, silent=False):
     Request.queryPage(payload, content=False, silent=silent, noteResponseTime=False, timeBasedCompare=True)
 
 def checkBooleanExpression(expression, expectingNone=True):
-    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, suppressOutput=True, expectingNone=expectingNone)
+    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, suppressOutput=True, expectingNone=expectingNone)
