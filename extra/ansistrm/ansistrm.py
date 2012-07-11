@@ -131,12 +131,6 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
     def format(self, record):
         message = logging.StreamHandler.format(self, record)
-        #if self.is_tty:
-        #    # Don't colorize any traceback
-        #    parts = message.split('\n', 1)
-        #    parts[0] = self.colorize(parts[0], record)
-        #    message = '\n'.join(parts)
-        #return message
         return self.colorize(message, record)
 
 def main():
