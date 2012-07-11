@@ -1380,7 +1380,6 @@ def __setConfAttributes():
     conf.authPassword = None
     conf.boundaries = []
     conf.cj = None
-    conf.currentMessage = None
     conf.dbmsConnector = None
     conf.dbmsHandler = None
     conf.dnsServer = None
@@ -1437,6 +1436,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.commonOutputs = None
     kb.counters = {}
+    kb.currentMessage = None
     kb.data = AttribDict()
     kb.dataOutputFlag = False
 

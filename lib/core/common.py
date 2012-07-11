@@ -696,43 +696,43 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
 
 def setCurrentMessage(message):
     if "[CRITICAL]" in message:
-        conf.currentMessage = "CRITICAL"
+        kb.currentMessage = "CRITICAL"
     elif "[ERROR]" in message:
-        conf.currentMessage = "ERROR"
+        kb.currentMessage = "ERROR"
     elif "[WARNING]" in message:
-        conf.currentMessage = "WARNING"
+        kb.currentMessage = "WARNING"
     elif "[INFO]" in message:
-        conf.currentMessage = "INFO"
+        kb.currentMessage = "INFO"
     elif "[DEBUG]" in message:
-        conf.currentMessage = "DEBUG"
+        kb.currentMessage = "DEBUG"
     elif "[PAYLOAD]" in message:
-        conf.currentMessage = "PAYLOAD"
+        kb.currentMessage = "PAYLOAD"
     elif "[TRAFFIC OUT]" in message:
-        conf.currentMessage = "TRAFFIC OUT"
+        kb.currentMessage = "TRAFFIC OUT"
     elif "[TRAFFIC IN]" in message:
-        conf.currentMessage = "TRAFFIC IN"
+        kb.currentMessage = "TRAFFIC IN"
 
 def setColour(message):
     setCurrentMessage(message)
 
-    if not hasattr(conf, "currentMessage"):
+    if not hasattr(kb, "currentMessage"):
         return message
 
-    if conf.currentMessage == "CRITICAL":
+    if kb.currentMessage == "CRITICAL":
         return colored(message, 'white', on_color='on_red', attrs=['bold'])
-    elif conf.currentMessage == "ERROR":
+    elif kb.currentMessage == "ERROR":
         return colored(message, 'red', attrs=['bold'])
-    elif conf.currentMessage == "WARNING":
+    elif kb.currentMessage == "WARNING":
         return colored(message, 'yellow')
-    elif conf.currentMessage == "INFO":
+    elif kb.currentMessage == "INFO":
         return colored(message, 'green')
-    elif conf.currentMessage == "DEBUG":
+    elif kb.currentMessage == "DEBUG":
         return colored(message, 'blue')
-    elif conf.currentMessage == "PAYLOAD":
+    elif kb.currentMessage == "PAYLOAD":
         return colored(message, 'magenta')
-    elif conf.currentMessage == "TRAFFIC OUT":
+    elif kb.currentMessage == "TRAFFIC OUT":
         return colored(message, 'cyan')
-    elif conf.currentMessage == "TRAFFIC IN":
+    elif kb.currentMessage == "TRAFFIC IN":
         return colored(message, 'grey')
     else:
         return message
