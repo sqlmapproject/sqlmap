@@ -48,6 +48,7 @@ from extra.cloak.cloak import decloak
 from extra.magic import magic
 from extra.odict.odict import OrderedDict
 from extra.safe2bin.safe2bin import safecharencode
+from extra.termcolor.termcolor import colored
 from lib.core.bigarray import BigArray
 from lib.core.data import conf
 from lib.core.data import kb
@@ -693,10 +694,53 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         kb.singleLogFlags.add(flag)
         logger.log(level, message)
 
+def setCurrentMessage(message):
+    if "[CRITICAL]" in message:
+        conf.currentMessage = "CRITICAL"
+    elif "[ERROR]" in message:
+        conf.currentMessage = "ERROR"
+    elif "[WARNING]" in message:
+        conf.currentMessage = "WARNING"
+    elif "[INFO]" in message:
+        conf.currentMessage = "INFO"
+    elif "[DEBUG]" in message:
+        conf.currentMessage = "DEBUG"
+    elif "[PAYLOAD]" in message:
+        conf.currentMessage = "PAYLOAD"
+    elif "[TRAFFIC OUT]" in message:
+        conf.currentMessage = "TRAFFIC OUT"
+    elif "[TRAFFIC IN]" in message:
+        conf.currentMessage = "TRAFFIC IN"
+
+def setColour(message):
+    if not hasattr(conf, "currentMessage"):
+        return message
+
+    if conf.currentMessage == "CRITICAL":
+        return colored(message, 'white', on_color='on_red', attrs=['bold'])
+    elif conf.currentMessage == "ERROR":
+        return colored(message, 'red', attrs=['bold'])
+    elif conf.currentMessage == "WARNING":
+        return colored(message, 'yellow')
+    elif conf.currentMessage == "INFO":
+        return colored(message, 'green')
+    elif conf.currentMessage == "DEBUG":
+        return colored(message, 'blue')
+    elif conf.currentMessage == "PAYLOAD":
+        return colored(message, 'magenta')
+    elif conf.currentMessage == "TRAFFIC OUT":
+        return colored(message, 'cyan')
+    elif conf.currentMessage == "TRAFFIC IN":
+        return colored(message, 'grey')
+    else:
+        return message
+
 def dataToStdout(data, forceOutput=False):
     """
     Writes text to the stdout (console) stream
     """
+
+    message = ""
 
     if not kb.get("threadException"):
         if forceOutput or not getCurrentThreadData().disableStdOut:
@@ -717,16 +761,19 @@ def dataToStdout(data, forceOutput=False):
                         warnMsg += "corresponding output files. "
                         singleTimeWarnMessage(warnMsg)
 
-                    sys.stdout.write(output)
+                    message = output
                 else:
-                    sys.stdout.write(data.encode(sys.stdout.encoding))
+                    message = data.encode(sys.stdout.encoding)
             except:
-                sys.stdout.write(data.encode(UNICODE_ENCODING))
-            finally:
-                sys.stdout.flush()
-                if kb.get("multiThreadMode"):
-                    logging._releaseLock()
-                setFormatterPrependFlag(len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
+                message = data.encode(UNICODE_ENCODING)
+
+            sys.stdout.write(setColour(message))
+            sys.stdout.flush()
+
+            if kb.get("multiThreadMode"):
+                logging._releaseLock()
+
+            setFormatterPrependFlag(len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
 
 def dataToTrafficFile(data):
     if not conf.trafficFile:

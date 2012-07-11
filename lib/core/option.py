@@ -1379,6 +1379,7 @@ def __setConfAttributes():
     conf.authPassword = None
     conf.boundaries = []
     conf.cj = None
+    conf.currentMessage = None
     conf.dbmsConnector = None
     conf.dbmsHandler = None
     conf.dnsServer = None
