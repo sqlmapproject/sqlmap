@@ -20,6 +20,7 @@ import urlparse
 import lib.core.common
 import lib.core.threads
 
+from extra.colorama.initialise import init as coloramainit
 from extra.keepalive import keepalive
 from extra.oset.pyoset import oset
 from extra.socks import socks
@@ -1950,6 +1951,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     based upon command line and configuration file options.
     """
 
+    coloramainit()
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __mergeOptions(inputOptions, overrideOptions)
