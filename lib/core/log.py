@@ -18,6 +18,26 @@ logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_IN, "TRAFFIC IN")
 
 LOGGER = logging.getLogger("sqlmapLog")
 
+LEVEL_COLORS = {
+                    "CRITICAL": "white",
+                    "ERROR": "red",
+                    "WARNING": "yellow",
+                    "INFO": "green",
+                    "DEBUG": "blue",
+                    "PAYLOAD": "magenta",
+                    "TRAFFIC OUT": "cyan",
+                    "TRAFFIC IN": "grey"
+               }
+
+LEVEL_ON_COLORS = {
+                    "CRITICAL": "on_red",
+                  }
+
+LEVEL_ATTRS = {
+                "CRITICAL": ('bold',),
+              }
+
+
 try:
     import ctypes
     LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)

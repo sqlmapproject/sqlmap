@@ -78,8 +78,10 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.log import FORMATTER
+from lib.core.log import LEVEL_ATTRS
+from lib.core.log import LEVEL_COLORS
+from lib.core.log import LEVEL_ON_COLORS
 from lib.core.optiondict import optDict
-from lib.core.settings import COLOR_MAP
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -696,14 +698,12 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         logger.log(level, message)
 
 def setColor(message, bold=False):
-    retVal = message
     level = extractRegexResult(r"\A\s*\[(?P<result>[A-Z ]+)\]", message)
 
     if level:
-        attrs = ('bold',) if (level == "CRITICAL" or bold) else None
-        on_color = 'on_red' if level == "CRITICAL" else None
-        color = COLOR_MAP.get(level)
-        retVal = colored(message, color=color, on_color=on_color, attrs=attrs)
+        retVal = colored(message, color=LEVEL_COLORS.get(level), on_color=LEVEL_ON_COLORS.get(level), attrs=LEVEL_ATTRS.get(level))
+    else:
+        retVal = message
 
     return retVal
 
