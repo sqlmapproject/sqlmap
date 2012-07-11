@@ -2393,8 +2393,8 @@ class Enumeration:
     def sqlQuery(self, query):
         output = None
         sqlType = None
-
         query = query.rstrip(';')
+        kb.unescape = False
 
         for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
             for sqlStatement in sqlStatements:
@@ -2407,12 +2407,16 @@ class Enumeration:
             logger.info(infoMsg)
 
             output = inject.getValue(query, fromUser=True)
+            kb.unescape = True
 
             return output
         elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
                 warnMsg = "execution of custom SQL queries is only "
                 warnMsg += "available when stacked queries are supported"
                 logger.warn(warnMsg)
+
+                kb.unescape = True
+
                 return None
         else:
             if sqlType:
@@ -2427,6 +2431,8 @@ class Enumeration:
             logger.debug(debugMsg)
 
             output = False
+
+        kb.unescape = True
 
         return output
 
@@ -2471,8 +2477,6 @@ class Enumeration:
                 dataToStdout("No output\n")
 
     def sqlFile(self):
-        kb.unescape = False
-
         infoMsg = "executing SQL statements from given file(s)"
         logger.info(infoMsg)
 
@@ -2488,5 +2492,3 @@ class Enumeration:
             logger.info(infoMsg)
 
             conf.dumper.query(query, self.sqlQuery(query))
-
-        kb.unescape = True
