@@ -96,6 +96,7 @@ optDict = {
                                "getBanner":         ("boolean", "Banners"),
                                "getCurrentUser":    ("boolean", "Users"),
                                "getCurrentDb":      ("boolean", "Databases"),
+                               "getHostname":       "boolean",
                                "isDba":             "boolean",
                                "getUsers":          ("boolean", "Users"),
                                "getPasswordHashes": ("boolean", "Passwords"),

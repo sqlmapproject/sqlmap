@@ -304,6 +304,10 @@ def cmdLineParser():
                                action="store_true",
                                help="Retrieve DBMS current database")
 
+        enumeration.add_option("--hostname", dest="getHostname",
+                               action="store_true",
+                               help="Retrieve DBMS server hostname")
+
         enumeration.add_option("--is-dba", dest="isDba",
                                action="store_true",
                                help="Detect if the DBMS current user is DBA")

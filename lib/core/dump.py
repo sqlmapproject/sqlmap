@@ -74,7 +74,7 @@ class Dump:
     def string(self, header, data, sort=True):
         if isListLike(data):
             self.lister(header, data, sort)
-        elif data is not None:
+        elif data is not None and len(data) > 0:
             data = getUnicode(data)
 
             if data[-1] == '\n':
@@ -124,6 +124,9 @@ class Dump:
             self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data)
         else:
             self.string("current database", data)
+
+    def hostname(self,data):
+        self.string("hostname", data)
 
     def dba(self,data):
         self.string("current user is DBA", data)

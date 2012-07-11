@@ -29,6 +29,7 @@
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
+        <hostname query="@@HOSTNAME"/>
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0,1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0,1)='%s'"/>
         <users>
@@ -102,6 +103,7 @@
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_DATABASE()"/>
+        <hostname/>
         <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
         <users>
@@ -169,6 +171,7 @@
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
+        <hostname query="@@SERVERNAME"/>
         <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin','%s')=1"/>
         <users>
             <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
@@ -242,6 +245,7 @@
              NOTE: in Oracle to check if the session user is DBA you can use:
              SELECT USERENV('ISDBA') FROM DUAL
         -->
+        <hostname query="SELECT UTL_INADDR.get_host_name FROM DUAL"/>
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
@@ -321,6 +325,7 @@
         <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
         <current_db/>
+        <hostname/>
         <is_dba/>
         <check_udf/>
         <users/>
@@ -366,6 +371,7 @@
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
         <current_db/>
+        <hostname/>
         <inference query="ASCW(MID((%s),%d,1)) > %d"/>
         <is_dba/>
         <dbs/>
@@ -407,6 +413,7 @@
         <banner query="SELECT RDB$GET_CONTEXT('SYSTEM','ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
+        <hostname/>
         <users>
             <inband query="SELECT DISTINCT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
@@ -455,6 +462,7 @@
         <cast query="REPLACE(CHR(%s),' ','_')"/>
         <current_user query="SELECT USER() FROM DUAL"/>
         <current_db query="SELECT DATABASE() FROM DUAL"/>
+        <hostname/>
         <order query="ORDER BY %s ASC"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
@@ -509,6 +517,7 @@
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
         <current_db query="SELECT DB_NAME()"/>
+        <hostname/>
         <is_dba query="PATINDEX('%sa_role%',SHOW_ROLE())>0" query2="EXISTS(SELECT * FROM master..syslogins,master..sysloginroles WHERE srid=0 and name='%s')"/>
         <users>
             <inband query="SELECT name FROM master..syslogins"/>
@@ -575,10 +584,11 @@
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
-        <banner query="SELECT service_level FROM TABLE (sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT, versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>
+        <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT, versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
         <!-- NOTE: On DB2 we use the current user as default schema (database) -->
         <current_db query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
+        <hostname query="SELECT host_name FROM TABLE(sysproc.env_get_sys_info())"/>
         <is_dba query="(SELECT dbadmauth FROM syscat.dbauth WHERE grantee=current user)='Y'"/>
         <users>
             <inband query="SELECT grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>

@@ -64,6 +64,9 @@ def action():
     if conf.getCurrentDb:
         conf.dumper.currentDb(conf.dbmsHandler.getCurrentDb())
 
+    if conf.getHostname:
+        conf.dumper.hostname(conf.dbmsHandler.getHostname())
+
     if conf.isDba:
         conf.dumper.dba(conf.dbmsHandler.isDba())
 

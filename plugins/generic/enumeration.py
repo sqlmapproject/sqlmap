@@ -83,6 +83,7 @@ class Enumeration:
         kb.data.banner = None
         kb.data.currentUser = ""
         kb.data.currentDb = ""
+        kb.data.hostname = ""
         kb.data.cachedUsers = []
         kb.data.cachedUsersPasswords = {}
         kb.data.cachedUsersPrivileges = {}
@@ -149,6 +150,17 @@ class Enumeration:
             kb.data.currentDb = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
 
         return kb.data.currentDb
+
+    def getHostname(self):
+        infoMsg = "fetching server hostname"
+        logger.info(infoMsg)
+
+        query = queries[Backend.getIdentifiedDbms()].hostname.query
+
+        if not kb.data.hostname:
+            kb.data.hostname = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
+
+        return kb.data.hostname
 
     def isDba(self, user=None):
         infoMsg = "testing if current user is DBA"
