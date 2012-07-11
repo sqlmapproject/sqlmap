@@ -78,9 +78,7 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.log import FORMATTER
-from lib.core.log import LEVEL_ATTRS
-from lib.core.log import LEVEL_COLORS
-from lib.core.log import LEVEL_ON_COLORS
+from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
@@ -698,10 +696,13 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         logger.log(level, message)
 
 def setColor(message, bold=False):
+    message = "[TRAFFIC IN] " + message
     level = extractRegexResult(r"\A\s*\[(?P<result>[A-Z ]+)\]", message)
 
-    if level:
-        retVal = colored(message, color=LEVEL_COLORS.get(level), on_color=LEVEL_ON_COLORS.get(level), attrs=LEVEL_ATTRS.get(level))
+    _ = LOGGER_HANDLER.level_map.get(logging._levelNames.get(level))
+    if _:
+        background, foreground, bold = _
+        retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
     else:
         retVal = message
 
