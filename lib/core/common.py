@@ -696,15 +696,14 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         logger.log(level, message)
 
 def setColor(message, bold=False):
-    message = "[TRAFFIC IN] " + message
+    retVal = message
     level = extractRegexResult(r"\A\s*\[(?P<result>[A-Z ]+)\]", message)
 
-    _ = LOGGER_HANDLER.level_map.get(logging._levelNames.get(level))
-    if _:
-        background, foreground, bold = _
-        retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
-    else:
-        retVal = message
+    if hasattr(LOGGER_HANDLER, "level_map"):
+        _ = LOGGER_HANDLER.level_map.get(logging._levelNames.get(level))
+        if _:
+            background, foreground, bold = _
+            retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
 
     return retVal
 
