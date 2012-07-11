@@ -713,6 +713,8 @@ def setCurrentMessage(message):
         conf.currentMessage = "TRAFFIC IN"
 
 def setColour(message):
+    setCurrentMessage(message)
+
     if not hasattr(conf, "currentMessage"):
         return message
 
