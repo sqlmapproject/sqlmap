@@ -1436,7 +1436,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.commonOutputs = None
     kb.counters = {}
-    kb.currentMessage = None
     kb.data = AttribDict()
     kb.dataOutputFlag = False
 

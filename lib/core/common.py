@@ -79,6 +79,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.log import FORMATTER
 from lib.core.optiondict import optDict
+from lib.core.settings import COLOR_MAP
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -694,30 +695,17 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         kb.singleLogFlags.add(flag)
         logger.log(level, message)
 
-def setCurrentMessage(message):
-    logMsg = re.search("(CRITICAL|ERROR|WARNING|INFO|DEBUG|PAYLOAD|TRAFFIC OUT|TRAFFIC IN)", message)
+def setColor(message, bold=False):
+    retVal = message
+    level = extractRegexResult(r"\A\s*\[(?P<result>[A-Z ]+)\]", message)
 
-    if logMsg:
-        kb.currentMessage = logMsg.group(0)
+    if level:
+        attrs = ('bold',) if (level == "CRITICAL" or bold) else None
+        on_color = 'on_red' if level == "CRITICAL" else None
+        color = COLOR_MAP.get(level)
+        retVal = colored(message, color=color, on_color=on_color, attrs=attrs)
 
-def setColour(message, bold=False):
-    if not hasattr(kb, "currentMessage"):
-        return message
-
-    setCurrentMessage(message)
-
-    color_map = {
-        "CRITICAL": "white",
-        "ERROR": "red",
-        "WARNING": "yellow",
-        "INFO": "green",
-        "DEBUG": "blue",
-        "PAYLOAD": "magenta",
-        "TRAFFIC OUT": "cyan",
-        "TRAFFIC IN": "grey"
-    }
-
-    return colored(message, color_map[kb.currentMessage] if kb.currentMessage else None, on_color='on_red' if kb.currentMessage == "CRITICAL" else None, attrs=['bold'] if (kb.currentMessage == "CRITICAL" or bold) else None)
+    return retVal
 
 def dataToStdout(data, forceOutput=False, bold=False):
     """
@@ -751,7 +739,7 @@ def dataToStdout(data, forceOutput=False, bold=False):
             except:
                 message = data.encode(UNICODE_ENCODING)
 
-            sys.stdout.write(setColour(message, bold))
+            sys.stdout.write(setColor(message, bold))
             sys.stdout.flush()
 
             if kb.get("multiThreadMode"):

@@ -268,6 +268,17 @@ BASIC_HELP_ITEMS = (
                         "wizard"
                    )
 
+COLOR_MAP = {
+                "CRITICAL": "white",
+                "ERROR": "red",
+                "WARNING": "yellow",
+                "INFO": "green",
+                "DEBUG": "blue",
+                "PAYLOAD": "magenta",
+                "TRAFFIC OUT": "cyan",
+                "TRAFFIC IN": "grey"
+            }
+
 # string representation for NULL value
 NULL = "NULL"
 
