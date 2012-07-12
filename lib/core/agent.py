@@ -763,6 +763,41 @@ class Agent:
 
         return limitedQuery
 
+    def forgeQueryOutputLength(self, expression):
+        lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
+        select = re.search("\ASELECT\s+", expression, re.I)
+        selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
+        selectDistinctExpr = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
+        selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
+        selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
+
+        if any((selectTopExpr, selectDistinctExpr, selectFromExpr, selectExpr)):
+            if selectTopExpr:
+                query = selectTopExpr.group(1)
+            elif selectDistinctExpr:
+                query = selectDistinctExpr.group(1)
+            elif selectFromExpr:
+                query = selectFromExpr.group(1)
+            elif selectExpr:
+                query = selectExpr.group(1)
+        else:
+            query = expression
+
+        if ( select and re.search("\A(COUNT|LTRIM)\(", query, re.I) ) or len(query) <= 1:
+            return query
+
+        if selectDistinctExpr:
+            lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % query, expression)
+
+            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                lengthExpr += " AS %s" % randomStr(lowercase=True)
+        elif select:
+            lengthExpr = expression.replace(query, lengthQuery % query, 1)
+        else:
+            lengthExpr = lengthQuery % expression
+
+        return unescaper.unescape(lengthExpr)
+
     def forgeCaseStatement(self, expression):
         """
         Take in input a query string and return its CASE statement query

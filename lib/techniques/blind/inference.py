@@ -553,43 +553,11 @@ def queryOutputLength(expression, payload):
     Returns the query output length.
     """
 
-    lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
-    select = re.search("\ASELECT\s+", expression, re.I)
-    selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
-    selectDistinctExpr = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
-    selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
-    selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
-
-    if any((selectTopExpr, selectDistinctExpr, selectFromExpr, selectExpr)):
-        if selectTopExpr:
-            query = selectTopExpr.group(1)
-        elif selectDistinctExpr:
-            query = selectDistinctExpr.group(1)
-        elif selectFromExpr:
-            query = selectFromExpr.group(1)
-        elif selectExpr:
-            query = selectExpr.group(1)
-    else:
-        query = expression
-
-    if ( select and re.search("\A(COUNT|LTRIM)\(", query, re.I) ) or len(query) <= 1:
-        return None, None, None
-
-    if selectDistinctExpr:
-        lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % query, expression)
-
-        if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
-            lengthExpr += " AS %s" % randomStr(lowercase=True)
-    elif select:
-        lengthExpr = expression.replace(query, lengthQuery % query, 1)
-    else:
-        lengthExpr = lengthQuery % expression
-
     infoMsg = "retrieving the length of query output"
     logger.info(infoMsg)
 
+    lengthExprUnescaped = agent.forgeQueryOutputLength(expression)
     start = time.time()
-    lengthExprUnescaped = unescaper.unescape(lengthExpr)
     count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
 
     debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
@@ -598,4 +566,4 @@ def queryOutputLength(expression, payload):
     if length == " ":
         length = 0
 
-    return count, length, query
+    return length
