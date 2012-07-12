@@ -1743,11 +1743,7 @@ class Enumeration:
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, column, tbl)
 
-                                    # Skip enumeration of cells that have a value length of 0
-                                    if not inject.checkBooleanExpression(agent.forgeQueryOutputLengthZero(query)):
-                                        logger.debug("column '%s', entry %d is blank" % (column, index+1))
-                                    else:
-                                        value = inject.getValue(query, inband=False, error=False, dump=True)
+                                    value = inject.getValue(query, inband=False, error=False, dump=True)
 
                                     lengths[column] = max(lengths[column], len(value) if value else 0)
                                     entries[column].append(value)

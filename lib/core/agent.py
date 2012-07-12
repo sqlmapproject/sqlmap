@@ -798,9 +798,6 @@ class Agent:
 
         return unescaper.unescape(lengthExpr)
 
-    def forgeQueryOutputLengthZero(self, expression):
-        return self.forgeCaseStatement(self.forgeQueryOutputLength(expression))
-
     def forgeCaseStatement(self, expression):
         """
         Take in input a query string and return its CASE statement query
