@@ -786,7 +786,7 @@ def readInput(message, default=None, checkBatch=True):
     Reads input from terminal
     """
 
-    kb.currentMessage = None
+    kb.stickyLevel = None
 
     if "\n" in message:
         message += "%s> " % ("\n" if message.count("\n") > 1 else "")
