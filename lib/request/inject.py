@@ -80,7 +80,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     if not (timeBasedCompare and kb.dnsTest):
         if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
-            _, length, _ = queryOutputLength(expression, payload)
+            length = queryOutputLength(expression, payload)
         else:
             length = None
 
