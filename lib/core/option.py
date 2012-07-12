@@ -1436,7 +1436,6 @@ def __setKnowledgeBaseAttributes(flushAll=True):
 
     kb.commonOutputs = None
     kb.counters = {}
-    kb.currentMessage = None
     kb.data = AttribDict()
     kb.dataOutputFlag = False
 
@@ -1511,6 +1510,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.singleLogFlags = set()
     kb.skipOthersDbms = None
     kb.stickyFlag = False
+    kb.stickyLevel = None
     kb.suppressResumeInfo = False
     kb.technique = None
     kb.testMode = False
