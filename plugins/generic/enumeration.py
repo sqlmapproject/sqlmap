@@ -1742,7 +1742,7 @@ class Enumeration:
 
                                     # Skip enumeration of cells that have a value length of 0
                                     if not inject.checkBooleanExpression(agent.forgeQueryOutputLengthZero(query)):
-                                        logger.debug(query)
+                                        logger.debug("column '%s', entry %d is blank" % (column, index+1))
                                         value = ""
                                     else:
                                         value = inject.getValue(query, inband=False, error=False, dump=True)
