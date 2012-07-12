@@ -26,7 +26,6 @@ from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
 from lib.core.common import randomStr
 from lib.core.common import safeStringFormat
-from lib.core.common import setFormatterPrependFlag
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -525,7 +524,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     except KeyboardInterrupt:
         abortedFlag = True
     finally:
-        setFormatterPrependFlag(False)
+        kb.prependFlag = False
+        kb.stickyLevel = None
 
         if finalValue is not None:
             finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue

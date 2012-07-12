@@ -411,13 +411,12 @@ def __adjustLoggingFormatter():
 
     def format(record):
         _ = FORMATTER._format(record)
-        if FORMATTER._prepend_flag:
+        if kb.prependFlag:
             _ = "\n%s" % _
-            FORMATTER._prepend_flag = False
+            kb.prependFlag = False
         return _
 
     FORMATTER._format = FORMATTER.format
-    FORMATTER._prepend_flag = False
     FORMATTER.format = format
 
 def __setRequestFromFile():
@@ -1497,6 +1496,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.pageStable = None
     kb.partRun = None
     kb.permissionFlag = False
+    kb.prependFlag = False
     kb.processResponseCounter = 0
     kb.proxyAuthHeader = None
     kb.queryCounter = 0

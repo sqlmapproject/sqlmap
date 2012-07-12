@@ -750,7 +750,7 @@ def dataToStdout(data, forceOutput=False, bold=False):
             if kb.get("multiThreadMode"):
                 logging._releaseLock()
 
-            setFormatterPrependFlag(len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
+            kb.prependFlag = len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n'
 
 def dataToTrafficFile(data):
     if not conf.trafficFile:
@@ -1559,7 +1559,9 @@ def clearConsoleLine(forceOutput=False):
     """
 
     dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
-    setFormatterPrependFlag(False)
+
+    kb.prependFlag = False
+    kb.stickyLevel = None
 
 def parseXmlFile(xmlFile, handler):
     """
@@ -3157,14 +3159,6 @@ def extractExpectedValue(value, expected):
                 value = int(value) if value.isdigit() else None
 
     return value
-
-def setFormatterPrependFlag(value=True):
-    """
-    Sets logging formatter flag used for signaling if newline is needed before
-    the logging message itself (used in inference mode)
-    """
-
-    FORMATTER._prepend_flag = value
 
 def hashDBWrite(key, value, serialize=False):
     """
