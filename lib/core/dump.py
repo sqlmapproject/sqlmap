@@ -72,6 +72,8 @@ class Dump:
         return self._outputFile
 
     def string(self, header, data, sort=True):
+        kb.stickyLevel = None
+
         if isListLike(data):
             self.lister(header, data, sort)
         elif data is not None:
