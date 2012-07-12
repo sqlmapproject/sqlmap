@@ -133,7 +133,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
             if bold:
                 params.append('1')
 
-            if params:
+            if params and message:
                 if message.lstrip() != message:
                     prefix = re.search(r"\s+", message).group(0)
                     message = message[len(prefix):]

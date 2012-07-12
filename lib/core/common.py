@@ -80,6 +80,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
+from lib.core.settings import BOLD_PATTERNS
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -695,11 +696,19 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         kb.singleLogFlags.add(flag)
         logger.log(level, message)
 
+def boldifyMessage(message):
+    retVal = message
+
+    if any(_ in message for _ in BOLD_PATTERNS):
+        retVal = setColor(message, True)
+
+    return retVal
+
 def setColor(message, bold=False):
     retVal = message
     level = extractRegexResult(r"\[(?P<result>[A-Z ]+)\]", message) or kb.get("stickyLevel")
 
-    if hasattr(LOGGER_HANDLER, "level_map"):  # colorizing handler
+    if message and hasattr(LOGGER_HANDLER, "level_map"):  # colorizing handler
         if bold:
             retVal = colored(message, color=None, on_color=None, attrs=("bold",))
         elif level:

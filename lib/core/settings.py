@@ -509,3 +509,6 @@ VALID_TIME_CHARS_RUN_THRESHOLD = 100
 
 # Check for empty columns only if table is sufficiently large
 CHECK_ZERO_COLUMNS_THRESHOLD = 10
+
+# Boldify all logger messages containing these "patterns"
+BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable")

@@ -26,6 +26,7 @@ from extra.oset.pyoset import oset
 from extra.socks import socks
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
+from lib.core.common import boldifyMessage
 from lib.core.common import dataToStdout
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import extractRegexResult
@@ -410,7 +411,7 @@ def __adjustLoggingFormatter():
         return
 
     def format(record):
-        _ = FORMATTER._format(record)
+        _ = boldifyMessage(FORMATTER._format(record))
         if kb.prependFlag:
             _ = "\n%s" % _
             kb.prependFlag = False
