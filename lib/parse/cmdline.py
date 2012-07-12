@@ -589,10 +589,6 @@ def cmdLineParser():
         miscellaneous.add_option("-z", dest="mnemonics",
                                help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
 
-        miscellaneous.add_option("--beep", dest="beep",
-                                  action="store_true",
-                                  help="Sound alert when SQL injection found")
-
         miscellaneous.add_option("--check-payload", dest="checkPayload",
                                   action="store_true",
                                   help="Offline WAF/IPS/IDS payload detection testing")
@@ -645,6 +641,9 @@ def cmdLineParser():
                                   help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
+        parser.add_option("--beep", dest="beep", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
 

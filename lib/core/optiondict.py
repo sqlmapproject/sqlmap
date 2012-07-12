@@ -185,7 +185,6 @@ optDict = {
                              },
 
             "Miscellaneous": {
-                               "beep":              "boolean",
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",
