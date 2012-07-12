@@ -702,14 +702,15 @@ def setColor(message, bold=False):
     if level:
         kb.currentMessage = level
 
-    if bold:
-        retVal = colored(message, color=None, on_color=None, attrs=("bold",))
-    elif hasattr(LOGGER_HANDLER, "level_map") and hasattr(kb, "currentMessage") and kb.currentMessage:
-        _ = LOGGER_HANDLER.level_map.get(logging.getLevelName(kb.currentMessage))
+    if hasattr(LOGGER_HANDLER, "level_map"):  # colorizing handler
+        if bold:
+            retVal = colored(message, color=None, on_color=None, attrs=("bold",))
+        elif hasattr(kb, "currentMessage") and kb.currentMessage:
+            _ = LOGGER_HANDLER.level_map.get(logging.getLevelName(kb.currentMessage))
 
-        if _:
-            background, foreground, bold = _
-            retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
+            if _:
+                background, foreground, bold = _
+                retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
 
     return retVal
 
