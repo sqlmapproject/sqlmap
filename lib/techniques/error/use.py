@@ -359,8 +359,8 @@ def errorUse(expression, expected=None, dump=False):
                 for field in expressionFieldsList:
                     if __oneShotErrorUse("SELECT COUNT(%s) FROM %s" % (field, kb.dumpTable)) == '0':
                         emptyFields.append(field)
-                        debugMsg = "column '%s' for table '%s' appears to be empty. "
-                        debugMsg += "It's values will not be dumped"
+                        debugMsg = "column '%s' of table '%s' will not be " % (field, kb.dumpTable)
+                        debugMsg += "dumped as it appears to be empty"
                         logger.debug(debugMsg)
 
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:

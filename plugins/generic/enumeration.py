@@ -57,6 +57,7 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.session import setOs
 from lib.core.settings import BLANK
+from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CONCAT_ROW_DELIMITER
 from lib.core.settings import CONCAT_VALUE_DELIMITER
 from lib.core.settings import CURRENT_DB
@@ -1717,8 +1718,17 @@ class Enumeration:
                             entries, lengths = retVal
 
                     else:
+                        emptyColumns = []
                         plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
                         indexRange = getLimitRange(count, dump=True, plusOne=plusOne)
+
+                        if len(colList) < len(indexRange) > CHECK_ZERO_COLUMNS_THRESHOLD:
+                            for column in colList:
+                                if inject.getValue("SELECT COUNT(%s) FROM %s" % (column, kb.dumpTable), inband=False, error=False) == '0':
+                                    emptyColumns.append(column)
+                                    debugMsg = "column '%s' of table '%s' will not be " % (column, kb.dumpTable)
+                                    debugMsg += "dumped as it appears to be empty"
+                                    logger.debug(debugMsg)
 
                         try:
                             for index in indexRange:
@@ -1743,7 +1753,7 @@ class Enumeration:
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, column, tbl)
 
-                                    value = inject.getValue(query, inband=False, error=False, dump=True)
+                                    value = NULL if column in emptyColumns else inject.getValue(query, inband=False, error=False, dump=True)
 
                                     lengths[column] = max(lengths[column], len(value) if value else 0)
                                     entries[column].append(value)
