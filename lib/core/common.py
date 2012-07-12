@@ -307,15 +307,15 @@ class Backend:
 
     @staticmethod
     def forceDbms(dbms, sticky=False):
-        if not kb.stickyFlag:
+        if not kb.stickyDBMS:
             kb.forcedDbms = aliasToDbmsEnum(dbms)
-            kb.stickyFlag = sticky
+            kb.stickyDBMS = sticky
 
     @staticmethod
     def flushForcedDbms(force=False):
-        if not kb.stickyFlag or force:
+        if not kb.stickyDBMS or force:
             kb.forcedDbms = None
-            kb.stickyFlag = False
+            kb.stickyDBMS = False
 
     @staticmethod
     def setOs(os):
