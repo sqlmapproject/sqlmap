@@ -33,7 +33,7 @@ for tunneling connections through SOCKS proxies.
 """
 
 """
-Minor modifications made by Miroslav Stampar (http://www.sqlmap.org/)
+Minor modifications made by Miroslav Stampar (http://sqlmap.org/)
 for patching DNS-leakage occuring in socket.create_connection()
 
 Minor modifications made by Christopher Gilbert (http://motomastyle.com/)

@@ -3,7 +3,7 @@
 """
 dbgtool.py - Portable executable to ASCII debug script converter
 
-Copyright (c) 2006-2012 sqlmap developers (http://www.sqlmap.org/)
+Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
