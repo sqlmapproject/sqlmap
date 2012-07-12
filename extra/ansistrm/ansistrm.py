@@ -18,22 +18,22 @@ class ColorizingStreamHandler(logging.StreamHandler):
         'white': 7,
     }
 
-    #levels to (background, foreground, bold/intense)
+    # levels to (background, foreground, bold/intense)
     if os.name == 'nt':
         level_map = {
             logging.DEBUG: (None, 'blue', False),
             logging.INFO: (None, 'green', False),
             logging.WARNING: (None, 'yellow', False),
-            logging.ERROR: (None, 'red', True),
-            logging.CRITICAL: ('red', 'white', True),
+            logging.ERROR: (None, 'red', False),
+            logging.CRITICAL: ('red', 'white', False)
         }
     else:
         level_map = {
             logging.DEBUG: (None, 'blue', False),
             logging.INFO: (None, 'green', False),
             logging.WARNING: (None, 'yellow', False),
-            logging.ERROR: (None, 'red', True),
-            logging.CRITICAL: ('red', 'white', True),
+            logging.ERROR: (None, 'red', False),
+            logging.CRITICAL: ('red', 'white', False)
         }
     csi = '\x1b['
     reset = '\x1b[0m'
@@ -47,11 +47,13 @@ class ColorizingStreamHandler(logging.StreamHandler):
         try:
             message = self.format(record)
             stream = self.stream
+
             if not self.is_tty:
                 stream.write(message)
             else:
                 self.output_colorized(message)
             stream.write(getattr(self, 'terminator', '\n'))
+
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
@@ -83,19 +85,26 @@ class ColorizingStreamHandler(logging.StreamHandler):
             write = self.stream.write
             h = None
             fd = getattr(self.stream, 'fileno', None)
+
             if fd is not None:
                 fd = fd()
+
                 if fd in (1, 2): # stdout or stderr
                     h = ctypes.windll.kernel32.GetStdHandle(-10 - fd)
+
             while parts:
                 text = parts.pop(0)
+
                 if text:
                     write(text)
+
                 if parts:
                     params = parts.pop(0)
+
                     if h is not None:
                         params = [int(p) for p in params.split(';')]
                         color = 0
+
                         for p in params:
                             if 40 <= p <= 47:
                                 color |= self.nt_color_map[p - 40] << 4
@@ -107,41 +116,35 @@ class ColorizingStreamHandler(logging.StreamHandler):
                                 color = 0x07
                             else:
                                 pass # error condition ignored
+
                         ctypes.windll.kernel32.SetConsoleTextAttribute(h, color)
 
     def colorize(self, message, record):
         if record.levelno in self.level_map:
             bg, fg, bold = self.level_map[record.levelno]
             params = []
+
             if bg in self.color_map:
                 params.append(str(self.color_map[bg] + 40))
+
             if fg in self.color_map:
                 params.append(str(self.color_map[fg] + 30))
+
             if bold:
                 params.append('1')
+
             if params:
                 if message.lstrip() != message:
                     prefix = re.search(r"\s+", message).group(0)
                     message = message[len(prefix):]
                 else:
                     prefix = ""
+
                 message = "%s%s" % (prefix, ''.join((self.csi, ';'.join(params),
                                    'm', message, self.reset)))
+
         return message
 
     def format(self, record):
         message = logging.StreamHandler.format(self, record)
         return self.colorize(message, record)
-
-def main():
-    root = logging.getLogger()
-    root.setLevel(logging.DEBUG)
-    root.addHandler(ColorizingStreamHandler())
-    logging.debug('DEBUG')
-    logging.info('INFO')
-    logging.warning('WARNING')
-    logging.error('ERROR')
-    logging.critical('CRITICAL')
-
-if __name__ == '__main__':
-    main()
