@@ -335,7 +335,7 @@ def __goBooleanProxy(expression):
     payload = agent.payload(newValue=query)
     timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
-    output = hashDBRetrieve(expression)
+    output = hashDBRetrieve(expression, checkConf=True)
 
     if output is None:
         output = Request.queryPage(payload, timeBasedCompare=timeBasedCompare, raise404=False)
