@@ -1712,6 +1712,7 @@ class Enumeration:
                             table = "%s.%s" % (conf.db, tbl)
 
                         retVal = self.__pivotDumpTable(table, colList, count, blind=True)
+
                         if retVal:
                             entries, lengths = retVal
 
@@ -1722,6 +1723,8 @@ class Enumeration:
                         try:
                             for index in indexRange:
                                 for column in colList:
+                                    value = ""
+
                                     if column not in lengths:
                                         lengths[column] = 0
 
@@ -1743,7 +1746,6 @@ class Enumeration:
                                     # Skip enumeration of cells that have a value length of 0
                                     if not inject.checkBooleanExpression(agent.forgeQueryOutputLengthZero(query)):
                                         logger.debug("column '%s', entry %d is blank" % (column, index+1))
-                                        value = ""
                                     else:
                                         value = inject.getValue(query, inband=False, error=False, dump=True)
 
