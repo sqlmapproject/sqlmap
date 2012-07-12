@@ -1573,7 +1573,7 @@ class Enumeration:
                 kb.data.cachedColumns = foundData
 
             try:
-                kb.dumpMode = True
+                kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
                 if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
                    or safeSQLIdentificatorNaming(tbl, True) not in \
@@ -1782,7 +1782,7 @@ class Enumeration:
                 logger.critical(errMsg)
 
             finally:
-                kb.dumpMode = False
+                kb.dumpTable = None
 
     def dumpAll(self):
         if conf.db is not None and conf.tbl is None:
