@@ -153,7 +153,7 @@ def __oneShotErrorUse(expression, field=None):
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
-def __errorFields(expression, expressionFields, expressionFieldsList, expected=None, num=None, emptyFields=None):
+def __errorFields(expression, expressionFields, expressionFieldsList, num=None, emptyFields=None):
     outputs = []
     origExpr = None
 
@@ -217,7 +217,7 @@ def __formatPartialContent(value):
             value = safecharencode(value)
     return value
 
-def errorUse(expression, expected=None, dump=False):
+def errorUse(expression, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of the error-based
     SQL injection vulnerability on the affected parameter.
@@ -380,7 +380,7 @@ def errorUse(expression, expected=None, dump=False):
                             except StopIteration:
                                 break
 
-                        output = __errorFields(expression, expressionFields, expressionFieldsList, expected, num, emptyFields)
+                        output = __errorFields(expression, expressionFields, expressionFieldsList, num, emptyFields)
 
                         if not kb.threadContinue:
                             break

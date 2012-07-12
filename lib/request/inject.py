@@ -94,7 +94,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     return value
 
-def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected=None, num=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
+def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     outputs = []
     origExpr = None
 
@@ -122,7 +122,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
 
     return outputs
 
-def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
+def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
     Retrieve the output of a SQL query characted by character taking
     advantage of an blind SQL injection vulnerability on the affected
@@ -304,7 +304,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
 
                 try:
                     for num in xrange(startLimit, stopLimit):
-                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
+                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
                         outputs.append(output)
 
                 except KeyboardInterrupt:
@@ -317,7 +317,7 @@ def __goInferenceProxy(expression, fromUser=False, expected=None, batch=False, u
     elif Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
         expression += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
-    outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, expected, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
+    outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
 
     return ", ".join(output for output in outputs) if not isNoneValue(outputs) else None
 
@@ -345,23 +345,14 @@ def __goBooleanProxy(expression):
 
     return output
 
-def __goError(expression, expected=None, dump=False):
-    """
-    Retrieve the output of a SQL query taking advantage of an error-based
-    SQL injection vulnerability on the affected parameter.
-    """
-
-    output = errorUse(expression, expected, dump)
-
-    return output
-
-def __goInband(expression, expected=None, unpack=True, dump=False):
+def __goInband(expression, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an inband SQL
     injection vulnerability on the affected parameter.
     """
 
     output = unionUse(expression, unpack=unpack, dump=dump)
+
     if isinstance(output, basestring):
         output = parseUnionPage(output)
 
@@ -392,41 +383,27 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 forgeCaseExpression = agent.forgeCaseStatement(expression)
 
         if conf.direct:
-            if expected == EXPECTED.BOOL:
-                value = direct(forgeCaseExpression)
-            else:
-                value = direct(expression)
+            value = direct(forgeCaseExpression if expected == EXPECTED.BOOL else expression)
 
         elif any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
             value = None
             found = False
+            count = 0
 
             if query and not 'COUNT(*)' in query:
                 query = query.replace("DISTINCT ", "")
 
-            count = 0
-
             if inband and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                 kb.technique = PAYLOAD.TECHNIQUE.UNION
-
-                if expected == EXPECTED.BOOL:
-                    value = __goInband(forgeCaseExpression, expected, unpack, dump)
-                else:
-                    value = __goInband(query, expected, unpack, dump)
-
+                value = __goInband(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.ERROR
-
-                if expected == EXPECTED.BOOL:
-                    value = __goError(forgeCaseExpression, expected, dump)
-                else:
-                    value = __goError(query, expected, dump)
-
+                value = errorUse(forgeCaseExpression if expected == EXPECTED.BOOL else query, dump)
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
@@ -436,7 +413,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(booleanExpression)
                 else:
-                    value = __goInferenceProxy(query, fromUser, expected, batch, unpack, charsetType, firstChar, lastChar, dump)
+                    value = __goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
@@ -450,7 +427,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 if expected == EXPECTED.BOOL:
                     value = __goBooleanProxy(booleanExpression)
                 else:
-                    value = __goInferenceProxy(query, fromUser, expected, batch, unpack, charsetType, firstChar, lastChar, dump)
+                    value = __goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
 
             if value and isinstance(value, basestring):
                 value = value.strip()
@@ -461,6 +438,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
     finally:
         kb.resumeValues = True
+
         if suppressOutput is not None:
             getCurrentThreadData().disableStdOut = popValue()
 
