@@ -306,7 +306,8 @@ class Web:
 
                     self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = localPath
-                    self.webBackdoorFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (localPath, backdoorName))).replace("//", "/").rstrip('/')
+
+                self.webBackdoorFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (localPath, backdoorName))).replace("//", "/").rstrip('/')
 
                 testStr = "command execution test"
                 output = self.webBackdoorRunCmd("echo %s" % testStr)

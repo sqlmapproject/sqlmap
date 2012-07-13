@@ -89,6 +89,9 @@ class Miscellaneous:
         kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(",", "").replace("-", "").replace(" ", "")
 
     def delRemoteFile(self, filename):
+        if not filename:
+            return
+
         self.checkDbmsOs()
 
         if Backend.isOs(OS.WINDOWS):
