@@ -109,7 +109,7 @@ def main():
         traceback.print_exc()
 
     finally:
-        dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
+        dataToStdout("\n[*] shutting down at %s\n" % time.strftime("%X"), forceOutput=True)
 
         kb.threadContinue = False
         kb.threadException = True
