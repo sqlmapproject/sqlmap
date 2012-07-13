@@ -73,7 +73,8 @@ class Dump:
 
     def string(self, header, data, sort=True):
         kb.stickyLevel = None
-
+        if type(data) is bool:
+            data = ("False", "True") [data]
         if isListLike(data):
             self.lister(header, data, sort)
         elif data is not None:
