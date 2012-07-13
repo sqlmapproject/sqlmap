@@ -1334,7 +1334,7 @@ def __cleanupOptions():
             kb.adjustTimeDelay = False
 
             warnMsg = "increasing default value for "
-            warnMsg += "--time-sec to %d because " % conf.timeSec
+            warnMsg += "option '--time-sec' to %d because " % conf.timeSec
             warnMsg += "switch '--tor' was provided"
             logger.warn(warnMsg)
         else:
