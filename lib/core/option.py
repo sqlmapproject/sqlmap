@@ -1794,7 +1794,7 @@ def __setTorHttpProxySettings():
         warnMsg += "HTTP proxy type (option '--tor-type') "
         warnMsg += "for accessing Tor anonymizing network because of "
         warnMsg += "known issues with default settings of various 'bundles' "
-        warnMsg += "(e.g. Vidalia/Polipo)"
+        warnMsg += "(e.g. Vidalia)"
         logger.warn(warnMsg)
 
 def __setTorSocksProxySettings():
