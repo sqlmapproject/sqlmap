@@ -475,7 +475,7 @@ class Dump:
 
         if conf.replicate:
             rtable.endTransaction()
-            logger.info("table '%s.%s' dumped to sqlite3 file '%s'" % (db, table, replication.dbpath))
+            logger.info("table '%s.%s' dumped to sqlite3 database '%s'" % (db, table, replication.dbpath))
 
         else:
             dataToDumpFile(dumpFP, "\n")
