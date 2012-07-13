@@ -117,7 +117,7 @@ def __setRequestParams():
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data)):
         if CUSTOM_INJECTION_MARK_CHAR in (value or ""):
             if kb.processUserMarks is None:
-                message = "custom injection mark ('%s') found in " % CUSTOM_INJECTION_MARK_CHAR
+                message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
                 message += "'%s'. Do you want to process it? [Y/n/q] " % {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data'}[place]
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):
