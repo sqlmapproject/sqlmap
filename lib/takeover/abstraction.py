@@ -183,11 +183,11 @@ class Abstraction(Web, UDF, xp_cmdshell):
             self.checkDbmsOs(detailed)
 
             if mandatory and not self.isDba():
-                warnMsg = "the functionality requested might not work because "
-                warnMsg += "the session user is not a database administrator"
+                warnMsg = "functionality requested probably does not work because "
+                warnMsg += "the curent session user is not a database administrator"
 
                 if not conf.dCred and Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.PGSQL ):
-                    warnMsg += ". You can try to provide --dbms-cred switch "
+                    warnMsg += ". You can try to to use option '--dbms-cred' "
                     warnMsg += "to execute statements as a DBA user if you "
                     warnMsg += "were able to extract and crack a DBA "
                     warnMsg += "password by any mean"

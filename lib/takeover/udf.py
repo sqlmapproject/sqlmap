@@ -180,8 +180,8 @@ class UDF:
         self.checkDbmsOs()
 
         if not self.isDba():
-            warnMsg = "the functionality requested might not work because "
-            warnMsg += "the session user is not a database administrator"
+            warnMsg = "functionality requested probably does not work because "
+            warnMsg += "the curent session user is not a database administrator"
             logger.warn(warnMsg)
 
         if not conf.shLib:
