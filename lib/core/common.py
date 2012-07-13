@@ -85,6 +85,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_USER_INJECTION
+from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import DBMS_DICT
@@ -590,38 +591,36 @@ def getDocRoot():
     docRoot = None
     pagePath = directoryPath(conf.path)
 
-    if Backend.isOs(OS.WINDOWS):
-        defaultDocRoot = ["C:/xampp/htdocs/", "C:/Inetpub/wwwroot/"]
-    else:
-        defaultDocRoot = ["/var/www/"]
+    defaultDocRoot = ("C:/xampp/htdocs/", "C:/Inetpub/wwwroot/") if Backend.isOs(OS.WINDOWS) else ("/var/www/",)
 
     if kb.absFilePaths:
         for absFilePath in kb.absFilePaths:
+            if docRoot:
+                break
+
             if directoryPath(absFilePath) == '/':
                 continue
 
             absFilePath = normalizePath(absFilePath)
-            absFilePathWin = None
+            windowsDriveLetter = None
 
-            if isWindowsPath(absFilePath):
-                absFilePathWin = posixToNtSlashes(absFilePath)
-                absFilePath = ntToPosixSlashes(absFilePath[2:])
-            elif isWindowsDriveLetterPath(absFilePath):
-                absFilePath = absFilePath[2:]
+            if isWindowsDriveLetterPath(absFilePath):
+                windowsDriveLetter, absFilePath = absFilePath[:2], absFilePath[2:]
+                absFilePath = ntToPosixSlashes(posixToNtSlashes(absFilePath))
 
-            if pagePath in absFilePath:
-                index = absFilePath.index(pagePath)
-                docRoot = absFilePath[:index]
+            if any("/%s/" % _ in absFilePath for _ in GENERIC_DOC_ROOT_DIRECTORY_NAMES):
+                for _ in GENERIC_DOC_ROOT_DIRECTORY_NAMES:
+                    _ = "/%s/" % _
+                    if _ in absFilePath:
+                        docRoot = "%s%s" % (absFilePath.split(_)[0], _)
+                        break
 
-                if len(docRoot) == 0:
-                    docRoot = None
-                    continue
+            elif pagePath in absFilePath:
+                docRoot = absFilePath.split(pagePath)[0]
+                if windowsDriveLetter:
+                    docRoot = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(docRoot))
 
-                if absFilePathWin:
-                    docRoot = "C:/%s" % ntToPosixSlashes(docRoot)
-
-                docRoot = normalizePath(docRoot)
-                break
+    docRoot = normalizePath(docRoot)
 
     if docRoot:
         infoMsg = "retrieved the web server document root: '%s'" % docRoot
@@ -1348,14 +1347,24 @@ def directoryPath(filepath):
     Returns directory path for a given filepath
     """
 
-    return ntpath.dirname(filepath) if isWindowsDriveLetterPath(filepath) else posixpath.dirname(filepath)
+    retVal = filepath
+
+    if filepath:
+        retVal = ntpath.dirname(filepath) if isWindowsDriveLetterPath(filepath) else posixpath.dirname(filepath)
+
+    return retVal
 
 def normalizePath(filepath):
     """
     Returns normalized string representation of a given filepath
     """
 
-    return ntpath.normpath(filepath) if isWindowsDriveLetterPath(filepath) else posixpath.normpath(filepath)
+    retVal = filepath
+
+    if filepath:
+        retVal = ntpath.normpath(filepath) if isWindowsDriveLetterPath(filepath) else posixpath.normpath(filepath)
+
+    return retVal
 
 def safeStringFormat(format_, params):
     """

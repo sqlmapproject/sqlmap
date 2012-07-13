@@ -12,6 +12,7 @@ import re
 
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
+from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import extractRegexResult
@@ -177,7 +178,7 @@ class Web:
                 break
 
         kb.docRoot = getDocRoot()
-        directories = getDirs().sort()
+        directories = sorted(getDirs())
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
@@ -188,14 +189,14 @@ class Web:
 
         success = False
 
-        for docRoot in kb.docRoot:
+        for docRoot in arrayizeValue(kb.docRoot):
             if success:
                 break
 
             for directory in directories:
                 uriPath = ""
 
-                if not all(isinstance(item, basestring) for item in (docRoot, directory)):
+                if not all(isinstance(_, basestring) for _ in (docRoot, directory)):
                     continue
 
                 directory = ntToPosixSlashes(normalizePath(directory)).replace("//", "/").rstrip('/')
