@@ -35,6 +35,7 @@ from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
+from lib.core.common import getUnicode
 from lib.core.common import isListLike
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -293,7 +294,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
                     # Avoid proxy and connection type related headers
                     elif key not in ( HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION ):
-                        conf.httpHeaders.append((str(key), str(value)))
+                        conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
 
             if getPostReq and (params or cookie):
                 if not port and isinstance(scheme, basestring) and scheme.lower() == "https":

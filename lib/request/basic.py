@@ -55,8 +55,8 @@ def forgeHeaders(items=None):
                         message += "The target url provided its own cookies within "
                         message += "the HTTP %s header which intersect with yours. " % HTTPHEADER.SET_COOKIE
                         message += "Do you want to merge them in futher requests? [Y/n] "
-                        test = readInput(message, default="Y")
-                        kb.mergeCookies = not test or test[0] in ("y", "Y")
+                        _ = readInput(message, default="Y")
+                        kb.mergeCookies = not _ or _[0] in ("y", "Y")
 
                     if kb.mergeCookies:
                         _ = lambda x: re.sub("(?i)%s=[^%s]+" % (cookie.name, DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, cookie.value), x)
@@ -64,6 +64,7 @@ def forgeHeaders(items=None):
 
                         if PLACE.COOKIE in conf.parameters:
                             conf.parameters[PLACE.COOKIE] = _(conf.parameters[PLACE.COOKIE])
+
                         conf.httpHeaders = [(item[0], item[1] if item[0] != HTTPHEADER.COOKIE else _(item[1])) for item in conf.httpHeaders]
 
                 elif not kb.testMode:
