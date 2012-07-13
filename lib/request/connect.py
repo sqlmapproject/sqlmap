@@ -256,7 +256,7 @@ class Connect:
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
-            headers = forgeHeaders({ HTTPHEADER.COOKIE: cookie, HTTPHEADER.USER_AGENT: ua, HTTPHEADER.REFERER: referer })
+            headers = forgeHeaders({HTTPHEADER.COOKIE: cookie, HTTPHEADER.USER_AGENT: ua, HTTPHEADER.REFERER: referer})
 
             if conf.realTest:
                 headers[HTTPHEADER.REFERER] = "%s://%s" % (conf.scheme, conf.hostname)

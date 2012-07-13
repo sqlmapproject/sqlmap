@@ -83,10 +83,7 @@ def __setRequestParams():
         else:
             conf.data = conf.data.replace("\n", " ")
 
-        if re.match(SOAP_REGEX, conf.data, re.I | re.M):
-            place = PLACE.SOAP
-        else:
-            place = PLACE.POST
+        place = PLACE.SOAP if re.match(SOAP_REGEX, conf.data, re.I | re.M) else PLACE.POST
 
         conf.parameters[place] = conf.data
         paramDict = paramToDict(place, conf.data)
@@ -167,7 +164,7 @@ def __setRequestParams():
                 condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
 
                 if condition:
-                    conf.paramDict[PLACE.UA] = { PLACE.UA: headerValue }
+                    conf.paramDict[PLACE.UA] = {PLACE.UA: headerValue}
                     testableParameters = True
 
             elif httpHeader == PLACE.REFERER:
@@ -176,7 +173,7 @@ def __setRequestParams():
                 condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
 
                 if condition:
-                    conf.paramDict[PLACE.REFERER] = { PLACE.REFERER: headerValue }
+                    conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
                     testableParameters = True
 
             elif httpHeader == PLACE.HOST:
@@ -185,7 +182,7 @@ def __setRequestParams():
                 condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))
 
                 if condition:
-                    conf.paramDict[PLACE.HOST] = { PLACE.HOST: headerValue }
+                    conf.paramDict[PLACE.HOST] = {PLACE.HOST: headerValue}
                     testableParameters = True
 
     if not conf.parameters:

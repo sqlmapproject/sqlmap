@@ -138,7 +138,7 @@ class Enumeration(GenericEnumeration):
                 infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
-                return { conf.db: kb.data.cachedColumns[conf.db]}
+                return {conf.db: kb.data.cachedColumns[conf.db]}
 
             infoMsg = "fetching columns "
             infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)

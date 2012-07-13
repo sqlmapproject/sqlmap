@@ -503,10 +503,10 @@ class Dump:
                                 if tbl in _[db]:
                                     _[db][tbl][col] = dataType
                                 else:
-                                    _[db][tbl] = { col: dataType }
+                                    _[db][tbl] = {col: dataType}
                             else:
                                 _[db] = {}
-                                _[db][tbl] = { col: dataType }
+                                _[db][tbl] = {col: dataType}
 
                             continue
 
