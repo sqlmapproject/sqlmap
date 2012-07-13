@@ -77,18 +77,15 @@ class Dump:
         if isListLike(data):
             self.lister(header, data, sort)
         elif data is not None:
-            if not isinstance(data, bool):
-                data = getUnicode(data)
+            _ = getUnicode(data)
 
-                if data[-1] == '\n':
-                    data = data[:-1]
+            if _ and _[-1] == '\n':
+                _ = _[:-1]
 
-            if "\n" in data:
-                self._write("%s:\n---\n%s\n---\n" % (header, data))
-            elif isinstance(data, bool):
-                self._write("%s:    %s\n" % (header, data))
+            if "\n" in _:
+                self._write("%s:\n---\n%s\n---\n" % (header, _))
             else:
-                self._write("%s:    '%s'\n" % (header, data))
+                self._write("%s:    %s\n" % (header, ("'%s'" % _) if isinstance(data, basestring) else _))
         else:
             self._write("%s:\tNone\n" % header)
 
