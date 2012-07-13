@@ -25,6 +25,7 @@ from lib.core.common import posixToNtSlashes
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -176,9 +177,7 @@ class Web:
                 break
 
         kb.docRoot = getDocRoot()
-        directories = getDirs()
-        directories = list(directories)
-        directories.sort()
+        directories = getDirs().sort()
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
         backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
@@ -187,16 +186,13 @@ class Web:
         stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
         stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
 
-        warned = set()
         success = False
 
-        for i in xrange(len(kb.docRoot)):
+        for docRoot in kb.docRoot:
             if success:
                 break
 
-            for j in xrange(len(directories)):
-                docRoot = kb.docRoot[i]
-                directory = directories[j]
+            for directory in directories:
                 uriPath = ""
 
                 if not all(isinstance(item, basestring) for item in (docRoot, directory)):
@@ -244,12 +240,9 @@ class Web:
                 uplPage = uplPage or ""
 
                 if "sqlmap file uploader" not in uplPage:
-                    if localPath not in warned:
-                        warnMsg = "unable to upload the file stager "
-                        warnMsg += "on '%s'" % localPath
-                        logger.warn(warnMsg)
-                        warned.add(localPath)
-
+                    warnMsg = "unable to upload the file stager "
+                    warnMsg += "on '%s'" % localPath
+                    singleTimeWarnMessage(warnMsg)
                     continue
 
                 elif "<%" in uplPage or "<?" in uplPage:

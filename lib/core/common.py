@@ -677,7 +677,7 @@ def getDirs():
             if inputDir:
                 directories.add(inputDir)
 
-    return directories
+    return list(directories)
 
 def filePathToString(filePath):
     strRepl = filePath.replace("/", "_").replace("\\", "_")
