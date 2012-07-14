@@ -1,4 +1,4 @@
-Libraries in `thirdparty/` directory:
+<h2 id="thirdparty">Libraries in `thirdparty/` directory</h2>
 
 | Library | Homepage | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- | ----------- |
@@ -21,13 +21,13 @@ Libraries in `thirdparty/` directory:
 | `thirdparty/termcolor/` | http://pypi.python.org/pypi/termcolor | MIT | Used to colourize output | - |
 | `thirdparty/xdot/` | http://code.google.com/p/jrfonseca/wiki/XDot | LGPL | Used for internal debug purposes | `--profile` |
 
-Libraries and tools in `extra/` directory not entirely written by sqlmap developers:
+<h2 id="extra">Libraries and tools in `extra/` directory not entirely written by sqlmap developers</h2>
 
 | Library / tool | Homepage | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- | ----------- |
 | `extra/icmpsh/` | http://leidecker.info | GPL | Used for OS takeover feature via ICMP | `--os-pwn` |
 
-Dependencies not bundled:
+<h2 id="notbundled">Dependencies not bundled</h2>
 
 | Library / tool | Homepage | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- | ----------- |
