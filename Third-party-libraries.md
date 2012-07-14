@@ -3,9 +3,9 @@ Libraries in `thirdparty/` directory:
 | Library | Homepage | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- | ----------- |
 | `thirdparty/ansistrm/` | http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html | BSD | Used to colourize logging messages | - |
-| `thirdparty/beautifulsoup/` | http://www.crummy.com/software/BeautifulSoup/ | BSD | | `--crawl` |
+| `thirdparty/beautifulsoup/` | http://www.crummy.com/software/BeautifulSoup/ | BSD | Used to crawl the target site | `--crawl` |
 | `thirdparty/chardet/` | http://chardet.feedparser.org/ | LGPL | Used to heuristically detect the HTTP response body charset | - |
-| `thirdparty/clientform/` | http://wwwsearch.sourceforge.net/old/ClientForm/ | BSD | | `--forms` |
+| `thirdparty/clientform/` | http://wwwsearch.sourceforge.net/old/ClientForm/ | BSD | Used to parse HTML forms | `--forms` |
 | `thirdparty/colorama/` | http://pypi.python.org/pypi/colorama | BSD | Used to make output colouring cross-platform | - |
 | `thirdparty/fcrypt/` | http://carey.geek.nz/code/python-fcrypt/ | BSD | Used to crack a generic password hash | `--passwords` |
 | `thirdparty/gprof2dot/` | http://code.google.com/p/jrfonseca/wiki/Gprof2Dot | LGPL | Used for internal debug purposes | `--profile` |
@@ -17,7 +17,7 @@ Libraries in `thirdparty/` directory:
 | `thirdparty/pagerank/` | http://code.google.com/p/corey-projects/ | MIT | Used to display page rank for Google dork results | `-g` |
 | `thirdparty/prettyprint/` | http://code.google.com/p/python-httpclient-gui/ | MIT | Used to generate XML output | `--xml`, to be replaced by `--report` (#14) |
 | `thirdparty/pydes/` | http://twhiteman.netfirms.com/des.html | Free, public domain | Used to crack the Oracle old password format | `--passwords` |
-| `thirdparty/socks/` | http://socksipy.sourceforge.net/ | BSD | | `--tor-type` |
+| `thirdparty/socks/` | http://socksipy.sourceforge.net/ | BSD | Used to tunnel your requests over Tor SOCKS proxy | `--tor-type` |
 | `thirdparty/termcolor/` | http://pypi.python.org/pypi/termcolor | MIT | Used to colourize output | - |
 | `thirdparty/xdot/` | http://code.google.com/p/jrfonseca/wiki/XDot | LGPL | Used for internal debug purposes | `--profile` |
 
