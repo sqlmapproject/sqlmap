@@ -1,0 +1,3 @@
+% sqlmap user's manual
+% [Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) and [Miroslav Stampar](mailto:miroslav@sqlmap.org)
+% July 14, 2012

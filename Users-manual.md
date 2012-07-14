@@ -1,7 +1,3 @@
-% sqlmap user's manual
-% [Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) and [Miroslav Stampar](mailto:miroslav@sqlmap.org)
-% July 14, 2012
-
 # Abstract
 
 This document is the user's manual for [sqlmap](http://sqlmap.org).
@@ -141,8 +137,8 @@ not store this information anywhere (e.g. MySQL < 5.0).
 ## Takeover features
 
 Some of these techniques are detailed in the white paper
-[Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857) and in the
-slide deck [Expanding the control over the operating system from the database](http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database).
+[Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857) and in the slide deck [Expanding the control over the operating system from the database](http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database).
+
 * Support to **inject custom user-defined functions**: the user can compile a shared library then use sqlmap to create within the back-end DBMS user-defined functions out of the compiled shared library file. These
 UDFs can then be executed, and optionally removed, via sqlmap. This is supported when the database software is MySQL or PostgreSQL.
 * Support to **download and upload any file** from the database server underlying file system when the database software is MySQL, PostgreSQL or Microsoft SQL Server.
@@ -242,6 +238,7 @@ limited support for MySQL added.
 # Download and update
 
 sqlmap can be downloaded from its [SourceForge File List page](http://sourceforge.net/projects/sqlmap/files/). It is available in two formats:
+
 * [Source gzip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz)
 * [Source zip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip)
 
