@@ -2,7 +2,7 @@
 
 | Library | Homepage | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- | ----------- |
-| `thirdparty/ansistrm/` | http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html | BSD | Used to colourize logging messages | - |
+| `thirdparty/ansistrm/` | http://goo.gl/z2zFT | BSD | Used to colourize logging messages | - |
 | `thirdparty/beautifulsoup/` | http://www.crummy.com/software/BeautifulSoup/ | BSD | Used to crawl the target site | `--crawl` |
 | `thirdparty/chardet/` | http://chardet.feedparser.org/ | LGPL | Used to heuristically detect the HTTP response body charset | - |
 | `thirdparty/clientform/` | http://wwwsearch.sourceforge.net/old/ClientForm/ | BSD | Used to parse HTML forms | `--forms` |
@@ -11,7 +11,7 @@
 | `thirdparty/gprof2dot/` | http://code.google.com/p/jrfonseca/wiki/Gprof2Dot | LGPL | Used for internal debug purposes | `--profile` |
 | `thirdparty/keepalive/` | http://urlgrabber.baseurl.org/ | LGPL | Used for persistent HTTP(s) requests | `--keep-alive` and `-o` |
 | `thirdparty/magic/` | http://pypi.python.org/pypi/python-magic/ | PSF | Used to identify and show the file type in log messages | `--file-write` |
-| `thirdparty/multipartpost/` | http://pipe.scs.fsu.edu/PostHandler/MultipartPostHandler.py | LGPL | Used to upload files via web file stager | `--os-cmd`, `--os-shell`, `--os-pwn` |
+| `thirdparty/multipartpost/` | http://goo.gl/Db4k8 | LGPL | Used to upload files via web file stager | `--os-cmd`, `--os-shell`, `--os-pwn` |
 | `thirdparty/odict/` | http://www.voidspace.org.uk/python/odict.html | BSD | Used internally | - |
 | `thirdparty/oset/` | http://pypi.python.org/pypi/oset/0.1.1 | BSD | Used to keep multiple targets sorted as they are provided | `-l`, `-m` and `-g` |
 | `thirdparty/pagerank/` | http://code.google.com/p/corey-projects/ | MIT | Used to display page rank for Google dork results | `-g` |
