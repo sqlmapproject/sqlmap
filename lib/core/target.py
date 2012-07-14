@@ -62,7 +62,7 @@ def __setRequestParams():
     testableParameters = False
 
     # Perform checks on GET parameters
-    if conf.parameters.has_key(PLACE.GET) and conf.parameters[PLACE.GET]:
+    if conf.parameters.get(PLACE.GET):
         parameters = conf.parameters[PLACE.GET]
         paramDict = paramToDict(PLACE.GET, parameters)
 

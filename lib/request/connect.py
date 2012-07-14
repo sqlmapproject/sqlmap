@@ -236,7 +236,7 @@ class Connect:
                 pass
 
             elif target:
-                if conf.parameters.has_key(PLACE.GET) and not get:
+                if PLACE.GET in conf.parameters and not get:
                     get = conf.parameters[PLACE.GET]
 
                 if get:
@@ -245,7 +245,7 @@ class Connect:
 
                 if conf.method == HTTPMETHOD.POST and not post:
                     for place in (PLACE.POST, PLACE.SOAP):
-                        if conf.parameters.has_key(place):
+                        if place in conf.parameters:
                             post = conf.parameters[place]
                             break
 

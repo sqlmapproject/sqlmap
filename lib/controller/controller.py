@@ -399,7 +399,7 @@ def start():
                     if skip:
                         continue
 
-                    if not conf.paramDict.has_key(place):
+                    if place not in conf.paramDict:
                         continue
 
                     paramDict = conf.paramDict[place]

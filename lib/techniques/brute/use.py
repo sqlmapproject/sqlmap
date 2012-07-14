@@ -123,7 +123,7 @@ def tableExists(tableFile, regex=None):
         logger.warn(warnMsg)
     else:
         for item in threadData.shared.outputs:
-            if not kb.data.cachedTables.has_key(conf.db):
+            if conf.db not in kb.data.cachedTables:
                 kb.data.cachedTables[conf.db] = [item]
             else:
                 kb.data.cachedTables[conf.db].append(item)
