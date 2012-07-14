@@ -955,7 +955,7 @@ It is possible to set the seconds to delay the response when testing for time-ba
 
 Switch: `--union-cols`
 
-By default sqlmap tests for UNION query SQL injection technique using 1 to 10 columns. However, this range can be increased up to 50 columns by providing an higher `-`-`level` value. See the relevant paragraph for details. 
+By default sqlmap tests for UNION query SQL injection technique using 1 to 10 columns. However, this range can be increased up to 50 columns by providing an higher `--level` value. See the relevant paragraph for details. 
 
 You can manually tell sqlmap to test for this type of SQL injection with a specific range of columns by providing the tool with the `--union-cols` switch followed by a range of integers. For instance, `12-16` means tests for UNION query SQL injection by using 12 up to 16 columns. 
 
@@ -963,7 +963,7 @@ You can manually tell sqlmap to test for this type of SQL injection with a speci
 
 Switch: `--union-char`
 
-By default sqlmap tests for UNION query SQL injection technique using `NULL` character. However, by providing an higher `-`-`level` value sqlmap will performs tests also with a random number because there are some corner cases where UNION query tests with `NULL` fail whereas with a random integer they succeed.
+By default sqlmap tests for UNION query SQL injection technique using `NULL` character. However, by providing an higher `--level` value sqlmap will performs tests also with a random number because there are some corner cases where UNION query tests with `NULL` fail whereas with a random integer they succeed.
 
 You can manually tell sqlmap to test for this type of SQL injection with a specific character by providing the tool with the `--union-char` switch followed by a string.
 
@@ -1238,13 +1238,13 @@ These options can be used to run brute force checks.
 
 Switches: `--common-tables`
 
-There are cases where `-`-`tables` switch can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
+There are cases where `--tables` switch can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
 
 * The database management system is MySQL ** < 5.0** where `information_schema` is not available.
 * The database management system is Microsoft Access and system table `MSysObjects` is not readable - default setting.
 * The session user does not have read privileges against the system table storing the scheme of the databases.
 
-If any of the first two cases apply and you provided the `-`-`tables` switch, sqlmap will prompt you with a question
+If any of the first two cases apply and you provided the `--tables` switch, sqlmap will prompt you with a question
 to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the `--common-tables` switch. sqlmap will perform a brute-force attack in order to detect the existence of common tables across the DBMS.
 
 The list of common table names is `txt/common-tables.txt` and you can edit it as you wish.
@@ -1280,13 +1280,13 @@ Example against a MySQL 4.1 target:
 
 Switches: `--common-columns`
 
-As per tables, there are cases where `-`-`columns` switch can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
+As per tables, there are cases where `--columns` switch can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
 
 * The database management system is MySQL ** < 5.0** where `information_schema` is not available.
 * The database management system is Microsoft Access where this kind of information is not available inside system tables.
 * The session user does not have read privileges against the system table storing the scheme of the databases.
 
-If any of the first two cases apply and you provided the `-`-`columns` switch, sqlmap will prompt you with a question
+If any of the first two cases apply and you provided the `--columns` switch, sqlmap will prompt you with a question
 to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the `--common-columns` switch. sqlmap will perform a brute-force attack in order to detect the existence of common columns across the DBMS.
 
 The list of common table names is `txt/common-columns.txt` and you can edit it as you wish.
