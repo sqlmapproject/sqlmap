@@ -1,1 +1,1 @@
-(sqlmap user's manual)[https://github.com/sqlmapproject/sqlmap/wiki/sqlmap-user's-manual]
+[sqlmap user's manual](https://github.com/sqlmapproject/sqlmap/wiki/sqlmap-user's-manual)
