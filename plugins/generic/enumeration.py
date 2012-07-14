@@ -283,7 +283,7 @@ class Enumeration:
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
                         # password = "0x%s" % strToHex(password)
-                        if not kb.data.cachedUsersPasswords.has_key(user):
+                        if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
                             kb.data.cachedUsersPasswords[user].append(password)
@@ -326,7 +326,7 @@ class Enumeration:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
                         password = "0x%s" % strToHex(password)
 
-                        if not kb.data.cachedUsersPasswords.has_key(user):
+                        if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
                             kb.data.cachedUsersPasswords[user].append(password)
@@ -390,6 +390,10 @@ class Enumeration:
             errMsg += "user has no read privileges over the relevant "
             errMsg += "system database table)"
             raise sqlmapNoneDataException, errMsg
+        else:
+            for user in kb.data.cachedUsersPasswords:
+                kb.data.cachedUsersPasswords[user] = list(set(kb.data.cachedUsersPasswords[user]))
+                    
 
         message = "do you want to perform a dictionary-based attack "
         message += "against retrieved password hashes? [Y/n/q]"
