@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 try:
     from crypt import crypt
 except ImportError, _:
-    from extra.fcrypt.fcrypt import crypt
+    from thirdparty.fcrypt.fcrypt import crypt
 
 _multiprocessing = None
 try:
@@ -30,8 +30,6 @@ from hashlib import md5
 from hashlib import sha1
 from Queue import Queue
 
-from extra.pydes.pyDes import des
-from extra.pydes.pyDes import CBC
 from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import clearConsoleLine
@@ -66,6 +64,8 @@ from lib.core.settings import ML
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
+from thirdparty.pydes.pyDes import des
+from thirdparty.pydes.pyDes import CBC
 
 def mysql_passwd(password, uppercase=True):
     """

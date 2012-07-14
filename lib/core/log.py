@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 import logging
 import sys
 
-from extra.ansistrm.ansistrm import ColorizingStreamHandler
 from lib.core.enums import CUSTOM_LOGGING
+from thirdparty.ansistrm.ansistrm import ColorizingStreamHandler
 
 logging.addLevelName(CUSTOM_LOGGING.PAYLOAD, "PAYLOAD")
 logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_OUT, "TRAFFIC OUT")

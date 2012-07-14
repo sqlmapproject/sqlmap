@@ -57,7 +57,7 @@ from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
-from extra.pagerank.pagerank import get_pagerank
+from thirdparty.pagerank.pagerank import get_pagerank
 
 def __selectInjection():
     """

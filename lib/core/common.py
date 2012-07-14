@@ -42,13 +42,8 @@ from xml.etree import ElementTree as ET
 from xml.dom import minidom
 from xml.sax import parse
 
-from extra.clientform.clientform import ParseResponse
-from extra.clientform.clientform import ParseError
 from extra.cloak.cloak import decloak
-from extra.magic import magic
-from extra.odict.odict import OrderedDict
 from extra.safe2bin.safe2bin import safecharencode
-from extra.termcolor.termcolor import colored
 from lib.core.bigarray import BigArray
 from lib.core.data import conf
 from lib.core.data import kb
@@ -130,6 +125,11 @@ from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.threads import getCurrentThreadData
+from thirdparty.clientform.clientform import ParseResponse
+from thirdparty.clientform.clientform import ParseError
+from thirdparty.magic import magic
+from thirdparty.odict.odict import OrderedDict
+from thirdparty.termcolor.termcolor import colored
 
 class UnicodeRawConfigParser(RawConfigParser):
     """

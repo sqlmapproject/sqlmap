@@ -20,8 +20,8 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     """
 
     try:
-        from extra.gprof2dot import gprof2dot
-        from extra.xdot import xdot
+        from thirdparty.gprof2dot import gprof2dot
+        from thirdparty.xdot import xdot
         import gobject
         import gtk
         import pydot

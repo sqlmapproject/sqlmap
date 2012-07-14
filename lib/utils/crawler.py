@@ -22,8 +22,8 @@ from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request.connect import Connect as Request
-from extra.beautifulsoup.beautifulsoup import BeautifulSoup
-from extra.oset.pyoset import oset
+from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
+from thirdparty.oset.pyoset import oset
 
 class Crawler:
     """

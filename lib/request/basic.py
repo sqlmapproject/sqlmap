@@ -12,7 +12,6 @@ import re
 import StringIO
 import zlib
 
-from extra.chardet import detect
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getUnicode
@@ -30,6 +29,7 @@ from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
+from thirdparty.chardet import detect
 
 def forgeHeaders(items=None):
     """

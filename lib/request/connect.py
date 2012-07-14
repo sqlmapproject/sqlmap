@@ -14,9 +14,6 @@ import urlparse
 import traceback
 
 from extra.safe2bin.safe2bin import safecharencode
-from extra.socks.socks import ProxyError
-from extra.multipart import multipartpost
-
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
@@ -67,6 +64,8 @@ from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
 from lib.utils.checkpayload import checkPayload
+from thirdparty.socks.socks import ProxyError
+from thirdparty.multipart import multipartpost
 
 
 class Connect:

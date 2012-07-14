@@ -9,7 +9,6 @@ import os
 import time
 
 from extra.icmpsh.icmpsh_m import main as icmpshmaster
-
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP
 from lib.core.common import normalizePath

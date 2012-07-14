@@ -20,10 +20,6 @@ import urlparse
 import lib.core.common
 import lib.core.threads
 
-from extra.colorama.initialise import init as coloramainit
-from extra.keepalive import keepalive
-from extra.oset.pyoset import oset
-from extra.socks import socks
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import boldifyMessage
@@ -130,6 +126,10 @@ from lib.request.templates import getPageTemplate
 from lib.utils.crawler import Crawler
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
+from thirdparty.colorama.initialise import init as coloramainit
+from thirdparty.keepalive import keepalive
+from thirdparty.oset.pyoset import oset
+from thirdparty.socks import socks
 from xml.etree.ElementTree import ElementTree
 
 authHandler = urllib2.BaseHandler()
