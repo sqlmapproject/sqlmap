@@ -1,6 +1,6 @@
-by [Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) and [Miroslav Stampar](mailto:miroslav@sqlmap.org)
-
-version 1.0-dev, XXX XX, 2012
+% sqlmap user's manual
+% [Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) and [Miroslav Stampar](mailto:miroslav@sqlmap.org)
+% July 14, 2012
 
 # Abstract
 
