@@ -45,8 +45,8 @@ class Dump:
         self._outputFP = None
         self._lock = threading.Lock()
 
-    def _write(self, data, n=True, console=True):
-        text = "%s%s" % (data, "\n" if n else " ")
+    def _write(self, data, newline=True, console=True):
+        text = "%s%s" % (data, "\n" if newline else " ")
         if console:
             dataToStdout(text)
 
@@ -83,11 +83,11 @@ class Dump:
                 _ = _[:-1]
 
             if "\n" in _:
-                self._write("%s:\n---\n%s\n---\n" % (header, _))
+                self._write("%s:\n---\n%s\n---" % (header, _))
             else:
-                self._write("%s:    %s\n" % (header, ("'%s'" % _) if isinstance(data, basestring) else _))
+                self._write("%s:    %s" % (header, ("'%s'" % _) if isinstance(data, basestring) else _))
         else:
-            self._write("%s:\tNone\n" % header)
+            self._write("%s:\tNone" % header)
 
     def lister(self, header, elements, sort=True):
         if elements:
@@ -405,7 +405,7 @@ class Dump:
                 maxlength = int(info["length"])
                 blank = " " * (maxlength - len(column))
 
-                self._write("| %s%s" % (column, blank), n=False)
+                self._write("| %s%s" % (column, blank), newline=False)
 
                 if not conf.replicate:
                     if field == fields:
@@ -450,7 +450,7 @@ class Dump:
                     values.append(value)
                     maxlength = int(info["length"])
                     blank = " " * (maxlength - len(value))
-                    self._write("| %s%s" % (value, blank), n=False, console=console)
+                    self._write("| %s%s" % (value, blank), newline=False, console=console)
 
                     if not conf.replicate:
                         if field == fields:
