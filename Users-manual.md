@@ -838,23 +838,26 @@ To take advantage of this switch, provide sqlmap with a comma-separated list of 
 
 The format of a valid tamper script is as follows:
 
-    # Needed imports
-    from lib.core.enums import PRIORITY
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+# Needed imports
+from lib.core.enums import PRIORITY
 
-    # Define which is the order of application of tamper scripts against the payload
-    __priority__ = PRIORITY.NORMAL
+# Define which is the order of application of tamper scripts against
+# the payload
+__priority__ = PRIORITY.NORMAL
 
-    def tamper(payload):
-        '''
-        Description of your tamper script
-        '''
+def tamper(payload):
+    '''
+    Description of your tamper script
+    '''
 
-        retVal = payload
+    retVal = payload
 
-        # your code to tamper the original payload
+    # your code to tamper the original payload
 
-        # return the tampered payload
-        return retVal
+    # return the tampered payload
+    return retVal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
 You can check valid and usable tamper scripts in the `tamper/` directory.
 
