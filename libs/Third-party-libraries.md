@@ -4,7 +4,7 @@
 <br>
 <br>
 <br>
-<h2 id="thirdparty">Libraries in `thirdparty/` directory</h2>
+<h2 id="thirdparty">Libraries in thirdparty/ directory</h2>
 
 | Library | Homepage | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- | ----------- |
@@ -27,7 +27,7 @@
 | `thirdparty/termcolor/` | http://pypi.python.org/pypi/termcolor | MIT | Used to colourize output | - |
 | `thirdparty/xdot/` | http://code.google.com/p/jrfonseca/wiki/XDot | LGPL | Used for internal debug purposes | `--profile` |
 
-<h2 id="extra">Libraries and tools in `extra/` directory</h2>
+<h2 id="extra">Libraries and tools in extra/ directory</h2>
 
 These listed are libraries and tools not entirely developed by sqlmap developers only.
 
