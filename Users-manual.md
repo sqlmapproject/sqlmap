@@ -1,34 +1,6 @@
-# Abstract
+# Scenario
 
-This document is the user's manual for [sqlmap](http://sqlmap.org).
-
-# Introduction
-sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.
-
-## Requirements
-
-sqlmap is developed in [python](http://www.python.org), a dynamic, object-oriented, interpreted programming language freely available from [http://python.org/download/](http://python.org/download/). This makes sqlmap a cross-platform application which is independant of the operating system. sqlmap requires Python version **2.6** or above. To make it even easier, many GNU/Linux distributions come out of the box with Python installed. Other Unixes and Mac OSX also provide Python packaged and ready to be installed. Windows users can download and install the Python installer for x86, AMD64 and Itanium.
-
-sqlmap relies on the [Metasploit Framework](http://metasploit.com) for some of its post-exploitation takeover features. You need to grab a copy of the framework from the [download](http://metasploit.com/download/) page - the required version is **3.5** or higher. For the ICMP tunneling out-of-band takeover technique, sqlmap requires the [Impacket](http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=tool&name=Impacket) library too.
-
-If you are willing to connect directly to a database server (switch `-d`), without passing through the web application, you need to install Python bindings for the database management system that you are going to attack:
-
-* Firebird: [python-kinterbasdb](http://kinterbasdb.sourceforge.net/)
-* Microsoft Access: [python-pyodbc](http://pyodbc.googlecode.com/)
-* Microsoft SQL Server: [python-pymssql](http://pymssql.sourceforge.net/)
-* MySQL: [python pymysql](http://code.google.com/p/pymysql/)
-* Oracle: [python cx_Oracle](http://cx-oracle.sourceforge.net/)
-* PostgreSQL: [python-psycopg2](http://initd.org/psycopg/)
-* SQLite: [python-pysqlite2](http://pysqlite.googlecode.com/)
-* Sybase: [python-pymssql](http://pymssql.sourceforge.net/)
-
-If you plan to attack a web application behind NTLM authentication or use the sqlmap update functionality (switch `--update`) you need to install respectively [python-ntlm](http://code.google.com/p/python-ntlm/) and [python-svn](http://pysvn.tigris.org/) libraries respectively.
-
-Optionally, if you are running sqlmap on Windows, you may wish to install the [PyReadline](http://ipython.scipy.org/moin/PyReadline/Intro) library in order to take advantage of the sqlmap TAB completion and history support features in the SQL shell and OS shell. Note that these functionalities are available natively via the standard Python [readline](http://docs.python.org/library/readline.html) library on other operating systems.
-
-## Scenario
-
-### Detect and exploit a SQL injection
+## Detect and exploit a SQL injection
 
 Let's say that you are auditing a web application and found a web page that accepts dynamic user-provided values via `GET`, `POST` or `Cookie` parameters or via the HTTP `User-Agent` request header.
 You now want to test if these are affected by a SQL injection vulnerability, and if so, exploit them to retrieve as much information as possible from the back-end database management system, or even be able to access the underlying file system and operating system.
@@ -70,12 +42,12 @@ sqlmap can automate the process of identifying and exploiting this type of vulne
 
 There exist many [resources](http://delicious.com/inquis/sqlinjection) on the web explaining in depth how to detect, exploit and prevent SQL injection vulnerabilities in web applications. It is recommendeded that you read them before going much further with sqlmap.
 
-### Direct connection to the database management system
+## Direct connection to the database management system
 Up until sqlmap version **0.8**, the tool has been **yet another SQL injection tool**, used by web application penetration testers/newbies/curious teens/computer addicted/punks and so on. Things move on
 and as they evolve, we do as well. Now it supports this new switch, `-d`, that allows you to connect from your machine to the database server's TCP port where the database management system daemon is listening
 on and perform any operation you would do while using it to attack a database via a SQL injection vulnerability.
 
-## Techniques
+# Techniques
 
 sqlmap is able to detect and exploit five different SQL injection **types**:
 
@@ -85,9 +57,6 @@ sqlmap is able to detect and exploit five different SQL injection **types**:
 * **UNION query SQL injection**, also known as **inband SQL injection**: sqlmap appends to the affected parameter a syntactically valid SQL statement starting with an `UNION ALL SELECT`. This techique works when the web application page passes directly the output of the `SELECT` statement within a `for` loop, or similar, so that each line of the query output is printed on the page content. sqlmap is also able to exploit **partial (single entry) UNION query SQL injection** vulnerabilities which occur when the output of the statement is not cycled in a `for` construct, whereas only the first entry of the query output is displayed.
 * **Stacked queries SQL injection**, also known as **multiple statements SQL injection**: sqlmap tests if the web application supports stacked queries and then, in case it does support, it appends to the affected
 parameter in the HTTP request, a semi-colon (`;`) followed by the SQL statement to be executed. This technique is useful to run SQL statements other than `SELECT`, like for instance, **data definition** or **data manipulation** statements, possibly leading to file system read and write access and operating system command execution depending on the underlying back-end database management system and the session user privileges.
-
-## Demo
-You can watch several demo videos on [YouTube](http://www.youtube.com/user/inquisb). Also, you can find lots of examples against publicly available vulnerable web applications made for legal web assessment [here](http://unconciousmind.blogspot.com/search/label/sqlmap).
 
 # Features
 
@@ -115,7 +84,7 @@ Features implemented in sqlmap include:
 * Support to **replicate the back-end database tables structure and entries** on a local SQLite 3 database.
 * Option to update sqlmap to the latest development version from the subversion repository.
 * Support to parse HTTP(S) responses and display any DBMS error message to the user.
-* Integration with other IT security open source projects, (http://metasploit.com "Metasploit) and [w3af](http://w3af.sourceforge.net/).
+* Integration with other IT security open source projects, [Metasploit](http://metasploit.com) and [w3af](http://w3af.sourceforge.net).
 
 ## Fingerprint and enumeration features
 
@@ -155,6 +124,52 @@ sqlmap relies on Metasploit to create the shellcode and implements four differen
 * Support for **database process' user privilege escalation** via Metasploit's `getsystem` command which include, among others, the 
 [kitrap0d](http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html) technique ([MS10-015](http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx)).
 * Support to access (read/add/delete) Windows registry hives.
+
+## Demo
+You can watch several demo videos on [YouTube](http://www.youtube.com/user/inquisb). Also, you can find lots of examples against publicly available vulnerable web applications made for legal web assessment [here](http://unconciousmind.blogspot.com/search/label/sqlmap).
+
+# Download and update
+
+sqlmap can be downloaded from its [SourceForge File List page](http://sourceforge.net/projects/sqlmap/files/). It is available in two formats:
+
+* [Source gzip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz)
+* [Source zip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip)
+
+You can also checkout the latest development version from the [Git](https://github.com/sqlmapproject/sqlmap)
+repository:
+
+    $ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+
+You can update it at any time to the latest development version by running:
+
+    $ python sqlmap.py --update
+
+Or:
+
+    $ git pull
+
+This is strongly recommended **before** reporting any bug to the [mailing list](http://www.sqlmap.org/#ml).
+
+# Dependencies
+
+sqlmap is developed in [python](http://www.python.org), a dynamic, object-oriented, interpreted programming language freely available from [http://python.org/download/](http://python.org/download/). This makes sqlmap a cross-platform application which is independant of the operating system. sqlmap requires Python version **2.6** or above. To make it even easier, many GNU/Linux distributions come out of the box with Python installed. Other Unixes and Mac OSX also provide Python packaged and ready to be installed. Windows users can download and install the Python installer for x86, AMD64 and Itanium.
+
+sqlmap relies on the [Metasploit Framework](http://metasploit.com) for some of its post-exploitation takeover features. You need to grab a copy of the framework from the [download](http://metasploit.com/download/) page - the required version is **3.5** or higher. For the ICMP tunneling out-of-band takeover technique, sqlmap requires the [Impacket](http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=tool&name=Impacket) library too.
+
+If you are willing to connect directly to a database server (switch `-d`), without passing through the web application, you need to install Python bindings for the database management system that you are going to attack:
+
+* Firebird: [python-kinterbasdb](http://kinterbasdb.sourceforge.net/)
+* Microsoft Access: [python-pyodbc](http://pyodbc.googlecode.com/)
+* Microsoft SQL Server: [python-pymssql](http://pymssql.sourceforge.net/)
+* MySQL: [python pymysql](http://code.google.com/p/pymysql/)
+* Oracle: [python cx_Oracle](http://cx-oracle.sourceforge.net/)
+* PostgreSQL: [python-psycopg2](http://initd.org/psycopg/)
+* SQLite: [python-pysqlite2](http://pysqlite.googlecode.com/)
+* Sybase: [python-pymssql](http://pymssql.sourceforge.net/)
+
+If you plan to attack a web application behind NTLM authentication or use the sqlmap update functionality (switch `--update`) you need to install respectively [python-ntlm](http://code.google.com/p/python-ntlm/) and [python-svn](http://pysvn.tigris.org/) libraries respectively.
+
+Optionally, if you are running sqlmap on Windows, you may wish to install the [PyReadline](http://ipython.scipy.org/moin/PyReadline/Intro) library in order to take advantage of the sqlmap TAB completion and history support features in the SQL shell and OS shell. Note that these functionalities are available natively via the standard Python [readline](http://docs.python.org/library/readline.html) library on other operating systems.
 
 # History
 
@@ -233,29 +248,6 @@ takes it over.
 * **August**, Daniele adds initial support for PostgreSQL and releases version **0.1**.
 * **July 25**, [Daniele Bellucci](http://dbellucci.blogspot.com) registers the sqlmap project on SourceForge and develops it on the [SourceForge subversion repository](http://sqlmap.svn.sourceforge.net/viewvc/sqlmap/). The skeleton is implemented and
 limited support for MySQL added.
-
-
-# Download and update
-
-sqlmap can be downloaded from its [SourceForge File List page](http://sourceforge.net/projects/sqlmap/files/). It is available in two formats:
-
-* [Source gzip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.tar.gz)
-* [Source zip compressed](http://downloads.sourceforge.net/sqlmap/sqlmap-0.9.zip)
-
-You can also checkout the latest development version from the [Git](https://github.com/sqlmapproject/sqlmap)
-repository:
-
-    $ git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
-
-You can update it at any time to the latest development version by running:
-
-    $ python sqlmap.py --update
-
-Or:
-
-    $ git pull
-
-This is strongly recommended **before** reporting any bug to the [mailing list](http://www.sqlmap.org/#ml).
 
 # Usage
 
@@ -1727,15 +1719,11 @@ sqlmap is released under the terms of the [General Public License v2](http://www
 
 # Disclaimer
 
-
 sqlmap is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
 
 Whatever you do with this tool is uniquely your responsibility. If you are not authorized to punch holes in the network you are attacking be aware that such action might get you in trouble with a lot of law enforcement agencies.
 
-
 # Authors
 
-[Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) (inquis)
-
-[Miroslav Stampar](http://about.me/stamparm) (stamparm)
+* [Bernardo Damele A. G.](mailto:bernardo@sqlmap.org) (inquis)
+* [Miroslav Stampar](mailto:miroslav@sqlmap.org) (stamparm)
