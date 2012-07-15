@@ -9,6 +9,7 @@
 * [[History]] - Kickin' databases since 2006.
 * [[Usage]] - A breakdown of all switches with examples.
 * [[License and copyright]] - The boring stuff.
+<br>
 ----
 #### Miscellaneous
 * [[FAQ]] - Frequently Asked Questions.
