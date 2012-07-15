@@ -106,9 +106,9 @@ table containing password hashes.
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/714)
 
-## What is `-``-text-only` switch?
+## What is `--text-only` switch?
 
-Switch `-``-text-only` is used for removing non-textual data (tags, 
+Switch `--text-only` is used for removing non-textual data (tags, 
 javascripts, styles,...) from the retrieved page content to further 
 improve detection capabilities.
 
@@ -120,16 +120,16 @@ the site normally?
 
 There are few IDSes that filter out all sqlmap requests based on default 
 User-Agent HTTP header used (e.g. `"User-agent: sqlmap/1.0-dev"`). To prevent this
-kind of situations you are advised to use switch `-``-random-agent`.
+kind of situations you are advised to use switch `--random-agent`.
 If you are getting those kind of messages for all targets then you
-most probably need to properly set up your proxy settings (switches `-``-proxy`
-and/or `-``-ignore-proxy`)
+most probably need to properly set up your proxy settings (switches `--proxy`
+and/or `--ignore-proxy`)
 
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/1241)
 
-## Is it possible to use `"INSERT/UPDATE"` SQL commands via `-``-sql-query`
-and/or `-``-sql-shell`?
+## Is it possible to use `"INSERT/UPDATE"` SQL commands via `--sql-query`
+and/or `--sql-shell`?
 
 It is possible to use those commands, but only if the stacked injection is supported
 by the vulnerable target. In vast majority of cases affected DBMSes by these kind of
