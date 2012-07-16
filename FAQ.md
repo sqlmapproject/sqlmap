@@ -26,7 +26,7 @@ Where `C:\Python27` is the path where you installed [Python](http://www.python.o
 
 ## Can I integrate sqlmap with a commercial closed source security tool my company is developing?
 
-We **might** consider to release you a copy under a commercial license - drop us an [email](dev@sqlmap.org) and we will discuss it through.
+We **might** consider to release you a copy under a commercial license - drop us an [email](mailto:dev@sqlmap.org) and we will discuss it through.
 
 ## How can I report bugs or request new features?
 
@@ -43,11 +43,11 @@ Guidelines:
 
 ## Can I contribute occasionally to the development?
 
-All code contributions are greatly appreciated. First off, clone the [Git repository](https://github.com/sqlmapproject/sqlmap), read the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki) carefully, go through the code yourself and [drop us an email](dev@sqlmap.org) if you are having a hard time grasping its structure and meaning. We apologize for not commenting the code enough - you could take a chance to read it through and [improve it](https://github.com/sqlmapproject/sqlmap/issues/37).
+All code contributions are greatly appreciated. First off, clone the [Git repository](https://github.com/sqlmapproject/sqlmap), read the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki) carefully, go through the code yourself and [drop us an email](mailto:dev@sqlmap.org) if you are having a hard time grasping its structure and meaning. We apologize for not commenting the code enough - you could take a chance to read it through and [improve it](https://github.com/sqlmapproject/sqlmap/issues/37).
 
 Our preferred method of patch submission is via a Git [pull request](https://help.github.com/articles/using-pull-requests).
 
-Each patch should make one logical change. Please follow the existing stylistic conventions: wrap code to 76 columns when possible. Avoid tabbing, use four blank spaces instead. Before you put time into a nontrivial patch, it is worth discussing it on the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users) or privately by [email](dev@sqlmap.org).
+Each patch should make one logical change. Please follow the existing stylistic conventions: wrap code to 76 columns when possible. Avoid tabbing, use four blank spaces instead. Before you put time into a nontrivial patch, it is worth discussing it on the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users) or privately by [email](mailto:dev@sqlmap.org).
 
 Many [people](https://raw.github.com/sqlmapproject/sqlmap/master/doc/THANKS) have contributed in different ways to the sqlmap development. **You** can be the next!
 
