@@ -176,10 +176,10 @@ class Miscellaneous:
 
     def likeOrExact(self, what):
         message = "do you want sqlmap to consider provided %s(s):\n" % what
-        message += "[1] as LIKE %s names (default)\n" % what
-        message += "[2] as exact %s names" % what
+        message += "[1] as LIKE %s names\n" % what
+        message += "[2] as exact %s names (default)" % what
 
-        choice = readInput(message, default='1') if not conf.disableLike else '2'
+        choice = readInput(message, default='2')
 
         if not choice or choice == '1':
             choice = '1'

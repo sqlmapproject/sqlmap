@@ -1073,7 +1073,7 @@ class Enumeration:
                 logger.error(errMsg)
                 bruteForce = True
 
-        if bruteForce or colList and conf.disableLike:
+        if bruteForce or colList:
             resumeAvailable = False
 
             for tbl in tblList:
@@ -1785,9 +1785,7 @@ class Enumeration:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
                                                         "table": safeSQLIdentificatorNaming(tbl, True),
                                                         "db": safeSQLIdentificatorNaming(conf.db)}
-                    if not conf.disableHash:
-                        attackDumpedTable()
-
+                    attackDumpedTable()
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
             except sqlmapConnectionException, e:
