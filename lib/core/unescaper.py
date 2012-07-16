@@ -6,13 +6,14 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.datatype import AttribDict
 from lib.core.settings import EXCLUDE_UNESCAPE
 
 class Unescaper(AttribDict):
     def unescape(self, expression, quote=True, dbms=None):
-        if not kb.unescape:
+        if not kb.unescape or conf.noUnescape:
             return expression
 
         if expression is None:
