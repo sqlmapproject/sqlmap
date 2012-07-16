@@ -63,12 +63,16 @@ sqlmap is the result of numerous hours of passionated work from a small team of 
 
 ## How can I follow closely the development?
 
-We tend to keep our Twitter account, [@sqlmap](https://twitter.com/sqlmap), up to date with the development. We certainly update it more often than the [mailing list](http://news.gmane.org/gmane.comp.security.sqlmap) - with the exception of bugs reported to the mailing list.
-Hence, if you are keen on keeping a closer eye at the development you can:
+We tend to keep our Twitter page, [@sqlmap](https://twitter.com/sqlmap), up to date with the development. We certainly update it more often than the [mailing list](http://news.gmane.org/gmane.comp.security.sqlmap).
+Hence, if you are keen on keeping a closer look at the development you can:
 
 * [Watch](https://github.com/sqlmapproject/sqlmap/toggle_watch) the project on GitHub given you have a GitHub account.
-* Subscribe to its [Atom feed](https://github.com/sqlmapproject/sqlmap/commits/master.atom) in your feed reader of choice.
-* Follow the Twitter account, [@sqlmap](https://twitter.com/sqlmap).
+* Subscribe to the [Atom feed](https://github.com/sqlmapproject/sqlmap/commits/master.atom) in your feed reader of choice.
+* Follow us on Twitter, [@sqlmap](https://twitter.com/sqlmap).
+* Subscribe to the [mailing list]((http://news.gmane.org/gmane.comp.security.sqlmap).
+ * Alternatively, you can subscribe to the [RSS feed](http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap).
+ * You can also browse the [posts' archive](http://news.gmane.org/gmane.comp.security.sqlmap) online.
+* Watch our videos on YouTube [#1](http://www.youtube.com/user/inquisb/videos) and [#2](http://www.youtube.com/user/stamparm/videos).
 
 ## Will you support other database management systems?
 
