@@ -36,7 +36,7 @@ def _adjust(condition, getRatioValue):
         # PAYLOAD.WHERE.NEGATIVE response is considered as True; in switch based approach negative logic is not
         # applied as that what is by user considered as True is that what is returned by the comparison mechanism
         # itself
-        retVal = not condition if kb.negativeLogic and condition is not None else condition
+        retVal = not condition if kb.negativeLogic and condition is not None and not getRatioValue else condition
     else:
         retVal = condition if not getRatioValue else (MAX_RATIO if condition else MIN_RATIO)
 
