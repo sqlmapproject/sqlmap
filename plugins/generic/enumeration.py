@@ -1353,6 +1353,8 @@ class Enumeration:
     def __tableGetCount(self, db, table):
         if Backend.isDbms(DBMS.DB2):
             query = "SELECT %s FROM %s.%s--" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db.upper()), safeSQLIdentificatorNaming(table.upper(), True))
+        elif Backend.isDbms(DBMS.MYSQL):
+            query = "SELECT %s FROM `%s`.`%s`" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
         else:
             query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
 
@@ -1578,7 +1580,7 @@ class Enumeration:
                 kb.data.cachedColumns = foundData
 
             try:
-                kb.dumpTable = "%s.%s" % (conf.db, tbl)
+                kb.dumpTable = "`%s`.`%s`" % (conf.db, tbl)
 
                 if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
                    or safeSQLIdentificatorNaming(tbl, True) not in \
@@ -1617,7 +1619,7 @@ class Enumeration:
                         # Partial inband and error
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
-
+                            
                             retVal = self.__pivotDumpTable(table, colList, blind=False)
 
                             if retVal:
@@ -1625,8 +1627,15 @@ class Enumeration:
                                 entries = zip(*[entries[colName] for colName in colList])
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                    elif Backend.getIdentifiedDbms() in (DBMS.PGSQL):
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL):
+                        newColString = ""
+                        for (index, column) in enumerate(colString.split(',')):
+                            newColString = "`%s`, %s" % (column.replace(" ", ""), newColString)
+                        newColString = newColString[:-2]   
+                       
+                        query = rootQuery.inband.query % (newColString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 
@@ -1684,7 +1693,7 @@ class Enumeration:
                     else:
                         query = rootQuery.blind.count % (conf.db, tbl)
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-
+                    
                     lengths = {}
                     entries = {}
 

@@ -12,7 +12,7 @@
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" LIMIT "/>
-        <order query="ORDER BY %s ASC"/>
+        <order query="ORDER BY `%s` ASC"/>
         <count query="COUNT(%s)"/>
         <comment query="-- " query2="/*" query3="#"/>
         <!--
@@ -58,8 +58,8 @@
             <blind query="SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" query2="SELECT column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <inband query="SELECT %s FROM `%s`.`%s` ORDER BY `%s`"/>
+            <blind query="SELECT %s FROM `%s`.`%s` ORDER BY `%s` LIMIT %d,1" count="SELECT COUNT(*) FROM `%s`.`%s`"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE " query2="SELECT db FROM mysql.db WHERE " condition="schema_name" condition2="db"/>
