@@ -876,50 +876,60 @@ def __setHTTPProxy():
 
         return
 
-    debugMsg = "setting the HTTP proxy to pass by all HTTP requests"
+    debugMsg = "setting the %s proxy to pass by all HTTP requests" % ("SOCKS" if "socks" in conf.proxy else "HTTP")
     logger.debug(debugMsg)
 
-    __proxySplit = urlparse.urlsplit(conf.proxy)
-    __hostnamePort = __proxySplit[1].split(":")
+    proxySplit = urlparse.urlsplit(conf.proxy)
+    hostnamePort = proxySplit[1].split(":")
 
-    __scheme = __proxySplit[0]
-    __hostname = __hostnamePort[0]
-    __port = None
-    __proxyString = ""
+    scheme = proxySplit[0].lower()
+    hostname = hostnamePort[0]
+    port = None
+    username = None
+    password = None
 
-    if len(__hostnamePort) == 2:
+    if len(hostnamePort) == 2:
         try:
-            __port = int(__hostnamePort[1])
+            port = int(hostnamePort[1])
         except:
             pass #drops into the next check block
 
-    if not __scheme or not __hostname or not __port:
-        errMsg = "proxy value must be in format 'http://url:port'"
+    if not all((scheme, hostname, port)):
+        errMsg = "proxy value must be in format '(http|socks|socks4|socks5)://url:port'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.pCred:
-        pCredRegExp = re.search("^(.*?):(.*?)$", conf.pCred)
-
-        if not pCredRegExp:
+        _ = re.search("^(.*?):(.*?)$", conf.pCred)
+        if not _:
             errMsg = "Proxy authentication credentials "
             errMsg += "value must be in format username:password"
             raise sqlmapSyntaxException, errMsg
+        else:
+            username = _.group(1)
+            password = _.group(2)
 
-        # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
-        __proxyString = "%s@" % conf.pCred
-
-    __proxyString += "%s:%d" % (__hostname, __port)
-
-    # Workaround for http://bugs.python.org/issue1424152 (urllib/urllib2:
-    # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
-    # can't be tunneled over an HTTP proxy natively by Python (<= 2.5)
-    # urllib2 standard library
-    if PYVERSION >= "2.6":
-        proxyHandler = urllib2.ProxyHandler({"http": __proxyString, "https": __proxyString})
-    elif conf.scheme == "https":
-        proxyHandler = ProxyHTTPSHandler(__proxyString)
+    if "socks" in scheme:
+        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if "4" not in scheme else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
+        socks.wrapmodule(urllib2)
     else:
-        proxyHandler = urllib2.ProxyHandler({"http": __proxyString})
+        if conf.pCred:
+            # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
+            proxyString = "%s@" % conf.pCred
+        else:
+            proxyString = ""
+
+        proxyString += "%s:%d" % (hostname, port)
+
+        # Workaround for http://bugs.python.org/issue1424152 (urllib/urllib2:
+        # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
+        # can't be tunneled over an HTTP proxy natively by Python (<= 2.5)
+        # urllib2 standard library
+        if PYVERSION >= "2.6":
+            proxyHandler = urllib2.ProxyHandler({"http": proxyString, "https": proxyString})
+        elif conf.scheme == "https":
+            proxyHandler = ProxyHTTPSHandler(proxyString)
+        else:
+            proxyHandler = urllib2.ProxyHandler({"http": proxyString})
 
 def __setSafeUrl():
     """
