@@ -142,14 +142,6 @@ It is possible to run those statements as well as any other statement on the tar
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/1237)
 
-## I am getting `finally: SyntaxError: invalid syntax` when trying to run sqlmap?
-
-You are most probably using outdated version of Python. sqlmap is generally supported by Python versions 2.5, 2.6 and 2.7, while you are strongly
-advised to use version 2.7.
-
-Question(s):
-[#1](http://thread.gmane.org/gmane.comp.security.sqlmap/1231)
-
 ## sqlmap is not able to detect/exploit injection while other commercial tools are?
 
 In most of those kind of cases blatant error message detection is used by commercial tools leading to *false positive* claims. You have to be aware that a
