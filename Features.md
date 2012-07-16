@@ -66,4 +66,5 @@ sqlmap relies on Metasploit to create the shellcode and implements four differen
 * Support to access (read/add/delete) Windows registry hives.
 
 ## Demo
-You can watch several demo videos on [YouTube](http://www.youtube.com/user/inquisb). Also, you can find lots of examples against publicly available vulnerable web applications made for legal web assessment [here](http://unconciousmind.blogspot.com/search/label/sqlmap).
+
+You can watch demo videos on [Bernardo](http://www.youtube.com/user/inquisb/videos) and [Miroslav](http://www.youtube.com/user/stamparm/videos) YouTube pages. Also, you can find lots of examples against publicly available vulnerable web applications made for legal web assessment [here](http://unconciousmind.blogspot.com/search/label/sqlmap).
