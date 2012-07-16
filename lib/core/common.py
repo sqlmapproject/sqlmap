@@ -2711,23 +2711,22 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     retVal = name
 
     if isinstance(name, basestring):
-        name = getUnicode(name)
+        retVal = getUnicode(name)
+        _ = isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE)
 
-        if isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and '.' not in name:
-            name = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, name)
+        if _:
+            retVal = re.sub(r"(?i)\A%s\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
 
-        parts = name.split('.')
+        if not re.match(r"\A[A-Za-z0-9_@\$]+\Z", retVal):  # Reference: http://stackoverflow.com/questions/954884/what-special-characters-are-allowed-in-t-sql-column-retVal
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+                retVal = "`%s`" % retVal.strip("`")
+            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.DB2):
+                retVal = "\"%s\"" % retVal.strip("\"")
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
+                retVal = "[%s]" % retVal.strip("[]")
 
-        for i in xrange(len(parts)):
-            if not re.match(r"\A[A-Za-z0-9_@\$]+\Z", parts[i]):  # Reference: http://stackoverflow.com/questions/954884/what-special-characters-are-allowed-in-t-sql-column-name
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
-                    parts[i] = "`%s`" % parts[i].strip("`")
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.DB2):
-                    parts[i] = "\"%s\"" % parts[i].strip("\"")
-                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
-                    parts[i] = "[%s]" % parts[i].strip("[]")
-
-        retVal = ".".join(parts)
+        if _ and DEFAULT_MSSQL_SCHEMA not in retVal:
+            retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
 
     return retVal
 
