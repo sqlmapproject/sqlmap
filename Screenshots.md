@@ -7,6 +7,6 @@ Concatenation of three tamper scripts to obfuscate the injected SQL payloads, `-
 ![Tamper scripts in action](images/sqlmap_tamper_in_action.png)
 
 Cracking dumped databased users' password hashes, `--passwords` switch:
-![Users' password hashes cracking](images/sqlmap_tamper_in_action.png)
+![Users' password hashes cracking](images/sqlmap_cracking_password_hashes.png)
 
 
