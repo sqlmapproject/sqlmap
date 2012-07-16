@@ -538,13 +538,9 @@ def __setBulkMultipleTargets():
         errMsg += "does not exist"
         raise sqlmapFilePathException, errMsg
 
-    f = open(conf.bulkFile, 'r')
-
-    for line in f.xreadlines():
+    for line in getFileItems(conf.bulkFile):
         if re.search(r"[^ ]+\?(.+)", line, re.I):
             kb.targetUrls.add((line.strip(), None, None, None))
-
-    f.close()
 
 def __findPageForms():
     if not conf.forms or conf.crawlDepth:
