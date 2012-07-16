@@ -75,11 +75,12 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         content = None
         redurl = self._get_header_redirect(headers)
 
-        if not urlparse.urlsplit(redurl).netloc:
-            redurl = urlparse.urljoin(req.get_full_url(), redurl)
+        if redurl:
+            if not urlparse.urlsplit(redurl).netloc:
+                redurl = urlparse.urljoin(req.get_full_url(), redurl)
 
-        self._infinite_loop_check(req)
-        self._ask_redirect_choice(code, redurl)
+            self._infinite_loop_check(req)
+            self._ask_redirect_choice(code, redurl)
 
         try:
             content = fp.read()
@@ -88,7 +89,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
-        if kb.redirectChoice == REDIRECTION.YES:
+        if redurl and kb.redirectChoice == REDIRECTION.YES:
             req.headers[HTTPHEADER.HOST] = getHostHeader(redurl)
             result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         else:
