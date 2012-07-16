@@ -876,13 +876,13 @@ def __setHTTPProxy():
 
         return
 
-    debugMsg = "setting the %s proxy to pass by all HTTP requests" % ("SOCKS" if "socks" in conf.proxy else "HTTP")
+    debugMsg = "setting the HTTP/SOCKS proxy to pass by all HTTP requests"
     logger.debug(debugMsg)
 
     proxySplit = urlparse.urlsplit(conf.proxy)
     hostnamePort = proxySplit[1].split(":")
 
-    scheme = proxySplit[0].lower()
+    scheme = proxySplit[0].upper()
     hostname = hostnamePort[0]
     port = None
     username = None
@@ -894,8 +894,8 @@ def __setHTTPProxy():
         except:
             pass #drops into the next check block
 
-    if not all((scheme, hostname, port)):
-        errMsg = "proxy value must be in format '(http|socks|socks4|socks5)://url:port'"
+    if not all((scheme, hasattr(PROXYTYPE, scheme), hostname, port)):
+        errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXYTYPE))
         raise sqlmapSyntaxException, errMsg
 
     if conf.pCred:
@@ -908,8 +908,8 @@ def __setHTTPProxy():
             username = _.group(1)
             password = _.group(2)
 
-    if "socks" in scheme:
-        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if "4" not in scheme else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
+    if scheme in (PROXYTYPE.SOCKS4, PROXYTYPE.SOCKS5):
+        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXYTYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
         socks.wrapmodule(urllib2)
     else:
         if conf.pCred:
