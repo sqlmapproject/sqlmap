@@ -31,7 +31,7 @@ We **might** consider to release you a copy under a commercial license - drop us
 ## How can I report bugs or request new features?
 
 **Bug reports are welcome**!
-Please report all bugs on the [issue tracker](https://github.com/sqlmapproject/sqlmap/issues) or, alternatively, on the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users).
+Please report all bugs on the [issue tracker](https://github.com/sqlmapproject/sqlmap/issues) or, alternatively, to the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users).
 
 Guidelines:
 
