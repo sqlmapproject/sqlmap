@@ -9,4 +9,7 @@ Concatenation of three tamper scripts to obfuscate the injected SQL payloads, `-
 Cracking dumped databased users' password hashes, `--passwords` switch:
 ![Users' password hashes cracking](images/sqlmap_cracking_password_hashes.png)
 
+Enumerating database table's columns, `--columns` switch:
+![Database table's columns dump](images/sqlmap_enumerating_columns.png)
+
 
