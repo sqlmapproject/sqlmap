@@ -3,12 +3,12 @@
 #### User's manual
 * [[Scenario]] - Use cases for sqlmap.
 * [[Techniques]] - SQLi techniques detected and exploited by sqlmap.
-* [[Features]] - A breakdown of main features.
+* [[Features]] - Breakdown of the features implemented.
 * [[Download and update]] - Keep your copy up-to-date.
 * [[Dependencies]] - Third-party libraries and tools required.
 * [[History]] - Kickin' databases since 2006.
-* [[Usage]] - A breakdown of all switches with examples.
-* [[License and copyright]] - The boring stuff.
+* [[Usage]] - Exhaustive breakdown of all switches with examples.
+* [[License]] - The boring stuff.
 
 <br>
 
