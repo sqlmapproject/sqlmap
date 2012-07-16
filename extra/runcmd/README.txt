@@ -1,7 +1,3 @@
 Files in this folder can be used to compile auxiliary program that can
 be used for running command prompt commands skipping standard "cmd /c" way. 
-They are licensed under the terms of the GNU Lesser General Public License 
-and it's compiled version is available on the official sqlmap subversion
-repository[1].
-
-[1] https://svn.sqlmap.org/sqlmap/trunk/sqlmap/shell/runcmd.exe_
+They are licensed under the terms of the GNU Lesser General Public License.
