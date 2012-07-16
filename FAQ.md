@@ -70,7 +70,7 @@ Hence, if you are keen on keeping a closer look at the development you can:
 * Subscribe to the [Atom feed](https://github.com/sqlmapproject/sqlmap/commits/master.atom) in your feed reader of choice.
 * Follow us on Twitter, [@sqlmap](https://twitter.com/sqlmap).
 * Watch demos on YouTube: [#1](http://www.youtube.com/user/inquisb/videos) and [#2](http://www.youtube.com/user/stamparm/videos).
-* Subscribe to the [mailing list]((http://news.gmane.org/gmane.comp.security.sqlmap).
+* Subscribe to the [mailing list](http://news.gmane.org/gmane.comp.security.sqlmap).
  * Alternatively, you can subscribe to the [RSS feed](http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap).
  * You can also browse the [posts' archive](http://news.gmane.org/gmane.comp.security.sqlmap) online.
 
