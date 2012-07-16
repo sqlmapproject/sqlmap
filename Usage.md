@@ -1,21 +1,15 @@
 # Usage
 
-    $ python sqlmap.py -h
-
-        sqlmap/1.0-dev - automatic SQL injection and database takeover tool
-        http://www.sqlmap.org
-
-    [!] legal disclaimer: usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Authors assume no liability and are not responsible for any misuse or damage caused by this program
-
     Usage: python sqlmap.py [options]
 
     Options:
-    --version             show program's version number and exit
-    -h, --help            show this help message and exit
-    -v VERBOSE            Verbosity level: 0-6 (default 1)
+      -h, --help            Show basic help message and exit
+      -hh                   Show advanced help message and exit
+      -v VERBOSE            Verbosity level: 0-6 (default 1)
 
-    Target:
-        At least one of these options has to be specified to set the source to get target urls from
+      Target:
+        At least one of these options has to be specified to set the source to
+        get target urls from
 
         -d DIRECT           Direct connection to the database
         -u URL, --url=URL   Target url
@@ -25,7 +19,7 @@
         -g GOOGLEDORK       Process Google dork results as target urls
         -c CONFIGFILE       Load options from a configuration INI file
 
-    Request:
+      Request:
         These options can be used to specify how to connect to the target url
 
         --data=DATA         Data string to be sent through POST
@@ -54,9 +48,10 @@
         --safe-url=SAFURL   Url address to visit frequently during testing
         --safe-freq=SAFREQ  Test requests between two visits to a given safe url
         --skip-urlencode    Skip URL encoding of POST data
-        --eval=EVALCODE     Evaluate provided Python code before the request (e.g. "import hashlib;id2=hashlib.md5(id).hexdigest()")
+        --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
+                            "import hashlib;id2=hashlib.md5(id).hexdigest()")
 
-    Optimization:
+      Optimization:
         These options can be used to optimize the performance of sqlmap
 
         -o                  Turn on all optimization switches
@@ -65,8 +60,9 @@
         --null-connection   Retrieve page length without actual HTTP response body
         --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
 
-    Injection:
-        These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts
+      Injection:
+        These options can be used to specify which parameters to test for,
+        provide custom injection payloads and optional tampering scripts
 
         -p TESTPARAMETER    Testable parameter(s)
         --dbms=DBMS         Force back-end DBMS to this value
@@ -74,24 +70,27 @@
         --invalid-bignum    Use big numbers for invalidating values
         --invalid-logical   Use logical operations for invalidating values
         --no-cast           Turn off payload casting mechanism
+        --no-unescape       Turn off string unescaping mechanism
         --prefix=PREFIX     Injection payload prefix string
         --suffix=SUFFIX     Injection payload suffix string
         --skip=SKIP         Skip testing for given parameter(s)
         --tamper=TAMPER     Use given script(s) for tampering injection data
 
-    Detection:
-        These options can be used to specify how to parse and compare page content from HTTP responses when using blind SQL injection technique
+      Detection:
+        These options can be used to specify how to parse and compare page
+        content from HTTP responses when using blind SQL injection technique
 
         --level=LEVEL       Level of tests to perform (1-5, default 1)
         --risk=RISK         Risk of tests to perform (0-3, default 1)
-        --string=STRING     String to match in the response when query is valid
-        --regexp=REGEXP     Regexp to match in the response when query is valid
-        --code=CODE         HTTP response code to match when the query is valid
+        --string=STRING     String to match when query is evaluated to True
+        --regexp=REGEXP     Regexp to match when query is evaluated to True
+        --code=CODE         HTTP code to match when query is evaluated to True
         --text-only         Compare pages based only on the textual content
         --titles            Compare pages based only on their titles
 
-    Techniques:
-        These options can be used to tweak testing of specific SQL injection techniques
+      Techniques:
+        These options can be used to tweak testing of specific SQL injection
+        techniques
 
         --technique=TECH    SQL injection techniques to test for (default "BEUST")
         --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
@@ -99,15 +98,18 @@
         --union-char=UCHAR  Character to use for bruteforcing number of columns
         --dns-domain=DNAME  Domain name used for DNS exfiltration attack
 
-    Fingerprint:
+      Fingerprint:
         -f, --fingerprint   Perform an extensive DBMS version fingerprint
 
-    Enumeration:
-        These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements
+      Enumeration:
+        These options can be used to enumerate the back-end database
+        management system information, structure and data contained in the
+        tables. Moreover you can run your own SQL statements
 
         -b, --banner        Retrieve DBMS banner
         --current-user      Retrieve DBMS current user
         --current-db        Retrieve DBMS current database
+        --hostname          Retrieve DBMS server hostname
         --is-dba            Detect if the DBMS current user is DBA
         --users             Enumerate DBMS users
         --passwords         Enumerate DBMS users password hashes
@@ -132,28 +134,31 @@
         --last=LASTCHAR     Last query output word character to retrieve
         --sql-query=QUERY   SQL statement to be executed
         --sql-shell         Prompt for an interactive SQL shell
+        --sql-file=SQLFILE  Execute SQL statements from given file(s)
 
-    Brute force:
+      Brute force:
         These options can be used to run brute force checks
 
         --common-tables     Check existence of common tables
         --common-columns    Check existence of common columns
 
-    User-defined function injection:
+      User-defined function injection:
         These options can be used to create custom user-defined functions
 
         --udf-inject        Inject custom user-defined functions
         --shared-lib=SHLIB  Local path of the shared library
 
-    File system access:
-        These options can be used to access the back-end database management system underlying file system
+      File system access:
+        These options can be used to access the back-end database management
+        system underlying file system
 
         --file-read=RFILE   Read a file from the back-end DBMS file system
         --file-write=WFILE  Write a local file on the back-end DBMS file system
         --file-dest=DFILE   Back-end DBMS absolute filepath to write to
 
-    Operating system access:
-        These options can be used to access the back-end database management system underlying operating system
+      Operating system access:
+        These options can be used to access the back-end database management
+        system underlying operating system
 
         --os-cmd=OSCMD      Execute an operating system command
         --os-shell          Prompt for an interactive operating system shell
@@ -164,8 +169,9 @@
         --msf-path=MSFPATH  Local path where Metasploit Framework is installed
         --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
-    Windows registry access:
-        These options can be used to access the back-end database management system Windows registry
+      Windows registry access:
+        These options can be used to access the back-end database management
+        system Windows registry
 
         --reg-read          Read a Windows registry key value
         --reg-add           Write a Windows registry key value data
@@ -175,7 +181,7 @@
         --reg-data=REGDATA  Windows registry key value data
         --reg-type=REGTYPE  Windows registry key value type
 
-    General:
+      General:
         These options can be used to set some general working parameters
 
         -t TRAFFICFILE      Log all HTTP traffic into a textual file
@@ -184,11 +190,13 @@
         --check-tor         Check to see if Tor is used properly
         --crawl=CRAWLDEPTH  Crawl the website starting from the target url
         --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
+        --dbms-cred=DCRED   DBMS authentication credentials (user:password)
         --eta               Display for each output the estimated time of arrival
-        --flush-session     Flush session file for current target
+        --flush-session     Flush session files for current target
         --forms             Parse and test forms on target url
         --fresh-queries     Ignores query results stored in session file
         --hex               Uses DBMS hex function(s) for data retrieval
+        --output-dir=ODIR   Custom output directory path
         --parse-errors      Parse and display DBMS error messages from responses
         --replicate         Replicate dumped data into a sqlite3 database
         --save              Save options to a configuration INI file
@@ -197,15 +205,12 @@
         --tor-type=TORTYPE  Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)
         --update            Update sqlmap
 
-    Miscellaneous:
+      Miscellaneous:
         -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
-        --beep              Sound alert when SQL injection found
         --check-payload     Offline WAF/IPS/IDS payload detection testing
         --check-waf         Check for existence of WAF/IPS/IDS protection
         --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
         --dependencies      Check for missing sqlmap dependencies
-        --disable-hash      Disable password hash cracking mechanism
-        --disable-like      Disable LIKE search of identificator names
         --gpage=GOOGLEPAGE  Use Google dork results from specified page number
         --mobile            Imitate smartphone through HTTP User-Agent header
         --page-rank         Display page rank (PR) for Google dork results
