@@ -112,7 +112,7 @@ class Miscellaneous:
         and functions
         """
 
-        if web:
+        if web and self.webBackdoorFilePath:
             logger.info("cleaning up the web files uploaded")
 
             self.delRemoteFile(self.webStagerFilePath)
