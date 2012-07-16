@@ -1,3 +1,5 @@
+# Material presented at conferences
+
 * *SQL injection: Not only AND 1=1* [slides](http://www.slideshare.net/inquis/sql-injection-not-only-and-11-updated) presented by Bernardo at the 2nd Digital Security Forum in Lisbon (Portugal) on June 27th, 2009.
 * *Advanced SQL injection to operating system full control* [whitepaper](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857) and [slides](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-slides) presented by Bernardo at [Black Hat Europe 2009](https://www.blackhat.com/html/bh-europe-09/bh-eu-09-main.html) in Amsterdam (The Netherlands) on April 16th, 2009.
 * *Expanding the control over the operating system from the database* [slides](http://www.slideshare.net/inquis/expanding-the-control-over-the-operating-system-from-the-database) presented by Bernardo at [SOURCE Conference](http://www.sourceconference.com/archive/) 2009 in Barcelona (Spain) on September 21st, 2009.
