@@ -34,7 +34,7 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
-        except pymysql.OperationalError, msg:
+        except (pymysql.OperationalError, pymysql.InternalError), msg:
             raise sqlmapConnectionException, msg[1]
 
         self.setCursor()
