@@ -85,8 +85,8 @@ Question(s):
 
 ## How to use sqlmap with `mod_rewrite` enabled?
 
-Just put `*` to the place where sqlmap should check for injections in URI itself. For example, `./sqlmap.py -u "www.site.com/id1/1*/id2/2"` sqlmap will try to inject the payloads just at that place marked with `*` character.
-This feature also applies to POST data.
+Append an asterisk, `*`, to the place where sqlmap should check for injections in URI itself. For example, `./sqlmap.py -u "http://target.tld/id1/1*/id2/2"`, sqlmap will inject its payloads at that place marked with `*` character.
+This feature also applies to POST data. Multiple injection points are supported and will be assessed sequentially.
 
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/731)
