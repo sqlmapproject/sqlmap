@@ -28,10 +28,6 @@ Where `C:\Python27` is the path where you installed [Python](http://www.python.o
 
 We **might** consider to release you a copy under a commercial license - drop us an [email](dev@sqlmap.org) and we will discuss it through.
 
-## Will you support other database management systems?
-
-We already support the major and some minor databases. We do have plans to extend support for some of them and support also new ones: Informix and Ingres at some point in time.
-
 ## How can I report bugs or request new features?
 
 **Bug reports are welcome**!
@@ -61,9 +57,22 @@ We are constantly seeking for people who can write some clean Python code, are u
 
 If this sounds interesting to you, send us your [pull requests](https://help.github.com/articles/using-pull-requests) - we are open to discuss granting of push access to the main repository if you prove professionalism, motivation and ability to write proper Python code.
 
-## How can I support the development?
+## How can I support the development and show my appreciation?
 
 sqlmap is the result of numerous hours of passionated work from a small team of computer security enthusiasts. If you appreciated our work and you want to see sqlmap kept being developed, please consider making a [donation](https://www.paypal.com/uk/cgi-bin/webscr?cmd=_send-money&nav=1) to our efforts via [PayPal](https://www.paypal.com) to `dev@sqlmap.org`.
+
+## How can I follow closely the development?
+
+We tend to keep our Twitter account, [@sqlmap](https://twitter.com/sqlmap), up to date with the development. We certainly update it more often than the [mailing list](http://news.gmane.org/gmane.comp.security.sqlmap) - with the exception of bugs reported to the mailing list.
+Hence, if you are keen on keeping a closer eye at the development you can:
+
+* [Watch](https://github.com/sqlmapproject/sqlmap/toggle_watch) the project on GitHub given you have a GitHub account.
+* Subscribe to its [Atom feed](https://github.com/sqlmapproject/sqlmap/commits/master.atom) in your feed reader of choice.
+* Follow the Twitter account, [@sqlmap](https://twitter.com/sqlmap).
+
+## Will you support other database management systems?
+
+We already support the major and some minor databases. We do have plans to extend support for some of them and support also new ones: Informix and Ingres at some point in time.
 
 ## Can you hack a site for me?
 
@@ -72,6 +81,15 @@ sqlmap is the result of numerous hours of passionated work from a small team of 
 ## When sqlmap will switch to Python 3?
 
 Currently there is no pressure on Python projects to switch to the new version of Python interpreter, as the process of switching, especially on larger projects can be cumbersome (due to the few backward incompatibilities). The switch will take place eventually, but currently it is a very [low priority task](https://github.com/sqlmapproject/sqlmap/issues/93).
+
+## How can I shorten the payloads injected by sqlmap?
+
+You can provide sqlmap with the following two switches:
+
+    --no-cast           Turn off payload casting mechanism
+    --no-unescape       Turn off string unescaping mechanism
+
+However, on the other hand you might lose the benefits provided by these switches in the default configuration.
 
 ## What does `WARNING unknown charset '...'` mean?
 
@@ -140,3 +158,36 @@ an injection point without making through tests if it can be exploited on the fi
 
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/970)
+
+## How can I dump only certain entries of a table based on my condition?
+
+sqlmap is very granular in terms of dumping entries from a table. The relevant switches are:
+
+    --dump              Dump DBMS database table entries
+    -D DB               DBMS database to enumerate
+    -T TBL              DBMS database table to enumerate
+    -C COL              DBMS database table column to enumerate
+    --start=LIMITSTART  First query output entry to retrieve
+    --stop=LIMITSTOP    Last query output entry to retrieve
+    --first=FIRSTCHAR   First query output word character to retrieve
+    --last=LASTCHAR     Last query output word character to retrieve
+
+However, in some cases you might want to dump all entries given a custom `WHERE` condition. For such cases, we recommend using one of the following switches:
+
+    --sql-query=QUERY   SQL statement to be executed
+    --sql-shell         Prompt for an interactive SQL shell
+    --sql-file=SQLFILE  Execute SQL statements from given file(s)
+
+For example:
+
+    SELECT user, password FROM users WHERE privilege='admin'
+
+Question(s):
+[#1](http://thread.gmane.org/gmane.comp.security.sqlmap/2309)
+
+## Where can I find old versions of sqlmap?
+
+From the [Downloads](https://github.com/sqlmapproject/sqlmap/downloads) page on GitHub.
+
+Question(s):
+[#1](http://thread.gmane.org/gmane.comp.security.sqlmap/2290)
