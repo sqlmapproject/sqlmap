@@ -16,4 +16,5 @@
 #### Miscellaneous
 * [[FAQ]] - Frequently Asked Questions.
 * [[Presentations]] - Material around sqlmap presented at conferences.
+* [[Screenshots]] - Collection of screen-shots demonstrating some features.
 * [[Third party libraries]] - Details of third-party libraries and tools used by sqlmap.
