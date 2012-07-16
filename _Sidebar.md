@@ -15,5 +15,5 @@
 ----
 #### Miscellaneous
 * [[FAQ]] - Frequently Asked Questions.
-* [[Presentations]] - List of material around sqlmap presented at conferences.
+* [[Presentations]] - Material around sqlmap presented at conferences.
 * [[Third party libraries]] - Details of third-party libraries and tools used by sqlmap.
