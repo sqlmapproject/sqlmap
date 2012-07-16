@@ -180,7 +180,7 @@ However, in some cases you might want to dump all entries given a custom `WHERE`
 
 For example:
 
-    SELECT user, password FROM users WHERE privilege='admin'
+    --sql-query "SELECT user, password FROM users WHERE privilege='admin'"
 
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/2309)
