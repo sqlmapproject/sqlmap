@@ -1625,7 +1625,10 @@ class Enumeration:
                                 entries = zip(*[entries[colName] for colName in colList])
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                    elif Backend.getIdentifiedDbms() in (DBMS.PGSQL):
+                        query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL):
+                        colString = '`%s`' % colString
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
