@@ -187,7 +187,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 warnMsg += "the curent session user is not a database administrator"
 
                 if not conf.dCred and Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.PGSQL ):
-                    warnMsg += ". You can try to to use option '--dbms-cred' "
+                    warnMsg += ". You can try to use option '--dbms-cred' "
                     warnMsg += "to execute statements as a DBA user if you "
                     warnMsg += "were able to extract and crack a DBA "
                     warnMsg += "password by any mean"

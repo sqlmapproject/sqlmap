@@ -1000,7 +1000,7 @@ def checkConnection(suppressOutput=False):
             errMsg = "unable to retrieve page content"
             raise sqlmapConnectionException, errMsg
         elif wasLastRequestDBMSError():
-            warnMsg = "there is a DBMS error found in the HTTP response body"
+            warnMsg = "there is a DBMS error found in the HTTP response body "
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
         elif wasLastRequestHTTPError():
