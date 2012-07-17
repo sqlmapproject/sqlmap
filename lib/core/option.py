@@ -1715,11 +1715,11 @@ def __mergeOptions(inputOptions, overrideOptions):
             conf[key] = value
 
     for key, value in conf.items():
-        if value:
+        if value is not None:
             kb.explicitSettings.add(key)
 
     for key, value in defaults.items():
-        if not conf[key]:
+        if conf[key] is None:
             conf[key] = value
 
 def __setTrafficOutputFP():
