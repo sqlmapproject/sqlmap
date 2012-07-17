@@ -18,6 +18,9 @@ Mnemonics (option `-z` set to `"flu,ign,bat,tec=B"`):
 Conducting through tests only if positive heuristic(s) (switch `--smart`):
 ![Smart mode](images/sqlmap_smart.png)
 
+DNS exfiltration technique (option `--dns-domain`):
+![DNS exfiltration technique](images/sqlmap_dns_exfiltration.png)
+
 Replicating table to a local SQLite3 database (switch `--replicate`):
 ![Replicated table](images/sqlmap_replicate_result.png)
 
