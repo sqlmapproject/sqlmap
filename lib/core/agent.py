@@ -851,7 +851,7 @@ class Agent:
         Replaces payload inside the input string with a given payload
         """
 
-        return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), "%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER), inpStr) if inpStr else inpStr
+        return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), inpStr) if inpStr else inpStr
 
     def runAsDBMSUser(self, query):
         if conf.dCred and "Ad Hoc Distributed Queries" not in query:
