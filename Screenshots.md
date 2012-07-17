@@ -12,11 +12,11 @@ Cracking dumped databased users' password hashes (switch `--passwords`):
 Enumerating database table's columns (switch `--columns`):
 ![Database table's columns dump](images/sqlmap_enumerating_columns.png)
 
-Mnemonics (option `-z` set to `flu,ign,bat,tec=B`):
+Mnemonics (option `-z` set to `"flu,ign,bat,tec=B"`):
 ![Mnemonics set to flu,ign,bat,tec=B](images/sqlmap_mnemonics.png)
 
 SQL shell mode (switch `--sql-shell`):
-![SQL shell mode](images/sqlmap_shell.png)
+![SQL shell mode](images/sqlmap_sql_shell.png)
 
 Wizard mode (switch `--wizard`):
 ![Wizard mode](images/sqlmap_wizard.png)
