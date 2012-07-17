@@ -13,7 +13,10 @@ Enumerating database table's columns (switch `--columns`):
 ![Database table's columns dump](images/sqlmap_enumerating_columns.png)
 
 Mnemonics (option `-z` set to `"flu,ign,bat,tec=B"`):
-![Mnemonics set to flu,ign,bat,tec=B](images/sqlmap_mnemonics.png)
+![Mnemonics usage](images/sqlmap_mnemonics.png)
+
+Replicating table to a local SQLite3 database (switch `--replicate`):
+![Replicated table](images/sqlmap_replicate_result.png)
 
 SQL shell mode (switch `--sql-shell`):
 ![SQL shell mode](images/sqlmap_sql_shell.png)
