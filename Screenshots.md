@@ -15,6 +15,9 @@ Enumerating database table's columns (switch `--columns`):
 Mnemonics (option `-z` set to `"flu,ign,bat,tec=B"`):
 ![Mnemonics usage](images/sqlmap_mnemonics.png)
 
+Conducting through tests only if positive heuristic(s) (switch `--smart`):
+![Smart mode](images/sqlmap_smart.png)
+
 Replicating table to a local SQLite3 database (switch `--replicate`):
 ![Replicated table](images/sqlmap_replicate_result.png)
 
