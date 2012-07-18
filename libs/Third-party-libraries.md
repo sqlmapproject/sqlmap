@@ -4,8 +4,6 @@
 <br>
 <br>
 <br>
-<br>
-<br>
 <h2 id="thirdparty">Libraries in thirdparty/ directory</h2>
 
 | Library | License | Notes | Switch |
