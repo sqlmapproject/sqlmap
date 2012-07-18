@@ -24,9 +24,9 @@ Where `C:\Python27` is the path where you installed [Python](http://www.python.o
 
 **Yes**. sqlmap is released under the terms of the [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html), which means that any derivative work must be distributed without further restrictions on the rights granted by the General Public License itself.
 
-## Can I integrate sqlmap with a commercial closed source security tool my company is developing?
+## Can I embed sqlmap into a proprietary software?
 
-We **might** consider to release you a copy under a commercial license - drop us an [email](mailto:dev@sqlmap.org) and we will discuss it through.
+If you wish to embed sqlmap technology into proprietary software, we sell alternative licenses (contact [dev@sqlmap.org](dev@sqlmap.org))
 
 ## How can I report bugs or request new features?
 
