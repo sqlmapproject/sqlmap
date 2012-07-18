@@ -5,6 +5,11 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
+import zipfile
+
+from lib.core.exception import sqlmapDataException
+
 class Wordlist:
     """
     Iterator for looping over a large dictionaries
@@ -32,7 +37,14 @@ class Wordlist:
             self.iter = iter(self.custom)
         else:
             current = self.filenames[self.index]
-            self.fp = open(current, "r")
+            if os.path.splitext(current)[1].lower() == ".zip":
+                _ = zipfile.ZipFile(current, 'r')
+                if len(_.namelist()) == 0:
+                    errMsg = "no file(s) inside '%s'" % current
+                    raise sqlmapDataException, errMsg
+                self.fp = _.open(_.namelist()[0])
+            else:
+                self.fp = open(current, 'r')
             self.iter = iter(self.fp)
 
         self.index += 1
