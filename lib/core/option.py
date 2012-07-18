@@ -1541,7 +1541,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.testedParams = set()
         kb.userAgents = None
         kb.vainRun = True
-        kb.wordlist = None
+        kb.wordlists = None
 
 def __useWizardInterface():
     """

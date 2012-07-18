@@ -410,10 +410,12 @@ def hashRecognition(value):
 
     return retVal
 
-def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, proc_id, proc_count):
+def __bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
     count = 0
     rotator = 0
     hashes = set([item[0][1] for item in attack_info])
+
+    wordlist = Wordlist(wordlists, proc_id, getattr(proc_count, "value", 0), custom_wordlist)
 
     try:
         for word in wordlist:
@@ -451,7 +453,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
 
                             attack_info.remove(item)
 
-                elif (proc_id == 0 or getattr(proc_count, 'value', 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                elif (proc_id == 0 or getattr(proc_count, "value", 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                     rotator += 1
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
@@ -477,9 +479,11 @@ def __bruteProcessVariantA(attack_info, hash_regex, wordlist, suffix, retVal, pr
         if hasattr(proc_count, 'value'):
             proc_count.value -= 1
 
-def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, retVal, found, proc_id, proc_count):
+def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
     count = 0
     rotator = 0
+
+    wordlist = Wordlist(wordlists, proc_id, getattr(proc_count, "value", 0), custom_wordlist)
 
     try:
         for word in wordlist:
@@ -515,7 +519,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
                     found.value = True
 
-                elif (proc_id == 0 or getattr(proc_count, 'value', 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
+                elif (proc_id == 0 or getattr(proc_count, "value", 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                     rotator += 1
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
@@ -545,6 +549,7 @@ def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, wordlist, suffix, re
 
 def dictionaryAttack(attack_dict):
     suffix_list = [""]
+    custom_wordlist = []
     hash_regexes = []
     results = []
     resumes = []
@@ -610,8 +615,8 @@ def dictionaryAttack(attack_dict):
         if not attack_info:
             continue
 
-        if not kb.wordlist:
-            while not kb.wordlist:
+        if not kb.wordlists:
+            while not kb.wordlists:
 
                 # the slowest of all methods hence smaller default dict
                 if hash_regex in (HASH.ORACLE_OLD, HASH.WORDPRESS):
@@ -644,10 +649,7 @@ def dictionaryAttack(attack_dict):
                     for dictPath in dictPaths:
                         checkFile(dictPath)
 
-                    kb.wordlist = Wordlist(dictPaths)
-
-                    if _multiprocessing:
-                        kb.wordlist.lock = _multiprocessing.Lock()
+                    kb.wordlists = dictPaths
 
                 except sqlmapFilePathException, msg:
                     warnMsg = "there was a problem while loading dictionaries"
@@ -665,9 +667,8 @@ def dictionaryAttack(attack_dict):
 
         for item in attack_info:
             ((user, _), _) = item
-
             if user and not user.startswith(DUMMY_USER_PREFIX):
-                kb.wordlist.append(normalizeUnicode(user))
+                custom_wordlist.append(normalizeUnicode(user))
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             for suffix in suffix_list:
@@ -679,13 +680,11 @@ def dictionaryAttack(attack_dict):
                     infoMsg = "using suffix '%s'" % suffix
                     logger.info(infoMsg)
 
-                kb.wordlist.rewind()
-
                 retVal = None
                 processes = []
 
                 try:
-                    if _multiprocessing and not IS_WIN:
+                    if _multiprocessing:
                         if _multiprocessing.cpu_count() > 1:
                             infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                             singleTimeLogMessage(infoMsg)
@@ -694,7 +693,7 @@ def dictionaryAttack(attack_dict):
                         count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                         for i in xrange(_multiprocessing.cpu_count()):
-                            p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, kb.wordlist, suffix, retVal, i, count))
+                            p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, suffix, retVal, i, count, kb.wordlists, custom_wordlist))
                             processes.append(p)
 
                         for p in processes:
@@ -709,7 +708,7 @@ def dictionaryAttack(attack_dict):
                         singleTimeWarnMessage(warnMsg)
 
                         retVal = Queue()
-                        __bruteProcessVariantA(attack_info, hash_regex, kb.wordlist, suffix, retVal, 0, 1)
+                        __bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist)
 
                 except KeyboardInterrupt:
                     print
@@ -751,13 +750,11 @@ def dictionaryAttack(attack_dict):
                         infoMsg = "using suffix '%s'" % suffix
                         logger.info(infoMsg)
 
-                    kb.wordlist.rewind()
-
                     retVal = None
                     processes = []
 
                     try:
-                        if _multiprocessing and not IS_WIN:
+                        if _multiprocessing:
                             if _multiprocessing.cpu_count() > 1:
                                 infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                                 singleTimeLogMessage(infoMsg)
@@ -767,7 +764,7 @@ def dictionaryAttack(attack_dict):
                             count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                             for i in xrange(_multiprocessing.cpu_count()):
-                                p = _multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, i, count))
+                                p = _multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, suffix, retVal, found_, i, count, kb.wordlists, custom_wordlist))
                                 processes.append(p)
 
                             for p in processes:
@@ -790,7 +787,7 @@ def dictionaryAttack(attack_dict):
                             found_ = Value()
                             found_.value = False
 
-                            __bruteProcessVariantB(user, hash_, kwargs, hash_regex, kb.wordlist, suffix, retVal, found_, 0, 1)
+                            __bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found_, 0, 1, kb.wordlists, custom_wordlist)
 
                             found = found_.value
 

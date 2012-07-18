@@ -5,21 +5,21 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import singleTimeLogMessage
-
 class Wordlist:
     """
     Iterator for looping over a large dictionaries
     """
 
-    def __init__(self, filenames):
+    def __init__(self, filenames, proc_id=None, proc_count=None, custom=None):
         self.filenames = filenames
         self.fp = None
         self.index = 0
+        self.counter = -1
         self.iter = None
-        self.custom = []
+        self.custom = custom or []
+        self.proc_id = proc_id
+        self.proc_count = proc_count
         self.adjust()
-        self.lock = None
 
     def __iter__(self):
         return self
@@ -29,22 +29,17 @@ class Wordlist:
         if self.index > len(self.filenames):
             raise StopIteration
         elif self.index == len(self.filenames):
-            if self.custom:
+            if not self.proc_id:
                 self.iter = iter(self.custom)
             else:
                 raise StopIteration
         else:
             current = self.filenames[self.index]
-            infoMsg = "loading dictionary from '%s'" % current
-            singleTimeLogMessage(infoMsg)
             self.fp = open(current, "r")
             self.iter = iter(self.fp)
 
         self.index += 1
 
-    def append(self, value):
-        self.custom.append(value)
-        
     def closeFP(self):
         if self.fp:
             self.fp.close()
@@ -52,16 +47,17 @@ class Wordlist:
 
     def next(self):
         retVal = None
-        if self.lock:
-            self.lock.acquire()
-        try:
-            retVal = self.iter.next().rstrip()
-        except StopIteration:
-            self.adjust()
-            retVal = self.iter.next().rstrip()
-        finally:
-            if self.lock:
-                self.lock.release()
+        while True:
+            try:
+                retVal = self.iter.next().rstrip()
+            except StopIteration:
+                self.adjust()
+                retVal = self.iter.next().rstrip()
+            if not self.proc_count:
+                break
+            self.counter += 1
+            if self.counter % self.proc_count == self.proc_id:
+                break
         return retVal
 
     def rewind(self):
