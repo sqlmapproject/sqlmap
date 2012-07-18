@@ -24,14 +24,14 @@ DNS exfiltration technique (option `--dns-domain`):
 Replicating table to a local SQLite3 database (switch `--replicate`):
 ![Replicated table](images/sqlmap_replicate_result.png)
 
-OS pwn (Meterpreter) (switch `--os-pwn`):
-![OS pwn](images/sqlmap_os_pwn.png)
+OS pwn mode (Meterpreter) (switch `--os-pwn`):
+![OS pwn mode](images/sqlmap_os_pwn.png)
 
-OS shell (switch `--os-shell`):
-![SQL shell](images/sqlmap_os_shell.png)
+OS shell mode (switch `--os-shell`):
+![SQL shell mode](images/sqlmap_os_shell.png)
 
-SQL shell (switch `--sql-shell`):
-![SQL shell](images/sqlmap_sql_shell.png)
+SQL shell mode (switch `--sql-shell`):
+![SQL shell mode](images/sqlmap_sql_shell.png)
 
 Wizard mode (switch `--wizard`):
 ![Wizard mode](images/sqlmap_wizard.png)
