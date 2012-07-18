@@ -14,13 +14,6 @@ import warnings
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-try:
-    import psyco
-    psyco.full()
-    psyco.profile()
-except ImportError:
-    pass
-
 from lib.controller.controller import start
 from lib.core.common import banner
 from lib.core.common import dataToStdout
