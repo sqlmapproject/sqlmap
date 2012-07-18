@@ -29,10 +29,7 @@ class Wordlist:
         if self.index > len(self.filenames):
             raise StopIteration
         elif self.index == len(self.filenames):
-            if not self.proc_id:
-                self.iter = iter(self.custom)
-            else:
-                raise StopIteration
+            self.iter = iter(self.custom)
         else:
             current = self.filenames[self.index]
             self.fp = open(current, "r")
@@ -48,15 +45,13 @@ class Wordlist:
     def next(self):
         retVal = None
         while True:
+            self.counter += 1
             try:
                 retVal = self.iter.next().rstrip()
             except StopIteration:
                 self.adjust()
                 retVal = self.iter.next().rstrip()
-            if not self.proc_count:
-                break
-            self.counter += 1
-            if self.counter % self.proc_count == self.proc_id:
+            if not self.proc_count or self.counter % self.proc_count == self.proc_id:
                 break
         return retVal
 
