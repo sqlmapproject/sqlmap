@@ -546,8 +546,6 @@ class Entries:
                     conf.dumper.dbTableValues(data)
 
     def dumpFoundTables(self, tables):
-        print "tables:", tables
-
         message = "do you want to dump tables' entries? [Y/n] "
         output = readInput(message, default="Y")
 
