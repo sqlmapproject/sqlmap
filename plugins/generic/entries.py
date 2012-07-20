@@ -483,14 +483,6 @@ class Entries:
                         logger.info(infoMsg)
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
-        if not dbs:
-            warnMsg = "no databases have tables containing any of the "
-            warnMsg += "provided columns"
-            logger.warn(warnMsg)
-            return
-
-        conf.dumper.dbColumns(foundCols, colConsider, dbs)
-
         message = "do you want to dump entries? [Y/n] "
         output = readInput(message, default="Y")
 
@@ -549,6 +541,67 @@ class Entries:
                 kb.data.dumpedTable = {}
 
                 data = self.dumpTable(dbs)
+
+                if data:
+                    conf.dumper.dbTableValues(data)
+
+    def dumpFoundTables(self, tables):
+        print "tables:", tables
+
+        message = "do you want to dump tables' entries? [Y/n] "
+        output = readInput(message, default="Y")
+
+        if output and output[0].lower() != "y":
+            return
+
+        dumpFromDbs = []
+        message = "which database(s)?\n[a]ll (default)\n"
+
+        for db, tablesList in tables.items():
+            if tablesList:
+                message += "[%s]\n" % db
+
+        message += "[q]uit"
+        test = readInput(message, default="a")
+
+        if not test or test.lower() == "a":
+            dumpFromDbs = tables.keys()
+        elif test.lower() == "q":
+            return
+        else:
+            dumpFromDbs = test.replace(" ", "").split(",")
+
+        for db, tablesList in tables.items():
+            if db not in dumpFromDbs or not tablesList:
+                continue
+
+            conf.db = db
+            dumpFromTbls = []
+            message = "which table(s) of database '%s'?\n" % db
+            message += "[a]ll (default)\n"
+
+            for tbl in tablesList:
+                message += "[%s]\n" % tbl
+
+            message += "[s]kip\n"
+            message += "[q]uit"
+            test = readInput(message, default="a")
+
+            if not test or test.lower() == "a":
+                dumpFromTbls = tablesList
+            elif test.lower() == "s":
+                continue
+            elif test.lower() == "q":
+                return
+            else:
+                dumpFromTbls = test.replace(" ", "").split(",")
+
+            for table in dumpFromTbls:
+                conf.tbl = table
+                kb.data.cachedColumns = {}
+                kb.data.dumpedTable = {}
+
+                data = self.dumpTable()
 
                 if data:
                     conf.dumper.dbTableValues(data)

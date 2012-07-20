@@ -282,7 +282,13 @@ class Search:
                         foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
                         foundTbls[db].append(foundTbl)
 
-        return foundTbls
+        if not foundTbls:
+            warnMsg = "no databases contain any of the provided tables"
+            logger.warn(warnMsg)
+            return
+
+        conf.dumper.dbTables(foundTbls)
+        self.dumpFoundTables(foundTbls)
 
     def searchColumn(self):
         bruteForce = False
@@ -519,6 +525,13 @@ class Search:
                             else:
                                 foundCols[column][db] = [tbl]
 
+        if not foundCols:
+            warnMsg = "no databases have tables containing any of the "
+            warnMsg += "provided columns"
+            logger.warn(warnMsg)
+            return
+
+        conf.dumper.dbColumns(foundCols, colConsider, dbs)
         self.dumpFoundColumn(dbs, foundCols, colConsider)
 
     def search(self):
@@ -531,12 +544,12 @@ class Search:
             self.searchColumn()
 
         elif conf.tbl:
-            conf.dumper.dbTables(self.searchTable())
+            self.searchTable()
 
         elif conf.db:
             conf.dumper.lister("found databases", self.searchDb())
 
         else:
-            errMsg = "missing parameter, provide -D, -T or -C together "
+            errMsg = "missing parameter, provide -D, -T or -C along "
             errMsg += "with --search"
             raise sqlmapMissingMandatoryOptionException, errMsg
