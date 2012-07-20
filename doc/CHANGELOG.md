@@ -1,96 +1,96 @@
 # Version 1.0 (upcoming)
 
-* Implemented support for automatic decoding of page content through detected charset (Miroslav)
-* Implemented mechanism for proper data dumping on DBMSes not supporting LIMIT/OFFSET like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.) (Miroslav)
-* Major improvements to program stabilization based on user reports (Miroslav)
-* Added new tampering scripts avoiding popular WAF/IPS/IDS mechanisms (Miroslav)
-* Added support for setting Tor proxy type together with port (Miroslav)
-* Fixed major bug with DNS leaking in Tor mode (Miroslav)
-* Added wordlist compilation made of the most popular cracking dictionaries (Miroslav)
-* Added support for mnemonics substantially helping user with program setup (Miroslav)
-* Implemented multi-processor hash cracking routine(s) on Linux OS (Miroslav)
-* Implemented advanced detection techniques for inband and time-based injections by usage of standard deviation method (Miroslav)
-* Old resume files are now deprecated and replaced by faster SQLite based session mechanism (Miroslav)
-* Substantial code optimization and smaller memory footprint (Miroslav)
-* Added switch -m for scanning multiple targets enlisted in a given textual file (Miroslav)
-* Added switch --randomize for randomly changing value of a given parameter(s) based on it's original form (Miroslav)
-* Added switch --force-ssl for forcing usage of SSL/HTTPS requests (Miroslav)
-* Added switch --host for manually setting HTTP Host header value (Miroslav)
-* Added switch --eval for evaluating provided Python code (with resulting parameter values) right before the request itself (Miroslav)
-* Added switch --skip for skipping tests for given parameter(s) (Miroslav)
-* Added switch --titles for comparing pages based only on their titles (Miroslav)
-* Added switch --charset for forcing character encoding used for data retrieval (Miroslav)
-* Added switch --check-tor for checking if Tor is used properly (Miroslav)
-* Added switch --crawl for multithreaded crawling of a given website starting from the target url (Miroslav)
-* Added switch --csv-del for manually setting delimiting character used in CSV output (Miroslav)
-* Added switch --hex for using DBMS hex conversion function(s) for data retrieval (Miroslav)
-* Added switch --smart for conducting through tests only in case of positive heuristic(s) (Miroslav)
-* Added switch --check-waf for checking of existence of WAF/IPS/IDS protection (Miroslav)
-* Added --schema switch to enumerate DBMS schema: shows all columns of all databases' tables (Bernardo)
-* Added --count switch to count the number of entries for a specific table or all database(s) tables (Bernardo)
-* Major improvements to --tables and --columns switches (Bernardo)
-* Takeover switch --os-pwn improved: stealthier, faster and AV-proof (Bernardo)
-* Added --mobile switch to imitate a mobile device through HTTP User-Agent header (Miroslav)
+* Implemented support for automatic decoding of page content through detected charset
+* Implemented mechanism for proper data dumping on DBMSes not supporting LIMIT/OFFSET like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.)
+* Major improvements to program stabilization based on user reports
+* Added new tampering scripts avoiding popular WAF/IPS/IDS mechanisms
+* Added support for setting Tor proxy type together with port
+* Fixed major bug with DNS leaking in Tor mode
+* Added wordlist compilation made of the most popular cracking dictionaries
+* Added support for mnemonics substantially helping user with program setup
+* Implemented multi-processor hash cracking routine(s) on Linux OS
+* Implemented advanced detection techniques for inband and time-based injections by usage of standard deviation method
+* Old resume files are now deprecated and replaced by faster SQLite based session mechanism
+* Substantial code optimization and smaller memory footprint
+* Added switch -m for scanning multiple targets enlisted in a given textual file
+* Added switch --randomize for randomly changing value of a given parameter(s) based on it's original form
+* Added switch --force-ssl for forcing usage of SSL/HTTPS requests
+* Added switch --host for manually setting HTTP Host header value
+* Added switch --eval for evaluating provided Python code (with resulting parameter values) right before the request itself
+* Added switch --skip for skipping tests for given parameter(s)
+* Added switch --titles for comparing pages based only on their titles
+* Added switch --charset for forcing character encoding used for data retrieval
+* Added switch --check-tor for checking if Tor is used properly
+* Added switch --crawl for multithreaded crawling of a given website starting from the target url
+* Added switch --csv-del for manually setting delimiting character used in CSV output
+* Added switch --hex for using DBMS hex conversion function(s) for data retrieval
+* Added switch --smart for conducting through tests only in case of positive heuristic(s)
+* Added switch --check-waf for checking of existence of WAF/IPS/IDS protection
+* Added --schema switch to enumerate DBMS schema: shows all columns of all databases' tables
+* Added --count switch to count the number of entries for a specific table or all database(s) tables
+* Major improvements to --tables and --columns switches
+* Takeover switch --os-pwn improved: stealthier, faster and AV-proof
+* Added --mobile switch to imitate a mobile device through HTTP User-Agent header
 
 # Version 0.9 (2011-04-10)
 
-* Rewritten SQL injection detection engine (Bernardo and Miroslav).
-* Support to directly connect to the database without passing via a SQL injection, -d switch (Bernardo and Miroslav).
-* Added full support for both time-based blind SQL injection and error-based SQL injection techniques (Bernardo and Miroslav).
-* Implemented support for SQLite 2 and 3 (Bernardo and Miroslav).
-* Implemented support for Firebird (Bernardo and Miroslav).
-* Implemented support for Microsoft Access, Sybase and SAP MaxDB (Miroslav).
-* Extended old '--dump -C' functionality to be able to search for specific database(s), table(s) and column(s), --search switch (Bernardo).
-* Added support to tamper injection data with --tamper switch (Bernardo and Miroslav).
-* Added automatic recognition of password hashes format and support to crack them with a dictionary-based attack (Miroslav).
-* Added support to enumerate roles on Oracle, --roles switch (Bernardo).
-* Added support for SOAP based web services requests (Bernardo).
-* Added support to fetch unicode data (Bernardo and Miroslav).
-* Added support to use persistent HTTP(s) connection for speed improvement, --keep-alive switch (Miroslav).
-* Implemented several optimization switches to speed up the exploitation of SQL injections (Bernardo and Miroslav).
-* Support to test and inject against HTTP Referer header (Miroslav).
-* Implemented HTTP(s) proxy authentication support, --proxy-cred switch (Miroslav).
-* Implemented feature to speedup the enumeration of table names (Miroslav).
-* Support for customizable HTTP(s) redirections (Bernardo).
-* Support to replicate the back-end DBMS tables structure and entries in a local SQLite 3 database, --replicate switch (Miroslav).
-* Support to parse and test forms on target url, --forms switch (Bernardo and Miroslav).
-* Added switches to brute-force tables names and columns names with a dictionary attack, --common-tables and --common-columns. Useful for instance when system table 'information_schema' is not available on MySQL (Miroslav).
-* Basic support for REST-style URL parameters by using the asterisk (*) to mark where to test for and exploit SQL injection (Miroslav).
-* Added safe URL feature, --safe-url and --safe-freq (Miroslav).
-* Added --text-only switch to strip from the HTTP response body the HTML/JS code and compare pages based only on their textual content (Miroslav).
-* Implemented few other features and switches (Bernardo and Miroslav).
-* Over 100 bugs fixed (Bernardo and Miroslav).
-* Major code refactoring (Bernardo and Miroslav).
-* User's manual updated (Bernardo).
+* Rewritten SQL injection detection engine.
+* Support to directly connect to the database without passing via a SQL injection, -d switch.
+* Added full support for both time-based blind SQL injection and error-based SQL injection techniques.
+* Implemented support for SQLite 2 and 3.
+* Implemented support for Firebird.
+* Implemented support for Microsoft Access, Sybase and SAP MaxDB.
+* Extended old '--dump -C' functionality to be able to search for specific database(s), table(s) and column(s), --search switch.
+* Added support to tamper injection data with --tamper switch.
+* Added automatic recognition of password hashes format and support to crack them with a dictionary-based attack.
+* Added support to enumerate roles on Oracle, --roles switch.
+* Added support for SOAP based web services requests.
+* Added support to fetch unicode data.
+* Added support to use persistent HTTP(s) connection for speed improvement, --keep-alive switch.
+* Implemented several optimization switches to speed up the exploitation of SQL injections.
+* Support to test and inject against HTTP Referer header.
+* Implemented HTTP(s) proxy authentication support, --proxy-cred switch.
+* Implemented feature to speedup the enumeration of table names.
+* Support for customizable HTTP(s) redirections.
+* Support to replicate the back-end DBMS tables structure and entries in a local SQLite 3 database, --replicate switch.
+* Support to parse and test forms on target url, --forms switch.
+* Added switches to brute-force tables names and columns names with a dictionary attack, --common-tables and --common-columns. Useful for instance when system table 'information_schema' is not available on MySQL.
+* Basic support for REST-style URL parameters by using the asterisk (*) to mark where to test for and exploit SQL injection.
+* Added safe URL feature, --safe-url and --safe-freq.
+* Added --text-only switch to strip from the HTTP response body the HTML/JS code and compare pages based only on their textual content.
+* Implemented few other features and switches.
+* Over 100 bugs fixed.
+* Major code refactoring.
+* User's manual updated.
 
 # Version 0.8 (2010-03-14)
 
-* Support to enumerate and dump all databases' tables containing user provided column(s) by specifying for instance '--dump -C user,pass'. Useful to identify for instance tables containing custom application credentials (Bernardo).
-* Support to parse -C (column name(s)) when fetching columns of a table with --columns: it will enumerate only columns like the provided one(s) within the specified table (Bernardo).
-* Support for takeover features on PostgreSQL 8.4 (Bernardo).
-* Enhanced --priv-esc to rely on new Metasploit Meterpreter's 'getsystem' command to elevate privileges of the user running the back-end DBMS instance to SYSTEM on Windows (Bernardo).
-* Automatic support in --os-pwn to use the web uploader/backdoor to upload and execute the Metasploit payload stager when stacked queries SQL injection is not supported, for instance on MySQL/PHP and MySQL/ASP, but there is a writable folder within the web server document root (Bernardo and Miroslav).
-* Fixed web backdoor functionality for --os-cmd, --os-shell and --os-pwn useful when web application does not support stacked queries (Bernardo).
-* Added support to properly read (--read-file) also binary files via PostgreSQL by injecting sqlmap new sys_fileread() user-defined function (Bernardo and Miroslav).
-* Updated active fingerprint and comment injection fingerprint for MySQL 5.1, MySQL 5.4 and MySQL 5.5 (Bernardo).
-* Updated active fingerprint for PostgreSQL 8.4 (Bernardo).
-* Support for NTLM authentication via python-ntlm third party library, http://code.google.com/p/python-ntlm/, --auth-type NTLM (Bernardo).
-* Support to automatically decode deflate, gzip and x-gzip HTTP responses (Miroslav).
-* Support for Certificate authentication, --auth-cert option added (Miroslav).
-* Added support for regular expression based scope when parsing Burp or Web Scarab proxy log file (-l), --scope (Miroslav).
-* Added option (-r) to load a single HTTP request from a text file (Miroslav).
-* Added option (--ignore-proxy) to ignore system default HTTP proxy (Miroslav).
-* Added support to ignore Set-Cookie in HTTP responses, --drop-set-cookie (Miroslav).
-* Added support to specify which Google dork result page to parse, --gpage to be used together with -g (Miroslav).
-* Major bug fix and enhancements to the multi-threading (--threads) functionality (Miroslav).
-* Fixed URL encoding/decoding of GET/POST parameters and Cookie header (Miroslav).
-* Refactored --update to use python-svn third party library if available or 'svn' command to update sqlmap to the latest development version from subversion repository (Bernardo and Miroslav).
-* Major bugs fixed (Bernardo and Miroslav).
-* Cleanup of UDF source code repository, https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack (Bernardo and Miroslav).
-* Major code cleanup (Miroslav).
-* Added simple file encryption/compression utility, extra/cloak/cloak.py, used by sqlmap to decrypt on the fly Churrasco, UPX executable and web shells consequently reducing drastically the number of anti-virus softwares that mistakenly mark sqlmap as a malware (Miroslav).
-* Updated user's manual (Bernardo and Miroslav).
-* Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://www.sqlmap.org/demo.html (Bernardo).
+* Support to enumerate and dump all databases' tables containing user provided column(s) by specifying for instance '--dump -C user,pass'. Useful to identify for instance tables containing custom application credentials.
+* Support to parse -C (column name(s)) when fetching columns of a table with --columns: it will enumerate only columns like the provided one(s) within the specified table.
+* Support for takeover features on PostgreSQL 8.4.
+* Enhanced --priv-esc to rely on new Metasploit Meterpreter's 'getsystem' command to elevate privileges of the user running the back-end DBMS instance to SYSTEM on Windows.
+* Automatic support in --os-pwn to use the web uploader/backdoor to upload and execute the Metasploit payload stager when stacked queries SQL injection is not supported, for instance on MySQL/PHP and MySQL/ASP, but there is a writable folder within the web server document root.
+* Fixed web backdoor functionality for --os-cmd, --os-shell and --os-pwn useful when web application does not support stacked queries.
+* Added support to properly read (--read-file) also binary files via PostgreSQL by injecting sqlmap new sys_fileread() user-defined function.
+* Updated active fingerprint and comment injection fingerprint for MySQL 5.1, MySQL 5.4 and MySQL 5.5.
+* Updated active fingerprint for PostgreSQL 8.4.
+* Support for NTLM authentication via python-ntlm third party library, http://code.google.com/p/python-ntlm/, --auth-type NTLM.
+* Support to automatically decode deflate, gzip and x-gzip HTTP responses.
+* Support for Certificate authentication, --auth-cert option added.
+* Added support for regular expression based scope when parsing Burp or Web Scarab proxy log file (-l), --scope.
+* Added option (-r) to load a single HTTP request from a text file.
+* Added option (--ignore-proxy) to ignore system default HTTP proxy.
+* Added support to ignore Set-Cookie in HTTP responses, --drop-set-cookie.
+* Added support to specify which Google dork result page to parse, --gpage to be used together with -g.
+* Major bug fix and enhancements to the multi-threading (--threads) functionality.
+* Fixed URL encoding/decoding of GET/POST parameters and Cookie header.
+* Refactored --update to use python-svn third party library if available or 'svn' command to update sqlmap to the latest development version from subversion repository.
+* Major bugs fixed.
+* Cleanup of UDF source code repository, https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack.
+* Major code cleanup.
+* Added simple file encryption/compression utility, extra/cloak/cloak.py, used by sqlmap to decrypt on the fly Churrasco, UPX executable and web shells consequently reducing drastically the number of anti-virus softwares that mistakenly mark sqlmap as a malware.
+* Updated user's manual.
+* Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://www.sqlmap.org/demo.html.
 
 # Version 0.8 release candidate (2009-09-21)
 
