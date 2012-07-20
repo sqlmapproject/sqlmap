@@ -261,6 +261,7 @@ class Enumeration(GenericEnumeration):
         dbs = {}
         whereTblsQuery = ""
         infoMsgTbl = ""
+        infoMsgDb = ""
         colList = conf.col.split(",")
         origTbl = conf.tbl
         origDb = conf.db
@@ -296,7 +297,16 @@ class Enumeration(GenericEnumeration):
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
 
-            logger.info("%s%s" % (infoMsg, infoMsgTbl))
+            if conf.db and conf.db != CURRENT_DB:
+                _ = conf.db.split(",")
+                infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+            elif conf.excludeSysDbs:
+                infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                logger.info(infoMsg2)
+            else:
+                infoMsgDb = " across all databases"
+
+            logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
@@ -305,9 +315,6 @@ class Enumeration(GenericEnumeration):
                 db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    infoMsg = "skipping system database '%s'" % db
-                    logger.info(infoMsg)
-
                     continue
 
                 if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
@@ -354,11 +361,12 @@ class Enumeration(GenericEnumeration):
                     if colConsider == "1":
                         infoMsg += "s like"
                     infoMsg += " '%s' in database '%s'" % (column, db)
-                    logger.info(infoMsg)
+                    logger.info("%s%s" % (infoMsg, infoMsgTbl))
 
                     query = rootQuery.blind.count
                     query = query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
+                    query += whereTblsQuery.replace("[DB]", db)
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
@@ -377,6 +385,7 @@ class Enumeration(GenericEnumeration):
                         query = rootQuery.blind.query
                         query = query % (db, db, db, db, db, db)
                         query += " AND %s" % colQuery.replace("[DB]", db)
+                        query += whereTblsQuery.replace("[DB]", db)
                         query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
                         tbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = tbl
