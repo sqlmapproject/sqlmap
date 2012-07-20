@@ -464,12 +464,17 @@ class Search:
                         if db not in foundCols[column]:
                             foundCols[column][db] = []
 
+                origDb = conf.db
+                origTbl = conf.tbl
+
                 for column, dbData in foundCols.items():
                     colQuery = "%s%s" % (colCond, colCondParam)
                     colQuery = colQuery % column
 
                     for db in dbData:
                         db = safeSQLIdentificatorNaming(db)
+                        conf.db = origDb
+                        conf.tbl = origTbl
 
                         infoMsg = "fetching number of tables containing column"
                         if colConsider == "1":
