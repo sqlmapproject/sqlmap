@@ -154,12 +154,10 @@ class Search:
 
         foundTbls = {}
         tblList = conf.tbl.split(",")
-
         rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
         whereDbsQuery = ""
-
         tblConsider, tblCondParam = self.likeOrExact("table")
 
         for tbl in tblList:

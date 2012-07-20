@@ -158,15 +158,16 @@ class Enumeration(GenericEnumeration):
         return kb.data.cachedTables
 
     def searchTable(self):
-        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         foundTbls = {}
         tblList = conf.tbl.split(",")
+        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         #dbCond = rootQuery.inband.condition2
-
         tblConsider, tblCondParam = self.likeOrExact("table")
 
-        if not len(kb.data.cachedDbs):
+        if conf.db and conf.db != CURRENT_DB:
+            enumDbs = conf.db.split(",")
+        elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
         else:
             enumDbs = kb.data.cachedDbs
@@ -247,7 +248,13 @@ class Enumeration(GenericEnumeration):
             if len(tbls) == 0:
                 foundTbls.pop(db)
 
-        return foundTbls
+        if not foundTbls:
+            warnMsg = "no databases contain any of the provided tables"
+            logger.warn(warnMsg)
+            return
+
+        conf.dumper.dbTables(foundTbls)
+        self.dumpFoundTables(foundTbls)
 
     def searchColumn(self):
         rootQuery = queries[Backend.getIdentifiedDbms()].search_column
