@@ -707,24 +707,24 @@ x, <deep_freeze@mail.ru>
 
 Black Hat team, <info@blackhat.com>
 * for the opportunity to present my research titled 'Advanced SQL injection to operating system full control' at Black Hat Europe 2009 Briefings on April 16, 2009 in Amsterdam (NL). I unveiled and demonstrated some of the sqlmap 0.7 release candidate version new features during my presentation
-    Homepage: http://goo.gl/BKfs7
-    Slides: http://goo.gl/Dh65t
-    White paper: http://goo.gl/spX3N
+ * Homepage: http://goo.gl/BKfs7
+ * Slides: http://goo.gl/Dh65t
+ * White paper: http://goo.gl/spX3N
 
 SOURCE Conference team, <press@sourceconference.com>
 * for the opportunity to present my research titled 'Expanding the control over the operating system from the database' at SOURCE Conference 2009 on September 21, 2009 in Barcelona (ES). I unveiled and demonstrated some of the sqlmap 0.8 release candidate version new features during my presentation
-    Homepage: http://goo.gl/IeXV4
-    Slides: http://goo.gl/OKnfj
+ * Homepage: http://goo.gl/IeXV4
+ * Slides: http://goo.gl/OKnfj
 
 AthCon Conference team, <cfp@athcon.org>
 * for the opportunity to present my research titled 'Got database access? Own the network!' at AthCon Conference 2010 on June 3, 2010 in Athens (GR). I unveiled and demonstrated some of the sqlmap 0.8 version features during my presentation
-    Homepage: http://goo.gl/Fs71I
-    Slides: http://goo.gl/QMfjO
+ * Homepage: http://goo.gl/Fs71I
+ * Slides: http://goo.gl/QMfjO
 
 Metasploit Framework development team, <msfdev@metasploit.com>
 * for their powerful tool Metasploit Framework, used by sqlmap, among others things, to create the shellcode and establish an out-of-band connection between sqlmap and the database server
-    Homepage: http://www.metasploit.com
+ * Homepage: http://www.metasploit.com
 
 OWASP Board, <info@owasp.org>
 * for sponsoring part of the sqlmap development in the context of OWASP Spring of Code 2007
-    Homepage: http://www.owasp.org
+ * Homepage: http://www.owasp.org
