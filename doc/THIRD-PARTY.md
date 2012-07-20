@@ -3,25 +3,25 @@ This file lists bundled packages and their associated licensing terms.
 # BSD
 
  - The Ansistrm library located under thirdparty/ansistrm/.
-  Copyright (C) 2010-2012 Vinay Sajip
+   Copyright (C) 2010-2012 Vinay Sajip
  - The Beautiful Soup library located under thirdparty/beautifulsoup/.
-  Copyright (C) 2004-2010, Leonard Richardson
+   Copyright (C) 2004-2010, Leonard Richardson
  - The ClientForm library located under thirdparty/clientform/.
-  Copyright (C) 2002-2007 John J. Lee
-  Copyright (C) 2005 Gary Poster
-  Copyright (C) 2005 Zope Corporation
-  Copyright (C) 1998-2000 Gisle Aas
+   Copyright (C) 2002-2007 John J. Lee
+   Copyright (C) 2005 Gary Poster
+   Copyright (C) 2005 Zope Corporation
+   Copyright (C) 1998-2000 Gisle Aas
  - The Colorama library located under thirdparty/colorama/.
-  Copyright (C) 2010 Jonathan Hartley
+   Copyright (C) 2010 Jonathan Hartley
  - The Fcrypt library located under thirdparty/fcrypt/.
-  Copyright (C) 2000, 2001, 2004 Carey Evans
+   Copyright (C) 2000, 2001, 2004 Carey Evans
  - The Odict library located under thirdparty/odict/.
-  Copyright (C) 2005 Nicola Larosa, Michael Foord
+   Copyright (C) 2005 Nicola Larosa, Michael Foord
  - The Oset library located under thirdparty/oset/.
-  Copyright (C) 2010, BlueDynamics Alliance, Austria
-  Copyright (C) 2009, Raymond Hettinger, and others
+   Copyright (C) 2010, BlueDynamics Alliance, Austria
+   Copyright (C) 2009, Raymond Hettinger, and others
  - The SocksiPy library located under thirdparty/socks/.
- Copyright 2006 Dan-Haim
+   Copyright (C) 2006 Dan-Haim
 
 ````
 Redistribution and use in source and binary forms, with or without
