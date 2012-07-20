@@ -162,7 +162,6 @@ class Enumeration(GenericEnumeration):
         tblList = conf.tbl.split(",")
         rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
-        #dbCond = rootQuery.inband.condition2
         tblConsider, tblCondParam = self.likeOrExact("table")
 
         if conf.db and conf.db != CURRENT_DB:
@@ -260,11 +259,16 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[Backend.getIdentifiedDbms()].search_column
         foundCols = {}
         dbs = {}
+        whereTblsQuery = ""
+        infoMsgTbl = ""
         colList = conf.col.split(",")
+        origTbl = conf.tbl
+        origDb = conf.db
         colCond = rootQuery.inband.condition
+        tblCond = rootQuery.inband.condition2
         colConsider, colCondParam = self.likeOrExact("column")
 
-        if conf.db is not None:
+        if conf.db and conf.db != CURRENT_DB:
             enumDbs = conf.db.split(",")
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
@@ -277,14 +281,22 @@ class Enumeration(GenericEnumeration):
 
         for column in colList:
             column = safeSQLIdentificatorNaming(column)
+            conf.db = origDb
+            conf.tbl = origTbl
 
             infoMsg = "searching column"
             if colConsider == "1":
                 infoMsg += "s like"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
-            logger.info(infoMsg)
 
             foundCols[column] = {}
+
+            if conf.tbl:
+                _ = conf.tbl.split(",")
+                whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
+                infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
+
+            logger.info("%s%s" % (infoMsg, infoMsgTbl))
 
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
@@ -301,6 +313,7 @@ class Enumeration(GenericEnumeration):
                 if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                     query = rootQuery.inband.query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
+                    query += whereTblsQuery.replace("[DB]", db)
                     values = inject.getValue(query, blind=False)
 
                     if not isNoneValue(values):
@@ -388,4 +401,5 @@ class Enumeration(GenericEnumeration):
 
                         foundCols[column][db].append(tbl)
 
+        conf.dumper.dbColumns(foundCols, colConsider, dbs)
         self.dumpFoundColumn(dbs, foundCols, colConsider)
