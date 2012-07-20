@@ -2,26 +2,26 @@ This file lists bundled packages and their associated licensing terms.
 
 # BSD
 
- - The Ansistrm library located under thirdparty/ansistrm/.
-   Copyright (C) 2010-2012, Vinay Sajip.
- - The Beautiful Soup library located under thirdparty/beautifulsoup/.
-   Copyright (C) 2004-2010, Leonard Richardson.
- - The ClientForm library located under thirdparty/clientform/.
-   Copyright (C) 2002-2007, John J. Lee.
-   Copyright (C) 2005, Gary Poster.
-   Copyright (C) 2005, Zope Corporation.
-   Copyright (C) 1998-2000, Gisle Aas.
- - The Colorama library located under thirdparty/colorama/.
-   Copyright (C) 2010, Jonathan Hartley.
- - The Fcrypt library located under thirdparty/fcrypt/.
-   Copyright (C) 2000, 2001, 2004 Carey Evans.
- - The Odict library located under thirdparty/odict/.
-   Copyright (C) 2005, Nicola Larosa, Michael Foord.
- - The Oset library located under thirdparty/oset/.
-   Copyright (C) 2010, BlueDynamics Alliance, Austria.
-   Copyright (C) 2009, Raymond Hettinger, and others.
- - The SocksiPy library located under thirdparty/socks/.
-   Copyright (C) 2006, Dan-Haim.
+* The Ansistrm library located under thirdparty/ansistrm/.
+  Copyright (C) 2010-2012, Vinay Sajip.
+* The Beautiful Soup library located under thirdparty/beautifulsoup/.
+  Copyright (C) 2004-2010, Leonard Richardson.
+* The ClientForm library located under thirdparty/clientform/.
+  Copyright (C) 2002-2007, John J. Lee.
+  Copyright (C) 2005, Gary Poster.
+  Copyright (C) 2005, Zope Corporation.
+  Copyright (C) 1998-2000, Gisle Aas.
+* The Colorama library located under thirdparty/colorama/.
+  Copyright (C) 2010, Jonathan Hartley.
+* The Fcrypt library located under thirdparty/fcrypt/.
+  Copyright (C) 2000, 2001, 2004 Carey Evans.
+* The Odict library located under thirdparty/odict/.
+  Copyright (C) 2005, Nicola Larosa, Michael Foord.
+* The Oset library located under thirdparty/oset/.
+  Copyright (C) 2010, BlueDynamics Alliance, Austria.
+  Copyright (C) 2009, Raymond Hettinger, and others.
+* The SocksiPy library located under thirdparty/socks/.
+  Copyright (C) 2006, Dan-Haim.
 
 ````
 Redistribution and use in source and binary forms, with or without
@@ -49,18 +49,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # LGPL
 
- - The Chardet library located under thirdparty/chardet/.
-   Copyright (C) 2008, Mark Pilgrim.
- - The Gprof2dot library located under thirdparty/gprof2dot/.
-   Copyright (C) 2008-2009, Jose Fonseca.
- - The KeepAlive library located under thirdparty/keepalive/.
-   Copyright (C) 2002-2003, Michael D. Stenner.
- - The MultipartPost library located under thirdparty/multipartpost/.
-   Copyright (C) 2006, Will Holcomb.
- - The XDot library located under thirdparty/xdot/.
-   Copyright (C) 2008, Jose Fonseca.
- - The icmpsh tool located under extra/icmpsh/.
-   Copyright (C) 2010, Nico Leidecker, Bernardo Damele
+* The Chardet library located under thirdparty/chardet/.
+  Copyright (C) 2008, Mark Pilgrim.
+* The Gprof2dot library located under thirdparty/gprof2dot/.
+  Copyright (C) 2008-2009, Jose Fonseca.
+* The KeepAlive library located under thirdparty/keepalive/.
+  Copyright (C) 2002-2003, Michael D. Stenner.
+* The MultipartPost library located under thirdparty/multipartpost/.
+  Copyright (C) 2006, Will Holcomb.
+* The XDot library located under thirdparty/xdot/.
+  Copyright (C) 2008, Jose Fonseca.
+* The icmpsh tool located under extra/icmpsh/.
+  Copyright (C) 2010, Nico Leidecker, Bernardo Damele.
 
 ````
                    GNU LESSER GENERAL PUBLIC LICENSE
@@ -232,28 +232,81 @@ Library.
 
 # PSF
 
- - The Magic library located under thirdparty/magic/.
-   Copyright (C) 2011, Adam Hupp
+* The Magic library located under thirdparty/magic/.
+  Copyright (C) 2011, Adam Hupp.
 
 ````
 PSF LICENSE AGREEMENT FOR PYTHON 2.7.3
 
-This LICENSE AGREEMENT is between the Python Software Foundation (“PSF”), and the Individual or Organization (“Licensee”) accessing and otherwise using Python 2.7.3 software in source or binary form and its associated documentation.
-Subject to the terms and conditions of this License Agreement, PSF hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python 2.7.3 alone or in any derivative version, provided, however, that PSF’s License Agreement and PSF’s notice of copyright, i.e., “Copyright © 2001-2012 Python Software Foundation; All Rights Reserved” are retained in Python 2.7.3 alone or in any derivative version prepared by Licensee.
-In the event Licensee prepares a derivative work that is based on or incorporates Python 2.7.3 or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to Python 2.7.3.
-PSF is making Python 2.7.3 available to Licensee on an “AS IS” basis. PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 2.7.3 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
-PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON 2.7.3 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 2.7.3, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
-This License Agreement will automatically terminate upon a material breach of its terms and conditions.
-Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between PSF and Licensee. This License Agreement does not grant permission to use PSF trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
-By copying, installing or otherwise using Python 2.7.3, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+This LICENSE AGREEMENT is between the Python Software Foundation (“PSF”),
+and the Individual or Organization (“Licensee”) accessing and otherwise
+using Python 2.7.3 software in source or binary form and its associated
+documentation.
+Subject to the terms and conditions of this License Agreement, PSF hereby
+grants Licensee a nonexclusive, royalty-free, world-wide license to
+reproduce, analyze, test, perform and/or display publicly, prepare
+derivative works, distribute, and otherwise use Python 2.7.3 alone or in any
+derivative version, provided, however, that PSF’s License Agreement and
+PSF’s notice of copyright, i.e., “Copyright © 2001-2012 Python Software
+Foundation; All Rights Reserved” are retained in Python 2.7.3 alone or in
+any derivative version prepared by Licensee.
+In the event Licensee prepares a derivative work that is based on or
+incorporates Python 2.7.3 or any part thereof, and wants to make the
+derivative work available to others as provided herein, then Licensee hereby
+agrees to include in any such work a brief summary of the changes made to
+Python 2.7.3.
+PSF is making Python 2.7.3 available to Licensee on an “AS IS” basis. PSF
+MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF
+EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION
+OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT
+THE USE OF PYTHON 2.7.3 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON 2.7.3 FOR
+ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF
+MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 2.7.3, OR ANY DERIVATIVE
+THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+This License Agreement will automatically terminate upon a material breach
+of its terms and conditions.
+Nothing in this License Agreement shall be deemed to create any relationship
+of agency, partnership, or joint venture between PSF and Licensee. This
+License Agreement does not grant permission to use PSF trademarks or trade
+name in a trademark sense to endorse or promote products or services of
+Licensee, or any third party.
+By copying, installing or otherwise using Python 2.7.3, Licensee agrees to
+be bound by the terms and conditions of this License Agreement.
 ````
 
 # MIT
 
- - The PageRank library located under thirdparty/pagerank/.
- - The PrettyPrint library located under thirdparty/prettyprint/.
- - The Termcolor library located under thirdparty/termcolor/.
+* The PageRank library located under thirdparty/pagerank/.
+  Copyright (C) 2010, Corey Goldberg.
+* The PrettyPrint library located under thirdparty/prettyprint/.
+  Copyright (C) 2010, Chris Hall.
+* The Termcolor library located under thirdparty/termcolor/.
+  Copyright (C) 2008-2011, Volvox Development Team.
+
+````
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+````
 
 # Public domain
 
- - The PyDes library located under thirdparty/pydes/.
+* The PyDes library located under thirdparty/pydes/.
+   Copyleft 2009, Todd Whiteman.
