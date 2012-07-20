@@ -15,6 +15,8 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
+        return expression
+
         if isDBMSVersionAtLeast('3'):
             if quote:
                 expression = expression.replace("'", "''")

