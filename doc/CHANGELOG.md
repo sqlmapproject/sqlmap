@@ -1,4 +1,4 @@
-# sqlmap (1.0-1) stable; urgency=low
+# Version 1.0 (upcoming)
 
 * Implemented support for automatic decoding of page content through detected charset (Miroslav)
 * Implemented mechanism for proper data dumping on DBMSes not supporting LIMIT/OFFSET like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.) (Miroslav)
@@ -32,9 +32,7 @@
 * Takeover switch --os-pwn improved: stealthier, faster and AV-proof (Bernardo)
 * Added --mobile switch to imitate a mobile device through HTTP User-Agent header (Miroslav)
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  XXX, XX XXX 2011 10:00:00 +0000
-
-# sqlmap (0.9-1) stable; urgency=low
+# Version 0.9 (2011-04-10)
 
 * Rewritten SQL injection detection engine (Bernardo and Miroslav).
 * Support to directly connect to the database without passing via a SQL injection, -d switch (Bernardo and Miroslav).
@@ -65,9 +63,7 @@
 * Major code refactoring (Bernardo and Miroslav).
 * User's manual updated (Bernardo).
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun, 10 Apr 2011 21:00:00 +0000
-
-# sqlmap (0.8-1) stable; urgency=low
+# Version 0.8 (2010-03-14)
 
 * Support to enumerate and dump all databases' tables containing user provided column(s) by specifying for instance '--dump -C user,pass'. Useful to identify for instance tables containing custom application credentials (Bernardo).
 * Support to parse -C (column name(s)) when fetching columns of a table with --columns: it will enumerate only columns like the provided one(s) within the specified table (Bernardo).
@@ -96,9 +92,7 @@
 * Updated user's manual (Bernardo and Miroslav).
 * Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://www.sqlmap.org/demo.html (Bernardo).
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun, 14 Mar 2010 10:00:00 +0000
-
-# sqlmap (0.8rc1-1) stable; urgency=low
+# Version 0.8 release candidate (2009-09-21)
 
 * Major enhancement to the Microsoft SQL Server stored procedure heap-based buffer overflow exploit (--os-bof) to automatically bypass DEP memory protection.
 * Added support for MySQL and PostgreSQL to execute Metasploit shellcode via UDF 'sys_bineval' (in-memory, anti-forensics technique) as an option instead of uploading the standalone payload stager executable.
@@ -110,9 +104,7 @@
 * Minor bugs fixed.
 * Major code refactoring.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Mon, 21 Sep 2009 15:00:00 +0000
-
-# sqlmap (0.7-1) stable; urgency=low
+# Version 0.7 (2009-07-25)
 
 * Adapted Metasploit wrapping functions to work with latest 3.3 development version too.
 * Adjusted code to make sqlmap 0.7 to work again on Mac OSX too.
@@ -127,9 +119,7 @@
 * Fixed basic Microsoft SQL Server 2000 fingerprint.
 * Many minor bug fixes and code refactoring.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sat, 25 Jul 2009 10:00:00 +0000
-
-# sqlmap (0.7rc1-1) stable; urgency=low
+# Version 0.7 release candidate (2009-04-22)
 
 * Added support to execute arbitrary commands on the database server underlying operating system either returning the standard output or not via UDF injection on MySQL and PostgreSQL and via xp_cmdshell() stored procedure on Microsoft SQL Server;
 * Added support for out-of-band connection between the attacker box and the database server underlying operating system via stand-alone payload stager created by Metasploit and supporting Meterpreter, shell and VNC payloads for both Windows and Linux;
@@ -141,9 +131,7 @@
 * Major bug fix in the comparison algorithm to correctly handle also the case that the url is stable and the False response changes the page content very little;
 * Many minor bug fixes, minor enhancements and layout adjustments.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Wed, 22 Apr 2009 10:30:00 +0000
-
-# sqlmap (0.6.4-1) stable; urgency=low
+# Version 0.6.4 (2009-02-03)
 
 * Major enhancement to make the comparison algorithm work properly also on url not stables automatically by using the difflib Sequence Matcher object;
 * Major enhancement to support SQL data definition statements, SQL data manipulation statements, etc from user in SQL query and SQL shell if stacked queries are supported by the web application technology;
@@ -159,9 +147,7 @@
 * Minor bug fix to make the --postfix work even if --prefix is not provided;
 * Updated documentation.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Tue,  3 Feb 2009 23:30:00 +0000
-
-# sqlmap (0.6.3-1) stable; urgency=low
+# Version 0.6.3 (2008-12-18)
 
 * Major enhancement to get list of targets to test from Burp proxy (http://portswigger.net/suite/) requests log file path or WebScarab proxy (http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project) 'conversations/' folder path by providing option -l <filepath>;
 * Major enhancement to support Partial UNION query SQL injection technique too;
@@ -187,9 +173,7 @@
 * Increased default output level from 0 to 1;
 * Updated documentation.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Thu, 18 Dec 2008 10:00:00 +0000
-
-# sqlmap (0.6.2-1) stable; urgency=low
+# Version 0.6.2 (2008-11-02)
 
 * Major bug fix to correctly dump tables entries when --stop is not specified;
 * Major bug fix so that the users' privileges enumeration now works properly also on both MySQL < 5.0 and MySQL >= 5.0;
@@ -202,9 +186,7 @@
 * Updated the database management system fingerprint checks to correctly identify MySQL 5.1.x, MySQL 6.0.x and PostgreSQL 8.3;
 * More user-friendly warning messages.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun,  2 Nov 2008 19:00:00 +0000
-
-# sqlmap (0.6.1-1) stable; urgency=low
+# Version 0.6.1 (2008-08-20)
 
 * Major bug fix to blind SQL injection bisection algorithm to handle an exception;
 * Added a Metasploit Framework 3 auxiliary module to run sqlmap;
@@ -215,9 +197,7 @@
 * Changed the order sqlmap dump table entries from column by column to row by row. Now it also dumps entries as they are stored in the tables, not forcing the entries' order alphabetically anymore;
 * Minor bug fix to correctly handle parameters' value with % character.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Fri, 20 Oct 2008 10:00:00 +0000
-
-# sqlmap (0.6-1) stable; urgency=low
+# Version 0.6 (2008-09-01)
 
 * Complete code refactor and many bugs fixed;
 * Added multithreading support to set the maximum number of concurrent HTTP requests;
@@ -254,9 +234,7 @@
 * Updated some docstrings;
 * Updated documentation files.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Mon,  1 Sep 2008 10:00:00 +0100
-
-# sqlmap (0.5-1) stable; urgency=low
+# Version 0.5 (2007-11-04)
 
 * Added support for Oracle database management system
 * Extended inband SQL injection functionality (--union-use) to all other possible queries since it only worked with -e and --file on all DMBS plugins;
@@ -278,9 +256,7 @@
 * Complete code refactoring, a lot of minor and some major fixes in libraries, many minor improvements;
 * Updated all documentation files.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sun,  4 Nov 2007 20:00:00 +0100
-
-# sqlmap (0.4-1) stable; urgency=low
+# Version 0.4 (2007-06-15)
 
 * Added DBMS fingerprint based also upon HTML error messages parsing defined in lib/parser.py which reads an XML file defining default error messages for each supported DBMS;
 * Added Microsoft SQL Server extensive DBMS fingerprint checks based upon accurate '@@version' parsing matching on an XML file to get also the exact patching level of the DBMS;
@@ -301,9 +277,7 @@
 * Splitted lib/common.py: inband injection functionalities now are moved to lib/union.py;
 * Updated documentation files.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Fri, 15 Jun 2007 20:00:00 +0100
-
-# sqlmap (0.3-1) stable; urgency=low
+# Version 0.3 (2007-01-20)
 
 * Added module for MS SQL Server;
 * Strongly improved MySQL dbms active fingerprint and added MySQL comment injection check;
@@ -317,9 +291,7 @@
 * Rewritten documentation files;
 * Complete code restyling.
 
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Sat, 20 Jan 2007 20:00:00 +0100
-
-# sqlmap (0.2-1) stable; urgency=low
+# Version 0.2 (2006-12-13)
 
 * complete refactor of entire program;
 * added TODO and THANKS files;
@@ -333,5 +305,3 @@
 * added InjectionCheck class in injection.py which performs check on url stability, dynamics of parameters and injection on dynamic url parameters;
 * improved output methods in dump.py;
 * layout enhancement on main program file (sqlmap.py), adapted to call new option/injection classes and improvements on catching of exceptions.
-
--- Bernardo Damele A. G. <bernardo@sqlmap.org>  Wed, 13 Dec 2006 20:00:00 +0100
