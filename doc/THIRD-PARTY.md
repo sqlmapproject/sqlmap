@@ -2,36 +2,36 @@ This file lists bundled packages and their associated licensing terms.
 
 # BSD
 
-* The Ansistrm library located under thirdparty/ansistrm/.
+ - The Ansistrm library located under thirdparty/ansistrm/.
   Copyright (C) 2010-2012 Vinay Sajip
-* The Beautiful Soup library located under thirdparty/beautifulsoup/.
+ - The Beautiful Soup library located under thirdparty/beautifulsoup/.
   Copyright (C) 2004-2010, Leonard Richardson
-* The ClientForm library located under thirdparty/clientform/.
+ - The ClientForm library located under thirdparty/clientform/.
   Copyright (C) 2002-2007 John J. Lee
   Copyright (C) 2005 Gary Poster
   Copyright (C) 2005 Zope Corporation
   Copyright (C) 1998-2000 Gisle Aas
-* The Colorama library located under thirdparty/colorama/.
+ - The Colorama library located under thirdparty/colorama/.
   Copyright (C) 2010 Jonathan Hartley
-* The Fcrypt library located under thirdparty/fcrypt/.
+ - The Fcrypt library located under thirdparty/fcrypt/.
   Copyright (C) 2000, 2001, 2004 Carey Evans
-* The Odict library located under thirdparty/odict/.
+ - The Odict library located under thirdparty/odict/.
   Copyright (C) 2005 Nicola Larosa, Michael Foord
-* The Oset library located under thirdparty/oset/.
+ - The Oset library located under thirdparty/oset/.
   Copyright (C) 2010, BlueDynamics Alliance, Austria
   Copyright (C) 2009, Raymond Hettinger, and others
-* The SocksiPy library located under thirdparty/socks/.
+ - The SocksiPy library located under thirdparty/socks/.
  Copyright 2006 Dan-Haim
 
 ````
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
+     - Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
+     - Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of the <organization> nor the
+     - Neither the name of the <organization> nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -49,23 +49,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # LGPL
 
-* The Chardet library located under thirdparty/chardet/.
-* The Gprof2dot library located under thirdparty/gprof2dot/.
-* The KeepAlive library located under thirdparty/keepalive/.
-* The MultipartPost library located under thirdparty/multipartpost/.
-* The XDot library located under thirdparty/xdot/.
-* The icmpsh tool located under extra/icmpsh/.
+ - The Chardet library located under thirdparty/chardet/.
+ - The Gprof2dot library located under thirdparty/gprof2dot/.
+ - The KeepAlive library located under thirdparty/keepalive/.
+ - The MultipartPost library located under thirdparty/multipartpost/.
+ - The XDot library located under thirdparty/xdot/.
+ - The icmpsh tool located under extra/icmpsh/.
 
 # PSF
 
-* The Magic library located under thirdparty/magic/.
+ - The Magic library located under thirdparty/magic/.
 
 # MIT
 
-* The PageRank library located under thirdparty/pagerank/.
-* The PrettyPrint library located under thirdparty/prettyprint/.
-* The Termcolor library located under thirdparty/termcolor/.
+ - The PageRank library located under thirdparty/pagerank/.
+ - The PrettyPrint library located under thirdparty/prettyprint/.
+ - The Termcolor library located under thirdparty/termcolor/.
 
 # Public domain
 
-* The PyDes library located under thirdparty/pydes/.
+ - The PyDes library located under thirdparty/pydes/.
