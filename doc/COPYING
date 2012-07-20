@@ -344,3 +344,31 @@ POSSIBILITY OF SUCH DAMAGES.
 
                      END OF TERMS AND CONDITIONS
 
+****************************************************************************
+
+The copyright on this package is held by Bernardo Damele Assumpcao
+Guimaraes, Miroslav Stampar.
+
+This license does not apply to the following components:
+
+* The Ansistrm library located under thirdparty/ansistrm/.
+* The Beautiful Soup library located under thirdparty/beautifulsoup/.
+* The Chardet library located under thirdparty/chardet/.
+* The ClientForm library located under thirdparty/clientform/.
+* The Colorama library located under thirdparty/colorama/.
+* The Fcrypt library located under thirdparty/fcrypt/.
+* The Gprof2dot library located under thirdparty/gprof2dot/.
+* The KeepAlive library located under thirdparty/keepalive/.
+* The Magic library located under thirdparty/magic/.
+* The MultipartPost library located under thirdparty/multipartpost/.
+* The Odict library located under thirdparty/odict/.
+* The Oset library located under thirdparty/oset/.
+* The PageRank library located under thirdparty/pagerank/.
+* The PrettyPrint library located under thirdparty/prettyprint/.
+* The PyDes library located under thirdparty/pydes/.
+* The SocksiPy library located under thirdparty/socks/.
+* The Termcolor library located under thirdparty/termcolor/.
+* The XDot library located under thirdparty/xdot/.
+* The icmpsh tool located under extra/icmpsh/.
+
+Details for the above packages can be found in the THIRD-PARTY.md file.
