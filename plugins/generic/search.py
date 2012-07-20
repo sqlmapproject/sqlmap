@@ -326,6 +326,8 @@ class Search:
         infoMsgTbl = ""
         infoMsgDb = ""
         colList = conf.col.split(",")
+        origTbl = conf.tbl
+        origDb = conf.db
         colCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
         tblCond = rootQuery.inband.condition3
@@ -333,6 +335,8 @@ class Search:
 
         for column in colList:
             column = safeSQLIdentificatorNaming(column)
+            conf.db = origDb
+            conf.tbl = origTbl
 
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 column = column.upper()
