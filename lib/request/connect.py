@@ -653,10 +653,20 @@ class Connect:
                             get += "%s%s=%s" % (delimiter, name, value)
 
         get = urlencode(get, limit=True)
-        if post and place not in (PLACE.POST, PLACE.SOAP, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
-            post = getattr(post, UNENCODED_ORIGINAL_VALUE)
-        elif not conf.skipUrlEncode and place not in (PLACE.SOAP,):
-            post = urlencode(post)
+        if post:
+            if conf.skipUrlEncode is None:
+                _ = (post or "").strip()
+                if _.startswith("<") and _.endswith(">"):
+                    msg = "provided POST data looks "
+                    msg += "like it's in XML format. "
+                    msg += "Do you want to turn off URL encoding "
+                    msg += "which is usually causing problems "
+                    msg += "in this kind of situations? [Y/n]"
+                    conf.skipUrlEncode = readInput(msg, default="Y").upper() != "N"
+            if place not in (PLACE.POST, PLACE.SOAP, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
+                post = getattr(post, UNENCODED_ORIGINAL_VALUE)
+            elif not conf.skipUrlEncode and place not in (PLACE.SOAP,):
+                post = urlencode(post)
 
         if timeBasedCompare:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:
