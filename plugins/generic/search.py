@@ -130,7 +130,7 @@ class Search:
                     value = safeSQLIdentificatorNaming(value)
                     foundDbs.append(value)
 
-        return foundDbs
+        conf.dumper.lister("found databases", foundDbs)
 
     def searchTable(self):
         bruteForce = False
@@ -329,7 +329,6 @@ class Search:
         colCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
         tblCond = rootQuery.inband.condition3
-
         colConsider, colCondParam = self.likeOrExact("column")
 
         for column in colList:
@@ -535,20 +534,17 @@ class Search:
         self.dumpFoundColumn(dbs, foundCols, colConsider)
 
     def search(self):
-        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             for item in ('db', 'tbl', 'col'):
                 if getattr(conf, item, None):
                     setattr(conf, item, getattr(conf, item).upper())
 
         if conf.col:
             self.searchColumn()
-
         elif conf.tbl:
             self.searchTable()
-
         elif conf.db:
-            conf.dumper.lister("found databases", self.searchDb())
-
+            self.searchDb()
         else:
             errMsg = "missing parameter, provide -D, -T or -C along "
             errMsg += "with --search"
