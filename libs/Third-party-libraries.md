@@ -10,7 +10,7 @@
 | ------------ | ----------- | ----------- | ----------- |
 | [thirdparty/ansistrm/](http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html) | BSD | Used to colourize logging messages | - |
 | [thirdparty/beautifulsoup/](http://www.crummy.com/software/BeautifulSoup/) | BSD | Used to crawl the target site | --crawl |
-| [thirdparty/chardet/](http://chardet.feedparser.org/) | LGPL | Used to heuristically detect the HTTP response body charset | - |
+| [thirdparty/chardet/](http://pypi.python.org/pypi/chardet) | LGPL | Used to heuristically detect the HTTP response body charset | - |
 | [thirdparty/clientform/](http://wwwsearch.sourceforge.net/old/ClientForm/) | BSD | Used to parse HTML forms | --forms |
 | [thirdparty/colorama/](http://pypi.python.org/pypi/colorama) | BSD | Used to make output colouring cross-platform | - |
 | [thirdparty/fcrypt/](http://carey.geek.nz/code/python-fcrypt/) | BSD | Used to crack a generic password hash | --passwords |
