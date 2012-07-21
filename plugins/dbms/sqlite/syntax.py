@@ -5,6 +5,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import binascii
+import re
+
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.exception import sqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
@@ -15,36 +18,16 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
+        unescaped = expression
+
         if isDBMSVersionAtLeast('3'):
             if quote:
-                expression = expression.replace("'", "''")
-                while True:
-                    index = expression.find("''")
-                    if index == -1:
-                        break
-
-                    firstIndex = index + 2
-                    index = expression[firstIndex:].find("''")
-
-                    if index == -1:
-                        raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression.replace("''", "'")
-
-                    lastIndex = firstIndex + index
-                    old = "''%s''" % expression[firstIndex:lastIndex]
-                    unescaped = ""
-
-                    for i in xrange(firstIndex, lastIndex):
-                        unescaped += "X'%x'" % ord(expression[i])
-                        if i < lastIndex - 1:
-                            unescaped += "||"
-
-                    #unescaped += ")"
-                    expression = expression.replace(old, unescaped)
-                expression = expression.replace("''", "'")
+                for item in re.findall(r"'[^']+'", expression, re.S):
+                    unescaped = unescaped.replace(item, "X'%s'" % binascii.hexlify(item.strip("'")))
             else:
-                expression = "||".join("X'%x" % ord(c) for c in expression)
+                unescaped = "X'%s'" % binascii.hexlify(expression)
 
-        return expression
+        return unescaped
 
     @staticmethod
     def escape(expression):
