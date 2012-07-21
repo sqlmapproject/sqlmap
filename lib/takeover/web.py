@@ -259,6 +259,8 @@ class Web:
 
                         if "sqlmap file uploader" not in uplPage:
                             continue
+                    else:
+                        continue
 
                 if "<%" in uplPage or "<?" in uplPage:
                     warnMsg = "file stager uploaded on '%s', " % localPath
@@ -326,7 +328,7 @@ class Web:
                 testStr = "command execution test"
                 output = self.webBackdoorRunCmd("echo %s" % testStr)
 
-                if testStr in output:
+                if output and testStr in output:
                     infoMsg = "the backdoor has been successfully "
                 else:
                     infoMsg = "the backdoor has probably been successfully "
