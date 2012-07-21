@@ -183,7 +183,7 @@ Question(s):
 
 ## Where can I find old versions of sqlmap?
 
-From the [Downloads](https://github.com/sqlmapproject/sqlmap/downloads) page on GitHub.
+From the [Tags](https://github.com/sqlmapproject/sqlmap/tags) page on GitHub.
 
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/2290)
