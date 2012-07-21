@@ -865,7 +865,7 @@ def checkFile(filename):
     Checks for file existence
     """
 
-    if not os.path.exists(filename):
+    if not os.path.isfile(filename):
         raise sqlmapFilePathException, "unable to read file '%s'" % filename
 
 def banner():
