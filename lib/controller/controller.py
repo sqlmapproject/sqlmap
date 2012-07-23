@@ -499,7 +499,7 @@ def start():
                     errMsg = "all parameters appear to be not injectable."
 
                     if conf.level < 5 or conf.risk < 3:
-                        errMsg += " Try to increase --level/--risk values "
+                        errMsg += " Try to increase '--level'/'--risk' values "
                         errMsg += "to perform more tests."
 
                     if isinstance(conf.tech, list) and len(conf.tech) < 5:
@@ -509,12 +509,12 @@ def start():
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
 
                         if kb.dynamicParameters:
-                            errMsg += " You can give it a go with the --text-only "
-                            errMsg += "switch if the target page has a low percentage "
+                            errMsg += " You can give it a go with the switch '--text-only' "
+                            errMsg += "if the target page has a low percentage "
                             errMsg += "of textual content (~%.2f%% of " % percent
                             errMsg += "page content is text)."
                         elif percent < LOW_TEXT_PERCENT and not kb.errorIsNone:
-                            errMsg += " Please retry with the --text-only switch "
+                            errMsg += " Please retry with the switch '--text-only' "
                             errMsg += "(along with --technique=BU) as this case "
                             errMsg += "looks like a perfect candidate "
                             errMsg += "(low textual content along with inability "
@@ -529,17 +529,16 @@ def start():
 
                     if not conf.string and not conf.regexp:
                         errMsg += " Also, you can try to rerun by providing "
-                        errMsg += "either a valid --string "
-                        errMsg += "or a valid --regexp, refer to the user's "
-                        errMsg += "manual for details"
+                        errMsg += "either a valid value for option '--string' "
+                        errMsg += "(or '--regexp')"
                     elif conf.string:
                         errMsg += " Also, you can try to rerun by providing a "
-                        errMsg += "valid --string as perhaps the string you "
+                        errMsg += "valid value for option '--string' as perhaps the string you "
                         errMsg += "have choosen does not match "
                         errMsg += "exclusively True responses"
                     elif conf.regexp:
                         errMsg += " Also, you can try to rerun by providing a "
-                        errMsg += "valid --regexp as perhaps the regular "
+                        errMsg += "valid value for option '--regexp' as perhaps the regular "
                         errMsg += "expression that you have choosen "
                         errMsg += "does not match exclusively True responses"
 
