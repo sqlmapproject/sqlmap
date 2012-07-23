@@ -2523,16 +2523,23 @@ def openFile(filename, mode='r'):
 
 def decodeIntToUnicode(value):
     """
-    Decodes inferenced integer value with usage of current page encoding
+    Decodes inferenced integer value to an unicode character
     """
-    try:
-        # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,) or conf.charset:
-            return struct.pack('B' if value < 256 else '<H', value).decode(kb.pageEncoding or UNICODE_ENCODING)
-        else:
-            return unichr(value)
-    except:
-        return INFERENCE_UNKNOWN_CHAR
+    retVal = value
+
+    if isinstance(value, int):
+        try:
+            # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+                retVal = getUnicode(struct.pack('B' if value < 256 else '<H', value))
+            elif value > 255:
+                retVal = unichr(value)
+            else:
+                retVal = getUnicode(chr(value))
+        except:
+            retVal = INFERENCE_UNKNOWN_CHAR
+
+    return retVal
 
 def unhandledExceptionMessage():
     """
