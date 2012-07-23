@@ -209,8 +209,10 @@ def decodePage(page, contentEncoding, contentType):
     else:
         kb.pageEncoding = conf.charset
 
+    # can't do for all responses because we need to support binary files too
     if contentType and not isinstance(page, unicode) and any(map(lambda x: x in contentType.lower(), ("text/txt", "text/raw", "text/html", "text/xml"))):
-        # can't do for all responses because we need to support binary files too
+        if "&#" in page:
+            page = re.sub('&#(\d+);', lambda _: chr(int(_.group(1))), page)
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
         page = getUnicode(page, kb.pageEncoding)
 

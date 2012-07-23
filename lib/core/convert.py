@@ -144,5 +144,4 @@ def htmlunescape(value):
     if value and isinstance(value, basestring):
         codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
-        retVal = re.sub('&#(\d+);', lambda x: getUnicode(chr(x.group(1))), retVal)
     return retVal
