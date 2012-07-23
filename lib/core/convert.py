@@ -136,13 +136,13 @@ def utf8decode(value):
     return value.decode("utf-8")
 
 def htmlescape(value):
-    _ = (('&', '&amp;'), ('<', '&lt;'), ('>', '&gt;'), ('"', '&quot;'), ("'", '&#39;'), (' ', '&nbsp;'))
-    return reduce(lambda x, y: x.replace(y[0], y[1]), _, value)
+    codes = (('&', '&amp;'), ('<', '&lt;'), ('>', '&gt;'), ('"', '&quot;'), ("'", '&#39;'), (' ', '&nbsp;'))
+    return reduce(lambda x, y: x.replace(y[0], y[1]), codes, value)
 
 def htmlunescape(value):
     retVal = value
     if value and isinstance(value, basestring):
-        _ = (('&amp;', '&'), ('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '))
-        retVal = reduce(lambda x, y: x.replace(y[0], y[1]), _, retVal)
-        retVal = re.sub('&#(\d+);', lambda x: unichr(int(x.group(1))), retVal)
+        codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
+        retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
+        retVal = re.sub('&#(\d+);', lambda x: getUnicode(chr(x.group(1))), retVal)
     return retVal
