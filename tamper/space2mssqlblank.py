@@ -53,7 +53,7 @@ def tamper(payload):
     #   CR      0D      carriage return                
     #   SO      0E      shift out 
     #   SI      0F      shift in
-    blanks = ['%01', '%02', '%03', '%04', '%05', '%06', '%07', '%08', '%09', '%0B', '%0C', '%0D', '%0E', '%0F', '%0A']
+    blanks = ('%01', '%02', '%03', '%04', '%05', '%06', '%07', '%08', '%09', '%0B', '%0C', '%0D', '%0E', '%0F', '%0A')
     retVal = payload
 
     if payload:

@@ -43,11 +43,11 @@ def tamper(payload):
             word = match.group()
 
             if word.upper() in kb.keywords:
-                newWord = str()
+                _ = str()
 
                 for i in xrange(len(word)):
-                    newWord += word[i].upper() if randomRange(0, 1) else word[i].lower()
+                    _ += word[i].upper() if randomRange(0, 1) else word[i].lower()
 
-                retVal = retVal.replace(word, newWord)
+                retVal = retVal.replace(word, _)
 
     return retVal

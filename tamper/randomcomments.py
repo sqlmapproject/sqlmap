@@ -29,12 +29,12 @@ def tamper(payload):
                 continue
 
             if word.upper() in kb.keywords:
-                newWord = word[0]
+                _ = word[0]
 
                 for i in xrange(1, len(word) - 1):
-                    newWord += "%s%s" % ("/**/" if randomRange(0, 1) else "", word[i])
+                    _ += "%s%s" % ("/**/" if randomRange(0, 1) else "", word[i])
 
-                newWord += word[-1]
-                retVal = retVal.replace(word, newWord)
+                _ += word[-1]
+                retVal = retVal.replace(word, _)
 
     return retVal

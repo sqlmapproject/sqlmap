@@ -27,4 +27,4 @@ def tamper(payload):
         * http://lukasz.pilorz.net/testy/full_width_utf/index.phps
     """
 
-    return payload.replace('\'', '%EF%BC%87') if payload else payload
+    return payload.replace('\'', "%EF%BC%87") if payload else payload

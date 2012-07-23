@@ -43,7 +43,7 @@ def tamper(payload):
     #   CR      0D      carriage return
     #   VT      0B      vertical TAB        (MySQL and Microsoft SQL Server only)
     #   -       A0      -                   (MySQL only)
-    blanks = ['%09', '%0A', '%0C', '%0D', '%0B', '%A0']
+    blanks = ('%09', '%0A', '%0C', '%0D', '%0B', '%A0')
     retVal = payload
 
     if payload:

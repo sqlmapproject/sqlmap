@@ -40,7 +40,7 @@ def tamper(payload):
                 retVal += payload[i:i+3]
                 i += 3
             else:
-                retVal += '%%25%X' % ord(payload[i])
+                retVal += '%%25%.2X' % ord(payload[i])
                 i += 1
 
     return retVal

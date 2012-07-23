@@ -38,7 +38,7 @@ def tamper(payload):
 
     def process(match):
         word = match.group()
-        word = "%sLIKE%s" % (" " if word[0]!=" " else "", " " if word[-1]!=" " else "")
+        word = "%sLIKE%s" % (" " if word[0] != " " else "", " " if word[-1] != " " else "")
 
         return word
 
