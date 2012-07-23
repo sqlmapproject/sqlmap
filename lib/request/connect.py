@@ -124,16 +124,20 @@ class Connect:
         retVal = ""
 
         if not kb.dnsMode:
-            while True:
-                _ = conn.read(MAX_CONNECTION_CHUNK_SIZE)
-                if len(_) == MAX_CONNECTION_CHUNK_SIZE:
-                    warnMsg = "large response detected. This could take a while"
-                    singleTimeWarnMessage(warnMsg)
-                    _ = re.sub(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start), "%s%s%s" % (kb.chars.stop, LARGE_CHUNK_TRIM_MARKER, kb.chars.start), _)
-                    retVal += _
-                else:
-                    retVal += _
-                    break
+            if conn.headers.getheader(HTTPHEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
+              or "text" not in conn.headers.getheader(HTTPHEADER.CONTENT_TYPE, "").lower():
+                retVal = conn.read()
+            else:
+                while True:
+                    _ = conn.read(MAX_CONNECTION_CHUNK_SIZE)
+                    if len(_) == MAX_CONNECTION_CHUNK_SIZE:
+                        warnMsg = "large response detected. This could take a while"
+                        singleTimeWarnMessage(warnMsg)
+                        _ = re.sub(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start), "%s%s%s" % (kb.chars.stop, LARGE_CHUNK_TRIM_MARKER, kb.chars.start), _)
+                        retVal += _
+                    else:
+                        retVal += _
+                        break
 
         return retVal
 
