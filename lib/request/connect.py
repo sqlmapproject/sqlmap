@@ -410,14 +410,14 @@ class Connect:
             if responseHeaders:
                 logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
+            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
 
             skipLogTraffic = True
 
             if conf.verbose <= 5:
                 responseMsg += getUnicode(logHeaders)
             elif conf.verbose > 5:
-                responseMsg += "%s\n\n%s\n" % (logHeaders, page)
+                responseMsg += "%s\n\n%s\n" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
@@ -502,12 +502,12 @@ class Connect:
             logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
 
         if not skipLogTraffic:
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, page))
+            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
 
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
         elif conf.verbose > 5:
-            responseMsg += "%s\n\n%s\n" % (logHeaders, page)
+            responseMsg += "%s\n\n%s\n" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
