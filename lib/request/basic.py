@@ -183,7 +183,7 @@ def decodePage(page, contentEncoding, contentType):
             # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             data = StringIO.StringIO(zlib.decompress(page, -15))
         else:
-            data = gzip.GzipFile('', 'rb', 9, StringIO.StringIO(page))
+            data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
 
         try:
             page = data.read()
@@ -196,8 +196,8 @@ def decodePage(page, contentEncoding, contentType):
         httpCharset, metaCharset = None, None
 
         # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
-        if contentType and (contentType.find('charset=') != -1):
-            httpCharset = checkCharEncoding(contentType.split('charset=')[-1])
+        if contentType and (contentType.find("charset=") != -1):
+            httpCharset = checkCharEncoding(contentType.split("charset=")[-1])
 
         metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE))
 
@@ -209,7 +209,7 @@ def decodePage(page, contentEncoding, contentType):
     else:
         kb.pageEncoding = conf.charset
 
-    if contentType and not isinstance(page, unicode) and any(map(lambda x: x in contentType.lower(), ('text/txt', 'text/raw', 'text/html', 'text/xml'))):
+    if contentType and not isinstance(page, unicode) and any(map(lambda x: x in contentType.lower(), ("text/txt", "text/raw", "text/html", "text/xml"))):
         # can't do for all responses because we need to support binary files too
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
         page = getUnicode(page, kb.pageEncoding)
