@@ -48,6 +48,7 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
+from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
 from lib.core.settings import META_REFRESH_REGEX
@@ -267,6 +268,7 @@ class Connect:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
+            headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
 
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
@@ -285,9 +287,6 @@ class Connect:
                 req.set_method(method)
             else:
                 req = urllib2.Request(url, post, headers)
-
-            if not req.has_header(HTTPHEADER.ACCEPT_ENCODING):
-                requestHeaders += "%s: identity\n" % HTTPHEADER.ACCEPT_ENCODING
 
             requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
 

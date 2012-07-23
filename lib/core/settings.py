@@ -70,8 +70,11 @@ UNION_STDEV_COEFF = 7
 # length of queue for candidates for time delay adjustment
 TIME_DELAY_CANDIDATES = 3
 
-# standard value for HTTP Accept header
+# default value for HTTP Accept header
 HTTP_ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+
+# default value for HTTP Accept-Encoding header
+HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip,deflate"
 
 # HTTP timeout in silent mode
 HTTP_SILENT_TIMEOUT = 3
