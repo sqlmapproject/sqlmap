@@ -386,11 +386,11 @@ class Backend:
     # Get methods
     @staticmethod
     def getForcedDbms():
-        return aliasToDbmsEnum(kb.forcedDbms)
+        return aliasToDbmsEnum(kb.get("forcedDbms"))
 
     @staticmethod
     def getDbms():
-        return aliasToDbmsEnum(kb.dbms) if kb.get('dbms') else None
+        return aliasToDbmsEnum(kb.get("dbms"))
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -406,7 +406,7 @@ class Backend:
            fingerprint phase.
         """
 
-        return kb.htmlFp if kb.heuristicTest is not None else []
+        return kb.htmlFp if kb.get("heuristicTest") is not None else []
 
     @staticmethod
     def getIdentifiedDbms():
@@ -2557,7 +2557,7 @@ def unhandledExceptionMessage():
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
     errMsg += "Command line: %s\n" % " ".join(sys.argv)
-    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb and kb.technique else None)
+    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else None)
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
 
     return maskSensitiveData(errMsg)
