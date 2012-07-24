@@ -125,36 +125,31 @@ class Filesystem:
         back-end DBMS underlying file system
         """
 
-        fcEncodedList = []
-        fp = codecs.open(fileName, "rb")
-        fcEncodedStr = fp.read().encode(encoding).replace("\n", "")
+        retVal = []
+        with codecs.open(fileName, "rb") as f:
+            content = f.read().encode(encoding).replace("\n", "")
 
         if not single:
-            fcLength = len(fcEncodedStr)
-
-            if fcLength > 256:
-                for i in xrange(0, fcLength, 256):
-                    string = ""
+            if len(content) > 256:
+                for i in xrange(0, len(content), 256):
+                    _ = content[i:i+256]
 
                     if encoding == "hex":
-                        string += "0x"
+                        _ = "0x%s" % _
+                    elif encoding == "base64":
+                        _ = "'%s'" % _
 
-                    string += fcEncodedStr[i:i+256]
+                    retVal.append(_)
 
-                    if encoding == "base64":
-                        string = "'%s'" % string
-
-                    fcEncodedList.append(string)
-
-        if not fcEncodedList:
+        if not retVal:
             if encoding == "hex":
-                fcEncodedStr = "0x%s" % fcEncodedStr
+                content = "0x%s" % content
             elif encoding == "base64":
-                fcEncodedStr = "'%s'" % fcEncodedStr
+                content = "'%s'" % content
 
-            fcEncodedList = [ fcEncodedStr ]
+            retVal = [ content ]
 
-        return fcEncodedList
+        return retVal
 
     def askCheckWrittenFile(self, wFile, dFile, fileType):
         message = "do you want confirmation that the file '%s' " % dFile
