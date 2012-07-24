@@ -519,3 +519,6 @@ BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is n
 
 # Generic www root directory names
 GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")
+
+# Maximum length of a help part containing switch/option name(s)
+MAX_HELP_OPTION_LENGTH = 18

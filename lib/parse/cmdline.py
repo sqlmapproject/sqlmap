@@ -18,6 +18,7 @@ from lib.core.data import logger
 from lib.core.defaults import defaults
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import IS_WIN
+from lib.core.settings import MAX_HELP_OPTION_LENGTH
 from lib.core.settings import VERSION_STRING
 
 def cmdLineParser():
@@ -629,7 +630,7 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Conduct through tests only if positive heuristic(s)")
 
-        miscellaneous.add_option("--test-filter", dest="tstF",
+        miscellaneous.add_option("--test-filter", dest="testFilter",
                                   help="Select tests by payloads and/or titles (e.g. ROW)")
 
         miscellaneous.add_option("--wizard", dest="wizard",
@@ -677,8 +678,8 @@ def cmdLineParser():
         # Dirty hack to display longer options without breaking into two lines
         def _(self, *args):
             _ = parser.formatter._format_option_strings(*args)
-            if len(_) > 18:
-                _ = "%.16s.." % _
+            if len(_) > MAX_HELP_OPTION_LENGTH:
+                _ = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - parser.formatter.indent_increment)) % _
             return _
 
         parser.formatter._format_option_strings = parser.formatter.format_option_strings

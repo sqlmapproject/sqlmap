@@ -137,8 +137,8 @@ def checkSqlInjection(place, parameter, value):
                 continue
 
             # Skip tests if title is not included by the given filter
-            if conf.tstF:
-                if not any(re.search(conf.tstF, str(item), re.I) for item in (test.title, test.vector,\
+            if conf.testFilter:
+                if not any(re.search(conf.testFilter, str(item), re.I) for item in (test.title, test.vector,\
                 test.details.dbms if "details" in test and "dbms" in test.details else "")):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "its name/vector/dbms is not included by the given filter"
@@ -478,7 +478,7 @@ def checkSqlInjection(place, parameter, value):
                                         injection.dbms = Backend.setDbms(dValue)
                                     else:
                                         Backend.forceDbms(dValue[0], True)
-                                elif dKey == "dbms_version" and injection.dbms_version is None and not conf.tstF:
+                                elif dKey == "dbms_version" and injection.dbms_version is None and not conf.testFilter:
                                     injection.dbms_version = Backend.setVersion(dValue)
                                 elif dKey == "os" and injection.os is None:
                                     injection.os = Backend.setOs(dValue)
