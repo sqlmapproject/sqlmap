@@ -24,7 +24,7 @@ optDict = {
                                "data":              "string",
                                "pDel":              "string",
                                "cookie":            "string",
-                               "loC":               "string",
+                               "loadCookies":       "string",
                                "cookieUrlencode":   "boolean",
                                "dropSetCookie":     "boolean",
                                "agent":             "string",
@@ -87,7 +87,7 @@ optDict = {
                                "timeSec":           "integer",
                                "uCols":             "string",
                                "uChar":             "string",
-                               "dName":             "string"
+                               "dnsName":           "string"
                              },
 
             "Fingerprint":   {
@@ -171,7 +171,7 @@ optDict = {
                                "checkTor":          "boolean",
                                "crawlDepth":        "integer",
                                "csvDel":            "string",
-                               "dCred":             "string",
+                               "dbmsCred":          "string",
                                "eta":               "boolean",
                                "flushSession":      "boolean",
                                "forms":             "boolean",

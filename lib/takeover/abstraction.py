@@ -142,7 +142,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
             self.runCmd(command)
 
     def __initRunAs(self):
-        if not conf.dCred:
+        if not conf.dbmsCred:
             return
 
         if not conf.direct and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
@@ -186,7 +186,7 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 warnMsg = "functionality requested probably does not work because "
                 warnMsg += "the curent session user is not a database administrator"
 
-                if not conf.dCred and Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.PGSQL ):
+                if not conf.dbmsCred and Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.PGSQL ):
                     warnMsg += ". You can try to use option '--dbms-cred' "
                     warnMsg += "to execute statements as a DBA user if you "
                     warnMsg += "were able to extract and crack a DBA "

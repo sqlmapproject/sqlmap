@@ -150,7 +150,7 @@ def __urllib2Opener():
     handlers = [proxyHandler, authHandler, redirectHandler, rangeHandler, httpsHandler]
 
     if not conf.dropSetCookie:
-        if not conf.loC:
+        if not conf.loadCookies:
             conf.cj = cookielib.CookieJar()
         else:
             conf.cj = cookielib.MozillaCookieJar()
@@ -562,13 +562,13 @@ def __setDBMSAuthentication():
     another user, not the session user
     """
 
-    if not conf.dCred:
+    if not conf.dbmsCred:
         return
 
     debugMsg = "setting the DBMS authentication credentials"
     logger.debug(debugMsg)
 
-    match = re.search("^(.+?):(.*?)$", conf.dCred)
+    match = re.search("^(.+?):(.*?)$", conf.dbmsCred)
 
     if not match:
         errMsg = "DBMS authentication credentials value must be in format "
@@ -1730,7 +1730,7 @@ def __setTrafficOutputFP():
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
 def __setDNSServer():
-    if not conf.dName:
+    if not conf.dnsName:
         return
 
     infoMsg = "setting up DNS server instance"
@@ -1944,9 +1944,9 @@ def __basicOptionValidation():
             errMsg += "supported charsets"
             raise sqlmapSyntaxException, errMsg
 
-    if conf.loC:
-        if not os.path.exists(conf.loC):
-            errMsg = "cookies file '%s' does not exist" % conf.loC
+    if conf.loadCookies:
+        if not os.path.exists(conf.loadCookies):
+            errMsg = "cookies file '%s' does not exist" % conf.loadCookies
             raise sqlmapFilePathException, errMsg
 
 def __resolveCrossReferences():

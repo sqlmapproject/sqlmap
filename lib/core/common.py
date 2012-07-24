@@ -3211,11 +3211,11 @@ def resetCookieJar(cookieJar):
     Cleans cookies from a given cookie jar
     """
 
-    if not conf.loC:
+    if not conf.loadCookies:
         cookieJar.clear()
     else:
         try:
-            cookieJar.load(conf.loC)
+            cookieJar.load(conf.loadCookies)
             cookieJar.clear_expired_cookies()
         except cookielib.LoadError, msg:
             errMsg = "there was a problem loading "

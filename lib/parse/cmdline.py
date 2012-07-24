@@ -76,7 +76,7 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
-        request.add_option("--load-cookies", dest="loC",
+        request.add_option("--load-cookies", dest="loadCookies",
                            help="File containing cookies in Netscape/wget format")
 
         request.add_option("--cookie-urlencode", dest="cookieUrlencode",
@@ -280,7 +280,7 @@ def cmdLineParser():
         techniques.add_option("--union-char", dest="uChar",
                               help="Character to use for bruteforcing number of columns")
 
-        techniques.add_option("--dns-domain", dest="dName",
+        techniques.add_option("--dns-domain", dest="dnsName",
                               help="Domain name used for DNS exfiltration attack")
 
         # Fingerprint options
@@ -533,7 +533,7 @@ def cmdLineParser():
                                   help="Delimiting character used in CSV output "
                                   "(default \"%s\")" % defaults.csvDel)
 
-        general.add_option("--dbms-cred", dest="dCred",
+        general.add_option("--dbms-cred", dest="dbmsCred",
                             help="DBMS authentication credentials (user:password)")
 
         general.add_option("--eta", dest="eta",
@@ -673,6 +673,16 @@ def cmdLineParser():
         parser.add_option_group(windows)
         parser.add_option_group(general)
         parser.add_option_group(miscellaneous)
+
+        # Dirty hack to display longer options without breaking into two lines
+        def _(self, *args):
+            _ = parser.formatter._format_option_strings(*args)
+            if len(_) > 18:
+                _ = "%.16s.." % _
+            return _
+
+        parser.formatter._format_option_strings = parser.formatter.format_option_strings
+        parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser, type(parser))
 
         # Dirty hack for making a short option -hh
         option = parser.get_option("--hh")

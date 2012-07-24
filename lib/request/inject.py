@@ -57,7 +57,7 @@ from lib.techniques.union.use import unionUse
 def __goDns(payload, expression):
     value = None
 
-    if conf.dName and kb.dnsTest is not False:
+    if conf.dnsName and kb.dnsTest is not False:
         if kb.dnsTest is None:
             dnsTest(payload)
 

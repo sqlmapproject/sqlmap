@@ -24,7 +24,7 @@ def dnsTest(payload):
         errMsg = "data retrieval through DNS channel failed. Turning off DNS exfiltration support"
         logger.error(errMsg)
 
-        conf.dName = None
+        conf.dnsName = None
     else:
         infoMsg = "data retrieval through DNS channel was successful"
         logger.info(infoMsg)

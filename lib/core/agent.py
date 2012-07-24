@@ -855,7 +855,7 @@ class Agent:
         return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), inpStr) if inpStr else inpStr
 
     def runAsDBMSUser(self, query):
-        if conf.dCred and "Ad Hoc Distributed Queries" not in query:
+        if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:
             query = getSQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
 
         return query

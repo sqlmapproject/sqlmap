@@ -155,7 +155,7 @@ class xp_cmdshell:
         # to retrieve it afterwards
         # NOTE: this does not need to be done when the command is 'del' to
         # delete the temporary file
-        if conf.dCred and insertIntoTable:
+        if conf.dbmsCred and insertIntoTable:
             self.tmpFile = "%s/tmpc%s.txt" % (conf.tmpPath, randomStr(lowercase=True))
             cmd = "%s > \"%s\"" % (cmd, self.tmpFile)
 
@@ -171,7 +171,7 @@ class xp_cmdshell:
         # it does not work unfortunately, BULK INSERT needs to be used to
         # retrieve the output when OPENROWSET is used hence the redirection
         # to a temporary file from above
-        if insertIntoTable and not conf.dCred:
+        if insertIntoTable and not conf.dbmsCred:
             self.__forgedCmd += "INSERT INTO %s " % insertIntoTable
 
         self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
@@ -203,7 +203,7 @@ class xp_cmdshell:
             # command standard output is redirected to a temporary file
             # The file needs to be copied to the support table,
             # 'sqlmapoutput'
-            if conf.dCred:
+            if conf.dbmsCred:
                 inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, self.tmpFile, randomStr(10), randomStr(10)))
                 self.delRemoteFile(self.tmpFile)
 
