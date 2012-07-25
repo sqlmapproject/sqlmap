@@ -26,7 +26,7 @@ Where `C:\Python27` is the path where you installed [Python](http://www.python.o
 
 ## Can I embed sqlmap into a proprietary software?
 
-If you wish to embed sqlmap technology into proprietary software, we sell alternative licenses (contact [dev@sqlmap.org](dev@sqlmap.org))
+If you wish to embed sqlmap technology into proprietary software, we sell alternative licenses (contact [sales@sqlmap.org](sales@sqlmap.org))
 
 ## How can I report bugs or request new features?
 
