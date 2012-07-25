@@ -3,7 +3,7 @@
 sqlmap is (C) 2006-2012 [Bernardo Damele Assumpcao Guimaraes](mailto:bernardo@sqlmap.org), [Miroslav Stampar](mailto:miroslav@sqlmap.org).
 
 This program is free software; you may redistribute and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html) as published by the [Free Software Foundation](http://www.fsf.org); Version 2 with the clarifications and exceptions described in the [license file](https://raw.github.com/sqlmapproject/sqlmap/master/doc/COPYING). This guarantees your right to use, modify, and redistribute this software under certain conditions. If you wish to embed sqlmap technology into proprietary software, we sell alternative licenses
-(contact [dev@sqlmap.org](dev@sqlmap.org)).
+(contact [sales@sqlmap.org](sales@sqlmap.org)).
 
 # Disclaimer
 
