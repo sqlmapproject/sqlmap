@@ -18,8 +18,8 @@ def getRevisionNumber():
 
     retVal = None
     filePath = None
-
     _ = os.path.dirname(__file__)
+
     while True:
         filePath = os.path.join(_, ".git", "HEAD")
         if os.path.exists(filePath):
@@ -30,6 +30,7 @@ def getRevisionNumber():
                 break
             else:
                 _ = os.path.dirname(_)
+
     while True:
         if filePath and os.path.isfile(filePath):
             with open(filePath, "r") as f:
