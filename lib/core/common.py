@@ -2447,7 +2447,7 @@ def getSortedInjectionTests():
     messages
     """
 
-    retVal = conf.tests
+    retVal = copy.deepcopy(conf.tests)
 
     def priorityFunction(test):
         retVal = SORT_ORDER.FIRST

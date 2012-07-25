@@ -66,11 +66,15 @@ class AttribDict(dict):
     def __deepcopy__(self, memo):
         retVal = self.__class__()
         memo[id(self)] = retVal
+
         for attr in dir(self):
             if not attr.startswith('_'):
                 value = getattr(self, attr)
                 if not isinstance(value, (types.BuiltinFunctionType, types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
                     setattr(retVal, attr, copy.deepcopy(value, memo))
+
+        for key, value in self.items():
+            retVal.__setitem__(key, copy.deepcopy(value, memo))
 
         return retVal
 
