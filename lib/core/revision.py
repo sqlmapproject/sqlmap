@@ -21,7 +21,7 @@ def getRevisionNumber():
 
     _ = os.path.dirname(__file__)
     while True:
-        filePath = os.path.join(_, ".git/refs/heads/master").replace('/', os.path.sep)
+        filePath = os.path.join(_, ".git", "HEAD")
         if os.path.exists(filePath):
             break
         else:
@@ -30,10 +30,17 @@ def getRevisionNumber():
                 break
             else:
                 _ = os.path.dirname(_)
-    if filePath:
-        with open(filePath, "r") as f:
-            match = re.match(r"(?i)[0-9a-f]{32}", f.read())
-            retVal = match.group(0) if match else None
+    while True:
+        if filePath and os.path.isfile(filePath):
+            with open(filePath, "r") as f:
+                content = f.read()
+                filePath = None
+                if content.startswith("ref: "):
+                    filePath = os.path.join(_, ".git", content.replace("ref: ", "")).strip()
+                else:
+                    match = re.match(r"(?i)[0-9a-f]{32}", content)
+                    retVal = match.group(0) if match else None
+                    break
 
     if not retVal:
         process = execute("git rev-parse --verify HEAD", shell=True, stdout=PIPE, stderr=PIPE)

@@ -17,6 +17,7 @@ from lib.core.common import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.revision import getRevisionNumber
 from lib.core.settings import GIT_REPOSITORY
 from lib.core.settings import IS_WIN
 from lib.core.settings import REVISION
@@ -49,7 +50,9 @@ def update():
         success = not process.returncode
 
         if success:
-            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", REVISION))
+            import lib.core.settings
+            _ = lib.core.settings.REVISION = getRevisionNumber()
+            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", _))
         else:
             logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", stderr).strip())
 
