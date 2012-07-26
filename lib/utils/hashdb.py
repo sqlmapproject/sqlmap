@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import hashlib
+import os
 import sqlite3
 import threading
 import time
@@ -54,7 +55,7 @@ class HashDB(object):
 
     def retrieve(self, key, unserialize=False):
         retVal = None
-        if key:
+        if key and (self._write_cache or os.path.isfile(self.filepath)):
             hash_ = HashDB.hashKey(key)
             retVal = self._write_cache.get(hash_, None)
             if not retVal:
