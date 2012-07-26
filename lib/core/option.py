@@ -1867,6 +1867,14 @@ def __basicOptionValidation():
         errMsg = "option '--string' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.notString and conf.nullConnection:
+        errMsg = "option '--not-string' is incompatible with switch '--null-connection'"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.string and conf.notString:
+        errMsg = "option '--string' is incompatible with switch '--not-string'"
+        raise sqlmapSyntaxException, errMsg
+
     if conf.regexp and conf.nullConnection:
         errMsg = "option '--regexp' is incompatible with switch '--null-connection'"
         raise sqlmapSyntaxException, errMsg

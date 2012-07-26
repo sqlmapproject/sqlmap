@@ -357,7 +357,7 @@ def start():
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) \
                 and (kb.injection.place is None or kb.injection.parameter is None):
 
-                if not conf.string and not conf.regexp and PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
+                if not any((conf.string, conf.notString, conf.regexp)) and PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
                     checkStability()
@@ -378,7 +378,7 @@ def start():
                 for place in parameters:
                     # Test User-Agent and Referer headers only if
                     # --level >= 3
-                    skip = (place == PLACE.UA and conf.level < 3)
+                    skip = (place == PLACE.USER_AGENT and conf.level < 3)
                     skip |= (place == PLACE.REFERER and conf.level < 3)
 
                     # Test Host header only if
@@ -388,11 +388,11 @@ def start():
                     # Test Cookie header only if --level >= 2
                     skip |= (place == PLACE.COOKIE and conf.level < 2)
 
-                    skip |= (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.COOKIE and intersect(PLACE.COOKIE, conf.skip, True) not in ([], None))
 
-                    skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
+                    skip &= not (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.HOST and intersect(HOST_ALIASES, conf.testParameter, True))
 
@@ -527,7 +527,7 @@ def start():
                         errMsg += "Please, consider usage of tampering scripts as "
                         errMsg += "your target might filter the queries."
 
-                    if not conf.string and not conf.regexp:
+                    if not conf.string and not conf.notString and not conf.regexp:
                         errMsg += " Also, you can try to rerun by providing "
                         errMsg += "either a valid value for option '--string' "
                         errMsg += "(or '--regexp')"

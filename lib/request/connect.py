@@ -192,7 +192,7 @@ class Connect:
         code = None
         page = None
         requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
-        requestMsg += "%s" % urlparse.urlsplit(url)[2] or "/"
+        requestMsg += ("%s" % urlparse.urlsplit(url)[2] or "/") if not any((refreshing, crawling)) else url
         responseMsg = u"HTTP response "
         requestHeaders = u""
         responseHeaders = None
@@ -236,7 +236,7 @@ class Connect:
 
                 return page
 
-            elif any ([refreshing, crawling]):
+            elif any ((refreshing, crawling)):
                 pass
 
             elif target:
@@ -595,8 +595,8 @@ class Connect:
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
 
-        if PLACE.UA in conf.parameters:
-            ua = conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value
+        if PLACE.USER_AGENT in conf.parameters:
+            ua = conf.parameters[PLACE.USER_AGENT] if place != PLACE.USER_AGENT or not value else value
 
         if PLACE.REFERER in conf.parameters:
             referer = conf.parameters[PLACE.REFERER] if place != PLACE.REFERER or not value else value
@@ -730,6 +730,9 @@ class Connect:
 
         if not pageLength:
             page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+
+        if conf.secondOrder:
+            page, headers, code = Connect.getPage(url=conf.secondOrder, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
 

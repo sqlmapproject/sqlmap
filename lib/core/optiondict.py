@@ -76,6 +76,7 @@ optDict = {
                                "level":             "integer",
                                "risk":              "integer",
                                "string":            "string",
+                               "notString":         "notString",
                                "regexp":            "string",
                                "code":              "integer",
                                "textOnly":          "boolean",
@@ -87,7 +88,8 @@ optDict = {
                                "timeSec":           "integer",
                                "uCols":             "string",
                                "uChar":             "string",
-                               "dnsName":           "string"
+                               "dnsName":           "string",
+                               "secondOrder":       "string"
                              },
 
             "Fingerprint":   {

@@ -359,7 +359,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                            if not injectable and not conf.string and kb.pageStable:
+                            if not injectable and not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
                                 trueSet = set(extractTextTagContent(truePage))
                                 falseSet = set(extractTextTagContent(falsePage))
                                 candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage else None for _ in (trueSet - falseSet)))
@@ -460,7 +460,7 @@ def checkSqlInjection(place, parameter, value):
                         # Feed with the boundaries details only the first time a
                         # test has been successful
                         if injection.place is None or injection.parameter is None:
-                            if place in (PLACE.UA, PLACE.REFERER, PLACE.HOST):
+                            if place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
                                 injection.parameter = place
                             else:
                                 injection.parameter = parameter
@@ -499,6 +499,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles
                         injection.conf.string = conf.string
+                        injection.conf.notString = conf.notString
                         injection.conf.regexp = conf.regexp
                         injection.conf.optimize = conf.optimize
 

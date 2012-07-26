@@ -245,6 +245,10 @@ def cmdLineParser():
                              help="String to match when "
                                   "query is evaluated to True")
 
+        detection.add_option("--not-string", dest="notString",
+                             help="String to match when "
+                                  "query is evaluated to False")
+
         detection.add_option("--regexp", dest="regexp",
                              help="Regexp to match when "
                                   "query is evaluated to True")
@@ -283,6 +287,10 @@ def cmdLineParser():
 
         techniques.add_option("--dns-domain", dest="dnsName",
                               help="Domain name used for DNS exfiltration attack")
+
+        techniques.add_option("--second-order", dest="secondOrder",
+                             help="Resulting page url searched for second-order "
+                                  "response")
 
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")
