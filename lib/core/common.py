@@ -255,7 +255,7 @@ class Format:
         if "technology" in info:
             infoStr += "\nweb application technology: %s" % Format.humanize(info["technology"], ", ")
 
-        return infoStr
+        return infoStr.lstrip()
 
 class Backend:
     # Set methods
