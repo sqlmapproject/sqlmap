@@ -76,6 +76,7 @@ optDict = {
                                "level":             "integer",
                                "risk":              "integer",
                                "string":            "string",
+                               "notString":         "notString",
                                "regexp":            "string",
                                "code":              "integer",
                                "textOnly":          "boolean",

@@ -245,6 +245,10 @@ def cmdLineParser():
                              help="String to match when "
                                   "query is evaluated to True")
 
+        detection.add_option("--not-string", dest="notString",
+                             help="String to match when "
+                                  "query is evaluated to False")
+
         detection.add_option("--regexp", dest="regexp",
                              help="Regexp to match when "
                                   "query is evaluated to True")
