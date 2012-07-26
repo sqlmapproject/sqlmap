@@ -26,6 +26,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.dump import dumper
 from lib.core.enums import HASHDB_KEYS
+from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapFilePathException
@@ -158,16 +159,18 @@ def __setRequestParams():
             # Url encoding of the header values should be avoided
             # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
 
-            if httpHeader == PLACE.UA:
-                conf.parameters[PLACE.UA] = urldecode(headerValue)
+            httpHeader = "-".join(_.capitalize() for _ in (httpHeader or "").split("-"))
+
+            if httpHeader == HTTPHEADER.USER_AGENT:
+                conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
 
                 if condition:
-                    conf.paramDict[PLACE.UA] = {PLACE.UA: headerValue}
+                    conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
                     testableParameters = True
 
-            elif httpHeader == PLACE.REFERER:
+            elif httpHeader == HTTPHEADER.REFERER:
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
@@ -176,7 +179,7 @@ def __setRequestParams():
                     conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
                     testableParameters = True
 
-            elif httpHeader == PLACE.HOST:
+            elif httpHeader == HTTPHEADER.HOST:
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))

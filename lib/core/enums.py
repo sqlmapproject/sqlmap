@@ -61,7 +61,7 @@ class PLACE:
     SOAP = "SOAP"
     URI = "URI"
     COOKIE = "Cookie"
-    UA = "User-Agent"
+    USER_AGENT = "User-Agent"
     REFERER = "Referer"
     HOST = "Host"
     CUSTOM_POST = "(custom) POST"

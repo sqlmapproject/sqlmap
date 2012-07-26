@@ -378,7 +378,7 @@ def start():
                 for place in parameters:
                     # Test User-Agent and Referer headers only if
                     # --level >= 3
-                    skip = (place == PLACE.UA and conf.level < 3)
+                    skip = (place == PLACE.USER_AGENT and conf.level < 3)
                     skip |= (place == PLACE.REFERER and conf.level < 3)
 
                     # Test Host header only if
@@ -388,11 +388,11 @@ def start():
                     # Test Cookie header only if --level >= 2
                     skip |= (place == PLACE.COOKIE and conf.level < 2)
 
-                    skip |= (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.COOKIE and intersect(PLACE.COOKIE, conf.skip, True) not in ([], None))
 
-                    skip &= not (place == PLACE.UA and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
+                    skip &= not (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.HOST and intersect(HOST_ALIASES, conf.testParameter, True))
 

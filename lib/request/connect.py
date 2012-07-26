@@ -595,8 +595,8 @@ class Connect:
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
 
-        if PLACE.UA in conf.parameters:
-            ua = conf.parameters[PLACE.UA] if place != PLACE.UA or not value else value
+        if PLACE.USER_AGENT in conf.parameters:
+            ua = conf.parameters[PLACE.USER_AGENT] if place != PLACE.USER_AGENT or not value else value
 
         if PLACE.REFERER in conf.parameters:
             referer = conf.parameters[PLACE.REFERER] if place != PLACE.REFERER or not value else value

@@ -118,7 +118,7 @@ class Agent:
             retVal = ET.tostring(root)
         elif place in (PLACE.URI, PLACE.CUSTOM_POST):
             retVal = paramString.replace("%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue))
-        elif place in (PLACE.UA, PLACE.REFERER, PLACE.HOST):
+        elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
             retVal = paramString.replace("%s=%s" % (parameter, origValue),
