@@ -12,7 +12,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Replaces space character (' ') with a dash comment ('--') followed by
     a random string and a new line ('\n')
@@ -46,4 +46,4 @@ def tamper(payload):
             else:
                 retVal += payload[i]
 
-    return retVal
+    return retVal, headers

@@ -16,7 +16,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Replaces space character (' ') with a dash comment ('--') followed by
     a new line ('\n')
@@ -47,4 +47,4 @@ def tamper(payload):
             else:
                 retVal += payload[i]
 
-    return retVal
+    return retVal, headers

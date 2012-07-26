@@ -12,7 +12,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Replaces apostrophe character with its illegal double unicode counterpart
 
@@ -21,4 +21,4 @@ def tamper(payload):
         * Output: AND %00%271%00%27=%00%271%00%27
     """
 
-    return payload.replace('\'', "%00%27") if payload else payload
+    return payload.replace('\'', "%00%27") if payload else payload, headers

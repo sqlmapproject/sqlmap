@@ -14,7 +14,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Base64 all characters in a given payload
 
@@ -23,4 +23,4 @@ def tamper(payload):
         * Output: MScgQU5EIFNMRUVQKDUpIw==
     """
 
-    return base64.b64encode(payload) if payload else payload
+    return base64.b64encode(payload) if payload else payload, headers

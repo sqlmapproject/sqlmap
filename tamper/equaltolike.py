@@ -17,7 +17,7 @@ __priority__ = PRIORITY.HIGHEST
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is unlikely to work against %s" % (os.path.basename(__file__).split(".")[0], DBMS.PGSQL))
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Replaces all occurances of operator equal ('=') with operator 'LIKE'
 
@@ -47,4 +47,4 @@ def tamper(payload):
     if payload:
         retVal = re.sub(r"\s*=\s*", lambda match: process(match), retVal)
 
-    return retVal
+    return retVal, headers

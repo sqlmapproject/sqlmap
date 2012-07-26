@@ -18,7 +18,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Encloses each non-function keyword with versioned MySQL comment
 
@@ -50,4 +50,4 @@ def tamper(payload):
         retVal = re.sub(r"(?<=\W)(?P<word>[A-Za-z_]+)(?=[^\w(]|\Z)", lambda match: process(match), retVal)
         retVal = retVal.replace(" /*!", "/*!").replace("*/ ", "*/")
 
-    return retVal
+    return retVal, headers

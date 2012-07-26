@@ -12,7 +12,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     pass
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Embraces complete query with zero-versioned comment
 
@@ -42,4 +42,4 @@ def tamper(payload):
         if ' ' in payload:
             retVal = "%s /*!00000%s*/%s" % (payload[:payload.find(' ')], payload[payload.find(' ') + 1:], postfix)
 
-    return retVal
+    return retVal, headers

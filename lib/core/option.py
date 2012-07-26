@@ -802,7 +802,7 @@ def __setTamperingFunctions():
             priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper" and function.func_code.co_argcount == 1:
+                if name == "tamper" and function.func_code.co_argcount == 2:
                     found = True
                     kb.tamperFunctions.append(function)
 
@@ -829,7 +829,9 @@ def __setTamperingFunctions():
                     function()
 
             if not found:
-                raise sqlmapGenericException, "missing function 'tamper(value)' in tamper script '%s'" % tfile
+                errMsg = "missing function 'tamper(payload, headers)' "
+                errMsg += "in tamper script '%s'" % tfile
+                raise sqlmapGenericException, errMsg
 
         if resolve_priorities and priorities:
             priorities.sort(reverse=True)

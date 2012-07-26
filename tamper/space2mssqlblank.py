@@ -17,7 +17,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MSSQL))
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Replaces space character (' ') with a random blank character from a
     valid set of alternate characters
@@ -86,4 +86,4 @@ def tamper(payload):
                 
             retVal += payload[i]
 
-    return retVal
+    return retVal, headers

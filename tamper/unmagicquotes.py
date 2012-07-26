@@ -14,7 +14,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Replaces quote character (') with a multi-byte combo %bf%27 together with
     generic comment at the end (to make it work)
@@ -48,4 +48,4 @@ def tamper(payload):
             retVal = re.sub("\s*(AND|OR)[\s(]+'[^']+'\s*(=|LIKE)\s*'.*", "", retVal)
             retVal += "-- "
 
-    return retVal
+    return retVal, headers

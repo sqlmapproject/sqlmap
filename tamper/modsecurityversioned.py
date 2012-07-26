@@ -13,7 +13,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     pass
 
-def tamper(payload):
+def tamper(payload, headers):
     """
     Embraces complete query with versioned comment
 
@@ -43,4 +43,4 @@ def tamper(payload):
         if ' ' in payload:
             retVal = "%s /*!30%s%s*/%s" % (payload[:payload.find(' ')], randomInt(3), payload[payload.find(' ') + 1:], postfix)
 
-    return retVal
+    return retVal, headers
