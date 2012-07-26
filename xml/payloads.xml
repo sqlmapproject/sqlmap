@@ -1978,6 +1978,7 @@ Formats:
     </test>
     <!-- End of inline queries tests -->
 
+
     <!-- Stacked queries tests -->
     <test>
         <title>MySQL &gt; 5.0.11 stacked queries</title>
