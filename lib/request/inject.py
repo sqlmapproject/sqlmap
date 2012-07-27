@@ -407,6 +407,13 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
+            if found and conf.dnsName:
+                _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E":PAYLOAD.TECHNIQUE.ERROR, "U":PAYLOAD.TECHNIQUE.UNION}.items())))
+                warnMsg = "option '--dns-domain' will be ignored "
+                warnMsg += "as faster techniques are usable "
+                warnMsg += "(%s) " % _
+                singleTimeWarnMessage(warnMsg)
+
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
 
