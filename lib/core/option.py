@@ -588,6 +588,22 @@ def __setMetasploit():
     msfEnvPathExists = False
 
     if IS_WIN:
+        if not conf.msfPath:
+            def _(key, value):
+                retVal = None
+
+                try:
+                    from  _winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
+                    _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+                    _ = OpenKey(_, key)
+                    retval = QueryValueEx(_, value)[0]
+                except:
+                    pass
+
+                return retVal
+
+            conf.msfPath = _(r"SOFTWARE\Rapid7\Metasploit", "Location")
+
         warnMsg = "some sqlmap takeover functionalities are not yet "
         warnMsg += "supported on Windows. Please use Linux in a virtual "
         warnMsg += "machine for out-of-band features."
@@ -607,7 +623,7 @@ def __setMetasploit():
             raise sqlmapMissingPrivileges, errMsg
 
     if conf.msfPath:
-        for path in (conf.msfPath, os.path.join(conf.msfPath, 'bin')):
+        for path in (conf.msfPath, os.path.join(conf.msfPath, "bin")):
             if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
                 msfEnvPathExists = True
                 conf.msfPath = path

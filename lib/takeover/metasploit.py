@@ -32,6 +32,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.exception import sqlmapDataException
 from lib.core.exception import sqlmapFilePathException
+from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
@@ -57,6 +58,12 @@ class Metasploit:
         self.__msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli"))
         self.__msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode"))
         self.__msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
+
+        if IS_WIN:
+            _ = normalizePath(os.path.join(conf.msfPath, "..", "scripts", "setenv.bat"))
+            for attr in dir(self):
+                if "__msf" in attr:
+                    setattr(self, attr, "%s & %s" % (_, getattr(self, attr)))
 
         self.__msfPayloadsList = {
                                       "windows": {
