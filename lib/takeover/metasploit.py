@@ -61,9 +61,9 @@ class Metasploit:
 
         if IS_WIN:
             _ = normalizePath(os.path.join(conf.msfPath, "..", "scripts", "setenv.bat"))
-            for attr in dir(self):
-                if "__msf" in attr:
-                    setattr(self, attr, "%s & %s" % (_, getattr(self, attr)))
+            self.__msfCli = "%s & ruby %s" % (_, self.__msfCli)
+            self.__msfEncode = "ruby %s" % self.__msfEncode
+            self.__msfPayload = "%s & ruby %s" % (_, self.__msfPayload)
 
         self.__msfPayloadsList = {
                                       "windows": {
@@ -360,12 +360,12 @@ class Metasploit:
             self.__payloadCmd += " PrependChrootBreak=true PrependSetuid=true"
 
         if extra == "BufferRegister=EAX":
-            self.__payloadCmd += " R | %s -a x86 -e %s -o %s -t %s" % (self.__msfEncode, self.encoderStr, outFile, format)
+            self.__payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (self.__msfEncode, self.encoderStr, outFile, format)
 
             if extra is not None:
                 self.__payloadCmd += " %s" % extra
         else:
-            self.__payloadCmd += " X > %s" % outFile
+            self.__payloadCmd += " X > \"%s\"" % outFile
 
     def __runMsfCliSmbrelay(self):
         self.__forgeMsfCliCmdForSmbrelay()
@@ -528,7 +528,7 @@ class Metasploit:
             debugMsg = "the shellcode size is %d bytes" % payloadSize
             logger.debug(debugMsg)
         else:
-            errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", "")
+            errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", " ").replace("\r", "")
             raise sqlmapFilePathException, errMsg
 
         self.__shellcodeFP = codecs.open(self.__shellcodeFilePath, "rb")
