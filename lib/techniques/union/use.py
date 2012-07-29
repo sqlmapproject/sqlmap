@@ -80,7 +80,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
                     None)
 
         # Automatically patching last char trimming cases
-        if kb.chars.stop not in page and kb.chars.stop[:-1] in page:
+        if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
             warnMsg = "automatically patching output having last char trimmed"
             singleTimeWarnMessage(warnMsg)
             page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
