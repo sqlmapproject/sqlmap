@@ -45,6 +45,9 @@ Sebastian Bittig, <s.bittig@r-tec.net> and the rest of the team at r-tec IT Syst
 Anthony Boynes, <aboynes@gmail.com>
 * for reporting several bugs
 
+Marcelo Toscani Brandao
+* for reporting a bug
+
 Velky Brat, <velkybrat@gmail.com>
 * for suggesting a minor enhancement to the bisection algorithm
 
@@ -367,7 +370,7 @@ Jaime Penalba, <nighterman@painsec.com>
 * for contributing a patch for INSERT/UPDATE generic boundaries
 
 Pedrito Perez, <0ark1ang3l@gmail.com>
-* for reporting a bug
+* for reporting a couple of bugs
 
 Brandon Perry, <bperry.volatile@gmail.com>
 * for reporting a couple of bugs
@@ -583,6 +586,9 @@ Alex, <m3zero@gmail.com>
 anonymous anonymous, <tmp@2ch.so>
 * for reporting a couple of bugs
 
+bamboo, <roberthacksley@gmail.com>
+* for reporting a couple of bugs
+
 Brandon E., <brandonpoc@gmail.com>
 * for reporting a bug
 
@@ -662,6 +668,9 @@ ragos, <ragos@joker.ms>
 
 rmillet, <rmillet42@gmail.com>
 * for reporting a bug
+
+Rub3nCT <rub3nct@gmail.com>
+* for reporting a minor bug
 
 shiftzwei, <shiftzwei@gmail.com>
 * for reporting a couple of bugs
