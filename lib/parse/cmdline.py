@@ -655,6 +655,9 @@ def cmdLineParser():
         parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--force-dns", dest="forceDns", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           help=SUPPRESS_HELP)
 

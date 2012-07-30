@@ -395,24 +395,25 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
             if query and not 'COUNT(*)' in query:
                 query = query.replace("DISTINCT ", "")
 
-            if inband and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                kb.technique = PAYLOAD.TECHNIQUE.UNION
-                value = __goInband(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
-                count += 1
-                found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+            if not conf.forceDns:
+                if inband and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
+                    kb.technique = PAYLOAD.TECHNIQUE.UNION
+                    value = __goInband(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
+                    count += 1
+                    found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-            if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
-                kb.technique = PAYLOAD.TECHNIQUE.ERROR
-                value = errorUse(forgeCaseExpression if expected == EXPECTED.BOOL else query, dump)
-                count += 1
-                found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+                if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
+                    kb.technique = PAYLOAD.TECHNIQUE.ERROR
+                    value = errorUse(forgeCaseExpression if expected == EXPECTED.BOOL else query, dump)
+                    count += 1
+                    found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-            if found and conf.dnsName:
-                _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E":PAYLOAD.TECHNIQUE.ERROR, "U":PAYLOAD.TECHNIQUE.UNION}.items())))
-                warnMsg = "option '--dns-domain' will be ignored "
-                warnMsg += "as faster techniques are usable "
-                warnMsg += "(%s) " % _
-                singleTimeWarnMessage(warnMsg)
+                if found and conf.dnsName:
+                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E":PAYLOAD.TECHNIQUE.ERROR, "U":PAYLOAD.TECHNIQUE.UNION}.items())))
+                    warnMsg = "option '--dns-domain' will be ignored "
+                    warnMsg += "as faster techniques are usable "
+                    warnMsg += "(%s) " % _
+                    singleTimeWarnMessage(warnMsg)
 
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN

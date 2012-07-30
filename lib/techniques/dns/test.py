@@ -10,6 +10,7 @@ from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.settings import FROM_DUMMY_TABLE
 from lib.techniques.dns.use import dnsUse
 
@@ -21,10 +22,13 @@ def dnsTest(payload):
     kb.dnsTest = dnsUse(payload, "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(randInt)
 
     if not kb.dnsTest:
-        errMsg = "data retrieval through DNS channel failed. Turning off DNS exfiltration support"
-        logger.error(errMsg)
-
-        conf.dnsName = None
+        errMsg = "data retrieval through DNS channel failed"
+        if not conf.forceDns:
+            conf.dnsName = None
+            errMsg += ". Turning off DNS exfiltration support"
+            logger.error(errMsg)
+        else:
+            raise sqlmapNotVulnerableException, errMsg
     else:
         infoMsg = "data retrieval through DNS channel was successful"
         logger.info(infoMsg)
