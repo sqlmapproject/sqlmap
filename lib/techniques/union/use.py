@@ -100,7 +100,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
             if trimmed:
                 warnMsg = "possible server trimmed output detected (probably due to its length): "
-                warnMsg += trimmed
+                warnMsg += safecharencode(trimmed)
                 logger.warn(warnMsg)
 
     return retVal

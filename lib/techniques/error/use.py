@@ -115,7 +115,7 @@ def __oneShotErrorUse(expression, field=None):
 
                     if trimmed:
                         warnMsg = "possible server trimmed output detected (due to its length): "
-                        warnMsg += trimmed
+                        warnMsg += safecharencode(trimmed)
                         logger.warn(warnMsg)
 
                 if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
