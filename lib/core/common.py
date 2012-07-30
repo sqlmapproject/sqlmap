@@ -55,6 +55,7 @@ from lib.core.convert import htmlunescape
 from lib.core.convert import unicodeencode
 from lib.core.convert import urldecode
 from lib.core.convert import urlencode
+from lib.core.decorators import cachedmethod
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -491,15 +492,6 @@ class Backend:
     @staticmethod
     def isOs(os):
         return Backend.getOs() is not None and Backend.getOs().lower() == os.lower()
-
-# Reference: http://code.activestate.com/recipes/325205-cache-decorator-in-python-24/
-def cachedmethod(f, cache={}):
-    def _(*args, **kwargs):
-        key = (f, tuple(args), frozenset(kwargs.items()))
-        if key not in cache:
-            cache[key] = f(*args, **kwargs)
-        return cache[key]
-    return _
 
 def paramToDict(place, parameters=None):
     """

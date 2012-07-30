@@ -294,7 +294,6 @@ class Users:
         else:
             for user in kb.data.cachedUsersPasswords:
                 kb.data.cachedUsersPasswords[user] = list(set(kb.data.cachedUsersPasswords[user]))
-                    
 
         message = "do you want to perform a dictionary-based attack "
         message += "against retrieved password hashes? [Y/n/q]"
