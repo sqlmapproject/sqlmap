@@ -42,6 +42,8 @@ def getRevisionNumber():
                     match = re.match(r"(?i)[0-9a-f]{32}", content)
                     retVal = match.group(0) if match else None
                     break
+        else:
+            break
 
     if not retVal:
         process = execute("git rev-parse --verify HEAD", shell=True, stdout=PIPE, stderr=PIPE)
