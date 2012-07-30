@@ -3009,28 +3009,37 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     if forms:
         for form in forms:
-            for control in form.controls:
-                if hasattr(control, "items"):
-                    # if control has selectable items select first non-disabled
-                    for item in control.items:
-                        if not item.disabled:
-                            if not item.selected:
-                                item.selected = True
-                            break
+            try:
+                for control in form.controls:
+                    if hasattr(control, "items"):
+                        # if control has selectable items select first non-disabled
+                        for item in control.items:
+                            if not item.disabled:
+                                if not item.selected:
+                                    item.selected = True
+                                break
 
-            request = form.click()
-            url = urldecode(request.get_full_url(), kb.pageEncoding)
-            method = request.get_method()
-            data = request.get_data() if request.has_data() else None
-            data = urldecode(data, kb.pageEncoding) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data
+                request = form.click()
+            except (ValueError, TypeError), ex:
+                errMsg = "there has been a problem while "
+                errMsg += "processing page forms ('%s')" % ex
+                if raise_:
+                    raise sqlmapGenericException, errMsg
+                else:
+                    logger.debug(errMsg)
+            else:
+                url = urldecode(request.get_full_url(), kb.pageEncoding)
+                method = request.get_method()
+                data = request.get_data() if request.has_data() else None
+                data = urldecode(data, kb.pageEncoding) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data
 
-            if not data and method and method.upper() == HTTPMETHOD.POST:
-                debugMsg = "invalid POST form with blank data detected"
-                logger.debug(debugMsg)
-                continue
+                if not data and method and method.upper() == HTTPMETHOD.POST:
+                    debugMsg = "invalid POST form with blank data detected"
+                    logger.debug(debugMsg)
+                    continue
 
-            target = (url, method, data, conf.cookie)
-            retVal.add(target)
+                target = (url, method, data, conf.cookie)
+                retVal.add(target)
     else:
         errMsg = "there were no forms found at the given target url"
         if raise_:
