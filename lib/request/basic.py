@@ -23,6 +23,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import PLACE
+from lib.core.htmlentities import htmlEntities
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
@@ -215,12 +216,18 @@ def decodePage(page, contentEncoding, contentType):
         if "&#" in page:
             page = re.sub('&#(\d{1,3});', lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
 
+        # e.g. &amp;
+        page = re.sub('&([^;]+);', lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
+
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
         page = getUnicode(page, kb.pageEncoding)
 
         # e.g. &#8217;&#8230;&#8482;
         if "&#" in page:
             page = re.sub('&#(\d+);', lambda _: unichr(int(_.group(1))), page)
+        
+        # e.g. &zeta;
+        page = re.sub('&([^;]+);', lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
     return page
 
