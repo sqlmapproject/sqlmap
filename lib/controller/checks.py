@@ -365,7 +365,7 @@ def checkSqlInjection(place, parameter, value):
                                 candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage else None for _ in (trueSet - falseSet)))
                                 if candidates:
                                     conf.string = random.sample(candidates, 1)[0]
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=%s)" % (place, parameter, title, repr(conf.string).lstrip('u'))
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (place, parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                     logger.info(infoMsg)
 
                                     injectable = True

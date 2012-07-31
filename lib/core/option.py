@@ -1375,6 +1375,9 @@ def __cleanupOptions():
     if conf.oDir:
         paths.SQLMAP_OUTPUT_PATH = conf.oDir
 
+    if conf.string:
+        conf.string = conf.string.decode("unicode_escape")
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
