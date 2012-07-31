@@ -5,6 +5,8 @@ import logging
 import os
 import re
 
+from lib.core.convert import stdoutencode
+
 class ColorizingStreamHandler(logging.StreamHandler):
     # color names to indices
     color_map = {
@@ -45,7 +47,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
     def emit(self, record):
         try:
-            message = self.format(record)
+            message = stdoutencode(self.format(record))
             stream = self.stream
 
             if not self.is_tty:

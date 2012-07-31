@@ -14,8 +14,8 @@ import urllib2
 
 from lib.core.common import getUnicode
 from lib.core.common import readInput
-from lib.core.convert import urldecode
-from lib.core.convert import urlencode
+from lib.core.common import urldecode
+from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

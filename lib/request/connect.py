@@ -32,8 +32,8 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import urlEncodeCookieValues
 from lib.core.common import wasLastRequestDelayed
-from lib.core.convert import unicodeencode
-from lib.core.convert import urlencode
+from lib.core.common import unicodeencode
+from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

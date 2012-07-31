@@ -18,7 +18,7 @@ from lib.core.common import intersect
 from lib.core.common import paramToDict
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
-from lib.core.convert import urldecode
+from lib.core.common import urldecode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb

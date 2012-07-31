@@ -52,9 +52,9 @@ from lib.core.data import paths
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.convert import htmlunescape
+from lib.core.convert import stdoutencode
 from lib.core.convert import unicodeencode
-from lib.core.convert import urldecode
-from lib.core.convert import urlencode
+from lib.core.convert import utf8encode
 from lib.core.decorators import cachedmethod
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
@@ -125,6 +125,8 @@ from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_QUESTION_MARKER
+from lib.core.settings import URLENCODE_CHAR_LIMIT
+from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.threads import getCurrentThreadData
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
@@ -721,29 +723,10 @@ def dataToStdout(data, forceOutput=False, bold=False):
 
     if not kb.get("threadException"):
         if forceOutput or not getCurrentThreadData().disableStdOut:
-            try:
-                if kb.get("multiThreadMode"):
-                    logging._acquireLock()
-                # Reference: http://bugs.python.org/issue1602
-                if IS_WIN:
-                    output = data.encode('ascii', "replace")
+            if kb.get("multiThreadMode"):
+                logging._acquireLock()
 
-                    if output != data:
-                        warnMsg = "cannot properly display Unicode characters "
-                        warnMsg += "inside Windows OS command prompt "
-                        warnMsg += "(http://bugs.python.org/issue1602). All "
-                        warnMsg += "unhandled occurances will result in "
-                        warnMsg += "replacement with '?' character. Please, find "
-                        warnMsg += "proper character representation inside "
-                        warnMsg += "corresponding output files. "
-                        singleTimeWarnMessage(warnMsg)
-
-                    message = output
-                else:
-                    message = data.encode(sys.stdout.encoding)
-            except:
-                message = data.encode(UNICODE_ENCODING)
-
+            message = stdoutencode(data)
             sys.stdout.write(setColor(message, bold))
             sys.stdout.flush()
 
@@ -2010,6 +1993,57 @@ def extractErrorMessage(page):
 
     return retVal
 
+def urldecode(value, encoding=None):
+    result = None
+
+    if value:
+        try:
+            # for cases like T%C3%BCrk%C3%A7e
+            value = str(value)
+        except ValueError:
+            pass
+        finally:
+            result = urllib.unquote_plus(value)
+
+    if isinstance(result, str):
+        result = unicode(result, encoding or UNICODE_ENCODING, "replace")
+
+    return result
+
+def urlencode(value, safe="%&=", convall=False, limit=False):
+    if conf.direct or PLACE.SOAP in conf.paramDict:
+        return value
+
+    count = 0
+    result = None if value is None else ""
+
+    if value:
+        if convall or safe is None:
+            safe = ""
+
+        # corner case when character % really needs to be
+        # encoded (when not representing url encoded char)
+        # except in cases when tampering scripts are used
+        if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
+            value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
+
+        while True:
+            result = urllib.quote(utf8encode(value), safe)
+
+            if limit and len(result) > URLENCODE_CHAR_LIMIT:
+                if count >= len(URLENCODE_FAILSAFE_CHARS):
+                    break
+
+                while count < len(URLENCODE_FAILSAFE_CHARS):
+                    safe += URLENCODE_FAILSAFE_CHARS[count]
+                    count += 1
+                    if safe[-1] in value:
+                        break
+            else:
+                break
+
+    return result
+
 def beep():
     """
     Does an audible beep sound
@@ -2094,11 +2128,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
         dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
         dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
-def getPageTemplate(payload, place):
-    """
-    Cross-linked method
-    """
-
+def getPageTemplate(payload, place):  # Cross-linked function
     pass
 
 def getPublicTypeMembers(type_, onlyValues=False):

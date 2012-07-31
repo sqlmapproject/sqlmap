@@ -19,6 +19,7 @@ import urlparse
 
 import lib.core.common
 import lib.core.threads
+import lib.core.convert
 
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -46,9 +47,10 @@ from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import UnicodeRawConfigParser
-from lib.core.convert import urldecode
-from lib.core.convert import urlencode
+from lib.core.common import urldecode
+from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -1970,6 +1972,7 @@ def __basicOptionValidation():
 def __resolveCrossReferences():
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
+    lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
 
 def init(inputOptions=AttribDict(), overrideOptions=False):
     """

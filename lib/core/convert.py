@@ -17,12 +17,9 @@ import sys
 import struct
 import urllib
 
-from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.enums import PLACE
+from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import URLENCODE_CHAR_LIMIT
-from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 
 def base64decode(value):
     return value.decode("base64")
@@ -62,57 +59,6 @@ def sha1hash(value):
     else:
         return sha.new(value).hexdigest()
 
-def urldecode(value, encoding=None):
-    result = None
-
-    if value:
-        try:
-            # for cases like T%C3%BCrk%C3%A7e
-            value = str(value)
-        except ValueError:
-            pass
-        finally:
-            result = urllib.unquote_plus(value)
-
-    if isinstance(result, str):
-        result = unicode(result, encoding or UNICODE_ENCODING, "replace")
-
-    return result
-
-def urlencode(value, safe="%&=", convall=False, limit=False):
-    if conf.direct or PLACE.SOAP in conf.paramDict:
-        return value
-
-    count = 0
-    result = None if value is None else ""
-
-    if value:
-        if convall or safe is None:
-            safe = ""
-
-        # corner case when character % really needs to be
-        # encoded (when not representing url encoded char)
-        # except in cases when tampering scripts are used
-        if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
-            value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
-
-        while True:
-            result = urllib.quote(utf8encode(value), safe)
-
-            if limit and len(result) > URLENCODE_CHAR_LIMIT:
-                if count >= len(URLENCODE_FAILSAFE_CHARS):
-                    break
-
-                while count < len(URLENCODE_FAILSAFE_CHARS):
-                    safe += URLENCODE_FAILSAFE_CHARS[count]
-                    count += 1
-                    if safe[-1] in value:
-                        break
-            else:
-                break
-
-    return result
-
 def unicodeencode(value, encoding=None):
     """
     Return 8-bit string representation of the supplied unicode value:
@@ -144,4 +90,33 @@ def htmlunescape(value):
     if value and isinstance(value, basestring):
         codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
+    return retVal
+
+def singleTimeWarnMessage(message):  # Cross-linked function
+    pass
+
+def stdoutencode(data):
+    retVal = None
+
+    try:
+        # Reference: http://bugs.python.org/issue1602
+        if IS_WIN:
+            output = data.encode('ascii', "replace")
+
+            if output != data:
+                warnMsg = "cannot properly display Unicode characters "
+                warnMsg += "inside Windows OS command prompt "
+                warnMsg += "(http://bugs.python.org/issue1602). All "
+                warnMsg += "unhandled occurances will result in "
+                warnMsg += "replacement with '?' character. Please, find "
+                warnMsg += "proper character representation inside "
+                warnMsg += "corresponding output files. "
+                singleTimeWarnMessage(warnMsg)
+
+            retVal = output
+        else:
+            retVal = data.encode(sys.stdout.encoding)
+    except:
+        retVal = data.encode(UNICODE_ENCODING)
+
     return retVal
