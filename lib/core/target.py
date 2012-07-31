@@ -36,6 +36,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import authHandler
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
+from lib.core.option import __setAuthCred
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import REFERER_ALIASES
@@ -331,14 +332,6 @@ def __setResultsFile():
         conf.resultsFP.writelines("Target url,Place,Parameter,Techniques%s" % os.linesep)
 
         logger.info("using '%s' as results file" % conf.resultsFilename)
-
-def __setAuthCred():
-    """
-    Adds authentication credentials (if any) for current target to the password manager (used by connection handler).
-    """
-
-    if kb.passwordMgr:
-        kb.passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), conf.authUsername, conf.authPassword)
 
 def __createFilesDir():
     """

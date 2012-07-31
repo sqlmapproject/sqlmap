@@ -993,6 +993,15 @@ def __setPrefixSuffix():
         # to be tested for
         conf.boundaries = [ boundary ]
 
+def __setAuthCred():
+    """
+    Adds authentication credentials (if any) for current target to the password manager
+    (used by connection handler)
+    """
+
+    if kb.passwordMgr:
+        kb.passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), conf.authUsername, conf.authPassword)
+
 def __setHTTPAuthentication():
     """
     Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or Certificate),
@@ -1043,6 +1052,8 @@ def __setHTTPAuthentication():
         conf.authPassword = aCredRegExp.group(2)
 
         kb.passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+
+        __setAuthCred()
 
         if aTypeLower == "basic":
             authHandler = SmartHTTPBasicAuthHandler(kb.passwordMgr)
