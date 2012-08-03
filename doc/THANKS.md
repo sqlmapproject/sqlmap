@@ -6,6 +6,9 @@ Andres Tarasco Acuna, <atarasco@gmail.com>
 Santiago Accurso, <saccurso@skygear.com.ar>
 * for reporting a bug
 
+Zaki Akhmad, <zakiakhmad@gmail.com>
+* for suggesting a couple of features
+
 Olu Akindeinde, <seyi.akin@gmail.com>
 * for reporting a couple of bugs
 
