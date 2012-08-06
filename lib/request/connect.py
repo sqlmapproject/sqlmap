@@ -51,6 +51,7 @@ from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
+from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import IS_WIN
@@ -137,6 +138,11 @@ class Connect:
                         retVal += _
                     else:
                         retVal += _
+                        break
+
+                    if len(retVal) > MAX_CONNECTION_TOTAL_SIZE:
+                        warnMsg = "too large response detected. Automatically trimming it"
+                        singleTimeWarnMessage(warnMsg)
                         break
 
         return retVal

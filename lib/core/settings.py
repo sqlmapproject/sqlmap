@@ -502,6 +502,9 @@ DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.letters)
 # Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION/inband injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 
+# Maximum response total page size (trimmed if larger)
+MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
+
 # Mark used for trimming unnecessary content in large chunks
 LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
 
