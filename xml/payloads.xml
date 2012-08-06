@@ -453,7 +453,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%')</prefix>
-        <suffix></suffix>
+        <suffix>AND ('%'='</suffix>
     </boundary>
 
     <boundary>
@@ -462,7 +462,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%'))</prefix>
-        <suffix></suffix>
+        <suffix>AND (('%'='</suffix>
     </boundary>
 
     <boundary>
@@ -471,7 +471,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%')))</prefix>
-        <suffix></suffix>
+        <suffix>AND ((('%'='</suffix>
     </boundary>
 
     <boundary>
@@ -480,7 +480,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%'</prefix>
-        <suffix></suffix>
+        <suffix>AND '%'='</suffix>
     </boundary>
     <!-- End of WHERE/HAVING clause boundaries -->
 
