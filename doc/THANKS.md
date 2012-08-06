@@ -715,6 +715,9 @@ warninggp, <warninggp@gmail.com>
 x, <deep_freeze@mail.ru>
 * for reporting a bug
 
+zhouhx <zhouhx@knownsec.com>
+* for contributing a minor patch
+
 # Organizations
 
 Black Hat team, <info@blackhat.com>
