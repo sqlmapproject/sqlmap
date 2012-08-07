@@ -701,7 +701,7 @@ def setColor(message, bold=False):
     retVal = message
     level = extractRegexResult(r"\[(?P<result>[A-Z ]+)\]", message) or kb.get("stickyLevel")
 
-    if message and hasattr(LOGGER_HANDLER, "level_map"):  # colorizing handler
+    if message and getattr(LOGGER_HANDLER, "is_tty", False):  # colorizing handler
         if bold:
             retVal = colored(message, color=None, on_color=None, attrs=("bold",))
         elif level:

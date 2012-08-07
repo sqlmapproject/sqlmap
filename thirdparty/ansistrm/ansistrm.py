@@ -51,6 +51,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
             stream = self.stream
 
             if not self.is_tty:
+                if message and message[0] == "\r":
+                    message = message[1:]
                 stream.write(message)
             else:
                 self.output_colorized(message)
@@ -122,7 +124,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                         ctypes.windll.kernel32.SetConsoleTextAttribute(h, color)
 
     def colorize(self, message, record):
-        if record.levelno in self.level_map:
+        if record.levelno in self.level_map and self.is_tty:
             bg, fg, bold = self.level_map[record.levelno]
             params = []
 
