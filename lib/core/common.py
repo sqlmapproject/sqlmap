@@ -123,7 +123,6 @@ from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import TEXT_TAG_REGEX
-from lib.core.settings import UNION_UNIQUE_FIFO_LENGTH
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
@@ -1164,7 +1163,7 @@ def parseUnionPage(page):
             logger.warn(warnMsg)
 
         data = BigArray()
-        _ = []
+        keys = set()
 
         for match in re.finditer("%s(.*?)%s" % (kb.chars.start, kb.chars.stop), page, re.DOTALL | re.IGNORECASE):
             entry = match.group(1)
@@ -1174,10 +1173,8 @@ def parseUnionPage(page):
 
             if kb.unionDuplicates:
                 key = entry.lower()
-                if key not in _:
-                    _.append(key)
-                    if len(_) > UNION_UNIQUE_FIFO_LENGTH:
-                        _.pop(0)
+                if key not in keys:
+                    keys.add(key)
                 else:
                     continue
 
