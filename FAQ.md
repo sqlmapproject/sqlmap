@@ -49,7 +49,7 @@ Our preferred method of patch submission is via a Git [pull request](https://hel
 
 Each patch should make one logical change. Please follow the existing stylistic conventions: wrap code to 76 columns when possible. Avoid tabbing, use four blank spaces instead. Before you put time into a nontrivial patch, it is worth discussing it on the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users) or privately by [email](mailto:dev@sqlmap.org).
 
-Many [people](https://raw.github.com/sqlmapproject/sqlmap/master/doc/THANKS) have contributed in different ways to the sqlmap development. **You** can be the next!
+Many [people](https://raw.github.com/sqlmapproject/sqlmap/master/doc/THANKS.md) have contributed in different ways to the sqlmap development. **You** can be the next!
 
 ## Can I actively contribute in the long-term development?
 
