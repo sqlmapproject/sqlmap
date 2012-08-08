@@ -672,7 +672,7 @@ ragos, <ragos@joker.ms>
 rmillet, <rmillet42@gmail.com>
 * for reporting a bug
 
-Rub3nCT <rub3nct@gmail.com>
+Rub3nCT, <rub3nct@gmail.com>
 * for reporting a minor bug
 
 shiftzwei, <shiftzwei@gmail.com>
@@ -715,7 +715,7 @@ warninggp, <warninggp@gmail.com>
 x, <deep_freeze@mail.ru>
 * for reporting a bug
 
-zhouhx <zhouhx@knownsec.com>
+zhouhx, <zhouhx@knownsec.com>
 * for contributing a minor patch
 
 # Organizations
