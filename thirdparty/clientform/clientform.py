@@ -241,6 +241,8 @@ def unescape_charref(data, encoding):
     name, base = data, 10
     if name.startswith("x"):
         name, base= name[1:], 16
+    elif not name.isdigit():
+        base = 16
     uc = unichr(int(name, base))
     if encoding is None:
         return uc
