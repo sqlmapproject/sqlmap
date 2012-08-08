@@ -260,8 +260,8 @@ class Databases:
                     infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                     logger.info(infoMsg)
                 elif not Backend.isDbms(DBMS.SQLITE):
-                    query += " WHERE "
-                    query += " OR ".join("%s = '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in sorted(dbs))
+                    query += " WHERE %s" % condition
+                    query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
