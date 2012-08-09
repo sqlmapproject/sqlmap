@@ -3353,9 +3353,7 @@ class HTMLForm:
         rest, (query, frag) = parts[:-2], parts[-2:]
 
         if method == "GET":
-            if self.enctype != "application/x-www-form-urlencoded":
-                raise ValueError(
-                    "unknown GET form encoding type '%s'" % self.enctype)
+            self.enctype = "application/x-www-form-urlencoded"  # force it
             parts = rest + (urlencode(self._pairs()), None)
             uri = self._urlunparse(parts)
             return uri, None, []
