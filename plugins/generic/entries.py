@@ -9,6 +9,7 @@ from extra.safe2bin.safe2bin import safechardecode
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
+from lib.core.common import decodeIntToUnicode
 from lib.core.common import getLimitRange
 from lib.core.common import getUnicode
 from lib.core.common import isInferenceAvailable
@@ -129,7 +130,7 @@ class Entries:
                     for char in ('\'', '?'):
                         if pivotValue and char in pivotValue and pivotValue[0] != char:
                             pivotValue = pivotValue.split(char)[0]
-                            pivotValue = pivotValue[:-1] + chr(ord(pivotValue[-1]) + 1)
+                            pivotValue = pivotValue[:-1] + decodeIntToUnicode(ord(pivotValue[-1]) + 1)
                             break
                     if column == colList[0]:
                         query = dumpNode.query % (column, table, column, pivotValue)
