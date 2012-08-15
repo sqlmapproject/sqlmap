@@ -77,6 +77,7 @@ from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.log import FORMATTER
+from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.purge import purge
 from lib.core.settings import CODECS_LIST_PAGE
@@ -1995,7 +1996,11 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     based upon command line and configuration file options.
     """
 
-    coloramainit()
+    if not inputOptions.disableColoring:
+        coloramainit()
+    else:
+        if hasattr(LOGGER_HANDLER, "disable_coloring"):
+            LOGGER_HANDLER.disable_coloring = True
     __setConfAttributes()
     __setKnowledgeBaseAttributes()
     __mergeOptions(inputOptions, overrideOptions)

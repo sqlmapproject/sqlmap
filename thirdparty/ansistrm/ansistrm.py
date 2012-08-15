@@ -39,11 +39,12 @@ class ColorizingStreamHandler(logging.StreamHandler):
         }
     csi = '\x1b['
     reset = '\x1b[0m'
+    disable_coloring = False
 
     @property
     def is_tty(self):
         isatty = getattr(self.stream, 'isatty', None)
-        return isatty and isatty()
+        return isatty and isatty() and not self.disable_coloring
 
     def emit(self, record):
         try:

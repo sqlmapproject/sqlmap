@@ -619,6 +619,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Check for missing sqlmap dependencies")
 
+        miscellaneous.add_option("--disable-coloring", dest="disableColoring",
+                                  action="store_true",
+                                  help="Disable console output coloring")
+
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
 

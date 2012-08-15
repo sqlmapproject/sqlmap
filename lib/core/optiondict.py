@@ -192,6 +192,7 @@ optDict = {
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",
+                               "disableColoring":   "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
                                "pageRank":          "boolean",
