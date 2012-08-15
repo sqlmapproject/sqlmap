@@ -1029,6 +1029,8 @@ def parseTargetUrl():
     if not conf.url:
         return
 
+    originalUrl = conf.url
+
     if re.search("\[.+\]", conf.url) and not socket.has_ipv6:
         errMsg = "IPv6 addressing is not supported "
         errMsg += "on this platform"
@@ -1090,6 +1092,9 @@ def parseTargetUrl():
         logger.debug(debugMsg)
         conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.HOST, conf.httpHeaders)
         conf.httpHeaders.append((HTTPHEADER.HOST, getHostHeader(conf.url)))
+
+    if originalUrl != conf.url:
+        kb.originalUrls[conf.url] = originalUrl
 
 def expandAsteriskForColumns(expression):
     """

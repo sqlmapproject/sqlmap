@@ -1519,6 +1519,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.originalCode = None
     kb.originalPage = None
     kb.originalTimeDelay = None
+    kb.originalUrls = dict()
 
     # Back-end DBMS underlying operating system fingerprint via banner (-b)
     # parsing

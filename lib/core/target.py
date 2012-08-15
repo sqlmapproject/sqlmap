@@ -398,6 +398,9 @@ def __createTargetDirs():
 
             conf.outputPath = tempDir
 
+    with open(os.path.join(conf.outputPath, "target.txt"), "w+") as f:
+        f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
+
     __createDumpDir()
     __createFilesDir()
     __configureDumper()
