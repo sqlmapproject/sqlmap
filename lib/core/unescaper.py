@@ -13,7 +13,7 @@ from lib.core.settings import EXCLUDE_UNESCAPE
 
 class Unescaper(AttribDict):
     def unescape(self, expression, quote=True, dbms=None):
-        if not kb.unescape or conf.noUnescape:
+        if conf.noUnescape:
             return expression
 
         if expression is None:
