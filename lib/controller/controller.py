@@ -438,8 +438,9 @@ def start():
                             logger.info(infoMsg)
 
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
-                                kb.dynamicParameter = checkDynParam(place, parameter, value)
-                                if not kb.dynamicParameter:
+                                check = checkDynParam(place, parameter, value)
+
+                                if not check:
                                     warnMsg = "%s parameter '%s' appears to be not dynamic" % (place, parameter)
                                     logger.warn(warnMsg)
 

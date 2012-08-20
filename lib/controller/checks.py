@@ -635,6 +635,15 @@ def heuristicCheckSqlInjection(place, parameter):
 
     kb.heuristicTest = result
 
+    if not result and kb.dynamicParameter:
+        _ = conf.paramDict[place][parameter]
+
+        if _.isdigit():
+            randInt = int(randomInt())
+            payload = "%s%s%s" % (prefix, "%s-%s" % (int(_) + randInt, randInt), suffix)
+            payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
+            result = Request.queryPage(payload, place, raise404=False)
+
     if result:
         infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
         logger.info(infoMsg)
@@ -675,10 +684,10 @@ def checkDynParam(place, parameter, value):
     except sqlmapConnectionException:
         pass
 
-    if dynResult is None:
-        return None
-    else:
-        return not dynResult
+    result = None if dynResult is None else not dynResult
+    kb.dynamicParameter = result
+
+    return result
 
 def checkDynamicContent(firstPage, secondPage):
     """
