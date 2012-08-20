@@ -508,18 +508,18 @@ def start():
                     if not conf.textOnly and kb.originalPage:
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
 
-                        if kb.dynamicParameters:
+                        if kb.dynamicMarkings:
                             errMsg += " You can give it a go with the switch '--text-only' "
                             errMsg += "if the target page has a low percentage "
                             errMsg += "of textual content (~%.2f%% of " % percent
-                            errMsg += "page content is text)."
+                            errMsg += "page content is text)"
                         elif percent < LOW_TEXT_PERCENT and not kb.errorIsNone:
                             errMsg += " Please retry with the switch '--text-only' "
                             errMsg += "(along with --technique=BU) as this case "
                             errMsg += "looks like a perfect candidate "
                             errMsg += "(low textual content along with inability "
                             errMsg += "of comparison engine to detect at least "
-                            errMsg += "one dynamic parameter)."
+                            errMsg += "one dynamic parameter)"
 
                     if kb.heuristicTest:
                         errMsg += " As heuristic test turned out positive you are "
