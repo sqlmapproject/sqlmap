@@ -364,8 +364,8 @@ class Agent:
         if fields.startswith("(CASE") or fields.startswith("(IIF") or fields.startswith("SUBSTR") or fields.startswith("MID(") or re.search(r"\A'[^']+'\Z", fields):
             nulledCastedConcatFields = fields
         else:
-            fields = fields.replace(", ", ",")
-            fieldsSplitted = fields.split(",")
+            fields = fields.replace(", ", ',')
+            fieldsSplitted = fields.split(',')
             dbmsDelimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
             nulledCastedFields = []
 
@@ -428,8 +428,8 @@ class Agent:
         if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]
         else:
-            fieldsToCastList = fieldsToCastStr.replace(", ", ",")
-            fieldsToCastList = fieldsToCastList.split(",")
+            fieldsToCastList = fieldsToCastStr.replace(", ", ',')
+            fieldsToCastList = fieldsToCastList.split(',')
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr, fieldsExists
 
@@ -475,7 +475,7 @@ class Agent:
 
         if unpack:
             concatenatedQuery = ""
-            query = query.replace(", ", ",")
+            query = query.replace(", ", ',')
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
             castedFields = self.nullCastConcatFields(fieldsToCastStr)
             concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
@@ -597,7 +597,7 @@ class Agent:
         inbandQuery = self.prefixQuery("%sUNION ALL SELECT " % limitOriginal, prefix=prefix)
 
         if limited:
-            inbandQuery += ",".join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
+            inbandQuery += ','.join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
             inbandQuery += FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
             inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
@@ -620,7 +620,7 @@ class Agent:
 
         for element in xrange(0, count):
             if element > 0:
-                inbandQuery += ", "
+                inbandQuery += ','
 
             if element == position:
                 if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
@@ -647,7 +647,7 @@ class Agent:
 
             for element in xrange(count):
                 if element > 0:
-                    inbandQuery += ", "
+                    inbandQuery += ','
 
                 if element == position:
                     inbandQuery += multipleUnions
@@ -705,9 +705,9 @@ class Agent:
 
             if query.startswith("SELECT "):
                 delimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
-                limitedQuery = "%s FROM (%s, %s" % (untilFrom, untilFrom.replace(delimiter, ','), limitStr)
+                limitedQuery = "%s FROM (%s,%s" % (untilFrom, untilFrom.replace(delimiter, ','), limitStr)
             else:
-                limitedQuery = "%s FROM (SELECT %s, %s" % (untilFrom, ", ".join(f for f in field), limitStr)
+                limitedQuery = "%s FROM (SELECT %s,%s" % (untilFrom, ','.join(f for f in field), limitStr)
             limitedQuery = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 

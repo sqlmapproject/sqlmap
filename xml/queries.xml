@@ -98,7 +98,7 @@
         <timedelay query="SELECT PG_SLEEP(%d)" query2="SELECT 'sqlmap' WHERE exists(SELECT * FROM generate_series(1,300000%d))" query3="CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6','sleep' language 'C' STRICT; SELECT sleep(%d)"/>
         <substring query="SUBSTR((%s)::text,%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <hex query="ENCODE(CONVERT_TO((%s), 'UTF8'),'HEX')"/>
+        <hex query="ENCODE(CONVERT_TO((%s),'UTF8'),'HEX')"/>
         <inference query="ASCII(SUBSTR((%s)::text,%d,1)) > %d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
@@ -190,8 +190,8 @@
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u', 'v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT name FROM %s..sysobjects WHERE xtype = 'U'"/>
-            <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u', 'v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u', 'v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT TOP 1 table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' AND table_schema+'.'+table_name NOT IN (SELECT TOP %d table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' ORDER BY table_schema+'.'+table_name) ORDER BY table_schema+'.'+table_name" count2="SELECT LTRIM(STR(COUNT(table_name))) FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype = 'U' AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype = 'U' ORDER BY name) ORDER BY name" count3="SELECT COUNT(name) FROM %s..sysobjects WHERE xtype = 'U'"/>
+            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT name FROM %s..sysobjects WHERE xtype = 'U'"/>
+            <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT TOP 1 table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' AND table_schema+'.'+table_name NOT IN (SELECT TOP %d table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' ORDER BY table_schema+'.'+table_name) ORDER BY table_schema+'.'+table_name" count2="SELECT LTRIM(STR(COUNT(table_name))) FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype = 'U' AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype = 'U' ORDER BY name) ORDER BY name" count3="SELECT COUNT(name) FROM %s..sysobjects WHERE xtype = 'U'"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
@@ -210,8 +210,8 @@
             <blind query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') " count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" condition="name" condition2="name"/>
         </search_table>
         <search_column>
-            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
-            <blind query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" count="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u', 'v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
+            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype in ('u','v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
+            <blind query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u','v')" count="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u','v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
         </search_column>
     </dbms>
 
@@ -513,7 +513,7 @@
         <timedelay query="WAITFOR DELAY '0:0:%d'"/>
         <substring query="SUBSTRING((%s),%d,%d)"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <hex query="BINTOSTR(CONVERT(VARBINARY, %s))"/>
+        <hex query="BINTOSTR(CONVERT(VARBINARY,%s))"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
@@ -585,7 +585,7 @@
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
-        <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT, versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>
+        <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT,versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
         <!-- NOTE: On DB2 we use the current user as default schema (database) -->
         <current_db query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
@@ -593,42 +593,42 @@
         <is_dba query="(SELECT dbadmauth FROM syscat.dbauth WHERE grantee=current user)='Y'"/>
         <users>
             <inband query="SELECT grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
-            <blind query="SELECT grantee FROM (SELECT ROW_NUMBER() OVER () AS LIMIT, grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC') AS foobar WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(grantee)) FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
+            <blind query="SELECT grantee FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC') AS foobar WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(grantee)) FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
         </users>
         <!-- NOTE: On DB2 it is not possible to list password hashes, since they are handled by the OS -->        
         <passwords/>
         <privileges>
-            <inband query="SELECT grantee, RTRIM(tabschema)||'.'||tabname||CHR(44)||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM syscat.tabauth" query2="" condition="grantee" condition2=""/>
-            <blind query="SELECT tabschema||'.'||tabname||CHR(44)||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS LIMIT, syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS foobar WHERE LIMIT=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
+            <inband query="SELECT grantee,RTRIM(tabschema)||'.'||tabname||CHR(44)||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM syscat.tabauth" query2="" condition="grantee" condition2=""/>
+            <blind query="SELECT tabschema||'.'||tabname||CHR(44)||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS foobar WHERE LIMIT=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
         </privileges>
         <roles/>
         <!-- NOTE: in DB2 schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT schemaname FROM syscat.schemata"/>
-            <blind query="SELECT schemaname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT, schemaname FROM syscat.schemata) AS foobar WHERE LIMIT=%d" count="SELECT COUNT(schemaname) FROM syscat.schemata"/>
+            <blind query="SELECT schemaname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,schemaname FROM syscat.schemata) AS foobar WHERE LIMIT=%d" count="SELECT COUNT(schemaname) FROM syscat.schemata"/>
         </dbs>
         <tables>
-            <inband query="SELECT tabschema, tabname FROM sysstat.tables" condition="tabschema"/>
-            <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT, tabname FROM sysstat.tables WHERE tabschema='%s') AS foobar WHERE LIMIT=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
+            <inband query="SELECT tabschema,tabname FROM sysstat.tables" condition="tabschema"/>
+            <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,tabname FROM sysstat.tables WHERE tabschema='%s') AS foobar WHERE LIMIT=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT name, RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s'" condition="name"/>
+            <inband query="SELECT name,RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s'" condition="name"/>
             <blind query="SELECT name FROM sysibm.syscolumns WHERE tbname='%s'" query2="SELECT RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s' AND name='%s'" count="SELECT COUNT(name) FROM sysibm.syscolumns WHERE tbname='%s'" condition="name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM (SELECT ROW_NUMBER() OVER () AS LIMIT, %s FROM %s) AS foobar WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,%s FROM %s) AS foobar WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schemaname FROM syscat.schemata WHERE " query2="" condition="schemaname" condition2=""/>
             <blind query="SELECT schemaname FROM (SELECT DISTINCT(schemaname) FROM syscat.schemata WHERE " query2="" count="SELECT COUNT(DISTINCT(schemaname)) FROM syscat.schemata WHERE " count2="" condition="schemaname" condition2=""/>
         </search_db>
         <search_table>
-            <inband query="SELECT tabschema, tabname FROM sysstat.tables WHERE " condition="tabname" condition2="tabschema"/>
+            <inband query="SELECT tabschema,tabname FROM sysstat.tables WHERE " condition="tabname" condition2="tabschema"/>
             <blind query="SELECT tabschema FROM (SELECT DISTINCT(tabschema) FROM sysstat.tables WHERE " query2="SELECT DISTINCT(tabname) FROM sysstat.tables WHERE tabschema='%s'" count="SELECT COUNT(DISTINCT(tabschema)) FROM sysstat.tables WHERE " count2="SELECT COUNT(tabname) FROM sysstat.tables WHERE tabschema='%s'" condition="tabname" condition2="tabschema"/>
         </search_table>
         <search_column>
-            <inband query="SELECT tabschema, tabname FROM sysstat.columns WHERE " condition="colname" condition2="tabschema" condition3="tabname"/>
+            <inband query="SELECT tabschema,tabname FROM sysstat.columns WHERE " condition="colname" condition2="tabschema" condition3="tabname"/>
             <blind query="SELECT tabschema FROM (SELECT DISTINCT(tabschema) FROM sysstat.columns WHERE " query2="SELECT DISTINCT(tabname) FROM sysstat.columns WHERE tabschema='%s'" count="SELECT COUNT(DISTINCT(tabschema)) FROM sysstat.columns WHERE " count2="SELECT COUNT(DISTINCT(tabname)) FROM sysstat.columns WHERE tabschema='%s'" condition="colname" condition2="tabschema" condition3="tabname"/>
         </search_column>
     </dbms>
