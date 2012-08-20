@@ -242,7 +242,7 @@ class Connect:
 
                 return page
 
-            elif any ((refreshing, crawling)):
+            elif any((refreshing, crawling)):
                 pass
 
             elif target:

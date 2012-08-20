@@ -129,7 +129,7 @@ class HTTPHandler(urllib2.HTTPHandler):
                 if not req.headers.has_key('Content-length'):
                     req.headers['Content-length'] = '%d' % len(data)
             else:
-                h.putrequest('GET', req.get_selector())
+                h.putrequest(req.get_method() or 'GET', req.get_selector())
 
             if not req.headers.has_key('Connection'):
                 req.headers['Connection'] = 'keep-alive'

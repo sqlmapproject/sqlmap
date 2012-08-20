@@ -953,6 +953,9 @@ def checkNullConnection():
     Reference: http://www.wisec.it/sectou.php?id=472f952d79293
     """
 
+    if conf.data:
+        return False
+
     infoMsg = "testing NULL connection to the target url"
     logger.info(infoMsg)
 
