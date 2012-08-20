@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import httplib
 import re
 import socket
+import string
 import time
 import urllib2
 import urlparse
@@ -276,7 +277,6 @@ class Connect:
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
             headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
-
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
             if auxHeaders:
@@ -301,6 +301,13 @@ class Connect:
                 conf.cj._policy._now = conf.cj._now = int(time.time())
                 cookies = conf.cj._cookies_for_request(req)
                 requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
+
+            if post:
+                if not req.has_header(HTTPHEADER.CONTENT_TYPE):
+                    requestHeaders += "\n%s: %s" % (string.capwords(HTTPHEADER.CONTENT_TYPE), "application/x-www-form-urlencoded")
+
+                if not req.has_header(HTTPHEADER.CONTENT_LENGTH):
+                    requestHeaders += "\n%s: %d" % (string.capwords(HTTPHEADER.CONTENT_LENGTH), len(post))
 
             if not req.has_header(HTTPHEADER.CONNECTION):
                 requestHeaders += "\n%s: close" % HTTPHEADER.CONNECTION
