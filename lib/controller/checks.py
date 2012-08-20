@@ -190,7 +190,7 @@ def checkSqlInjection(place, parameter, value):
                     msg += "back-end DBMS could be %s. " % Format.getErrorParsedDBMSes()
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
 
-                    if conf.realTest or readInput(msg, default="Y") in ("y", "Y"):
+                    if readInput(msg, default="Y") in ("y", "Y"):
                         kb.skipOthersDbms = Backend.getErrorParsedDBMSes()
                     else:
                         kb.skipOthersDbms = []
@@ -503,7 +503,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.regexp = conf.regexp
                         injection.conf.optimize = conf.optimize
 
-                        if conf.beep or conf.realTest:
+                        if conf.beep:
                             beep()
 
                         # There is no need to perform this test for other
@@ -644,44 +644,6 @@ def heuristicCheckSqlInjection(place, parameter):
 
     return result
 
-def simpletonCheckSqlInjection(place, parameter, value):
-    """
-    This is a function for the quickest and simplest
-    SQL injection check (e.g. AND 1=1) - only works
-    with integer parameters
-    """
-
-    result = False
-    randInt = randomInt()
-
-    if value.isdigit():
-        payload = "%s AND %d=%d" % (value, randInt, randInt)
-    else:
-        return False
-
-    payload = agent.payload(place, parameter, value, payload)
-    firstPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
-
-    if not (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
-        if getComparePageRatio(kb.originalPage, firstPage, filtered=True) > CONSTANT_RATIO:
-            payload = "%s AND %d=%d" % (value, randInt, randInt + 1)
-
-            payload = agent.payload(place, parameter, value, payload)
-            secondPage, _ = Request.queryPage(payload, place, content=True, raise404=False)
-            result = getComparePageRatio(firstPage, secondPage, filtered=True) <= CONSTANT_RATIO
-
-    infoMsg = "simpleton test shows that %s " % place
-    infoMsg += "parameter '%s' might " % parameter
-
-    if result:
-        infoMsg += "be injectable"
-        logger.info(infoMsg)
-    else:
-        infoMsg += "not be injectable"
-        logger.warn(infoMsg)
-
-    return result
-
 def checkDynParam(place, parameter, value):
     """
     This function checks if the url parameter is dynamic. If it is
@@ -806,10 +768,7 @@ def checkStability():
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [(C)ontinue/(s)tring/(r)egex/(q)uit] "
-        if not conf.realTest:
-            test = readInput(message, default="C")
-        else:
-            test = None
+        test = readInput(message, default="C")
 
         if test and test[0] in ("q", "Q"):
             raise sqlmapUserQuitException

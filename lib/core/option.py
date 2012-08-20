@@ -1484,6 +1484,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.docRoot = None
     kb.dumpTable = None
     kb.dynamicMarkings = []
+    kb.dynamicParameter = False
     kb.endDetection = False
     kb.explicitSettings = set()
     kb.errorIsNone = True

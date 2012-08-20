@@ -18,7 +18,6 @@ from lib.controller.checks import checkConnection
 from lib.controller.checks import checkNullConnection
 from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
-from lib.controller.checks import simpletonCheckSqlInjection
 from lib.core.agent import agent
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
@@ -327,8 +326,6 @@ def start():
                     elif test[0] in ("q", "Q"):
                         break
 
-                elif conf.realTest:
-                    logger.info(message)
                 else:
                     message += "\ndo you want to test this url? [Y/n/q]"
                     test = readInput(message, default="Y")
@@ -440,11 +437,9 @@ def start():
                             infoMsg = "ignoring %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
-                        elif conf.realTest:
-                            pass
-
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
-                                if not checkDynParam(place, parameter, value):
+                                kb.dynamicParameter = checkDynParam(place, parameter, value)
+                                if not kb.dynamicParameter:
                                     warnMsg = "%s parameter '%s' appears to be not dynamic" % (place, parameter)
                                     logger.warn(warnMsg)
 
@@ -458,7 +453,7 @@ def start():
                             check = heuristicCheckSqlInjection(place, parameter)
 
                             if not check:
-                                if conf.smart or conf.realTest and not simpletonCheckSqlInjection(place, parameter, value):
+                                if conf.smart:
                                     infoMsg = "skipping %s parameter '%s'" % (place, parameter)
                                     logger.info(infoMsg)
                                     continue
@@ -495,7 +490,7 @@ def start():
                     errMsg = "no parameter(s) found for testing in the provided data "
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
                     raise sqlmapNoneDataException, errMsg
-                elif not conf.realTest:
+                else:
                     errMsg = "all parameters appear to be not injectable."
 
                     if conf.level < 5 or conf.risk < 3:
@@ -543,9 +538,6 @@ def start():
                         errMsg += "does not match exclusively True responses"
 
                     raise sqlmapNotVulnerableException, errMsg
-                else:
-                    errMsg = "it seems that all parameters are not injectable"
-                    raise sqlmapNotVulnerableException, errMsg
             else:
                 # Flush the flag
                 kb.testMode = False
@@ -556,9 +548,7 @@ def start():
                 __selectInjection()
 
             if kb.injection.place is not None and kb.injection.parameter is not None:
-                if kb.testQueryCount == 0 and conf.realTest:
-                    condition = False
-                elif conf.multipleTargets:
+                if conf.multipleTargets:
                     message = "do you want to exploit this SQL injection? [Y/n] "
                     exploit = readInput(message, default="Y")
 

@@ -268,9 +268,6 @@ class Connect:
             # Prepare HTTP headers
             headers = forgeHeaders({HTTPHEADER.COOKIE: cookie, HTTPHEADER.USER_AGENT: ua, HTTPHEADER.REFERER: referer})
 
-            if conf.realTest:
-                headers[HTTPHEADER.REFERER] = "%s://%s" % (conf.scheme, conf.hostname)
-
             if kb.authHeader:
                 headers[HTTPHEADER.AUTHORIZATION] = kb.authHeader
 
@@ -447,7 +444,7 @@ class Connect:
                     return None, None, None
                 else:
                     warnMsg = "unable to connect to the target url (%d - %s)" % (e.code, httplib.responses[e.code])
-                    if threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
+                    if threadData.retriesCount < conf.retries and not kb.threadException:
                         warnMsg += ", sqlmap is going to retry the request"
                         logger.critical(warnMsg)
                         return Connect.__retryProxy(**kwargs)
@@ -490,7 +487,7 @@ class Connect:
                 return None, None, None
             elif silent or (ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead"))):
                 return None, None, None
-            elif threadData.retriesCount < conf.retries and not kb.threadException and not conf.realTest:
+            elif threadData.retriesCount < conf.retries and not kb.threadException:
                 warnMsg += ", sqlmap is going to retry the request"
                 logger.critical(warnMsg)
                 return Connect.__retryProxy(**kwargs)
