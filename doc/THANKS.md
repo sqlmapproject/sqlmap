@@ -328,6 +328,9 @@ Devon Mitchell, <devon.mitchell1988@yahoo.com>
 Anton Mogilin, <azarmaster81@yahoo.com>
 * for reporting a few bugs
 
+Sergio Molina, <smolina@wpr.es>
+* for reporting a minor bug
+
 Anastasios Monachos, <anastasiosm@gmail.com>
 * for providing some useful data
 * for suggesting a feature
@@ -391,6 +394,9 @@ Steve Pinkham, <steve.pinkham@gmail.com>
 
 Adam Pridgen, <adam.pridgen@gmail.com>
 * for suggesting some features
+
+Luka Pusic, <luka@pusic.si>
+* for reporting a couple of bugs
 
 Ole Rasmussen, <olerass@gmail.com>
 * for reporting a bug
