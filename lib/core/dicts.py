@@ -19,7 +19,7 @@ from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
 
-firebirdTypes = {
+FIREBIRD_TYPES = {
                     "261":"BLOB",
                     "14":"CHAR",
                     "40":"CSTRING",
@@ -36,7 +36,7 @@ firebirdTypes = {
                     "37":"VARCHAR"
                 }
 
-sybaseTypes = {
+SYBASE_TYPES = {
                     "14":"floatn",
                     "8":"float",
                     "15":"datetimn",
@@ -67,7 +67,7 @@ sybaseTypes = {
                     "20":"image",
                 }
 
-mysqlPrivs = {
+MYSQL_PRIVS = {
                     1:"select_priv",
                     2:"insert_priv",
                     3:"update_priv",
@@ -96,13 +96,13 @@ mysqlPrivs = {
                     26:"create_user_priv",
                 }
 
-pgsqlPrivs = {
+PGSQL_PRIVS = {
                     1:"createdb",
                     2:"super",
                     3:"catupd",
                 }
 
-firebirdPrivs = {
+FIREBIRD_PRIVS = {
                     "S": "SELECT",
                     "I": "INSERT",
                     "U": "UPDATE",
@@ -111,7 +111,7 @@ firebirdPrivs = {
                     "E": "EXECUTE"
                 }
 
-db2Privs = {
+DB2_PRIVS = {
                     1: "CONTROLAUTH",
                     2: "ALTERAUTH",
                     3: "DELETEAUTH",
@@ -122,7 +122,7 @@ db2Privs = {
                     8: "UPDATEAUTH"
            }
 
-dumpReplacements = {" ": NULL, "": BLANK}
+DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
 
 DBMS_DICT = {
                 DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),

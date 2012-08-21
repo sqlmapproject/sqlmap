@@ -15,7 +15,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.dicts import sybaseTypes
+from lib.core.dicts import SYBASE_TYPES
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException

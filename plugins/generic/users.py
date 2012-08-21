@@ -26,10 +26,10 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.dicts import mysqlPrivs
-from lib.core.dicts import pgsqlPrivs
-from lib.core.dicts import firebirdPrivs
-from lib.core.dicts import db2Privs
+from lib.core.dicts import MYSQL_PRIVS
+from lib.core.dicts import PGSQL_PRIVS
+from lib.core.dicts import FIREBIRD_PRIVS
+from lib.core.dicts import DB2_PRIVS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -408,7 +408,7 @@ class Users:
                             # True, 0 otherwise
                             if Backend.isDbms(DBMS.PGSQL) and getUnicode(privilege).isdigit():
                                 if int(privilege) == 1:
-                                    privileges.add(pgsqlPrivs[count])
+                                    privileges.add(PGSQL_PRIVS[count])
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
@@ -419,7 +419,7 @@ class Users:
                             # True, N otherwise
                             elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                                 if privilege.upper() == "Y":
-                                    privileges.add(mysqlPrivs[count])
+                                    privileges.add(MYSQL_PRIVS[count])
 
                             # In DB2 we get Y or G if the privilege is
                             # True, N otherwise
@@ -432,7 +432,7 @@ class Users:
 
                                 for priv in privs:
                                     if priv.upper() in ("Y", "G"):
-                                        for position, db2Priv in db2Privs.items():
+                                        for position, db2Priv in DB2_PRIVS.items():
                                             if position == i:
                                                 privilege += ", " + db2Priv
 
@@ -529,7 +529,7 @@ class Users:
 
                         for priv in privs:
                             if priv.isdigit() and int(priv) == 1:
-                                for position, pgsqlPriv in pgsqlPrivs.items():
+                                for position, pgsqlPriv in PGSQL_PRIVS.items():
                                     if position == i:
                                         privileges.add(pgsqlPriv)
 
@@ -549,7 +549,7 @@ class Users:
 
                         for priv in privs:
                             if priv.upper() == "Y":
-                                for position, mysqlPriv in mysqlPrivs.items():
+                                for position, mysqlPriv in MYSQL_PRIVS.items():
                                     if position == i:
                                         privileges.add(mysqlPriv)
 
@@ -557,7 +557,7 @@ class Users:
 
                     # In Firebird we get one letter for each privilege
                     elif Backend.isDbms(DBMS.FIREBIRD):
-                        privileges.add(firebirdPrivs[privilege.strip()])
+                        privileges.add(FIREBIRD_PRIVS[privilege.strip()])
 
                     # In DB2 we get Y or G if the privilege is
                     # True, N otherwise
@@ -570,7 +570,7 @@ class Users:
 
                         for priv in privs:
                             if priv.upper() in ("Y", "G"):
-                                for position, db2Priv in db2Privs.items():
+                                for position, db2Priv in DB2_PRIVS.items():
                                     if position == i:
                                         privilege += ", " + db2Priv
 

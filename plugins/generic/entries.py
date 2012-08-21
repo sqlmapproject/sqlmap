@@ -27,7 +27,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.dicts import dumpReplacements
+from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -306,7 +306,7 @@ class Entries:
                             else:
                                 colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
 
-                            _ = len(dumpReplacements.get(getUnicode(colEntry), getUnicode(colEntry)))
+                            _ = len(DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry)))
                             maxLen = max(len(column), _)
 
                             if maxLen > kb.data.dumpedTable[column]["length"]:
@@ -408,7 +408,7 @@ class Entries:
 
                                     value = NULL if column in emptyColumns else inject.getValue(query, inband=False, error=False, dump=True)
 
-                                    _ = dumpReplacements.get(getUnicode(value), getUnicode(value))
+                                    _ = DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))
                                     lengths[column] = max(lengths[column], len(_))
                                     entries[column].append(value)
 

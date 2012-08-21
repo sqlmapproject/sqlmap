@@ -27,7 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
-from lib.core.dicts import firebirdTypes
+from lib.core.dicts import FIREBIRD_TYPES
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED

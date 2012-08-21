@@ -24,7 +24,7 @@ from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.dicts import dumpReplacements
+from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import DBMS
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapValueException
@@ -444,7 +444,7 @@ class Dump:
                         value = u''
                     else:
                         value = getUnicode(info["values"][i])
-                        value = dumpReplacements.get(value, value)
+                        value = DUMP_REPLACEMENTS.get(value, value)
 
                     values.append(value)
                     maxlength = int(info["length"])
