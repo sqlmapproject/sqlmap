@@ -430,7 +430,7 @@ class Connect:
             if conf.verbose <= 5:
                 responseMsg += getUnicode(logHeaders)
             elif conf.verbose > 5:
-                responseMsg += "%s\n\n%s\n" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
+                responseMsg += "%s\n\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
@@ -520,7 +520,7 @@ class Connect:
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
         elif conf.verbose > 5:
-            responseMsg += "%s\n\n%s\n" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
+            responseMsg += "%s\n\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
