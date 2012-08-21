@@ -3110,6 +3110,8 @@ def evaluateCode(code, variables=None):
 
     try:
         exec(code, variables)
+    except KeyboardInterrupt:
+        raise
     except Exception, ex:
         errMsg = "an error occured while evaluating provided code ('%s'). " % ex
         raise sqlmapGenericException, errMsg

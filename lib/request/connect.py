@@ -647,7 +647,7 @@ class Connect:
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        evaluateCode("%s='%s'" % (name, value), variables)
+                        evaluateCode("%s=%s" % (name, repr(value)), variables)
 
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
