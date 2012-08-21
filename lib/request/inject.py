@@ -33,13 +33,13 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX

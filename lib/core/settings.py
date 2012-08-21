@@ -161,79 +161,9 @@ DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) f
 SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
 SUPPORTED_OS = ( "linux", "windows" )
 
-DBMS_DICT = {
-                DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
-                DBMS.MYSQL: (MYSQL_ALIASES, "python pymysql", "http://code.google.com/p/pymysql/"),
-                DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"),
-                DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"),
-                DBMS.SQLITE: (SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"),
-                DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"),
-                DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"),
-                DBMS.MAXDB: (MAXDB_ALIASES, None, None),
-                DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
-                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/")
-            }
-
 USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
 REFERER_ALIASES = ( "ref", "referer", "referrer" )
 HOST_ALIASES = ( "host", )
-
-FROM_DUMMY_TABLE = {
-                        DBMS.ORACLE: " FROM DUAL",
-                        DBMS.ACCESS: " FROM MSysAccessObjects",
-                        DBMS.FIREBIRD: " FROM RDB$DATABASE",
-                        DBMS.MAXDB: " FROM VERSIONS",
-                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
-                   }
-
-SQL_STATEMENTS = {
-                       "SQL SELECT statement":  (
-                             "select ",
-                             "show ",
-                             " top ",
-                             " distinct ",
-                             " from ",
-                             " from dual",
-                             " where ",
-                             " group by ",
-                             " order by ",
-                             " having ",
-                             " limit ",
-                             " offset ",
-                             " union all ",
-                             " rownum as ",
-                             "(case ",          ),
-
-                       "SQL data definition":   (
-                             "create ",
-                             "declare ",
-                             "drop ",
-                             "truncate ",
-                             "alter ",          ),
-
-                       "SQL data manipulation": (
-                             "bulk ",
-                             "insert ",
-                             "update ",
-                             "delete ",
-                             "merge ",
-                             "load ",           ),
-
-                       "SQL data control":      (
-                             "grant ",
-                             "revoke ",         ),
-
-                       "SQL data execution":    (
-                             "exec ",
-                             "execute ",        ),
-
-                       "SQL transaction":       (
-                             "start transaction ",
-                             "begin work ",
-                             "begin transaction ",
-                             "commit ",
-                             "rollback ",       ),
-                     }
 
 # items displayed in basic help (-h) output
 BASIC_HELP_ITEMS = (

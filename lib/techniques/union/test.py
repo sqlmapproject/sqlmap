@@ -26,8 +26,8 @@ from lib.core.common import wasLastRequestDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import PAYLOAD
-from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import UNION_MIN_RESPONSE_CHARS
 from lib.core.settings import UNION_STDEV_COEFF
 from lib.core.settings import MIN_RATIO

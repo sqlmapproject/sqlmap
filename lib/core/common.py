@@ -56,6 +56,8 @@ from lib.core.convert import stdoutencode
 from lib.core.convert import unicodeencode
 from lib.core.convert import utf8encode
 from lib.core.decorators import cachedmethod
+from lib.core.dicts import DBMS_DICT
+from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -84,7 +86,6 @@ from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import DBMS_DICT
 from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
@@ -104,7 +105,6 @@ from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import PRINTABLE_CHAR_REGEX
-from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA

@@ -19,8 +19,8 @@ from lib.core.common import isListLike
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import DBMS
-from lib.core.settings import SQL_STATEMENTS
 from lib.core.settings import UNICODE_ENCODING
 from lib.utils.timeout import timeout
 

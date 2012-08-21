@@ -16,9 +16,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
-from lib.core.settings import SQL_STATEMENTS
 from lib.core.shell import autoCompletion
 from lib.request import inject
 

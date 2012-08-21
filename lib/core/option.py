@@ -58,6 +58,7 @@ from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.defaults import defaults
+from lib.core.dicts import DBMS_DICT
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -90,7 +91,6 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
 from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
-from lib.core.settings import DBMS_DICT
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import VERSION_STRING

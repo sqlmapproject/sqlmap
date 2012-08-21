@@ -5,6 +5,20 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.enums import DBMS
+from lib.core.settings import BLANK
+from lib.core.settings import NULL
+from lib.core.settings import MSSQL_ALIASES
+from lib.core.settings import MYSQL_ALIASES
+from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import ORACLE_ALIASES
+from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import FIREBIRD_ALIASES
+from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import SYBASE_ALIASES
+from lib.core.settings import DB2_ALIASES
+
 firebirdTypes = {
                     "261":"BLOB",
                     "14":"CHAR",
@@ -107,3 +121,75 @@ db2Privs = {
                     7: "SELECTAUTH",
                     8: "UPDATEAUTH"
            }
+
+dumpReplacements = {" ": NULL, "": BLANK}
+
+DBMS_DICT = {
+                DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
+                DBMS.MYSQL: (MYSQL_ALIASES, "python pymysql", "http://code.google.com/p/pymysql/"),
+                DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"),
+                DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"),
+                DBMS.SQLITE: (SQLITE_ALIASES, "python-pysqlite2", "http://pysqlite.googlecode.com/"),
+                DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"),
+                DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"),
+                DBMS.MAXDB: (MAXDB_ALIASES, None, None),
+                DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
+                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/")
+            }
+
+FROM_DUMMY_TABLE = {
+                        DBMS.ORACLE: " FROM DUAL",
+                        DBMS.ACCESS: " FROM MSysAccessObjects",
+                        DBMS.FIREBIRD: " FROM RDB$DATABASE",
+                        DBMS.MAXDB: " FROM VERSIONS",
+                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
+                   }
+
+SQL_STATEMENTS = {
+                       "SQL SELECT statement":  (
+                             "select ",
+                             "show ",
+                             " top ",
+                             " distinct ",
+                             " from ",
+                             " from dual",
+                             " where ",
+                             " group by ",
+                             " order by ",
+                             " having ",
+                             " limit ",
+                             " offset ",
+                             " union all ",
+                             " rownum as ",
+                             "(case ",          ),
+
+                       "SQL data definition":   (
+                             "create ",
+                             "declare ",
+                             "drop ",
+                             "truncate ",
+                             "alter ",          ),
+
+                       "SQL data manipulation": (
+                             "bulk ",
+                             "insert ",
+                             "update ",
+                             "delete ",
+                             "merge ",
+                             "load ",           ),
+
+                       "SQL data control":      (
+                             "grant ",
+                             "revoke ",         ),
+
+                       "SQL data execution":    (
+                             "exec ",
+                             "execute ",        ),
+
+                       "SQL transaction":       (
+                             "start transaction ",
+                             "begin work ",
+                             "begin transaction ",
+                             "commit ",
+                             "rollback ",       ),
+                     }

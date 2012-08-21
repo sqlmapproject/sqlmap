@@ -20,15 +20,15 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
+from lib.core.dicts import FROM_DUMMY_TABLE
+from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import FROM_DUMMY_TABLE
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
-from lib.core.settings import SQL_STATEMENTS
 from lib.core.unescaper import unescaper
 
 class Agent:

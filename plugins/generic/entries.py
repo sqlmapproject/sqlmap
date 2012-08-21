@@ -27,6 +27,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.dicts import dumpReplacements
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -35,7 +36,6 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.settings import BLANK
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import MAX_INT
@@ -294,10 +294,8 @@ class Entries:
                     entriesCount = len(entries)
 
                     for index, column in enumerate(colList):
-                        colLen = len(column)
-
                         if column not in kb.data.dumpedTable:
-                            kb.data.dumpedTable[column] = {"length": colLen, "values": BigArray()}
+                            kb.data.dumpedTable[column] = {"length": len(column), "values": BigArray()}
 
                         for entry in entries:
                             if entry is None or len(entry) == 0:
@@ -308,8 +306,8 @@ class Entries:
                             else:
                                 colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
 
-                            colEntryLen = len({" ": NULL, "": BLANK}.get(getUnicode(colEntry), getUnicode(colEntry)))
-                            maxLen = max(colLen, colEntryLen)
+                            _ = len(dumpReplacements.get(getUnicode(colEntry), getUnicode(colEntry)))
+                            maxLen = max(len(column), _)
 
                             if maxLen > kb.data.dumpedTable[column]["length"]:
                                 kb.data.dumpedTable[column]["length"] = maxLen
@@ -410,7 +408,8 @@ class Entries:
 
                                     value = NULL if column in emptyColumns else inject.getValue(query, inband=False, error=False, dump=True)
 
-                                    lengths[column] = max(lengths[column], len(value) if value else 0)
+                                    _ = dumpReplacements.get(getUnicode(value), getUnicode(value))
+                                    lengths[column] = max(lengths[column], len(_))
                                     entries[column].append(value)
 
                         except KeyboardInterrupt:

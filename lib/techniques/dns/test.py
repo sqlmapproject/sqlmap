@@ -10,8 +10,8 @@ from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.settings import FROM_DUMMY_TABLE
 from lib.techniques.dns.use import dnsUse
 
 
