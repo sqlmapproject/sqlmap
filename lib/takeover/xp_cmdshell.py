@@ -223,9 +223,9 @@ class xp_cmdshell:
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isListLike(output) and len(output) > 1:
-                if not output[0].strip():
+                if not (output[0] or "").strip():
                     output = output[1:]
-                elif not output[-1].strip():
+                elif not (output[-1] or "").strip():
                     output = output[:-1]
 
                 output = "\n".join(line for line in output)
