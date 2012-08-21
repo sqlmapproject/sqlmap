@@ -57,7 +57,7 @@ class HashDB(object):
         retVal = None
         if key and (self._write_cache or os.path.isfile(self.filepath)):
             hash_ = HashDB.hashKey(key)
-            retVal = self._write_cache.get(hash_, None)
+            retVal = self._write_cache.get(hash_)
             if not retVal:
                 while True:
                     try:

@@ -107,12 +107,12 @@ def main():
         kb.threadContinue = False
         kb.threadException = True
 
-        if conf.get("hashDB", None):
+        if conf.get("hashDB"):
             try:
                 conf.hashDB.flush(True)
             except KeyboardInterrupt:
                 pass
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
-        if conf.get("threads", 0) > 1 or conf.get("dnsServer", None):
+        if conf.get("threads", 0) > 1 or conf.get("dnsServer"):
             os._exit(0)

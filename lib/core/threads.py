@@ -195,7 +195,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             if lock.locked_lock():
                 lock.release()
 
-        if conf.get("hashDB", None):
+        if conf.get("hashDB"):
             conf.hashDB.flush(True)
 
         if cleanupFunction:
