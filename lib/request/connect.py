@@ -276,7 +276,7 @@ class Connect:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
-            headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
+            headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD else "identity"
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
             if auxHeaders:
