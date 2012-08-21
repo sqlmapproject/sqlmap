@@ -3110,8 +3110,6 @@ def evaluateCode(code, variables=None):
 
     try:
         exec(code, variables)
-        import pdb
-        pdb.set_trace()
     except KeyboardInterrupt:
         raise
     except Exception, ex:
