@@ -53,6 +53,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import CONSTANT_RATIO
+from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
@@ -620,6 +621,8 @@ def heuristicCheckSqlInjection(place, parameter):
         logger.debug(debugMsg)
         return None
 
+    origValue = conf.paramDict[place][parameter]
+
     prefix = ""
     suffix = ""
 
@@ -640,37 +643,39 @@ def heuristicCheckSqlInjection(place, parameter):
     infoMsg = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
-    casting = False
-    if not result and kb.dynamicParameter:
-        origValue = conf.paramDict[place][parameter]
+    def _(page):
+        return any(_ in (page or "") for _ in FORMAT_EXCEPTION_STRINGS)
 
-        if origValue and origValue.isdigit():
-            randInt = int(randomInt())
-            payload = "%s%s%s" % (prefix, "%d-%d" % (int(origValue) + randInt, randInt), suffix)
+    casting = _(page) and not _(kb.originalPage)
+
+    if not casting and not result and kb.dynamicParameter and origValue.isdigit():
+        randInt = int(randomInt())
+        payload = "%s%s%s" % (prefix, "%d-%d" % (int(origValue) + randInt, randInt), suffix)
+        payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
+        result = Request.queryPage(payload, place, raise404=False)
+
+        if not result:
+            randStr = randomStr()
+            payload = "%s%s%s" % (prefix, "%s%s" % (origValue, randStr), suffix)
             payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
-            result = Request.queryPage(payload, place, raise404=False)
-
-            if not result:
-                randStr = randomStr()
-                payload = "%s%s%s" % (prefix, "%s%s" % (origValue, randStr), suffix)
-                payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
-                casting = Request.queryPage(payload, place, raise404=False)
-
-    if result:
-        infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
-        logger.info(infoMsg)
-    else:
-        infoMsg += "not be injectable"
-        logger.warn(infoMsg)
+            casting = Request.queryPage(payload, place, raise404=False)
 
     if casting:
-        errMsg = "possible integer casting "
+        errMsg = "possible %scasting " % ("integer " if origValue.isdigit() else "")
         errMsg += "detected (e.g. %s=(int)$_REQUEST('%s')) " % (parameter, parameter)
         errMsg += "at the back-end web application"
         logger.error(errMsg)
 
         message = "do you want to skip those kind of cases (and save scanning time)? [Y/n] "
         kb.ignoreCasted = readInput(message, default='Y').upper() != 'N'
+
+    elif result:
+        infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
+        logger.info(infoMsg)
+
+    else:
+        infoMsg += "not be injectable"
+        logger.warn(infoMsg)
 
     kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
 
