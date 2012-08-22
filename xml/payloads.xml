@@ -547,8 +547,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>||(SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)||</suffix>
+        <prefix>(SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)</suffix>
     </boundary>
 
     <boundary>
@@ -556,8 +556,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>||(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)||</suffix>
+        <prefix>(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)</suffix>
     </boundary>
 
     <boundary>
@@ -583,8 +583,8 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>1</ptype>
-        <prefix>+(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)</suffix>
+        <prefix>'+(SELECT [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)+'</suffix>
     </boundary>
 
     <boundary>
