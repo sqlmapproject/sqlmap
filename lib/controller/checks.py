@@ -638,7 +638,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
         if _ and _.isdigit():
             randInt = int(randomInt())
-            payload = "%s%s%s" % (prefix, "%s-%s" % (int(_) + randInt, randInt), suffix)
+            payload = "%s%s%s" % (prefix, "%d-%d" % (int(_) + randInt, randInt), suffix)
             payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
             result = Request.queryPage(payload, place, raise404=False)
 
