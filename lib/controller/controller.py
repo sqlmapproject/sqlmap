@@ -493,7 +493,7 @@ def start():
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
                     raise sqlmapNoneDataException, errMsg
                 else:
-                    errMsg = "all parameters appear to be not injectable."
+                    errMsg = "all tested parameters appear to be not injectable."
 
                     if conf.level < 5 or conf.risk < 3:
                         errMsg += " Try to increase '--level'/'--risk' values "
