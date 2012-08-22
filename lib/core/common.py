@@ -794,6 +794,7 @@ def readInput(message, default=None, checkBatch=True):
     else:
         logging._acquireLock()
         dataToStdout("\r%s" % message, forceOutput=True, bold=True)
+        kb.prependFlag = False
         data = raw_input() or default
         #data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
         logging._releaseLock()
