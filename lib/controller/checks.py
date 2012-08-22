@@ -666,8 +666,9 @@ def heuristicCheckSqlInjection(place, parameter):
         errMsg += "at the back-end web application"
         logger.error(errMsg)
 
-        message = "do you want to skip those kind of cases (and save scanning time)? [Y/n] "
-        kb.ignoreCasted = readInput(message, default='Y').upper() != 'N'
+        if kb.ignoreCasted is None:
+            message = "do you want to skip those kind of parameters (and save scanning time)? %s " % ("[Y/n]" if conf.multipleTargets else "[y/N]")
+            kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N').upper() != 'N'
 
     elif result:
         infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
