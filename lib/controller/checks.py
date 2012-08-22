@@ -520,8 +520,7 @@ def checkSqlInjection(place, parameter, value):
                         break
 
                 if injectable is True:
-                    # There is no need to perform this test with others
-                    # boundaries
+                    kb.vulnHosts.add(conf.hostname)
                     break
 
             # Reset forced back-end DBMS value

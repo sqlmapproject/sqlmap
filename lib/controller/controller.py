@@ -236,7 +236,7 @@ def start():
         action()
         return True
 
-    if conf.url and not any([conf.forms, conf.crawlDepth]):
+    if conf.url and not any((conf.forms, conf.crawlDepth)):
         kb.targetUrls.add((conf.url, conf.method, conf.data, conf.cookie))
 
     if conf.configFile and not kb.targetUrls:
@@ -277,6 +277,7 @@ def start():
                     testSqlInj = True
 
             testSqlInj &= (conf.hostname, conf.path, None, None) not in kb.testedParams
+            testSqlInj &= conf.hostname not in kb.vulnHosts
 
             if not testSqlInj:
                 infoMsg = "skipping '%s'" % targetUrl

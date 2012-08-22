@@ -1569,6 +1569,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.testedParams = set()
         kb.userAgents = None
         kb.vainRun = True
+        kb.vulnHosts = set()
         kb.wordlists = None
 
 def __useWizardInterface():
