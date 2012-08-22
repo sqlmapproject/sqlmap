@@ -661,7 +661,7 @@ def heuristicCheckSqlInjection(place, parameter):
             casting = Request.queryPage(payload, place, raise404=False)
 
     if casting:
-        errMsg = "possible %scasting " % ("integer " if origValue.isdigit() else "")
+        errMsg = "possible %s casting " % ("integer" if origValue.isdigit() else "type")
         errMsg += "detected (e.g. %s=(int)$_REQUEST('%s')) " % (parameter, parameter)
         errMsg += "at the back-end web application"
         logger.error(errMsg)
