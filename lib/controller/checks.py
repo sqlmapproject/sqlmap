@@ -5,6 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import copy
 import httplib
 import random
 import re
@@ -237,7 +238,13 @@ def checkSqlInjection(place, parameter, value):
             comment = agent.getComment(test.request) if len(conf.boundaries) > 1 else None
             fstPayload = agent.cleanupPayload(test.request.payload, origValue=value)
 
-            for boundary in conf.boundaries:
+            # Favoring non-string specific boundaries in case of digit-like parameter values
+            if value.isdigit():
+                boundaries = sorted(copy.deepcopy(conf.boundaries), key=lambda x: any(_ in (x.prefix or "") or _ in (x.suffix or "") for _ in ('"', '\'')))
+            else:
+                boundaries = conf.boundaries
+
+            for boundary in boundaries:
                 injectable = False
 
                 # Skip boundary if the level is higher than the provided (or
