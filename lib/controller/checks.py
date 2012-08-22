@@ -667,7 +667,7 @@ def heuristicCheckSqlInjection(place, parameter):
         logger.error(errMsg)
 
         if kb.ignoreCasted is None:
-            message = "do you want to skip those kind of parameters (and save scanning time)? %s " % ("[Y/n]" if conf.multipleTargets else "[y/N]")
+            message = "do you want to skip those kind of cases (and save scanning time)? %s " % ("[Y/n]" if conf.multipleTargets else "[y/N]")
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N').upper() != 'N'
 
     elif result:
