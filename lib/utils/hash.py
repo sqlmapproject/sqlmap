@@ -362,8 +362,8 @@ def attackDumpedTable():
         if attack_dict:
             message = "recognized possible password hashes in column%s " % ("s" if len(col_passwords) > 1 else "")
             message += "'%s'. Do you want to " % ", ".join(col for col in col_passwords)
-            message += "crack them via a dictionary-based attack? [y/N/q]"
-            test = readInput(message, default="N")
+            message += "crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
+            test = readInput(message, default="N" if conf.multipleTargets else "Y")
 
             if test[0] in ("n", "N"):
                 return
