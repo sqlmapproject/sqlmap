@@ -663,7 +663,7 @@ def heuristicCheckSqlInjection(place, parameter):
         errMsg += "at the back-end web application"
         logger.error(errMsg)
 
-        message = "do you want to skip those kind of cases? [Y/n] "
+        message = "do you want to skip those kind of cases (and save scanning time)? [Y/n] "
         kb.ignoreCasted = readInput(message, default='Y').upper() != 'N'
 
     return result
