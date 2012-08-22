@@ -633,16 +633,16 @@ def heuristicCheckSqlInjection(place, parameter):
     infoMsg = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
-    kb.heuristicTest = result
-
     if not result and kb.dynamicParameter:
         _ = conf.paramDict[place][parameter]
 
-        if _.isdigit():
+        if _ and _.isdigit():
             randInt = int(randomInt())
             payload = "%s%s%s" % (prefix, "%s-%s" % (int(_) + randInt, randInt), suffix)
             payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
             result = Request.queryPage(payload, place, raise404=False)
+
+    kb.heuristicTest = result
 
     if result:
         infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
