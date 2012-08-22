@@ -31,7 +31,7 @@ def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     return _
 
 def _adjust(condition, getRatioValue):
-    if not any([conf.string, conf.notString, conf.regexp, conf.code]):
+    if not any((conf.string, conf.notString, conf.regexp, conf.code)):
         # Negative logic approach is used in raw page comparison scheme as that what is "different" than original
         # PAYLOAD.WHERE.NEGATIVE response is considered as True; in switch based approach negative logic is not
         # applied as that what is by user considered as True is that what is returned by the comparison mechanism
@@ -54,7 +54,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
-    if any([conf.string, conf.notString, conf.regexp]):
+    if any((conf.string, conf.notString, conf.regexp)):
         rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
         # String to match in page when the query is True and/or valid
