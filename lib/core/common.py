@@ -61,6 +61,7 @@ from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import OS
@@ -197,7 +198,7 @@ class Format:
 
         htmlParsed = None
 
-        if len(kb.htmlFp) == 0 or kb.heuristicTest is None:
+        if len(kb.htmlFp) == 0 or kb.heuristicTest != HEURISTIC_TEST.POSITIVE:
             pass
         elif len(kb.htmlFp) == 1:
             htmlParsed = kb.htmlFp[0]

@@ -36,6 +36,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HASHDB_KEYS
+from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
@@ -453,8 +454,8 @@ def start():
                         if testSqlInj:
                             check = heuristicCheckSqlInjection(place, parameter)
 
-                            if not check:
-                                if conf.smart or kb.ignoreCasted:
+                            if check != HEURISTIC_TEST.POSITIVE:
+                                if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
                                     infoMsg = "skipping %s parameter '%s'" % (place, parameter)
                                     logger.info(infoMsg)
                                     continue
@@ -517,7 +518,7 @@ def start():
                             errMsg += "of comparison engine to detect at least "
                             errMsg += "one dynamic parameter)."
 
-                    if kb.heuristicTest:
+                    if kb.heuristicTest == HEURISTIC_TEST.POSITIVE:
                         errMsg += " As heuristic test turned out positive you are "
                         errMsg += "strongly advised to continue on with the tests. "
                         errMsg += "Please, consider usage of tampering scripts as "

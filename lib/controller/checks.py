@@ -41,6 +41,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
+from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
@@ -648,8 +649,6 @@ def heuristicCheckSqlInjection(place, parameter):
                 payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
                 casting = Request.queryPage(payload, place, raise404=False)
 
-    kb.heuristicTest = result
-
     if result:
         infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
         logger.info(infoMsg)
@@ -666,7 +665,9 @@ def heuristicCheckSqlInjection(place, parameter):
         message = "do you want to skip those kind of cases (and save scanning time)? [Y/n] "
         kb.ignoreCasted = readInput(message, default='Y').upper() != 'N'
 
-    return result
+    kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
+
+    return kb.heuristicTest
 
 def checkDynParam(place, parameter, value):
     """

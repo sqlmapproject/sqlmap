@@ -86,6 +86,11 @@ class CHARSET_TYPE:
     ALPHA = 4,
     ALPHANUM = 5
 
+class HEURISTIC_TEST:
+    CASTED = 1,
+    NEGATIVE = 2,
+    POSITIVE = 3
+
 class HASH:
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
     MYSQL_OLD = r'(?i)\A(?![0-9]+\Z)[0-9a-f]{16}\Z'
