@@ -454,7 +454,7 @@ def start():
                             check = heuristicCheckSqlInjection(place, parameter)
 
                             if not check:
-                                if conf.smart:
+                                if conf.smart or kb.ignoreCasted:
                                     infoMsg = "skipping %s parameter '%s'" % (place, parameter)
                                     logger.info(infoMsg)
                                     continue

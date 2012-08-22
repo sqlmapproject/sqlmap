@@ -627,20 +627,26 @@ def heuristicCheckSqlInjection(place, parameter):
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
     parseFilePaths(page)
-
     result = wasLastRequestDBMSError()
 
     infoMsg = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
+    casting = False
     if not result and kb.dynamicParameter:
-        _ = conf.paramDict[place][parameter]
+        origValue = conf.paramDict[place][parameter]
 
-        if _ and _.isdigit():
+        if origValue and origValue.isdigit():
             randInt = int(randomInt())
-            payload = "%s%s%s" % (prefix, "%d-%d" % (int(_) + randInt, randInt), suffix)
+            payload = "%s%s%s" % (prefix, "%d-%d" % (int(origValue) + randInt, randInt), suffix)
             payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
             result = Request.queryPage(payload, place, raise404=False)
+
+            if not result:
+                randStr = randomStr()
+                payload = "%s%s%s" % (prefix, "%s%s" % (origValue, randStr), suffix)
+                payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
+                casting = Request.queryPage(payload, place, raise404=False)
 
     kb.heuristicTest = result
 
@@ -650,6 +656,15 @@ def heuristicCheckSqlInjection(place, parameter):
     else:
         infoMsg += "not be injectable"
         logger.warn(infoMsg)
+
+    if casting:
+        errMsg = "possible integer casting "
+        errMsg += "detected (e.g. %s=(int)$_REQUEST('%s')) " % (parameter, parameter)
+        errMsg += "at the back-end web application"
+        logger.error(errMsg)
+
+        message = "do you want to skip those kind of cases? [Y/n] "
+        kb.ignoreCasted = readInput(message, default='Y').upper() != 'N'
 
     return result
 
