@@ -3,7 +3,7 @@ sqlmap is an open source penetration testing tool that automates the process of 
 **Links**
 
 * Homepage: http://sqlmap.org
-* Download: https://github.com/sqlmapproject/sqlmap/tarball/master
+* Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * User's manual: https://github.com/sqlmapproject/sqlmap/wiki
