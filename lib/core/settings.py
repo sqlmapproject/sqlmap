@@ -454,4 +454,4 @@ GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")
 MAX_HELP_OPTION_LENGTH = 18
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "System.FormatException", "java.lang.NumberFormatException")
+FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "System.FormatException", "java.lang.NumberFormatException")
