@@ -236,6 +236,7 @@ class HTTPResponse(httplib.HTTPResponse):
         else: # 2.2 doesn't
             httplib.HTTPResponse.__init__(self, sock, debuglevel)
         self.fileno = sock.fileno
+        self._method = method
         self._rbuf = ''
         self._rbufsize = 8096
         self._handler = None # inserted by the handler later
