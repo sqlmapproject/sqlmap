@@ -491,6 +491,9 @@ Sumit Siddharth, <sid@notsosecure.com>
 Andre Silva, <andreoaz@gmail.com>
 * for reporting a bug
 
+Duarte Silva <duarte.silva@serializing.me>
+* for reporting a couple of bugs
+
 M Simkin, <mlsimkin@cox.net>
 * for suggesting a feature
 
