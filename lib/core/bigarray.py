@@ -114,5 +114,5 @@ class BigArray(list):
         for filename in self.filenames:
             try:
                 os.remove(filename)
-            except OSError:
+            except:
                 pass
