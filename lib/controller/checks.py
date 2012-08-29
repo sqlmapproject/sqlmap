@@ -659,6 +659,8 @@ def heuristicCheckSqlInjection(place, parameter):
             payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
             casting = Request.queryPage(payload, place, raise404=False)
 
+    kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
+
     if casting:
         errMsg = "possible %s casting " % ("integer" if origValue.isdigit() else "type")
         errMsg += "detected (e.g. %s=(int)$_REQUEST('%s')) " % (parameter, parameter)
@@ -676,8 +678,6 @@ def heuristicCheckSqlInjection(place, parameter):
     else:
         infoMsg += "not be injectable"
         logger.warn(infoMsg)
-
-    kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
 
     return kb.heuristicTest
 
