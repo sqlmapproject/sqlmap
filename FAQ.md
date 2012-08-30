@@ -59,7 +59,7 @@ If this sounds interesting to you, send us your [pull requests](https://help.git
 
 ## How can I support the development and show my appreciation?
 
-sqlmap is the result of numerous hours of passionated work from a small team of computer security enthusiasts. If you appreciated our work and you want to see sqlmap kept being developed, please consider making a [donation](https://www.paypal.com/uk/cgi-bin/webscr?cmd=_send-money&nav=1) to our efforts via [PayPal](https://www.paypal.com) to `onations@sqlmap.org`.
+sqlmap is the result of numerous hours of passionated work from a small team of computer security enthusiasts. If you appreciated our work and you want to see sqlmap kept being developed, please consider making a [donation](https://www.paypal.com/uk/cgi-bin/webscr?cmd=_send-money&nav=1) to our efforts via [PayPal](https://www.paypal.com) to `donations@sqlmap.org`.
 
 ## How can I follow closely the development?
 
