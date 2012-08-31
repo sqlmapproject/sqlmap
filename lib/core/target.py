@@ -159,7 +159,7 @@ def __setRequestParams():
             # Url encoding of the header values should be avoided
             # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
 
-            httpHeader = "-".join(_.capitalize() for _ in (httpHeader or "").split("-"))
+            httpHeader = httpHeader.title()
 
             if httpHeader == HTTPHEADER.USER_AGENT:
                 conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
