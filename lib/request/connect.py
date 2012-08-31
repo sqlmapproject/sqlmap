@@ -548,6 +548,7 @@ class Connect:
         pageLength = None
         uri = None
         code = None
+        skipUrlEncode = conf.skipUrlEncode
 
         if not place:
             place = kb.injection.place or PLACE.GET
@@ -557,6 +558,12 @@ class Connect:
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
+
+        if skipUrlEncode is None and conf.httpHeaders:
+            headers = dict(conf.httpHeaders)
+            _ = max(headers[_] if _.upper() == HTTPHEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
+            if _ and "urlencoded" not in _:
+                skipUrlEncode = True
 
         if payload:
             if kb.tamperFunctions:
@@ -573,7 +580,7 @@ class Connect:
                 # addendum: as we support url encoding in tampering
                 # functions therefore we need to use % as a safe char
                 if place != PLACE.URI or (value and payload and '?' in value and value.find('?') < value.find(payload)):
-                    payload = urlencode(payload, '%', False, True) if place not in (PLACE.POST, PLACE.CUSTOM_POST) and not conf.skipUrlEncode else payload
+                    payload = urlencode(payload, '%', False, True) if place not in (PLACE.POST, PLACE.CUSTOM_POST) and not skipUrlEncode else payload
                     value = agent.replacePayload(value, payload)
 
             elif place == PLACE.SOAP:
@@ -676,10 +683,10 @@ class Connect:
                     msg += "Do you want to turn off URL encoding "
                     msg += "which is usually causing problems "
                     msg += "in this kind of situations? [Y/n]"
-                    conf.skipUrlEncode = readInput(msg, default="Y").upper() != "N"
+                    skipUrlEncode = conf.skipUrlEncode = readInput(msg, default="Y").upper() != "N"
             if place not in (PLACE.POST, PLACE.SOAP, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
-            elif not conf.skipUrlEncode and place not in (PLACE.SOAP,):
+            elif not skipUrlEncode and place not in (PLACE.SOAP,):
                 post = urlencode(post)
 
         if timeBasedCompare:
