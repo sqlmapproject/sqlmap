@@ -80,7 +80,6 @@ def __setRequestParams():
     if conf.data:
         if hasattr(conf.data, UNENCODED_ORIGINAL_VALUE):
             original = getattr(conf.data, UNENCODED_ORIGINAL_VALUE)
-            conf.data = type(conf.data)(conf.data.replace("\n", " "))
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
         else:
             conf.data = conf.data.replace("\n", " ")
