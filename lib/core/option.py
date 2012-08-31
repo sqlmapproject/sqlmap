@@ -267,7 +267,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
 
                 # POST parameters
                 elif data is not None and params:
-                    data += line
+                    data += "%s%s" % ("\n" if data else "", line)
 
                 # GET parameters
                 elif "?" in line and "=" in line and ": " not in line:

@@ -81,8 +81,6 @@ def __setRequestParams():
         if hasattr(conf.data, UNENCODED_ORIGINAL_VALUE):
             original = getattr(conf.data, UNENCODED_ORIGINAL_VALUE)
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
-        else:
-            conf.data = conf.data.replace("\n", " ")
 
         place = PLACE.SOAP if re.match(SOAP_REGEX, conf.data, re.I | re.M) else PLACE.POST
 
