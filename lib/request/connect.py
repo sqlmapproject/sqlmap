@@ -24,6 +24,7 @@ from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getHostHeader
+from lib.core.common import getRequestHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import randomizeParameterValue
@@ -297,19 +298,19 @@ class Connect:
 
             requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
 
-            if not req.has_header(HTTPHEADER.COOKIE) and conf.cj:
+            if not getRequestHeader(req, HTTPHEADER.COOKIE) and conf.cj:
                 conf.cj._policy._now = conf.cj._now = int(time.time())
                 cookies = conf.cj._cookies_for_request(req)
                 requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
             if post:
-                if not req.has_header(HTTPHEADER.CONTENT_TYPE):
+                if not getRequestHeader(req, HTTPHEADER.CONTENT_TYPE):
                     requestHeaders += "\n%s: %s" % (string.capwords(HTTPHEADER.CONTENT_TYPE), "application/x-www-form-urlencoded")
 
-                if not req.has_header(HTTPHEADER.CONTENT_LENGTH):
+                if not getRequestHeader(req, HTTPHEADER.CONTENT_LENGTH):
                     requestHeaders += "\n%s: %d" % (string.capwords(HTTPHEADER.CONTENT_LENGTH), len(post))
 
-            if not req.has_header(HTTPHEADER.CONNECTION):
+            if not getRequestHeader(req, HTTPHEADER.CONNECTION):
                 requestHeaders += "\n%s: close" % HTTPHEADER.CONNECTION
 
             requestMsg += "\n%s" % requestHeaders
@@ -325,11 +326,11 @@ class Connect:
 
             conn = urllib2.urlopen(req)
 
-            if not kb.authHeader and req.has_header(HTTPHEADER.AUTHORIZATION):
-                kb.authHeader = req.get_header(HTTPHEADER.AUTHORIZATION)
+            if not kb.authHeader and getRequestHeader(req, HTTPHEADER.AUTHORIZATION):
+                kb.authHeader = getRequestHeader(req, HTTPHEADER.AUTHORIZATION)
 
-            if not kb.proxyAuthHeader and req.has_header(HTTPHEADER.PROXY_AUTHORIZATION):
-                kb.proxyAuthHeader = req.get_header(HTTPHEADER.PROXY_AUTHORIZATION)
+            if not kb.proxyAuthHeader and getRequestHeader(req, HTTPHEADER.PROXY_AUTHORIZATION):
+                kb.proxyAuthHeader = getRequestHeader(req, HTTPHEADER.PROXY_AUTHORIZATION)
 
             # Return response object
             if response:

@@ -3267,3 +3267,15 @@ def prioritySortColumns(columns):
     """
     _ = lambda x: x and "id" in x.lower()
     return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
+
+def getRequestHeader(request, name):
+    """
+    Solving an issue with an urllib2 Request header case sensitivity
+
+    Reference: http://bugs.python.org/issue2275
+    """
+
+    retVal = None
+    if request and name:
+        retVal = max(request.get_header(_) if name.upper() == _.upper() else None for _ in request.headers.keys())
+    return retVal
