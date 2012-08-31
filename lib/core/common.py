@@ -728,7 +728,11 @@ def dataToStdout(data, forceOutput=False, bold=False):
 
             message = stdoutencode(data)
             sys.stdout.write(setColor(message, bold))
-            sys.stdout.flush()
+
+            try:
+                sys.stdout.flush()
+            except IOError:
+                pass
 
             if kb.get("multiThreadMode"):
                 logging._releaseLock()
