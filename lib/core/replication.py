@@ -5,8 +5,11 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import sqlite3
+
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapValueException
 
@@ -17,12 +20,6 @@ class Replication:
     """
 
     def __init__(self, dbpath):
-        try:
-            import sqlite3
-        except ImportError:
-            errMsg = "missing module 'sqlite3' needed by switch '--replicate'"
-            raise sqlmapMissingDependence, errMsg
-
         self.dbpath = dbpath
         self.connection = sqlite3.connect(dbpath)
         self.connection.isolation_level = None
@@ -53,11 +50,11 @@ class Replication:
             self.name = unsafeSQLIdentificatorNaming(name)
             self.columns = columns
             if create:
-                self.parent.cursor.execute('DROP TABLE IF EXISTS "%s"' % self.name)
+                self.execute('DROP TABLE IF EXISTS "%s"' % self.name)
                 if not typeless:
-                    self.parent.cursor.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
+                    self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
                 else:
-                    self.parent.cursor.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
+                    self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
 
         def insert(self, values):
             """
@@ -65,41 +62,44 @@ class Replication:
             """
 
             if len(values) == len(self.columns):
-                self.parent.cursor.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?']*len(values))), safechardecode(values))
+                self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?']*len(values))), safechardecode(values))
             else:
                 errMsg = "wrong number of columns used in replicating insert"
                 raise sqlmapValueException, errMsg
+
+        def execute(self, sql, parameters=[]):
+            try:
+                self.parent.cursor.execute(sql, parameters)
+            except sqlite3.OperationalError, ex:
+                errMsg = "problem occurred ('%s') while accessing sqlite database " % ex
+                errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
+                errMsg += "it's not used by some other program"
+                raise sqlmapGenericException, errMsg
 
         def beginTransaction(self):
             """
             Great speed improvement can be gained by using explicit transactions around multiple inserts.
             Reference: http://stackoverflow.com/questions/4719836/python-and-sqlite3-adding-thousands-of-rows
             """
-            self.parent.cursor.execute('BEGIN TRANSACTION')
+            self.execute('BEGIN TRANSACTION')
 
         def endTransaction(self):
-            self.parent.cursor.execute('END TRANSACTION')
+            self.execute('END TRANSACTION')
 
         def select(self, condition=None):
             """
             This function is used for selecting row(s) from current table.
             """
-            stmt = 'SELECT * FROM %s' % self.name
+            _ = 'SELECT * FROM %s' % self.name
             if condition:
-                stmt += 'WHERE %s' % condition
-            return self.parent.cursor.execute(stmt)
+                _ += 'WHERE %s' % condition
+            return self.execute(_)
 
     def createTable(self, tblname, columns=None, typeless=False):
         """
         This function creates Table instance with current connection settings.
         """
         return Replication.Table(parent=self, name=tblname, columns=columns, typeless=typeless)
-
-    def dropTable(self, tblname):
-        """
-        This function drops table with given name using current connection.
-        """
-        self.cursor.execute('DROP TABLE IF EXISTS %s' % tblname)
 
     def __del__(self):
         self.cursor.close()
