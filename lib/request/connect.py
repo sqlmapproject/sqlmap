@@ -126,9 +126,9 @@ class Connect:
     def __connReadProxy(conn):
         retVal = ""
 
-        if not kb.dnsMode:
-            if conn.headers.getheader(HTTPHEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
-              or "text" not in conn.headers.getheader(HTTPHEADER.CONTENT_TYPE, "").lower():
+        if not kb.dnsMode and conn:
+            if conn.headers and (conn.headers.getheader(HTTPHEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
+              or "text" not in conn.headers.getheader(HTTPHEADER.CONTENT_TYPE, "").lower()):
                 retVal = conn.read()
             else:
                 while True:
