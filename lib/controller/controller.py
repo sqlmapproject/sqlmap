@@ -161,12 +161,13 @@ def __randomFillBlankFields(value):
         message = "do you want to fill blank fields with random values? [Y/n] "
         test = readInput(message, default="Y")
         if not test or test[0] in ("y", "Y"):
-            while extractRegexResult(EMPTY_FORM_FIELDS_REGEX, retVal):
-                item = extractRegexResult(EMPTY_FORM_FIELDS_REGEX, retVal)
-                if item[-1] == DEFAULT_GET_POST_DELIMITER:
-                    retVal = retVal.replace(item, "%s%s%s" % (item[:-1], randomStr(), DEFAULT_GET_POST_DELIMITER))
-                else:
-                    retVal = retVal.replace(item, "%s%s" % (item, randomStr()))
+            for match in re.finditer(EMPTY_FORM_FIELDS_REGEX, retVal):
+                item = match.group("result")
+                if not any(_ in item for _ in IGNORE_PARAMETERS):
+                    if item[-1] == DEFAULT_GET_POST_DELIMITER:
+                        retVal = retVal.replace(item, "%s%s%s" % (item[:-1], randomStr(), DEFAULT_GET_POST_DELIMITER))
+                    else:
+                        retVal = retVal.replace(item, "%s%s" % (item, randomStr()))
 
     return retVal
 

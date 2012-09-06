@@ -455,3 +455,6 @@ MAX_HELP_OPTION_LENGTH = 18
 
 # Strings for detecting formatting errors
 FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
+
+# Regular expression used for extracting ASP.NET View State values
+VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<name>[^"]+)'
