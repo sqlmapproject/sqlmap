@@ -458,3 +458,6 @@ FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to conv
 
 # Regular expression used for extracting ASP.NET View State values
 VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<name>[^"]+)'
+
+# Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
+LIMITED_ROWS_TEST_NUMBER = 15

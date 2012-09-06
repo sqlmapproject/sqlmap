@@ -555,7 +555,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False):
+    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -586,6 +586,8 @@ class Agent:
         @rtype: C{str}
         """
 
+        fromTable = fromTable or FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
+
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]
 
@@ -598,7 +600,7 @@ class Agent:
 
         if limited:
             inbandQuery += ','.join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
-            inbandQuery += FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
+            inbandQuery += fromTable
             inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
             return inbandQuery
@@ -615,8 +617,8 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and inbandQuery.endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
-            inbandQuery = inbandQuery[:-len(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()])]
+        if fromTable and inbandQuery.endswith(fromTable):
+            inbandQuery = inbandQuery[:-len(fromTable)]
 
         for element in xrange(0, count):
             if element > 0:
@@ -635,9 +637,9 @@ class Agent:
             conditionIndex = query.index(" FROM ")
             inbandQuery += query[conditionIndex:]
 
-        if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE:
+        if fromTable:
             if " FROM " not in inbandQuery or "(CASE " in inbandQuery or "(IIF" in inbandQuery:
-                inbandQuery += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
+                inbandQuery += fromTable
 
         if intoRegExp:
             inbandQuery += intoRegExp
@@ -654,8 +656,8 @@ class Agent:
                 else:
                     inbandQuery += char
 
-            if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE:
-                inbandQuery += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
+            if fromTable:
+                inbandQuery += fromTable
 
         inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
 
