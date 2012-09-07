@@ -409,7 +409,7 @@ class Backend:
            fingerprint phase.
         """
 
-        return kb.htmlFp if kb.get("heuristicTest") is not None else []
+        return kb.htmlFp if kb.get("heuristicTest") == HEURISTIC_TEST.POSITIVE else []
 
     @staticmethod
     def getIdentifiedDbms():
