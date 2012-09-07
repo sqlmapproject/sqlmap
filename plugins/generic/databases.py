@@ -604,9 +604,7 @@ class Databases:
                 table = {}
                 columns = {}
 
-                indexRange = getLimitRange(count)
-
-                for index in indexRange:
+                for index in getLimitRange(count):
                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
@@ -616,8 +614,7 @@ class Databases:
                         query += condQuery
                         field = None
                     elif Backend.isDbms(DBMS.MSSQL):
-                        query = rootQuery.blind.query % (conf.db, conf.db, conf.db, conf.db,
-                                                         conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
+                        query = rootQuery.blind.query.replace("'%s'", "'%s'" % unsafeSQLIdentificatorNaming(tbl).split(".")[-1]).replace("%s", conf.db).replace("%d", str(index))
                         query += condQuery.replace("[DB]", conf.db)
                         field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
@@ -625,7 +622,7 @@ class Databases:
                         query += condQuery
                         field = None
 
-                    query = agent.limitQuery(index, query, field)
+                    query = agent.limitQuery(index, query, field, field)
                     column = inject.getValue(query, inband=False, error=False)
 
                     if not isNoneValue(column):

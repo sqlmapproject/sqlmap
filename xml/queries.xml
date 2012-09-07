@@ -195,7 +195,7 @@
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
-            <blind query="SELECT %s..syscolumns.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
+            <blind query="SELECT TOP 1 %s..syscolumns.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s' AND %s..syscolumns.name NOT IN (SELECT TOP %d %s..syscolumns.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s' ORDER BY %s..syscolumns.name) ORDER BY %s..syscolumns.name" query2="SELECT TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.name='%s' AND %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..syscolumns WHERE id=(SELECT id FROM %s..sysobjects WHERE name='%s')" condition="[DB]..syscolumns.name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
