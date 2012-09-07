@@ -80,15 +80,15 @@ class REFLECTIVE_COUNTER:
     HIT = "HIT"
 
 class CHARSET_TYPE:
-    BINARY = 1,
-    DIGITS = 2,
-    HEXADECIMAL = 3,
-    ALPHA = 4,
+    BINARY = 1
+    DIGITS = 2
+    HEXADECIMAL = 3
+    ALPHA = 4
     ALPHANUM = 5
 
 class HEURISTIC_TEST:
-    CASTED = 1,
-    NEGATIVE = 2,
+    CASTED = 1
+    NEGATIVE = 2
     POSITIVE = 3
 
 class HASH:
