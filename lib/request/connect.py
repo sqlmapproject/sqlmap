@@ -199,8 +199,10 @@ class Connect:
 
         code = None
         page = None
+
+        _ = urlparse.urlsplit(url)
         requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
-        requestMsg += ("%s" % urlparse.urlsplit(url)[2] or "/") if not any((refreshing, crawling)) else url
+        requestMsg += ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling)) else url
         responseMsg = u"HTTP response "
         requestHeaders = u""
         responseHeaders = None
