@@ -168,7 +168,7 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         randInt = getUnicode(randomInt(1))
-        result = inject.checkBooleanExpression("CONNECTION_ID()=CONNECTION_ID()")
+        result = inject.checkBooleanExpression("QUARTER(NULL) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MYSQL
