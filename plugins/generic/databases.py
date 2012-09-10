@@ -640,7 +640,7 @@ class Databases:
                             colType = inject.getValue(query, inband=False, error=False)
 
                             if Backend.isDbms(DBMS.FIREBIRD):
-                                colType = firebirdTypes.get(colType, colType)
+                                colType = FIREBIRD_TYPES.get(colType, colType)
 
                             column = safeSQLIdentificatorNaming(column)
                             columns[column] = colType
