@@ -42,6 +42,7 @@ from lib.core.settings import MAX_INT
 from lib.core.settings import NULL
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
+from lib.utils.pivotdumptable import pivotDumpTable
 
 class Entries:
     """
@@ -50,129 +51,6 @@ class Entries:
 
     def __init__(self):
         pass
-
-    def __pivotDumpTable(self, table, colList, count=None, blind=True):
-        lengths = {}
-        entries = {}
-
-        dumpNode = queries[Backend.getIdentifiedDbms()].dump_table.blind
-
-        validColumnList = False
-        validPivotValue = False
-
-        if count is None:
-            query = dumpNode.count % table
-            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, expected=EXPECTED.INT)
-
-        if isinstance(count, basestring) and count.isdigit():
-            count = int(count)
-
-        if count == 0:
-            infoMsg = "table '%s' appears to be empty" % unsafeSQLIdentificatorNaming(table)
-            logger.info(infoMsg)
-
-            for column in colList:
-                lengths[column] = len(column)
-                entries[column] = []
-
-            return entries, lengths
-
-        elif not isNumPosStrValue(count):
-            return None
-
-        for column in colList:
-            lengths[column] = 0
-            entries[column] = BigArray()
-
-        colList = filter(None, sorted(colList, key=lambda x: len(x) if x else MAX_INT))
-
-        for column in colList:
-            infoMsg = "fetching number of distinct "
-            infoMsg += "values for column '%s'" % column
-            logger.info(infoMsg)
-
-            query = dumpNode.count2 % (column, table)
-            value = inject.getValue(query, blind=blind, inband=not blind, error=not blind, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-
-            if isNumPosStrValue(value):
-                validColumnList = True
-
-                if value == count:
-                    infoMsg = "using column '%s' as a pivot " % column
-                    infoMsg += "for retrieving row data"
-                    logger.info(infoMsg)
-
-                    validPivotValue = True
-
-                    colList.remove(column)
-                    colList.insert(0, column)
-                    break
-
-        if not validColumnList:
-            errMsg = "all column name(s) provided are non-existent"
-            raise sqlmapNoneDataException, errMsg
-
-        if not validPivotValue:
-            warnMsg = "no proper pivot column provided (with unique values)."
-            warnMsg += " It won't be possible to retrieve all rows"
-            logger.warn(warnMsg)
-
-        pivotValue = " "
-        breakRetrieval = False
-
-        try:
-            for i in xrange(count):
-                if breakRetrieval:
-                    break
-
-                for column in colList:
-                    # Correction for pivotValues with unrecognized/problematic chars
-                    for char in ('\'', '?'):
-                        if pivotValue and char in pivotValue and pivotValue[0] != char:
-                            pivotValue = pivotValue.split(char)[0]
-                            pivotValue = pivotValue[:-1] + decodeIntToUnicode(ord(pivotValue[-1]) + 1)
-                            break
-                    if column == colList[0]:
-                        query = dumpNode.query % (column, table, column, pivotValue)
-                    else:
-                        query = dumpNode.query2 % (column, table, colList[0], pivotValue)
-
-                    value = inject.getValue(query, blind=blind, inband=not blind, error=not blind)
-
-                    if column == colList[0]:
-                        if isNoneValue(value):
-                            breakRetrieval = True
-                            break
-                        else:
-                            pivotValue = safechardecode(value)
-
-                    if conf.limitStart or conf.limitStop:
-                        if conf.limitStart and (i + 1) < conf.limitStart:
-                            warnMsg = "skipping first %d pivot " % conf.limitStart
-                            warnMsg += "point values"
-                            singleTimeWarnMessage(warnMsg)
-                            break
-                        elif conf.limitStop and (i + 1) > conf.limitStop:
-                            breakRetrieval = True
-                            break
-
-                    value = "" if isNoneValue(value) else unArrayizeValue(value)
-
-                    lengths[column] = max(lengths[column], len(value) if value else 0)
-                    entries[column].append(value)
-
-        except KeyboardInterrupt:
-            warnMsg = "user aborted during enumeration. sqlmap "
-            warnMsg += "will display partial output"
-            logger.warn(warnMsg)
-
-        except sqlmapConnectionException, e:
-            errMsg = "connection exception detected. sqlmap "
-            errMsg += "will display partial output"
-            errMsg += "'%s'" % e
-            logger.critical(errMsg)
-
-        return entries, lengths
 
     def dumpTable(self, foundData=None):
         self.forceDbmsEnum()
@@ -269,7 +147,7 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            retVal = self.__pivotDumpTable(table, colList, blind=False)
+                            retVal = pivotDumpTable(table, colList, blind=False)
 
                             if retVal:
                                 entries, _ = retVal
@@ -365,7 +243,7 @@ class Entries:
                         elif Backend.isDbms(DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
 
-                        retVal = self.__pivotDumpTable(table, colList, count, blind=True)
+                        retVal = pivotDumpTable(table, colList, count, blind=True)
 
                         if retVal:
                             entries, lengths = retVal

@@ -39,6 +39,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
+from lib.utils.pivotdumptable import pivotDumpTable
 
 class Users:
     """
@@ -179,7 +180,7 @@ class Users:
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
 
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False)
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
@@ -221,7 +222,7 @@ class Users:
                 randStr = randomStr()
                 query = rootQuery.inband.query
 
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=True)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=True)
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):

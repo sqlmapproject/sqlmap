@@ -16,6 +16,7 @@ from lib.core.data import queries
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
+from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
@@ -40,7 +41,7 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[Backend.getIdentifiedDbms()].dbs
         randStr = randomStr()
         query = rootQuery.inband.query
-        retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.schemaname' % randStr], blind=True)
+        retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.schemaname' % randStr], blind=True)
 
         if retVal:
             kb.data.cachedDbs = retVal[0].values()[0]
@@ -76,7 +77,7 @@ class Enumeration(GenericEnumeration):
         for db in dbs:
             randStr = randomStr()
             query = rootQuery.inband.query % (("'%s'" % db) if db != "USER" else 'USER')
-            retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.tablename' % randStr], blind=True)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.tablename' % randStr], blind=True)
 
             if retVal:
                 for table in retVal[0].values()[0]:
@@ -147,7 +148,7 @@ class Enumeration(GenericEnumeration):
 
             randStr = randomStr()
             query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), ("'%s'" % unsafeSQLIdentificatorNaming(conf.db)) if unsafeSQLIdentificatorNaming(conf.db) != "USER" else 'USER')
-            retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.columnname' % randStr,'%s.datatype' % randStr,'%s.len' % randStr], blind=True)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.columnname' % randStr,'%s.datatype' % randStr,'%s.len' % randStr], blind=True)
 
             if retVal:
                 table = {}

@@ -20,6 +20,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
+from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
@@ -41,7 +42,7 @@ class Enumeration(GenericEnumeration):
             blinds = (True,)
 
         for blind in blinds:
-            retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
 
             if retVal:
                 kb.data.cachedUsers = retVal[0].values()[0]
@@ -95,7 +96,7 @@ class Enumeration(GenericEnumeration):
             blinds = [True]
 
         for blind in blinds:
-            retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
 
             if retVal:
                 kb.data.cachedDbs = retVal[0].values()[0]
@@ -140,7 +141,7 @@ class Enumeration(GenericEnumeration):
             for blind in blinds:
                 randStr = randomStr()
                 query = rootQuery.inband.query % db
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
 
                 if retVal:
                     for table in retVal[0].values()[0]:
@@ -232,7 +233,7 @@ class Enumeration(GenericEnumeration):
             for blind in blinds:
                 randStr = randomStr()
                 query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
-                retVal = self.__pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.usertype' % randStr], blind=blind)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.usertype' % randStr], blind=blind)
 
                 if retVal:
                     table = {}
