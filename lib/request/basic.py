@@ -180,18 +180,19 @@ def decodePage(page, contentEncoding, contentType):
         return getUnicode(page)
 
     if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ("gzip", "x-gzip", "deflate"):
-        if contentEncoding == "deflate":
-            # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
-            data = StringIO.StringIO(zlib.decompress(page, -15))
-        else:
-            data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
-
         try:
+            if contentEncoding == "deflate":
+                # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
+                data = StringIO.StringIO(zlib.decompress(page, -15))
+            else:
+                data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
+
             page = data.read()
         except Exception, msg:
             errMsg = "detected invalid data for declared content "
             errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)
             singleTimeLogMessage(errMsg, logging.ERROR)
+            return page
 
     if not conf.charset:
         httpCharset, metaCharset = None, None
