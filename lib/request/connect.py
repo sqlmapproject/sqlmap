@@ -46,6 +46,7 @@ from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import REDIRECTION
+from lib.core.exception import sqlmapCompressionException
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
@@ -108,7 +109,7 @@ class Connect:
                     warnMsg += "(e.g. https://help.ubuntu.com/community/Tor)"
             else:
                 warnMsg = "if the problem persists please check that the provided "
-                warnMsg += "target url is valid. If it is, you can try to rerun "
+                warnMsg += "target url is valid. In case that it is, you can try to rerun "
                 warnMsg += "with the switch '--random-agent' turned on "
                 warnMsg += "and/or proxy switches (--ignore-proxy, --proxy,...)"
             singleTimeWarnMessage(warnMsg)
@@ -279,7 +280,7 @@ class Connect:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
-            headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD else "identity"
+            headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
             if auxHeaders:
@@ -467,7 +468,7 @@ class Connect:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError, sqlmapCompressionException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:

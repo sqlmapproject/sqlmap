@@ -1513,6 +1513,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.multiThreadMode = False
     kb.negativeLogic = False
     kb.nullConnection = None
+    kb.pageCompress = True
     kb.pageTemplate = None
     kb.pageTemplates = dict()
     kb.previousMethod = None

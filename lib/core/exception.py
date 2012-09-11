@@ -5,6 +5,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+class sqlmapCompressionException(Exception):
+    pass
+
 class sqlmapConnectionException(Exception):
     pass
 
@@ -60,6 +63,7 @@ class sqlmapValueException(Exception):
     pass
 
 exceptionsTuple = (
+                    sqlmapCompressionException,
                     sqlmapConnectionException,
                     sqlmapDataException,
                     sqlmapFilePathException,

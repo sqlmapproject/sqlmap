@@ -18,11 +18,13 @@ from lib.core.common import getUnicode
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import PLACE
+from lib.core.exception import sqlmapCompressionException
 from lib.core.htmlentities import htmlEntities
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import ML
@@ -181,7 +183,7 @@ def decodePage(page, contentEncoding, contentType):
 
     if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ("gzip", "x-gzip", "deflate"):
         try:
-            if contentEncoding == "deflate":
+            if contentEncoding.lower() == "deflate":
                 # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
                 data = StringIO.StringIO(zlib.decompress(page, -15))
             else:
@@ -192,7 +194,12 @@ def decodePage(page, contentEncoding, contentType):
             errMsg = "detected invalid data for declared content "
             errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)
             singleTimeLogMessage(errMsg, logging.ERROR)
-            return page
+
+            warnMsg = "turning off page compression"
+            singleTimeWarnMessage(warnMsg)
+
+            kb.pageCompress = False
+            raise sqlmapCompressionException
 
     if not conf.charset:
         httpCharset, metaCharset = None, None
