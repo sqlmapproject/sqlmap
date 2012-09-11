@@ -328,7 +328,7 @@ def __setResultsFile():
         conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING)
         conf.resultsFP.writelines("Target url,Place,Parameter,Techniques%s" % os.linesep)
 
-        logger.info("using '%s' as the CSV results file for multiple targets" % conf.resultsFilename)
+        logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
 
 def __createFilesDir():
     """
