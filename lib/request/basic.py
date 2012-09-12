@@ -10,6 +10,7 @@ import gzip
 import logging
 import re
 import StringIO
+import struct
 import zlib
 
 from lib.core.common import extractErrorMessage
@@ -27,6 +28,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapCompressionException
 from lib.core.htmlentities import htmlEntities
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
+from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
@@ -182,12 +184,17 @@ def decodePage(page, contentEncoding, contentType):
         return getUnicode(page)
 
     if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ("gzip", "x-gzip", "deflate"):
+        if not kb.pageCompress:
+            return None
+
         try:
             if contentEncoding.lower() == "deflate":
-                # http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
-                data = StringIO.StringIO(zlib.decompress(page, -15))
+                data = StringIO.StringIO(zlib.decompress(page, -15))  # Reference: http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             else:
                 data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
+                size = struct.unpack("<l", page[-4:])[0]  # Reference: http://pydoc.org/get.cgi/usr/local/lib/python2.5/gzip.py
+                if size > MAX_CONNECTION_TOTAL_SIZE:
+                    raise Exception, "size too large"
 
             page = data.read()
         except Exception, msg:
