@@ -325,7 +325,7 @@ def __setResultsFile():
 
     if not conf.resultsFP:
         conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, time.strftime(RESULTS_FILE_FORMAT).lower())
-        conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING)
+        conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
         conf.resultsFP.writelines("Target url,Place,Parameter,Techniques%s" % os.linesep)
 
         logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
