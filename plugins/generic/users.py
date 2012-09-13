@@ -80,7 +80,7 @@ class Users:
         query = agent.forgeCaseStatement(query)
         kb.data.isDba = unArrayizeValue(inject.getValue(query, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY))
 
-        return kb.data.isDba == "1"
+        return kb.data.isDba
 
     def getUsers(self):
         infoMsg = "fetching database users"
