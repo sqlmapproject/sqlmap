@@ -545,24 +545,6 @@ Formats:
     <boundary>
         <level>5</level>
         <clause>1</clause>
-        <where>3</where>
-        <ptype>2</ptype>
-        <prefix>(SELECT [RANDNUM1] FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)</suffix>
-    </boundary>
-
-    <boundary>
-        <level>5</level>
-        <clause>1</clause>
-        <where>3</where>
-        <ptype>2</ptype>
-        <prefix>(SELECT [RANDNUM1] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)</suffix>
-    </boundary>
-
-    <boundary>
-        <level>5</level>
-        <clause>1</clause>
         <where>1</where>
         <ptype>2</ptype>
         <prefix>'||(SELECT '[RANDSTR]' FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
