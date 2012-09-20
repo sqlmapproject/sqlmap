@@ -228,7 +228,7 @@ class xp_cmdshell:
                 elif not (output[-1] or "").strip():
                     output = output[:-1]
 
-                output = "\n".join(line for line in output)
+                output = "\n".join(line for line in filter(None, output))
 
         return output
 
