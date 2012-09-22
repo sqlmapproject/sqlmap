@@ -80,10 +80,6 @@ def cmdLineParser():
         request.add_option("--load-cookies", dest="loadCookies",
                            help="File containing cookies in Netscape/wget format")
 
-        request.add_option("--cookie-urlencode", dest="cookieUrlencode",
-                             action="store_true",
-                             help="URL Encode generated cookie injections")
-
         request.add_option("--drop-set-cookie", dest="dropSetCookie",
                            action="store_true",
                            help="Ignore Set-Cookie header from response")

@@ -32,7 +32,6 @@ from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
-from lib.core.common import urlEncodeCookieValues
 from lib.core.common import wasLastRequestDelayed
 from lib.core.common import unicodeencode
 from lib.core.common import urlencode
@@ -577,7 +576,13 @@ class Connect:
 
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
 
-            if place in (PLACE.GET, PLACE.POST, PLACE.URI, PLACE.CUSTOM_POST):
+            if place == PLACE.SOAP:
+                # payloads in SOAP should have chars > and < replaced
+                # with their HTML encoded counterparts
+                payload = payload.replace('>', "&gt;").replace('<', "&lt;")
+                value = agent.replacePayload(value, payload)
+
+            else:
                 # payloads in GET and/or POST need to be urlencoded
                 # throughly without safe chars (especially & and =)
                 # addendum: as we support url encoding in tampering
@@ -586,17 +591,8 @@ class Connect:
                     payload = urlencode(payload, '%', False, True) if place not in (PLACE.POST, PLACE.CUSTOM_POST) and not skipUrlEncode else payload
                     value = agent.replacePayload(value, payload)
 
-            elif place == PLACE.SOAP:
-                # payloads in SOAP should have chars > and < replaced
-                # with their HTML encoded counterparts
-                payload = payload.replace('>', "&gt;").replace('<', "&lt;")
-                value = agent.replacePayload(value, payload)
-
         if place:
             value = agent.removePayloadDelimiters(value)
-
-            if place == PLACE.COOKIE and conf.cookieUrlencode:
-                value = urlEncodeCookieValues(value)
 
         if conf.checkPayload:
             checkPayload(value)

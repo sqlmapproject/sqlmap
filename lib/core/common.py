@@ -1301,30 +1301,6 @@ def searchEnvPath(filename):
 
     return retVal
 
-def urlEncodeCookieValues(cookieStr):
-    if cookieStr:
-        retVal = ""
-
-        for part in cookieStr.split(';'):
-            index = part.find('=') + 1
-            if index > 0:
-                name = part[:index - 1].strip()
-                value = urlencode(part[index:], convall=True)
-                retVal += "; %s=%s" % (name, value)
-            elif part.strip().lower() != "secure":
-                retVal += "%s%s" % ("%3B", urlencode(part, convall=True))
-            else:
-                retVal += "; secure"
-
-        if retVal.startswith('; '):
-            retVal = retVal[2:]
-        elif retVal.startswith('%3B'):
-            retVal = retVal[3:]
-
-        return retVal
-    else:
-        return None
-
 def directoryPath(filepath):
     """
     Returns directory path for a given filepath
