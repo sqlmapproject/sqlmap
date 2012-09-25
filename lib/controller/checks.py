@@ -281,6 +281,12 @@ def checkSqlInjection(place, parameter, value):
                 # Parse boundary's <prefix>, <suffix> and <ptype>
                 prefix = boundary.prefix if boundary.prefix else ""
                 suffix = boundary.suffix if boundary.suffix else ""
+
+                # Options --prefix/--suffix have a higher priority (if set by user)
+                prefix = conf.prefix if conf.prefix is not None else prefix
+                suffix = conf.suffix if conf.suffix is not None else suffix
+                comment = None if conf.suffix is not None else comment
+
                 ptype = boundary.ptype
 
                 # If the previous injections succeeded, we know which prefix,

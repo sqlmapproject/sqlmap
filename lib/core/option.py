@@ -958,15 +958,6 @@ def __setSafeUrl():
         raise sqlmapSyntaxException, errMsg
 
 def __setPrefixSuffix():
-    if conf.prefix is not None and conf.suffix is None:
-        errMsg = "you specified the payload prefix, but did not provide "
-        errMsg += "the payload suffix"
-        raise sqlmapSyntaxException, errMsg
-    elif conf.prefix is None and conf.suffix is not None:
-        errMsg = "you specified the payload suffix, but did not provide "
-        errMsg += "the payload prefix"
-        raise sqlmapSyntaxException, errMsg
-
     if conf.prefix is not None and conf.suffix is not None:
         # Create a custom boundary object for user's supplied prefix
         # and suffix
