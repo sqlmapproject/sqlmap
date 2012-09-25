@@ -117,6 +117,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
+from lib.request.basic import checkCharEncoding
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
 from lib.request.proxy import ProxyHTTPSHandler
@@ -1965,13 +1966,14 @@ def __basicOptionValidation():
             raise sqlmapSyntaxException, errMsg
 
     if conf.charset:
-        try:
-            codecs.lookup(conf.charset)
-        except LookupError:
+        _ = checkCharEncoding(conf.charset, False)
+        if _ is None:
             errMsg = "unknown charset '%s'. Please visit " % conf.charset
             errMsg += "'%s' to get the full list of " % CODECS_LIST_PAGE
             errMsg += "supported charsets"
             raise sqlmapSyntaxException, errMsg
+        else:
+            conf.charset = _
 
     if conf.loadCookies:
         if not os.path.exists(conf.loadCookies):

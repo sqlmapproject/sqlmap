@@ -100,14 +100,14 @@ def parseResponse(page, headers):
     if page:
         htmlParser(page)
 
-def checkCharEncoding(encoding):
+def checkCharEncoding(encoding, warn=True):
     if encoding:
         encoding = encoding.lower()
     else:
         return encoding
 
     # http://www.destructor.de/charsets/index.htm
-    translate = { "windows-874": "iso-8859-11", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8",  "utc8": "utf8"}
+    translate = { "windows-874": "iso-8859-11", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8",  "utc8": "utf8", "ebcdic": "ebcdic-cp-be"}
 
     for delimiter in (';', ',', '('):
         if delimiter in encoding:
@@ -156,9 +156,10 @@ def checkCharEncoding(encoding):
     try:
         codecs.lookup(encoding)
     except LookupError:
-        warnMsg = "unknown web page charset '%s'. " % encoding
-        warnMsg += "Please report by e-mail to %s." % ML
-        singleTimeLogMessage(warnMsg, logging.WARN, encoding)
+        if warn:
+            warnMsg = "unknown web page charset '%s'. " % encoding
+            warnMsg += "Please report by e-mail to %s." % ML
+            singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
 
     return encoding
