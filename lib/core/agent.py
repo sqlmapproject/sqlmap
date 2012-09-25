@@ -189,6 +189,9 @@ class Agent:
 
         expression = self.cleanupPayload(expression)
 
+        # User supplied --suffix nullifies any eventual payload comments
+        comment = None if conf.suffix is not None and suffix == conf.suffix else comment
+
         if Backend.getIdentifiedDbms() == DBMS.ACCESS and comment == GENERIC_SQL_COMMENT:
             comment = "%00"
 
