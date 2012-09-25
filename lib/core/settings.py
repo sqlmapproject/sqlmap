@@ -402,6 +402,9 @@ DEFAULT_COOKIE_DELIMITER = ';'
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
 
+# Number of retries for unsuccessful HashDB flush attempts
+HASHDB_FLUSH_RETRIES = 3
+
 # Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
 HASHDB_MILESTONE_VALUE = "cAWxkLYCQT"  # r5129 "".join(random.sample(string.letters, 10))
 

@@ -14,6 +14,8 @@ import time
 from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
+from lib.core.data import logger
+from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
@@ -95,6 +97,7 @@ class HashDB(object):
         try:
             self.beginTransaction()
             for hash_, value in _.items():
+                retries = 0
                 while True:
                     try:
                         try:
@@ -102,9 +105,16 @@ class HashDB(object):
                         except sqlite3.IntegrityError:
                             self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
                     except sqlite3.OperationalError, ex:
-                        if not any(_ in ex.message for _ in ('locked', 'I/O')):
-                            raise
+
+                        if retries == 0:
+                            warnMsg = "there has been a problem while writing to "
+                            warnMsg += "the session file ('%s')" % ex.message
+                            logger.warn(warnMsg)
+
+                        if retries >= HASHDB_FLUSH_RETRIES:
+                            return
                         else:
+                            retries += 1
                             time.sleep(1)
                     else:
                         break
