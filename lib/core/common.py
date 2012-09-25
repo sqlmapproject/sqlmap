@@ -1839,10 +1839,7 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
         if isinstance(value, unicode):
             return value
         elif isinstance(value, basestring):
-            try:
-                return unicode(value, encoding or kb.pageEncoding)
-            except:
-                return unicode(value, UNICODE_ENCODING, "replace")
+            return unicode(value, encoding or kb.pageEncoding or UNICODE_ENCODING, "replace")
         else:
             return unicode(value)  # encoding ignored for non-basestring instances
     else:
