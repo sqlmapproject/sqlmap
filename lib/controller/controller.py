@@ -128,12 +128,15 @@ def __formatInjection(inj):
     for stype, sdata in inj.data.items():
         title = sdata.title
         vector = sdata.vector
+        comment = sdata.comment
         if stype == PAYLOAD.TECHNIQUE.UNION:
             count = re.sub(r"(?i)(\(.+\))|(\blimit[^A-Za-z]+)", "", sdata.payload).count(',') + 1
             title = re.sub(r"\d+ to \d+", str(count), title)
             vector = agent.forgeInbandQuery("[QUERY]", vector[0], vector[1], vector[2], None, None, vector[5], vector[6])
             if count == 1:
                 title = title.replace("columns", "column")
+        elif comment:
+            vector = "%s%s" % (vector, comment)
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
         data += "    Payload: %s\n" % agent.adjustLateValues(sdata.payload)

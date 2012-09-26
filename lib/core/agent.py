@@ -189,8 +189,12 @@ class Agent:
 
         expression = self.cleanupPayload(expression)
 
-        # User supplied --suffix nullifies any eventual payload comments
-        comment = None if conf.suffix is not None and suffix == conf.suffix else comment
+        # Take default values if None
+        suffix = kb.injection.suffix if kb.injection and suffix is None else suffix
+
+        if kb.technique and kb.technique in kb.injection.data:
+            where = kb.injection.data[kb.technique].where if where is None else where
+            comment = kb.injection.data[kb.technique].comment if comment is None else comment
 
         if Backend.getIdentifiedDbms() == DBMS.ACCESS and comment == GENERIC_SQL_COMMENT:
             comment = "%00"
@@ -198,16 +202,13 @@ class Agent:
         if comment is not None:
             expression += comment
 
-        if where is None and kb.technique and kb.technique in kb.injection.data:
-            where = kb.injection.data[kb.technique].where
-
         # If we are replacing (<where>) the parameter original value with
         # our payload do not append the suffix
         if where == PAYLOAD.WHERE.REPLACE:
             pass
 
-        elif any([kb.injection.suffix, suffix]) and not (comment and not conf.suffix):
-            expression += " %s" % (kb.injection.suffix or suffix)
+        elif suffix and not comment:
+            expression += " %s" % suffix
 
         return re.sub(r"(?s);\W*;", ";", expression)
 

