@@ -47,7 +47,7 @@
         --scope=SCOPE       Regexp to filter targets from provided proxy log
         --safe-url=SAFURL   Url address to visit frequently during testing
         --safe-freq=SAFREQ  Test requests between two visits to a given safe url
-        --skip-urlencode    Skip URL encoding of POST data
+        --skip-urlencode    Skip URL encoding of payload data
         --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
                             "import hashlib;id2=hashlib.md5(id).hexdigest()")
 
