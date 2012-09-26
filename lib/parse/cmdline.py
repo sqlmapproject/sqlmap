@@ -151,7 +151,7 @@ def cmdLineParser():
 
         request.add_option("--skip-urlencode", dest="skipUrlEncode",
                            action="store_true",
-                           help="Skip URL encoding of POST data")
+                           help="Skip URL encoding of payload data")
 
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
