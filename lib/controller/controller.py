@@ -343,7 +343,7 @@ def start():
                     elif test[0] in ("q", "Q"):
                         break
 
-                    infoMsg = "testing url %s" % targetUrl
+                    infoMsg = "testing url '%s'" % targetUrl
                     logger.info(infoMsg)
 
             setupTargetEnv()
