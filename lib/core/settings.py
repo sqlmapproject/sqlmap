@@ -25,15 +25,15 @@ ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
 GIT_REPOSITORY = "git://github.com/sqlmapproject/sqlmap.git"
 ML = "sqlmap-users@lists.sourceforge.net"
 
-# minimum distance of ratio from kb.matchRatio to result in True
+# Minimum distance of ratio from kb.matchRatio to result in True
 DIFF_TOLERANCE = 0.05
 CONSTANT_RATIO = 0.9
 
-# lower and upper values for match ratio in case of stable page
+# Lower and upper values for match ratio in case of stable page
 LOWER_RATIO_BOUND = 0.02
 UPPER_RATIO_BOUND = 0.98
 
-# markers for special cases when parameter values contain html encoded characters
+# Markers for special cases when parameter values contain html encoded characters
 PARAMETER_AMP_MARKER = "__AMP__"
 PARAMETER_SEMICOLON_MARKER = "__SEMICOLON__"
 
@@ -45,80 +45,80 @@ PAYLOAD_DELIMITER = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 PRINTABLE_CHAR_REGEX = r"[^\x00-\x1f\x7e-\xff]"
 
-# regular expression used for recognition of generic permission messages
+# Regular expression used for recognition of generic permission messages
 PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"
 
-# regular expression used for recognition of generic maximum connection messages
+# Regular expression used for recognition of generic maximum connection messages
 MAX_CONNECTIONS_REGEX = r"max.+connections"
 
-# regular expression used for extracting results from google search
+# Regular expression used for extracting results from google search
 GOOGLE_REGEX = r"url\?\w+=(http[^>]+)&(sa=U|rct=j)"
 
-# regular expression used for extracting content from "textual" tags
+# Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
 
-# dumping characters used in GROUP_CONCAT MySQL technique
+# Dumping characters used in GROUP_CONCAT MySQL technique
 CONCAT_ROW_DELIMITER = ','
 CONCAT_VALUE_DELIMITER = '|'
 
-# coefficient used for a time-based query delay checking (must be >= 7)
+# Coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 7
 
-# standard deviation after which a warning message should be displayed about connection lags
+# Standard deviation after which a warning message should be displayed about connection lags
 WARN_TIME_STDEV = 0.5
 
-# minimum length of usable union injected response (quick defense against substr fields)
+# Minimum length of usable union injected response (quick defense against substr fields)
 UNION_MIN_RESPONSE_CHARS = 10
 
-# coefficient used for a union-based number of columns checking (must be >= 7)
+# Coefficient used for a union-based number of columns checking (must be >= 7)
 UNION_STDEV_COEFF = 7
 
-# length of queue for candidates for time delay adjustment
+# Length of queue for candidates for time delay adjustment
 TIME_DELAY_CANDIDATES = 3
 
-# default value for HTTP Accept header
+# Default value for HTTP Accept header
 HTTP_ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 
-# default value for HTTP Accept-Encoding header
+# Default value for HTTP Accept-Encoding header
 HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip,deflate"
 
 # HTTP timeout in silent mode
 HTTP_SILENT_TIMEOUT = 3
 
-# maximum number of techniques used in inject.py/getValue() per one value
+# Maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
 
-# suffix used for naming meta databases in DBMS(es) without explicit database name
+# Suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX = "_masterdb"
 
-# minimum time response set needed for time-comparison based on standard deviation
+# Minimum time response set needed for time-comparison based on standard deviation
 MIN_TIME_RESPONSES = 10
 
-# minimum comparison ratio set needed for searching valid union column number based on standard deviation
+# Minimum comparison ratio set needed for searching valid union column number based on standard deviation
 MIN_UNION_RESPONSES = 5
 
-# after these number of blanks at the end inference should stop (just in case)
+# After these number of blanks at the end inference should stop (just in case)
 INFERENCE_BLANK_BREAK = 10
 
-# use this replacement character for cases when inference is not able to retrieve the proper character value
+# Use this replacement character for cases when inference is not able to retrieve the proper character value
 INFERENCE_UNKNOWN_CHAR = '?'
 
-# character used for operation "greater" in inference
+# Character used for operation "greater" in inference
 INFERENCE_GREATER_CHAR = ">"
 
-# character used for operation "equals" in inference
+# Character used for operation "equals" in inference
 INFERENCE_EQUALS_CHAR = "="
 
-# character used for operation "not-equals" in inference
+# Character used for operation "not-equals" in inference
 INFERENCE_NOT_EQUALS_CHAR = "!="
 
-# string used for representation of unknown dbms version
+# String used for representation of unknown dbms version
 UNKNOWN_DBMS_VERSION = "Unknown"
 
-# dynamicity mark length used in dynamicity removal engine
+# Dynamicity mark length used in dynamicity removal engine
 DYNAMICITY_MARK_LENGTH = 32
 
-# dummy user prefix used in dictionary attack
+# Dummy user prefix used in dictionary attack
 DUMMY_USER_PREFIX = "__dummy__"
 
 # Reference: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
@@ -126,9 +126,8 @@ DEFAULT_PAGE_ENCODING = "iso-8859-1"
 
 # System variables
 IS_WIN = subprocess.mswindows
-# The name of the operating system dependent module imported. The following
-# names have currently been registered: 'posix', 'nt', 'mac', 'os2', 'ce',
-# 'java', 'riscos'
+
+# The name of the operating system dependent module imported. The following names have currently been registered: 'posix', 'nt', 'mac', 'os2', 'ce', 'java', 'riscos'
 PLATFORM = os.name
 PYVERSION = sys.version.split()[0]
 
@@ -171,7 +170,7 @@ USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
 REFERER_ALIASES = ( "ref", "referer", "referrer" )
 HOST_ALIASES = ( "host", )
 
-# items displayed in basic help (-h) output
+# Items displayed in basic help (-h) output
 BASIC_HELP_ITEMS = (
                         "url",
                         "googleDork",
@@ -205,13 +204,13 @@ BASIC_HELP_ITEMS = (
                         "wizard"
                    )
 
-# string representation for NULL value
+# String representation for NULL value
 NULL = "NULL"
 
-# string representation for blank ('') value
+# String representation for blank ('') value
 BLANK = "<blank>"
 
-# string representation for current database
+# String representation for current database
 CURRENT_DB = "CD"
 
 # Regular expressions used for parsing error messages (--parse-errors)
@@ -470,3 +469,6 @@ VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<name>[^"]+)'
 
 # Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
 LIMITED_ROWS_TEST_NUMBER = 15
+
+# Regular expressing used for detecting JSON-like POST data
+JSON_RECOGNITION_REGEX = r'(?s)\A\s*.*"[^"]+"\s*:\s*"[^"]+".+\}\s*\Z'

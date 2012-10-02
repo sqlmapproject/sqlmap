@@ -685,6 +685,7 @@ class Connect:
                     msg += "which is usually causing problems "
                     msg += "in this kind of situations? [Y/n]"
                     skipUrlEncode = conf.skipUrlEncode = readInput(msg, default="Y").upper() != "N"
+
             if place not in (PLACE.POST, PLACE.SOAP, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
             elif not skipUrlEncode and place not in (PLACE.SOAP,):

@@ -39,6 +39,7 @@ from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.option import __setAuthCred
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
+from lib.core.settings import JSON_RECOGNITION_REGEX
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_REGEX
@@ -110,11 +111,23 @@ def __setRequestParams():
         elif test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
 
+
+    if re.search(JSON_RECOGNITION_REGEX, conf.data or ""):
+        message = "JSON like data found in POST data. "
+        message += "Do you want to process it? [Y/n/q] "
+        test = readInput(message, default="Y")
+        if test and test[0] in ("q", "Q"):
+            raise sqlmapUserQuitException
+        elif test[0] not in ("n", "N"):
+            conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>*"', conf.data or "")
+            kb.processUserMarks = True
+
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data)):
         if CUSTOM_INJECTION_MARK_CHAR in (value or ""):
             if kb.processUserMarks is None:
+                _ = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data'}
                 message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
-                message += "'%s'. Do you want to process it? [Y/n/q] " % {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data'}[place]
+                message += "'%s'. Do you want to process it? [Y/n/q] " % _[place]
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):
                     raise sqlmapUserQuitException
