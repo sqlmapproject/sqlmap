@@ -53,11 +53,13 @@ from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
+from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
+from lib.core.settings import PERMISSION_DENIED_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
@@ -766,8 +768,8 @@ class Connect:
         if not response and removeReflection:
             page = removeReflectiveValues(page, payload)
 
-        kb.maxConnectionsFlag = re.search(r"max.+connections", page or "", re.I) is not None
-        kb.permissionFlag = re.search(r"(command|permission|access)\s*(was|is)?\s*denied", page or "", re.I) is not None
+        kb.maxConnectionsFlag = re.search(MAX_CONNECTIONS_REGEX, page or "", re.I) is not None
+        kb.permissionFlag = re.search(PERMISSION_DENIED_REGEX, page or "", re.I) is not None
 
         if content or response:
             return page, headers

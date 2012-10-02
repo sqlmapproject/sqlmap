@@ -45,6 +45,12 @@ PAYLOAD_DELIMITER = "\x00"
 CHAR_INFERENCE_MARK = "%c"
 PRINTABLE_CHAR_REGEX = r"[^\x00-\x1f\x7e-\xff]"
 
+# regular expression used for recognition of generic permission messages
+PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"
+
+# regular expression used for recognition of generic maximum connection messages
+MAX_CONNECTIONS_REGEX = r"max.+connections"
+
 # regular expression used for extracting results from google search
 GOOGLE_REGEX = r"url\?\w+=(http[^>]+)&(sa=U|rct=j)"
 
