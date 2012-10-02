@@ -676,7 +676,7 @@ class Connect:
         if post:
             if conf.skipUrlEncode is None:
                 _ = (post or "").strip()
-                if _.startswith("<") and _.endswith(">"):
+                if _.startswith('<') and _.endswith('>'):
                     msg = "provided POST data looks "
                     msg += "like it's in XML format. "
                     msg += "Do you want to turn off URL encoding "
