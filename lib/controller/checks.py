@@ -443,8 +443,7 @@ def checkSqlInjection(place, parameter, value):
                                 warnMsg = "using unescaped version of the test "
                                 warnMsg += "because of zero knowledge of the "
                                 warnMsg += "back-end DBMS. You can try to "
-                                warnMsg += "explicitly set it using the --dbms "
-                                warnMsg += "option"
+                                warnMsg += "explicitly set it using option '--dbms'"
                                 singleTimeWarnMessage(warnMsg)
 
                             if unionExtended:
