@@ -58,13 +58,16 @@ class OS:
 class PLACE:
     GET = "GET"
     POST = "POST"
-    SOAP = "SOAP"
     URI = "URI"
     COOKIE = "Cookie"
     USER_AGENT = "User-Agent"
     REFERER = "Referer"
     HOST = "Host"
     CUSTOM_POST = "(custom) POST"
+
+class POST_HINT:
+    SOAP = "SOAP"
+    JSON = "JSON"
 
 class HTTPMETHOD:
     GET = "GET"

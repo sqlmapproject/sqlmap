@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.enums import DBMS
+from lib.core.enums import POST_HINT
 from lib.core.settings import BLANK
 from lib.core.settings import NULL
 from lib.core.settings import MSSQL_ALIASES
@@ -193,3 +194,8 @@ SQL_STATEMENTS = {
                              "commit ",
                              "rollback ",       ),
                      }
+
+POST_HINT_CONTENT_TYPES = {
+                                POST_HINT.JSON: "application/json",
+                                POST_HINT.SOAP: "application/soap+xml"
+                          }

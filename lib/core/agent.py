@@ -108,15 +108,7 @@ class Agent:
 
         newValue = self.cleanupPayload(newValue, origValue)
 
-        if place == PLACE.SOAP:
-            root = ET.XML(paramString)
-            iterator = root.getiterator(parameter)
-
-            for child in iterator:
-                child.text = self.addPayloadDelimiters(newValue)
-
-            retVal = ET.tostring(root)
-        elif place in (PLACE.URI, PLACE.CUSTOM_POST):
+        if place in (PLACE.URI, PLACE.CUSTOM_POST):
             retVal = paramString.replace("%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue)).replace(CUSTOM_INJECTION_MARK_CHAR, "")
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))

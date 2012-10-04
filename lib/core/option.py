@@ -1508,6 +1508,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.pageCompress = True
     kb.pageTemplate = None
     kb.pageTemplates = dict()
+    kb.postHint = None
     kb.previousMethod = None
     kb.processUserMarks = None
     kb.orderByColumns = None

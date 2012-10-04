@@ -29,6 +29,7 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PLACE
+from lib.core.enums import POST_HINT
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapSyntaxException
@@ -42,7 +43,7 @@ from lib.core.settings import HOST_ALIASES
 from lib.core.settings import JSON_RECOGNITION_REGEX
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
-from lib.core.settings import SOAP_REGEX
+from lib.core.settings import SOAP_RECOGNITION_REGEX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
@@ -78,12 +79,35 @@ def __setRequestParams():
         errMsg = "HTTP POST method depends on HTTP data value to be posted"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.data:
+    if re.search(JSON_RECOGNITION_REGEX, conf.data or ""):
+        message = "JSON like data found in POST data. "
+        message += "Do you want to process it? [Y/n/q] "
+        test = readInput(message, default="Y")
+        if test and test[0] in ("q", "Q"):
+            raise sqlmapUserQuitException
+        elif test[0] not in ("n", "N"):
+            conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>*"', conf.data)
+            conf.data = re.sub(r'("[^"]+"\s*:\s*)(\d+)', r'\g<1>"\g<2>*"', conf.data)
+            kb.processUserMarks = True
+            kb.postHint = POST_HINT.JSON
+
+    elif re.search(SOAP_RECOGNITION_REGEX, conf.data or ""):
+        message = "SOAP like data found in POST data. "
+        message += "Do you want to process it? [Y/n/q] "
+        test = readInput(message, default="Y")
+        if test and test[0] in ("q", "Q"):
+            raise sqlmapUserQuitException
+        elif test[0] not in ("n", "N"):
+            conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>*\g<5>", conf.data)
+            kb.processUserMarks = True
+            kb.postHint = POST_HINT.SOAP
+
+    elif conf.data:
         if hasattr(conf.data, UNENCODED_ORIGINAL_VALUE):
             original = getattr(conf.data, UNENCODED_ORIGINAL_VALUE)
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
 
-        place = PLACE.SOAP if re.match(SOAP_REGEX, conf.data, re.I | re.M) else PLACE.POST
+        place = PLACE.POST
 
         conf.parameters[place] = conf.data
         paramDict = paramToDict(place, conf.data)
@@ -110,17 +134,6 @@ def __setRequestParams():
             kb.processUserMarks = True
         elif test[0] in ("q", "Q"):
             raise sqlmapUserQuitException
-
-
-    if re.search(JSON_RECOGNITION_REGEX, conf.data or ""):
-        message = "JSON like data found in POST data. "
-        message += "Do you want to process it? [Y/n/q] "
-        test = readInput(message, default="Y")
-        if test and test[0] in ("q", "Q"):
-            raise sqlmapUserQuitException
-        elif test[0] not in ("n", "N"):
-            conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>*"', conf.data or "")
-            kb.processUserMarks = True
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data)):
         if CUSTOM_INJECTION_MARK_CHAR in (value or ""):

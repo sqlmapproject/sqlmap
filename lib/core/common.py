@@ -506,56 +506,37 @@ def paramToDict(place, parameters=None):
     if place in conf.parameters and not parameters:
         parameters = conf.parameters[place]
 
-    if place != PLACE.SOAP:
-        parameters = parameters.replace(", ", ",")
-        parameters = re.sub(r"&(\w{1,4});", r"%s\g<1>%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), parameters)
-        splitParams = parameters.split(conf.pDel or (DEFAULT_COOKIE_DELIMITER if place == PLACE.COOKIE else DEFAULT_GET_POST_DELIMITER))
+    parameters = parameters.replace(", ", ",")
+    parameters = re.sub(r"&(\w{1,4});", r"%s\g<1>%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), parameters)
+    splitParams = parameters.split(conf.pDel or (DEFAULT_COOKIE_DELIMITER if place == PLACE.COOKIE else DEFAULT_GET_POST_DELIMITER))
 
-        for element in splitParams:
-            element = re.sub(r"%s(.+?)%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), r"&\g<1>;", element)
-            elem = element.split("=")
+    for element in splitParams:
+        element = re.sub(r"%s(.+?)%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), r"&\g<1>;", element)
+        elem = element.split("=")
 
-            if len(elem) >= 2:
-                parameter = elem[0].replace(" ", "")
-
-                condition = not conf.testParameter
-                condition |= parameter in conf.testParameter
-
-                if condition:
-                    testableParameters[parameter] = "=".join(elem[1:])
-                    if not conf.multipleTargets:
-                        if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
-                          or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
-                            warnMsg = "it appears that you have provided tainted parameter values "
-                            warnMsg += "('%s') with most probably leftover " % element
-                            warnMsg += "chars from manual SQL injection "
-                            warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
-                            warnMsg += "Please, always use only valid parameter values "
-                            warnMsg += "so sqlmap could be able to properly run "
-                            logger.warn(warnMsg)
-
-                            message = "Are you sure you want to continue? [y/N] "
-                            test = readInput(message, default="N")
-                            if test[0] not in ("y", "Y"):
-                                raise sqlmapSilentQuitException
-
-    else:
-        root = ET.XML(parameters)
-        iterator = root.getiterator()
-
-        for child in iterator:
-            parameter = child.tag
-
-            if "}" in parameter:
-                testParam = parameter.split("}")[1]
-            else:
-                testParam = parameter
+        if len(elem) >= 2:
+            parameter = elem[0].replace(" ", "")
 
             condition = not conf.testParameter
-            condition |= testParam in conf.testParameter
+            condition |= parameter in conf.testParameter
 
             if condition:
-                testableParameters[parameter] = child.text
+                testableParameters[parameter] = "=".join(elem[1:])
+                if not conf.multipleTargets:
+                    if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
+                        or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
+                        warnMsg = "it appears that you have provided tainted parameter values "
+                        warnMsg += "('%s') with most probably leftover " % element
+                        warnMsg += "chars from manual SQL injection "
+                        warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
+                        warnMsg += "Please, always use only valid parameter values "
+                        warnMsg += "so sqlmap could be able to properly run "
+                        logger.warn(warnMsg)
+
+                        message = "Are you sure you want to continue? [y/N] "
+                        test = readInput(message, default="N")
+                        if test[0] not in ("y", "Y"):
+                            raise sqlmapSilentQuitException
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
@@ -1992,7 +1973,7 @@ def urldecode(value, encoding=None):
     return result
 
 def urlencode(value, safe="%&=", convall=False, limit=False):
-    if conf.direct or PLACE.SOAP in conf.paramDict:
+    if conf.direct:
         return value
 
     count = 0

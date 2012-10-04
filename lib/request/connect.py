@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import httplib
+import json
 import re
 import socket
 import string
@@ -38,17 +39,20 @@ from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
+from lib.core.enums import POST_HINT
 from lib.core.enums import REDIRECTION
 from lib.core.exception import sqlmapCompressionException
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
+from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
@@ -260,7 +264,7 @@ class Connect:
                     requestMsg += "?%s" % get
 
                 if conf.method == HTTPMETHOD.POST and not post:
-                    for place in (PLACE.POST, PLACE.SOAP):
+                    for place in (PLACE.POST,):
                         if place in conf.parameters:
                             post = conf.parameters[place]
                             break
@@ -283,6 +287,9 @@ class Connect:
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
             headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
+
+            if post:
+                headers[HTTPHEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
@@ -308,9 +315,6 @@ class Connect:
                 requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
             if post:
-                if not getRequestHeader(req, HTTPHEADER.CONTENT_TYPE):
-                    requestHeaders += "\n%s: %s" % (string.capwords(HTTPHEADER.CONTENT_TYPE), "application/x-www-form-urlencoded")
-
                 if not getRequestHeader(req, HTTPHEADER.CONTENT_LENGTH):
                     requestHeaders += "\n%s: %d" % (string.capwords(HTTPHEADER.CONTENT_LENGTH), len(post))
 
@@ -578,10 +582,13 @@ class Connect:
 
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
 
-            if place == PLACE.SOAP:
-                # payloads in SOAP should have chars > and < replaced
-                # with their HTML encoded counterparts
-                payload = payload.replace('>', "&gt;").replace('<', "&lt;")
+            if place == PLACE.CUSTOM_POST:
+                if kb.postHint == POST_HINT.SOAP:
+                    # payloads in SOAP should have chars > and < replaced
+                    # with their HTML encoded counterparts
+                    payload = payload.replace('>', "&gt;").replace('<', "&lt;")
+                elif kb.postHint == POST_HINT.JSON:
+                    payload = json.dumps(payload)[1:-1]
                 value = agent.replacePayload(value, payload)
 
             else:
@@ -607,9 +614,6 @@ class Connect:
 
         if PLACE.CUSTOM_POST in conf.parameters:
             post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR, "") if place != PLACE.CUSTOM_POST or not value else value
-
-        if PLACE.SOAP in conf.parameters:
-            post = conf.parameters[PLACE.SOAP] if place != PLACE.SOAP or not value else value
 
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
@@ -686,9 +690,9 @@ class Connect:
                     msg += "in this kind of situations? [Y/n]"
                     skipUrlEncode = conf.skipUrlEncode = readInput(msg, default="Y").upper() != "N"
 
-            if place not in (PLACE.POST, PLACE.SOAP, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
+            if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
-            elif not skipUrlEncode and place not in (PLACE.SOAP,):
+            elif not skipUrlEncode and kb.postHint not in (POST_HINT.JSON, POST_HINT.SOAP):
                 post = urlencode(post)
 
         if timeBasedCompare:
