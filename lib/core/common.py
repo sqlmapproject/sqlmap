@@ -3237,3 +3237,15 @@ def getRequestHeader(request, name):
     if request and name:
         retVal = max(request.get_header(_) if name.upper() == _.upper() else None for _ in request.headers.keys())
     return retVal
+
+def isNumber(value):
+    """
+    Returns True if the given value is a number-like object
+    """
+
+    try:
+        _ = float(value)
+    except:
+        return False
+    else:
+        return True

@@ -13,6 +13,7 @@ from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getSQLSnippet
 from lib.core.common import isDBMSVersionAtLeast
+from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -113,7 +114,7 @@ class Agent:
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST):
             _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
-            if kb.postHint == POST_HINT.JSON and not newValue.isdigit() and not '"%s"' % _ in paramString:
+            if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and not '"%s"' % _ in paramString:
                 newValue = '"%s"' % newValue
             retVal = paramString.replace(_, self.addPayloadDelimiters(newValue)).replace(CUSTOM_INJECTION_MARK_CHAR, "")
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
