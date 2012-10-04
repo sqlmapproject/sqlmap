@@ -447,7 +447,7 @@ def start():
                                 check = checkDynParam(place, parameter, value)
 
                                 if not check:
-                                    warnMsg = "%s parameter '%s' appears to be not dynamic" % (place, parameter)
+                                    warnMsg = "%s parameter '%s' does not appear dynamic" % (place, parameter)
                                     logger.warn(warnMsg)
 
                                 else:
