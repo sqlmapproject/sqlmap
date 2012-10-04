@@ -760,7 +760,7 @@ def checkDynamicContent(firstPage, secondPage):
                 return
 
             warnMsg = "target url is heavily dynamic"
-            warnMsg += ", sqlmap is going to retry the request"
+            warnMsg += ". sqlmap is going to retry the request"
             logger.critical(warnMsg)
 
             secondPage, _ = Request.queryPage(content=True)

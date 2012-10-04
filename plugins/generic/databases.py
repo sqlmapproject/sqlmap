@@ -357,7 +357,7 @@ class Databases:
 
         if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
-                warnMsg = "missing database parameter, sqlmap is going "
+                warnMsg = "missing database parameter. sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
                 warnMsg += "table(s) columns"
                 logger.warn(warnMsg)
@@ -730,7 +730,7 @@ class Databases:
                 conf.db, conf.tbl = conf.tbl.split(".")
 
         if conf.tbl is not None and conf.db is None:
-            warnMsg = "missing database parameter, sqlmap is going to "
+            warnMsg = "missing database parameter. sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
             warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
             logger.warn(warnMsg)

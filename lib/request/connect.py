@@ -461,7 +461,7 @@ class Connect:
                 else:
                     warnMsg = "unable to connect to the target url (%d - %s)" % (e.code, httplib.responses[e.code])
                     if threadData.retriesCount < conf.retries and not kb.threadException:
-                        warnMsg += ", sqlmap is going to retry the request"
+                        warnMsg += ". sqlmap is going to retry the request"
                         logger.critical(warnMsg)
                         return Connect.__retryProxy(**kwargs)
                     elif kb.testMode:
@@ -504,7 +504,7 @@ class Connect:
             elif silent or (ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead"))):
                 return None, None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
-                warnMsg += ", sqlmap is going to retry the request"
+                warnMsg += ". sqlmap is going to retry the request"
                 logger.critical(warnMsg)
                 return Connect.__retryProxy(**kwargs)
             elif kb.testMode:

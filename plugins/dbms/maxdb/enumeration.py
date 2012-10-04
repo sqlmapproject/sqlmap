@@ -96,7 +96,7 @@ class Enumeration(GenericEnumeration):
 
         if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
-                warnMsg = "missing database parameter, sqlmap is going "
+                warnMsg = "missing database parameter. sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
                 warnMsg += "table(s) columns"
                 logger.warn(warnMsg)
