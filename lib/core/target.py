@@ -99,7 +99,7 @@ def __setRequestParams():
                 kb.postHint = POST_HINT.JSON
 
         elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
-            message = "SOAP like data found in POST data. "
+            message = "SOAP/XML like data found in POST data. "
             message += "Do you want to process it? [Y/n/q] "
             test = readInput(message, default="Y")
             if test and test[0] in ("q", "Q"):
@@ -107,7 +107,7 @@ def __setRequestParams():
             elif test[0] not in ("n", "N"):
                 conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>*\g<5>", conf.data)
                 kb.processUserMarks = True
-                kb.postHint = POST_HINT.SOAP
+                kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
         else:
             place = PLACE.POST

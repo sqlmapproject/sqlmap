@@ -68,6 +68,7 @@ class PLACE:
 class POST_HINT:
     SOAP = "SOAP"
     JSON = "JSON"
+    XML = "XML (generic)"
 
 class HTTPMETHOD:
     GET = "GET"

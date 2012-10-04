@@ -583,8 +583,8 @@ class Connect:
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
 
             if place == PLACE.CUSTOM_POST:
-                if kb.postHint == POST_HINT.SOAP:
-                    # payloads in SOAP should have chars > and < replaced
+                if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
+                    # payloads in SOAP/XML should have chars > and < replaced
                     # with their HTML encoded counterparts
                     payload = payload.replace('>', "&gt;").replace('<', "&lt;")
                 elif kb.postHint == POST_HINT.JSON:
