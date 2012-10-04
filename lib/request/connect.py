@@ -683,16 +683,6 @@ class Connect:
 
         get = urlencode(get, limit=True)
         if post:
-            if conf.skipUrlEncode is None:
-                _ = (post or "").strip()
-                if _.startswith('<') and _.endswith('>'):
-                    msg = "provided POST data looks "
-                    msg += "like it's in XML format. "
-                    msg += "Do you want to turn off URL encoding "
-                    msg += "which is usually causing problems "
-                    msg += "in this kind of situations? [Y/n]"
-                    skipUrlEncode = conf.skipUrlEncode = readInput(msg, default="Y").upper() != "N"
-
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
             elif not skipUrlEncode and kb.postHint not in POST_HINT_CONTENT_TYPES.keys():

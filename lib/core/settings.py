@@ -467,8 +467,8 @@ VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<name>[^"]+)'
 # Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
 LIMITED_ROWS_TEST_NUMBER = 15
 
-# Regular expression for soap message recognition
-SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2"
+# Regular expression for SOAP-like POST data
+SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2.*>\s*\Z"
 
 # Regular expressing used for detecting JSON-like POST data
 JSON_RECOGNITION_REGEX = r'(?s)\A\s*\{.*"[^"]+"\s*:\s*("[^"]+"|\d+).*\}\s*\Z'
