@@ -83,10 +83,6 @@ def __setRequestParams():
     if conf.data:
         conf.method = HTTPMETHOD.POST
 
-        if hasattr(conf.data, UNENCODED_ORIGINAL_VALUE):
-            original = getattr(conf.data, UNENCODED_ORIGINAL_VALUE)
-            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
-
         if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
             pass
 
