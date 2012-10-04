@@ -52,6 +52,7 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
+from thirdparty.odict.odict import OrderedDict
 
 def __setRequestParams():
     """
@@ -151,7 +152,7 @@ def __setRequestParams():
                 continue
 
             conf.parameters[place] = value
-            conf.paramDict[place] = {}
+            conf.paramDict[place] = OrderedDict()
             parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
 
             for i in xrange(len(parts) - 1):
