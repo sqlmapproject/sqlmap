@@ -588,7 +588,10 @@ class Connect:
                     # with their HTML encoded counterparts
                     payload = payload.replace('>', "&gt;").replace('<', "&lt;")
                 elif kb.postHint == POST_HINT.JSON:
-                    payload = json.dumps(payload)[1:-1]
+                    if payload.startswith('"') and payload.endswith('"'):
+                        payload = json.dumps(payload[1:-1])
+                    else:
+                        payload = json.dumps(payload)[1:-1]
                 value = agent.replacePayload(value, payload)
 
             else:

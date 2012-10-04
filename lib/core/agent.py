@@ -25,6 +25,7 @@ from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
+from lib.core.enums import POST_HINT
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import GENERIC_SQL_COMMENT
@@ -111,7 +112,10 @@ class Agent:
         newValue = self.cleanupPayload(newValue, origValue)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST):
-            retVal = paramString.replace("%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR), self.addPayloadDelimiters(newValue)).replace(CUSTOM_INJECTION_MARK_CHAR, "")
+            _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
+            if kb.postHint == POST_HINT.JSON and not newValue.isdigit() and not '"%s"' % _ in paramString:
+                newValue = '"%s"' % newValue
+            retVal = paramString.replace(_, self.addPayloadDelimiters(newValue)).replace(CUSTOM_INJECTION_MARK_CHAR, "")
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
