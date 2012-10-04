@@ -94,7 +94,7 @@ def __setRequestParams():
                 raise sqlmapUserQuitException
             elif test[0] not in ("n", "N"):
                 conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>*"', conf.data)
-                conf.data = re.sub(r'("[^"]+"\s*:\s*)(\d+)', r'\g<1>"\g<2>*"', conf.data)
+                conf.data = re.sub(r'("[^"]+"\s*:\s*)([\d\.]+)', r'\g<1>"\g<2>*"', conf.data)
                 kb.processUserMarks = True
                 kb.postHint = POST_HINT.JSON
 
