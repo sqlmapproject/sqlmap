@@ -80,44 +80,48 @@ def __setRequestParams():
         errMsg = "HTTP POST method depends on HTTP data value to be posted"
         raise sqlmapSyntaxException, errMsg
 
-    if re.search(JSON_RECOGNITION_REGEX, conf.data or ""):
-        message = "JSON like data found in POST data. "
-        message += "Do you want to process it? [Y/n/q] "
-        test = readInput(message, default="Y")
-        if test and test[0] in ("q", "Q"):
-            raise sqlmapUserQuitException
-        elif test[0] not in ("n", "N"):
-            conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>*"', conf.data)
-            conf.data = re.sub(r'("[^"]+"\s*:\s*)(\d+)', r'\g<1>"\g<2>*"', conf.data)
-            kb.processUserMarks = True
-            kb.postHint = POST_HINT.JSON
+    if conf.data:
+        conf.method = HTTPMETHOD.POST
 
-    elif re.search(SOAP_RECOGNITION_REGEX, conf.data or ""):
-        message = "SOAP like data found in POST data. "
-        message += "Do you want to process it? [Y/n/q] "
-        test = readInput(message, default="Y")
-        if test and test[0] in ("q", "Q"):
-            raise sqlmapUserQuitException
-        elif test[0] not in ("n", "N"):
-            conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>*\g<5>", conf.data)
-            kb.processUserMarks = True
-            kb.postHint = POST_HINT.SOAP
-
-    elif conf.data:
         if hasattr(conf.data, UNENCODED_ORIGINAL_VALUE):
             original = getattr(conf.data, UNENCODED_ORIGINAL_VALUE)
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
 
-        place = PLACE.POST
+        if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
+            pass
 
-        conf.parameters[place] = conf.data
-        paramDict = paramToDict(place, conf.data)
+        elif re.search(JSON_RECOGNITION_REGEX, conf.data):
+            message = "JSON like data found in POST data. "
+            message += "Do you want to process it? [Y/n/q] "
+            test = readInput(message, default="Y")
+            if test and test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            elif test[0] not in ("n", "N"):
+                conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>*"', conf.data)
+                conf.data = re.sub(r'("[^"]+"\s*:\s*)(\d+)', r'\g<1>"\g<2>*"', conf.data)
+                kb.processUserMarks = True
+                kb.postHint = POST_HINT.JSON
 
-        if paramDict:
-            conf.paramDict[place] = paramDict
-            testableParameters = True
+        elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
+            message = "SOAP like data found in POST data. "
+            message += "Do you want to process it? [Y/n/q] "
+            test = readInput(message, default="Y")
+            if test and test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            elif test[0] not in ("n", "N"):
+                conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>*\g<5>", conf.data)
+                kb.processUserMarks = True
+                kb.postHint = POST_HINT.SOAP
 
-        conf.method = HTTPMETHOD.POST
+        else:
+            place = PLACE.POST
+
+            conf.parameters[place] = conf.data
+            paramDict = paramToDict(place, conf.data)
+
+            if paramDict:
+                conf.paramDict[place] = paramDict
+                testableParameters = True
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(map(lambda place: place in conf.parameters, [PLACE.GET, PLACE.POST])):
         warnMsg  = "you've provided target url without any GET "
@@ -156,7 +160,7 @@ def __setRequestParams():
             parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
 
             for i in xrange(len(parts) - 1):
-                conf.paramDict[place]["#%d%s" % (i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
+                conf.paramDict[place]["%s#%d%s" % (("%s " % kb.postHint) if kb.postHint else "", i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
 
             if place == PLACE.URI and PLACE.GET in conf.paramDict:
                 del conf.paramDict[PLACE.GET]
