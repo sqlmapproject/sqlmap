@@ -23,7 +23,7 @@
 | [thirdparty/pagerank/](http://code.google.com/p/corey-projects/) | MIT | Used to display page rank for Google dork results | -g |
 | [thirdparty/prettyprint/](http://code.google.com/p/python-httpclient-gui/) | MIT | Used to generate XML output | --xml, to be replaced by --report (#14) |
 | [thirdparty/pydes/](http://twhiteman.netfirms.com/des.html) | Free, public domain | Used to crack the Oracle old password format | --passwords |
-| [thirdparty/socks/](http://socksipy.sourceforge.net/) | BSD | Used to tunnel your requests over Tor SOCKS proxy | --tor-type |
+| [thirdparty/socks/](http://socksipy.sourceforge.net/) | BSD | Used to tunnel your requests over Tor SOCKS proxy | --tor-type and --proxy |
 | [thirdparty/termcolor/](http://pypi.python.org/pypi/termcolor) | MIT | Used to colourize output | - |
 | [thirdparty/xdot/](http://code.google.com/p/jrfonseca/wiki/XDot) | LGPL | Used for internal debug purposes | --profile |
 
