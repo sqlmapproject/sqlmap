@@ -96,6 +96,7 @@ optDict = {
                              },
 
             "Enumeration":   {
+                               "getAll":            "boolean",
                                "getBanner":         ("boolean", "Banners"),
                                "getCurrentUser":    ("boolean", "Users"),
                                "getCurrentDb":      ("boolean", "Databases"),

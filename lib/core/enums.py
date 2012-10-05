@@ -218,3 +218,8 @@ class PAYLOAD:
         ORIGINAL = 1
         NEGATIVE = 2
         REPLACE = 3
+
+class WIZARD:
+    BASIC = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba")
+    SMART = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema", "excludeSysDbs")
+    ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes", "getPrivileges", "getRoles", "dumpAll")

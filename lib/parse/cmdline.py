@@ -302,6 +302,9 @@ def cmdLineParser():
                                   "and data contained in the tables. Moreover "
                                   "you can run your own SQL statements")
 
+        enumeration.add_option("-a", "--all", dest="getAll",
+                               action="store_true", help="Retrieve everything")
+
         enumeration.add_option("-b", "--banner", dest="getBanner",
                                action="store_true", help="Retrieve DBMS banner")
 

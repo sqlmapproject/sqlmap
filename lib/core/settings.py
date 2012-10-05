@@ -183,6 +183,7 @@ BASIC_HELP_ITEMS = (
                         "level",
                         "risk",
                         "tech",
+                        "getAll",
                         "getBanner",
                         "getCurrentUser",
                         "getCurrentDb",

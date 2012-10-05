@@ -67,6 +67,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
 from lib.core.enums import PROXYTYPE
 from lib.core.enums import REFLECTIVE_COUNTER
+from lib.core.enums import WIZARD
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
@@ -1382,6 +1383,9 @@ def __cleanupOptions():
     if conf.string:
         conf.string = conf.string.decode("unicode_escape")
 
+    if conf.getAll:
+        map(lambda x: conf.__setitem__(x, True), WIZARD.ALL)
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
@@ -1613,19 +1617,20 @@ def __useWizardInterface():
             conf.risk = 1
             conf.level = 1
 
-    choice = None
+    if not conf.getAll:
+        choice = None
 
-    while choice is None or choice not in ("", "1", "2", "3"):
-        message = "Enumeration (--banner/--current-user/etc). Please choose:\n"
-        message += "[1] Basic (default)\n[2] Smart\n[3] All"
-        choice = readInput(message, default='1')
+        while choice is None or choice not in ("", "1", "2", "3"):
+            message = "Enumeration (--banner/--current-user/etc). Please choose:\n"
+            message += "[1] Basic (default)\n[2] Smart\n[3] All"
+            choice = readInput(message, default='1')
 
-        if choice == '2':
-            map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getDbs', 'getTables', 'getSchema', 'excludeSysDbs'])
-        elif choice == '3':
-            map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba', 'getUsers', 'getPasswordHashes', 'getPrivileges', 'getRoles', 'dumpAll'])
-        else:
-            map(lambda x: conf.__setitem__(x, True), ['getBanner', 'getCurrentUser', 'getCurrentDb', 'isDba'])
+            if choice == '2':
+                map(lambda x: conf.__setitem__(x, True), WIZARD.SMART)
+            elif choice == '3':
+                map(lambda x: conf.__setitem__(x, True), WIZARD.ALL)
+            else:
+                map(lambda x: conf.__setitem__(x, True), WIZARD.BASIC)
 
     logger.debug("muting sqlmap.. it will do the magic for you")
     conf.verbose = 0
