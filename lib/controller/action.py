@@ -11,7 +11,9 @@ from lib.core.common import Format
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.brute.use import columnExists
@@ -74,16 +76,31 @@ def action():
         conf.dumper.users(conf.dbmsHandler.getUsers())
 
     if conf.getPasswordHashes:
-        conf.dumper.userSettings("database management system users password hashes",
-                                 conf.dbmsHandler.getPasswordHashes(), "password hash")
+        try:
+            conf.dumper.userSettings("database management system users password hashes",
+                                    conf.dbmsHandler.getPasswordHashes(), "password hash")
+        except sqlmapNoneDataException, ex:
+            logger.critical(ex)
+        except:
+            raise
 
     if conf.getPrivileges:
-        conf.dumper.userSettings("database management system users privileges",
-                                 conf.dbmsHandler.getPrivileges(), "privilege")
+        try:
+            conf.dumper.userSettings("database management system users privileges",
+                                    conf.dbmsHandler.getPrivileges(), "privilege")
+        except sqlmapNoneDataException, ex:
+            logger.critical(ex)
+        except:
+            raise
 
     if conf.getRoles:
-        conf.dumper.userSettings("database management system users roles",
-                                 conf.dbmsHandler.getRoles(), "role")
+        try:
+            conf.dumper.userSettings("database management system users roles",
+                                    conf.dbmsHandler.getRoles(), "role")
+        except sqlmapNoneDataException, ex:
+            logger.critical(ex)
+        except:
+            raise
 
     if conf.getDbs:
         conf.dumper.dbs(conf.dbmsHandler.getDbs())
