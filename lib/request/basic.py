@@ -51,6 +51,8 @@ def forgeHeaders(items=None):
     headers = dict(conf.httpHeaders)
     headers.update(items or {})
 
+    headers = dict(("-".join(_.capitalize() for _ in key.split('-')), value) for (key, value) in headers.items())
+
     if conf.cj:
         if HTTPHEADER.COOKIE in headers:
             for cookie in conf.cj:

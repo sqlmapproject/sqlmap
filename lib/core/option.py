@@ -201,7 +201,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 logger.debug("not a valid WebScarab log data")
                 continue
 
-            if method.upper() == "POST":
+            if method.upper() == HTTPMETHOD.POST:
                 warnMsg = "POST requests from WebScarab logs aren't supported "
                 warnMsg += "as their body content is stored in separate files. "
                 warnMsg += "Nevertheless you can use -r to load them individually."
@@ -1170,24 +1170,24 @@ def __setHTTPUserAgent():
 
         item = item[item.find(';') + 1:]
 
-        conf.httpHeaders.append(("User-Agent", item))
+        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, item))
 
     elif conf.agent:
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append(("User-Agent", conf.agent))
+        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, conf.agent))
 
     elif not conf.randomAgent:
         _ = True
 
         for header, _ in conf.httpHeaders:
-            if header == "User-Agent":
+            if header == HTTPHEADER.USER_AGENT:
                 _ = False
                 break
 
         if _:
-            conf.httpHeaders.append(("User-Agent", __defaultHTTPUserAgent()))
+            conf.httpHeaders.append((HTTPHEADER.USER_AGENT, __defaultHTTPUserAgent()))
 
     else:
         if not kb.userAgents:
