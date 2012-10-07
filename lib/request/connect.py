@@ -288,7 +288,7 @@ class Connect:
             headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
-            if post:
+            if post and HTTPHEADER.CONTENT_TYPE not in headers:
                 headers[HTTPHEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
 
             if auxHeaders:
