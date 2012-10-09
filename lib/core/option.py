@@ -217,20 +217,22 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
         """
         Parses burp logs
         """
-        port = None
-        scheme = None
 
-        reqResList = re.findall(BURP_REQUEST_REGEX, content, re.I | re.S)
-        if not reqResList:
+        if not re.search(BURP_REQUEST_REGEX, content, re.I | re.S):
             reqResList = [content]
+        else:
+            reqResList = re.finditer(BURP_REQUEST_REGEX, content, re.I | re.S)
 
-        for request in reqResList:
-            if scheme is None:
-                schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
+        for match in reqResList:
+            request = match if isinstance(match, basestring) else match.group(0)
 
-                if schemePort:
-                    scheme = schemePort.group(1)
-                    port = schemePort.group(2)
+            schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
+
+            if schemePort:
+                scheme = schemePort.group(1)
+                port = schemePort.group(2)
+            else:
+                scheme, port = None, None
 
             if not re.search (r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
                 continue
