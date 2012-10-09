@@ -1371,7 +1371,7 @@ def __cleanupOptions():
         conf.code = int(conf.code)
 
     if conf.csvDel:
-        conf.csvDel = conf.csvDel.decode('string_escape') # e.g. '\\t' -> '\t'
+        conf.csvDel = conf.csvDel.decode("string_escape") # e.g. '\\t' -> '\t'
 
     if conf.torPort and conf.torPort.isdigit():
         conf.torPort = int(conf.torPort)
@@ -1452,7 +1452,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     kb.authHeader = None
     kb.bannerFp = AttribDict()
 
-    kb.brute = AttribDict({'tables':[], 'columns':[]})
+    kb.brute = AttribDict({"tables":[], "columns":[]})
     kb.bruteMode = False
 
     kb.cache = AttribDict()
