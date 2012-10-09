@@ -595,12 +595,9 @@ class Connect:
                 value = agent.replacePayload(value, payload)
 
             else:
-                # payloads in GET and/or POST need to be urlencoded
-                # throughly without safe chars (especially & and =)
-                # addendum: as we support url encoding in tampering
-                # functions therefore we need to use % as a safe char
                 if place != PLACE.URI or (value and payload and '?' in value and value.find('?') < value.find(payload)):
-                    payload = urlencode(payload, '%', False, True) if place not in (PLACE.POST, PLACE.CUSTOM_POST) and not skipUrlEncode else payload
+                    # GET, URI and Cookie need to be throughly URL encoded (POST is encoded down below)
+                    payload = urlencode(payload, '%', False, True) if place in (PLACE.GET, PLACE.COOKIE, PLACE.URI) and not skipUrlEncode else payload
                     value = agent.replacePayload(value, payload)
 
         if place:
