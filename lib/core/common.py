@@ -58,6 +58,7 @@ from lib.core.convert import utf8encode
 from lib.core.decorators import cachedmethod
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import SQL_STATEMENTS
+from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -1906,8 +1907,14 @@ def wasLastRequestDelayed():
         lowerStdLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
         retVal = (threadData.lastQueryDuration >= lowerStdLimit)
 
-        if not kb.testMode and retVal and kb.adjustTimeDelay:
-            adjustTimeDelay(threadData.lastQueryDuration, lowerStdLimit)
+        if not kb.testMode and retVal:
+            if kb.adjustTimeDelay is None:
+                msg = "do you want sqlmap to try to optimize value(s) "
+                msg += "for DBMS delay responses (option '--time-sec')? [Y/n] "
+                choice = readInput(msg, default='Y')
+                kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE if choice.upper() == 'N' else ADJUST_TIME_DELAY.YES
+            if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
+                adjustTimeDelay(threadData.lastQueryDuration, lowerStdLimit)
 
         return retVal
     else:

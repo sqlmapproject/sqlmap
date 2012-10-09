@@ -40,6 +40,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
+from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -704,7 +705,7 @@ class Connect:
                 deviation = stdev(kb.responseTimes)
 
                 if deviation > WARN_TIME_STDEV:
-                    kb.adjustTimeDelay = False
+                    kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
                     warnMsg = "there is considerable lagging "
                     warnMsg += "in connection response(s). Please use as high "

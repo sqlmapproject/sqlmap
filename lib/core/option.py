@@ -59,6 +59,7 @@ from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
+from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -1356,16 +1357,14 @@ def __cleanupOptions():
     if conf.timeSec not in kb.explicitSettings:
         if conf.tor:
             conf.timeSec = 2 * conf.timeSec
-            kb.adjustTimeDelay = False
+            kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
             warnMsg = "increasing default value for "
             warnMsg += "option '--time-sec' to %d because " % conf.timeSec
             warnMsg += "switch '--tor' was provided"
             logger.warn(warnMsg)
-        else:
-            kb.adjustTimeDelay = True
     else:
-        kb.adjustTimeDelay = False
+        kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
     if conf.code:
         conf.code = int(conf.code)
@@ -1446,7 +1445,7 @@ def __setKnowledgeBaseAttributes(flushAll=True):
     logger.debug(debugMsg)
 
     kb.absFilePaths = set()
-    kb.adjustTimeDelay = False
+    kb.adjustTimeDelay = None
     kb.alwaysRefresh = None
     kb.arch = None
     kb.authHeader = None

@@ -31,6 +31,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
@@ -289,10 +290,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
                                         logger.warn(warnMsg)
 
-                                        if kb.adjustTimeDelay:
+                                        if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
                                             dbgMsg = "turning off time auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
-                                            kb.adjustTimeDelay = False
+                                            kb.adjustTimeDelay = ADJUST_TIME_DELAY.NO
 
                                         return getChar(idx, originalTbl, continuousOrder, expand, shiftTable)
                                     else:
@@ -303,10 +304,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 else:
                                     if timeBasedCompare:
                                         kb.timeValidCharsRun += 1
-                                        if not kb.adjustTimeDelay and kb.timeValidCharsRun > VALID_TIME_CHARS_RUN_THRESHOLD:
+                                        if kb.adjustTimeDelay is ADJUST_TIME_DELAY.NO and kb.timeValidCharsRun > VALID_TIME_CHARS_RUN_THRESHOLD:
                                             dbgMsg = "turning back on time auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
-                                            kb.adjustTimeDelay = True
+                                            kb.adjustTimeDelay = ADJUST_TIME_DELAY.YES
                                     
                                     return decodeIntToUnicode(retVal)
                             else:
