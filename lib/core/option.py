@@ -278,7 +278,7 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     params = True
 
                 # Headers
-                elif ": " in line:
+                elif re.search(r"\A\S+: ", line):
                     key, value = line.split(": ", 1)
 
                     # Cookie and Host headers
