@@ -1925,7 +1925,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     Provides tip for adjusting time delay in time-based data retrieval
     """
 
-    candidate = 1 + int(round((1 - (lastQueryDuration - lowerStdLimit) / lastQueryDuration) * conf.timeSec))
+    candidate = 1 + int(round(lowerStdLimit))
 
     if candidate:
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
