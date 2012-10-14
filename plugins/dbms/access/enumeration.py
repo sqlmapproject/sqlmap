@@ -75,3 +75,7 @@ class Enumeration(GenericEnumeration):
     def search(self):
         warnMsg = "on Microsoft Access search option is not available"
         logger.warn(warnMsg)
+
+    def getHostname(self):
+        warnMsg = "on Microsoft Access it is not possible to enumerate the hostname"
+        logger.warn(warnMsg)

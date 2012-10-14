@@ -270,3 +270,7 @@ class Enumeration(GenericEnumeration):
     def search(self):
         warnMsg = "on Sybase search option is not available"
         logger.warn(warnMsg)
+
+    def getHostname(self):
+        warnMsg = "on Sybase it is not possible to enumerate the hostname"
+        logger.warn(warnMsg)

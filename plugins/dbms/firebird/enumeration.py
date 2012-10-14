@@ -45,3 +45,7 @@ class Enumeration(GenericEnumeration):
     def search(self):
         warnMsg = "on Firebird search option is not available"
         logger.warn(warnMsg)
+
+    def getHostname(self):
+        warnMsg = "on Firebird it is not possible to enumerate the hostname"
+        logger.warn(warnMsg)
