@@ -823,7 +823,7 @@ class Agent:
 
         caseExpression = expression
 
-        if Backend.getIdentifiedDbms() is not None and hasattr(queries[Backend.getIdentifiedDbms()], "case"):
+        if Backend.getIdentifiedDbms() is not None:
             caseExpression = queries[Backend.getIdentifiedDbms()].case.query % expression
 
             if "(IIF" not in caseExpression and Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not caseExpression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):

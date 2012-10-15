@@ -78,7 +78,7 @@ class Users:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
         query = agent.forgeCaseStatement(query)
-        kb.data.isDba = unArrayizeValue(inject.getValue(query, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY))
+        kb.data.isDba = inject.checkBooleanExpression(query)
 
         return kb.data.isDba
 

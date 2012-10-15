@@ -379,6 +379,8 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
 
             if expression.upper().startswith("SELECT "):
                 booleanExpression = expression[len("SELECT "):]
+                if re.search(r"(?i)\(.+\)\Z", booleanExpression):
+                    booleanExpression = "%s=%s" % (booleanExpression, "'1'" if "'1'" in booleanExpression else '1')
             else:
                 forgeCaseExpression = agent.forgeCaseStatement(expression)
 
@@ -472,4 +474,4 @@ def goStacked(expression, silent=False):
     Request.queryPage(payload, content=False, silent=silent, noteResponseTime=False, timeBasedCompare=True)
 
 def checkBooleanExpression(expression, expectingNone=True):
-    return getValue(unescaper.unescape(expression), expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, suppressOutput=True, expectingNone=expectingNone)
+    return getValue(expression, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, suppressOutput=True, expectingNone=expectingNone)
