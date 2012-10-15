@@ -515,7 +515,7 @@ class Databases:
                 value = inject.getValue(query, blind=False)
 
                 if Backend.isDbms(DBMS.SQLITE):
-                    parseSqliteTableSchema(value)
+                    parseSqliteTableSchema(unArrayizeValue(value))
                 elif not isNoneValue(value):
                     table = {}
                     columns = {}
