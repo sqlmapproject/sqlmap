@@ -1962,7 +1962,7 @@ def extractErrorMessage(page):
 
     return retVal
 
-def urldecode(value, encoding=None):
+def urldecode(value, encoding=None, onlyPrintable=True):
     result = None
 
     if value:
@@ -1972,7 +1972,13 @@ def urldecode(value, encoding=None):
         except ValueError:
             pass
         finally:
-            result = urllib.unquote_plus(value)
+            if onlyPrintable:
+                def _(match):
+                    char = chr(ord(match.group(1).decode("hex")))
+                    return char if char in string.printable.replace("&", "") else match.group(0)
+                result = re.sub("%([0-9a-fA-F]{2})", _, value)
+            else:
+                result = urllib.unquote_plus(value)
 
     if isinstance(result, str):
         result = unicode(result, encoding or UNICODE_ENCODING, "replace")

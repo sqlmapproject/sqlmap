@@ -1339,10 +1339,10 @@ def __cleanupOptions():
         if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
             original = conf.data
             class _(unicode): pass
-            conf.data = _(urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data)
+            conf.data = _(urldecode(conf.data))
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
         else:
-            conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
+            conf.data = urldecode(conf.data)
 
     if conf.os:
         conf.os = conf.os.capitalize()
