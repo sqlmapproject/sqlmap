@@ -42,7 +42,7 @@ def direct(query, content=True):
                 break
 
     if select and not query.upper().startswith("SELECT "):
-        query = "SELECT " + query
+        query = "SELECT %s" % query
 
     logger.log(9, query)
 
