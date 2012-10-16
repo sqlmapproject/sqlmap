@@ -586,22 +586,28 @@ def checkFalsePositives(injection):
             return int(randomInt(2)) + 1
 
         kb.injection = injection
-        randInt1, randInt2, randInt3 = (_() for i in xrange(3))
-
-        # Just in case (also, they have to be different than 0 because of the last test)
-        while randInt1 == randInt2:
-            randInt2 = _()
 
         # Simple arithmetic operations which should show basic
         # arithmetic ability of the backend if it's really injectable
-        if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
-            retVal = None
-        elif checkBooleanExpression("%d>(%d+%d)" % (min(randInt1, randInt2), randInt3, max(randInt1, randInt2))):
-            retVal = None
-        elif checkBooleanExpression("(%d+%d)>%d" % (randInt3, min(randInt1, randInt2), randInt1 + randInt2 + randInt3)):
-            retVal = None
-        elif not checkBooleanExpression("%d=(%d+%d)" % (randInt1 + randInt2, randInt1, randInt2)):
-            retVal = None
+        for i in xrange(1 + conf.level / 2):
+            randInt1, randInt2, randInt3 = (_() for j in xrange(3))
+
+            # Just in case (also, they have to be different than 0 because of the last test)
+            while randInt1 == randInt2:
+                randInt2 = _()
+
+            if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
+                retVal = None
+                break
+            elif checkBooleanExpression("%d>(%d+%d)" % (min(randInt1, randInt2), randInt3, max(randInt1, randInt2))):
+                retVal = None
+                break
+            elif checkBooleanExpression("(%d+%d)>%d" % (randInt3, min(randInt1, randInt2), randInt1 + randInt2 + randInt3)):
+                retVal = None
+                break
+            elif not checkBooleanExpression("%d=(%d+%d)" % (randInt1 + randInt2, randInt1, randInt2)):
+                retVal = None
+                break
 
         if retVal is None:
             warnMsg = "false positive or unexploitable injection point detected"
