@@ -293,7 +293,7 @@ class Connect:
             if post and HTTPHEADER.CONTENT_TYPE not in headers:
                 headers[HTTPHEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
 
-            if headers[HTTPHEADER.CONTENT_TYPE] == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
+            if headers.get(HTTPHEADER.CONTENT_TYPE) == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
                 warnMsg = "missing 'boundary parameter' in '%s' header. " % HTTPHEADER.CONTENT_TYPE
                 warnMsg += "Will try to reconstruct"
                 singleTimeWarnMessage(warnMsg)
