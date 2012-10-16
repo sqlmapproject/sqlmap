@@ -471,8 +471,11 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Regular expression for SOAP-like POST data
 SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2.*>\s*\Z"
 
-# Regular expressing used for detecting JSON-like POST data
+# Regular expression used for detecting JSON-like POST data
 JSON_RECOGNITION_REGEX = r'(?s)\A\s*\{.*"[^"]+"\s*:\s*("[^"]+"|\d+).*\}\s*\Z'
+
+# Regular expression used for detecting multipart POST data
+MULTIPART_RECOGNITION_REGEX = r"(?i)Content-Disposition:[^;]+;\s*name="
 
 # Default POST data content-type
 DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded"

@@ -23,6 +23,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
+from lib.core.common import findMultipartPostBoundary
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
@@ -291,6 +292,15 @@ class Connect:
 
             if post and HTTPHEADER.CONTENT_TYPE not in headers:
                 headers[HTTPHEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
+
+            if headers[HTTPHEADER.CONTENT_TYPE] == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
+                warnMsg = "missing 'boundary parameter' in '%s' header. " % HTTPHEADER.CONTENT_TYPE
+                warnMsg += "Will try to reconstruct"
+                singleTimeWarnMessage(warnMsg)
+
+                boundary = findMultipartPostBoundary(conf.data)
+                if boundary:
+                    headers[HTTPHEADER.CONTENT_TYPE] = "%s; boundary=%s" % (headers[HTTPHEADER.CONTENT_TYPE], boundary)
 
             if auxHeaders:
                 for key, item in auxHeaders.items():

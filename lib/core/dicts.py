@@ -197,6 +197,7 @@ SQL_STATEMENTS = {
 
 POST_HINT_CONTENT_TYPES = {
                                 POST_HINT.JSON: "application/json",
+                                POST_HINT.MULTIPART: "multipart/form-data",
                                 POST_HINT.SOAP: "application/soap+xml",
                                 POST_HINT.XML: "application/xml"
                           }

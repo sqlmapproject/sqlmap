@@ -1962,7 +1962,31 @@ def extractErrorMessage(page):
 
     return retVal
 
-def urldecode(value, encoding=None, unsafe="%&=", convall=False):
+def findMultipartPostBoundary(post):
+    """
+    Finds value for a boundary parameter in given multipart POST body
+    """
+
+    retVal = None
+
+    done = set()
+    candidates = []
+
+    for match in re.finditer(r"(?m)^--(.+?)(--)?$", post or ""):
+        _ = match.group(1)
+        if _ in done:
+            continue
+        else:
+            candidates.append((post.count(_), _))
+            done.add(_)
+
+    if candidates:
+        candidates.sort(key=lambda _: _[0], reverse=True)
+        retVal = candidates[0][1]
+
+    return retVal
+
+def urldecode(value, encoding=None, unsafe="%%&=%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False):
     result = None
 
     if value:

@@ -41,6 +41,7 @@ from lib.core.option import __setAuthCred
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import JSON_RECOGNITION_REGEX
+from lib.core.settings import MULTIPART_RECOGNITION_REGEX
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_RECOGNITION_REGEX
@@ -95,7 +96,6 @@ def __setRequestParams():
             elif test[0] not in ("n", "N"):
                 conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 conf.data = re.sub(r'("[^"]+"\s*:\s*)(-?\d[\d\.]*\b)', r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
-                kb.processUserMarks = True
                 kb.postHint = POST_HINT.JSON
 
         elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
@@ -105,9 +105,18 @@ def __setRequestParams():
             if test and test[0] in ("q", "Q"):
                 raise sqlmapUserQuitException
             elif test[0] not in ("n", "N"):
-                conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>*\g<5>", conf.data)
-                kb.processUserMarks = True
+                conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
+
+        elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
+            message = "Multipart like data found in POST data. "
+            message += "Do you want to process it? [Y/n/q] "
+            test = readInput(message, default="Y")
+            if test and test[0] in ("q", "Q"):
+                raise sqlmapUserQuitException
+            elif test[0] not in ("n", "N"):
+                conf.data = re.sub(r"(?si)(Content-Disposition.+?)((\r)?\n--)", r"\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
+                kb.postHint = POST_HINT.MULTIPART
 
         else:
             place = PLACE.POST
@@ -118,6 +127,8 @@ def __setRequestParams():
             if paramDict:
                 conf.paramDict[place] = paramDict
                 testableParameters = True
+
+    kb.processUserMarks = True if kb.postHint else kb.processUserMarks
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(map(lambda place: place in conf.parameters, [PLACE.GET, PLACE.POST])):
         warnMsg  = "you've provided target url without any GET "
