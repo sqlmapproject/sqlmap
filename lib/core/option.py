@@ -1857,25 +1857,33 @@ def __checkTor():
 
 def __basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
-        errMsg = "value for --start (limitStart) option must be an integer value greater than zero (>0)"
+        errMsg = "value for option '--start' (limitStart) must be an integer value greater than zero (>0)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.limitStop is not None and not (isinstance(conf.limitStop, int) and conf.limitStop > 0):
-        errMsg = "value for --stop (limitStop) option must be an integer value greater than zero (>0)"
+        errMsg = "value for option '--stop' (limitStop) must be an integer value greater than zero (>0)"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.level is not None and not (isinstance(conf.level, int) and conf.level > 0):
+        errMsg = "value for option '--level' must be an integer value greater than zero (>0)"
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.risk is not None and not (isinstance(conf.risk, int) and conf.risk > 0):
+        errMsg = "value for option '--risk' must be an integer value greater than zero (>0)"
         raise sqlmapSyntaxException, errMsg
 
     if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
        conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
-        errMsg = "value for --start (limitStart) option must be smaller or equal than value for --stop (limitStop) option"
+        errMsg = "value for option '--start' (limitStart) must be smaller or equal than value for --stop (limitStop) option"
         raise sqlmapSyntaxException, errMsg
 
     if conf.firstChar is not None and isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
        conf.lastChar is not None and isinstance(conf.lastChar, int) and conf.lastChar < conf.firstChar:
-        errMsg = "value for --first (firstChar) option must be smaller than or equal to value for --last (lastChar) option"
+        errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
         raise sqlmapSyntaxException, errMsg
 
     if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
-        errMsg = "value for --cpu-throttle (cpuThrottle) option must be in range [0,100]"
+        errMsg = "value for option '--cpu-throttle' (cpuThrottle) must be in range [0,100]"
         raise sqlmapSyntaxException, errMsg
 
     if conf.textOnly and conf.nullConnection:
