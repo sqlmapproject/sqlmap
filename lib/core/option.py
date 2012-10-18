@@ -12,6 +12,7 @@ import logging
 import os
 import re
 import socket
+import string
 import sys
 import threading
 import urllib2
@@ -1382,7 +1383,12 @@ def __cleanupOptions():
         paths.SQLMAP_OUTPUT_PATH = conf.oDir
 
     if conf.string:
-        conf.string = conf.string.decode("unicode_escape")
+        try:
+            conf.string = conf.string.decode("unicode_escape")
+        except:
+            charset = string.whitespace.replace(" ", "")
+            for _ in charset:
+                conf.string = conf.string.replace(_.encode("string_escape"), _)
 
     if conf.getAll:
         map(lambda x: conf.__setitem__(x, True), WIZARD.ALL)
