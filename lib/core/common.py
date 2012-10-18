@@ -1986,7 +1986,7 @@ def findMultipartPostBoundary(post):
 
     return retVal
 
-def urldecode(value, encoding=None, unsafe="%%&=%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False):
+def urldecode(value, encoding=None, unsafe="%%&=*%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False):
     result = None
 
     if value:
