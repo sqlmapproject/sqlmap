@@ -263,10 +263,13 @@ def processResponse(page, responseHeaders):
         if msg:
             logger.info("parsed error message: '%s'" % msg)
 
-    for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):
-        match = re.search(regex, page, re.I)
-        if match and PLACE.POST in conf.parameters:
-            name, value = match.groups()
-            conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
-            if PLACE.POST in conf.paramDict and name in conf.paramDict[PLACE.POST]:
-                conf.paramDict[PLACE.POST][name] = value
+    if kb.originalPage is None:
+        for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):
+            match = re.search(regex, page, re.I)
+            if match and PLACE.POST in conf.parameters:
+                name, value = match.groups()
+                if PLACE.POST in conf.paramDict and name in conf.paramDict[PLACE.POST]:
+                    if conf.paramDict[PLACE.POST][name] in page:
+                        continue
+                    conf.paramDict[PLACE.POST][name] = value
+                conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
