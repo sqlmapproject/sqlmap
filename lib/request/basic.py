@@ -264,7 +264,7 @@ def processResponse(page, responseHeaders):
             logger.info("parsed error message: '%s'" % msg)
 
     for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):
-        match = re.search(regex, page)
+        match = re.search(regex, page, re.I)
         if match and PLACE.POST in conf.parameters:
             name, value = match.groups()
             conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
