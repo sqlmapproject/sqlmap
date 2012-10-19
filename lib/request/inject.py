@@ -168,6 +168,7 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
       expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
 
+        limitCond = True
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
 
@@ -199,8 +200,6 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
 
             elif Backend.isDbms(DBMS.ORACLE):
                 limitCond = False
-        else:
-            limitCond = True
 
         # We assume that only queries NOT containing a "LIMIT #, 1"
         # (or similar depending on the back-end DBMS) can return
