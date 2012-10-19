@@ -47,6 +47,7 @@ from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
+from lib.core.settings import ASP_NET_CONTROL_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
@@ -166,7 +167,7 @@ def __randomFillBlankFields(value):
         if not test or test[0] in ("y", "Y"):
             for match in re.finditer(EMPTY_FORM_FIELDS_REGEX, retVal):
                 item = match.group("result")
-                if not any(_ in item for _ in IGNORE_PARAMETERS):
+                if not any(_ in item for _ in IGNORE_PARAMETERS) and not re.search(ASP_NET_CONTROL_REGEX, item):
                     if item[-1] == DEFAULT_GET_POST_DELIMITER:
                         retVal = retVal.replace(item, "%s%s%s" % (item[:-1], randomStr(), DEFAULT_GET_POST_DELIMITER))
                     else:

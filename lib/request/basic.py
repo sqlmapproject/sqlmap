@@ -28,10 +28,12 @@ from lib.core.enums import PLACE
 from lib.core.exception import sqlmapCompressionException
 from lib.core.htmlentities import htmlEntities
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
+from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
+from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 from thirdparty.chardet import detect
@@ -260,3 +262,11 @@ def processResponse(page, responseHeaders):
 
         if msg:
             logger.info("parsed error message: '%s'" % msg)
+
+    for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):
+        match = re.search(regex, page)
+        if match and PLACE.POST in conf.parameters:
+            name, value = match.groups()
+            conf.parameters[PLACE.POST] = re.sub("(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
+            if PLACE.POST in conf.paramDict and name in conf.paramDict[PLACE.POST]:
+                conf.paramDict[PLACE.POST][name] = value

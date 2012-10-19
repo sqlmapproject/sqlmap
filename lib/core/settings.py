@@ -229,7 +229,7 @@ META_CHARSET_REGEX = r'<meta http-equiv="?content-type"?[^>]+charset=(?P<result>
 META_REFRESH_REGEX = r'<meta http-equiv="?refresh"?[^>]+content="?[^">]+url=(?P<result>[^">]+)'
 
 # Regular expression used for parsing empty fields in tested form data
-EMPTY_FORM_FIELDS_REGEX = r'(?P<result>[^=]+=(&|\Z))'
+EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=(&|\Z))'
 
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
 COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18")
@@ -308,6 +308,9 @@ MAX_INT = sys.maxint
 
 # Parameters to be ignored in detection phase (upper case)
 IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
+
+# Regular expression used for recognition of ASP.NET control parameters
+ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
 
 # Turn off resume console info to avoid potential slowdowns
 TURN_OFF_RESUME_INFO_LIMIT = 20
@@ -462,8 +465,11 @@ MAX_HELP_OPTION_LENGTH = 18
 # Strings for detecting formatting errors
 FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
 
-# Regular expression used for extracting ASP.NET View State values
-VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<name>[^"]+)'
+# Regular expression used for extracting ASP.NET view state values
+VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<value>[^"]+)'
+
+# Regular expression used for extracting ASP.NET event validation values
+EVENTVALIDATION_REGEX = r'(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<value>[^"]+)'
 
 # Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
 LIMITED_ROWS_TEST_NUMBER = 15
