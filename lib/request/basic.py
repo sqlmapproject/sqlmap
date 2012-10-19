@@ -267,6 +267,6 @@ def processResponse(page, responseHeaders):
         match = re.search(regex, page)
         if match and PLACE.POST in conf.parameters:
             name, value = match.groups()
-            conf.parameters[PLACE.POST] = re.sub("(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
+            conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
             if PLACE.POST in conf.paramDict and name in conf.paramDict[PLACE.POST]:
                 conf.paramDict[PLACE.POST][name] = value
