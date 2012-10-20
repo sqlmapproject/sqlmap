@@ -138,7 +138,6 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
     startLimit = 0
     stopLimit = None
     outputs = BigArray()
-    test = None
     untilLimitChar = None
     untilOrderChar = None
 
@@ -218,11 +217,10 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                     stopLimit += startLimit
 
+            test = True
             if not stopLimit or stopLimit <= 1:
                 if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
                     test = False
-                else:
-                    test = True
 
             if test:
                 # Count the number of SQL query entries output
