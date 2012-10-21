@@ -13,7 +13,7 @@ class Enumeration(GenericEnumeration):
         GenericEnumeration.__init__(self)
 
     def getDbs(self):
-        warnMsg = "on Firebird it is not possible to enumerate databases"
+        warnMsg = "on Firebird it is not possible to enumerate databases (use only '--tables')"
         logger.warn(warnMsg)
 
         return []

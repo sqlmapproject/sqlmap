@@ -49,7 +49,7 @@ class Enumeration(GenericEnumeration):
         return {}
 
     def getDbs(self):
-        warnMsg = "on Microsoft Access it is not possible to enumerate databases"
+        warnMsg = "on Microsoft Access it is not possible to enumerate databases (use only '--tables')"
         logger.warn(warnMsg)
 
         return []

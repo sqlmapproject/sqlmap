@@ -204,7 +204,7 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
         # (or similar depending on the back-end DBMS) can return
         # multiple entries
         if limitCond:
-            if limitRegExp:
+            if limitRegExp and stopLimit is not None:
                 stopLimit = int(stopLimit)
 
                 # From now on we need only the expression until the " LIMIT "
