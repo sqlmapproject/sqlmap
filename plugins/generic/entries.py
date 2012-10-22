@@ -285,6 +285,7 @@ class Entries:
                                         query = rootQuery.blind.query % (index, column, tbl)
 
                                     value = NULL if column in emptyColumns else inject.getValue(query, inband=False, error=False, dump=True)
+                                    value = '' if value is None else value
 
                                     _ = DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))
                                     lengths[column] = max(lengths[column], len(_))

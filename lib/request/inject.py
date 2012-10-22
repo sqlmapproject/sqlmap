@@ -437,7 +437,7 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                     value = __goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
 
             if value and isinstance(value, basestring):
-                value = value.strip()
+                value = value.strip() if value.strip() else value[:1]
         else:
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
