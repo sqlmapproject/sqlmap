@@ -770,6 +770,8 @@ class Agent:
         return limitedQuery
 
     def forgeQueryOutputLength(self, expression):
+        import pdb
+        pdb.set_trace()
         lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
         select = re.search("\ASELECT\s+", expression, re.I)
         selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
