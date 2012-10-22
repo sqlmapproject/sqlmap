@@ -60,6 +60,7 @@ from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
+from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
@@ -1392,6 +1393,10 @@ def __cleanupOptions():
 
     if conf.getAll:
         map(lambda x: conf.__setitem__(x, True), WIZARD.ALL)
+
+    if conf.noCast:
+        for _ in DUMP_REPLACEMENTS.keys():
+            del DUMP_REPLACEMENTS[_]
 
     threadData = getCurrentThreadData()
     threadData.reset()
