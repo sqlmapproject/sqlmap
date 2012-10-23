@@ -24,6 +24,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.dicts import DBMS_DICT
 from lib.core.dump import dumper
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTPHEADER
@@ -301,8 +302,14 @@ def __resumeDBMS():
         dbmsVersion = [_.group(2)]
 
     if conf.dbms:
-        if conf.dbms.lower() != dbms:
-            message = "you provided '%s' as back-end DBMS, " % conf.dbms
+        check = True
+        for aliases, _, _ in DBMS_DICT.values():
+            if conf.dbms.lower() in aliases and dbms not in aliases:
+                check = False
+                break
+
+        if not check:
+            message = "you provided '%s' as a back-end DBMS, " % conf.dbms
             message += "but from a past scan information on the target URL "
             message += "sqlmap assumes the back-end DBMS is %s. " % dbms
             message += "Do you really want to force the back-end "
