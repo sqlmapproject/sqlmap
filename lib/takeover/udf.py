@@ -185,7 +185,7 @@ class UDF:
             logger.warn(warnMsg)
 
         if not conf.shLib:
-            msg = "which is the local path of the shared library? "
+            msg = "what is the local path of the shared library? "
 
             while True:
                 self.udfLocalFile = readInput(msg)

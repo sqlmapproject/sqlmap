@@ -269,7 +269,7 @@ class Metasploit:
 
     def __selectRhost(self):
         if self.connectionStr.startswith("bind"):
-            message = "which is the back-end DBMS address? [%s] " % self.remoteIP
+            message = "what is the back-end DBMS address? [%s] " % self.remoteIP
             address = readInput(message, default=self.remoteIP)
 
             if not address:
@@ -285,7 +285,7 @@ class Metasploit:
 
     def __selectLhost(self):
         if self.connectionStr.startswith("reverse"):
-            message = "which is the local address? [%s] " % self.localIP
+            message = "what is the local address? [%s] " % self.localIP
             address = readInput(message, default=self.localIP)
 
             if not address:
