@@ -110,7 +110,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
                 else:
                     query = dumpNode.query2 % (column, table, colList[0], pivotValue)
 
-                value = inject.getValue(query, blind=blind, inband=not blind, error=not blind)
+                value = unArrayizeValue(inject.getValue(query, blind=blind, inband=not blind, error=not blind))
 
                 if column == colList[0]:
                     if isNoneValue(value):
