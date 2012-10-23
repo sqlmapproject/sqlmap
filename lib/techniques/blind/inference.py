@@ -535,7 +535,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
 
     if conf.hexConvert:
-        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * len(finalValue))
+        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * len(finalValue or ""))
         dataToStdout(infoMsg)
     else:
         if conf.verbose in (1, 2) or showEta:
