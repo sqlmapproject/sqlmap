@@ -90,7 +90,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
         found = kb.orderByColumns or __orderByTechnique()
         if found:
             kb.orderByColumns = found
-            infoMsg = "target url appears to have %d columns in query" % found
+            infoMsg = "target url appears to have %d column%s in query" % (found, 's' if found > 1 else "")
             singleTimeLogMessage(infoMsg)
             return found
 
