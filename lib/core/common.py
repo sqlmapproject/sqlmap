@@ -785,6 +785,7 @@ def readInput(message, default=None, checkBatch=True):
         try:
             data = raw_input() or default
         except:
+            kb.prependFlag = True
             raise sqlmapUserQuitException
         finally:
             logging._releaseLock()
