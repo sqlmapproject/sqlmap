@@ -66,7 +66,7 @@ def __goDns(payload, expression):
 
     return value
 
-def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None, dump=False):
+def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None, dump=False, field=None):
     start = time.time()
     value = None
     count = 0
@@ -80,7 +80,12 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     if not (timeBasedCompare and kb.dnsTest):
         if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
-            length = queryOutputLength(expression, payload)
+            if field:
+                nulledCastedField = agent.nullAndCastField(field)
+                injExpression = expression.replace(field, nulledCastedField, 1)
+            else:
+                injExpression = expression
+            length = queryOutputLength(injExpression, payload)
         else:
             length = None
 
@@ -113,7 +118,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        output = __goInference(payload, expressionReplaced, charsetType, firstChar, lastChar, dump)
+        output = __goInference(payload, expressionReplaced, charsetType, firstChar, lastChar, dump, field)
 
         if isinstance(num, int):
             expression = origExpr

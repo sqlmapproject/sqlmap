@@ -314,20 +314,23 @@ class Agent:
         @rtype: C{str}
         """
 
-        rootQuery = queries[Backend.getIdentifiedDbms()]
+        nulledCastedField = field
 
-        if field.startswith("(CASE") or field.startswith("(IIF") or\
-          conf.noCast or Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3'):
-            nulledCastedField = field
-        else:
-            nulledCastedField = rootQuery.cast.query % field
-            if Backend.isDbms(DBMS.ACCESS):
-                nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
+        if field:
+            rootQuery = queries[Backend.getIdentifiedDbms()]
+
+            if field.startswith("(CASE") or field.startswith("(IIF") or\
+            conf.noCast or Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3'):
+                nulledCastedField = field
             else:
-                nulledCastedField = rootQuery.isnull.query % nulledCastedField
+                nulledCastedField = rootQuery.cast.query % field
+                if Backend.isDbms(DBMS.ACCESS):
+                    nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
+                else:
+                    nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
-        if conf.hexConvert:
-            nulledCastedField = self.hexConvertField(nulledCastedField)
+            if conf.hexConvert:
+                nulledCastedField = self.hexConvertField(nulledCastedField)
 
         return nulledCastedField
 
