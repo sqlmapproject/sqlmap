@@ -311,7 +311,7 @@ def __resumeDBMS():
         if not check:
             message = "you provided '%s' as a back-end DBMS, " % conf.dbms
             message += "but from a past scan information on the target URL "
-            message += "sqlmap assumes the back-end DBMS is %s. " % dbms
+            message += "sqlmap assumes the back-end DBMS is '%s'. " % dbms
             message += "Do you really want to force the back-end "
             message += "DBMS value? [y/N] "
             test = readInput(message, default="N")
