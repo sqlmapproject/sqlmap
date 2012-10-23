@@ -785,6 +785,7 @@ def readInput(message, default=None, checkBatch=True):
         try:
             data = raw_input() or default
         except:
+            time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
             kb.prependFlag = True
             raise sqlmapUserQuitException
         finally:
