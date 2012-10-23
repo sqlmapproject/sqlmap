@@ -302,7 +302,13 @@ class Databases:
 
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-                if not isNumPosStrValue(count):
+                if count == 0:
+                    warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
+                    warnMsg += "appears to be empty"
+                    logger.warn(warnMsg)
+                    continue
+
+                elif not isNumPosStrValue(count):
                     warnMsg = "unable to retrieve the number of "
                     warnMsg += "tables for database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.warn(warnMsg)
