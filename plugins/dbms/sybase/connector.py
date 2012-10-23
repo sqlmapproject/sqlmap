@@ -11,6 +11,8 @@ try:
 except ImportError, _:
     pass
 
+import logging
+
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -49,14 +51,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except (pymssql.ProgrammingError, pymssql.OperationalError, _mssql.MssqlDatabaseException), msg:
-            logger.warn("(remote) %s" % msg)
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(utf8encode(query))
         except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
-            logger.warn("(remote) %s" % msg)
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
         except pymssql.InternalError, msg:
             raise sqlmapConnectionException, msg
 

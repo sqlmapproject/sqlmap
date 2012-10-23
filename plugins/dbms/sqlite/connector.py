@@ -10,6 +10,8 @@ try:
 except ImportError, _:
     pass
 
+import logging
+
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -68,14 +70,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except self.__sqlite.OperationalError, msg:
-            logger.warn("(remote) %s" % msg[0])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(utf8encode(query))
         except self.__sqlite.OperationalError, msg:
-            logger.warn("(remote) %s" % msg[0])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
         except self.__sqlite.DatabaseError, msg:
             raise sqlmapConnectionException, msg[0]
 

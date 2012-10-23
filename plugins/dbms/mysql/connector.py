@@ -10,6 +10,8 @@ try:
 except ImportError, _:
     pass
 
+import logging
+
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
@@ -44,7 +46,7 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except pymysql.ProgrammingError, msg:
-            logger.warn(msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
@@ -54,7 +56,7 @@ class Connector(GenericConnector):
             self.cursor.execute(query)
             retVal = True
         except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
-            logger.warn("(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except pymysql.InternalError, msg:
             raise sqlmapConnectionException, msg[1]
 

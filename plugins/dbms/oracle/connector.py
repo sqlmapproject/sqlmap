@@ -10,9 +10,11 @@ try:
 except ImportError, _:
     pass
 
+import logging
 import os
 
 from lib.core.convert import utf8encode
+from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
@@ -53,7 +55,7 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except cx_Oracle.InterfaceError, msg:
-            logger.warn("(remote) %s" % msg)
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
             return None
 
     def execute(self, query):
@@ -63,7 +65,7 @@ class Connector(GenericConnector):
             self.cursor.execute(utf8encode(query))
             retVal = True
         except (cx_Oracle.DatabaseError), msg:
-            logger.warn("(remote) %s" % msg)
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
         except cx_Oracle.InternalError, msg:
             raise sqlmapConnectionException, msg
 

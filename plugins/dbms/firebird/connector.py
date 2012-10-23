@@ -10,6 +10,8 @@ try:
 except ImportError, _:
     pass
 
+import logging
+
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import UNICODE_ENCODING
@@ -47,14 +49,14 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except kinterbasdb.OperationalError, msg:
-            logger.warn("(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except kinterbasdb.OperationalError, msg:
-            logger.warn("(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except kinterbasdb.Error, msg:
             raise sqlmapConnectionException, msg[1]
 
