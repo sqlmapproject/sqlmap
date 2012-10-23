@@ -77,6 +77,7 @@ from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import sqlmapUserQuitException
 from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
@@ -781,9 +782,12 @@ def readInput(message, default=None, checkBatch=True):
         logging._acquireLock()
         dataToStdout("\r%s" % message, forceOutput=True, bold=True)
         kb.prependFlag = False
-        data = raw_input() or default
-        #data = raw_input(message.encode(sys.stdout.encoding or UNICODE_ENCODING))
-        logging._releaseLock()
+        try:
+            data = raw_input() or default
+        except:
+            raise sqlmapUserQuitException
+        finally:
+            logging._releaseLock()
 
     return data
 
