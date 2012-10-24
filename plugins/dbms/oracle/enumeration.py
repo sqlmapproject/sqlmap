@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import getLimitRange
+from lib.core.common import isAdminFromPrivileges
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -78,7 +79,7 @@ class Enumeration(GenericEnumeration):
                             # In Oracle we get the list of roles as string
                             roles.add(role)
 
-                    if self.__isAdminFromPrivileges(roles):
+                    if isAdminFromPrivileges(roles):
                         areAdmins.add(user)
 
                     if kb.data.cachedUsersRoles.has_key(user):

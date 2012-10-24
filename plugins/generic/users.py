@@ -13,6 +13,7 @@ from lib.core.common import Backend
 from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
 from lib.core.common import getUnicode
+from lib.core.common import isAdminFromPrivileges
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -309,30 +310,6 @@ class Users:
 
         return kb.data.cachedUsersPasswords
 
-    def __isAdminFromPrivileges(self, privileges):
-        # In PostgreSQL the usesuper privilege means that the
-        # user is DBA
-        dbaCondition = (Backend.isDbms(DBMS.PGSQL) and "super" in privileges)
-
-        # In Oracle the DBA privilege means that the
-        # user is DBA
-        dbaCondition |= (Backend.isDbms(DBMS.ORACLE) and "DBA" in privileges)
-
-        # In MySQL >= 5.0 the SUPER privilege means
-        # that the user is DBA
-        dbaCondition |= (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema and "SUPER" in privileges)
-
-        # In MySQL < 5.0 the super_priv privilege means
-        # that the user is DBA
-        dbaCondition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema and "super_priv" in privileges)
-
-        # In Firebird there is no specific privilege that means
-        # that the user is DBA
-        # TODO: confirm
-        dbaCondition |= (Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges)
-
-        return dbaCondition
-
     def getPrivileges(self, query2=False):
         infoMsg = "fetching database users privileges"
 
@@ -441,7 +418,7 @@ class Users:
 
                                 privileges.add(privilege)
 
-                    if self.__isAdminFromPrivileges(privileges):
+                    if isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
 
                     if user in kb.data.cachedUsersPrivileges:
@@ -579,7 +556,7 @@ class Users:
 
                         privileges.add(privilege)
 
-                    if self.__isAdminFromPrivileges(privileges):
+                    if isAdminFromPrivileges(privileges):
                         areAdmins.add(user)
 
                     # In MySQL < 5.0 we break the cycle after the first

@@ -3005,6 +3005,34 @@ def asciifyUrl(url, forceQuote=False):
 
     return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment])
 
+def isAdminFromPrivileges(privileges):
+    """
+    Inspects privileges to see if those are comming from an admin user
+    """
+
+    # In PostgreSQL the usesuper privilege means that the
+    # user is DBA
+    retVal = (Backend.isDbms(DBMS.PGSQL) and "super" in privileges)
+
+    # In Oracle the DBA privilege means that the
+    # user is DBA
+    retVal |= (Backend.isDbms(DBMS.ORACLE) and "DBA" in privileges)
+
+    # In MySQL >= 5.0 the SUPER privilege means
+    # that the user is DBA
+    retVal |= (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema and "SUPER" in privileges)
+
+    # In MySQL < 5.0 the super_priv privilege means
+    # that the user is DBA
+    retVal |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema and "super_priv" in privileges)
+
+    # In Firebird there is no specific privilege that means
+    # that the user is DBA
+    # TODO: confirm
+    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges)
+
+    return retVal
+
 def findPageForms(content, url, raise_=False, addToTargets=False):
     """
     Parses given page content for possible forms
