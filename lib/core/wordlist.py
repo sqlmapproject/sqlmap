@@ -9,6 +9,7 @@ import os
 import zipfile
 
 from lib.core.exception import sqlmapDataException
+from lib.core.settings import UNICODE_ENCODING
 
 class Wordlist:
     """
@@ -63,6 +64,10 @@ class Wordlist:
             except StopIteration:
                 self.adjust()
                 retVal = self.iter.next().rstrip()
+            try:
+                retVal = retVal.decode(UNICODE_ENCODING)
+            except UnicodeDecodeError:
+                continue
             if not self.proc_count or self.counter % self.proc_count == self.proc_id:
                 break
         return retVal
