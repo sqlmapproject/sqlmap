@@ -14,6 +14,7 @@ from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -85,7 +86,7 @@ class Miscellaneous:
         if conf.direct:
             query = "SELECT %s" % query
 
-        kb.bannerFp["dbmsVersion"] = inject.getValue(query)
+        kb.bannerFp["dbmsVersion"] = unArrayizeValue(inject.getValue(query))
         kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(",", "").replace("-", "").replace(" ", "")
 
     def delRemoteFile(self, filename):
