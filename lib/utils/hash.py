@@ -717,8 +717,11 @@ def dictionaryAttack(attack_dict):
                     logger.warn(warnMsg)
 
                     for process in processes:
-                        process.terminate()
-                        process.join()
+                        try:
+                            process.terminate()
+                            process.join()
+                        except OSError:
+                            pass
 
                 finally:
                     if retVal:
@@ -798,8 +801,11 @@ def dictionaryAttack(attack_dict):
                         logger.warn(warnMsg)
 
                         for process in processes:
-                            process.terminate()
-                            process.join()
+                            try:
+                                process.terminate()
+                                process.join()
+                            except OSError:
+                                pass
 
                     finally:
                         if retVal:
