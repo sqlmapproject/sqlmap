@@ -2680,7 +2680,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                 value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
             return value
 
-        payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, '')))
+        payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ''), convall=True))
         regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
         if regex != payload:
