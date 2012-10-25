@@ -14,6 +14,11 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
+        """
+        Note: PostgreSQL has a general problem with concenation operator (||) precedence (hence the parentheses enclosing)
+              e.g. SELECT 1 WHERE 'a'!='a'||'b' will trigger error ("argument of WHERE must be type boolean, not type text")
+        """
+
         if quote:
             while True:
                 index = expression.find("'")
@@ -28,11 +33,11 @@ class Syntax(GenericSyntax):
 
                 lastIndex = firstIndex + index
                 old = "'%s'" % expression[firstIndex:lastIndex]
-                unescaped = "||".join("CHR(%d)" % (ord(expression[i])) for i in xrange(firstIndex, lastIndex))  # Postgres CHR() function already accepts Unicode code point of character(s)
+                unescaped = "(%s)" % "||".join("CHR(%d)" % (ord(expression[i])) for i in xrange(firstIndex, lastIndex))  # Postgres CHR() function already accepts Unicode code point of character(s)
 
                 expression = expression.replace(old, unescaped)
         else:
-            expression = "||".join("CHR(%d)" % ord(c) for c in expression)
+            expression = "(%s)" % "||".join("CHR(%d)" % ord(c) for c in expression)
 
         return expression
 
