@@ -625,7 +625,7 @@ def checkFalsePositives(injection):
 
 def checkSuhoshinPatch(injection):
     """
-    Checks for existence of Suhoshin-patch (like) protection mechanism
+    Checks for existence of Suhoshin-patch (and alike) protection mechanism(s)
     """
 
     if injection.place == PLACE.GET:
@@ -634,7 +634,8 @@ def checkSuhoshinPatch(injection):
         kb.injection = injection
         randInt = randomInt()
 
-        if not checkBooleanExpression("%d=%s%d" % (randInt, " " * SUHOSHIN_MAX_VALUE_LENGTH, randInt)):
+        _ = " " * SUHOSHIN_MAX_VALUE_LENGTH
+        if not checkBooleanExpression("%d%s=%s%d" % (randInt, _, _, randInt)):
             warnMsg = "parameter length constraint "
             warnMsg += "mechanism detected (e.g. Suhoshin patch). "
             warnMsg += "Potential problems in enumeration phase can be expected"
