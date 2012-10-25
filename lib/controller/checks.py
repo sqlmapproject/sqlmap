@@ -40,6 +40,7 @@ from lib.core.common import wasLastRequestHTTPError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.enums import HEURISTIC_TEST
@@ -54,6 +55,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
+from lib.core.settings import SUHOSHIN_MAX_VALUE_LENGTH
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
@@ -562,9 +564,13 @@ def checkSqlInjection(place, parameter, value):
             logger.warn(warnMsg)
 
         injection = checkFalsePositives(injection)
-        return injection
     else:
-        return None
+        injection = None
+
+    if injection:
+        checkSuhoshinPatch(injection)
+
+    return injection
 
 def checkFalsePositives(injection):
     """
@@ -616,6 +622,25 @@ def checkFalsePositives(injection):
         kb.injection = popValue()
 
     return retVal
+
+def checkSuhoshinPatch(injection):
+    """
+    Checks for existence of Suhoshin-patch (like) protection mechanism
+    """
+
+    if injection.place == PLACE.GET:
+        pushValue(kb.injection)
+
+        kb.injection = injection
+        randInt = randomInt()
+
+        if not checkBooleanExpression("%d=%s%d" % (randInt, " " * SUHOSHIN_MAX_VALUE_LENGTH, randInt)):
+            warnMsg = "parameter length constraint "
+            warnMsg += "mechanism detected (e.g. Suhoshin patch). "
+            warnMsg += "Potential problems in enumeration phase can be expected"
+            logger.warn(warnMsg)
+
+        kb.injection = popValue()
 
 def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:

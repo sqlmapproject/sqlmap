@@ -485,3 +485,6 @@ MULTIPART_RECOGNITION_REGEX = r"(?i)Content-Disposition:[^;]+;\s*name="
 
 # Default POST data content-type
 DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded"
+
+# Length used while checking for existence of Suhoshin-patch (like) protection mechanism
+SUHOSHIN_MAX_VALUE_LENGTH = 512
