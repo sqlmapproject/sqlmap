@@ -210,6 +210,7 @@ class Entries:
                         query = rootQuery.blind.count % tbl
                     else:
                         query = rootQuery.blind.count % (conf.db, tbl)
+
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     lengths = {}

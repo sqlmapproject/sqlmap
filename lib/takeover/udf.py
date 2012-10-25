@@ -21,6 +21,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
+from lib.core.common import unArrayizeValue
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapMissingMandatoryOptionException
 from lib.core.exception import sqlmapUnsupportedFeatureException
@@ -106,14 +107,8 @@ class UDF:
             cmd = unescaper.unescape(self.udfForgeCmd(cmd))
 
             inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
-            output = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False)
+            output = unArrayizeValue(inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False))
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
-
-            if output and isinstance(output, (list, tuple)):
-                output = output[0]
-
-                if output and isinstance(output, (list, tuple)):
-                    output = output[0]
 
         return output
 

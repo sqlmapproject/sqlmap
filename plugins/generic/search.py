@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
+from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
@@ -83,8 +84,7 @@ class Search:
                 values = inject.getValue(query, blind=False)
 
                 if not isNoneValue(values):
-                    if isinstance(values, basestring):
-                        values = [values]
+                    values = arrayizeValue(values)
 
                     for value in values:
                         value = safeSQLIdentificatorNaming(value)
@@ -100,6 +100,7 @@ class Search:
                     query = rootQuery.blind.count2
                 else:
                     query = rootQuery.blind.count
+
                 query += dbQuery
                 query += exclDbsQuery
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -232,6 +233,7 @@ class Search:
                     if Backend.isDbms(DBMS.DB2):
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query)
+
                     foundDb = inject.getValue(query, inband=False, error=False)
                     foundDb = safeSQLIdentificatorNaming(foundDb)
 
@@ -275,6 +277,7 @@ class Search:
                         query = query % unsafeSQLIdentificatorNaming(db)
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query)
+
                         foundTbl = inject.getValue(query, inband=False, error=False)
                         kb.hintValue = foundTbl
                         foundTbl = safeSQLIdentificatorNaming(foundTbl, True)

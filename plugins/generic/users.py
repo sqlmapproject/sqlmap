@@ -97,7 +97,7 @@ class Users:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False)
+            value = unArrayizeValue(inject.getValue(query, blind=False))
 
             if not isNoneValue(value):
                 kb.data.cachedUsers = arrayizeValue(value)
@@ -110,6 +110,7 @@ class Users:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
+
             count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
@@ -250,6 +251,7 @@ class Users:
                         query = rootQuery.blind.count2 % user
                     else:
                         query = rootQuery.blind.count % user
+
                     count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
@@ -274,6 +276,7 @@ class Users:
                                 query = rootQuery.blind.query % (user, index, user)
                         else:
                             query = rootQuery.blind.query % (user, index)
+
                         password = inject.getValue(query, inband=False, error=False)
                         password = parsePasswordHash(password)
                         passwords.append(password)
@@ -463,6 +466,7 @@ class Users:
                     query = rootQuery.blind.count2 % user
                 else:
                     query = rootQuery.blind.count % user
+
                 count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
