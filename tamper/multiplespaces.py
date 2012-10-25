@@ -16,7 +16,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Adds multiple spaces around SQL keywords
 
@@ -46,4 +46,4 @@ def tamper(payload, headers):
             retVal = re.sub("(?<=\W)%s(?=[^A-Za-z_(]|\Z)" % word, "%s%s%s" % (' '*random.randrange(1,4), word, ' '*random.randrange(1,4)), retVal)
             retVal = re.sub("(?<=\W)%s(?=[(])" % word, "%s%s" % (' '*random.randrange(1,4), word), retVal)
 
-    return retVal, headers
+    return retVal

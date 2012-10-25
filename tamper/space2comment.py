@@ -12,7 +12,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Replaces space character (' ') with comments '/**/'
 
@@ -55,4 +55,4 @@ def tamper(payload, headers):
 
             retVal += payload[i]
 
-    return retVal, headers
+    return retVal

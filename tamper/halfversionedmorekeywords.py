@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """
-$Id$
-
 Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
@@ -21,7 +19,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s < 5.1" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Adds versioned MySQL comment before each keyword
 
@@ -55,4 +53,4 @@ def tamper(payload, headers):
         retVal = re.sub(r"(?<=\W)(?P<word>[A-Za-z_]+)(?=\W|\Z)", lambda match: process(match), retVal)
         retVal = retVal.replace(" /*!0", "/*!0")
 
-    return retVal, headers
+    return retVal

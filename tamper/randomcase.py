@@ -16,7 +16,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Replaces each keyword character with random case value
 
@@ -50,4 +50,4 @@ def tamper(payload, headers):
 
                 retVal = retVal.replace(word, _)
 
-    return retVal, headers
+    return retVal

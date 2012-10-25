@@ -14,7 +14,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Appends special crafted string
 
@@ -27,4 +27,4 @@ def tamper(payload, headers):
         * Reference: http://seclists.org/fulldisclosure/2011/May/163
     """
 
-    return payload + " and '0having'='0having'" if payload else payload, headers
+    return payload + " and '0having'='0having'" if payload else payload

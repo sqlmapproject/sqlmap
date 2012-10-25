@@ -13,7 +13,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Replaces predefined SQL keywords with representations
     suitable for replacement (e.g. .replace("SELECT", "")) filters
@@ -38,4 +38,4 @@ def tamper(payload, headers):
             _ = random.randint(1, len(keyword) - 1)
             retVal = re.sub(r"(?i)\b%s\b" % keyword, "%s%s%s" % (keyword[:_], keyword, keyword[_:]), retVal)
 
-    return retVal, headers
+    return retVal

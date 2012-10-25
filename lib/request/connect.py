@@ -587,7 +587,7 @@ class Connect:
         if payload:
             if kb.tamperFunctions:
                 for function in kb.tamperFunctions:
-                    payload, auxHeaders = function(payload=payload, headers=auxHeaders)
+                    payload = function(payload=payload, headers=auxHeaders)
 
                 value = agent.replacePayload(value, payload)
 

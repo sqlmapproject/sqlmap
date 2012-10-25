@@ -12,7 +12,7 @@ __priority__ = PRIORITY.HIGHEST
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Replaces instances like 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
 
@@ -61,4 +61,4 @@ def tamper(payload, headers):
             else:
                 break
 
-    return payload, headers
+    return payload

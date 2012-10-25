@@ -12,7 +12,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Replaces apostrophe character with its UTF-8 full width counterpart
 
@@ -27,4 +27,4 @@ def tamper(payload, headers):
         * http://lukasz.pilorz.net/testy/full_width_utf/index.phps
     """
 
-    return payload.replace('\'', "%EF%BC%87") if payload else payload, headers
+    return payload.replace('\'', "%EF%BC%87") if payload else payload

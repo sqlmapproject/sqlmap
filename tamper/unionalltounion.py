@@ -14,7 +14,7 @@ __priority__ = PRIORITY.HIGHEST
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Replaces UNION ALL SELECT with UNION SELECT
 
@@ -23,4 +23,4 @@ def tamper(payload, headers):
         * Output: -1 UNION SELECT
     """
 
-    return payload.replace("UNION ALL SELECT", "UNION SELECT") if payload else payload, headers
+    return payload.replace("UNION ALL SELECT", "UNION SELECT") if payload else payload

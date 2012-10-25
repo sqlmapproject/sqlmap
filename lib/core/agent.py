@@ -48,7 +48,7 @@ class Agent:
 
         if kb.tamperFunctions:
             for function in kb.tamperFunctions:
-                query, _ = function(payload=query, headers=None)
+                query = function(payload=query)
 
         return query
 

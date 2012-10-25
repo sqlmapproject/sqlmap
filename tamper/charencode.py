@@ -14,7 +14,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Url-encodes all characters in a given payload (not processing already
     encoded)
@@ -50,4 +50,4 @@ def tamper(payload, headers):
                 retVal += '%%%.2X' % ord(payload[i])
                 i += 1
 
-    return retVal, headers
+    return retVal

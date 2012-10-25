@@ -12,7 +12,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload, headers):
+def tamper(payload, headers=None):
     """
     Appends encoded NULL byte character at the end of payload
 
@@ -31,4 +31,4 @@ def tamper(payload, headers):
     Reference: http://projects.webappsec.org/w/page/13246949/Null-Byte-Injection
     """
 
-    return "%s%%00" % payload if payload else payload, headers
+    return "%s%%00" % payload if payload else payload
