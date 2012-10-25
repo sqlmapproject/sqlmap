@@ -634,7 +634,7 @@ def checkSuhoshinPatch(injection):
         kb.injection = injection
         randInt = randomInt()
 
-        _ = " " * SUHOSHIN_MAX_VALUE_LENGTH / 2
+        _ = " " * (SUHOSHIN_MAX_VALUE_LENGTH / 2)
         if not checkBooleanExpression("%d%s=%s%d" % (randInt, _, _, randInt)):
             warnMsg = "parameter length constraint "
             warnMsg += "mechanism detected (e.g. Suhoshin patch). "
