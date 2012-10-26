@@ -35,7 +35,7 @@ def checkPayload(payload):
     global rules
 
     detected = False
-    payload = urldecode(payload)
+    payload = urldecode(payload, convall=True)
 
     if not rules:
         xmlrules = readXmlFile(paths.PHPIDS_RULES_XML)
