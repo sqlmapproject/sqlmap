@@ -15,6 +15,6 @@ If you are willing to connect directly to a database server (switch `-d`), witho
 * SQLite: [python-pysqlite2](http://pysqlite.googlecode.com/)
 * Sybase: [python-pymssql](http://code.google.com/p/pymssql/)
 
-If you plan to attack a web application behind NTLM authentication or use the sqlmap update functionality (switch `--update`) you need to install respectively [python-ntlm](http://code.google.com/p/python-ntlm/) and [python-svn](http://pysvn.tigris.org/) libraries respectively.
+If you plan to attack a web application behind a NTLM authentication you'll need to install [python-ntlm](http://code.google.com/p/python-ntlm/) library.
 
 Optionally, if you are running sqlmap on Windows, you may wish to install the [PyReadline](http://ipython.scipy.org/moin/PyReadline/Intro) library in order to take advantage of the sqlmap TAB completion and history support features in the SQL shell and OS shell. Note that these functionalities are available natively via the standard Python [readline](http://docs.python.org/library/readline.html) library on other operating systems.
