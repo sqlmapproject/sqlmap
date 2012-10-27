@@ -35,7 +35,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
 
     if count is None:
         query = dumpNode.count % table
-        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, expected=EXPECTED.INT)
+        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT)
 
     if isinstance(count, basestring) and count.isdigit():
         count = int(count)

@@ -210,7 +210,7 @@ class xp_cmdshell:
             query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
 
             if conf.direct or any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)):
-                output = inject.getValue(query, resumeValue=False, blind=False)
+                output = inject.getValue(query, resumeValue=False, blind=False, time=False)
             else:
                 output = []
                 count = inject.getValue("SELECT COUNT(*) FROM %s" % self.cmdTblName, resumeValue=False, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)

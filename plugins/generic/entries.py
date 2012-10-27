@@ -147,7 +147,7 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            retVal = pivotDumpTable(table, colList, blind=False)
+                            retVal = pivotDumpTable(table, colList, blind=False, time=False)
 
                             if retVal:
                                 entries, _ = retVal
@@ -160,7 +160,7 @@ class Entries:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 
                     if not entries and query:
-                        entries = inject.getValue(query, blind=False, dump=True)
+                        entries = inject.getValue(query, blind=False, time=False, dump=True)
 
                     if isNoneValue(entries):
                         entries = []

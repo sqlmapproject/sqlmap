@@ -138,7 +138,7 @@ class Filesystem(GenericFilesystem):
         inject.goStacked(binToHexQuery)
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), resumeValue=False, blind=False, error=False)
+            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), resumeValue=False, blind=False, time=False, error=False)
 
         if not result:
             result = []

@@ -54,7 +54,7 @@ class Enumeration(GenericEnumeration):
                 query += " WHERE "
                 query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
-            values = inject.getValue(query, blind=False)
+            values = inject.getValue(query, blind=False, time=False)
 
             if not values and not query2:
                 infoMsg = "trying with table USER_ROLE_PRIVS"

@@ -103,7 +103,7 @@ class Databases:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(value):
                 kb.data.cachedDbs = arrayizeValue(value)
@@ -266,7 +266,7 @@ class Databases:
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
 
-            value = inject.getValue(query, blind=False)
+            value = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(value):
                 value = filter(None, arrayizeValue(value))
@@ -518,7 +518,7 @@ class Databases:
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.inband.query % tbl
 
-                value = inject.getValue(query, blind=False)
+                value = inject.getValue(query, blind=False, time=False)
 
                 if Backend.isDbms(DBMS.SQLITE):
                     parseSqliteTableSchema(unArrayizeValue(value))

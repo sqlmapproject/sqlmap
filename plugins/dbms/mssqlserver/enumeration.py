@@ -96,7 +96,7 @@ class Enumeration(GenericEnumeration):
 
                 for query in (rootQuery.inband.query, rootQuery.inband.query2, rootQuery.inband.query3):
                     query = query.replace("%s", db)
-                    value = inject.getValue(query, blind=False)
+                    value = inject.getValue(query, blind=False, time=False)
                     if not isNoneValue(value):
                         break
 
@@ -199,7 +199,7 @@ class Enumeration(GenericEnumeration):
                 if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
                     query = rootQuery.inband.query.replace("%s", db)
                     query += tblQuery
-                    values = inject.getValue(query, blind=False)
+                    values = inject.getValue(query, blind=False, time=False)
 
                     if not isNoneValue(values):
                         if isinstance(values, basestring):
@@ -321,7 +321,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.inband.query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     query += whereTblsQuery.replace("[DB]", db)
-                    values = inject.getValue(query, blind=False)
+                    values = inject.getValue(query, blind=False, time=False)
 
                     if not isNoneValue(values):
                         if isinstance(values, basestring):

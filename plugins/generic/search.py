@@ -81,7 +81,7 @@ class Search:
                     query = rootQuery.inband.query
                 query += dbQuery
                 query += exclDbsQuery
-                values = inject.getValue(query, blind=False)
+                values = inject.getValue(query, blind=False, time=False)
 
                 if not isNoneValue(values):
                     values = arrayizeValue(values)
@@ -190,7 +190,7 @@ class Search:
                 query = rootQuery.inband.query
                 query += tblQuery
                 query += whereDbsQuery
-                values = inject.getValue(query, blind=False)
+                values = inject.getValue(query, blind=False, time=False)
 
                 for foundDb, foundTbl in filterPairValues(values):
                     foundDb = safeSQLIdentificatorNaming(foundDb)
@@ -378,7 +378,7 @@ class Search:
                     query += colQuery
                     query += whereDbsQuery
                     query += whereTblsQuery
-                    values = inject.getValue(query, blind=False)
+                    values = inject.getValue(query, blind=False, time=False)
                 else:
                     # Assume provided databases' tables contain the
                     # column(s) provided

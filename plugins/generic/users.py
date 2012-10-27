@@ -97,7 +97,7 @@ class Users:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = unArrayizeValue(inject.getValue(query, blind=False))
+            value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
 
             if not isNoneValue(value):
                 kb.data.cachedUsers = arrayizeValue(value)
@@ -182,7 +182,7 @@ class Users:
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
 
-                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False, time=False)
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
@@ -194,7 +194,7 @@ class Users:
 
                 getCurrentThreadData().disableStdOut = False
             else:
-                value = inject.getValue(query, blind=False)
+                value = inject.getValue(query, blind=False, time=False)
 
                 for user, password in filterPairValues(value):
                     if not user or user == " ":
@@ -363,7 +363,7 @@ class Users:
                 else:
                     query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
-            values = inject.getValue(query, blind=False)
+            values = inject.getValue(query, blind=False, time=False)
 
             if not values and Backend.isDbms(DBMS.ORACLE) and not query2:
                 infoMsg = "trying with table USER_SYS_PRIVS"
