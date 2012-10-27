@@ -382,7 +382,7 @@ This switch should be used in cases when the web server requires proper client-s
 
 ### HTTP(S) proxy
 
-Options and switch: `--proxy`, `--proxy-cred`, `--ignore-proxy` and `--tor`
+Options and switch: `--proxy`, `--proxy-cred`, `--tor` and `--ignore-proxy`
 
 It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) requests to the target URL. The syntax of HTTP(S) proxy value is `http://url:port`.
 
