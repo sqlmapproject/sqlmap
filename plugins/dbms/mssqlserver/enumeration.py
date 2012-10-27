@@ -119,7 +119,7 @@ class Enumeration(GenericEnumeration):
 
                 for query in (rootQuery.blind.count, rootQuery.blind.count2, rootQuery.blind.count3):
                     _ = query.replace("%s", db)
-                    count = inject.getValue(_, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(_, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
                     if not isNoneValue(count):
                         break
 
@@ -135,7 +135,7 @@ class Enumeration(GenericEnumeration):
                 for index in xrange(int(count)):
                     _ = (rootQuery.blind.query if query == rootQuery.blind.count else rootQuery.blind.query2 if query == rootQuery.blind.count2 else rootQuery.blind.query3).replace("%s", db) % index
 
-                    table = inject.getValue(_, inband=False, error=False)
+                    table = inject.getValue(_, union=False, error=False)
                     if not isNoneValue(table):
                         kb.hintValue = table
                         table = safeSQLIdentificatorNaming(table, True)
@@ -220,7 +220,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count
                     query = query.replace("%s", db)
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -239,7 +239,7 @@ class Enumeration(GenericEnumeration):
                         query = query.replace("%s", db)
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query, tblCond)
-                        tbl = inject.getValue(query, inband=False, error=False)
+                        tbl = inject.getValue(query, union=False, error=False)
                         kb.hintValue = tbl
                         foundTbls[db].append(tbl)
 
@@ -367,7 +367,7 @@ class Enumeration(GenericEnumeration):
                     query = query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     query += whereTblsQuery.replace("[DB]", db)
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"
@@ -387,7 +387,7 @@ class Enumeration(GenericEnumeration):
                         query += " AND %s" % colQuery.replace("[DB]", db)
                         query += whereTblsQuery.replace("[DB]", db)
                         query = agent.limitQuery(index, query, colCond.replace("[DB]", db))
-                        tbl = inject.getValue(query, inband=False, error=False)
+                        tbl = inject.getValue(query, union=False, error=False)
                         kb.hintValue = tbl
 
                         tbl = safeSQLIdentificatorNaming(tbl, True)

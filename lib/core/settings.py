@@ -435,7 +435,7 @@ MAX_DNS_LABEL = 63
 # Alphabet used for prefix and suffix strings of name resolution requests in DNS technique (excluding hexadecimal chars for not mixing with inner content)
 DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.letters)
 
-# Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION/inband injections)
+# Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 
 # Maximum response total page size (trimmed if larger)

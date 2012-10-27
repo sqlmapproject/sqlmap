@@ -111,7 +111,7 @@ class Users:
             else:
                 query = rootQuery.blind.count
 
-            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
@@ -127,7 +127,7 @@ class Users:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
-                user = inject.getValue(query, inband=False, error=False)
+                user = inject.getValue(query, union=False, error=False)
 
                 if user:
                     kb.data.cachedUsers.append(user)
@@ -252,7 +252,7 @@ class Users:
                     else:
                         query = rootQuery.blind.count % user
 
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "unable to retrieve the number of password "
@@ -277,7 +277,7 @@ class Users:
                         else:
                             query = rootQuery.blind.query % (user, index)
 
-                        password = inject.getValue(query, inband=False, error=False)
+                        password = inject.getValue(query, union=False, error=False)
                         password = parsePasswordHash(password)
                         passwords.append(password)
 
@@ -467,7 +467,7 @@ class Users:
                 else:
                     query = rootQuery.blind.count % user
 
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     if Backend.isDbms(DBMS.ORACLE) and not query2:
@@ -500,7 +500,7 @@ class Users:
                         query = rootQuery.blind.query % (index, user)
                     else:
                         query = rootQuery.blind.query % (user, index)
-                    privilege = inject.getValue(query, inband=False, error=False)
+                    privilege = inject.getValue(query, union=False, error=False)
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise

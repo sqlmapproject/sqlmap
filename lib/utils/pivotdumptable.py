@@ -35,7 +35,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
 
     if count is None:
         query = dumpNode.count % table
-        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT)
+        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT)
 
     if isinstance(count, basestring) and count.isdigit():
         count = int(count)
@@ -65,7 +65,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
         logger.info(infoMsg)
 
         query = dumpNode.count2 % (column, table)
-        value = inject.getValue(query, blind=blind, inband=not blind, error=not blind, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+        value = inject.getValue(query, blind=blind, union=not blind, error=not blind, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if isNumPosStrValue(value):
             validColumnList = True
@@ -110,7 +110,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
                 else:
                     query = dumpNode.query2 % (column, table, colList[0], pivotValue)
 
-                value = unArrayizeValue(inject.getValue(query, blind=blind, time=blind, inband=not blind, error=not blind))
+                value = unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))
 
                 if column == colList[0]:
                     if isNoneValue(value):

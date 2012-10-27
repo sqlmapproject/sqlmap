@@ -119,7 +119,7 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     if count != 0 and not query2:
@@ -145,7 +145,7 @@ class Enumeration(GenericEnumeration):
                         query = rootQuery.blind.query2 % (queryUser, index)
                     else:
                         query = rootQuery.blind.query % (queryUser, index)
-                    role = inject.getValue(query, inband=False, error=False)
+                    role = inject.getValue(query, union=False, error=False)
 
                     # In Oracle we get the list of roles as string
                     roles.add(role)

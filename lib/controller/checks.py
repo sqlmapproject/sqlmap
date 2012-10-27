@@ -436,7 +436,7 @@ def checkSqlInjection(place, parameter, value):
                             # Test for UNION injection and set the sample
                             # payload as well as the vector.
                             # NOTE: vector is set to a tuple with 6 elements,
-                            # used afterwards by Agent.forgeInbandQuery()
+                            # used afterwards by Agent.forgeUnionQuery()
                             # method to forge the UNION query payload
 
                             configUnion(test.request.char, test.request.columns)

@@ -48,7 +48,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
 def __oneShotUnionUse(expression, unpack=True, limited=False):
-    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert, expression), checkConf=True)  # as inband data is stored raw unconverted
+    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert, expression), checkConf=True)  # as union data is stored raw unconverted
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -59,10 +59,10 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
 
         where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else None
 
-        # Forge the inband SQL injection request
+        # Forge the union SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
-        query = agent.forgeInbandQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
+        query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
         payload = agent.payload(newValue=query, where=where)
 
         # Perform the request
@@ -90,7 +90,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
 
-            # Special case when DBMS is Microsoft SQL Server and error message is used as a result of inband injection
+            # Special case when DBMS is Microsoft SQL Server and error message is used as a result of union injection
             if Backend.isDbms(DBMS.MSSQL) and wasLastRequestDBMSError():
                 retVal = htmlunescape(retVal).replace("<br>", "\n")
 
@@ -140,9 +140,9 @@ def configUnion(char=None, columns=None):
 
 def unionUse(expression, unpack=True, dump=False):
     """
-    This function tests for an inband SQL injection on the target
+    This function tests for an union SQL injection on the target
     url then call its subsidiary function to effectively perform an
-    inband SQL injection on the affected url
+    union SQL injection on the affected url
     """
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)
@@ -341,7 +341,7 @@ def unionUse(expression, unpack=True, dump=False):
                 kb.suppressResumeInfo = False
 
     if not value and not abortedFlag:
-        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full inband doesn't play well with ORDER BY
+        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full union doesn't play well with ORDER BY
         value = __oneShotUnionUse(expression, unpack)
 
     duration = calculateDeltaSeconds(start)

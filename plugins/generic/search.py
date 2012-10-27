@@ -103,7 +103,7 @@ class Search:
 
                 query += dbQuery
                 query += exclDbsQuery
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     warnMsg = "no database"
@@ -127,7 +127,7 @@ class Search:
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query, dbCond)
 
-                    value = inject.getValue(query, inband=False, error=False)
+                    value = inject.getValue(query, union=False, error=False)
                     value = safeSQLIdentificatorNaming(value)
                     foundDbs.append(value)
 
@@ -213,7 +213,7 @@ class Search:
                 query = rootQuery.blind.count
                 query += tblQuery
                 query += whereDbsQuery
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     warnMsg = "no databases have table"
@@ -234,7 +234,7 @@ class Search:
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query)
 
-                    foundDb = inject.getValue(query, inband=False, error=False)
+                    foundDb = inject.getValue(query, union=False, error=False)
                     foundDb = safeSQLIdentificatorNaming(foundDb)
 
                     if foundDb not in foundTbls:
@@ -258,7 +258,7 @@ class Search:
                     query = rootQuery.blind.count2
                     query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -278,7 +278,7 @@ class Search:
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query)
 
-                        foundTbl = inject.getValue(query, inband=False, error=False)
+                        foundTbl = inject.getValue(query, union=False, error=False)
                         kb.hintValue = foundTbl
                         foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
                         foundTbls[db].append(foundTbl)
@@ -431,7 +431,7 @@ class Search:
                     query += colQuery
                     query += whereDbsQuery
                     query += whereTblsQuery
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no databases have tables containing column"
@@ -452,7 +452,7 @@ class Search:
                         if Backend.isDbms(DBMS.DB2):
                             query += ") AS foobar"
                         query = agent.limitQuery(index, query)
-                        db = inject.getValue(query, inband=False, error=False)
+                        db = inject.getValue(query, union=False, error=False)
                         db = safeSQLIdentificatorNaming(db)
 
                         if db not in dbs:
@@ -487,7 +487,7 @@ class Search:
                         query = query % db
                         query += " AND %s" % colQuery
                         query += whereTblsQuery
-                        count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"
@@ -507,7 +507,7 @@ class Search:
                             query += " AND %s" % colQuery
                             query += whereTblsQuery
                             query = agent.limitQuery(index, query)
-                            tbl = inject.getValue(query, inband=False, error=False)
+                            tbl = inject.getValue(query, union=False, error=False)
                             kb.hintValue = tbl
 
                             tbl = safeSQLIdentificatorNaming(tbl, True)

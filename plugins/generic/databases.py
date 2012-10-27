@@ -116,7 +116,7 @@ class Databases:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
-            count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of databases"
@@ -132,7 +132,7 @@ class Databases:
                         query = rootQuery.blind.query2 % index
                     else:
                         query = rootQuery.blind.query % index
-                    db = inject.getValue(query, inband=False, error=False)
+                    db = inject.getValue(query, union=False, error=False)
 
                     if db:
                         kb.data.cachedDbs.append(safeSQLIdentificatorNaming(db))
@@ -300,7 +300,7 @@ class Databases:
                 else:
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(db)
 
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if count == 0:
                     warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
@@ -329,7 +329,7 @@ class Databases:
                     else:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
 
-                    table = inject.getValue(query, inband=False, error=False)
+                    table = inject.getValue(query, union=False, error=False)
                     if not isNoneValue(table):
                         kb.hintValue = table
                         table = safeSQLIdentificatorNaming(table, True)
@@ -593,11 +593,11 @@ class Databases:
 
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.blind.query % tbl
-                    value = inject.getValue(query, inband=False, error=False)
+                    value = inject.getValue(query, union=False, error=False)
                     parseSqliteTableSchema(value)
                     return kb.data.cachedColumns
 
-                count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     errMsg = "unable to retrieve the number of columns "
@@ -629,7 +629,7 @@ class Databases:
                         field = None
 
                     query = agent.limitQuery(index, query, field, field)
-                    column = inject.getValue(query, inband=False, error=False)
+                    column = inject.getValue(query, union=False, error=False)
 
                     if not isNoneValue(column):
                         if not onlyColNames:
@@ -643,7 +643,7 @@ class Databases:
                             elif Backend.isDbms(DBMS.FIREBIRD):
                                 query = rootQuery.blind.query2 % (tbl, column)
 
-                            colType = inject.getValue(query, inband=False, error=False)
+                            colType = inject.getValue(query, union=False, error=False)
 
                             if Backend.isDbms(DBMS.FIREBIRD):
                                 colType = FIREBIRD_TYPES.get(colType, colType)

@@ -210,7 +210,7 @@ class Entries:
                     else:
                         query = rootQuery.blind.count % (conf.db, tbl)
 
-                    count = inject.getValue(query, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     lengths = {}
                     entries = {}
@@ -255,7 +255,7 @@ class Entries:
 
                         if len(colList) < len(indexRange) > CHECK_ZERO_COLUMNS_THRESHOLD:
                             for column in colList:
-                                if inject.getValue("SELECT COUNT(%s) FROM %s" % (column, kb.dumpTable), inband=False, error=False) == '0':
+                                if inject.getValue("SELECT COUNT(%s) FROM %s" % (column, kb.dumpTable), union=False, error=False) == '0':
                                     emptyColumns.append(column)
                                     debugMsg = "column '%s' of table '%s' will not be " % (column, kb.dumpTable)
                                     debugMsg += "dumped as it appears to be empty"
@@ -284,7 +284,7 @@ class Entries:
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, column, tbl)
 
-                                    value = NULL if column in emptyColumns else inject.getValue(query, inband=False, error=False, dump=True)
+                                    value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
                                     value = '' if value is None else value
 
                                     _ = DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))

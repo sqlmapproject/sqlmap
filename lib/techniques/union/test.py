@@ -101,7 +101,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     pages = {}
 
     for count in xrange(lowerCount, upperCount+1):
-        query = agent.forgeInbandQuery('', -1, count, comment, prefix, suffix, kb.uChar, where)
+        query = agent.forgeUnionQuery('', -1, count, comment, prefix, suffix, kb.uChar, where)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
         page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
         if not isNullValue(kb.uChar):
@@ -166,7 +166,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
     # For each column of the table (# of NULL) perform a request using
     # the UNION ALL SELECT statement to test it the target url is
-    # affected by an exploitable inband SQL injection vulnerability
+    # affected by an exploitable union SQL injection vulnerability
     for position in positions:
         # Prepare expression with delimiters
         randQuery = randomStr(UNION_MIN_RESPONSE_CHARS)
@@ -174,8 +174,8 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
         randQueryUnescaped = unescaper.unescape(randQueryProcessed)
 
-        # Forge the inband SQL injection request
-        query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
+        # Forge the union SQL injection request
+        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
         # Perform the request
@@ -196,8 +196,8 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
                 randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
 
-                # Confirm that it is a full inband SQL injection
-                query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
+                # Confirm that it is a full union SQL injection
+                query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
                 payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                 # Perform the request
@@ -210,7 +210,7 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
                     fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
 
                     # Check for limited row output
-                    query = agent.forgeInbandQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
+                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
                     payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                     # Perform the request
@@ -239,11 +239,11 @@ def __unionConfirm(comment, place, parameter, prefix, suffix, count):
     validPayload = None
     vector = None
 
-    # Confirm the inband SQL injection and get the exact column
+    # Confirm the union SQL injection and get the exact column
     # position which can be used to extract data
     validPayload, vector = __unionPosition(comment, place, parameter, prefix, suffix, count)
 
-    # Assure that the above function found the exploitable full inband
+    # Assure that the above function found the exploitable full union
     # SQL injection position
     if not validPayload:
         validPayload, vector = __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
@@ -252,7 +252,7 @@ def __unionConfirm(comment, place, parameter, prefix, suffix, count):
 
 def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
     """
-    This method tests if the target url is affected by an inband
+    This method tests if the target url is affected by an union
     SQL injection vulnerability. The test is done up to 50 columns
     on the target database table
     """
@@ -297,7 +297,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
 
 def unionTest(comment, place, parameter, value, prefix, suffix):
     """
-    This method tests if the target url is affected by an inband
+    This method tests if the target url is affected by an union
     SQL injection vulnerability. The test is done up to 3*50 times
     """
 

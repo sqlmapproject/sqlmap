@@ -561,7 +561,7 @@ class Agent:
 
         return concatenatedQuery
 
-    def forgeInbandQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None):
+    def forgeUnionQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -602,20 +602,20 @@ class Agent:
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, ):
                 limitOriginal = "%s " % (queries[Backend.getIdentifiedDbms()].limit.query % (0, 1))
 
-        inbandQuery = self.prefixQuery("%sUNION ALL SELECT " % limitOriginal, prefix=prefix)
+        unionQuery = self.prefixQuery("%sUNION ALL SELECT " % limitOriginal, prefix=prefix)
 
         if limited:
-            inbandQuery += ','.join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
-            inbandQuery += fromTable
-            inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
+            unionQuery += ','.join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
+            unionQuery += fromTable
+            unionQuery = self.suffixQuery(unionQuery, comment, suffix)
 
-            return inbandQuery
+            return unionQuery
 
         topNumRegex = re.search("\ATOP\s+([\d]+)\s+", query, re.I)
         if topNumRegex:
             topNum = topNumRegex.group(1)
             query = query[len("TOP %s " % topNum):]
-            inbandQuery += "TOP %s " % topNum
+            unionQuery += "TOP %s " % topNum
 
         intoRegExp = re.search("(\s+INTO (DUMP|OUT)FILE\s+\'(.+?)\')", query, re.I)
 
@@ -623,51 +623,51 @@ class Agent:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if fromTable and inbandQuery.endswith(fromTable):
-            inbandQuery = inbandQuery[:-len(fromTable)]
+        if fromTable and unionQuery.endswith(fromTable):
+            unionQuery = unionQuery[:-len(fromTable)]
 
         for element in xrange(0, count):
             if element > 0:
-                inbandQuery += ','
+                unionQuery += ','
 
             if element == position:
                 if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
                     conditionIndex = query.index(" FROM ")
-                    inbandQuery += query[:conditionIndex]
+                    unionQuery += query[:conditionIndex]
                 else:
-                    inbandQuery += query
+                    unionQuery += query
             else:
-                inbandQuery += char
+                unionQuery += char
 
         if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
             conditionIndex = query.index(" FROM ")
-            inbandQuery += query[conditionIndex:]
+            unionQuery += query[conditionIndex:]
 
         if fromTable:
-            if " FROM " not in inbandQuery or "(CASE " in inbandQuery or "(IIF" in inbandQuery:
-                inbandQuery += fromTable
+            if " FROM " not in unionQuery or "(CASE " in unionQuery or "(IIF" in unionQuery:
+                unionQuery += fromTable
 
         if intoRegExp:
-            inbandQuery += intoRegExp
+            unionQuery += intoRegExp
 
         if multipleUnions:
-            inbandQuery += " UNION ALL SELECT "
+            unionQuery += " UNION ALL SELECT "
 
             for element in xrange(count):
                 if element > 0:
-                    inbandQuery += ','
+                    unionQuery += ','
 
                 if element == position:
-                    inbandQuery += multipleUnions
+                    unionQuery += multipleUnions
                 else:
-                    inbandQuery += char
+                    unionQuery += char
 
             if fromTable:
-                inbandQuery += fromTable
+                unionQuery += fromTable
 
-        inbandQuery = self.suffixQuery(inbandQuery, comment, suffix)
+        unionQuery = self.suffixQuery(unionQuery, comment, suffix)
 
-        return inbandQuery
+        return unionQuery
 
     def limitQuery(self, num, query, field=None, uniqueField=None):
         """

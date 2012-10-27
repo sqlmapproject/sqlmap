@@ -347,9 +347,9 @@ def __goBooleanProxy(expression):
 
     return output
 
-def __goInband(expression, unpack=True, dump=False):
+def __goUnion(expression, unpack=True, dump=False):
     """
-    Retrieve the output of a SQL query taking advantage of an inband SQL
+    Retrieve the output of a SQL query taking advantage of an union SQL
     injection vulnerability on the affected parameter.
     """
 
@@ -360,12 +360,10 @@ def __goInband(expression, unpack=True, dump=False):
 
     return output
 
-def getValue(expression, blind=True, inband=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
+def getValue(expression, blind=True, union=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
     """
     Called each time sqlmap inject a SQL query on the SQL injection
-    affected parameter. It can call a function to retrieve the output
-    through inband SQL injection (if selected) and/or blind SQL injection
-    (if selected).
+    affected parameter.
     """
 
     kb.safeCharEncode = safeCharEncode
@@ -400,9 +398,9 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
                 query = query.replace("DISTINCT ", "")
 
             if not conf.forceDns:
-                if inband and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
+                if union and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                     kb.technique = PAYLOAD.TECHNIQUE.UNION
-                    value = __goInband(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
+                    value = __goUnion(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 

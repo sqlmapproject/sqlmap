@@ -1150,7 +1150,7 @@ def getLimitRange(count, dump=False, plusOne=False):
 
 def parseUnionPage(page):
     """
-    Returns resulting items from inband query inside provided page content
+    Returns resulting items from union query inside provided page content
     """
 
     if page is None:

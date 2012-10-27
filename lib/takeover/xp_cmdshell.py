@@ -213,12 +213,12 @@ class xp_cmdshell:
                 output = inject.getValue(query, resumeValue=False, blind=False, time=False)
             else:
                 output = []
-                count = inject.getValue("SELECT COUNT(*) FROM %s" % self.cmdTblName, resumeValue=False, inband=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue("SELECT COUNT(*) FROM %s" % self.cmdTblName, resumeValue=False, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if isNumPosStrValue(count):
                     for index in getLimitRange(count):
                         query = agent.limitQuery(index, query, self.tblField)
-                        output.append(inject.getValue(query, inband=False, error=False, resumeValue=False))
+                        output.append(inject.getValue(query, union=False, error=False, resumeValue=False))
 
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
