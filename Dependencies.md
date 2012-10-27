@@ -13,7 +13,7 @@ If you are willing to connect directly to a database server (switch `-d`), witho
 * Oracle: [python cx_Oracle](http://cx-oracle.sourceforge.net/)
 * PostgreSQL: [python-psycopg2](http://initd.org/psycopg/)
 * SQLite: [python-pysqlite2](http://pysqlite.googlecode.com/)
-* Sybase: [python-pymssql](http://pymssql.sourceforge.net/)
+* Sybase: [python-pymssql](http://code.google.com/p/pymssql/)
 
 If you plan to attack a web application behind NTLM authentication or use the sqlmap update functionality (switch `--update`) you need to install respectively [python-ntlm](http://code.google.com/p/python-ntlm/) and [python-svn](http://pysvn.tigris.org/) libraries respectively.
 
