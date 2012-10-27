@@ -224,9 +224,9 @@
 
 ## Output verbosity
 
-Switch: `-v`
+Option: `-v`
 
-This switch can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.
+This option can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.
 
 * **0**: Show only Python tracebacks, error and critical messages.
 * **1**: Show also information and warning messages.
@@ -244,24 +244,24 @@ At least one of these options has to be provided.
 
 ### Target URL
 
-Switch: `-u` or `--url`
+Option: `-u` or `--url`
 
 Run sqlmap against a single target URL. This switch requires an argument which is the target URL in the form `http(s)://targeturl[:port]/[...]`.
 
 ### Parse targets from Burp or WebScarab proxy logs
 
-Switch: `-l`
+Option: `-l`
 
 Rather than providing a single target URL, it is possible to test and inject against HTTP requests proxied through [Burp proxy](http://portswigger.net/suite/) or 
-[WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This switch requires an argument which is the proxy's HTTP requests log file.
+[WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This option requires an argument which is the proxy's HTTP requests log file.
 
 ### Load HTTP request from a file
 
-Switch: `-r`
+Option: `-r`
 
 One of the possibilities of sqlmap is loading of complete HTTP request from a textual file. That way you can skip usage of bunch of other options (e.g. setting of cookies, POSTed data, etc).
 
-Sample content of a HTTP request file provided as argument to this switch:
+Sample content of a HTTP request file provided as an argument to this option:
 
     POST /sqlmap/mysql/post_int.php HTTP/1.1
     Host: 192.168.136.131
@@ -271,7 +271,7 @@ Sample content of a HTTP request file provided as argument to this switch:
 
 ### Process Google dork results as target addresses
 
-Switch: `-g`
+Option: `-g`
 
 It is also possible to test and inject on `GET` parameters on the results of your Google dork.
 
@@ -279,7 +279,7 @@ This option makes sqlmap negotiate with the search engine its session cookie to 
 
 ### Load options from a configuration INI file
 
-Switch: `-c`
+Option: `-c`
 
 It is possible to pass user's options from a configuration INI file, an example is `sqlmap.conf`.
 
@@ -323,7 +323,7 @@ Note that also the HTTP `Cookie` header is tested against SQL injection if the `
 ### HTTP `User-Agent` header
 
 
-Switches: `--user-agent` and `--random-agent`
+Option and switch: `--user-agent` and `--random-agent`
 
 By default sqlmap performs HTTP requests with the following `User-Agent` header value:
 
@@ -343,7 +343,7 @@ Read below for details.
 
 ### HTTP `Referer` header
 
-Switch: `--referer`
+Option: `--referer`
 
 It is possible to fake the HTTP `Referer` header value. By default **no** HTTP `Referer` header is sent in HTTP requests if not explicitly set.
 
@@ -351,13 +351,13 @@ Note that also the HTTP `Referer` header is tested against SQL injection if the 
 
 ### Extra HTTP headers
 
-Switch: `--headers`
+Option: `--headers`
 
 It is possible to provide extra HTTP headers by setting the `--headers` switch. Each header must be separated by a newline and it is much easier to provide them from the configuration INI file. Have a look at the sample `sqlmap.conf` file for an example.
 
 ### HTTP protocol authentication
 
-Switches: `--auth-type` and `--auth-cred`
+Options: `--auth-type` and `--auth-cred`
 
 These options can be used to specify which HTTP protocol authentication the web server implements and the valid credentials to be used to perform all HTTP requests to the target application.
 
@@ -376,44 +376,44 @@ Example of valid syntax:
 
 ### HTTP protocol certificate authentication
 
-Switch: `--auth-cert`
+Option: `--auth-cert`
 
 This switch should be used in cases when the web server requires proper client-side certificate for authentication. Supplied values should be in the form: `key_file,cert_file`, where `key_file` should be the name of a PEM formatted file that contains your private key, while `cert_file` should be the name for a PEM formatted certificate chain file.
 
 ### HTTP(S) proxy
 
-Switches: `--proxy`, `--proxy-cred`, `--ignore-proxy` and `--tor`
+Options and switch: `--proxy`, `--proxy-cred`, `--ignore-proxy` and `--tor`
 
 It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) requests to the target URL. The syntax of HTTP(S) proxy value is `http://url:port`.
 
 If the HTTP(S) proxy requires authentication, you can provide the credentials in the format `username:password` to the
 `--proxy-cred` switch.
 
-If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained on the Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply providing the tool with the `--tor` switch instead of `--proxy`.
+If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained on the Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply providing the tool with the option `--tor` instead of `--proxy`.
 
-The switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
+Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
 
 ### Delay between each HTTP request
 
-Switch: `--delay`
+Option: `--delay`
 
 It is possible to specify a number of seconds to hold between each HTTP(S) request. The valid value is a float, for instance `0.5` means half a second. By default, no delay is set.
 
 ### Seconds to wait before timeout connection
 
-Switch: `--timeout`
+Option: `--timeout`
 
 It is possible to specify a number of seconds to wait before considering the HTTP(S) request timed out. The valid value is a float, for instance 10.5 means ten seconds and a half. By default **30 seconds** are set.
 
 ### Maximum number of retries when the HTTP connection timeouts
 
-Switch: `--retries`
+Option: `--retries`
 
 It is possible to specify the maximum number of retries when the HTTP(S) connection timeouts. By default it retries up to **three times**.
 
 ### Filtering targets from provided proxy log using regular expression
 
-Switch: `--scope`
+Option: `--scope`
 
 Rather than using all hosts parsed from provided logs with switch `-l`, you can specify valid Python regular expression to be used for filtering desired ones.
 
@@ -423,11 +423,11 @@ Example of valid syntax:
 
 ### Avoid your session to be destroyed after too many unsuccessful requests
 
-Switches: `--safe-url` and `--safe-freq`
+Options: `--safe-url` and `--safe-freq`
 
 Sometimes web applications or inspection technology in between destroys the session if a certain number of unsuccessful requests is performed. This might occur during the detection phase of sqlmap or when it exploits any of the blind SQL injection types. Reason why is that the SQL payload does not necessarily returns output and might therefore raise a signal to either the application session management or the inspection technology.
 
-To bypass this limitation set by the target, you can provide two switches:
+To bypass this limitation set by the target, you can provide two options:
 
 * `--safe-url`: Url address to visit frequently during testing.
 * `--safe-freq`: Test requests between two visits to a given safe url.
@@ -442,7 +442,7 @@ These switches can be used to optimize the performance of sqlmap.
 
 Switch: `-o`
 
-This switch is an alias that implicitly sets the following switches:
+This switch is an alias that implicitly sets the following options and switches:
 
 * `--keep-alive`
 * `--null-connection`
@@ -496,7 +496,7 @@ These options can be used to specify which parameters to test for, provide custo
 
 ### Testable parameter(s)
 
-Switch: `-p`
+Option: `-p`
 
 By default sqlmap tests all `GET` parameters and `POST` parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on the value of `--level` too. 
 
@@ -514,7 +514,7 @@ An example of valid command line would be:
 
 ### Force the database management system name
 
-Switch: `--dbms`
+Option: `--dbms`
 
 By default sqlmap automatically detects the web application's back-end database management system. As of version **0.9**, sqlmap fully supports the following database management systems: 
 
@@ -536,7 +536,7 @@ Note that this option is **not** mandatory and it is strongly recommended to use
 
 ### Force the database management system operating system name
 
-Switch: `--os`
+Option: `--os`
 
 By default sqlmap automatically detects the web application's back-end database management system underlying operating system when this information is a dependence of any other provided switch. At the moment the fully supported operating systems are two:
 
@@ -549,7 +549,7 @@ Note that this option is **not** mandatory and it is strongly recommended to use
 
 ### Custom injection payload
 
-Switches: `--prefix` and `--suffix`
+Options: `--prefix` and `--suffix`
 
 In some circumstances the vulnerable parameter is exploitable only if the user provides a specific suffix to be appended to the injection payload. Another scenario where these options come handy presents itself when the user already knows that query syntax and want to detect and exploit the SQL injection by directly providing a injection payload prefix and suffix. 
 
@@ -575,7 +575,7 @@ In this simple example, sqlmap could detect the SQL injection and exploit it wit
 
 ### Tamper injection data
 
-Switch: `--tamper`
+Option: `--tamper`
 
 sqlmap itself does no obfuscation of the payload sent, except for strings between single quotes replaced by their `CHAR()`-alike representation. 
 
@@ -639,7 +639,7 @@ content from HTTP responses when using blind SQL injection technique.
 
 ### Level
 
-Switch: `--level`
+Option: `--level`
 
 This switch requires an argument which specifies the level of tests to perform. There are **five** levels. The default value is **1** where limited number of tests (requests) are performed. Vice versa, level **5** will test verbosely for a much larger number of payloads and boundaries (as in pair of SQL payload prefix and suffix). The payloads used by sqlmap are specified in the textual file `xml/payloads.xml`. Following the instructions on top of the file, if sqlmap misses an injection, you should be able to add your own payload(s) to test for too!
 
@@ -651,7 +651,7 @@ It is strongly recommended to higher this value before reporting to the mailing 
 
 ### Risk
 
-Switch: `--risk`
+Option: `--risk`
 
 This switch requires an argument which specifies the risk of tests to perform. There are **four** risk values. The default value is **1** which is innocuous for the majority of SQL injection points. Risk value 2 adds to the default level the tests for heavy query time-based SQL injections and value 3 adds also `OR`-based SQL injection tests.
 
@@ -659,7 +659,7 @@ In some instances, like a SQL injection in an `UPDATE` statement, injecting an `
 
 ### Page comparison
 
-Switches: `--string`, `--regexp` and `--text-only`
+Options and switch: `--string`, `--regexp` and `--text-only`
 
 By default the distinction of a `True` query by a `False` one (rough concept behind boolean-based blind SQL injection vulnerabilities) is done by comparing the injected requests page content with the original not injected page content.
 Not always this concept works because sometimes the page content changes at each refresh even not injecting anything, for instance when the page has a counter, a dynamic advertisement banner or any other part of the HTML which is rendered dynamically and might change in time not only consequently to user's input. To bypass this limit, sqlmap tries hard to identify these snippets of the response bodies and deal accordingly. Sometimes it may fail, that is why the user can provide a string (`--string` switch) which is **always** present on the not injected page **and** on all True injected query pages, but that it is **not** on the False ones. As an alternative to a static string, the user can provide a regular expression (`--regexp` switch).
@@ -674,7 +674,7 @@ These options can be used to tweak testing of specific SQL injection techniques.
 
 ### SQL injection techniques to test for
 
-Switch: `--technique`
+Option: `--technique`
 
 This switch can be used to specify which SQL injection type to test for. By default sqlmap tests for **all** types/techniques it supports.
 
@@ -694,13 +694,13 @@ Note that the string must include stacked queries technique letter, `S`, when yo
 
 ### Seconds to delay the DBMS response for time-based blind SQL injection
 
-Switch: `--time-sec`
+Option: `--time-sec`
 
 It is possible to set the seconds to delay the response when testing for time-based blind SQL injection, by providing the `--time-sec` option followed by an integer. By default delay is set to **5 seconds**. 
 
 ### Number of columns in UNION query SQL injection
 
-Switch: `--union-cols`
+Option: `--union-cols`
 
 By default sqlmap tests for UNION query SQL injection technique using 1 to 10 columns. However, this range can be increased up to 50 columns by providing an higher `--level` value. See the relevant paragraph for details. 
 
@@ -708,11 +708,11 @@ You can manually tell sqlmap to test for this type of SQL injection with a speci
 
 ### Character to use to test for UNION query SQL injection
 
-Switch: `--union-char`
+Option: `--union-char`
 
 By default sqlmap tests for UNION query SQL injection technique using `NULL` character. However, by providing an higher `--level` value sqlmap will performs tests also with a random number because there are some corner cases where UNION query tests with `NULL` fail whereas with a random integer they succeed.
 
-You can manually tell sqlmap to test for this type of SQL injection with a specific character by providing the tool with the `--union-char` switch followed by a string.
+You can manually tell sqlmap to test for this type of SQL injection with a specific character by providing the tool with the option `--union-char` followed by a string.
 
 ## Fingerprint
 
@@ -839,7 +839,7 @@ Note that on Oracle you have to provide the `TABLESPACE_NAME` instead of the dat
 
 ### Enumerate database table columns
 
-Switches: `--columns`, `-C`, `-T` and `-D`
+Switch and options: `--columns`, `-C`, `-T` and `-D`
 
 When the session user has read access to the system table containing information about database's tables, it is possible to enumerate the list of columns for a specific database table. sqlmap also enumerates the data-type for each column. 
 
@@ -866,19 +866,19 @@ Note that on PostgreSQL you have to provide `public` or the name of a system dat
 
 ### Enumerate database management system schema
 
-Switches: `--schema`
+Switch: `--schema`
 
 [TODO]
 
 ### Retrieve number of entries for table(s)
 
-Switches: `--count`
+Switch: `--count`
 
 [TODO]
 
 ### Dump database table entries
 
-Switches: `--dump`, `-C`, `-T`, `-D`, `--start`, `--stop`, `--first` and `--last`
+Switch and options: `--dump`, `-C`, `-T`, `-D`, `--start`, `--stop`, `--first` and `--last`
 
 When the session user has read access to a specific database's table it is possible to dump the table entries.
 
@@ -924,13 +924,13 @@ Note that on Microsoft SQL Server the `master` database is not considered a syst
 
 ### Search for columns, tables or databases
 
-Switches: `--search`, `-C`, `-T`, `-D`
+Switch and options: `--search`, `-C`, `-T`, `-D`
 
 This switch allows you to **search for specific database names, specific tables across all databases or specific columns across all databases' tables**. 
 
 This is useful, for instance, to identify tables containing custom application credentials where relevant columns' names contain string like _name_ and _pass_.
 
-The switch `--search` needs to be used in conjunction with one of the following support switches:
+Switch `--search` needs to be used in conjunction with one of the following support switches:
 
 * `-C` following a list of comma-separated column names to look for across the whole database management system.
 * `-T` following a list of comma-separated table names to look for across the whole database management system.
@@ -938,7 +938,7 @@ The switch `--search` needs to be used in conjunction with one of the following 
 
 ### Run custom SQL statement
 
-Switches: `--sql-query` and `--sql-shell`
+Option and switch: `--sql-query` and `--sql-shell`
 
 The SQL query and the SQL shell features allow to run arbitrary SQL statements on the database management system. sqlmap automatically dissects the provided statement, determines which technique is appropriate to use to inject it and how to pack the SQL payload accordingly. 
 
@@ -983,7 +983,7 @@ These options can be used to run brute force checks.
 
 ### Brute force tables names
 
-Switches: `--common-tables`
+Switch: `--common-tables`
 
 There are cases where `--tables` switch can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
 
@@ -1025,7 +1025,7 @@ Example against a MySQL 4.1 target:
 
 ### Brute force columns names
 
-Switches: `--common-columns`
+Switch: `--common-columns`
 
 As per tables, there are cases where `--columns` switch can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
 
@@ -1044,13 +1044,13 @@ These options can be used to create custom user-defined functions.
 
 ### Inject custom user-defined functions (UDF)
 
-Switches: `--udf-inject` and `--shared-lib`
+Options: `--udf-inject` and `--shared-lib`
 
 You can inject your own user-defined functions (UDFs) by compiling a MySQL or PostgreSQL shared library, DLL for Windows and shared object for Linux/Unix, then provide sqlmap with the path where the shared library is stored locally on your machine. sqlmap will then ask you some questions, upload the shared library on the database server file system, create the user-defined function(s) from it and, depending on your options, execute them. When you are finished using the injected UDFs, sqlmap can also remove them from the database for you. 
 
 These techniques are detailed in the white paper [Advanced SQL injection to operating system full control](http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-full-control-whitepaper-4633857).
 
-Use switch `--udf-inject` and follow the instructions.
+Use option `--udf-inject` and follow the instructions.
 
 If you want, you can specify the shared library local file system path via command line too by using `--shared-lib` option. Vice versa sqlmap will ask you for the path at runtime.
 
@@ -1060,7 +1060,7 @@ This feature is available only when the database management system is MySQL or P
 
 ### Read a file from the database server's file system
 
-Switch: `--file-read`
+Option: `--file-read`
 
 It is possible to retrieve the content of files from the underlying file system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. The file specified can be either a textual or a binary file. sqlmap will handle it properly. 
 
@@ -1091,7 +1091,7 @@ Example against a Microsoft SQL Server 2005 target to retrieve a binary file:
 
 ### Upload a file to the database server's file system
 
-Switches: `--file-write` and `--file-dest`
+Options: `--file-write` and `--file-dest`
 
 It is possible to upload a local file to the database server's file system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. The file specified can be either a textual or a binary file. sqlmap will handle it properly. 
 
@@ -1125,7 +1125,7 @@ Example against a MySQL target to upload a binary UPX-compressed file:
 
 ### Run arbitrary operating system command
 
-Switches: `--os-cmd` and `--os-shell`
+Option and switch: `--os-cmd` and `--os-shell`
 
 It is possible to **run arbitrary commands on the database server's underlying operating system** when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses.
 
@@ -1172,7 +1172,7 @@ Where stacked queries has not been identified on the web application (e.g. PHP o
 
 ### Out-of-band stateful connection: Meterpreter & friends
 
-Switches: `--os-pwn`, `--os-smbrelay`, `--os-bof`, `--priv-esc`, `--msf-path` and `--tmp-path`
+Options and switches: `--os-pwn`, `--os-smbrelay`, `--os-bof`, `--priv-esc`, `--msf-path` and `--tmp-path`
 
 It is possible to establish an **out-of-band stateful TCP connection between the attacker machine and the database server** underlying operating system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. This channel can be an interactive command prompt, a Meterpreter session or a graphical user interface (VNC) session as per user's choice. 
 
@@ -1303,25 +1303,25 @@ It is possible to provide sqlmap with the `--priv-esc` switch to perform a **dat
 It is possible to access Windows registry when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and when the web application supports stacked queries. Also, session user has to have the needed privileges to access it. 
 ### Read a Windows registry key value
 
-Switch: `--reg-read`
+Option: `--reg-read`
 
 Using this option you can read registry key values.
 
 ### Write a Windows registry key value
 
-Switch: `--reg-add`
+Option: `--reg-add`
 
 Using this option you can write registry key values.
 
 ### Delete a Windows registry key
 
-Switch: `--reg-del`
+Option: `--reg-del`
 
 Using this option you can delete registry keys.
 
 ### Auxiliary registry switches
 
-Switches: `--reg-key`, `--reg-value`, `--reg-data` and `--reg-type`
+Options: `--reg-key`, `--reg-value`, `--reg-data` and `--reg-type`
 
 These switches can be used to provide data needed for proper running of options `--reg-read`, `--reg-add` and  `--reg-del`. So, instead of providing registry key information when asked, you can use them at command prompt as program arguments. 
 
@@ -1336,7 +1336,7 @@ A sample command line for adding a registry key hive follows:
 
 ### Log HTTP(s) traffic to a textual file
 
-Switch: `-t`
+Option: `-t`
 
 This switch requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap - HTTP(s) requests and HTTP(s) responses. 
 
@@ -1344,7 +1344,7 @@ This is useful primarily for debug purposes.
 
 ### Flush session files
 
-Switch: `--flush-session`
+Option: `--flush-session`
 
 As you are already familiar with the concept of a session file from the description above, it is good to know that you can flush the content of that file using option `--flush-session`. This way you can avoid the caching mechanisms implemented by default in sqlmap. Other possible way is to manually remove the session file(s). 
 
@@ -1430,7 +1430,7 @@ Provide sqlmap with `--forms` as well as the page where the form can be found as
 
 ### Use Google dork results from specified page number
 
-Switch: `--gpage`
+Option: `--gpage`
 
 Default sqlmap behavior with option `-g` is to do a Google search and use the first 100 resulting URLs for further SQL injection testing. However, in combination with this option you can specify with this switch, `--gpage`, some page other than the first one to retrieve target URLs from. 
 
