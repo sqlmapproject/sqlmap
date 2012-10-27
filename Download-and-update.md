@@ -10,6 +10,6 @@ You can update it at any time to the latest development version by running:
 
     python sqlmap.py --update
 
-Or:
+or:
 
     git pull
