@@ -92,7 +92,7 @@ You can provide sqlmap with the following switch:
 
     --no-cast           Turn off payload casting mechanism
 
-However, on the other hand you might lose the benefits provided by these switch in the default configuration.
+However, on the other hand you might lose the benefits provided by this switch in the default configuration.
 
 ## What does `WARNING unknown charset '...'` mean?
 
