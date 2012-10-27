@@ -446,7 +446,7 @@ This switch is an alias that implicitly sets the following options and switches:
 
 * `--keep-alive`
 * `--null-connection`
-* `--threads 3` if not set to a higher value.
+* `--threads=3` if not set to a higher value.
 
 
 Read below for details about each switch.
@@ -475,7 +475,7 @@ There are special HTTP request types which can be used to retrieve HTTP response
 
 These techniques are detailed in the white paper [Bursting Performances in Blind SQL Injection - Take 2 (Bandwidth)](http://www.wisec.it/sectou.php?id=472f952d79293).
 
-Note that this switch is incompatible with `--text-only` switch.
+Note that this switch is incompatible with switch `--text-only`.
 
 ### Concurrent HTTP(S) requests
 
@@ -512,7 +512,7 @@ An example of valid command line would be:
 
     $ python sqlmap.py -u "http://targeturl/param1/value1*/param2/value2/"
 
-### Force the database management system name
+### Force the DBMS
 
 Option: `--dbms`
 
@@ -682,11 +682,11 @@ In certain situations you may want to test only for one or few specific types of
 
 This switch requires an argument. Such argument is a string composed by any combination of `B`, `E`, `U`, `S` and `T` characters where each letter stands for a different technique: 
 
-* `B`: Boolean-based blind SQL injection
-* `E`: Error-based SQL injection
-* `U`: UNION query SQL injection
-* `S`: Stacked queries SQL injection
-* `T`: Time-based blind SQL injection
+* `B`: Boolean-based blind
+* `E`: Error-based
+* `U`: Union query-based
+* `S`: Stacked queries
+* `T`: Time-based blind
 
 For instance, you can provide `ES` if you want to test for and exploit error-based and stacked queries SQL injection types only. The default value is `BEUST`. 
 
@@ -696,13 +696,13 @@ Note that the string must include stacked queries technique letter, `S`, when yo
 
 Option: `--time-sec`
 
-It is possible to set the seconds to delay the response when testing for time-based blind SQL injection, by providing the `--time-sec` option followed by an integer. By default delay is set to **5 seconds**. 
+It is possible to set the seconds to delay the response when testing for time-based blind SQL injection, by providing the `--time-sec` option followed by an integer. By default it's value is set to **5 seconds**. 
 
 ### Number of columns in UNION query SQL injection
 
 Option: `--union-cols`
 
-By default sqlmap tests for UNION query SQL injection technique using 1 to 10 columns. However, this range can be increased up to 50 columns by providing an higher `--level` value. See the relevant paragraph for details. 
+By default sqlmap tests for UNION query SQL injection technique using 1 to 10 columns. However, this range can be increased up to 50 columns by providing an higher `--level` value. See the relevant paragraph for more details. 
 
 You can manually tell sqlmap to test for this type of SQL injection with a specific range of columns by providing the tool with the `--union-cols` switch followed by a range of integers. For instance, `12-16` means tests for UNION query SQL injection by using 12 up to 16 columns. 
 
