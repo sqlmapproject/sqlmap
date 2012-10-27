@@ -427,6 +427,8 @@ class Backend:
             dbms = conf.dbms
         elif len(Backend.getErrorParsedDBMSes()) > 0:
             dbms = Backend.getErrorParsedDBMSes()[0]
+        elif kb.injection.dbms:
+            dbms = unArrayizeValue(kb.injection.dbms)
 
         return aliasToDbmsEnum(dbms)
 

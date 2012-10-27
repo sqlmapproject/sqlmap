@@ -491,8 +491,9 @@ def checkSqlInjection(place, parameter, value):
                         if hasattr(test, "details"):
                             for dKey, dValue in test.details.items():
                                 if dKey == "dbms":
+                                    injection.dbms = dValue
                                     if not isinstance(dValue, list):
-                                        injection.dbms = Backend.setDbms(dValue)
+                                        Backend.setDbms(dValue)
                                     else:
                                         Backend.forceDbms(dValue[0], True)
                                 elif dKey == "dbms_version" and injection.dbms_version is None and not conf.testFilter:
