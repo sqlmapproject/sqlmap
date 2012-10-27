@@ -425,8 +425,8 @@ class Backend:
             dbms = kb.dbms
         elif conf.get('dbms'):
             dbms = conf.dbms
-        elif len(Backend.getErrorParsedDBMSes()) > 0:
-            dbms = Backend.getErrorParsedDBMSes()[0]
+        elif Backend.getErrorParsedDBMSes():
+            dbms = unArrayizeValue(Backend.getErrorParsedDBMSes())
         elif kb.injection.dbms:
             dbms = unArrayizeValue(kb.injection.dbms)
 
