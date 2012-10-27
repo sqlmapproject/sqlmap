@@ -147,7 +147,7 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            retVal = pivotDumpTable(table, colList, blind=False, time=False)
+                            retVal = pivotDumpTable(table, colList, blind=False)
 
                             if retVal:
                                 entries, _ = retVal

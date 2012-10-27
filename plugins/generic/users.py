@@ -182,7 +182,7 @@ class Users:
                 randStr = randomStr()
                 getCurrentThreadData().disableStdOut = True
 
-                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False, time=False)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.password' % randStr], blind=False)
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
