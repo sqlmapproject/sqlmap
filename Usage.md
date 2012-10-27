@@ -1,223 +1,226 @@
 # Usage
 
-    Usage: python sqlmap.py [options]
+Usage: python sqlmap.py [options]
 
-    Options:
-      -h, --help            Show basic help message and exit
-      -hh                   Show advanced help message and exit
-      -v VERBOSE            Verbosity level: 0-6 (default 1)
+Options:
+  -h, --help            Show basic help message and exit
+  -hh                   Show advanced help message and exit
+  -v VERBOSE            Verbosity level: 0-6 (default 1)
 
-      Target:
-        At least one of these options has to be specified to set the source to
-        get target urls from
+  Target:
+    At least one of these options has to be specified to set the source to
+    get target urls from
 
-        -d DIRECT           Direct connection to the database
-        -u URL, --url=URL   Target url
-        -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
-        -m BULKFILE         Scan multiple targets enlisted in a given textual file
-        -r REQUESTFILE      Load HTTP request from a file
-        -g GOOGLEDORK       Process Google dork results as target urls
-        -c CONFIGFILE       Load options from a configuration INI file
+    -d DIRECT           Direct connection to the database
+    -u URL, --url=URL   Target url
+    -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
+    -m BULKFILE         Scan multiple targets enlisted in a given textual file
+    -r REQUESTFILE      Load HTTP request from a file
+    -g GOOGLEDORK       Process Google dork results as target urls
+    -c CONFIGFILE       Load options from a configuration INI file
 
-      Request:
-        These options can be used to specify how to connect to the target url
+  Request:
+    These options can be used to specify how to connect to the target url
 
-        --data=DATA         Data string to be sent through POST
-        --param-del=PDEL    Character used for splitting parameter values
-        --cookie=COOKIE     HTTP Cookie header
-        --load-cookies=LOC  File containing cookies in Netscape/wget format
-        --cookie-urlencode  URL Encode generated cookie injections
-        --drop-set-cookie   Ignore Set-Cookie header from response
-        --user-agent=AGENT  HTTP User-Agent header
-        --random-agent      Use randomly selected HTTP User-Agent header
-        --randomize=RPARAM  Randomly change value for given parameter(s)
-        --force-ssl         Force usage of SSL/HTTPS requests
-        --host=HOST         HTTP Host header
-        --referer=REFERER   HTTP Referer header
-        --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
-        --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
-        --auth-cred=ACRED   HTTP authentication credentials (name:password)
-        --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
-        --proxy=PROXY       Use a HTTP proxy to connect to the target url
-        --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
-        --ignore-proxy      Ignore system default HTTP proxy
-        --delay=DELAY       Delay in seconds between each HTTP request
-        --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
-        --retries=RETRIES   Retries when the connection timeouts (default 3)
-        --scope=SCOPE       Regexp to filter targets from provided proxy log
-        --safe-url=SAFURL   Url address to visit frequently during testing
-        --safe-freq=SAFREQ  Test requests between two visits to a given safe url
-        --skip-urlencode    Skip URL encoding of payload data
-        --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
-                            "import hashlib;id2=hashlib.md5(id).hexdigest()")
+    --data=DATA         Data string to be sent through POST
+    --param-del=PDEL    Character used for splitting parameter values
+    --cookie=COOKIE     HTTP Cookie header
+    --load-cookies=L..  File containing cookies in Netscape/wget format
+    --drop-set-cookie   Ignore Set-Cookie header from response
+    --user-agent=AGENT  HTTP User-Agent header
+    --random-agent      Use randomly selected HTTP User-Agent header
+    --randomize=RPARAM  Randomly change value for given parameter(s)
+    --force-ssl         Force usage of SSL/HTTPS requests
+    --host=HOST         HTTP Host header
+    --referer=REFERER   HTTP Referer header
+    --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
+    --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
+    --auth-cred=ACRED   HTTP authentication credentials (name:password)
+    --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
+    --proxy=PROXY       Use a HTTP proxy to connect to the target url
+    --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
+    --ignore-proxy      Ignore system default HTTP proxy
+    --delay=DELAY       Delay in seconds between each HTTP request
+    --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
+    --retries=RETRIES   Retries when the connection timeouts (default 3)
+    --scope=SCOPE       Regexp to filter targets from provided proxy log
+    --safe-url=SAFURL   Url address to visit frequently during testing
+    --safe-freq=SAFREQ  Test requests between two visits to a given safe url
+    --skip-urlencode    Skip URL encoding of payload data
+    --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
+                        "import hashlib;id2=hashlib.md5(id).hexdigest()")
 
-      Optimization:
-        These options can be used to optimize the performance of sqlmap
+  Optimization:
+    These options can be used to optimize the performance of sqlmap
 
-        -o                  Turn on all optimization switches
-        --predict-output    Predict common queries output
-        --keep-alive        Use persistent HTTP(s) connections
-        --null-connection   Retrieve page length without actual HTTP response body
-        --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
+    -o                  Turn on all optimization switches
+    --predict-output    Predict common queries output
+    --keep-alive        Use persistent HTTP(s) connections
+    --null-connection   Retrieve page length without actual HTTP response body
+    --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
 
-      Injection:
-        These options can be used to specify which parameters to test for,
-        provide custom injection payloads and optional tampering scripts
+  Injection:
+    These options can be used to specify which parameters to test for,
+    provide custom injection payloads and optional tampering scripts
 
-        -p TESTPARAMETER    Testable parameter(s)
-        --dbms=DBMS         Force back-end DBMS to this value
-        --os=OS             Force back-end DBMS operating system to this value
-        --invalid-bignum    Use big numbers for invalidating values
-        --invalid-logical   Use logical operations for invalidating values
-        --no-cast           Turn off payload casting mechanism
-        --no-unescape       Turn off string unescaping mechanism
-        --prefix=PREFIX     Injection payload prefix string
-        --suffix=SUFFIX     Injection payload suffix string
-        --skip=SKIP         Skip testing for given parameter(s)
-        --tamper=TAMPER     Use given script(s) for tampering injection data
+    -p TESTPARAMETER    Testable parameter(s)
+    --dbms=DBMS         Force back-end DBMS to this value
+    --os=OS             Force back-end DBMS operating system to this value
+    --invalid-bignum    Use big numbers for invalidating values
+    --invalid-logical   Use logical operations for invalidating values
+    --no-cast           Turn off payload casting mechanism
+    --no-unescape       Turn off string unescaping mechanism
+    --prefix=PREFIX     Injection payload prefix string
+    --suffix=SUFFIX     Injection payload suffix string
+    --skip=SKIP         Skip testing for given parameter(s)
+    --tamper=TAMPER     Use given script(s) for tampering injection data
 
-      Detection:
-        These options can be used to specify how to parse and compare page
-        content from HTTP responses when using blind SQL injection technique
+  Detection:
+    These options can be used to specify how to parse and compare page
+    content from HTTP responses when using blind SQL injection technique
 
-        --level=LEVEL       Level of tests to perform (1-5, default 1)
-        --risk=RISK         Risk of tests to perform (0-3, default 1)
-        --string=STRING     String to match when query is evaluated to True
-        --regexp=REGEXP     Regexp to match when query is evaluated to True
-        --code=CODE         HTTP code to match when query is evaluated to True
-        --text-only         Compare pages based only on the textual content
-        --titles            Compare pages based only on their titles
+    --level=LEVEL       Level of tests to perform (1-5, default 1)
+    --risk=RISK         Risk of tests to perform (0-3, default 1)
+    --string=STRING     String to match when query is evaluated to True
+    --not-string=NOT..  String to match when query is evaluated to False
+    --regexp=REGEXP     Regexp to match when query is evaluated to True
+    --code=CODE         HTTP code to match when query is evaluated to True
+    --text-only         Compare pages based only on the textual content
+    --titles            Compare pages based only on their titles
 
-      Techniques:
-        These options can be used to tweak testing of specific SQL injection
-        techniques
+  Techniques:
+    These options can be used to tweak testing of specific SQL injection
+    techniques
 
-        --technique=TECH    SQL injection techniques to test for (default "BEUST")
-        --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
-        --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
-        --union-char=UCHAR  Character to use for bruteforcing number of columns
-        --dns-domain=DNAME  Domain name used for DNS exfiltration attack
+    --technique=TECH    SQL injection techniques to test for (default "BEUST")
+    --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
+    --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
+    --union-char=UCHAR  Character to use for bruteforcing number of columns
+    --dns-domain=DNS..  Domain name used for DNS exfiltration attack
+    --second-order=S..  Resulting page url searched for second-order response
 
-      Fingerprint:
-        -f, --fingerprint   Perform an extensive DBMS version fingerprint
+  Fingerprint:
+    -f, --fingerprint   Perform an extensive DBMS version fingerprint
 
-      Enumeration:
-        These options can be used to enumerate the back-end database
-        management system information, structure and data contained in the
-        tables. Moreover you can run your own SQL statements
+  Enumeration:
+    These options can be used to enumerate the back-end database
+    management system information, structure and data contained in the
+    tables. Moreover you can run your own SQL statements
 
-        -b, --banner        Retrieve DBMS banner
-        --current-user      Retrieve DBMS current user
-        --current-db        Retrieve DBMS current database
-        --hostname          Retrieve DBMS server hostname
-        --is-dba            Detect if the DBMS current user is DBA
-        --users             Enumerate DBMS users
-        --passwords         Enumerate DBMS users password hashes
-        --privileges        Enumerate DBMS users privileges
-        --roles             Enumerate DBMS users roles
-        --dbs               Enumerate DBMS databases
-        --tables            Enumerate DBMS database tables
-        --columns           Enumerate DBMS database table columns
-        --schema            Enumerate DBMS schema
-        --count             Retrieve number of entries for table(s)
-        --dump              Dump DBMS database table entries
-        --dump-all          Dump all DBMS databases tables entries
-        --search            Search column(s), table(s) and/or database name(s)
-        -D DB               DBMS database to enumerate
-        -T TBL              DBMS database table to enumerate
-        -C COL              DBMS database table column to enumerate
-        -U USER             DBMS user to enumerate
-        --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
-        --start=LIMITSTART  First query output entry to retrieve
-        --stop=LIMITSTOP    Last query output entry to retrieve
-        --first=FIRSTCHAR   First query output word character to retrieve
-        --last=LASTCHAR     Last query output word character to retrieve
-        --sql-query=QUERY   SQL statement to be executed
-        --sql-shell         Prompt for an interactive SQL shell
-        --sql-file=SQLFILE  Execute SQL statements from given file(s)
+    -a, --all           Retrieve everything
+    -b, --banner        Retrieve DBMS banner
+    --current-user      Retrieve DBMS current user
+    --current-db        Retrieve DBMS current database
+    --hostname          Retrieve DBMS server hostname
+    --is-dba            Detect if the DBMS current user is DBA
+    --users             Enumerate DBMS users
+    --passwords         Enumerate DBMS users password hashes
+    --privileges        Enumerate DBMS users privileges
+    --roles             Enumerate DBMS users roles
+    --dbs               Enumerate DBMS databases
+    --tables            Enumerate DBMS database tables
+    --columns           Enumerate DBMS database table columns
+    --schema            Enumerate DBMS schema
+    --count             Retrieve number of entries for table(s)
+    --dump              Dump DBMS database table entries
+    --dump-all          Dump all DBMS databases tables entries
+    --search            Search column(s), table(s) and/or database name(s)
+    -D DB               DBMS database to enumerate
+    -T TBL              DBMS database table to enumerate
+    -C COL              DBMS database table column to enumerate
+    -U USER             DBMS user to enumerate
+    --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
+    --start=LIMITSTART  First query output entry to retrieve
+    --stop=LIMITSTOP    Last query output entry to retrieve
+    --first=FIRSTCHAR   First query output word character to retrieve
+    --last=LASTCHAR     Last query output word character to retrieve
+    --sql-query=QUERY   SQL statement to be executed
+    --sql-shell         Prompt for an interactive SQL shell
+    --sql-file=SQLFILE  Execute SQL statements from given file(s)
 
-      Brute force:
-        These options can be used to run brute force checks
+  Brute force:
+    These options can be used to run brute force checks
 
-        --common-tables     Check existence of common tables
-        --common-columns    Check existence of common columns
+    --common-tables     Check existence of common tables
+    --common-columns    Check existence of common columns
 
-      User-defined function injection:
-        These options can be used to create custom user-defined functions
+  User-defined function injection:
+    These options can be used to create custom user-defined functions
 
-        --udf-inject        Inject custom user-defined functions
-        --shared-lib=SHLIB  Local path of the shared library
+    --udf-inject        Inject custom user-defined functions
+    --shared-lib=SHLIB  Local path of the shared library
 
-      File system access:
-        These options can be used to access the back-end database management
-        system underlying file system
+  File system access:
+    These options can be used to access the back-end database management
+    system underlying file system
 
-        --file-read=RFILE   Read a file from the back-end DBMS file system
-        --file-write=WFILE  Write a local file on the back-end DBMS file system
-        --file-dest=DFILE   Back-end DBMS absolute filepath to write to
+    --file-read=RFILE   Read a file from the back-end DBMS file system
+    --file-write=WFILE  Write a local file on the back-end DBMS file system
+    --file-dest=DFILE   Back-end DBMS absolute filepath to write to
 
-      Operating system access:
-        These options can be used to access the back-end database management
-        system underlying operating system
+  Operating system access:
+    These options can be used to access the back-end database management
+    system underlying operating system
 
-        --os-cmd=OSCMD      Execute an operating system command
-        --os-shell          Prompt for an interactive operating system shell
-        --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
-        --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
-        --os-bof            Stored procedure buffer overflow exploitation
-        --priv-esc          Database process' user privilege escalation
-        --msf-path=MSFPATH  Local path where Metasploit Framework is installed
-        --tmp-path=TMPPATH  Remote absolute path of temporary files directory
+    --os-cmd=OSCMD      Execute an operating system command
+    --os-shell          Prompt for an interactive operating system shell
+    --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
+    --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
+    --os-bof            Stored procedure buffer overflow exploitation
+    --priv-esc          Database process' user privilege escalation
+    --msf-path=MSFPATH  Local path where Metasploit Framework is installed
+    --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
-      Windows registry access:
-        These options can be used to access the back-end database management
-        system Windows registry
+  Windows registry access:
+    These options can be used to access the back-end database management
+    system Windows registry
 
-        --reg-read          Read a Windows registry key value
-        --reg-add           Write a Windows registry key value data
-        --reg-del           Delete a Windows registry key value
-        --reg-key=REGKEY    Windows registry key
-        --reg-value=REGVAL  Windows registry key value
-        --reg-data=REGDATA  Windows registry key value data
-        --reg-type=REGTYPE  Windows registry key value type
+    --reg-read          Read a Windows registry key value
+    --reg-add           Write a Windows registry key value data
+    --reg-del           Delete a Windows registry key value
+    --reg-key=REGKEY    Windows registry key
+    --reg-value=REGVAL  Windows registry key value
+    --reg-data=REGDATA  Windows registry key value data
+    --reg-type=REGTYPE  Windows registry key value type
 
-      General:
-        These options can be used to set some general working parameters
+  General:
+    These options can be used to set some general working parameters
 
-        -t TRAFFICFILE      Log all HTTP traffic into a textual file
-        --batch             Never ask for user input, use the default behaviour
-        --charset=CHARSET   Force character encoding used for data retrieval
-        --check-tor         Check to see if Tor is used properly
-        --crawl=CRAWLDEPTH  Crawl the website starting from the target url
-        --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
-        --dbms-cred=DCRED   DBMS authentication credentials (user:password)
-        --eta               Display for each output the estimated time of arrival
-        --flush-session     Flush session files for current target
-        --forms             Parse and test forms on target url
-        --fresh-queries     Ignores query results stored in session file
-        --hex               Uses DBMS hex function(s) for data retrieval
-        --output-dir=ODIR   Custom output directory path
-        --parse-errors      Parse and display DBMS error messages from responses
-        --replicate         Replicate dumped data into a sqlite3 database
-        --save              Save options to a configuration INI file
-        --tor               Use Tor anonymity network
-        --tor-port=TORPORT  Set Tor proxy port other than default
-        --tor-type=TORTYPE  Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)
-        --update            Update sqlmap
+    -t TRAFFICFILE      Log all HTTP traffic into a textual file
+    --batch             Never ask for user input, use the default behaviour
+    --charset=CHARSET   Force character encoding used for data retrieval
+    --check-tor         Check to see if Tor is used properly
+    --crawl=CRAWLDEPTH  Crawl the website starting from the target url
+    --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
+    --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
+    --eta               Display for each output the estimated time of arrival
+    --flush-session     Flush session files for current target
+    --forms             Parse and test forms on target url
+    --fresh-queries     Ignores query results stored in session file
+    --hex               Uses DBMS hex function(s) for data retrieval
+    --output-dir=ODIR   Custom output directory path
+    --parse-errors      Parse and display DBMS error messages from responses
+    --replicate         Replicate dumped data into a sqlite3 database
+    --save              Save options to a configuration INI file
+    --tor               Use Tor anonymity network
+    --tor-port=TORPORT  Set Tor proxy port other than default
+    --tor-type=TORTYPE  Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)
+    --update            Update sqlmap
 
-      Miscellaneous:
-        -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
-        --check-payload     Offline WAF/IPS/IDS payload detection testing
-        --check-waf         Check for existence of WAF/IPS/IDS protection
-        --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
-        --dependencies      Check for missing sqlmap dependencies
-        --gpage=GOOGLEPAGE  Use Google dork results from specified page number
-        --mobile            Imitate smartphone through HTTP User-Agent header
-        --page-rank         Display page rank (PR) for Google dork results
-        --purge-output      Safely remove all content from output directory
-        --smart             Conduct through tests only if positive heuristic(s)
-        --test-filter=TSTF  Select tests by payloads and/or titles (e.g. ROW)
-        --wizard            Simple wizard interface for beginner users
+  Miscellaneous:
+    -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
+    --check-payload     Offline WAF/IPS/IDS payload detection testing
+    --check-waf         Check for existence of WAF/IPS/IDS protection
+    --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
+    --dependencies      Check for missing sqlmap dependencies
+    --disable-coloring  Disable console output coloring
+    --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+    --mobile            Imitate smartphone through HTTP User-Agent header
+    --page-rank         Display page rank (PR) for Google dork results
+    --purge-output      Safely remove all content from output directory
+    --smart             Conduct through tests only if positive heuristic(s)
+    --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
+    --wizard            Simple wizard interface for beginner users
 
 ## Output verbosity
 
