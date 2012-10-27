@@ -55,6 +55,7 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
+from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSHIN_MAX_VALUE_LENGTH
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND
@@ -670,7 +671,11 @@ def heuristicCheckSqlInjection(place, parameter):
         if conf.suffix:
             suffix = conf.suffix
 
-    payload = "%s%s%s" % (prefix, randomStr(length=10, alphabet=['"', '\'', ')', '(']), suffix)
+    randStr = ""
+    while '\'' not in randStr:
+        randStr = randomStr(length=10, alphabet=HEURISTIC_CHECK_ALPHABET)
+
+    payload = "%s%s%s" % (prefix, randStr, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 

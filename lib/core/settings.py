@@ -435,6 +435,9 @@ MAX_DNS_LABEL = 63
 # Alphabet used for prefix and suffix strings of name resolution requests in DNS technique (excluding hexadecimal chars for not mixing with inner content)
 DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.letters)
 
+# Alphabet used for heuristic checks
+HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', '[', ']', ',', '.')
+
 # Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 
