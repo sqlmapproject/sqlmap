@@ -367,7 +367,6 @@ def getValue(expression, blind=True, inband=True, error=True, time=True, fromUse
     through inband SQL injection (if selected) and/or blind SQL injection
     (if selected).
     """
-
     kb.safeCharEncode = safeCharEncode
     kb.resumeValues = resumeValue
 

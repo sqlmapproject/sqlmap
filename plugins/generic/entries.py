@@ -162,35 +162,34 @@ class Entries:
                     if not entries and query:
                         entries = inject.getValue(query, blind=False, time=False, dump=True)
 
-                    if isNoneValue(entries):
-                        entries = []
-                    elif isinstance(entries, basestring):
-                        entries = [entries]
-                    elif not isListLike(entries):
-                        entries = []
+                    if not isNoneValue(entries):
+                        if isinstance(entries, basestring):
+                            entries = [entries]
+                        elif not isListLike(entries):
+                            entries = []
 
-                    entriesCount = len(entries)
+                        entriesCount = len(entries)
 
-                    for index, column in enumerate(colList):
-                        if column not in kb.data.dumpedTable:
-                            kb.data.dumpedTable[column] = {"length": len(column), "values": BigArray()}
+                        for index, column in enumerate(colList):
+                            if column not in kb.data.dumpedTable:
+                                kb.data.dumpedTable[column] = {"length": len(column), "values": BigArray()}
 
-                        for entry in entries:
-                            if entry is None or len(entry) == 0:
-                                continue
+                            for entry in entries:
+                                if entry is None or len(entry) == 0:
+                                    continue
 
-                            if isinstance(entry, basestring):
-                                colEntry = entry
-                            else:
-                                colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
+                                if isinstance(entry, basestring):
+                                    colEntry = entry
+                                else:
+                                    colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
 
-                            _ = len(DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry)))
-                            maxLen = max(len(column), _)
+                                _ = len(DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry)))
+                                maxLen = max(len(column), _)
 
-                            if maxLen > kb.data.dumpedTable[column]["length"]:
-                                kb.data.dumpedTable[column]["length"] = maxLen
+                                if maxLen > kb.data.dumpedTable[column]["length"]:
+                                    kb.data.dumpedTable[column]["length"] = maxLen
 
-                            kb.data.dumpedTable[column]["values"].append(colEntry)
+                                kb.data.dumpedTable[column]["values"].append(colEntry)
 
                 if not kb.data.dumpedTable and isInferenceAvailable() and not conf.direct:
                     infoMsg = "fetching number of "
