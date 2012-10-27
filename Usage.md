@@ -1,5 +1,5 @@
 # Usage
-
+```
 Usage: python sqlmap.py [options]
 
 Options:
@@ -221,7 +221,7 @@ Options:
     --smart             Conduct through tests only if positive heuristic(s)
     --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
     --wizard            Simple wizard interface for beginner users
-
+```
 ## Output verbosity
 
 Switch: `-v`
