@@ -121,7 +121,7 @@ The session user most probably does not have enough permissions for querying on 
 Question(s):
 [#1](http://thread.gmane.org/gmane.comp.security.sqlmap/714)
 
-## What is `--text-only` switch?
+## What does switch `--text-only` do?
 
 Switch `--text-only` is used for removing non-textual data (tags, javascripts, styles, etc.) from the retrieved page content to further improve SQL injection detection capabilities.
 
