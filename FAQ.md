@@ -88,12 +88,11 @@ Currently there is no pressure on Python projects to switch to the new version o
 
 ## How can I shorten the payloads injected by sqlmap?
 
-You can provide sqlmap with the following two switches:
+You can provide sqlmap with the following switch:
 
     --no-cast           Turn off payload casting mechanism
-    --no-unescape       Turn off string unescaping mechanism
 
-However, on the other hand you might lose the benefits provided by these switches in the default configuration.
+However, on the other hand you might lose the benefits provided by these switch in the default configuration.
 
 ## What does `WARNING unknown charset '...'` mean?
 
