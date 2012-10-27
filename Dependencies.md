@@ -9,7 +9,7 @@ If you are willing to connect directly to a database server (switch `-d`), witho
 * Firebird: [python-kinterbasdb](http://kinterbasdb.sourceforge.net/)
 * Microsoft Access: [python-pyodbc](http://pyodbc.googlecode.com/)
 * Microsoft SQL Server: [python-pymssql](http://code.google.com/p/pymssql/)
-* MySQL: [python pymysql](http://code.google.com/p/pymysql/)
+* MySQL: [python pymysql](https://github.com/petehunt/PyMySQL/)
 * Oracle: [python cx_Oracle](http://cx-oracle.sourceforge.net/)
 * PostgreSQL: [python-psycopg2](http://initd.org/psycopg/)
 * SQLite: [python-pysqlite2](http://pysqlite.googlecode.com/)
