@@ -60,6 +60,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     abortedFlag = False
     partialValue = u""
     finalValue = None
+    retrievedLength = 0
     asciiTbl = getCharset(charsetType)
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
     retVal = hashDBRetrieve(expression, checkConf=True)
@@ -410,7 +411,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 if conf.verbose in (1, 2) and not showEta:
                                     output += '_' * (min(length, conf.progressWidth) - len(output))
                                     status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
-                                    output += status if count != length else " "*len(status)
+                                    output += status if count != length else " " * len(status)
 
                                     dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
 
@@ -527,6 +528,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finally:
         kb.prependFlag = False
         kb.stickyLevel = None
+        retrievedLength = len(finalValue or "")
 
         if finalValue is not None:
             finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
@@ -534,8 +536,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
 
-    if conf.hexConvert:
-        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * len(finalValue or ""))
+    if conf.hexConvert and not abortedFlag:
+        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
         dataToStdout(infoMsg)
     else:
         if conf.verbose in (1, 2) or showEta:
