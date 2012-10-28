@@ -1260,7 +1260,9 @@ def getCharset(charsetType=None):
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 58))
         asciiTbl.extend(xrange(64, 71))
+        asciiTbl.extend([87, 88])  # X
         asciiTbl.extend(xrange(96, 103))
+        asciiTbl.extend([119, 120])  # x
 
     # Characters
     elif charsetType == CHARSET_TYPE.ALPHA:

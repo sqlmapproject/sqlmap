@@ -308,7 +308,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                             dbgMsg = "turning back on time auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = ADJUST_TIME_DELAY.YES
-                                    
+
                                     return decodeIntToUnicode(retVal)
                             else:
                                 return None
