@@ -752,7 +752,7 @@ class Agent:
                 if " ORDER BY " not in fromFrom:
                     # Reference: http://vorg.ca/626-the-MS-SQL-equivalent-to-MySQLs-limit-command
                     if " WHERE " in limitedQuery:
-                        limitedQuery = "%s AND %s " % (limitedQuery, uniqueField or field)
+                        limitedQuery = "%s AND %s " % (limitedQuery, self.nullAndCastField(uniqueField or field))
                     else:
                         limitedQuery = "%s WHERE ISNULL(%s,' ') " % (limitedQuery, uniqueField or field)
 
