@@ -21,6 +21,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import MAX_INT
 from lib.request import inject
 
@@ -99,25 +100,31 @@ def pivotDumpTable(table, colList, count=None, blind=True):
                 break
 
             for column in colList:
-                # Correction for pivotValues with unrecognized/problematic chars
-                for char in ('\'', '?'):
-                    if pivotValue and char in pivotValue and pivotValue[0] != char:
-                        pivotValue = pivotValue.split(char)[0]
-                        pivotValue = pivotValue[:-1] + decodeIntToUnicode(ord(pivotValue[-1]) + 1)
-                        break
-                if column == colList[0]:
-                    query = dumpNode.query % (column, table, column, pivotValue)
-                else:
-                    query = dumpNode.query2 % (column, table, colList[0], pivotValue)
+                def _(pivotValue):
+                    # Correction for pivotValues with unrecognized/problematic chars
+                    for char in (INFERENCE_UNKNOWN_CHAR, '\''):
+                        if pivotValue and char in pivotValue and pivotValue[0] != char:
+                            pivotValue = pivotValue.split(char)[0]
+                            pivotValue = pivotValue[:-1] + decodeIntToUnicode(ord(pivotValue[-1]) + 1)
+                            break
+                    if column == colList[0]:
+                        query = dumpNode.query % (column, table, column, pivotValue)
+                    else:
+                        query = dumpNode.query2 % (column, table, colList[0], pivotValue)
 
-                value = unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))
+                    return unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))
 
+                value = _(pivotValue)
                 if column == colList[0]:
+                    if isNoneValue(value):
+                        for pivotValue in filter(None, ("  " if pivotValue == " " else None, "%s%s" % (pivotValue[0], chr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None, chr(ord(pivotValue[0]) + 1))):
+                            value = _(pivotValue)
+                            if not isNoneValue(value):
+                                break
                     if isNoneValue(value):
                         breakRetrieval = True
                         break
-                    else:
-                        pivotValue = safechardecode(value)
+                    pivotValue = safechardecode(value)
 
                 if conf.limitStart or conf.limitStop:
                     if conf.limitStart and (i + 1) < conf.limitStart:
