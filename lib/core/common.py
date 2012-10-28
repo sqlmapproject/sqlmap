@@ -3209,14 +3209,9 @@ def decodeHexValue(value):
             if value.lower().startswith("0x"):
                 value = value[2:]
             value = value.decode("hex")
-            if len(value) > 1 and value[1] == '\x00':
+            if Backend.isDbms(DBMS.MSSQL):
                 try:
                     value = value.decode("utf-16-le")
-                except UnicodeDecodeError:
-                    pass
-            elif value and value[0] == '\x00':
-                try:
-                    value = value.decode("utf-16-be")
                 except UnicodeDecodeError:
                     pass
             if not isinstance(value, unicode):
