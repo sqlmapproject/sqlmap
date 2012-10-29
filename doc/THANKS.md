@@ -491,6 +491,9 @@ Sumit Siddharth, <sid@notsosecure.com>
 Andre Silva, <andreoaz@gmail.com>
 * for reporting a bug
 
+Benjamin Silva H. <silva96@gmail.com>
+* for reporting a bug
+
 Duarte Silva <duarte.silva@serializing.me>
 * for reporting a couple of bugs
 
@@ -555,7 +558,7 @@ Kyprianos Vasilopoulos, <kyprianos.vasilopoulos@gmail.com>
 * for reporting a couple of minor bugs
 
 Vlado Velichkovski, <ketejadam@hotmail.com>
-* for reporting a couple of bugs
+* for reporting considerable amount of bugs
 
 Johnny Venter, <johnny.venter@zoho.com>
 * for reporting a couple of bugs
