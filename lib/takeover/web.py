@@ -280,7 +280,7 @@ class Web:
                 infoMsg += "on '%s' - %s" % (localPath, self.webStagerUrl)
                 logger.info(infoMsg)
 
-                if self.webApi == "asp":
+                if self.webApi == WEB_API.ASP:
                     runcmdName = "tmpe%s.exe" % randomStr(lowercase=True)
                     runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
                     match = re.search(r'input type=hidden name=scriptsdir value="([^"]+)"', uplPage)
