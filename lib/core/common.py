@@ -36,7 +36,6 @@ from math import sqrt
 from optparse import OptionValueError
 from subprocess import PIPE
 from subprocess import Popen as execute
-from tempfile import NamedTemporaryFile
 from tempfile import mkstemp
 from xml.etree import ElementTree as ET
 from xml.dom import minidom
@@ -1401,37 +1400,11 @@ def showStaticWords(firstPage, secondPage):
 
     logger.info(infoMsg)
 
-def decloakToNamedTemporaryFile(filepath, name=None):
-    retVal = NamedTemporaryFile()
-
-    def __del__():
-        try:
-            if hasattr(retVal, 'old_name'):
-                retVal.name = retVal.old_name
-            retVal.close()
-        except OSError:
-            pass
-
-    retVal.__del__ = __del__
-    retVal.write(decloak(filepath))
-    retVal.seek(0)
-
-    if name:
-        retVal.old_name = retVal.name
-        retVal.name = name
-
-    return retVal
-
-def decloakToMkstemp(filepath, **kwargs):
-    handle, name = mkstemp(**kwargs)
-
-    _ = os.fdopen(handle)
-    _.close()  # close low level handle (causing problems latter)
-
-    retVal = open(name, 'w+b')
-
-    retVal.write(decloak(filepath))
-    retVal.seek(0)
+def decloakToNamedStream(filepath, name=None):
+    class _(StringIO):
+        __len__ = property(lambda self: self.len)
+    retVal = _(decloak(filepath))
+    retVal.name = name
 
     return retVal
 

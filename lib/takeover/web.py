@@ -10,12 +10,13 @@ import os
 import posixpath
 import re
 
+from tempfile import mkstemp
+
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
-from lib.core.common import decloakToMkstemp
-from lib.core.common import decloakToNamedTemporaryFile
+from lib.core.common import decloakToNamedStream
 from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
@@ -187,7 +188,7 @@ class Web:
         directories = sorted(getDirs())
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
-        backdoorStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
+        backdoorStream = decloakToNamedStream(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
         originalBackdoorContent = backdoorContent = backdoorStream.read()
 
         stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
@@ -255,8 +256,15 @@ class Web:
                         infoMsg += "UNION technique"
                         logger.info(infoMsg)
 
-                        stagerDecloacked = decloakToMkstemp(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
-                        self.unionWriteFile(stagerDecloacked.name, self.webStagerFilePath, "text")
+                        handle, filename = mkstemp()
+                        os.fdopen(handle).close()  # close low level handle (causing problems latter)
+
+                        with open(filename, "w+") as f:
+                            _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
+                            _ = _.replace("WRITABLE_DIR", localPath.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else localPath)
+                            f.write(_)
+
+                        self.unionWriteFile(filename, self.webStagerFilePath, "text")
 
                         uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
                         uplPage = uplPage or ""
@@ -282,7 +290,7 @@ class Web:
 
                 if self.webApi == WEB_API.ASP:
                     runcmdName = "tmpe%s.exe" % randomStr(lowercase=True)
-                    runcmdStream = decloakToNamedTemporaryFile(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
+                    runcmdStream = decloakToNamedStream(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
                     match = re.search(r'input type=hidden name=scriptsdir value="([^"]+)"', uplPage)
 
                     if match:
@@ -291,7 +299,7 @@ class Web:
                         continue
 
                     backdoorContent = originalBackdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
-                    backdoorStream.file.truncate()
+                    backdoorStream.truncate()
                     backdoorStream.read()
                     backdoorStream.seek(0)
                     backdoorStream.write(backdoorContent)
