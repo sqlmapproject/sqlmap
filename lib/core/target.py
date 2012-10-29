@@ -33,6 +33,7 @@ from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import sqlmapFilePathException
 from lib.core.exception import sqlmapGenericException
+from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.option import authHandler
@@ -440,9 +441,18 @@ def __createTargetDirs():
 
             conf.outputPath = tempDir
 
-    with open(os.path.join(conf.outputPath, "target.txt"), "w+") as f:
-        _ = kb.originalUrls.get(conf.url) or conf.url or conf.hostname
-        f.write(_.encode(UNICODE_ENCODING))
+    try:
+        with open(os.path.join(conf.outputPath, "target.txt"), "w+") as f:
+            _ = kb.originalUrls.get(conf.url) or conf.url or conf.hostname
+            f.write(_.encode(UNICODE_ENCODING))
+    except IOError, msg:
+        if "denied" in str(msg):
+            errMsg = "you don't have enough permissions "
+        else:
+            errMsg = "something went wrong while trying "
+        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, msg)
+
+        raise sqlmapMissingPrivileges, errMsg
 
     __createDumpDir()
     __createFilesDir()
