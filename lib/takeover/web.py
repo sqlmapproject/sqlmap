@@ -22,6 +22,7 @@ from lib.core.common import getDirs
 from lib.core.common import getDocRoot
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
+from lib.core.common import getUnicode
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
@@ -113,7 +114,7 @@ class Web:
 
     def __webFileInject(self, fileContent, fileName, directory):
         outFile = posixpath.normpath("%s/%s" % (directory, fileName))
-        uplQuery = fileContent.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
+        uplQuery = getUnicode(fileContent).replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
         query = ""
 
         if isTechniqueAvailable(kb.technique):
