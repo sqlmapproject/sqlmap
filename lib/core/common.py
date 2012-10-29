@@ -83,52 +83,53 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BOLD_PATTERNS
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
+from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import DUMMY_USER_INJECTION
-from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
-from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import DBMS_DIRECTORY_DICT
+from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
-from lib.core.settings import NULL
-from lib.core.settings import HASHDB_MILESTONE_VALUE
-from lib.core.settings import IS_WIN
-from lib.core.settings import ISSUES_PAGE
-from lib.core.settings import PLATFORM
-from lib.core.settings import PYVERSION
-from lib.core.settings import VERSION
-from lib.core.settings import REVISION
-from lib.core.settings import VERSION_STRING
-from lib.core.settings import SITE
-from lib.core.settings import HOST_ALIASES
-from lib.core.settings import REFERER_ALIASES
-from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.settings import PARTIAL_VALUE_MARKER
+from lib.core.settings import DUMMY_USER_INJECTION
+from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
-from lib.core.settings import PRINTABLE_CHAR_REGEX
-from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import DEFAULT_MSSQL_SCHEMA
+from lib.core.settings import FORM_SEARCH_REGEX
+from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
+from lib.core.settings import HASHDB_MILESTONE_VALUE
+from lib.core.settings import HOST_ALIASES
+from lib.core.settings import INFERENCE_UNKNOWN_CHAR
+from lib.core.settings import ISSUES_PAGE
+from lib.core.settings import IS_WIN
+from lib.core.settings import LARGE_OUTPUT_THRESHOLD
+from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import ML
+from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_AMP_MARKER
 from lib.core.settings import PARAMETER_SEMICOLON_MARKER
-from lib.core.settings import LARGE_OUTPUT_THRESHOLD
-from lib.core.settings import ML
-from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.settings import PLATFORM
+from lib.core.settings import PRINTABLE_CHAR_REGEX
+from lib.core.settings import PYVERSION
+from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import REFLECTED_BORDER_REGEX
-from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
+from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import TIME_STDEV_COEFF
-from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
+from lib.core.settings import REVISION
 from lib.core.settings import SENSITIVE_DATA_REGEX
+from lib.core.settings import SITE
+from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import TEXT_TAG_REGEX
+from lib.core.settings import TIME_STDEV_COEFF
+from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
+from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import VERSION
+from lib.core.settings import VERSION_STRING
 from lib.core.threads import getCurrentThreadData
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
@@ -3066,7 +3067,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         warnMsg = "badly formed HTML at the given url ('%s'). Going to filter it" % url
         logger.warning(warnMsg)
         response.seek(0)
-        filtered = _("".join(re.findall(r"<form(?!.+<form).+?</form>", response.read(), re.I | re.S)), response.geturl())
+        filtered = _("".join(re.findall(FORM_SEARCH_REGEX, response.read())), response.geturl())
         try:
             forms = ParseResponse(filtered, backwards_compat=False)
         except ParseError:

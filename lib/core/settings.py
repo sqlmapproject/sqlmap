@@ -491,3 +491,6 @@ DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 # Length used while checking for existence of Suhoshin-patch (like) protection mechanism
 SUHOSHIN_MAX_VALUE_LENGTH = 512
+
+# Regular expression used for extracting form tags
+FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
