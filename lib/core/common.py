@@ -1529,7 +1529,7 @@ def getSQLSnippet(dbms, sfile, **variables):
 
     retVal = readCachedFileContent(filename)
     retVal = re.sub(r"#.+", "", retVal)
-    retVal = re.sub(r"(?s);\s+", "; ", retVal).strip()
+    retVal = re.sub(r"(?s);\s+", "; ", retVal).strip("\r\n")
 
     for _ in variables.keys():
         retVal = re.sub(r"%%%s%%" % _, variables[_], retVal)
