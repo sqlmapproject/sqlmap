@@ -38,7 +38,7 @@ def hexdecode(value):
     return (value[2:] if value.startswith("0x") else value).decode("hex")
 
 def hexencode(value):
-    return value.encode("hex")
+    return utf8encode(value).encode("hex")
 
 def md5hash(value):
     if sys.modules.has_key('hashlib'):
