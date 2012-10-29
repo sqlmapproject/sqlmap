@@ -19,6 +19,7 @@ from lib.core.common import decloakToNamedTemporaryFile
 from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
+from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
@@ -37,6 +38,9 @@ from lib.core.data import paths
 from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
+from lib.core.enums import WEB_API
+from lib.core.settings import EVENTVALIDATION_REGEX
+from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
 
 
@@ -85,14 +89,14 @@ class Web:
     def __webFileStreamUpload(self, stream, destFileName, directory):
         stream.seek(0) # Rewind
 
-        if self.webApi in ("php", "asp", "aspx", "jsp"):
+        if self.webApi in getPublicTypeMembers(WEB_API, True):
             multipartParams = {
                                 "upload":    "1",
                                 "file":      stream,
                                 "uploadDir": directory,
                               }
 
-            if self.webApi == "aspx":
+            if self.webApi == WEB_API.ASPX:
                 multipartParams['__EVENTVALIDATION'] = kb.data.__EVENTVALIDATION
                 multipartParams['__VIEWSTATE'] = kb.data.__VIEWSTATE
 
@@ -141,7 +145,7 @@ class Web:
         logger.info(infoMsg)
 
         default = None
-        choices = ('asp', 'aspx', 'php', 'jsp')
+        choices = list(getPublicTypeMembers(WEB_API, True))
 
         for ext in choices:
             if conf.url.endswith(ext):
@@ -150,9 +154,9 @@ class Web:
 
         if not default:
             if Backend.isOs(OS.WINDOWS):
-                default = "asp"
+                default = WEB_API.ASP
             else:
-                default = "php"
+                default = WEB_API.PHP
 
         message = "which web application language does the web server "
         message += "support?\n"
@@ -268,9 +272,9 @@ class Web:
                     logger.warn(warnMsg)
                     continue
 
-                elif self.webApi == "aspx":
-                    kb.data.__EVENTVALIDATION = extractRegexResult(r"__EVENTVALIDATION[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
-                    kb.data.__VIEWSTATE = extractRegexResult(r"__VIEWSTATE[^>]+value=\"(?P<result>[^\"]+)\"", uplPage, re.I)
+                elif self.webApi == WEB_API.ASPX:
+                    kb.data.__EVENTVALIDATION = extractRegexResult(EVENTVALIDATION_REGEX, uplPage)
+                    kb.data.__VIEWSTATE = extractRegexResult(VIEWSTATE_REGEX, uplPage)
 
                 infoMsg = "the file stager has been successfully uploaded "
                 infoMsg += "on '%s' - %s" % (localPath, self.webStagerUrl)

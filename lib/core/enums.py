@@ -229,3 +229,9 @@ class ADJUST_TIME_DELAY:
     DISABLE = -1
     NO = 0
     YES = 1
+
+class WEB_API:
+    PHP = "php"
+    ASP = "asp"
+    ASPX = "aspx"
+    JSP = "jsp"

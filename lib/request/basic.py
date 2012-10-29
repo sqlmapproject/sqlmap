@@ -265,7 +265,7 @@ def processResponse(page, responseHeaders):
 
     if kb.originalPage is None:
         for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):
-            match = re.search(regex, page, re.I)
+            match = re.search(regex, page)
             if match and PLACE.POST in conf.parameters:
                 name, value = match.groups()
                 if PLACE.POST in conf.paramDict and name in conf.paramDict[PLACE.POST]:

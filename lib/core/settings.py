@@ -469,10 +469,10 @@ MAX_HELP_OPTION_LENGTH = 18
 FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
 
 # Regular expression used for extracting ASP.NET view state values
-VIEWSTATE_REGEX = r'(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<value>[^"]+)'
+VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'
 
 # Regular expression used for extracting ASP.NET event validation values
-EVENTVALIDATION_REGEX = r'(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<value>[^"]+)'
+EVENTVALIDATION_REGEX = r'(?i)(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<result>[^"]+)'
 
 # Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
 LIMITED_ROWS_TEST_NUMBER = 15
