@@ -786,6 +786,7 @@ def readInput(message, default=None, checkBatch=True):
         kb.prependFlag = False
         try:
             data = raw_input() or default
+            data = getUnicode(data, system=True) if data else data
         except:
             time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
             kb.prependFlag = True

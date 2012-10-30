@@ -33,6 +33,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import hexencode
+from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -263,7 +264,7 @@ class Web:
                         with open(filename, "w+") as f:
                             _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
                             _ = _.replace("WRITABLE_DIR", localPath.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else localPath)
-                            f.write(_)
+                            f.write(utf8encode(_))
 
                         self.unionWriteFile(filename, self.webStagerFilePath, "text")
 
