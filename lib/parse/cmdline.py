@@ -616,7 +616,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--dependencies", dest="dependencies",
                                   action="store_true",
-                                  help="Check for missing sqlmap dependencies")
+                                  help="Check for missing (not required) sqlmap dependencies")
 
         miscellaneous.add_option("--disable-coloring", dest="disableColoring",
                                   action="store_true",
