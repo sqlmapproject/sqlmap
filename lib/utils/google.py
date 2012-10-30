@@ -60,14 +60,14 @@ class Google:
         for _ in self._matches:
             _ = urldecode(_)
             if re.search(r"(.*?)\?(.+)", _):
-                kb.targetUrls.add((_, None, None, None))
+                kb.targetUrls.add((_, conf.method, conf.data, conf.cookie))
             elif re.search(URI_INJECTABLE_REGEX, _, re.I):
                 if kb.scanOnlyGoogleGETs is None:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
                     test = readInput(message, default="Y")
                     kb.scanOnlyGoogleGETs = test.lower() != 'n'
                 if not kb.scanOnlyGoogleGETs:
-                    kb.targetUrls.add((_, None, None, None))
+                    kb.targetUrls.add((_, conf.method, conf.data, conf.cookie))
 
     def getCookie(self):
         """
