@@ -242,22 +242,22 @@ def start():
         return True
 
     if conf.url and not any((conf.forms, conf.crawlDepth)):
-        kb.targetUrls.add((conf.url, conf.method, conf.data, conf.cookie))
+        kb.targets.add((conf.url, conf.method, conf.data, conf.cookie))
 
-    if conf.configFile and not kb.targetUrls:
+    if conf.configFile and not kb.targets:
         errMsg = "you did not edit the configuration file properly, set "
         errMsg += "the target url, list of targets or google dork"
         logger.error(errMsg)
         return False
 
-    if kb.targetUrls and len(kb.targetUrls) > 1:
-        infoMsg = "sqlmap got a total of %d targets" % len(kb.targetUrls)
+    if kb.targets and len(kb.targets) > 1:
+        infoMsg = "sqlmap got a total of %d targets" % len(kb.targets)
         logger.info(infoMsg)
 
     hostCount = 0
     cookieStr = ""
 
-    for targetUrl, targetMethod, targetData, targetCookie in kb.targetUrls:
+    for targetUrl, targetMethod, targetData, targetCookie in kb.targets:
         try:
             conf.url = targetUrl
             conf.method = targetMethod

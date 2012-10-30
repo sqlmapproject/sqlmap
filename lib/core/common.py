@@ -3093,7 +3093,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     if addToTargets and retVal:
         for target in retVal:
-            kb.targetUrls.add(target)
+            kb.targets.add(target)
 
     return retVal
 

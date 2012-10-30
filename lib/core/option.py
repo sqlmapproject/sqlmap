@@ -85,37 +85,38 @@ from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.purge import purge
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import BURP_REQUEST_REGEX
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
+from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
+from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import IS_WIN
-from lib.core.settings import NULL
-from lib.core.settings import PYVERSION
-from lib.core.settings import SITE
-from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import SUPPORTED_OS
-from lib.core.settings import VERSION_STRING
+from lib.core.settings import LOCALHOST
+from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
-from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import NULL
 from lib.core.settings import ORACLE_ALIASES
-from lib.core.settings import SQLITE_ALIASES
-from lib.core.settings import ACCESS_ALIASES
-from lib.core.settings import FIREBIRD_ALIASES
-from lib.core.settings import MAXDB_ALIASES
-from lib.core.settings import SYBASE_ALIASES
-from lib.core.settings import DB2_ALIASES
-from lib.core.settings import BURP_REQUEST_REGEX
-from lib.core.settings import LOCALHOST
-from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
+from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import PYVERSION
+from lib.core.settings import SITE
+from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import SUPPORTED_DBMS
+from lib.core.settings import SUPPORTED_OS
+from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import TIME_DELAY_CANDIDATES
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNION_CHAR_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import URI_INJECTABLE_REGEX
+from lib.core.settings import VERSION_STRING
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
 from lib.core.update import update
@@ -212,8 +213,8 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                 continue
 
             if not(conf.scope and not re.search(conf.scope, url, re.I)):
-                if not kb.targetUrls or url not in addedTargetUrls:
-                    kb.targetUrls.add((url, method, None, cookie))
+                if not kb.targets or url not in addedTargetUrls:
+                    kb.targets.add((url, method, None, cookie))
                     addedTargetUrls.add(url)
 
     def __parseBurpLog(content):
@@ -322,8 +323,8 @@ def __feedTargetsDict(reqFile, addedTargetUrls):
                     port = None
 
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
-                    if not kb.targetUrls or url not in addedTargetUrls:
-                        kb.targetUrls.add((url, method, urldecode(data) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data, cookie))
+                    if not kb.targets or url not in addedTargetUrls:
+                        kb.targets.add((url, method, urldecode(data) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data, cookie))
                         addedTargetUrls.add(url)
 
     fp = openFile(reqFile, "rb")
@@ -374,7 +375,7 @@ def __setMultipleTargets():
     mode.
     """
 
-    initialTargetsCount = len(kb.targetUrls)
+    initialTargetsCount = len(kb.targets)
     addedTargetUrls = set()
 
     if not conf.logFile:
@@ -405,7 +406,7 @@ def __setMultipleTargets():
         errMsg += "nor a directory"
         raise sqlmapFilePathException, errMsg
 
-    updatedTargetsCount = len(kb.targetUrls)
+    updatedTargetsCount = len(kb.targets)
 
     if updatedTargetsCount > initialTargetsCount:
         infoMsg = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
@@ -493,37 +494,48 @@ def __setGoogleDorking():
             handlers.append(keepAliveHandler)
 
     googleObj = Google(handlers)
-    googleObj.getCookie()
+    kb.data.onlyGETs = None
 
-    def search():
-        matches = googleObj.search(conf.googleDork)
+    def retrieve():
+        links = googleObj.search(conf.googleDork)
 
-        if not matches:
+        if not links:
             errMsg = "unable to find results for your "
             errMsg += "Google dork expression"
             raise sqlmapGenericException, errMsg
 
-        googleObj.getTargetUrls()
-        return matches
+        for link in links:
+            link = urldecode(link)
+            if re.search(r"(.*?)\?(.+)", link):
+                kb.targets.add((link, conf.method, conf.data, conf.cookie))
+            elif re.search(URI_INJECTABLE_REGEX, link, re.I):
+                if kb.data.onlyGETs is None and conf.data is None:
+                    message = "do you want to scan only results containing GET parameters? [Y/n] "
+                    test = readInput(message, default="Y")
+                    kb.data.onlyGETs = test.lower() != 'n'
+                if not kb.data.onlyGETs:
+                    kb.targets.add((link, conf.method, conf.data, conf.cookie))
+
+        return links
 
     while True:
-        matches = search()
+        links = retrieve()
 
-        if kb.targetUrls:
-            infoMsg = "sqlmap got %d results for your " % len(matches)
+        if kb.targets:
+            infoMsg = "sqlmap got %d results for your " % len(links)
             infoMsg += "Google dork expression, "
 
-            if len(matches) == len(kb.targetUrls):
+            if len(links) == len(kb.targets):
                 infoMsg += "all "
             else:
-                infoMsg += "%d " % len(kb.targetUrls)
+                infoMsg += "%d " % len(kb.targets)
 
             infoMsg += "of them are testable targets"
             logger.info(infoMsg)
             break
 
         else:
-            message = "sqlmap got %d results " % len(matches)
+            message = "sqlmap got %d results " % len(links)
             message += "for your Google dork expression, but none of them "
             message += "have GET parameters to test for SQL injection. "
             message += "Do you want to skip to the next result page? [Y/n]"
@@ -550,7 +562,7 @@ def __setBulkMultipleTargets():
 
     for line in getFileItems(conf.bulkFile):
         if re.search(r"[^ ]+\?(.+)", line, re.I):
-            kb.targetUrls.add((line.strip(), None, None, None))
+            kb.targets.add((line.strip(), None, None, None))
 
 def __findPageForms():
     if not conf.forms or conf.crawlDepth:
@@ -1571,9 +1583,8 @@ def __setKnowledgeBaseAttributes(flushAll=True):
         kb.headerPaths = {}
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.passwordMgr = None
-        kb.scanOnlyGoogleGETs = None
         kb.tamperFunctions = []
-        kb.targetUrls = oset()
+        kb.targets = oset()
         kb.testedParams = set()
         kb.userAgents = None
         kb.vainRun = True

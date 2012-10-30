@@ -33,7 +33,6 @@ class Google:
     """
 
     def __init__(self, handlers):
-        self._matches = []
         self._cj = cookielib.CookieJar()
 
         handlers.append(urllib2.HTTPCookieProcessor(self._cj))
@@ -41,52 +40,16 @@ class Google:
         self.opener = urllib2.build_opener(*handlers)
         self.opener.addheaders = conf.httpHeaders
 
-    def _parsePage(self, page):
-        """
-        Parse Google dork search results page to get the list of
-        HTTP addresses
-        """
-
-        retVal = [urllib.unquote(match.group(1)) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
-
-        return retVal
-
-    def getTargetUrls(self):
-        """
-        This method returns the list of hosts with parameters out of
-        your Google dork search results
-        """
-
-        for _ in self._matches:
-            _ = urldecode(_)
-            if re.search(r"(.*?)\?(.+)", _):
-                kb.targetUrls.add((_, conf.method, conf.data, conf.cookie))
-            elif re.search(URI_INJECTABLE_REGEX, _, re.I):
-                if kb.scanOnlyGoogleGETs is None:
-                    message = "do you want to scan only results containing GET parameters? [Y/n] "
-                    test = readInput(message, default="Y")
-                    kb.scanOnlyGoogleGETs = test.lower() != 'n'
-                if not kb.scanOnlyGoogleGETs:
-                    kb.targetUrls.add((_, conf.method, conf.data, conf.cookie))
-
-    def getCookie(self):
-        """
-        This method is the first to be called when initializing a
-        Google dorking object through this library. It is used to
-        retrieve the Google session cookie needed to perform the
-        further search
-        """
-
         try:
             conn = self.opener.open("http://www.google.com/ncr")
-            _ = conn.info()
+            _ = conn.info()  # retrieve session cookie
         except urllib2.HTTPError, e:
             _ = e.info()
         except urllib2.URLError:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
-    def search(self, googleDork):
+    def search(self, dork):
         """
         This method performs the effective search on Google providing
         the google dork and the Google session cookie
@@ -95,11 +58,11 @@ class Google:
         gpage = conf.googlePage if conf.googlePage > 1 else 1
         logger.info("using Google result page #%d" % gpage)
 
-        if not googleDork:
+        if not dork:
             return None
 
         url = "http://www.google.com/search?"
-        url += "q=%s&" % urlencode(googleDork, convall=True)
+        url += "q=%s&" % urlencode(dork, convall=True)
         url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
         url += "&start=%d" % ((gpage-1) * 100)
 
@@ -136,11 +99,11 @@ class Google:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg
 
-        self._matches = self._parsePage(page)
+        retVal = [urllib.unquote(match.group(1)) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
 
-        if not self._matches and "detected unusual traffic" in page:
+        if not retVal and "detected unusual traffic" in page:
             warnMsg = "Google has detected 'unusual' traffic from "
             warnMsg += "this computer disabling further searches"
             raise sqlmapGenericException, warnMsg
 
-        return self._matches
+        return retVal

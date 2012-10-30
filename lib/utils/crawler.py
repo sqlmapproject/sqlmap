@@ -126,4 +126,4 @@ class Crawler:
                 logger.warn(warnMsg)
             else:
                 for url in threadData.shared.outputs:
-                    kb.targetUrls.add(( url, None, None, None ))
+                    kb.targets.add(( url, None, None, None ))
