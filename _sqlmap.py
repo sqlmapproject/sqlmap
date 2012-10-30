@@ -5,6 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import bdb
 import os
 import sys
 import time
@@ -75,7 +76,7 @@ def main():
         errMsg = "user quit"
         logger.error(errMsg)
 
-    except sqlmapSilentQuitException:
+    except (sqlmapSilentQuitException, bdb.BdbQuit):
         pass
 
     except exceptionsTuple, e:
