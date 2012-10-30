@@ -1164,7 +1164,7 @@ def __setHTTPUserAgent():
 
         for count in xrange(len(items)):
             item = items[count]
-            message += "[%d] %s%s\n" % (count + 1, item[:item.find(';')], " (default)" if item == MOBILES.IPHONE else "")
+            message += "[%d] %s%s\n" % (count + 1, item[0], " (default)" if item == MOBILES.IPHONE else "")
 
         test = readInput(message.rstrip('\n'), default=items.index(MOBILES.IPHONE) + 1)
 
@@ -1173,9 +1173,7 @@ def __setHTTPUserAgent():
         except:
             item = MOBILES.IPHONE
 
-        item = item[item.find(';') + 1:]
-
-        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, item))
+        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, item[1]))
 
     elif conf.agent:
         debugMsg = "setting the HTTP User-Agent header"
