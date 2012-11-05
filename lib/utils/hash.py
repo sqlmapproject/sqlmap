@@ -672,7 +672,7 @@ def dictionaryAttack(attack_dict):
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             for suffix in suffix_list:
-                if len(attack_info) == len(results) or processException:
+                if len(attack_info) <= len(results) or processException:
                     break
 
                 if suffix:
@@ -728,7 +728,8 @@ def dictionaryAttack(attack_dict):
                         conf.hashDB.beginTransaction()
 
                         while not retVal.empty():
-                            _, hash_, word = item = retVal.get(block=False)
+                            user, hash_, word = item = retVal.get(block=False)
+                            attack_info = filter(lambda _: _[0][0] != user or _[0][1] != hash_, attack_info)
                             hashDBWrite(hash_, word)
                             results.append(item)
 
@@ -740,6 +741,9 @@ def dictionaryAttack(attack_dict):
             for ((user, hash_), kwargs) in attack_info:
                 if processException:
                     break
+
+                if any(_[0] == user and _[1] == hash_ for _ in results):
+                    continue
 
                 count = 0
                 found = False
@@ -812,7 +816,7 @@ def dictionaryAttack(attack_dict):
                             conf.hashDB.beginTransaction()
 
                             while not retVal.empty():
-                                _, hash_, word = item = retVal.get(block=False)
+                                user, hash_, word = item = retVal.get(block=False)
                                 hashDBWrite(hash_, word)
                                 results.append(item)
 
