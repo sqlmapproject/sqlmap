@@ -11,6 +11,7 @@ import os
 import re
 import tempfile
 import time
+import urlparse
 
 from lib.core.common import Backend
 from lib.core.common import hashDBRetrieve
@@ -162,6 +163,15 @@ def __setRequestParams():
                     kb.processUserMarks = not test or test[0] not in ("n", "N")
 
             if not kb.processUserMarks:
+                if place == PLACE.URI:
+                    query = urlparse.urlsplit(value)[3]
+                    if query:
+                        parameters = conf.parameters[PLACE.GET] = query
+                        paramDict = paramToDict(PLACE.GET, parameters)
+
+                        if paramDict:
+                            conf.paramDict[PLACE.GET] = paramDict
+                            testableParameters = True
                 continue
 
             conf.parameters[place] = value
