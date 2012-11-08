@@ -838,7 +838,7 @@ def __setTamperingFunctions():
 
                     if check_priority and priority > last_priority:
                         message = "it seems that you might have mixed "
-                        message += "the order of tamper scripts.\n"
+                        message += "the order of tamper scripts. "
                         message += "Do you want to auto resolve this? [Y/n/q] "
                         test = readInput(message, default="Y")
 
