@@ -1408,6 +1408,9 @@ def __cleanupOptions():
         for _ in DUMP_REPLACEMENTS.keys():
             del DUMP_REPLACEMENTS[_]
 
+    if conf.sessionFile:
+        conf.hashDBFile = conf.sessionFile
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
@@ -1450,7 +1453,6 @@ def __setConfAttributes():
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
-    conf.sessionFP = None
     conf.start = True
     conf.tests = []
     conf.trafficFP = None

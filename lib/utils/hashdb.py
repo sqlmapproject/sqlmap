@@ -15,6 +15,7 @@ from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
 from lib.core.data import logger
+from lib.core.exception import sqlmapDataException
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
@@ -31,9 +32,14 @@ class HashDB(object):
         threadData = getCurrentThreadData()
 
         if threadData.hashDBCursor is None:
-            connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
-            threadData.hashDBCursor = connection.cursor()
-            threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+            try:
+                connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
+                threadData.hashDBCursor = connection.cursor()
+                threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+            except Exception, ex:
+                errMsg = "error occurred while opening a session "
+                errMsg += "file '%s' ('%s')" % (self.filepath, ex)
+                raise sqlmapDataException, errMsg
 
         return threadData.hashDBCursor
 

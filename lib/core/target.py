@@ -483,9 +483,6 @@ def initTargetEnv():
     """
 
     if conf.multipleTargets:
-        if conf.sessionFP:
-            conf.sessionFP.close()
-
         if conf.hashDB:
             conf.hashDB.close()
 
