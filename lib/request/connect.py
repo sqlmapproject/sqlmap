@@ -53,6 +53,7 @@ from lib.core.enums import REDIRECTION
 from lib.core.exception import sqlmapCompressionException
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import sqlmapValueException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
@@ -588,6 +589,10 @@ class Connect:
             if kb.tamperFunctions:
                 for function in kb.tamperFunctions:
                     payload = function(payload=payload, headers=auxHeaders)
+                    if not isinstance(payload, basestring):
+                        errMsg = "tamper function '%s' returns " % function.func_name
+                        errMsg += "invalid payload type ('%s')" % type(payload)
+                        raise sqlmapValueException, errMsg
 
                 value = agent.replacePayload(value, payload)
 
@@ -722,6 +727,7 @@ class Connect:
                     warnMsg += "value for option '--time-sec' as possible (e.g. "
                     warnMsg += "%d or more)" % (conf.timeSec * 2)
                     logger.critical(warnMsg)
+
             elif not kb.testMode:
                 warnMsg = "it is very important not to stress the network adapter's "
                 warnMsg += "bandwidth during usage of time-based queries"

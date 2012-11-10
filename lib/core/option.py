@@ -835,6 +835,7 @@ def __setTamperingFunctions():
                 if name == "tamper" and function.func_code.co_argcount == 2:
                     found = True
                     kb.tamperFunctions.append(function)
+                    function.func_name = module.__name__
 
                     if check_priority and priority > last_priority:
                         message = "it seems that you might have mixed "
