@@ -80,11 +80,11 @@ def __setRequestParams():
             testableParameters = True
 
     # Perform checks on POST parameters
-    if conf.method == HTTPMETHOD.POST and not conf.data:
+    if conf.method == HTTPMETHOD.POST and conf.data is None:
         errMsg = "HTTP POST method depends on HTTP data value to be posted"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.data:
+    if conf.data is not None:
         conf.method = HTTPMETHOD.POST
 
         if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed

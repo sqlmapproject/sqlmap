@@ -300,7 +300,7 @@ def start():
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
 
-                if conf.data:
+                if conf.data is not None:
                     message += "\nPOST data: %s" % urlencode(conf.data) if conf.data else ""
 
                 if conf.forms:

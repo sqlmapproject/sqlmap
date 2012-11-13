@@ -1110,7 +1110,7 @@ def __setHTTPMethod():
     Check and set the HTTP method to perform HTTP requests through.
     """
 
-    conf.method = HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET
+    conf.method = HTTPMETHOD.POST if conf.data is not None else HTTPMETHOD.GET
 
     debugMsg = "setting the HTTP method to %s" % conf.method
     logger.debug(debugMsg)

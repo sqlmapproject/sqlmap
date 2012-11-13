@@ -210,7 +210,7 @@ class Connect:
         page = None
 
         _ = urlparse.urlsplit(url)
-        requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post else HTTPMETHOD.GET))
+        requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
         requestMsg += ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling)) else url
         responseMsg = u"HTTP response "
         requestHeaders = u""
@@ -291,7 +291,7 @@ class Connect:
             headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
-            if post and HTTPHEADER.CONTENT_TYPE not in headers:
+            if post is not None and HTTPHEADER.CONTENT_TYPE not in headers:
                 headers[HTTPHEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
 
             if headers.get(HTTPHEADER.CONTENT_TYPE) == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
@@ -326,7 +326,7 @@ class Connect:
                 cookies = conf.cj._cookies_for_request(req)
                 requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
-            if post:
+            if post is not None:
                 if not getRequestHeader(req, HTTPHEADER.CONTENT_LENGTH):
                     requestHeaders += "\n%s: %d" % (string.capwords(HTTPHEADER.CONTENT_LENGTH), len(post))
 
@@ -335,7 +335,7 @@ class Connect:
 
             requestMsg += "\n%s" % requestHeaders
 
-            if post:
+            if post is not None:
                 requestMsg += "\n\n%s" % getUnicode(post)
 
             requestMsg += "\n"
@@ -689,13 +689,13 @@ class Connect:
                             get = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, get)
                         elif '%s=' % name in (post or ""):
                             post = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, post)
-                        elif post:
+                        elif post is not None:
                             post += "%s%s=%s" % (delimiter, name, value)
                         else:
                             get += "%s%s=%s" % (delimiter, name, value)
 
         get = urlencode(get, limit=True)
-        if post:
+        if post is not None:
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
             elif not skipUrlEncode and kb.postHint not in POST_HINT_CONTENT_TYPES.keys():
