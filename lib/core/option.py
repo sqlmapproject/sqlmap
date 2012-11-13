@@ -1409,9 +1409,6 @@ def __cleanupOptions():
         for _ in DUMP_REPLACEMENTS.keys():
             del DUMP_REPLACEMENTS[_]
 
-    if conf.sessionFile:
-        conf.hashDBFile = conf.sessionFile
-
     threadData = getCurrentThreadData()
     threadData.reset()
 

@@ -252,7 +252,7 @@ def __setHashDB():
     """
 
     if not conf.hashDBFile:
-        conf.hashDBFile = "%s%ssession.sqlite" % (conf.outputPath, os.sep)
+        conf.hashDBFile = conf.sessionFile or "%s%ssession.sqlite" % (conf.outputPath, os.sep)
 
     if os.path.exists(conf.hashDBFile):
         if conf.flushSession:
