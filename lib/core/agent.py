@@ -28,6 +28,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import sqlmapNoneDataException
+from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -116,7 +117,9 @@ class Agent:
             _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
             if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and not '"%s"' % _ in paramString:
                 newValue = '"%s"' % newValue
-            retVal = paramString.replace(_, self.addPayloadDelimiters(newValue)).replace(CUSTOM_INJECTION_MARK_CHAR, "")
+            newValue = newValue.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
+            retVal = paramString.replace(_, self.addPayloadDelimiters(newValue))
+            retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(ASTERISK_MARKER, CUSTOM_INJECTION_MARK_CHAR)
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
