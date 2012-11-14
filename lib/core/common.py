@@ -1989,6 +1989,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;%s" % CUSTOM_INJECTION_MARK_CHA
                     char = chr(ord(match.group(1).decode("hex")))
                     return char if char in charset else match.group(0)
                 result = re.sub("%([0-9a-fA-F]{2})", _, value)
+                result = result.replace("+", " ")  # plus sign has a special meaning in url encoded data (hence the usage of urllib.unquote_plus in convall case)
 
     if isinstance(result, str):
         result = unicode(result, encoding or UNICODE_ENCODING, "replace")
