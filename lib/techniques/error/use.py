@@ -306,7 +306,7 @@ def errorUse(expression, dump=False):
                     stopLimit = conf.limitStop
 
             # Count the number of SQL query entries output
-            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
+            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 
             if " ORDER BY " in expression:
                 countedExpression = countedExpression[:countedExpression.index(" ORDER BY ")]
