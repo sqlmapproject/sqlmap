@@ -527,8 +527,9 @@ def paramToDict(place, parameters=None):
             if condition:
                 testableParameters[parameter] = "=".join(elem[1:])
                 if not conf.multipleTargets:
-                    if testableParameters[parameter].strip(DUMMY_SQL_INJECTION_CHARS) != testableParameters[parameter]\
-                        or re.search(r'\A9{3,}', testableParameters[parameter]) or re.search(DUMMY_USER_INJECTION, testableParameters[parameter]):
+                    _ = urldecode(testableParameters[parameter], convall=True)
+                    if _.strip(DUMMY_SQL_INJECTION_CHARS) != _\
+                        or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most probably leftover " % element
                         warnMsg += "chars from manual SQL injection "
