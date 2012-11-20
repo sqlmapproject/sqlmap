@@ -2,7 +2,7 @@
 
 # sqlmap completion commands. written by kost
 # put this file in your zsh completion dir and restart your shell. Zsh completion dir is usually 
-# located somehwere in /usr/share/zsh/ or /usr/local/share/zsh 
+# located somewhere in /usr/share/zsh/ or /usr/local/share/zsh 
 
 local curcontext="$curcontext" state line
 
