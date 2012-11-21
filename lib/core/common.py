@@ -759,6 +759,7 @@ def readInput(message, default=None, checkBatch=True):
     Reads input from terminal
     """
 
+    retVal = None
     kb.stickyLevel = None
 
     if "\n" in message:
@@ -766,36 +767,52 @@ def readInput(message, default=None, checkBatch=True):
     elif message[-1] == ']':
         message += " "
 
-    if checkBatch and conf.batch:
-        if isListLike(default):
-            options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
-        elif default:
-            options = getUnicode(default, UNICODE_ENCODING)
+    if conf.answers:
+        for item in conf.answers.split(','):
+            question = item.split('=')[0].strip()
+            answer = item.split('=')[1] if len(item.split('=')) > 1 else None
+            if answer and question.lower() in message.lower():
+                retVal = getUnicode(answer, UNICODE_ENCODING)
+
+                infoMsg = "%s%s" % (getUnicode(message), retVal)
+                logger.info(infoMsg)
+
+                debugMsg = "used the given answer"
+                logger.debug(debugMsg)
+
+                break
+
+    if retVal is None:
+        if checkBatch and conf.batch:
+            if isListLike(default):
+                options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
+            elif default:
+                options = getUnicode(default, UNICODE_ENCODING)
+            else:
+                options = unicode()
+
+            infoMsg = "%s%s" % (getUnicode(message), options)
+            logger.info(infoMsg)
+
+            debugMsg = "used the default behaviour, running in batch mode"
+            logger.debug(debugMsg)
+
+            retVal = default
         else:
-            options = unicode()
+            logging._acquireLock()
+            dataToStdout("\r%s" % message, forceOutput=True, bold=True)
+            kb.prependFlag = False
+            try:
+                retVal = raw_input() or default
+                retVal = getUnicode(retVal, system=True) if retVal else retVal
+            except:
+                time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
+                kb.prependFlag = True
+                raise sqlmapUserQuitException
+            finally:
+                logging._releaseLock()
 
-        infoMsg = "%s%s" % (getUnicode(message), options)
-        logger.info(infoMsg)
-
-        debugMsg = "used the default behaviour, running in batch mode"
-        logger.debug(debugMsg)
-
-        data = default
-    else:
-        logging._acquireLock()
-        dataToStdout("\r%s" % message, forceOutput=True, bold=True)
-        kb.prependFlag = False
-        try:
-            data = raw_input() or default
-            data = getUnicode(data, system=True) if data else data
-        except:
-            time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
-            kb.prependFlag = True
-            raise sqlmapUserQuitException
-        finally:
-            logging._releaseLock()
-
-    return data
+    return retVal
 
 def randomRange(start=0, stop=1000):
     """

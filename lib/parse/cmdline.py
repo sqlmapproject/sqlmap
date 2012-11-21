@@ -604,6 +604,9 @@ def cmdLineParser():
         miscellaneous.add_option("-z", dest="mnemonics",
                                help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
 
+        miscellaneous.add_option("--answers", dest="answers",
+                                  help="Set question answers (e.g. \"quit=N,follow=N\")")
+
         miscellaneous.add_option("--check-payload", dest="checkPayload",
                                   action="store_true",
                                   help="Offline WAF/IPS/IDS payload detection testing")
