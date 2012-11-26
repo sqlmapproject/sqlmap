@@ -13,6 +13,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import randomStr
+from lib.core.common import unArrayizeValue
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -40,7 +41,7 @@ class Takeover(GenericTakeover):
                 logger.info("retrieving MySQL base directory absolute path")
 
                 # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
-                self.__basedir = inject.getValue("SELECT @@basedir")
+                self.__basedir = unArrayizeValue(inject.getValue("SELECT @@basedir"))
 
                 if re.search("^[\w]\:[\/\\\\]+", self.__basedir, re.I):
                     Backend.setOs(OS.WINDOWS)
