@@ -28,7 +28,16 @@ def base64encode(value):
     return value.encode("base64")[:-1].replace("\n", "")
 
 def base64pickle(value):
-    return base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
+    retVal = None
+    try:
+        retVal = base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
+    except:
+        warnMsg = "problem occurred while serializing "
+        warnMsg += "instance of a type '%s'" % type(value)
+        singleTimeWarnMessage(warnMsg)
+
+        retVal = base64encode(pickle.dumps(str(value), pickle.HIGHEST_PROTOCOL))
+    return retVal
 
 def base64unpickle(value):
     return pickle.loads(base64decode(value))
