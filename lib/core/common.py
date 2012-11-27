@@ -2759,7 +2759,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
                 retVal = "[%s]" % retVal.strip("[]")
 
-        if _ and DEFAULT_MSSQL_SCHEMA not in retVal:
+        if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
             retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
 
     return retVal
