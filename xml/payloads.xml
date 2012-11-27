@@ -709,7 +709,7 @@ Formats:
             <payload>RLIKE IF([RANDNUM]=[RANDNUM],[ORIGVALUE],0x28)</payload>
         </request>
         <response>
-            <comparison>RLIKE IF([RANDNUM]=[RANDNUM],[ORIGVALUE],0x28)</comparison>
+            <comparison>RLIKE IF([RANDNUM]=[RANDNUM1],[ORIGVALUE],0x28)</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
