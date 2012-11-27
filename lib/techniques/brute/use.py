@@ -155,11 +155,9 @@ def columnExists(columnFile, regex=None):
     columns.extend(__addPageTextWords())
     columns = filterListValue(columns, regex)
 
+    table = safeSQLIdentificatorNaming(conf.tbl, True)
     if conf.db and METADB_SUFFIX not in conf.db:
-        table = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', conf.tbl)
-    else:
-        table = conf.tbl
-    table = safeSQLIdentificatorNaming(table, True)
+        table = "%s.%s" % (safeSQLIdentificatorNaming(conf.db), table)
 
     kb.threadContinue = True
     kb.bruteMode = True
