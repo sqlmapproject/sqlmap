@@ -20,6 +20,7 @@ _defaults =  {
                "threads":      1,
                "level":        1,
                "risk":         1,
+               "dumpFormat":   "CSV",
                "tech":         "BEUST",
                "torType":      "HTTP"
              }

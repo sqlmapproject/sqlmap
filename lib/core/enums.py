@@ -124,6 +124,11 @@ class PROXYTYPE:
     SOCKS4 = "SOCKS4"
     SOCKS5 = "SOCKS5"
 
+class DUMP_FORMAT:
+    CSV = "CSV"
+    HTML = "HTML"
+    SQLITE = "SQLITE"
+
 class HTTPHEADER:
     ACCEPT = "Accept"
     ACCEPT_CHARSET = "Accept-Charset"

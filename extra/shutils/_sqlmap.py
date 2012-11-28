@@ -141,7 +141,6 @@ _arguments -C -s \
   '(--hex)'--hex'[Uses DBMS hex function(s) for data retrieval]' \
   '(--output-dir)'--output-dir=-'[Custom output directory path]:ODIR' \
   '(--parse-errors)'--parse-errors'[Parse and display DBMS error messages from responses]' \
-  '(--replicate)'--replicate'[Replicate dumped data into a sqlite3 database]' \
   '(--save)'--save'[Save options to a configuration INI file]' \
   '(--tor)'--tor'[Use Tor anonymity network]' \
   '(--tor-port)'--tor-port=-'[Set Tor proxy port other than default]:TORPORT' \

@@ -547,6 +547,9 @@ def cmdLineParser():
         general.add_option("--dbms-cred", dest="dbmsCred",
                             help="DBMS authentication credentials (user:password)")
 
+        general.add_option("--dump-format", dest="dumpFormat",
+                                  help="Format of dumped data (CSV (default), HTML or SQLITE)")
+
         general.add_option("--eta", dest="eta",
                             action="store_true",
                             help="Display for each output the "
@@ -576,10 +579,6 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Parse and display DBMS error messages from responses")
 
-        general.add_option("--replicate", dest="replicate",
-                                  action="store_true",
-                                  help="Replicate dumped data into a sqlite3 database")
-
         general.add_option("--save", dest="saveCmdline",
                             action="store_true",
                             help="Save options to a configuration INI file")
@@ -592,7 +591,7 @@ def cmdLineParser():
                                   help="Set Tor proxy port other than default")
 
         general.add_option("--tor-type", dest="torType",
-                                  help="Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)")
+                                  help="Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",

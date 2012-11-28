@@ -63,6 +63,7 @@ from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CUSTOM_LOGGING
+from lib.core.enums import DUMP_FORMAT
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
@@ -1409,6 +1410,12 @@ def __cleanupOptions():
         for _ in DUMP_REPLACEMENTS.keys():
             del DUMP_REPLACEMENTS[_]
 
+    if conf.dumpFormat:
+        conf.dumpFormat = conf.dumpFormat.upper()
+
+    if conf.torType:
+        conf.torType = conf.torType.upper()
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
@@ -1968,6 +1975,10 @@ def __basicOptionValidation():
 
     if conf.torType not in getPublicTypeMembers(PROXYTYPE, True):
         errMsg = "option '--tor-type' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXYTYPE, True))
+        raise sqlmapSyntaxException, errMsg
+
+    if conf.dumpFormat not in getPublicTypeMembers(DUMP_FORMAT, True):
+        errMsg = "option '--dump-format' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(DUMP_FORMAT, True))
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:

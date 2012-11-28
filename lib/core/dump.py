@@ -26,6 +26,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import DBMS
+from lib.core.enums import DUMP_FORMAT
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
@@ -330,7 +331,7 @@ class Dump:
             db = "All"
         table = tableValues["__infos__"]["table"]
 
-        if conf.replicate:
+        if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
         else:
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
@@ -357,7 +358,7 @@ class Dump:
         separator += "+"
         self._write("Database: %s\nTable: %s" % (db if db else "Current database", table))
 
-        if conf.replicate:
+        if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             cols = []
 
             for column in columns:
@@ -406,7 +407,7 @@ class Dump:
 
                 self._write("| %s%s" % (column, blank), newline=False)
 
-                if not conf.replicate:
+                if conf.dumpFormat != DUMP_FORMAT.SQLITE:
                     if field == fields:
                         dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
                     else:
@@ -416,10 +417,10 @@ class Dump:
 
         self._write("|\n%s" % separator)
 
-        if not conf.replicate:
+        if conf.dumpFormat != DUMP_FORMAT.SQLITE:
             dataToDumpFile(dumpFP, "\n")
 
-        if conf.replicate:
+        if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.beginTransaction()
 
         if count > TRIM_STDOUT_DUMP_SIZE:
@@ -451,7 +452,7 @@ class Dump:
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    if not conf.replicate:
+                    if conf.dumpFormat != DUMP_FORMAT.SQLITE:
                         if field == fields:
                             dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
                         else:
@@ -459,7 +460,7 @@ class Dump:
 
                     field += 1
 
-            if conf.replicate:
+            if conf.dumpFormat == DUMP_FORMAT.SQLITE:
                 try:
                     rtable.insert(values)
                 except sqlmapValueException:
@@ -467,12 +468,12 @@ class Dump:
 
             self._write("|", console=console)
 
-            if not conf.replicate:
+            if conf.dumpFormat != DUMP_FORMAT.SQLITE:
                 dataToDumpFile(dumpFP, "\n")
 
         self._write("%s\n" % separator)
 
-        if conf.replicate:
+        if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.endTransaction()
             logger.info("table '%s.%s' dumped to sqlite3 database '%s'" % (db, table, replication.dbpath))
 
