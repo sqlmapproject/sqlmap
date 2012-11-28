@@ -11,6 +11,8 @@ import os
 import StringIO
 import threading
 
+from xml.dom.minidom import getDOMImplementation
+
 from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
@@ -322,6 +324,10 @@ class Dump:
     def dbTableValues(self, tableValues):
         replication = None
         rtable = None
+        documentNode = None
+        tableNode = None
+        rowNode = None
+        dumpFP = None
 
         if tableValues is None:
             return
@@ -333,13 +339,13 @@ class Dump:
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
-        elif conf.dumpFormat == DUMP_FORMAT.CSV:
+        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
 
             if not os.path.isdir(dumpDbPath):
                 os.makedirs(dumpDbPath, 0755)
 
-            dumpFileName = "%s%s%s.csv" % (dumpDbPath, os.sep, unsafeSQLIdentificatorNaming(table))
+            dumpFileName = "%s%s%s.%s" % (dumpDbPath, os.sep, unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())
             dumpFP = openFile(dumpFileName, "wb")
 
         count = int(tableValues["__infos__"]["count"])
@@ -391,6 +397,9 @@ class Dump:
                     cols.append((column, colType if colType else Replication.TEXT))
 
             rtable = replication.createTable(table, cols)
+        elif conf.dumpFormat == DUMP_FORMAT.HTML:
+            documentNode = getDOMImplementation().createDocument(None, "table", None)
+            tableNode = documentNode.documentElement
 
         if count == 1:
             self._write("[1 entry]")
@@ -398,6 +407,10 @@ class Dump:
             self._write("[%d entries]" % count)
 
         self._write(separator)
+
+        if conf.dumpFormat == DUMP_FORMAT.HTML:
+            rowNode = documentNode.createElement("tr")
+            tableNode.appendChild(rowNode)
 
         for column in columns:
             if column != "__infos__":
@@ -412,6 +425,10 @@ class Dump:
                         dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
                     else:
                         dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
+                elif conf.dumpFormat == DUMP_FORMAT.HTML:
+                    entryNode = documentNode.createElement("td")
+                    rowNode.appendChild(entryNode)
+                    entryNode.appendChild(documentNode.createTextNode(column))
 
                 field += 1
 
@@ -433,6 +450,10 @@ class Dump:
             console = (i >= count - TRIM_STDOUT_DUMP_SIZE)
             field = 1
             values = []
+
+            if conf.dumpFormat == DUMP_FORMAT.HTML:
+                rowNode = documentNode.createElement("tr")
+                tableNode.appendChild(rowNode)
 
             for column in columns:
                 if column != "__infos__":
@@ -457,6 +478,10 @@ class Dump:
                             dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
+                    elif conf.dumpFormat == DUMP_FORMAT.HTML:
+                        entryNode = documentNode.createElement("td")
+                        rowNode.appendChild(entryNode)
+                        entryNode.appendChild(documentNode.createTextNode(value))
 
                     field += 1
 
@@ -476,10 +501,13 @@ class Dump:
             rtable.endTransaction()
             logger.info("table '%s.%s' dumped to sqlite3 database '%s'" % (db, table, replication.dbpath))
 
-        elif conf.dumpFormat == DUMP_FORMAT.CSV:
-            dataToDumpFile(dumpFP, "\n")
+        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
+            if conf.dumpFormat == DUMP_FORMAT.HTML:
+                dataToDumpFile(dumpFP, tableNode.toxml())
+            else:
+                dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
-            logger.info("table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
+            logger.info("table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName))
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         for column in dbColumnsDict.keys():
