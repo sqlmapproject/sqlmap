@@ -12,6 +12,7 @@ from optparse import OptionGroup
 from optparse import OptionParser
 from optparse import SUPPRESS_HELP
 
+from lib.core.common import checkDeprecatedOptions
 from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import logger
@@ -715,6 +716,8 @@ def cmdLineParser():
 
         for arg in sys.argv:
             args.append(getUnicode(arg, system=True))
+
+        checkDeprecatedOptions(args)
 
         # Hide non-basic options in basic help case
         for i in xrange(len(sys.argv)):

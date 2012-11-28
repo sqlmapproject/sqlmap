@@ -305,6 +305,9 @@ HASH_MOD_ITEM_DISPLAY = 11
 # Maximum integer value
 MAX_INT = sys.maxint
 
+# List of deprecated options
+DEPRECATED_OPTIONS = ("--replicate",)
+
 # Parameters to be ignored in detection phase (upper case)
 IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
 

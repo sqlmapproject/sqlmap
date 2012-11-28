@@ -201,3 +201,5 @@ POST_HINT_CONTENT_TYPES = {
                                 POST_HINT.SOAP: "application/soap+xml",
                                 POST_HINT.XML: "application/xml"
                           }
+
+DEPRECATED_HINTS = {"--replicate": "use '--dump-format=SQLITE' instead"}

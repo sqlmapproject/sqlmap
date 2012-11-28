@@ -56,6 +56,7 @@ from lib.core.convert import unicodeencode
 from lib.core.convert import utf8encode
 from lib.core.decorators import cachedmethod
 from lib.core.dicts import DBMS_DICT
+from lib.core.dicts import DEPRECATED_HINTS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CHARSET_TYPE
@@ -86,6 +87,7 @@ from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
+from lib.core.settings import DEPRECATED_OPTIONS
 from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import DUMMY_USER_INJECTION
@@ -3132,6 +3134,18 @@ def getHostHeader(url):
             retVal = retVal.split(':')[0]
 
     return retVal
+
+def checkDeprecatedOptions(args):
+    """
+    Checks for deprecated options
+    """
+
+    for _ in args:
+        if _ in DEPRECATED_OPTIONS:
+            errMsg = "switch/option '%s' is deprecated" % _
+            if _ in DEPRECATED_HINTS:
+                errMsg += " (hint: %s)" % DEPRECATED_HINTS[_]
+            raise sqlmapSyntaxException, errMsg
 
 def evaluateCode(code, variables=None):
     """
