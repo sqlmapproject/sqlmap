@@ -269,6 +269,9 @@ MAX_RATIO = 1.0
 # Character used for marking injectable position inside provided data
 CUSTOM_INJECTION_MARK_CHAR = '*'
 
+# Other way to declare injection position
+INJECT_HERE_MARK = '%INJECT HERE%'
+
 # Maximum length used for retrieving data over MySQL error based payload due to "known" problems with longer result strings
 MYSQL_ERROR_CHUNK_LENGTH = 50
 

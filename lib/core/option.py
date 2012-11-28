@@ -90,12 +90,14 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import BURP_REQUEST_REGEX
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import FIREBIRD_ALIASES
+from lib.core.settings import INJECT_HERE_MARK
 from lib.core.settings import IS_WIN
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAXDB_ALIASES
@@ -1350,6 +1352,8 @@ def __cleanupOptions():
         setOptimize()
 
     if conf.data:
+        conf.data = re.sub(INJECT_HERE_MARK, CUSTOM_INJECTION_MARK_CHAR, conf.data, re.I)
+
         if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
             original = conf.data
             class _(unicode): pass
@@ -1357,6 +1361,9 @@ def __cleanupOptions():
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
         else:
             conf.data = urldecode(conf.data)
+
+    if conf.url:
+        conf.url = re.sub(INJECT_HERE_MARK, CUSTOM_INJECTION_MARK_CHAR, conf.url, re.I)
 
     if conf.os:
         conf.os = conf.os.capitalize()
