@@ -1352,7 +1352,7 @@ def __cleanupOptions():
         setOptimize()
 
     if conf.data:
-        conf.data = re.sub(INJECT_HERE_MARK, CUSTOM_INJECTION_MARK_CHAR, conf.data, re.I)
+        conf.data = re.sub(INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.data, re.I)
 
         if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
             original = conf.data
@@ -1363,7 +1363,7 @@ def __cleanupOptions():
             conf.data = urldecode(conf.data)
 
     if conf.url:
-        conf.url = re.sub(INJECT_HERE_MARK, CUSTOM_INJECTION_MARK_CHAR, conf.url, re.I)
+        conf.url = re.sub(INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.url, re.I)
 
     if conf.os:
         conf.os = conf.os.capitalize()
