@@ -32,6 +32,8 @@ from lib.core.enums import DUMP_FORMAT
 from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapValueException
 from lib.core.replication import Replication
+from lib.core.settings import HTML_DUMP_CSS_STYLE
+from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 
@@ -503,7 +505,11 @@ class Dump:
 
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
+                dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
+                dataToDumpFile(dumpFP, HTML_DUMP_CSS_STYLE)
+                dataToDumpFile(dumpFP, "\n</head>\n")
                 dataToDumpFile(dumpFP, tableNode.toxml())
+                dataToDumpFile(dumpFP, "\n</html>")
             else:
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()

@@ -499,3 +499,18 @@ SUHOSHIN_MAX_VALUE_LENGTH = 512
 
 # Regular expression used for extracting form tags
 FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
+
+# CSS style used in HTML dump format
+HTML_DUMP_CSS_STYLE = """<style>
+table{
+margin:10;
+background-color:#ffffff;
+font-family:verdana;
+font-size:12px;
+align:center;
+}
+td{
+font-family:verdana;
+font-size:10px;
+}
+</style>"""
