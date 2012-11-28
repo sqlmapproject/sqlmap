@@ -69,7 +69,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
-from lib.core.enums import PROXYTYPE
+from lib.core.enums import PROXY_TYPE
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import WIZARD
 from lib.core.exception import sqlmapConnectionException
@@ -924,8 +924,8 @@ def __setHTTPProxy():
         except:
             pass #drops into the next check block
 
-    if not all((scheme, hasattr(PROXYTYPE, scheme), hostname, port)):
-        errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXYTYPE))
+    if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
+        errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
         raise sqlmapSyntaxException, errMsg
 
     if conf.pCred:
@@ -938,8 +938,8 @@ def __setHTTPProxy():
             username = _.group(1)
             password = _.group(2)
 
-    if scheme in (PROXYTYPE.SOCKS4, PROXYTYPE.SOCKS5):
-        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXYTYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
+    if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
+        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
         socks.wrapmodule(urllib2)
     else:
         if conf.pCred:
@@ -1813,7 +1813,7 @@ def __setTorProxySettings():
     if not conf.tor:
         return
 
-    if conf.torType == PROXYTYPE.HTTP:
+    if conf.torType == PROXY_TYPE.HTTP:
         __setTorHttpProxySettings()
     else:
         __setTorSocksProxySettings()
@@ -1864,7 +1864,7 @@ def __setTorSocksProxySettings():
     logger.info(infoMsg)
 
     # Has to be SOCKS5 to prevent DNS leaks (http://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXYTYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, conf.torPort or DEFAULT_TOR_SOCKS_PORT)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, conf.torPort or DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
 
 def __checkTor():
@@ -1973,8 +1973,8 @@ def __basicOptionValidation():
         errMsg = "value for option '--tor-port' must be a positive integer"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.torType not in getPublicTypeMembers(PROXYTYPE, True):
-        errMsg = "option '--tor-type' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXYTYPE, True))
+    if conf.torType not in getPublicTypeMembers(PROXY_TYPE, True):
+        errMsg = "option '--tor-type' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXY_TYPE, True))
         raise sqlmapSyntaxException, errMsg
 
     if conf.dumpFormat not in getPublicTypeMembers(DUMP_FORMAT, True):

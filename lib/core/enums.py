@@ -119,7 +119,7 @@ class MOBILES:
     NEXUS = ("Google Nexus 7", "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19")
     NOKIA = ("Nokia N97", "Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/10.0.012; Profile/MIDP-2.1 Configuration/CLDC-1.1; en-us) AppleWebKit/525 (KHTML, like Gecko) WicKed/7.1.12344")
 
-class PROXYTYPE:
+class PROXY_TYPE:
     HTTP = "HTTP"
     SOCKS4 = "SOCKS4"
     SOCKS5 = "SOCKS5"
