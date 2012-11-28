@@ -333,7 +333,7 @@ class Dump:
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
-        else:
+        elif conf.dumpFormat == DUMP_FORMAT.CSV:
             dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
 
             if not os.path.isdir(dumpDbPath):
@@ -407,7 +407,7 @@ class Dump:
 
                 self._write("| %s%s" % (column, blank), newline=False)
 
-                if conf.dumpFormat != DUMP_FORMAT.SQLITE:
+                if conf.dumpFormat == DUMP_FORMAT.CSV:
                     if field == fields:
                         dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
                     else:
@@ -417,10 +417,10 @@ class Dump:
 
         self._write("|\n%s" % separator)
 
-        if conf.dumpFormat != DUMP_FORMAT.SQLITE:
+        if conf.dumpFormat == DUMP_FORMAT.CSV:
             dataToDumpFile(dumpFP, "\n")
 
-        if conf.dumpFormat == DUMP_FORMAT.SQLITE:
+        elif conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.beginTransaction()
 
         if count > TRIM_STDOUT_DUMP_SIZE:
@@ -452,7 +452,7 @@ class Dump:
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    if conf.dumpFormat != DUMP_FORMAT.SQLITE:
+                    if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
                             dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
                         else:
@@ -465,11 +465,10 @@ class Dump:
                     rtable.insert(values)
                 except sqlmapValueException:
                     pass
+            elif conf.dumpFormat == DUMP_FORMAT.CSV:
+                dataToDumpFile(dumpFP, "\n")
 
             self._write("|", console=console)
-
-            if conf.dumpFormat != DUMP_FORMAT.SQLITE:
-                dataToDumpFile(dumpFP, "\n")
 
         self._write("%s\n" % separator)
 
@@ -477,7 +476,7 @@ class Dump:
             rtable.endTransaction()
             logger.info("table '%s.%s' dumped to sqlite3 database '%s'" % (db, table, replication.dbpath))
 
-        else:
+        elif conf.dumpFormat == DUMP_FORMAT.CSV:
             dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
             logger.info("table '%s.%s' dumped to CSV file '%s'" % (db, table, dumpFileName))
