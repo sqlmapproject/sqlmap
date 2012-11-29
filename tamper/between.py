@@ -5,6 +5,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
+
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHEST
@@ -54,7 +56,7 @@ def tamper(payload, headers=None):
 
             elif payload[i] == ">" and not doublequote and not quote:
                 retVal += " " if i > 0 and not payload[i-1].isspace() else ""
-                retVal += "NOT BETWEEN 0 AND"
+                retVal += "NOT BETWEEN %s AND" % ('0' if re.search(r"\A[^\w]*\d", payload[i+1:]) else "NULL")
                 retVal += " " if i < len(payload) - 1 and not payload[i+1:i+2].isspace() else ""
 
                 continue
