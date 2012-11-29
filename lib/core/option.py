@@ -1989,7 +1989,7 @@ def __basicOptionValidation():
         raise sqlmapSyntaxException, errMsg
 
     if conf.dumpFormat != defaults.dumpFormat and not any((conf.dumpTable, conf.dumpAll)):
-        errMsg = "option '--dump-format' requires usage of switch '--dump' or '--dump-all'"
+        errMsg = "option '--dump-format' requires usage of switch '--dump' (or '--dump-all')"
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:
