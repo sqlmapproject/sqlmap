@@ -15,7 +15,7 @@ from lib.core.enums import PRIORITY
 __priority__ = PRIORITY.NORMAL
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+    pass
 
 def tamper(payload, headers=None):
     """
@@ -27,7 +27,7 @@ def tamper(payload, headers=None):
         * Output: SELECT%09id FROM users where id LIKE 1
 
     Requirement:
-        * MySQL, Blue Coat SGOS with WAF activated as documented in
+        * Blue Coat SGOS with WAF activated as documented in
         https://kb.bluecoat.com/index?page=content&id=FAQ2147
 
     Tested against:
