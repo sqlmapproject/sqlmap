@@ -397,7 +397,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
             found = False
             count = 0
 
-            if query and not 'COUNT(*)' in query:
+            if query and not re.search(r"COUNT.*FROM.*\(.*DISTINCT", query, re.I):
                 query = query.replace("DISTINCT ", "")
 
             if not conf.forceDns:
