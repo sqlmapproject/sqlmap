@@ -1972,7 +1972,7 @@ def __basicOptionValidation():
         errMsg = "switch '--tor' is incompatible with option '--proxy'"
         raise sqlmapSyntaxException, errMsg
 
-    if conf.checkTor and not any([conf.tor, conf.proxy]):
+    if conf.checkTor and not any((conf.tor, conf.proxy)):
         errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
         raise sqlmapSyntaxException, errMsg
 
@@ -1988,8 +1988,8 @@ def __basicOptionValidation():
         errMsg = "option '--dump-format' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(DUMP_FORMAT, True))
         raise sqlmapSyntaxException, errMsg
 
-    if conf.dumpFormat != defaults.dumpFormat and not conf.dumpTable:
-        errMsg = "option '--dump-format' requires usage of switch '--dump'"
+    if conf.dumpFormat != defaults.dumpFormat and not any((conf.dumpTable, conf.dumpAll)):
+        errMsg = "option '--dump-format' requires usage of switch '--dump' or '--dump-all'"
         raise sqlmapSyntaxException, errMsg
 
     if conf.skip and conf.testParameter:
