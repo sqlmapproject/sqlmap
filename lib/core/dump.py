@@ -326,9 +326,7 @@ class Dump:
     def dbTableValues(self, tableValues):
         replication = None
         rtable = None
-        documentNode = None
-        tableNode = None
-        rowNode = None
+        documentNode, tableNode, bodyNode, headNode, rowNode = (0,) * 5
         dumpFP = None
 
         if tableValues is None:
@@ -411,8 +409,12 @@ class Dump:
         self._write(separator)
 
         if conf.dumpFormat == DUMP_FORMAT.HTML:
+            headNode = documentNode.createElement("thead")
             rowNode = documentNode.createElement("tr")
-            tableNode.appendChild(rowNode)
+            tableNode.appendChild(headNode)
+            headNode.appendChild(rowNode)
+            bodyNode = documentNode.createElement("tbody")
+            tableNode.appendChild(bodyNode)
 
         for column in columns:
             if column != "__infos__":
@@ -455,7 +457,7 @@ class Dump:
 
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 rowNode = documentNode.createElement("tr")
-                tableNode.appendChild(rowNode)
+                bodyNode.appendChild(rowNode)
 
             for column in columns:
                 if column != "__infos__":

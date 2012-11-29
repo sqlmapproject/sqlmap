@@ -503,14 +503,21 @@ FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
 table{
-margin:10;
-background-color:#ffffff;
-font-family:verdana;
-font-size:12px;
-align:center;
+    margin:10;
+    background-color:#FFFFFF;
+    font-family:verdana;
+    font-size:12px;
+    align:center;
+}
+thead{
+    font-weight:bold;
+    background-color:#4F81BD;
+    color:#FFFFFF;
+}
+tr:nth-child(even) {
+    background-color: #D3DFEE
 }
 td{
-font-family:verdana;
-font-size:10px;
+    font-size:10px;
 }
 </style>"""
