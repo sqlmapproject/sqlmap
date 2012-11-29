@@ -416,7 +416,7 @@
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
         <hostname/>
         <users>
-            <inband query="SELECT DISTINCT RDB$USER FROM RDB$USER_PRIVILEGES"/>
+            <inband query="SELECT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
         </users>
         <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
