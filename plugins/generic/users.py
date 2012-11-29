@@ -97,7 +97,7 @@ class Users:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+            value = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(value):
                 kb.data.cachedUsers = arrayizeValue(value)
