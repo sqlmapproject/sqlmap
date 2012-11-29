@@ -75,7 +75,11 @@ def __oneShotErrorUse(expression, field=None):
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
 
-                    if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
+                    if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)) and not any(_ in field for _ in ("COUNT", "CASE")):  # skip chunking of scalar expression (unneeded)
+                        extendedField = re.search(r"[^ ,]*%s[^ ,]*" % re.escape(field), expression).group(0)
+                        if extendedField != field:  # e.g. MIN(surname)
+                            nulledCastedField = extendedField.replace(field, nulledCastedField)
+                            field = extendedField
                         nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
 
                 # Forge the error-based SQL injection request
