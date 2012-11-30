@@ -507,7 +507,9 @@ class Dump:
 
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
-                dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
+                dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n")
+                dataToDumpFile(dumpFP, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=%s\">\n" % UNICODE_ENCODING)
+                dataToDumpFile(dumpFP, "<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
                 dataToDumpFile(dumpFP, HTML_DUMP_CSS_STYLE)
                 dataToDumpFile(dumpFP, "\n</head>\n")
                 dataToDumpFile(dumpFP, tableNode.toxml())
