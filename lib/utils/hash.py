@@ -672,7 +672,7 @@ def dictionaryAttack(attack_dict):
 
         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
             for suffix in suffix_list:
-                if len(attack_info) <= len(results) or processException:
+                if not attack_info or processException:
                     break
 
                 if suffix:
