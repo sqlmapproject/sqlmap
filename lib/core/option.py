@@ -1988,10 +1988,6 @@ def __basicOptionValidation():
         errMsg = "option '--dump-format' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(DUMP_FORMAT, True))
         raise sqlmapSyntaxException, errMsg
 
-    if conf.dumpFormat != defaults.dumpFormat and not any((conf.dumpTable, conf.dumpAll)):
-        errMsg = "option '--dump-format' requires usage of switch '--dump' (or '--dump-all')"
-        raise sqlmapSyntaxException, errMsg
-
     if conf.skip and conf.testParameter:
         errMsg = "option '--skip' is incompatible with option '-p'"
         raise sqlmapSyntaxException, errMsg
