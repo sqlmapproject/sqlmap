@@ -14,7 +14,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Replaces space character (' ') with a random blank character from a
     valid set of alternate characters

@@ -9,7 +9,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGH
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Appends 'sp_password' to the end of the payload for automatic obfuscation from DBMS logs
 

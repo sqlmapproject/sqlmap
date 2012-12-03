@@ -16,7 +16,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against ASP or ASP.NET web applications" % os.path.basename(__file__).split(".")[0])
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Unicode-url-encodes non-encoded characters in a given payload (not
     processing already encoded)

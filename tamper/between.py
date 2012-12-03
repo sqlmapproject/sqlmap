@@ -14,7 +14,7 @@ __priority__ = PRIORITY.HIGHEST
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Replaces greater than operator ('>') with 'NOT BETWEEN 0 AND #'
 

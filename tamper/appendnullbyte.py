@@ -12,7 +12,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Appends encoded NULL byte character at the end of payload
 

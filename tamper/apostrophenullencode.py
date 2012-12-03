@@ -12,7 +12,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Replaces apostrophe character with its illegal double unicode counterpart
 

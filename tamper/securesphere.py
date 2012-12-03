@@ -14,7 +14,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Appends special crafted string
 

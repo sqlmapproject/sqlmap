@@ -16,7 +16,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against ASP web applications" % os.path.basename(__file__).split(".")[0])
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Adds a percentage sign ('%') infront of each character
 

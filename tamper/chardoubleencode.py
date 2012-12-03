@@ -14,7 +14,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Double url-encodes all characters in a given payload (not processing
     already encoded)

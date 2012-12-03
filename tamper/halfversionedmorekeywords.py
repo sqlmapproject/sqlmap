@@ -19,7 +19,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s < 5.1" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Adds versioned MySQL comment before each keyword
 

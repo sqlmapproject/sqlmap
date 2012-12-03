@@ -12,7 +12,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Embraces complete query with zero-versioned comment
 

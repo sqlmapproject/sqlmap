@@ -13,7 +13,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Add random comments to SQL keywords
     Example: 'INSERT' becomes 'IN/**/S/**/ERT'

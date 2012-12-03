@@ -13,7 +13,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Replaces predefined SQL keywords with representations
     suitable for replacement (e.g. .replace("SELECT", "")) filters

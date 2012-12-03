@@ -17,7 +17,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
-def tamper(payload, headers=None):
+def tamper(payload, **kwargs):
     """
     Replaces space character after SQL statement with a valid random blank character.
     Afterwards replace character = with LIKE operator
