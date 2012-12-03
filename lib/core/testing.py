@@ -34,18 +34,18 @@ def smokeTest():
     count, length = 0, 0
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if 'extra' in root:
+        if any(_ in root for _ in ("thirdparty", "extra")):
             continue
 
         for ifile in files:
             length += 1
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if 'extra' in root:
+        if any(_ in root for _ in ("thirdparty", "extra")):
             continue
 
         for ifile in files:
-            if os.path.splitext(ifile)[1].lower() == '.py' and ifile != '__init__.py':
+            if os.path.splitext(ifile)[1].lower() == ".py" and ifile != "__init__.py":
                 path = os.path.join(root, os.path.splitext(ifile)[0])
                 path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
                 path = path.replace(os.sep, '.').lstrip('.')
