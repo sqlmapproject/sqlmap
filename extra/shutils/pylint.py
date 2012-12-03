@@ -38,6 +38,8 @@ if __name__ == "__main__":
 
     print "looking for *.py scripts in subdirectories of ", BASE_DIRECTORY
     for root, dirs, files in os.walk(BASE_DIRECTORY):
+        if any(_ in root for _ in ("extra", "thirdparty")):
+            continue
         for name in files:
             filepath = os.path.join(root, name)
             check(filepath)
