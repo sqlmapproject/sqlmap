@@ -372,8 +372,8 @@ class Connect:
             page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             status = getUnicode(conn.msg)
 
-            if extractRegexResult(META_REFRESH_REGEX, page, re.DOTALL | re.IGNORECASE) and not refreshing:
-                url = extractRegexResult(META_REFRESH_REGEX, page, re.DOTALL | re.IGNORECASE)
+            if extractRegexResult(META_REFRESH_REGEX, page) and not refreshing:
+                url = extractRegexResult(META_REFRESH_REGEX, page)
 
                 debugMsg = "got HTML meta refresh header"
                 logger.debug(debugMsg)

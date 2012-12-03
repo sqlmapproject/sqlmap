@@ -222,10 +222,10 @@ ERROR_PARSING_REGEXES = (
                         )
 
 # Regular expression used for parsing charset info from meta html headers
-META_CHARSET_REGEX = r'<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+)'
+META_CHARSET_REGEX = r'(?si)<head>.*<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+).*</head>'
 
 # Regular expression used for parsing refresh info from meta html headers
-META_REFRESH_REGEX = r'<meta http-equiv="?refresh"?[^>]+content="?[^">]+url=(?P<result>[^">]+)'
+META_REFRESH_REGEX = r'(?si)<head>.*<meta http-equiv="?refresh"?[^>]+content="?[^">]+url=(?P<result>[^">]+).*</head>'
 
 # Regular expression used for parsing empty fields in tested form data
 EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=(&|\Z))'

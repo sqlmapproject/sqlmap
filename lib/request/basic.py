@@ -220,7 +220,7 @@ def decodePage(page, contentEncoding, contentType):
         if contentType and (contentType.find("charset=") != -1):
             httpCharset = checkCharEncoding(contentType.split("charset=")[-1])
 
-        metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page, re.DOTALL | re.IGNORECASE))
+        metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page))
 
         if ((httpCharset or metaCharset) and not all([httpCharset, metaCharset]))\
             or (httpCharset == metaCharset and all([httpCharset, metaCharset])):
