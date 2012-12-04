@@ -40,6 +40,7 @@ from lib.core.exception import sqlmapUserQuitException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
+from lib.utils.hash import storeHashesToFile
 from lib.utils.pivotdumptable import pivotDumpTable
 
 class Users:
@@ -299,6 +300,8 @@ class Users:
         else:
             for user in kb.data.cachedUsersPasswords:
                 kb.data.cachedUsersPasswords[user] = list(set(kb.data.cachedUsersPasswords[user]))
+
+        storeHashesToFile(kb.data.cachedUsersPasswords)
 
         message = "do you want to perform a dictionary-based attack "
         message += "against retrieved password hashes? [Y/n/q]"

@@ -61,6 +61,7 @@ from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
 from lib.core.settings import ITOA64
 from lib.core.settings import ML
+from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
@@ -314,6 +315,8 @@ def storeHashesToFile(attack_dict):
     with open(filename, "w+") as f:
         for user, hashes in attack_dict.items():
             for hash_ in hashes:
+                if not hash_ or hash_ == NULL or not hashRecognition(hash_):
+                    continue
                 if user and not user.startswith(DUMMY_USER_PREFIX):
                     f.write("%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING)))
                 else:
@@ -321,7 +324,6 @@ def storeHashesToFile(attack_dict):
 
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
-        storeHashesToFile(kb.data.cachedUsersPasswords)
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
 
         for (_, hash_, password) in results:
