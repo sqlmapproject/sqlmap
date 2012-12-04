@@ -1964,6 +1964,10 @@ def __basicOptionValidation():
         errMsg = "switch '--forms' requires usage of option '-u' (--url)"
         raise sqlmapSyntaxException, errMsg
 
+    if conf.requestFile and conf.url:
+        errMsg = "option '-r' is incompatible with option '-u' (--url)"
+        raise sqlmapSyntaxException, errMsg
+
     if conf.tor and conf.ignoreProxy:
         errMsg = "switch '--tor' is incompatible with switch '--ignore-proxy'"
         raise sqlmapSyntaxException, errMsg
