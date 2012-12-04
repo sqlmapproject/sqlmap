@@ -300,8 +300,28 @@ __functions__ = {
                     HASH.WORDPRESS: wordpress_passwd
                 }
 
+def storeHashesToFile(attack_dict):
+    if not attack_dict:
+        return
+
+    handle, filename = tempfile.mkstemp(suffix=".txt")
+    os.close(handle)
+
+    warnMsg = "writing hashes to file '%s' " % filename
+    warnMsg += "for eventual further processing with other tools"
+    logger.warn(warnMsg)
+
+    with open(filename, "w+") as f:
+        for user, hashes in attack_dict.items():
+            for hash_ in hashes:
+                if user and not user.startswith(DUMMY_USER_PREFIX):
+                    f.write("%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING)))
+                else:
+                    f.write("%s\n" % hash_.encode(UNICODE_ENCODING))
+
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
+        storeHashesToFile(kb.data.cachedUsersPasswords)
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
 
         for (_, hash_, password) in results:
@@ -360,9 +380,13 @@ def attackDumpedTable():
                     col_passwords.add(column)
 
         if attack_dict:
-            message = "recognized possible password hashes in column%s " % ("s" if len(col_passwords) > 1 else "")
-            message += "'%s'. Do you want to " % ", ".join(col for col in col_passwords)
-            message += "crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
+            infoMsg = "recognized possible password hashes in column%s " % ("s" if len(col_passwords) > 1 else "")
+            infoMsg += "'%s'" % ", ".join(col for col in col_passwords)
+            logger.info(infoMsg)
+
+            storeHashesToFile(attack_dict)
+
+            message = "do you want to crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
             test = readInput(message, default="N" if conf.multipleTargets else "Y")
 
             if test[0] in ("n", "N"):
@@ -825,21 +849,6 @@ def dictionaryAttack(attack_dict):
                 clearConsoleLine()
 
     results.extend(resumes)
-
-    fp = None
-    for user, hash_ in user_hash:
-        if not any(_[1] == hash_ for _ in results):
-            if fp is None:
-                handle, filename = tempfile.mkstemp(suffix=".txt")
-                os.close(handle)
-                fp = open(filename, "w+")
-                singleTimeLogMessage("writing uncracked hashes to file '%s' for eventual further processing" % filename)
-            if user and not user.startswith(DUMMY_USER_PREFIX):
-                fp.write("%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING)))
-            else:
-                fp.write("%s\n" % hash_.encode(UNICODE_ENCODING))
-    if fp:
-        fp.close()
 
     if len(hash_regexes) == 0:
         warnMsg = "unknown hash format. "
