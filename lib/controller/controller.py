@@ -138,7 +138,7 @@ def __formatInjection(inj):
                 title = title.replace("columns", "column")
         elif comment:
             vector = "%s%s" % (vector, comment)
-        data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
+        data += "    Type: %s\n" % (PAYLOAD.SQLINJECTION[stype] if "inline" not in title else "inline query")
         data += "    Title: %s\n" % title
         data += "    Payload: %s\n" % agent.adjustLateValues(sdata.payload)
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
