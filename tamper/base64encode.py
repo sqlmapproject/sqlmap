@@ -14,6 +14,7 @@ __priority__ = PRIORITY.LOWEST
 def dependencies():
     pass
 
+
 def tamper(payload, **kwargs):
     """
     Base64 all characters in a given payload

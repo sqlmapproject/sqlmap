@@ -6,16 +6,11 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-
 from ConfigParser import MissingSectionHeaderError
 
-from lib.core.common import checkFile
-from lib.core.common import unArrayizeValue
-from lib.core.common import UnicodeRawConfigParser
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapSyntaxException
+from lib.core.common import checkFile, unArrayizeValue, UnicodeRawConfigParser
+from lib.core.data import conf, logger
+from lib.core.exception import sqlmapMissingMandatoryOptionException, sqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 

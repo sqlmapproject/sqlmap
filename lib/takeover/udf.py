@@ -8,28 +8,16 @@ See the file 'doc/COPYING' for copying permission
 import os
 
 from lib.core.agent import agent
-from lib.core.common import dataToStdout
-from lib.core.common import Backend
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import readInput
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.enums import DBMS
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import EXPECTED
-from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
+from lib.core.common import dataToStdout, Backend, isTechniqueAvailable, readInput
+from lib.core.data import conf, logger, queries
+from lib.core.enums import DBMS, CHARSET_TYPE, EXPECTED, OS, PAYLOAD
 from lib.core.common import unArrayizeValue
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import sqlmapFilePathException, sqlmapMissingMandatoryOptionException, \
+    sqlmapUnsupportedFeatureException, sqlmapUserQuitException
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
-class UDF:
+class UDF(object):
     """
     This class defines methods to deal with User-Defined Functions for
     plugins.

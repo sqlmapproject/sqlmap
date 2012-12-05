@@ -17,110 +17,38 @@ import sys
 import threading
 import urllib2
 import urlparse
+from xml.etree.ElementTree import ElementTree
 
 import lib.core.common
 import lib.core.threads
 import lib.core.convert
 
 from lib.controller.checks import checkConnection
-from lib.core.common import Backend
-from lib.core.common import boldifyMessage
-from lib.core.common import dataToStdout
-from lib.core.common import getPublicTypeMembers
-from lib.core.common import extractRegexResult
-from lib.core.common import filterStringValue
-from lib.core.common import findPageForms
-from lib.core.common import getConsoleWidth
-from lib.core.common import getFileItems
-from lib.core.common import getFileType
-from lib.core.common import getUnicode
-from lib.core.common import isListLike
-from lib.core.common import normalizePath
-from lib.core.common import ntToPosixSlashes
-from lib.core.common import openFile
-from lib.core.common import parseTargetDirect
-from lib.core.common import parseTargetUrl
-from lib.core.common import paths
-from lib.core.common import randomRange
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.common import resetCookieJar
-from lib.core.common import runningAsAdmin
-from lib.core.common import sanitizeStr
-from lib.core.common import setOptimize
-from lib.core.common import singleTimeWarnMessage
-from lib.core.common import UnicodeRawConfigParser
-from lib.core.common import urldecode
-from lib.core.common import urlencode
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.datatype import AttribDict
-from lib.core.datatype import InjectionDict
+from lib.core.common import Backend, boldifyMessage, dataToStdout, getPublicTypeMembers, extractRegexResult,\
+    filterStringValue, findPageForms, getConsoleWidth, getFileItems, getFileType, getUnicode, isListLike,\
+    normalizePath, ntToPosixSlashes, openFile, parseTargetDirect, parseTargetUrl, paths, randomRange, randomStr,\
+    readInput, resetCookieJar, runningAsAdmin, sanitizeStr, setOptimize, singleTimeWarnMessage,\
+    UnicodeRawConfigParser, urldecode, urlencode
+from lib.core.data import conf, kb, logger, queries
+from lib.core.datatype import AttribDict, InjectionDict
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DUMP_REPLACEMENTS
-from lib.core.enums import ADJUST_TIME_DELAY
-from lib.core.enums import CUSTOM_LOGGING
-from lib.core.enums import DUMP_FORMAT
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import MOBILES
-from lib.core.enums import PAYLOAD
-from lib.core.enums import PRIORITY
-from lib.core.enums import PROXY_TYPE
-from lib.core.enums import REFLECTIVE_COUNTER
-from lib.core.enums import WIZARD
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapMissingDependence
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapMissingPrivileges
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapUnsupportedDBMSException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.log import FORMATTER
-from lib.core.log import LOGGER_HANDLER
+from lib.core.enums import  ADJUST_TIME_DELAY, CUSTOM_LOGGING, DUMP_FORMAT, HTTPHEADER, HTTPMETHOD, MOBILES,\
+    PAYLOAD, PRIORITY, PROXY_TYPE, REFLECTIVE_COUNTER, WIZARD
+from lib.core.exception import  sqlmapConnectionException, sqlmapFilePathException, sqlmapGenericException,\
+    sqlmapMissingDependence, sqlmapMissingMandatoryOptionException, sqlmapMissingPrivileges,\
+    sqlmapSilentQuitException, sqlmapSyntaxException, sqlmapUnsupportedDBMSException, sqlmapUserQuitException
+from lib.core.log import FORMATTER, LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.purge import purge
-from lib.core.settings import ACCESS_ALIASES
-from lib.core.settings import BURP_REQUEST_REGEX
-from lib.core.settings import CODECS_LIST_PAGE
-from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import DB2_ALIASES
-from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import DEFAULT_PAGE_ENCODING
-from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
-from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
-from lib.core.settings import FIREBIRD_ALIASES
-from lib.core.settings import INJECT_HERE_MARK
-from lib.core.settings import IS_WIN
-from lib.core.settings import LOCALHOST
-from lib.core.settings import MAXDB_ALIASES
-from lib.core.settings import MAX_NUMBER_OF_THREADS
-from lib.core.settings import MSSQL_ALIASES
-from lib.core.settings import MYSQL_ALIASES
-from lib.core.settings import NULL
-from lib.core.settings import ORACLE_ALIASES
-from lib.core.settings import PARAMETER_SPLITTING_REGEX
-from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import PYVERSION
-from lib.core.settings import SITE
-from lib.core.settings import SQLITE_ALIASES
-from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import SUPPORTED_OS
-from lib.core.settings import SYBASE_ALIASES
-from lib.core.settings import TIME_DELAY_CANDIDATES
-from lib.core.settings import UNENCODED_ORIGINAL_VALUE
-from lib.core.settings import UNION_CHAR_REGEX
-from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import URI_INJECTABLE_REGEX
-from lib.core.settings import VERSION_STRING
-from lib.core.settings import WEBSCARAB_SPLITTER
+from lib.core.settings import ACCESS_ALIASES, BURP_REQUEST_REGEX, CODECS_LIST_PAGE, CRAWL_EXCLUDE_EXTENSIONS,\
+    CUSTOM_INJECTION_MARK_CHAR, DB2_ALIASES, DEFAULT_GET_POST_DELIMITER, DEFAULT_PAGE_ENCODING,\
+    DEFAULT_TOR_HTTP_PORTS, DEFAULT_TOR_SOCKS_PORT, FIREBIRD_ALIASES, INJECT_HERE_MARK, IS_WIN,\
+    LOCALHOST, MAXDB_ALIASES, MAX_NUMBER_OF_THREADS, MSSQL_ALIASES, MYSQL_ALIASES, NULL, ORACLE_ALIASES,\
+    PARAMETER_SPLITTING_REGEX, PGSQL_ALIASES, PYVERSION, SITE, SQLITE_ALIASES, SUPPORTED_DBMS, SUPPORTED_OS,\
+    SYBASE_ALIASES, TIME_DELAY_CANDIDATES, UNENCODED_ORIGINAL_VALUE, UNION_CHAR_REGEX, UNKNOWN_DBMS_VERSION,\
+    URI_INJECTABLE_REGEX, VERSION_STRING, WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
@@ -142,7 +70,7 @@ from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.keepalive import keepalive
 from thirdparty.oset.pyoset import oset
 from thirdparty.socks import socks
-from xml.etree.ElementTree import ElementTree
+
 
 authHandler = urllib2.BaseHandler()
 httpsHandler = HTTPSHandler()

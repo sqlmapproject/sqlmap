@@ -5,49 +5,22 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
 import threading
 import time
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
-from lib.core.common import Backend
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import dataToStdout
-from lib.core.common import decodeHexValue
-from lib.core.common import decodeIntToUnicode
-from lib.core.common import filterControlChars
-from lib.core.common import getCharset
-from lib.core.common import getCounter
-from lib.core.common import goGoodSamaritan
-from lib.core.common import getPartRun
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import incrementCounter
-from lib.core.common import randomStr
-from lib.core.common import safeStringFormat
-from lib.core.common import singleTimeWarnMessage
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.enums import ADJUST_TIME_DELAY
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
+from lib.core.common import Backend, calculateDeltaSeconds, dataToStdout, decodeHexValue, decodeIntToUnicode,\
+    filterControlChars, getCharset, getCounter, goGoodSamaritan, getPartRun, hashDBRetrieve, hashDBWrite,\
+    incrementCounter, safeStringFormat, singleTimeWarnMessage
+from lib.core.data import conf, kb, logger, queries
+from lib.core.enums import ADJUST_TIME_DELAY, CHARSET_TYPE, DBMS, PAYLOAD
 from lib.core.exception import sqlmapThreadException
 from lib.core.progress import ProgressBar
-from lib.core.settings import CHAR_INFERENCE_MARK
-from lib.core.settings import INFERENCE_BLANK_BREAK
-from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import INFERENCE_GREATER_CHAR
-from lib.core.settings import INFERENCE_EQUALS_CHAR
-from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
-from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
-from lib.core.settings import PARTIAL_VALUE_MARKER
-from lib.core.settings import VALID_TIME_CHARS_RUN_THRESHOLD
-from lib.core.threads import getCurrentThreadData
-from lib.core.threads import runThreads
+from lib.core.settings import CHAR_INFERENCE_MARK, INFERENCE_BLANK_BREAK, INFERENCE_UNKNOWN_CHAR,\
+    INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR, INFERENCE_NOT_EQUALS_CHAR, MAX_TIME_REVALIDATION_STEPS,\
+    PARTIAL_VALUE_MARKER, VALID_TIME_CHARS_RUN_THRESHOLD
+from lib.core.threads import getCurrentThreadData, runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 

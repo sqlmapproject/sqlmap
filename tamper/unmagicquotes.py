@@ -14,6 +14,7 @@ __priority__ = PRIORITY.NORMAL
 def dependencies():
     pass
 
+
 def tamper(payload, **kwargs):
     """
     Replaces quote character (') with a multi-byte combo %bf%27 together with

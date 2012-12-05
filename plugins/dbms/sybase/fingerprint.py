@@ -5,13 +5,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
-from lib.core.common import Format
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import OS
+from lib.core.common import Backend, Format
+from lib.core.data import conf, kb, logger
+from lib.core.enums import DBMS, OS
 from lib.core.session import setDbms
 from lib.core.settings import SYBASE_ALIASES
 from lib.request import inject
@@ -57,8 +53,8 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(SYBASE_ALIASES) \
-           or conf.dbms in SYBASE_ALIASES) and Backend.getVersion() and \
+        if not conf.extensiveFp and (Backend.isDbmsWithin(SYBASE_ALIASES)\
+                                     or conf.dbms in SYBASE_ALIASES) and Backend.getVersion() and\
            Backend.getVersion().isdigit():
             setDbms("%s %s" % (DBMS.SYBASE, Backend.getVersion()))
 

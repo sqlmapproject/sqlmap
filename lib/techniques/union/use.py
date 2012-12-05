@@ -11,39 +11,17 @@ import time
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
-from lib.core.common import arrayizeValue
-from lib.core.common import Backend
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
-from lib.core.common import extractRegexResult
-from lib.core.common import flattenValue
-from lib.core.common import getConsoleWidth
-from lib.core.common import getUnicode
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import incrementCounter
-from lib.core.common import initTechnique
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import listToStrValue
-from lib.core.common import parseUnionPage
-from lib.core.common import removeReflectiveValues
-from lib.core.common import singleTimeWarnMessage
-from lib.core.common import wasLastRequestDBMSError
+from lib.core.common import arrayizeValue, Backend, calculateDeltaSeconds, clearConsoleLine, dataToStdout, \
+    extractRegexResult, flattenValue, getConsoleWidth, getUnicode, hashDBRetrieve, hashDBWrite, incrementCounter, \
+    initTechnique, isNoneValue, isNumPosStrValue, listToStrValue, parseUnionPage, removeReflectiveValues,\
+    singleTimeWarnMessage, wasLastRequestDBMSError
 from lib.core.convert import htmlunescape
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
+from lib.core.data import conf,kb, logger, queries
 from lib.core.dicts import FROM_DUMMY_TABLE
-from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
+from lib.core.enums import DBMS, PAYLOAD
 from lib.core.exception import sqlmapSyntaxException
-from lib.core.settings import SQL_SCALAR_REGEX
-from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
-from lib.core.threads import getCurrentThreadData
-from lib.core.threads import runThreads
+from lib.core.settings import SQL_SCALAR_REGEX, TURN_OFF_RESUME_INFO_LIMIT
+from lib.core.threads import getCurrentThreadData, runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 

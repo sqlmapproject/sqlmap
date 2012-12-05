@@ -26,7 +26,7 @@ try:
 except ImportError:
     LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
 
-FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
+FORMATTER = logging.Formatter(u"\r[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
 
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)

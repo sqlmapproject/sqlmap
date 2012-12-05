@@ -7,21 +7,11 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 
-from lib.core.common import Backend
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import readInput
-from lib.core.common import runningAsAdmin
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapMissingDependence
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapMissingPrivileges
-from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.exception import sqlmapUndefinedMethod
-from lib.core.exception import sqlmapUnsupportedDBMSException
+from lib.core.common import Backend, isTechniqueAvailable, readInput, runningAsAdmin
+from lib.core.data import conf, logger
+from lib.core.enums import DBMS, OS, PAYLOAD
+from lib.core.exception import sqlmapMissingDependence, sqlmapMissingMandatoryOptionException,\
+    sqlmapMissingPrivileges, sqlmapNotVulnerableException, sqlmapUndefinedMethod, sqlmapUnsupportedDBMSException
 from lib.takeover.abstraction import Abstraction
 from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit

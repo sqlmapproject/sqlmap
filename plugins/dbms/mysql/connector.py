@@ -7,13 +7,12 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import pymysql
-except ImportError, _:
+except ImportError:
     pass
 
 import logging
 
-from lib.core.data import conf
-from lib.core.data import logger
+from lib.core.data import conf, logger
 from lib.core.exception import sqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 

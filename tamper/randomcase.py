@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
+from re import finditer
 
 from lib.core.common import randomRange
 from lib.core.data import kb
@@ -15,6 +15,7 @@ __priority__ = PRIORITY.NORMAL
 
 def dependencies():
     pass
+
 
 def tamper(payload, **kwargs):
     """
@@ -39,7 +40,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"[A-Za-z_]+", retVal):
+        for match in finditer(r"[A-Za-z_]+", retVal):
             word = match.group()
 
             if word.upper() in kb.keywords:

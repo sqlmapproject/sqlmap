@@ -5,6 +5,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+#TODO: Moved all of these to namedtuple
+
 class PRIORITY:
     LOWEST = -100
     LOWER = -50
@@ -14,6 +16,7 @@ class PRIORITY:
     HIGHER = 50
     HIGHEST = 100
 
+
 class SORT_ORDER:
     FIRST = 0
     SECOND = 1
@@ -22,9 +25,10 @@ class SORT_ORDER:
     FIFTH = 4
     LAST = 100
 
+
 class DBMS:
     ACCESS = "Microsoft Access"
-    DB2 = "IBM DB2"    
+    DB2 = "IBM DB2"
     FIREBIRD = "Firebird"
     MAXDB = "SAP MaxDB"
     MSSQL = "Microsoft SQL Server"
@@ -33,6 +37,7 @@ class DBMS:
     PGSQL = "PostgreSQL"
     SQLITE = "SQLite"
     SYBASE = "Sybase"
+
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
@@ -46,14 +51,17 @@ class DBMS_DIRECTORY_NAME:
     SQLITE = "sqlite"
     SYBASE = "sybase"
 
+
 class CUSTOM_LOGGING:
     PAYLOAD = 9
     TRAFFIC_OUT = 8
     TRAFFIC_IN = 7
 
+
 class OS:
     LINUX = "Linux"
     WINDOWS = "Windows"
+
 
 class PLACE:
     GET = "GET"
@@ -65,24 +73,29 @@ class PLACE:
     HOST = "Host"
     CUSTOM_POST = "(custom) POST"
 
+
 class POST_HINT:
     SOAP = "SOAP"
     JSON = "JSON"
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
 
+
 class HTTPMETHOD:
     GET = "GET"
     POST = "POST"
     HEAD = "HEAD"
 
+
 class NULLCONNECTION:
     HEAD = "HEAD"
     RANGE = "Range"
 
+
 class REFLECTIVE_COUNTER:
     MISS = "MISS"
     HIT = "HIT"
+
 
 class CHARSET_TYPE:
     BINARY = 1
@@ -91,10 +104,12 @@ class CHARSET_TYPE:
     ALPHA = 4
     ALPHANUM = 5
 
+
 class HEURISTIC_TEST:
     CASTED = 1
     NEGATIVE = 2
     POSITIVE = 3
+
 
 class HASH:
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
@@ -111,23 +126,32 @@ class HASH:
 
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
 class MOBILES:
-    BLACKBERRY = ("BlackBerry 9900", "Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.1.0.346 Mobile Safari/534.11+")
-    GALAXY = ("Samsung Galaxy S", "Mozilla/5.0 (Linux; U; Android 2.2; en-US; SGH-T959D Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1")
+    BLACKBERRY = ("BlackBerry 9900",
+                  "Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.1.0.346 Mobile Safari/534.11+")
+    GALAXY = ("Samsung Galaxy S",
+              "Mozilla/5.0 (Linux; U; Android 2.2; en-US; SGH-T959D Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1")
     HP = ("HP iPAQ 6365", "Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; PPC; 240x320; HP iPAQ h6300)")
-    HTC = ("HTC Sensation", "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30")
-    IPHONE = ("Apple iPhone 4s", "Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B179 Safari/7534.48.3")
-    NEXUS = ("Google Nexus 7", "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19")
-    NOKIA = ("Nokia N97", "Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/10.0.012; Profile/MIDP-2.1 Configuration/CLDC-1.1; en-us) AppleWebKit/525 (KHTML, like Gecko) WicKed/7.1.12344")
+    HTC = ("HTC Sensation",
+           "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30")
+    IPHONE = ("Apple iPhone 4s",
+              "Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B179 Safari/7534.48.3")
+    NEXUS = ("Google Nexus 7",
+             "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19")
+    NOKIA = ("Nokia N97",
+             "Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/10.0.012; Profile/MIDP-2.1 Configuration/CLDC-1.1; en-us) AppleWebKit/525 (KHTML, like Gecko) WicKed/7.1.12344")
+
 
 class PROXY_TYPE:
     HTTP = "HTTP"
     SOCKS4 = "SOCKS4"
     SOCKS5 = "SOCKS5"
 
+
 class DUMP_FORMAT:
     CSV = "CSV"
     HTML = "HTML"
     SQLITE = "SQLITE"
+
 
 class HTTPHEADER:
     ACCEPT = "Accept"
@@ -151,9 +175,11 @@ class HTTPHEADER:
     REFERER = "Referer"
     USER_AGENT = "User-Agent"
 
+
 class EXPECTED:
     BOOL = "bool"
     INT = "int"
+
 
 class HASHDB_KEYS:
     DBMS = "DBMS"
@@ -167,46 +193,48 @@ class HASHDB_KEYS:
     KB_XP_CMDSHELL_AVAILABLE = "KB_XP_CMDSHELL_AVAILABLE"
     OS = "OS"
 
+
 class REDIRECTION:
     YES = "Y"
     NO = "N"
 
+
 class PAYLOAD:
     SQLINJECTION = {
-                     1: "boolean-based blind",
-                     2: "error-based",
-                     3: "UNION query",
-                     4: "stacked queries",
-                     5: "AND/OR time-based blind",
-                     6: "inline query"
-                   }
+        1: "boolean-based blind",
+        2: "error-based",
+        3: "UNION query",
+        4: "stacked queries",
+        5: "AND/OR time-based blind",
+        6: "inline query"
+    }
 
     PARAMETER = {
-                  1: "Unescaped numeric",
-                  2: "Single quoted string",
-                  3: "LIKE single quoted string",
-                  4: "Double quoted string",
-                  5: "LIKE double quoted string"
-                }
+        1: "Unescaped numeric",
+        2: "Single quoted string",
+        3: "LIKE single quoted string",
+        4: "Double quoted string",
+        5: "LIKE double quoted string"
+    }
 
     RISK = {
-             0: "No risk",
-             1: "Low risk",
-             2: "Medium risk",
-             3: "High risk"
-           }
+        0: "No risk",
+        1: "Low risk",
+        2: "Medium risk",
+        3: "High risk"
+    }
 
     CLAUSE = {
-               0: "Always",
-               1: "WHERE",
-               2: "GROUP BY",
-               3: "ORDER BY",
-               4: "LIMIT",
-               5: "OFFSET",
-               6: "TOP",
-               7: "Table name",
-               8: "Column name"
-             }
+        0: "Always",
+        1: "WHERE",
+        2: "GROUP BY",
+        3: "ORDER BY",
+        4: "LIMIT",
+        5: "OFFSET",
+        6: "TOP",
+        7: "Table name",
+        8: "Column name"
+    }
 
     class METHOD:
         COMPARISON = "comparison"
@@ -227,15 +255,20 @@ class PAYLOAD:
         NEGATIVE = 2
         REPLACE = 3
 
+
 class WIZARD:
     BASIC = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba")
-    SMART = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema", "excludeSysDbs")
-    ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes", "getPrivileges", "getRoles", "dumpAll")
+    SMART = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema",
+             "excludeSysDbs")
+    ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes",
+           "getPrivileges", "getRoles", "dumpAll")
+
 
 class ADJUST_TIME_DELAY:
     DISABLE = -1
     NO = 0
     YES = 1
+
 
 class WEB_API:
     PHP = "php"

@@ -11,8 +11,7 @@ import rlcompleter
 
 from lib.core import readlineng as readline
 from lib.core.common import Backend
-from lib.core.data import logger
-from lib.core.data import paths
+from lib.core.data import logger, paths
 from lib.core.enums import OS
 
 def saveHistory():

@@ -10,17 +10,11 @@ import re
 import urlparse
 import time
 
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
-from lib.core.common import findPageForms
-from lib.core.common import singleTimeWarnMessage
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.common import clearConsoleLine, dataToStdout, findPageForms, singleTimeWarnMessage
+from lib.core.data import conf, kb, logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
-from lib.core.threads import getCurrentThreadData
-from lib.core.threads import runThreads
+from lib.core.threads import getCurrentThreadData, runThreads
 from lib.request.connect import Connect as Request
 from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
 from thirdparty.oset.pyoset import oset

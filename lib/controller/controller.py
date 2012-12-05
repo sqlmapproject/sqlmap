@@ -9,55 +9,21 @@ import os
 import re
 
 from lib.controller.action import action
-from lib.controller.checks import checkSqlInjection
-from lib.controller.checks import checkDynParam
-from lib.controller.checks import checkStability
-from lib.controller.checks import checkString
-from lib.controller.checks import checkRegexp
-from lib.controller.checks import checkConnection
-from lib.controller.checks import checkNullConnection
-from lib.controller.checks import checkWaf
-from lib.controller.checks import heuristicCheckSqlInjection
+from lib.controller.checks import checkSqlInjection, checkDynParam, checkStability, checkString, checkRegexp, \
+    checkConnection, checkNullConnection, checkWaf, heuristicCheckSqlInjection
 from lib.core.agent import agent
-from lib.core.common import extractRegexResult
-from lib.core.common import getFilteredPageContent
-from lib.core.common import getPublicTypeMembers
-from lib.core.common import getUnicode
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import intersect
-from lib.core.common import parseTargetUrl
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.common import showHttpErrorCodes
-from lib.core.common import urlencode
-from lib.core.common import urldecode
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import HASHDB_KEYS
-from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import PAYLOAD
-from lib.core.enums import PLACE
-from lib.core.exception import exceptionsTuple
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapValueException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import ASP_NET_CONTROL_REGEX
-from lib.core.settings import DEFAULT_COOKIE_DELIMITER
-from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
-from lib.core.settings import IGNORE_PARAMETERS
-from lib.core.settings import LOW_TEXT_PERCENT
-from lib.core.settings import HOST_ALIASES
-from lib.core.settings import REFERER_ALIASES
-from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.target import initTargetEnv
-from lib.core.target import setupTargetEnv
+from lib.core.common import extractRegexResult, getFilteredPageContent, getPublicTypeMembers, getUnicode,\
+     hashDBRetrieve, hashDBWrite, intersect, parseTargetUrl, randomStr, readInput, showHttpErrorCodes, urlencode, \
+     urldecode
+
+from lib.core.data import conf, kb, logger
+from lib.core.enums import HASHDB_KEYS, HEURISTIC_TEST, HTTPMETHOD, PAYLOAD, PLACE
+from lib.core.exception import exceptionsTuple, sqlmapNoneDataException, sqlmapNotVulnerableException,\
+    sqlmapSilentQuitException, sqlmapValueException, sqlmapUserQuitException
+from lib.core.settings import ASP_NET_CONTROL_REGEX, DEFAULT_GET_POST_DELIMITER, EMPTY_FORM_FIELDS_REGEX,\
+    IGNORE_PARAMETERS, LOW_TEXT_PERCENT, HOST_ALIASES, REFERER_ALIASES, USER_AGENT_ALIASES
+from lib.core.target import initTargetEnv, setupTargetEnv
+
 from thirdparty.pagerank.pagerank import get_pagerank
 
 def __selectInjection():

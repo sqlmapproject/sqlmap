@@ -7,16 +7,14 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import sqlite3
-except ImportError, _:
+except ImportError:
     pass
 
 import logging
 
 from lib.core.convert import utf8encode
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapMissingDependence
+from lib.core.data import conf, logger
+from lib.core.exception import sqlmapConnectionException, sqlmapMissingDependence
 from plugins.generic.connector import Connector as GenericConnector
 
 

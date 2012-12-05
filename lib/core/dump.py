@@ -6,36 +6,19 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-import re
 import os
-import StringIO
 import threading
 
 from xml.dom.minidom import getDOMImplementation
 
-from lib.core.common import Backend
-from lib.core.common import dataToDumpFile
-from lib.core.common import dataToStdout
-from lib.core.common import getUnicode
-from lib.core.common import isListLike
-from lib.core.common import normalizeUnicode
-from lib.core.common import openFile
-from lib.core.common import prioritySortColumns
-from lib.core.common import safeCSValue
-from lib.core.common import unsafeSQLIdentificatorNaming
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.dicts import DUMP_REPLACEMENTS
-from lib.core.enums import DBMS
+from lib.core.common import Backend, dataToDumpFile, dataToStdout, getUnicode, isListLike, normalizeUnicode, \
+    openFile, prioritySortColumns, safeCSValue, unsafeSQLIdentificatorNaming
+from lib.core.data import conf, kb, logger
+from lib.core.dicts import DUMP_REPLACEMENTS, DBMS
 from lib.core.enums import DUMP_FORMAT
-from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapValueException
+from lib.core.exception import sqlmapGenericException, sqlmapValueException
 from lib.core.replication import Replication
-from lib.core.settings import HTML_DUMP_CSS_STYLE
-from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
-from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import HTML_DUMP_CSS_STYLE, METADB_SUFFIX, TRIM_STDOUT_DUMP_SIZE, UNICODE_ENCODING
 
 class Dump:
     """

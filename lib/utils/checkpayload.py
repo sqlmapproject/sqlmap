@@ -5,21 +5,19 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
+from re import sub, search
 
-from lib.core.common import readXmlFile
-from lib.core.common import urldecode
-from lib.core.data import paths
-from lib.core.data import logger
+from lib.core.common import readXmlFile, urldecode
+from lib.core.data import paths, logger
 
 rules = None
 
 def __adjustGrammar(string):
-    string = re.sub('\ADetects', 'Detected', string)
-    string = re.sub('\Afinds', 'Found', string)
-    string = re.sub('attempts\Z', 'attempt', string)
-    string = re.sub('injections\Z', 'injection', string)
-    string = re.sub('attacks\Z', 'attack', string)
+    string = sub('\ADetects', 'Detected', string)
+    string = sub('\Afinds', 'Found', string)
+    string = sub('attempts\Z', 'attempt', string)
+    string = sub('injections\Z', 'injection', string)
+    string = sub('attacks\Z', 'attack', string)
 
     return string
 
@@ -48,7 +46,7 @@ def checkPayload(payload):
 
     if payload:
         for rule, desc in rules:
-            if re.search(rule, payload):
+            if search(rule, payload):
                 detected = True
                 logger.warn("highly probable IDS/IPS detection: '%s: %s'" % (desc, payload))
 

@@ -7,37 +7,19 @@ See the file 'doc/COPYING' for copying permission
 
 import time
 
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
-from lib.core.common import filterListValue
-from lib.core.common import getFileItems
-from lib.core.common import Backend
-from lib.core.common import getPageWordSet
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import randomInt
-from lib.core.common import randomStr
-from lib.core.common import safeStringFormat
-from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import HASHDB_KEYS
-from lib.core.exception import sqlmapDataException
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
-from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
-from lib.core.threads import getCurrentThreadData
-from lib.core.threads import runThreads
+from lib.core.common import clearConsoleLine,  dataToStdout,  filterListValue,  getFileItems,  Backend, \
+    getPageWordSet,  hashDBWrite, randomInt, randomStr, safeStringFormat, safeSQLIdentificatorNaming
+from lib.core.data import conf, kb, logger
+from lib.core.enums import DBMS, HASHDB_KEYS
+from lib.core.exception import sqlmapDataException, sqlmapMissingMandatoryOptionException
+from lib.core.settings import METADB_SUFFIX, BRUTE_COLUMN_EXISTS_TEMPLATE, BRUTE_TABLE_EXISTS_TEMPLATE
+from lib.core.threads import getCurrentThreadData, runThreads
 from lib.request import inject
 
 def __addPageTextWords():
     wordsList = []
 
-    infoMsg = "adding words used on web page to the check list"
-    logger.info(infoMsg)
+    logger.info("adding words used on web page to the check list")
     pageWords = getPageWordSet(kb.originalPage)
 
     for word in pageWords:
@@ -58,8 +40,7 @@ def tableExists(tableFile, regex=None):
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
 
-    infoMsg = "checking table existence using items from '%s'" % tableFile
-    logger.info(infoMsg)
+    logger.info("checking table existence using items from '%s'" % tableFile)
 
     tables.extend(__addPageTextWords())
     tables = filterListValue(tables, regex)

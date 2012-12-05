@@ -8,17 +8,9 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import Backend
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import normalizePath
-from lib.core.common import ntToPosixSlashes
-from lib.core.common import randomStr
-from lib.core.common import unArrayizeValue
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import paths
-from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
+from lib.core.common import Backend, isTechniqueAvailable, normalizePath, ntToPosixSlashes, randomStr, unArrayizeValue
+from lib.core.data import kb, logger, paths
+from lib.core.enums import OS, PAYLOAD
 from lib.request import inject
 from lib.request.connect import Connect as Request
 from plugins.generic.takeover import Takeover as GenericTakeover
@@ -93,7 +85,8 @@ class Takeover(GenericTakeover):
 
             # Reference: http://dev.mysql.com/doc/refman/5.1/en/create-function-udf.html
             inject.goStacked("DROP FUNCTION %s" % udf)
-            inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (udf, ret, self.udfSharedLibName, self.udfSharedLibExt))
+            inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (
+            udf, ret, self.udfSharedLibName, self.udfSharedLibExt))
 
             self.createdUdf.add(udf)
         else:

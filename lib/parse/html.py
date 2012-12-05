@@ -42,6 +42,7 @@ class htmlHandler(ContentHandler):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
 
+
 def htmlParser(page):
     """
     This function calls a class that parses the input HTML page to

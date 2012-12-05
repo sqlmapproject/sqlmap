@@ -11,16 +11,11 @@ import sqlite3
 import threading
 import time
 
-from lib.core.common import getUnicode
-from lib.core.common import serializeObject
-from lib.core.common import unserializeObject
+from lib.core.common import getUnicode, serializeObject, unserializeObject
 from lib.core.data import logger
 from lib.core.exception import sqlmapDataException
-from lib.core.settings import HASHDB_FLUSH_RETRIES
-from lib.core.settings import HASHDB_FLUSH_THRESHOLD
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.threads import getCurrentThreadData
-from lib.core.threads import getCurrentThreadName
+from lib.core.settings import HASHDB_FLUSH_RETRIES, HASHDB_FLUSH_THRESHOLD, UNICODE_ENCODING
+from lib.core.threads import getCurrentThreadData, getCurrentThreadName
 
 class HashDB(object):
     def __init__(self, filepath):

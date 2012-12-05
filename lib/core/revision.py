@@ -8,8 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 import re
 
-from subprocess import PIPE
-from subprocess import Popen as execute
+from subprocess import PIPE, Popen as execute
 
 def getRevisionNumber():
     """

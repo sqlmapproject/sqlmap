@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import pyodbc
-except ImportError, _:
+except ImportError:
     pass
 
 import logging

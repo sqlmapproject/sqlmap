@@ -13,54 +13,21 @@ import socket
 import time
 
 from lib.core.agent import agent
-from lib.core.common import arrayizeValue
-from lib.core.common import Backend
-from lib.core.common import beep
-from lib.core.common import extractRegexResult
-from lib.core.common import extractTextTagContent
-from lib.core.common import findDynamicContent
-from lib.core.common import Format
-from lib.core.common import getComparePageRatio
-from lib.core.common import getLastRequestHTTPError
-from lib.core.common import getSortedInjectionTests
-from lib.core.common import getUnicode
-from lib.core.common import intersect
-from lib.core.common import listToStrValue
-from lib.core.common import parseFilePaths
-from lib.core.common import popValue
-from lib.core.common import pushValue
-from lib.core.common import randomInt
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.common import showStaticWords
-from lib.core.common import singleTimeLogMessage
-from lib.core.common import singleTimeWarnMessage
-from lib.core.common import wasLastRequestDBMSError
-from lib.core.common import wasLastRequestHTTPError
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.datatype import AttribDict
-from lib.core.datatype import InjectionDict
-from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import NULLCONNECTION
-from lib.core.enums import PAYLOAD
-from lib.core.enums import PLACE
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import CONSTANT_RATIO
-from lib.core.settings import FORMAT_EXCEPTION_STRINGS
-from lib.core.settings import HEURISTIC_CHECK_ALPHABET
-from lib.core.settings import SUHOSHIN_MAX_VALUE_LENGTH
-from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import LOWER_RATIO_BOUND
-from lib.core.settings import UPPER_RATIO_BOUND
-from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
+from lib.core.common import arrayizeValue, Backend, beep, extractRegexResult, extractTextTagContent, \
+    findDynamicContent, Format, getLastRequestHTTPError, getSortedInjectionTests, getUnicode, intersect, \
+    listToStrValue, parseFilePaths, popValue, pushValue, randomInt, randomStr, readInput, showStaticWords, \
+    singleTimeLogMessage, singleTimeWarnMessage, wasLastRequestDBMSError, wasLastRequestHTTPError
+
+from lib.core.data import conf, kb, logger
+
+from lib.core.datatype import AttribDict, InjectionDict
+from lib.core.enums import HEURISTIC_TEST, HTTPHEADER, HTTPMETHOD, NULLCONNECTION, PAYLOAD, PLACE
+
+from lib.core.exception import sqlmapConnectionException, sqlmapNoneDataException, sqlmapSilentQuitException ,\
+    sqlmapUserQuitException
+from lib.core.settings import UPPER_RATIO_BOUND, FORMAT_EXCEPTION_STRINGS, HEURISTIC_CHECK_ALPHABET, \
+    SUHOSHIN_MAX_VALUE_LENGTH,  UNKNOWN_DBMS_VERSION, LOWER_RATIO_BOUND, IDS_WAF_CHECK_PAYLOAD
+
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression

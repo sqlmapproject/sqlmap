@@ -5,7 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import binascii
 import codecs
 import os
 import re
@@ -13,47 +12,18 @@ import tempfile
 import time
 import urlparse
 
-from lib.core.common import Backend
-from lib.core.common import hashDBRetrieve
-from lib.core.common import intersect
-from lib.core.common import paramToDict
-from lib.core.common import readInput
-from lib.core.common import resetCookieJar
-from lib.core.common import urldecode
-from lib.core.data import cmdLineOptions
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import paths
+from lib.core.common import Backend, hashDBRetrieve, intersect, paramToDict, readInput, resetCookieJar, urldecode
+from lib.core.data import cmdLineOptions, conf, kb, logger, paths
 from lib.core.dicts import DBMS_DICT
 from lib.core.dump import dumper
-from lib.core.enums import HASHDB_KEYS
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import PLACE
-from lib.core.enums import POST_HINT
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapMissingPrivileges
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.option import authHandler
-from lib.core.option import __setDBMS
-from lib.core.option import __setKnowledgeBaseAttributes
-from lib.core.option import __setAuthCred
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import HOST_ALIASES
-from lib.core.settings import JSON_RECOGNITION_REGEX
-from lib.core.settings import MULTIPART_RECOGNITION_REGEX
-from lib.core.settings import REFERER_ALIASES
-from lib.core.settings import RESULTS_FILE_FORMAT
-from lib.core.settings import SOAP_RECOGNITION_REGEX
-from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import UNENCODED_ORIGINAL_VALUE
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import URI_INJECTABLE_REGEX
-from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.enums import HASHDB_KEYS, HTTPHEADER, HTTPMETHOD, PLACE, POST_HINT
+from lib.core.exception import sqlmapFilePathException, sqlmapGenericException, sqlmapMissingPrivileges,\
+    sqlmapSyntaxException, sqlmapUserQuitException
+
+from lib.core.option import __setDBMS, __setKnowledgeBaseAttributes, __setAuthCred
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR, HOST_ALIASES, JSON_RECOGNITION_REGEX,\
+    MULTIPART_RECOGNITION_REGEX, REFERER_ALIASES, RESULTS_FILE_FORMAT, SOAP_RECOGNITION_REGEX,\
+    SUPPORTED_DBMS, UNICODE_ENCODING, UNKNOWN_DBMS_VERSION, URI_INJECTABLE_REGEX, USER_AGENT_ALIASES
 from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
 from thirdparty.odict.odict import OrderedDict

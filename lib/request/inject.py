@@ -10,41 +10,16 @@ import time
 
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
-from lib.core.common import Backend
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import cleanQuery
-from lib.core.common import expandAsteriskForColumns
-from lib.core.common import extractExpectedValue
-from lib.core.common import getPublicTypeMembers
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import initTechnique
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import parseUnionPage
-from lib.core.common import popValue
-from lib.core.common import pushValue
-from lib.core.common import randomInt
-from lib.core.common import readInput
-from lib.core.common import safeStringFormat
-from lib.core.common import singleTimeWarnMessage
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
+from lib.core.common import Backend, calculateDeltaSeconds, cleanQuery, expandAsteriskForColumns, \
+    extractExpectedValue, getPublicTypeMembers, hashDBRetrieve, hashDBWrite, initTechnique, \
+    isNoneValue, isNumPosStrValue, isTechniqueAvailable, parseUnionPage, popValue, pushValue, readInput,\
+    singleTimeWarnMessage
+from lib.core.data import conf, kb, logger, queries
 from lib.core.dicts import FROM_DUMMY_TABLE
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
-from lib.core.settings import SQL_SCALAR_REGEX
+from lib.core.enums import CHARSET_TYPE, DBMS, EXPECTED, PAYLOAD
+from lib.core.exception import sqlmapNotVulnerableException, sqlmapUserQuitException
+from lib.core.settings import MAX_TECHNIQUES_PER_VALUE, SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
-from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.techniques.blind.inference import bisection

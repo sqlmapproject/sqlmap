@@ -12,6 +12,7 @@ __priority__ = PRIORITY.LOW
 def dependencies():
     pass
 
+
 def tamper(payload, **kwargs):
     """
     Replaces space character (' ') with comments '/**/'
@@ -49,7 +50,7 @@ def tamper(payload, **kwargs):
             elif payload[i] == '"':
                 doublequote = not doublequote
 
-            elif payload[i]==" " and not doublequote and not quote:
+            elif payload[i] == " " and not doublequote and not quote:
                 retVal += "/**/"
                 continue
 

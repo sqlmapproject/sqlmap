@@ -12,35 +12,18 @@ import sys
 import time
 
 from select import select
-from subprocess import PIPE
-from subprocess import Popen as execute
+from subprocess import PIPE, Popen as execute
 
-from lib.core.common import dataToStdout
-from lib.core.common import Backend
-from lib.core.common import getLocalIP
-from lib.core.common import getRemoteIP
-from lib.core.common import getUnicode
-from lib.core.common import normalizePath
-from lib.core.common import ntToPosixSlashes
-from lib.core.common import randomRange
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.data import paths
-from lib.core.enums import DBMS
-from lib.core.enums import OS
-from lib.core.exception import sqlmapDataException
-from lib.core.exception import sqlmapFilePathException
-from lib.core.settings import IS_WIN
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.subprocessng import blockingReadFromFD
-from lib.core.subprocessng import blockingWriteToFD
-from lib.core.subprocessng import pollProcess
-from lib.core.subprocessng import setNonBlocking
+from lib.core.common import dataToStdout, Backend, getLocalIP, getRemoteIP, getUnicode, normalizePath,\
+    ntToPosixSlashes, randomRange, randomStr, readInput
+from lib.core.data import conf, logger, paths
+from lib.core.enums import DBMS, OS
+from lib.core.exception import sqlmapDataException, sqlmapFilePathException
+from lib.core.settings import IS_WIN, UNICODE_ENCODING
+from lib.core.subprocessng import blockingReadFromFD, blockingWriteToFD, pollProcess, setNonBlocking
 
 
-class Metasploit:
+class Metasploit(object):
     """
     This class defines methods to call Metasploit for plugins.
     """
@@ -66,60 +49,64 @@ class Metasploit:
             self.__msfPayload = "%s & ruby %s" % (_, self.__msfPayload)
 
         self.__msfPayloadsList = {
-                                      "windows": {
-                                                   1: ( "Meterpreter (default)", "windows/meterpreter" ),
-                                                   2: ( "Shell", "windows/shell" ),
-                                                   3: ( "VNC", "windows/vncinject" ),
-                                                 },
-                                      "linux":   {
-                                                   1: ( "Shell (default)", "linux/x86/shell" ),
-                                                   2: ( "Meterpreter (beta)", "linux/x86/meterpreter" ),
-                                                 }
-                                    }
+            "windows": {
+                1: ( "Meterpreter (default)", "windows/meterpreter" ),
+                2: ( "Shell", "windows/shell" ),
+                3: ( "VNC", "windows/vncinject" ),
+            },
+            "linux": {
+                1: ( "Shell (default)", "linux/x86/shell" ),
+                2: ( "Meterpreter (beta)", "linux/x86/meterpreter" ),
+            }
+        }
 
         self.__msfConnectionsList = {
-                                      "windows": {
-                                                   1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
-                                                   2: ( "Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535", "reverse_tcp_allports" ),
-                                                   3: ( "Reverse HTTP: Connect back from the database host to this machine tunnelling traffic over HTTP", "reverse_http" ),
-                                                   4: ( "Reverse HTTPS: Connect back from the database host to this machine tunnelling traffic over HTTPS", "reverse_https" ),
-                                                   5: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" )
-                                                 },
-                                      "linux":   {
-                                                   1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
-                                                   2: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
-                                                 }
-                                    }
+            "windows": {
+                1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
+                2: (
+                "Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535",
+                "reverse_tcp_allports" ),
+                3: ("Reverse HTTP: Connect back from the database host to this machine tunnelling traffic over HTTP",
+                    "reverse_http" ),
+                4: ("Reverse HTTPS: Connect back from the database host to this machine tunnelling traffic over HTTPS",
+                    "reverse_https" ),
+                5: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" )
+            },
+            "linux": {
+                1: ( "Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp" ),
+                2: ( "Bind TCP: Listen on the database host for a connection", "bind_tcp" ),
+            }
+        }
 
         self.__msfEncodersList = {
-                                      "windows": {
-                                                   1: ( "No Encoder", "generic/none" ),
-                                                   2: ( "Alpha2 Alphanumeric Mixedcase Encoder", "x86/alpha_mixed" ),
-                                                   3: ( "Alpha2 Alphanumeric Uppercase Encoder", "x86/alpha_upper" ),
-                                                   4: ( "Avoid UTF8/tolower", "x86/avoid_utf8_tolower" ),
-                                                   5: ( "Call+4 Dword XOR Encoder", "x86/call4_dword_xor" ),
-                                                   6: ( "Single-byte XOR Countdown Encoder", "x86/countdown" ),
-                                                   7: ( "Variable-length Fnstenv/mov Dword XOR Encoder", "x86/fnstenv_mov" ),
-                                                   8: ( "Polymorphic Jump/Call XOR Additive Feedback Encoder", "x86/jmp_call_additive" ),
-                                                   9: ( "Non-Alpha Encoder", "x86/nonalpha" ),
-                                                  10: ( "Non-Upper Encoder", "x86/nonupper" ),
-                                                  11: ( "Polymorphic XOR Additive Feedback Encoder (default)", "x86/shikata_ga_nai" ),
-                                                  12: ( "Alpha2 Alphanumeric Unicode Mixedcase Encoder", "x86/unicode_mixed" ),
-                                                  13: ( "Alpha2 Alphanumeric Unicode Uppercase Encoder", "x86/unicode_upper" ),
-                                                 }
-                                    }
+            "windows": {
+                1: ( "No Encoder", "generic/none" ),
+                2: ( "Alpha2 Alphanumeric Mixedcase Encoder", "x86/alpha_mixed" ),
+                3: ( "Alpha2 Alphanumeric Uppercase Encoder", "x86/alpha_upper" ),
+                4: ( "Avoid UTF8/tolower", "x86/avoid_utf8_tolower" ),
+                5: ( "Call+4 Dword XOR Encoder", "x86/call4_dword_xor" ),
+                6: ( "Single-byte XOR Countdown Encoder", "x86/countdown" ),
+                7: ( "Variable-length Fnstenv/mov Dword XOR Encoder", "x86/fnstenv_mov" ),
+                8: ( "Polymorphic Jump/Call XOR Additive Feedback Encoder", "x86/jmp_call_additive" ),
+                9: ( "Non-Alpha Encoder", "x86/nonalpha" ),
+                10: ( "Non-Upper Encoder", "x86/nonupper" ),
+                11: ( "Polymorphic XOR Additive Feedback Encoder (default)", "x86/shikata_ga_nai" ),
+                12: ( "Alpha2 Alphanumeric Unicode Mixedcase Encoder", "x86/unicode_mixed" ),
+                13: ( "Alpha2 Alphanumeric Unicode Uppercase Encoder", "x86/unicode_upper" ),
+            }
+        }
 
         self.__msfSMBPortsList = {
-                                      "windows": {
-                                                   1: ( "139/TCP", "139" ),
-                                                   2: ( "445/TCP (default)", "445" ),
-                                                 }
-                                    }
+            "windows": {
+                1: ( "139/TCP", "139" ),
+                2: ( "445/TCP (default)", "445" ),
+            }
+        }
 
         self.__portData = {
-                            "bind": "remote port number",
-                            "reverse": "local port number",
-                          }
+            "bind": "remote port number",
+            "reverse": "local port number",
+        }
 
     def __skeletonSelection(self, msg, lst=None, maxValue=1, default=1):
         if Backend.isOs(OS.WINDOWS):
@@ -360,7 +347,8 @@ class Metasploit:
             self.__payloadCmd += " PrependChrootBreak=true PrependSetuid=true"
 
         if extra == "BufferRegister=EAX":
-            self.__payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (self.__msfEncode, self.encoderStr, outFile, format)
+            self.__payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (
+            self.__msfEncode, self.encoderStr, outFile, format)
 
             if extra is not None:
                 self.__payloadCmd += " %s" % extra

@@ -7,17 +7,14 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import hashlib
-except:
+except ImportError:
     import md5
     import sha
 
 import pickle
-import re
 import sys
 import struct
-import urllib
 
-from lib.core.enums import PLACE
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 
@@ -31,9 +28,8 @@ def base64pickle(value):
     retVal = None
     try:
         retVal = base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
-    except:
-        warnMsg = "problem occurred while serializing "
-        warnMsg += "instance of a type '%s'" % type(value)
+    except pickle.PicklingError:
+        warnMsg = "problem occurred while serializing instance of a type '%s'" % type(value)
         singleTimeWarnMessage(warnMsg)
 
         retVal = base64encode(pickle.dumps(str(value), pickle.HIGHEST_PROTOCOL))
@@ -116,7 +112,7 @@ def stdoutencode(data):
                 warnMsg = "cannot properly display Unicode characters "
                 warnMsg += "inside Windows OS command prompt "
                 warnMsg += "(http://bugs.python.org/issue1602). All "
-                warnMsg += "unhandled occurances will result in "
+                warnMsg += "unhandled occurrences will result in "
                 warnMsg += "replacement with '?' character. Please, find "
                 warnMsg += "proper character representation inside "
                 warnMsg += "corresponding output files. "

@@ -7,15 +7,8 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import Backend
-from lib.core.common import Format
-from lib.core.common import getCurrentThreadData
-from lib.core.common import randomInt
-from lib.core.common import randomStr
-from lib.core.common import wasLastRequestDBMSError
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.common import Backend, Format, getCurrentThreadData, randomInt, randomStr, wasLastRequestDBMSError
+from lib.core.data import conf, kb, logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import ACCESS_ALIASES
@@ -49,11 +42,11 @@ class Fingerprint(GenericFingerprint):
 
         # Microsoft Access table reference updated on 01/2010
         sysTables = {
-                      "97":           ("MSysModules2", "MSysAccessObjects"),
-                      "2000" :        ("!MSysModules2", "MSysAccessObjects"),
-                      "2002-2003" :   ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),
-                      "2007" :        ("MSysAccessStorage", "MSysNavPaneObjectIDs")
-                    }
+            "97": ("MSysModules2", "MSysAccessObjects"),
+            "2000": ("!MSysModules2", "MSysAccessObjects"),
+            "2002-2003": ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),
+            "2007": ("MSysAccessStorage", "MSysNavPaneObjectIDs")
+        }
         # MSysAccessXML is not a reliable system table because it doesn't always exist
         # ("Access through Access", p6, should be "normally doesn't exist" instead of "is normally empty")
 
@@ -68,7 +61,8 @@ class Fingerprint(GenericFingerprint):
                     table = table[1:]
 
                 randInt = randomInt()
-                result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
+                result = inject.checkBooleanExpression(
+                    "EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
                 if result is None:
                     result = False
 
@@ -93,7 +87,8 @@ class Fingerprint(GenericFingerprint):
 
         randInt = randomInt()
         randStr = randomStr()
-        _ = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
+        _ = inject.checkBooleanExpression(
+            "EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
 
         if wasLastRequestDBMSError():
             threadData = getCurrentThreadData()

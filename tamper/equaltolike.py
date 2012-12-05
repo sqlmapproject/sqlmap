@@ -9,13 +9,14 @@ import os
 import re
 
 from lib.core.common import singleTimeWarnMessage
-from lib.core.enums import DBMS
-from lib.core.enums import PRIORITY
+from lib.core.enums import DBMS, PRIORITY
 
 __priority__ = PRIORITY.HIGHEST
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is unlikely to work against %s" % (os.path.basename(__file__).split(".")[0], DBMS.PGSQL))
+    singleTimeWarnMessage(
+        u"tamper script '%s' is unlikely to work against %s" % (os.path.basename(__file__).split(".")[0], DBMS.PGSQL))
+
 
 def tamper(payload, **kwargs):
     """

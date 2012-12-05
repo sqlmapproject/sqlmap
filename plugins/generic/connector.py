@@ -7,14 +7,12 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.data import conf, logger
+from lib.core.exception import sqlmapFilePathException, sqlmapUndefinedMethod
 
-class Connector:
+class Connector(object):
     """
-    This class defines generic dbms protocol functionalities for plugins.
+    This class defines generic dbms protocol functionality for plugins.
     """
 
     def __init__(self):

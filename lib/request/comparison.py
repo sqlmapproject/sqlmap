@@ -7,29 +7,17 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import extractRegexResult
-from lib.core.common import getFilteredPageContent
-from lib.core.common import listToStrValue
-from lib.core.common import removeDynamicContent
-from lib.core.common import wasLastRequestDBMSError
-from lib.core.common import wasLastRequestHTTPError
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.common import extractRegexResult, getFilteredPageContent, listToStrValue, removeDynamicContent, \
+    wasLastRequestDBMSError, wasLastRequestHTTPError
+from lib.core.data import conf, kb, logger
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import DEFAULT_PAGE_ENCODING
-from lib.core.settings import DIFF_TOLERANCE
-from lib.core.settings import HTML_TITLE_REGEX
-from lib.core.settings import MIN_RATIO
-from lib.core.settings import MAX_RATIO
-from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import LOWER_RATIO_BOUND
-from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.settings import DEFAULT_PAGE_ENCODING, DIFF_TOLERANCE, HTML_TITLE_REGEX, MIN_RATIO, MAX_RATIO, \
+    REFLECTED_VALUE_MARKER, LOWER_RATIO_BOUND, UPPER_RATIO_BOUND
+
 from lib.core.threads import getCurrentThreadData
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
-    _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
-    return _
+    return _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
 
 def _adjust(condition, getRatioValue):
     if not any((conf.string, conf.notString, conf.regexp, conf.code)):

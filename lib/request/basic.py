@@ -9,9 +9,12 @@ import codecs
 import gzip
 import logging
 import re
-import StringIO
 import struct
 import zlib
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
@@ -46,14 +49,14 @@ def forgeHeaders(items=None):
 
     items = items or {}
 
-    for _ in items.keys():
+    for _ in items.iterkeys():
         if items[_] is None:
             del items[_]
 
     headers = dict(conf.httpHeaders)
     headers.update(items or {})
 
-    headers = dict(("-".join(_.capitalize() for _ in key.split('-')), value) for (key, value) in headers.items())
+    headers = dict(("-".join(_.capitalize() for _ in key.split('-')), value) for (key, value) in headers.iteritems())
 
     if conf.cj:
         if HTTPHEADER.COOKIE in headers:

@@ -11,38 +11,16 @@ import time
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
-from lib.core.common import Backend
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import dataToStdout
-from lib.core.common import decodeHexValue
-from lib.core.common import extractRegexResult
-from lib.core.common import getUnicode
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import incrementCounter
-from lib.core.common import initTechnique
-from lib.core.common import isListLike
-from lib.core.common import isNumPosStrValue
-from lib.core.common import listToStrValue
-from lib.core.common import readInput
+from lib.core.common import Backend, calculateDeltaSeconds, dataToStdout, decodeHexValue, extractRegexResult,\
+    getUnicode, hashDBRetrieve, hashDBWrite, incrementCounter, initTechnique, isListLike, isNumPosStrValue,\
+    listToStrValue, readInput
 from lib.core.convert import htmlunescape
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
+from lib.core.data import conf, kb, logger, queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
-from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
-from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
-from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
-from lib.core.settings import NULL
-from lib.core.settings import PARTIAL_VALUE_MARKER
-from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
-from lib.core.settings import SQL_SCALAR_REGEX
-from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
-from lib.core.threads import getCurrentThreadData
-from lib.core.threads import runThreads
+from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD, MYSQL_ERROR_CHUNK_LENGTH, MSSQL_ERROR_CHUNK_LENGTH, \
+    NULL, PARTIAL_VALUE_MARKER, SLOW_ORDER_COUNT_THRESHOLD, SQL_SCALAR_REGEX, TURN_OFF_RESUME_INFO_LIMIT
+from lib.core.threads import getCurrentThreadData, runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 

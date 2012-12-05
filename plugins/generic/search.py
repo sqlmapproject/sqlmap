@@ -6,31 +6,14 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import arrayizeValue
-from lib.core.common import Backend
-from lib.core.common import filterPairValues
-from lib.core.common import getLimitRange
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import readInput
-from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.common import unsafeSQLIdentificatorNaming
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import paths
-from lib.core.data import queries
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.common import arrayizeValue, Backend, filterPairValues, getLimitRange, isNoneValue, \
+    isNumPosStrValue, isTechniqueAvailable, readInput, safeSQLIdentificatorNaming, unsafeSQLIdentificatorNaming
+from lib.core.data import conf, kb, logger, paths, queries
+from lib.core.enums import CHARSET_TYPE, DBMS, EXPECTED, PAYLOAD
+from lib.core.exception import sqlmapMissingMandatoryOptionException, sqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
-from lib.techniques.brute.use import columnExists
-from lib.techniques.brute.use import tableExists
+from lib.techniques.brute.use import columnExists, tableExists
 
 class Search:
     """

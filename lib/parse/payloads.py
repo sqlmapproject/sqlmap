@@ -7,8 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 from xml.etree import ElementTree as et
 
-from lib.core.data import conf
-from lib.core.data import paths
+from lib.core.data import conf, paths
 from lib.core.datatype import AttribDict
 
 def cleanupVals(text, tag):
@@ -37,6 +36,7 @@ def cleanupVals(text, tag):
             text = text[0]
 
     return text
+
 
 def parseXmlNode(node):
     for element in node.getiterator('boundary'):
@@ -73,6 +73,7 @@ def parseXmlNode(node):
                         test[child.tag][gchild.tag] = gchild.text
 
         conf.tests.append(test)
+
 
 def loadPayloads():
     doc = et.parse(paths.PAYLOADS_XML)

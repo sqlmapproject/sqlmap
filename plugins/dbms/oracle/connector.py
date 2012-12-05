@@ -40,7 +40,8 @@ class Connector(GenericConnector):
         self.password = utf8encode(self.password)
 
         try:
-            self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
+            self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password,
+                mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
         except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError), _:
             try:

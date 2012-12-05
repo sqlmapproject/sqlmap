@@ -8,8 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 
 from lib.core.common import randomInt
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.data import kb, logger
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.request import inject
 from plugins.generic.filesystem import Filesystem as GenericFilesystem

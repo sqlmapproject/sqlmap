@@ -6,22 +6,10 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
-from lib.core.common import arrayizeValue
-from lib.core.common import Backend
-from lib.core.common import getLimitRange
-from lib.core.common import isInferenceAvailable
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.common import unsafeSQLIdentificatorNaming
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
+from lib.core.common import arrayizeValue, Backend, getLimitRange, isInferenceAvailable, isNoneValue,\
+    isNumPosStrValue, isTechniqueAvailable, safeSQLIdentificatorNaming, unsafeSQLIdentificatorNaming
+from lib.core.data import conf, kb, logger, queries
+from lib.core.enums import CHARSET_TYPE, EXPECTED, PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject

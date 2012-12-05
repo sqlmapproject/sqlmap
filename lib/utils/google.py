@@ -12,21 +12,12 @@ import socket
 import urllib
 import urllib2
 
-from lib.core.common import getUnicode
-from lib.core.common import readInput
-from lib.core.common import urldecode
-from lib.core.common import urlencode
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapGenericException
-from lib.core.settings import GOOGLE_REGEX
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import URI_INJECTABLE_REGEX
-from lib.request.basic import decodePage
+from lib.core.common import getUnicode, urlencode
+from lib.core.data import conf, logger
+from lib.core.exception import sqlmapConnectionException, sqlmapGenericException
+from lib.core.settings import GOOGLE_REGEX, UNICODE_ENCODING, decodePage
 
-class Google:
+class Google(object):
     """
     This class defines methods used to perform Google dorking (command
     line option '-g <google dork>'
