@@ -1885,7 +1885,7 @@ Formats:
     <test>
         <title>MySQL inline queries</title>
         <stype>6</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -1904,7 +1904,7 @@ Formats:
     <test>
         <title>PostgreSQL inline queries</title>
         <stype>6</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -1923,7 +1923,7 @@ Formats:
     <test>
         <title>Microsoft SQL Server/Sybase inline queries</title>
         <stype>6</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -1944,7 +1944,7 @@ Formats:
     <test>
         <title>Oracle inline queries</title>
         <stype>6</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
