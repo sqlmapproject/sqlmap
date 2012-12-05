@@ -74,7 +74,7 @@ class Search:
             dbQuery = "%s%s" % (dbCond, dbCondParam)
             dbQuery = dbQuery % unsafeSQLIdentificatorNaming(db)
 
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
@@ -186,7 +186,7 @@ class Search:
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % tbl
 
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 query = rootQuery.inband.query
                 query += tblQuery
                 query += whereDbsQuery
@@ -370,7 +370,7 @@ class Search:
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 if not all((conf.db, conf.tbl)):
                     # Enumerate tables containing the column provided if
                     # either of database(s) or table(s) is not provided

@@ -209,7 +209,7 @@ class xp_cmdshell:
 
             query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
 
-            if conf.direct or any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR)):
+            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 output = inject.getValue(query, resumeValue=False, blind=False, time=False)
             else:
                 output = []

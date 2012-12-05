@@ -21,7 +21,7 @@ _defaults =  {
                "level":        1,
                "risk":         1,
                "dumpFormat":   "CSV",
-               "tech":         "BEUST",
+               "tech":         "BEUSTQ",
                "torType":      "HTTP"
              }
 

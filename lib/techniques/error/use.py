@@ -83,7 +83,7 @@ def __oneShotErrorUse(expression, field=None):
                         nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
 
                 # Forge the error-based SQL injection request
-                vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
+                vector = kb.injection.data[kb.technique].vector
                 query = agent.prefixQuery(vector)
                 query = agent.suffixQuery(query)
                 injExpression = expression.replace(field, nulledCastedField, 1) if field else expression
@@ -94,7 +94,7 @@ def __oneShotErrorUse(expression, field=None):
                 # Perform the request
                 page, headers = Request.queryPage(payload, content=True)
 
-                incrementCounter(PAYLOAD.TECHNIQUE.ERROR)
+                incrementCounter(kb.technique)
 
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
@@ -227,7 +227,7 @@ def errorUse(expression, dump=False):
     SQL injection vulnerability on the affected parameter.
     """
 
-    initTechnique(PAYLOAD.TECHNIQUE.ERROR)
+    initTechnique(kb.technique)
 
     abortedFlag = False
     count = None
@@ -416,7 +416,7 @@ def errorUse(expression, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d queries in %d seconds" % (kb.counters[PAYLOAD.TECHNIQUE.ERROR], duration)
+        debugMsg = "performed %d queries in %d seconds" % (kb.counters[kb.technique], duration)
         logger.debug(debugMsg)
 
     return outputs

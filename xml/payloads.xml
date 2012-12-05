@@ -73,10 +73,11 @@ Tag: <test>
         Valid values:
             0: Heuristic check to parse response errors
             1: Boolean-based blind SQL injection
-            2: Error-based/Inline queries SQL injection
+            2: Error-based queries SQL injection
             3: UNION query SQL injection
             4: Stacked queries SQL injection
             5: Time-based blind SQL injection
+            6: Inline queries SQL injection
 
     Sub-tag: <level>
         From which level check for this test.
@@ -1883,8 +1884,8 @@ Formats:
     <!-- Inline queries tests -->
     <test>
         <title>MySQL inline queries</title>
-        <stype>2</stype>
-        <level>5</level>
+        <stype>6</stype>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -1902,8 +1903,8 @@ Formats:
 
     <test>
         <title>PostgreSQL inline queries</title>
-        <stype>2</stype>
-        <level>5</level>
+        <stype>6</stype>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -1921,8 +1922,8 @@ Formats:
 
     <test>
         <title>Microsoft SQL Server/Sybase inline queries</title>
-        <stype>2</stype>
-        <level>5</level>
+        <stype>6</stype>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -1942,8 +1943,8 @@ Formats:
 
     <test>
         <title>Oracle inline queries</title>
-        <stype>2</stype>
-        <level>5</level>
+        <stype>6</stype>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>

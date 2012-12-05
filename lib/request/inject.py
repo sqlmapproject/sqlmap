@@ -407,14 +407,14 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-                if error and isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) and not found:
-                    kb.technique = PAYLOAD.TECHNIQUE.ERROR
+                if error and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) and not found:
+                    kb.technique = PAYLOAD.TECHNIQUE.ERROR if isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) else PAYLOAD.TECHNIQUE.QUERY
                     value = errorUse(forgeCaseExpression if expected == EXPECTED.BOOL else query, dump)
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
                 if found and conf.dnsName:
-                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E":PAYLOAD.TECHNIQUE.ERROR, "U":PAYLOAD.TECHNIQUE.UNION}.items())))
+                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E":PAYLOAD.TECHNIQUE.ERROR, "Q":PAYLOAD.TECHNIQUE.QUERY, "U":PAYLOAD.TECHNIQUE.UNION}.items())))
                     warnMsg = "option '--dns-domain' will be ignored "
                     warnMsg += "as faster techniques are usable "
                     warnMsg += "(%s) " % _

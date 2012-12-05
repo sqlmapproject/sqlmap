@@ -177,7 +177,8 @@ class PAYLOAD:
                      2: "error-based",
                      3: "UNION query",
                      4: "stacked queries",
-                     5: "AND/OR time-based blind"
+                     5: "AND/OR time-based blind",
+                     6: "inline query"
                    }
 
     PARAMETER = {
@@ -219,6 +220,7 @@ class PAYLOAD:
         UNION = 3
         STACKED = 4
         TIME = 5
+        QUERY = 6
 
     class WHERE:
         ORIGINAL = 1

@@ -68,7 +68,7 @@ _arguments -C -s \
   '(--code)'--code=-'[HTTP code to match when query is evaluated to True]' \
   '(--text-only)'--text-only'[Compare pages based only on the textual content]' \
   '(--titles)'--titles'[Compare pages based only on their titles]' \
-  '(--technique)'--technique=-'[SQL injection techniques to test for (default "BEUST")]:TECH:->list-techniques' \
+  '(--technique)'--technique=-'[SQL injection techniques to test for (default "BEUSTQ")]:TECH:->list-techniques' \
   '(--time-sec)'--time-sec=-'[Seconds to delay the DBMS response (default 5)]:TIMESEC' \
   '(--union-cols)'--union-cols=-'[Range of columns to test for UNION query SQL injection]:UCOLS' \
   '(--union-char)'--union-char=-'[Character to use for bruteforcing number of columns]:UCHAR' \
