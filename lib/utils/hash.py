@@ -30,43 +30,16 @@ from hashlib import md5
 from hashlib import sha1
 from Queue import Queue
 
-from lib.core.common import Backend
-from lib.core.common import checkFile
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
-from lib.core.common import getFileItems
-from lib.core.common import getPublicTypeMembers
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import normalizeUnicode
-from lib.core.common import paths
-from lib.core.common import readInput
-from lib.core.common import singleTimeLogMessage
-from lib.core.common import singleTimeWarnMessage
-from lib.core.convert import hexdecode
-from lib.core.convert import hexencode
-from lib.core.convert import utf8encode
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import HASH
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import COMMON_PASSWORD_SUFFIXES
-from lib.core.settings import COMMON_USER_COLUMNS
-from lib.core.settings import DUMMY_USER_PREFIX
-from lib.core.settings import HASH_MOD_ITEM_DISPLAY
-from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
-from lib.core.settings import IS_WIN
-from lib.core.settings import ITOA64
-from lib.core.settings import ML
-from lib.core.settings import NULL
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import ROTATING_CHARS
+from lib.core.common import Backend, checkFile, clearConsoleLine, dataToStdout, getFileItems, getPublicTypeMembers,\
+    hashDBRetrieve, hashDBWrite, normalizeUnicode, paths, readInput, singleTimeLogMessage, singleTimeWarnMessage
+from lib.core.convert import hexdecode, hexencode, utf8encode
+from lib.core.data import conf, kb, logger
+from lib.core.enums import DBMS, HASH
+from lib.core.exception import sqlmapFilePathException, sqlmapUserQuitException
+from lib.core.settings import COMMON_PASSWORD_SUFFIXES, COMMON_USER_COLUMNS, DUMMY_USER_PREFIX, HASH_MOD_ITEM_DISPLAY,\
+    HASH_RECOGNITION_QUIT_THRESHOLD, IS_WIN, ITOA64, ML, NULL, UNICODE_ENCODING, ROTATING_CHARS
 from lib.core.wordlist import Wordlist
-from thirdparty.pydes.pyDes import des
-from thirdparty.pydes.pyDes import CBC
+from thirdparty.pydes.pyDes import des, CBC
 
 def mysql_passwd(password, uppercase=True):
     """

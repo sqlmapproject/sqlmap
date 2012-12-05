@@ -6,8 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.data import logger
-from lib.core.settings import IS_WIN
-from lib.core.settings import PLATFORM
+from lib.core.settings import IS_WIN, PLATFORM
 
 _readline = None
 

@@ -7,23 +7,11 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 import time
-import string
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
-from lib.core.common import Backend
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import dataToStdout
-from lib.core.common import decodeHexValue
-from lib.core.common import extractRegexResult
-from lib.core.common import getSQLSnippet
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import randomInt
-from lib.core.common import randomStr
-from lib.core.common import safecharencode
-from lib.core.common import safeStringFormat
-from lib.core.common import singleTimeWarnMessage
+from lib.core.common import Backend, calculateDeltaSeconds, dataToStdout, decodeHexValue, extractRegexResult,\
+    getSQLSnippet, hashDBRetrieve, hashDBWrite, randomInt, randomStr, safeStringFormat, singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

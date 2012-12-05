@@ -14,15 +14,9 @@ import tempfile
 import time
 
 from lib.controller.controller import start
-from lib.core.common import beep
-from lib.core.common import clearConsoleLine
-from lib.core.common import dataToStdout
-from lib.core.common import readXmlFile
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.data import paths
-from lib.core.option import init
-from lib.core.option import __setVerbosity
+from lib.core.common import beep, clearConsoleLine, dataToStdout, readXmlFile
+from lib.core.data import conf, logger, paths
+from lib.core.option import init, __setVerbosity
 from lib.core.optiondict import optDict
 from lib.parse.cmdline import cmdLineParser
 

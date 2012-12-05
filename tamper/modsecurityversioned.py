@@ -13,6 +13,7 @@ __priority__ = PRIORITY.HIGHER
 def dependencies():
     pass
 
+
 def tamper(payload, **kwargs):
     """
     Embraces complete query with versioned comment
@@ -41,6 +42,7 @@ def tamper(payload, **kwargs):
                 payload = payload[:payload.find(comment)]
                 break
         if ' ' in payload:
-            retVal = "%s /*!30%s%s*/%s" % (payload[:payload.find(' ')], randomInt(3), payload[payload.find(' ') + 1:], postfix)
+            retVal = "%s /*!30%s%s*/%s" % (
+            payload[:payload.find(' ')], randomInt(3), payload[payload.find(' ') + 1:], postfix)
 
     return retVal

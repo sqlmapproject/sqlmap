@@ -15,7 +15,9 @@ from lib.core.enums import PRIORITY
 __priority__ = PRIORITY.LOW
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MSSQL))
+    singleTimeWarnMessage(u"tamper script '%s' is only meant to be run against %s" % (
+    os.path.basename(__file__).split(".")[0], DBMS.MSSQL))
+
 
 def tamper(payload, **kwargs):
     """
@@ -73,7 +75,7 @@ def tamper(payload, **kwargs):
             elif payload[i] == '"':
                 doublequote = not doublequote
 
-            elif payload[i] == '#' or payload[i:i+3] == '-- ':
+            elif payload[i] == '#' or payload[i:i + 3] == '-- ':
                 end = True
 
             elif payload[i] == " " and not doublequote and not quote:
@@ -82,8 +84,8 @@ def tamper(payload, **kwargs):
                 else:
                     retVal += random.choice(blanks)
 
-                continue        
-                
+                continue
+
             retVal += payload[i]
 
     return retVal

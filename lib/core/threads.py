@@ -12,16 +12,11 @@ import traceback
 
 from thread import error as threadError
 
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.data import conf, kb, logger
 from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapThreadException
-from lib.core.exception import sqlmapValueException
-from lib.core.settings import MAX_NUMBER_OF_THREADS
-from lib.core.settings import PYVERSION
+from lib.core.exception import sqlmapConnectionException, sqlmapThreadException, sqlmapValueException
+from lib.core.settings import MAX_NUMBER_OF_THREADS, PYVERSION
 
 shared = AttribDict()
 

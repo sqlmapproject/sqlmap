@@ -24,13 +24,13 @@ def headersParser(headers):
 
     if not kb.headerPaths:
         kb.headerPaths = {
-            "cookie":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
+            "cookie": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
             "microsoftsharepointteamservices": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "sharepoint.xml"),
-            "server":                          os.path.join(paths.SQLMAP_XML_BANNER_PATH, "server.xml"),
-            "servlet-engine":                  os.path.join(paths.SQLMAP_XML_BANNER_PATH, "servlet.xml"),
-            "set-cookie":                      os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
-            "x-aspnet-version":                os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-aspnet-version.xml"),
-            "x-powered-by":                    os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml")
+            "server": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "server.xml"),
+            "servlet-engine": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "servlet.xml"),
+            "set-cookie": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "cookie.xml"),
+            "x-aspnet-version": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-aspnet-version.xml"),
+            "x-powered-by": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml")
         }
 
     for header in itertools.ifilter(lambda x: x in kb.headerPaths, headers):

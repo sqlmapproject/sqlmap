@@ -5,20 +5,10 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
-from lib.core.common import getLimitRange
-from lib.core.common import isAdminFromPrivileges
-from lib.core.common import isInferenceAvailable
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
+from lib.core.common import Backend, getLimitRange, isAdminFromPrivileges, isInferenceAvailable, isNoneValue,\
+    isNumPosStrValue, isTechniqueAvailable
+from lib.core.data import conf, kb, logger, queries
+from lib.core.enums import CHARSET_TYPE, EXPECTED, PAYLOAD
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
@@ -41,7 +31,8 @@ class Enumeration(GenericEnumeration):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in (
+        PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if query2:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -119,7 +110,8 @@ class Enumeration(GenericEnumeration):
                     query = rootQuery.blind.count2 % queryUser
                 else:
                     query = rootQuery.blind.count % queryUser
-                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                    charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     if count != 0 and not query2:
@@ -164,4 +156,4 @@ class Enumeration(GenericEnumeration):
             errMsg += "for the database users"
             raise sqlmapNoneDataException, errMsg
 
-        return ( kb.data.cachedUsersRoles, areAdmins )
+        return kb.data.cachedUsersRoles, areAdmins

@@ -8,39 +8,17 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.agent import agent
-from lib.core.common import arrayizeValue
-from lib.core.common import Backend
-from lib.core.common import filterPairValues
-from lib.core.common import getLimitRange
-from lib.core.common import getUnicode
-from lib.core.common import isAdminFromPrivileges
-from lib.core.common import isInferenceAvailable
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import parsePasswordHash
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.common import strToHex
-from lib.core.common import unArrayizeValue
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.dicts import MYSQL_PRIVS
-from lib.core.dicts import PGSQL_PRIVS
-from lib.core.dicts import FIREBIRD_PRIVS
-from lib.core.dicts import DB2_PRIVS
+from lib.core.common import arrayizeValue, Backend, filterPairValues, getLimitRange, \
+    getUnicode, isAdminFromPrivileges, isInferenceAvailable, isNoneValue, isNumPosStrValue, isTechniqueAvailable,\
+    parsePasswordHash, randomStr, readInput, strToHex, unArrayizeValue
+from lib.core.data import conf, kb, logger, queries
+from lib.core.dicts import MYSQL_PRIVS, PGSQL_PRIVS, FIREBIRD_PRIVS, DB2_PRIVS
 from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.enums import DBMS, EXPECTED, PAYLOAD
+from lib.core.exception import sqlmapNoneDataException, sqlmapUserQuitException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
-from lib.utils.hash import attackCachedUsersPasswords
-from lib.utils.hash import storeHashesToFile
+from lib.utils.hash import attackCachedUsersPasswords, storeHashesToFile
 from lib.utils.pivotdumptable import pivotDumpTable
 
 class Users:

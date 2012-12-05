@@ -7,19 +7,11 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import Backend
-from lib.core.common import Format
-from lib.core.common import getUnicode
-from lib.core.common import randomInt
-from lib.core.common import randomRange
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.common import Backend,  Format, getUnicode, randomInt, randomRange
+from lib.core.data import conf, kb, logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
-from lib.core.settings import FIREBIRD_ALIASES
-from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import FIREBIRD_ALIASES, METADB_SUFFIX, UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 

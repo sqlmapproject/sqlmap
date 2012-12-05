@@ -5,18 +5,11 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
-from lib.core.common import Format
-from lib.core.common import getUnicode
-from lib.core.common import randomInt
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import OS
+from lib.core.common import Backend, Format, getUnicode, randomInt
+from lib.core.data import conf, kb, logger
+from lib.core.enums import DBMS, OS
 from lib.core.session import setDbms
-from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import PGSQL_SYSTEM_DBS
+from lib.core.settings import PGSQL_ALIASES, PGSQL_SYSTEM_DBS
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 

@@ -5,17 +5,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import randomStr
-from lib.core.common import singleTimeWarnMessage
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
-from lib.core.enums import PLACE
+from lib.core.common import isNumPosStrValue, isTechniqueAvailable, randomStr, singleTimeWarnMessage
+from lib.core.data import conf, kb, logger
+from lib.core.enums import CHARSET_TYPE, EXPECTED, PAYLOAD, PLACE
 from lib.core.exception import sqlmapNoneDataException
 from lib.request import inject
 from lib.techniques.union.use import unionUse

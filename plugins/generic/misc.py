@@ -7,27 +7,14 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import Backend
-from lib.core.common import hashDBWrite
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import normalizePath
-from lib.core.common import ntToPosixSlashes
-from lib.core.common import posixToNtSlashes
-from lib.core.common import readInput
-from lib.core.common import unArrayizeValue
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
-from lib.core.enums import DBMS
-from lib.core.enums import HASHDB_KEYS
-from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.common import Backend, hashDBWrite, isTechniqueAvailable, normalizePath, ntToPosixSlashes,\
+    posixToNtSlashes, readInput, unArrayizeValue
+from lib.core.data import conf, kb, logger, queries
+from lib.core.enums import DBMS, HASHDB_KEYS, OS, PAYLOAD
+from lib.core.exception import sqlmapNoneDataException, sqlmapUnsupportedFeatureException
 from lib.request import inject
 
-class Miscellaneous:
+class Miscellaneous(object):
     """
     This class defines miscellaneous functionalities for plugins.
     """

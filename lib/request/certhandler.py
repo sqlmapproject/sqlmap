@@ -5,6 +5,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+#TODO: Move to requests
+
 import httplib
 import urllib2
 import sys

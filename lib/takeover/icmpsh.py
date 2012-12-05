@@ -9,18 +9,11 @@ import os
 import time
 
 from extra.icmpsh.icmpsh_m import main as icmpshmaster
-from lib.core.common import getLocalIP
-from lib.core.common import getRemoteIP
-from lib.core.common import normalizePath
-from lib.core.common import ntToPosixSlashes
-from lib.core.common import randomStr
-from lib.core.common import readInput
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.data import paths
+from lib.core.common import getLocalIP, getRemoteIP, normalizePath, ntToPosixSlashes, randomStr, readInput
+from lib.core.data import conf, logger, paths
 
 
-class ICMPsh:
+class ICMPsh(object):
     """
     This class defines methods to call icmpsh for plugins.
     """

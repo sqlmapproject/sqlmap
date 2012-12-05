@@ -8,18 +8,11 @@ See the file 'doc/COPYING' for copying permission
 import urllib2
 import urlparse
 
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.common import getHostHeader
-from lib.core.common import getUnicode
-from lib.core.common import logHTTPTraffic
-from lib.core.common import readInput
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import REDIRECTION
+from lib.core.data import kb, logger
+from lib.core.common import getHostHeader, getUnicode, logHTTPTraffic, readInput
+from lib.core.enums import HTTPHEADER, REDIRECTION
 from lib.core.exception import sqlmapConnectionException
-from lib.core.settings import MAX_SINGLE_URL_REDIRECTIONS
-from lib.core.settings import MAX_TOTAL_REDIRECTIONS
+from lib.core.settings import MAX_SINGLE_URL_REDIRECTIONS, MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 

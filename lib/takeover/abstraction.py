@@ -6,15 +6,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from extra.safe2bin.safe2bin import safechardecode
-from lib.core.common import dataToStdout
-from lib.core.common import Backend
-from lib.core.common import getSQLSnippet
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import readInput
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
+from lib.core.common import dataToStdout, Backend, getSQLSnippet, isTechniqueAvailable, readInput
+from lib.core.data import conf, logger
+from lib.core.enums import DBMS, PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.request import inject
@@ -25,7 +19,7 @@ from lib.takeover.xp_cmdshell import xp_cmdshell
 
 class Abstraction(Web, UDF, xp_cmdshell):
     """
-    This class defines an abstraction layer for OS takeover functionalities
+    This class defines an abstraction layer for OS takeover functionality
     to UDF / xp_cmdshell objects
     """
 
@@ -166,10 +160,10 @@ class Abstraction(Web, UDF, xp_cmdshell):
                 expression = getSQLSnippet(DBMS.MSSQL, "configure_openrowset", ENABLE="1")
                 inject.goStacked(expression)
 
-        # TODO: add support for PostgreSQL
-        #elif Backend.isDbms(DBMS.PGSQL):
-        #    expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
-        #    inject.goStacked(expression)
+                # TODO: add support for PostgreSQL
+                #elif Backend.isDbms(DBMS.PGSQL):
+                #    expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
+                #    inject.goStacked(expression)
 
     def initEnv(self, mandatory=True, detailed=False, web=False):
         self.__initRunAs()

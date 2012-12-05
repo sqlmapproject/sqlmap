@@ -9,13 +9,14 @@ import os
 import random
 
 from lib.core.common import singleTimeWarnMessage
-from lib.core.enums import DBMS
-from lib.core.enums import PRIORITY
+from lib.core.enums import DBMS, PRIORITY
 
 __priority__ = PRIORITY.LOW
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+    singleTimeWarnMessage(u"tamper script '%s' is only meant to be run against %s" % (
+    os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+
 
 def tamper(payload, **kwargs):
     """

@@ -9,20 +9,12 @@ import codecs
 import ntpath
 import os
 
-from lib.core.common import getLimitRange
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import posixToNtSlashes
-from lib.core.common import randomStr
-from lib.core.common import readInput
+from lib.core.common import getLimitRange, isNumPosStrValue, isTechniqueAvailable, posixToNtSlashes, \
+    randomStr, readInput
 from lib.core.convert import hexencode
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.data import conf, logger
+from lib.core.enums import CHARSET_TYPE, EXPECTED, PAYLOAD
+from lib.core.exception import sqlmapNoneDataException, sqlmapUnsupportedFeatureException
 from lib.request import inject
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem

@@ -15,7 +15,6 @@ import inspect
 import logging
 import ntpath
 import os
-import pickle
 import posixpath
 import random
 import re
@@ -27,113 +26,50 @@ import time
 import urllib
 import urlparse
 import unicodedata
-
-from ConfigParser import DEFAULTSECT
-from ConfigParser import RawConfigParser
-from StringIO import StringIO
+from ConfigParser import DEFAULTSECT, RawConfigParser
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
 from subprocess import PIPE
 from subprocess import Popen as execute
-from tempfile import mkstemp
-from xml.etree import ElementTree as ET
 from xml.dom import minidom
 from xml.sax import parse
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
+
 
 from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import paths
-from lib.core.convert import base64pickle
-from lib.core.convert import base64unpickle
-from lib.core.convert import htmlunescape
-from lib.core.convert import stdoutencode
-from lib.core.convert import unicodeencode
-from lib.core.convert import utf8encode
+from lib.core.data import conf, kb, logger, paths
+from lib.core.convert import base64pickle, base64unpickle, htmlunescape, stdoutencode, unicodeencode, utf8encode
 from lib.core.decorators import cachedmethod
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEPRECATED_HINTS
 from lib.core.dicts import SQL_STATEMENTS
-from lib.core.enums import ADJUST_TIME_DELAY
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
-from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import OS
-from lib.core.enums import PLACE
-from lib.core.enums import PAYLOAD
-from lib.core.enums import REFLECTIVE_COUNTER
-from lib.core.enums import SORT_ORDER
-from lib.core.exception import sqlmapDataException
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapMissingDependence
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.log import FORMATTER
+from lib.core.enums import ADJUST_TIME_DELAY, CHARSET_TYPE, DBMS, EXPECTED, HEURISTIC_TEST, HTTPHEADER, HTTPMETHOD, \
+     OS, PLACE, PAYLOAD, REFLECTIVE_COUNTER, SORT_ORDER
+from lib.core.exception import sqlmapDataException, sqlmapFilePathException, sqlmapGenericException, \
+    sqlmapNoneDataException, sqlmapMissingDependence, sqlmapSilentQuitException, sqlmapSyntaxException, \
+    sqlmapUserQuitException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
-from lib.core.settings import BOLD_PATTERNS
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import DBMS_DIRECTORY_DICT
-from lib.core.settings import DEFAULT_COOKIE_DELIMITER
-from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import DEFAULT_MSSQL_SCHEMA
-from lib.core.settings import DEPRECATED_OPTIONS
-from lib.core.settings import DESCRIPTION
-from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
-from lib.core.settings import DUMMY_USER_INJECTION
-from lib.core.settings import DYNAMICITY_MARK_LENGTH
-from lib.core.settings import ERROR_PARSING_REGEXES
-from lib.core.settings import FORM_SEARCH_REGEX
-from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
-from lib.core.settings import HASHDB_MILESTONE_VALUE
-from lib.core.settings import HOST_ALIASES
-from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import ISSUES_PAGE
-from lib.core.settings import IS_WIN
-from lib.core.settings import LARGE_OUTPUT_THRESHOLD
-from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import ML
-from lib.core.settings import NULL
-from lib.core.settings import PARAMETER_AMP_MARKER
-from lib.core.settings import PARAMETER_SEMICOLON_MARKER
-from lib.core.settings import PARTIAL_VALUE_MARKER
-from lib.core.settings import PAYLOAD_DELIMITER
-from lib.core.settings import PLATFORM
-from lib.core.settings import PRINTABLE_CHAR_REGEX
-from lib.core.settings import PYVERSION
-from lib.core.settings import REFERER_ALIASES
-from lib.core.settings import REFLECTED_BORDER_REGEX
-from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
-from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
-from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
-from lib.core.settings import REVISION
-from lib.core.settings import SENSITIVE_DATA_REGEX
-from lib.core.settings import SITE
-from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import TEXT_TAG_REGEX
-from lib.core.settings import TIME_STDEV_COEFF
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import URI_QUESTION_MARKER
-from lib.core.settings import URLENCODE_CHAR_LIMIT
-from lib.core.settings import URLENCODE_FAILSAFE_CHARS
-from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.settings import VERSION
-from lib.core.settings import VERSION_STRING
+from lib.core.settings import BOLD_PATTERNS, CUSTOM_INJECTION_MARK_CHAR, DBMS_DIRECTORY_DICT,\
+    DEFAULT_COOKIE_DELIMITER,DEFAULT_GET_POST_DELIMITER, DEFAULT_MSSQL_SCHEMA, DEPRECATED_OPTIONS, DESCRIPTION, \
+    DUMMY_SQL_INJECTION_CHARS, DUMMY_USER_INJECTION, DYNAMICITY_MARK_LENGTH, ERROR_PARSING_REGEXES, \
+    FORM_SEARCH_REGEX, GENERIC_DOC_ROOT_DIRECTORY_NAMES, HASHDB_MILESTONE_VALUE, HOST_ALIASES,\
+    INFERENCE_UNKNOWN_CHAR, ISSUES_PAGE, IS_WIN, LARGE_OUTPUT_THRESHOLD, MIN_TIME_RESPONSES, ML, \
+    NULL, PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER, PARTIAL_VALUE_MARKER, PAYLOAD_DELIMITER,\
+    PLATFORM, PRINTABLE_CHAR_REGEX, PYVERSION, REFERER_ALIASES, REFLECTED_BORDER_REGEX, REFLECTED_MAX_REGEX_PARTS, \
+    REFLECTED_REPLACEMENT_REGEX, REFLECTED_VALUE_MARKER, REFLECTIVE_MISS_THRESHOLD, REVISION, SENSITIVE_DATA_REGEX, \
+    SITE, SUPPORTED_DBMS, TEXT_TAG_REGEX, TIME_STDEV_COEFF, UNICODE_ENCODING, UNKNOWN_DBMS_VERSION, \
+    URI_QUESTION_MARKER, URLENCODE_CHAR_LIMIT, URLENCODE_FAILSAFE_CHARS, USER_AGENT_ALIASES, VERSION, VERSION_STRING
 from lib.core.threads import getCurrentThreadData
-from thirdparty.clientform.clientform import ParseResponse
-from thirdparty.clientform.clientform import ParseError
+from thirdparty.clientform.clientform import ParseResponse, ParseError
 from thirdparty.magic import magic
 from thirdparty.odict.odict import OrderedDict
 from thirdparty.termcolor.termcolor import colored

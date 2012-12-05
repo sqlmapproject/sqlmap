@@ -5,41 +5,16 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from extra.safe2bin.safe2bin import safechardecode
 from lib.core.bigarray import BigArray
-from lib.core.common import Backend
-from lib.core.common import clearConsoleLine
-from lib.core.common import decodeIntToUnicode
-from lib.core.common import getLimitRange
-from lib.core.common import getUnicode
-from lib.core.common import isInferenceAvailable
-from lib.core.common import isListLike
-from lib.core.common import isNoneValue
-from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
-from lib.core.common import prioritySortColumns
-from lib.core.common import readInput
-from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.common import singleTimeWarnMessage
-from lib.core.common import unArrayizeValue
-from lib.core.common import unsafeSQLIdentificatorNaming
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import queries
+from lib.core.common import Backend, clearConsoleLine, getLimitRange, getUnicode, isInferenceAvailable,\
+    isListLike, isNoneValue, isNumPosStrValue, isTechniqueAvailable, prioritySortColumns, readInput,\
+    safeSQLIdentificatorNaming, unArrayizeValue, unsafeSQLIdentificatorNaming
+from lib.core.data import conf, kb, logger, queries
 from lib.core.dicts import DUMP_REPLACEMENTS
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
-from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedFeatureException
-from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
-from lib.core.settings import CURRENT_DB
-from lib.core.settings import MAX_INT
-from lib.core.settings import NULL
+from lib.core.enums import CHARSET_TYPE, DBMS, EXPECTED, PAYLOAD
+from lib.core.exception import sqlmapConnectionException, sqlmapMissingMandatoryOptionException, \
+    sqlmapNoneDataException, sqlmapUnsupportedFeatureException
+from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD, CURRENT_DB, NULL
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
 from lib.utils.pivotdumptable import pivotDumpTable

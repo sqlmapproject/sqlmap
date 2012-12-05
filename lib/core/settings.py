@@ -16,7 +16,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
-VERSION = "1.0-dev"
+VERSION = "1.0-dev" #TODO: Move to read from file
 REVISION = getRevisionNumber()
 VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "")
 DESCRIPTION = "automatic SQL injection and database takeover tool"
@@ -136,14 +136,17 @@ MYSQL_SYSTEM_DBS = ( "information_schema", "mysql" )                   # Before 
 PGSQL_SYSTEM_DBS = ( "information_schema", "pg_catalog", "pg_toast" )
 ORACLE_SYSTEM_DBS = ( "SYSTEM", "SYSAUX", "SYS" )                      # These are TABLESPACE_NAME
 SQLITE_SYSTEM_DBS = ( "sqlite_master", "sqlite_temp_master" )
-ACCESS_SYSTEM_DBS = ( "MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
-                        "MSysAccessXML", "MSysModules", "MSysModules2" )
-FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE",\
-                        "RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS",\
-                        "RDB$FORMATS", "RDB$FUNCTIONS", "RDB$FUNCTION_ARGUMENTS", "RDB$GENERATORS", "RDB$INDEX_SEGMENTS", "RDB$INDICES",\
-                        "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS",\
-                        "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS",\
-                        "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
+ACCESS_SYSTEM_DBS = (
+"MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
+"MSysAccessXML", "MSysModules", "MSysModules2" )
+FIREBIRD_SYSTEM_DBS = (
+"RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE",\
+"RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS",\
+"RDB$FORMATS", "RDB$FUNCTIONS", "RDB$FUNCTION_ARGUMENTS", "RDB$GENERATORS", "RDB$INDEX_SEGMENTS", "RDB$INDICES",\
+"RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS",\
+"RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS",
+"RDB$TRIGGERS",\
+"RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
 MAXDB_SYSTEM_DBS = ( "SYSINFO", "DOMAIN" )
 SYBASE_SYSTEM_DBS = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
 DB2_SYSTEM_DBS = ( "NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS",\
@@ -160,7 +163,8 @@ MAXDB_ALIASES = ( "maxdb", "sap maxdb", "sap db" )
 SYBASE_ALIASES = ( "sybase", "sybase sql server" )
 DB2_ALIASES = ( "db2", "ibm db2", "ibmdb2" )
 
-DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
+DBMS_DIRECTORY_DICT = dict(
+    (getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 
 SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
 SUPPORTED_OS = ( "linux", "windows" )
@@ -171,38 +175,38 @@ HOST_ALIASES = ( "host", )
 
 # Items displayed in basic help (-h) output
 BASIC_HELP_ITEMS = (
-                        "url",
-                        "googleDork",
-                        "data",
-                        "cookie",
-                        "randomAgent",
-                        "proxy",
-                        "testParameter",
-                        "dbms",
-                        "level",
-                        "risk",
-                        "tech",
-                        "getAll",
-                        "getBanner",
-                        "getCurrentUser",
-                        "getCurrentDb",
-                        "getPasswordHashes",
-                        "getTables",
-                        "getColumns",
-                        "getSchema",
-                        "dumpTable",
-                        "dumpAll",
-                        "db",
-                        "tbl",
-                        "col",
-                        "osShell",
-                        "osPwn",
-                        "batch",
-                        "checkTor",
-                        "flushSession",
-                        "tor",
-                        "wizard"
-                   )
+    "url",
+    "googleDork",
+    "data",
+    "cookie",
+    "randomAgent",
+    "proxy",
+    "testParameter",
+    "dbms",
+    "level",
+    "risk",
+    "tech",
+    "getAll",
+    "getBanner",
+    "getCurrentUser",
+    "getCurrentDb",
+    "getPasswordHashes",
+    "getTables",
+    "getColumns",
+    "getSchema",
+    "dumpTable",
+    "dumpAll",
+    "db",
+    "tbl",
+    "col",
+    "osShell",
+    "osPwn",
+    "batch",
+    "checkTor",
+    "flushSession",
+    "tor",
+    "wizard"
+    )
 
 # String representation for NULL value
 NULL = "NULL"
@@ -215,11 +219,11 @@ CURRENT_DB = "CD"
 
 # Regular expressions used for parsing error messages (--parse-errors)
 ERROR_PARSING_REGEXES = (
-                          r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
-                          r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>.+?)$",
-                          r"<li>Error Type:<br>(?P<result>.+?)</li>",
-                          r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)"
-                        )
+    r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
+    r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>.+?)$",
+    r"<li>Error Type:<br>(?P<result>.+?)</li>",
+    r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)"
+    )
 
 # Regular expression used for parsing charset info from meta html headers
 META_CHARSET_REGEX = r'(?si)<head>.*<meta http-equiv="?content-type"?[^>]+charset=(?P<result>[^">]+).*</head>'
@@ -231,7 +235,9 @@ META_REFRESH_REGEX = r'(?si)<head>.*<meta http-equiv="?refresh"?[^>]+content="?[
 EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=(&|\Z))'
 
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
-COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18")
+COMMON_PASSWORD_SUFFIXES = (
+"1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15",
+"69", "16", "6", "18")
 
 # Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
 COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@")
@@ -279,7 +285,9 @@ MYSQL_ERROR_CHUNK_LENGTH = 50
 MSSQL_ERROR_CHUNK_LENGTH = 100
 
 # Do not unescape the injected statement if it contains any of the following SQL words
-EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", "'%s'" % CHAR_INFERENCE_MARK)
+EXCLUDE_UNESCAPE = (
+"WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ",
+"'%s'" % CHAR_INFERENCE_MARK)
 
 # Mark used for replacement of reflected values
 REFLECTED_VALUE_MARKER = "__REFLECTED_VALUE__"
@@ -312,7 +320,9 @@ MAX_INT = sys.maxint
 DEPRECATED_OPTIONS = ("--replicate",)
 
 # Parameters to be ignored in detection phase (upper case)
-IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
+IGNORE_PARAMETERS = (
+"__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID",
+"ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
 
 # Regular expression used for recognition of ASP.NET control parameters
 ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
@@ -343,7 +353,9 @@ LOW_TEXT_PERCENT = 20
 
 # These MySQL keywords can't go (alone) into versioned comment form (/*!...*/)
 # Reference: http://dev.mysql.com/doc/refman/5.1/en/function-resolution.html
-IGNORE_SPACE_AFFECTED_KEYWORDS = ("CAST", "COUNT", "EXTRACT", "GROUP_CONCAT", "MAX", "MID", "MIN", "SESSION_USER", "SUBSTR", "SUBSTRING", "SUM", "SYSTEM_USER", "TRIM")
+IGNORE_SPACE_AFFECTED_KEYWORDS = (
+"CAST", "COUNT", "EXTRACT", "GROUP_CONCAT", "MAX", "MID", "MIN", "SESSION_USER", "SUBSTR", "SUBSTRING", "SUM",
+"SYSTEM_USER", "TRIM")
 
 LEGAL_DISCLAIMER = "Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program"
 
@@ -363,7 +375,9 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = ("gif","jpg","jar","tif","bmp","war","ear","mpg","wmv","mpeg","scm","iso","dmp","dll","cab","so","avi","bin","exe","iso","tar","png","pdf","ps","mp3","zip","rar","gz")
+CRAWL_EXCLUDE_EXTENSIONS = (
+"gif", "jpg", "jar", "tif", "bmp", "war", "ear", "mpg", "wmv", "mpeg", "scm", "iso", "dmp", "dll", "cab", "so", "avi",
+"bin", "exe", "iso", "tar", "png", "pdf", "ps", "mp3", "zip", "rar", "gz")
 
 # Template used for common table existence check
 BRUTE_TABLE_EXISTS_TEMPLATE = "EXISTS(SELECT %d FROM %s)"
@@ -402,7 +416,9 @@ UNION_CHAR_REGEX = r'\A\w+\Z'
 UNENCODED_ORIGINAL_VALUE = 'original'
 
 # Common column names containing usernames (used for hash cracking in some cases)
-COMMON_USER_COLUMNS = ('user', 'username', 'user_name', 'benutzername', 'benutzer', 'utilisateur', 'usager', 'consommateur', 'utente', 'utilizzatore', 'usufrutuario', 'korisnik', 'usuario', 'consumidor')
+COMMON_USER_COLUMNS = (
+'user', 'username', 'user_name', 'benutzername', 'benutzer', 'utilisateur', 'usager', 'consommateur', 'utente',
+'utilizzatore', 'usufrutuario', 'korisnik', 'usuario', 'consumidor')
 
 # Default delimiter in GET/POST values
 DEFAULT_GET_POST_DELIMITER = '&'
@@ -420,7 +436,7 @@ HASHDB_FLUSH_RETRIES = 3
 HASHDB_MILESTONE_VALUE = "cAWxkLYCQT"  # r5129 "".join(random.sample(string.letters, 10))
 
 # Warn user of possible delay due to large page dump in full UNION query injections
-LARGE_OUTPUT_THRESHOLD = 1024**2
+LARGE_OUTPUT_THRESHOLD = 1024 ** 2
 
 # On huge tables there is a considerable slowdown if every row retrieval requires ORDER BY (most noticable in table dumping using ERROR injections)
 SLOW_ORDER_COUNT_THRESHOLD = 10000
@@ -471,7 +487,8 @@ GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")
 MAX_HELP_OPTION_LENGTH = 18
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
+FORMAT_EXCEPTION_STRINGS = (
+"Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
 
 # Regular expression used for extracting ASP.NET view state values
 VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'

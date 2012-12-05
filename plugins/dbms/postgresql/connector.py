@@ -10,7 +10,7 @@ try:
     import psycopg2.extensions
     psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
     psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-except ImportError, _:
+except ImportError:
     pass
 
 from lib.core.data import logger

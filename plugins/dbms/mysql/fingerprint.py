@@ -7,15 +7,9 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import Backend
-from lib.core.common import Format
-from lib.core.common import getUnicode
-from lib.core.common import randomInt
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.enums import DBMS
-from lib.core.enums import OS
+from lib.core.common import Backend, Format, getUnicode, randomInt
+from lib.core.data import conf, kb, logger
+from lib.core.enums import DBMS, OS
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -41,17 +35,17 @@ class Fingerprint(GenericFingerprint):
 
         # MySQL valid versions updated on 04/2011
         versions = (
-                     (32200, 32235),    # MySQL 3.22
-                     (32300, 32359),    # MySQL 3.23
-                     (40000, 40032),    # MySQL 4.0
-                     (40100, 40131),    # MySQL 4.1
-                     (50000, 50092),    # MySQL 5.0
-                     (50100, 50156),    # MySQL 5.1
-                     (50400, 50404),    # MySQL 5.4
-                     (50500, 50521),    # MySQL 5.5
-                     (50600, 50604),    # MySQL 5.6
-                     (60000, 60014),    # MySQL 6.0
-                   )
+            (32200, 32235), # MySQL 3.22
+            (32300, 32359), # MySQL 3.23
+            (40000, 40032), # MySQL 4.0
+            (40100, 40131), # MySQL 4.1
+            (50000, 50092), # MySQL 5.0
+            (50100, 50156), # MySQL 5.1
+            (50400, 50404), # MySQL 5.4
+            (50500, 50521), # MySQL 5.5
+            (50600, 50604), # MySQL 5.6
+            (60000, 60014),    # MySQL 6.0
+            )
 
         index = -1
         for i in xrange(len(versions)):

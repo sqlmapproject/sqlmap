@@ -17,62 +17,21 @@ import traceback
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
-from lib.core.common import asciifyUrl
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import clearConsoleLine
-from lib.core.common import cpuThrottle
-from lib.core.common import evaluateCode
-from lib.core.common import extractRegexResult
-from lib.core.common import findMultipartPostBoundary
-from lib.core.common import getCurrentThreadData
-from lib.core.common import getHostHeader
-from lib.core.common import getRequestHeader
-from lib.core.common import getUnicode
-from lib.core.common import logHTTPTraffic
-from lib.core.common import randomizeParameterValue
-from lib.core.common import readInput
-from lib.core.common import removeReflectiveValues
-from lib.core.common import singleTimeWarnMessage
-from lib.core.common import stdev
-from lib.core.common import wasLastRequestDelayed
-from lib.core.common import unicodeencode
-from lib.core.common import urlencode
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.common import asciifyUrl, calculateDeltaSeconds, clearConsoleLine, cpuThrottle, evaluateCode,\
+    extractRegexResult, findMultipartPostBoundary, getCurrentThreadData, getHostHeader, getRequestHeader,\
+    getUnicode, logHTTPTraffic, randomizeParameterValue, readInput, removeReflectiveValues, singleTimeWarnMessage,\
+    stdev, wasLastRequestDelayed, unicodeencode, urlencode
+from lib.core.data import conf, kb, logger
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
-from lib.core.enums import ADJUST_TIME_DELAY
-from lib.core.enums import CUSTOM_LOGGING
-from lib.core.enums import HTTPHEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import NULLCONNECTION
-from lib.core.enums import PAYLOAD
-from lib.core.enums import PLACE
-from lib.core.enums import POST_HINT
-from lib.core.enums import REDIRECTION
-from lib.core.exception import sqlmapCompressionException
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapValueException
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import DEFAULT_CONTENT_TYPE
-from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
-from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
-from lib.core.settings import HTTP_SILENT_TIMEOUT
-from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
-from lib.core.settings import MAX_CONNECTIONS_REGEX
-from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
-from lib.core.settings import META_REFRESH_REGEX
-from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import IS_WIN
-from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
-from lib.core.settings import PERMISSION_DENIED_REGEX
-from lib.core.settings import UNENCODED_ORIGINAL_VALUE
-from lib.core.settings import URI_HTTP_HEADER
-from lib.core.settings import WARN_TIME_STDEV
-from lib.request.basic import decodePage
-from lib.request.basic import forgeHeaders
-from lib.request.basic import processResponse
+from lib.core.enums import ADJUST_TIME_DELAY, CUSTOM_LOGGING, HTTPHEADER, HTTPMETHOD, NULLCONNECTION, PAYLOAD,\
+    PLACE, POST_HINT, REDIRECTION
+from lib.core.exception import sqlmapCompressionException, sqlmapConnectionException, sqlmapSyntaxException,\
+    sqlmapValueException
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR, DEFAULT_CONTENT_TYPE, HTTP_ACCEPT_HEADER_VALUE,\
+    HTTP_ACCEPT_ENCODING_HEADER_VALUE, HTTP_SILENT_TIMEOUT, MAX_CONNECTION_CHUNK_SIZE, MAX_CONNECTIONS_REGEX,\
+    MAX_CONNECTION_TOTAL_SIZE, META_REFRESH_REGEX, MIN_TIME_RESPONSES, IS_WIN, LARGE_CHUNK_TRIM_MARKER,\
+    PERMISSION_DENIED_REGEX, UNENCODED_ORIGINAL_VALUE, URI_HTTP_HEADER, WARN_TIME_STDEV
+from lib.request.basic import decodePage, forgeHeaders, processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
@@ -138,7 +97,7 @@ class Connect:
         if not kb.dnsMode and conn:
             headers = conn.info()
             if headers and (headers.getheader(HTTPHEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
-              or "text" not in headers.getheader(HTTPHEADER.CONTENT_TYPE, "").lower()):
+                            or "text" not in headers.getheader(HTTPHEADER.CONTENT_TYPE, "").lower()):
                 retVal = conn.read()
             else:
                 while True:
@@ -146,7 +105,8 @@ class Connect:
                     if len(_) == MAX_CONNECTION_CHUNK_SIZE:
                         warnMsg = "large response detected. This could take a while"
                         singleTimeWarnMessage(warnMsg)
-                        _ = re.sub(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start), "%s%s%s" % (kb.chars.stop, LARGE_CHUNK_TRIM_MARKER, kb.chars.start), _)
+                        _ = re.sub(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start),
+                            "%s%s%s" % (kb.chars.stop, LARGE_CHUNK_TRIM_MARKER, kb.chars.start), _)
                         retVal += _
                     else:
                         retVal += _
@@ -174,30 +134,31 @@ class Connect:
         threadData = getCurrentThreadData()
         threadData.lastRequestUID += 1
 
-        url = kwargs.get('url',                     conf.url)
-        get = kwargs.get('get',                     None)
-        post = kwargs.get('post',                   None)
-        method = kwargs.get('method',               None)
-        cookie = kwargs.get('cookie',               None)
-        ua = kwargs.get('ua',                       None)
-        referer = kwargs.get('referer',             None)
-        host = kwargs.get('host',                   conf.host)
-        direct = kwargs.get('direct',               False)
-        multipart = kwargs.get('multipart',         False)
-        silent = kwargs.get('silent',               False)
-        raise404 = kwargs.get('raise404',           True)
-        auxHeaders = kwargs.get('auxHeaders',       None)
-        response = kwargs.get('response',           False)
+        url = kwargs.get('url', conf.url)
+        get = kwargs.get('get', None)
+        post = kwargs.get('post', None)
+        method = kwargs.get('method', None)
+        cookie = kwargs.get('cookie', None)
+        ua = kwargs.get('ua', None)
+        referer = kwargs.get('referer', None)
+        host = kwargs.get('host', conf.host)
+        direct = kwargs.get('direct', False)
+        multipart = kwargs.get('multipart', False)
+        silent = kwargs.get('silent', False)
+        raise404 = kwargs.get('raise404', True)
+        auxHeaders = kwargs.get('auxHeaders', None)
+        response = kwargs.get('response', False)
         ignoreTimeout = kwargs.get('ignoreTimeout', kb.ignoreTimeout)
-        refreshing = kwargs.get('refreshing',       False)
-        retrying = kwargs.get('retrying',           False)
-        crawling = kwargs.get('crawling',           False)
+        refreshing = kwargs.get('refreshing', False)
+        retrying = kwargs.get('retrying', False)
+        crawling = kwargs.get('crawling', False)
 
         if not urlparse.urlsplit(url).netloc:
             url = urlparse.urljoin(conf.url, url)
 
         # flag to know if we are dealing with the same target host
-        target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url or ""]))
+        target = reduce(lambda x, y: x == y,
+            map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url or ""]))
 
         if not retrying:
             # Reset the number of connection retries
@@ -211,8 +172,10 @@ class Connect:
         page = None
 
         _ = urlparse.urlsplit(url)
-        requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
-        requestMsg += ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling)) else url
+        requestMsg = u"HTTP request [#%d]:\n%s " % (
+        threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
+        requestMsg += ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any(
+            (refreshing, crawling)) else url
         responseMsg = u"HTTP response "
         requestHeaders = u""
         responseHeaders = None
@@ -252,7 +215,8 @@ class Connect:
                 page = Connect.__connReadProxy(conn)
                 responseHeaders = conn.info()
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
-                page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
+                page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING),
+                    responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
 
                 return page
 
@@ -289,7 +253,8 @@ class Connect:
                 headers[HTTPHEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             headers[HTTPHEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
-            headers[HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
+            headers[
+            HTTPHEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
             headers[HTTPHEADER.HOST] = host or getHostHeader(url)
 
             if post is not None and HTTPHEADER.CONTENT_TYPE not in headers:
@@ -320,12 +285,15 @@ class Connect:
             else:
                 req = urllib2.Request(url, post, headers)
 
-            requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
+            requestHeaders += "\n".join(
+                "%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (
+                key, value) in req.header_items())
 
             if not getRequestHeader(req, HTTPHEADER.COOKIE) and conf.cj:
                 conf.cj._policy._now = conf.cj._now = int(time.time())
                 cookies = conf.cj._cookies_for_request(req)
-                requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
+                requestHeaders += "\n%s" % ("Cookie: %s" % ";".join(
+                    "%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
             if post is not None:
                 if not getRequestHeader(req, HTTPHEADER.CONTENT_LENGTH):
@@ -360,7 +328,7 @@ class Connect:
             # Get HTTP response
             if hasattr(conn, 'redurl'):
                 page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
-                  else Connect.__connReadProxy(conn)
+                else Connect.__connReadProxy(conn)
                 skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
                 code = conn.redcode
             else:
@@ -369,7 +337,8 @@ class Connect:
             code = code or conn.code
             responseHeaders = conn.info()
             responseHeaders[URI_HTTP_HEADER] = conn.geturl()
-            page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
+            page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING),
+                responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             status = getUnicode(conn.msg)
 
             if extractRegexResult(META_REFRESH_REGEX, page) and not refreshing:
@@ -391,7 +360,7 @@ class Connect:
                     if url.lower().startswith('http://'):
                         kwargs['url'] = url
                     else:
-                        kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
+                        kwargs['url'] = conf.url[:conf.url.rfind('/') + 1] + url
 
                     threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                     kwargs['refreshing'] = True
@@ -421,7 +390,8 @@ class Connect:
                 page = e.read()
                 responseHeaders = e.info()
                 responseHeaders[URI_HTTP_HEADER] = e.geturl()
-                page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
+                page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING),
+                    responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code
@@ -443,9 +413,12 @@ class Connect:
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
+                logHeaders = "\n".join(
+                    "%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (
+                    key, value) in responseHeaders.items())
 
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
+            logHTTPTraffic(requestMsg,
+                "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
 
             skipLogTraffic = True
 
@@ -486,7 +459,9 @@ class Connect:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError, sqlmapCompressionException), e:
+        except (
+        urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError,
+        sqlmapCompressionException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
@@ -534,10 +509,13 @@ class Connect:
 
         responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
         if responseHeaders:
-            logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in responseHeaders.items())
+            logHeaders = "\n".join(
+                "%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (
+                key, value) in responseHeaders.items())
 
         if not skipLogTraffic:
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
+            logHTTPTraffic(requestMsg,
+                "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
 
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
@@ -549,7 +527,9 @@ class Connect:
         return page, responseHeaders, code
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True):
+    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None,
+                  timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None,
+                  removeReflection=True):
         """
         This method calls a function to get the target url page content
         and returns its page MD5 hash or a boolean value in case of
@@ -614,7 +594,8 @@ class Connect:
             else:
                 if place != PLACE.URI or (value and payload and '?' in value and value.find('?') < value.find(payload)):
                     # GET, URI and Cookie need to be throughly URL encoded (POST is encoded down below)
-                    payload = urlencode(payload, '%', False, True) if place in (PLACE.GET, PLACE.COOKIE, PLACE.URI) and not skipUrlEncode else payload
+                    payload = urlencode(payload, '%', False, True) if place in (
+                    PLACE.GET, PLACE.COOKIE, PLACE.URI) and not skipUrlEncode else payload
                     value = agent.replacePayload(value, payload)
 
         if place:
@@ -630,7 +611,8 @@ class Connect:
             post = conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value
 
         if PLACE.CUSTOM_POST in conf.parameters:
-            post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR, "") if place != PLACE.CUSTOM_POST or not value else value
+            post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR,
+                "") if place != PLACE.CUSTOM_POST or not value else value
 
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value
@@ -655,7 +637,8 @@ class Connect:
                 match = re.search("%s=(?P<value>[^&;]+)" % randomParameter, paramString)
                 if match:
                     origValue = match.group("value")
-                    retVal = re.sub("%s=[^&;]+" % randomParameter, "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
+                    retVal = re.sub("%s=[^&;]+" % randomParameter,
+                        "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
                 return retVal
 
             for randomParameter in conf.rParam:
@@ -737,7 +720,8 @@ class Connect:
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
             if kb.queryCounter % conf.saFreq == 0:
-                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
+                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer,
+                    host=host)
 
         start = time.time()
 
@@ -752,19 +736,25 @@ class Connect:
 
                 auxHeaders[HTTPHEADER.RANGE] = "bytes=-1"
 
-            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer,
+                host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
 
             if headers:
                 if kb.nullConnection == NULLCONNECTION.HEAD and HTTPHEADER.CONTENT_LENGTH in headers:
                     pageLength = int(headers[HTTPHEADER.CONTENT_LENGTH])
                 elif kb.nullConnection == NULLCONNECTION.RANGE and HTTPHEADER.CONTENT_RANGE in headers:
-                    pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
+                    pageLength = int(
+                        headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
 
         if not pageLength:
-            page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+            page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer,
+                host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404,
+                ignoreTimeout=timeBasedCompare)
 
         if conf.secondOrder:
-            page, headers, code = Connect.getPage(url=conf.secondOrder, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
+            page, headers, code = Connect.getPage(url=conf.secondOrder, cookie=cookie, ua=ua, silent=silent,
+                auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare,
+                refreshing=True)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
@@ -788,7 +778,8 @@ class Connect:
             return page, headers
 
         if getRatioValue:
-            return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page, headers, code, getRatioValue=True, pageLength=pageLength)
+            return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page,
+                headers, code, getRatioValue=True, pageLength=pageLength)
         elif pageLength or page:
             return comparison(page, headers, code, getRatioValue, pageLength)
         else:

@@ -4,9 +4,7 @@
 Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
-
 import os
-import random
 import re
 import socket
 import threading

@@ -40,7 +40,8 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user, password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
+            self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user,
+                password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
         except pymssql.OperationalError, msg:
             raise sqlmapConnectionException, msg
 

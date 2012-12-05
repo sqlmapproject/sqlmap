@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
+from re import finditer
 
 from lib.core.common import randomRange
 from lib.core.data import kb
@@ -22,7 +22,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"[A-Za-z_]+", payload):
+        for match in finditer(r"[A-Za-z_]+", payload):
             word = match.group()
 
             if len(word) < 2:

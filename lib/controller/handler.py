@@ -6,18 +6,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
-from lib.core.data import conf
-from lib.core.data import logger
-from lib.core.settings import MSSQL_ALIASES
-from lib.core.settings import MYSQL_ALIASES
-from lib.core.settings import ORACLE_ALIASES
-from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import SQLITE_ALIASES
-from lib.core.settings import ACCESS_ALIASES
-from lib.core.settings import FIREBIRD_ALIASES
-from lib.core.settings import MAXDB_ALIASES
-from lib.core.settings import SYBASE_ALIASES
-from lib.core.settings import DB2_ALIASES
+from lib.core.data import conf, logger
+from lib.core.settings import MSSQL_ALIASES, MYSQL_ALIASES, ORACLE_ALIASES, PGSQL_ALIASES, SQLITE_ALIASES,\
+    ACCESS_ALIASES, FIREBIRD_ALIASES, MAXDB_ALIASES, SYBASE_ALIASES, DB2_ALIASES
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
 from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn

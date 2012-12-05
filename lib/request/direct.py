@@ -9,20 +9,11 @@ import time
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
-from lib.core.common import Backend
-from lib.core.common import calculateDeltaSeconds
-from lib.core.common import extractExpectedValue
-from lib.core.common import getCurrentThreadData
-from lib.core.common import getUnicode
-from lib.core.common import hashDBRetrieve
-from lib.core.common import hashDBWrite
-from lib.core.common import isListLike
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
+from lib.core.common import Backend, calculateDeltaSeconds, extractExpectedValue, getCurrentThreadData, \
+    getUnicode, hashDBRetrieve, hashDBWrite, isListLike
+from lib.core.data import conf, kb, logger
 from lib.core.dicts import SQL_STATEMENTS
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
+from lib.core.enums import DBMS, EXPECTED
 from lib.core.settings import UNICODE_ENCODING
 from lib.utils.timeout import timeout
 
