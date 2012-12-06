@@ -148,11 +148,11 @@ class Databases:
                 kb.data.cachedDbs = []
                 while True:
                     query = rootQuery.inband.query2 % count
-                    value = inject.getValue(query, blind=blind)
-                    if not value:
+                    value = unArrayizeValue(inject.getValue(query, blind=blind))
+                    if not (value or "").strip():
                         break
                     else:
-                        kb.data.cachedDbs.append(unArrayizeValue(value))
+                        kb.data.cachedDbs.append(value)
                         count += 1
                 if kb.data.cachedDbs:
                     break
