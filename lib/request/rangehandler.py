@@ -18,7 +18,7 @@ class HTTPRangeHandler(urllib2.BaseHandler):
 
     This was extremely simple. The Range header is a HTTP feature to
     begin with so all this class does is tell urllib2 that the 
-    "206 Partial Content" reponse from the HTTP server is what we 
+    "206 Partial Content" response from the HTTP server is what we 
     expected.
 
     Example:

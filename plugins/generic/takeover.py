@@ -129,7 +129,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             try:
                 from impacket import ImpactDecoder
                 from impacket import ImpactPacket
-            except ImportError, _:
+            except ImportError:
                 errMsg = "sqlmap requires 'impacket' third-party library "
                 errMsg += "in order to run icmpsh master. Download from "
                 errMsg += "http://oss.coresecurity.com/projects/impacket.html"

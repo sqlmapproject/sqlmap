@@ -164,4 +164,4 @@ class Enumeration(GenericEnumeration):
             errMsg += "for the database users"
             raise sqlmapNoneDataException, errMsg
 
-        return ( kb.data.cachedUsersRoles, areAdmins )
+        return kb.data.cachedUsersRoles, areAdmins

@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     from crypt import crypt
-except ImportError, _:
+except ImportError:
     from thirdparty.fcrypt.fcrypt import crypt
 
 _multiprocessing = None

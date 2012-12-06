@@ -39,7 +39,7 @@ def checkDependencies():
                 import pyodbc
             elif dbmsName == DBMS.FIREBIRD:
                 import kinterbasdb
-        except ImportError, _:
+        except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the database "
             warnMsg += "%s. Download from %s" % (dbmsName, data[2])
@@ -55,7 +55,7 @@ def checkDependencies():
         import impacket
         debugMsg = "'python-impacket' third-party library is found"
         logger.debug(debugMsg)
-    except ImportError, _:
+    except ImportError:
         warnMsg = "sqlmap requires 'python-impacket' third-party library for "
         warnMsg += "out-of-band takeover feature. Download from "
         warnMsg += "http://code.google.com/p/impacket/"
@@ -66,7 +66,7 @@ def checkDependencies():
         import ntlm
         debugMsg = "'python-ntlm' third-party library is found"
         logger.debug(debugMsg)
-    except ImportError, _:
+    except ImportError:
         warnMsg = "sqlmap requires 'python-ntlm' third-party library for "
         warnMsg += "if you plan to attack a web application behind NTLM "
         warnMsg += "authentication. Download from http://code.google.com/p/python-ntlm/"
@@ -78,7 +78,7 @@ def checkDependencies():
             import pyreadline
             debugMsg = "'python-pyreadline' third-party library is found"
             logger.debug(debugMsg)
-        except ImportError, _:
+        except ImportError:
             warnMsg = "sqlmap requires 'pyreadline' third-party library to "
             warnMsg += "be able to take advantage of the sqlmap TAB "
             warnMsg += "completion and history support features in the SQL "

@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import kinterbasdb
-except ImportError, _:
+except ImportError:
     pass
 
 import logging

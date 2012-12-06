@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import ibm_db_dbi
-except ImportError, _:
+except ImportError:
     pass
 
 import logging

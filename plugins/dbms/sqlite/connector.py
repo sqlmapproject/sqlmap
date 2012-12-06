@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import sqlite3
-except ImportError, _:
+except ImportError:
     pass
 
 import logging
@@ -53,7 +53,7 @@ class Connector(GenericConnector):
             try:
                 try:
                     import sqlite
-                except ImportError, _:
+                except ImportError:
                     errMsg = "sqlmap requires 'python-sqlite2' third-party library "
                     errMsg += "in order to directly connect to the database '%s'" % self.db
                     raise sqlmapMissingDependence, errMsg
