@@ -3110,6 +3110,17 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     if addToTargets and retVal:
         for target in retVal:
+            url = target[0]
+
+            # flag to know if we are dealing with the same target host
+            _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (response.geturl(), url)))
+
+            if conf.scope:
+                if not re.search(conf.scope, url, re.I):
+                    continue
+            elif not _:
+                continue
+
             kb.targets.add(target)
 
     return retVal

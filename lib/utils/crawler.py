@@ -70,12 +70,12 @@ class Crawler(object):
                                     url = urlparse.urljoin(conf.url, tag.get("href"))
 
                                     # flag to know if we are dealing with the same target host
-                                    target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url]))
+                                    _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (url, conf.url)))
 
                                     if conf.scope:
                                         if not re.search(conf.scope, url, re.I):
                                             continue
-                                    elif not target:
+                                    elif not _:
                                         continue
 
                                     if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
