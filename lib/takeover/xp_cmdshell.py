@@ -32,7 +32,7 @@ from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 
-class xp_cmdshell:
+class Xp_cmdshell:
     """
     This class defines methods to deal with Microsoft SQL Server
     xp_cmdshell extended procedure for plugins.
