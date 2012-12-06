@@ -6,9 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-import re
 import os
-import StringIO
 import threading
 
 from xml.dom.minidom import getDOMImplementation

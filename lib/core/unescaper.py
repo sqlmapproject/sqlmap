@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.datatype import AttribDict
 from lib.core.settings import EXCLUDE_UNESCAPE
 

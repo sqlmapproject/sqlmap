@@ -20,7 +20,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
-from lib.core.common import getComparePageRatio
 from lib.core.common import getLastRequestHTTPError
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
@@ -40,7 +39,6 @@ from lib.core.common import wasLastRequestHTTPError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.enums import HEURISTIC_TEST
@@ -53,7 +51,6 @@ from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import CONSTANT_RATIO
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSHIN_MAX_VALUE_LENGTH

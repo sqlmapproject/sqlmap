@@ -15,7 +15,6 @@ import inspect
 import logging
 import ntpath
 import os
-import pickle
 import posixpath
 import random
 import re
@@ -36,8 +35,6 @@ from math import sqrt
 from optparse import OptionValueError
 from subprocess import PIPE
 from subprocess import Popen as execute
-from tempfile import mkstemp
-from xml.etree import ElementTree as ET
 from xml.dom import minidom
 from xml.sax import parse
 
@@ -78,7 +75,6 @@ from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BOLD_PATTERNS
@@ -3325,7 +3321,7 @@ def isNumber(value):
     """
 
     try:
-        _ = float(value)
+        float(value)
     except:
         return False
     else:

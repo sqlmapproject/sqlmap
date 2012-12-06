@@ -25,9 +25,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
-from lib.core.common import randomInt
 from lib.core.common import readInput
-from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
@@ -40,11 +38,9 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapNotVulnerableException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
-from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.techniques.blind.inference import bisection

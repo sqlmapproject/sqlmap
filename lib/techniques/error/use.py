@@ -32,7 +32,6 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH

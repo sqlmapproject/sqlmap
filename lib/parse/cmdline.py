@@ -20,7 +20,6 @@ from lib.core.defaults import defaults
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
-from lib.core.settings import VERSION_STRING
 
 def cmdLineParser():
     """

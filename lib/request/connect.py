@@ -182,7 +182,7 @@ class Connect(object):
         ua = kwargs.get('ua',                       None)
         referer = kwargs.get('referer',             None)
         host = kwargs.get('host',                   conf.host)
-        direct = kwargs.get('direct',               False)
+        direct_ = kwargs.get('direct',               False)
         multipart = kwargs.get('multipart',         False)
         silent = kwargs.get('silent',               False)
         raise404 = kwargs.get('raise404',           True)
@@ -235,7 +235,7 @@ class Connect(object):
             else:
                 socket.setdefaulttimeout(conf.timeout)
 
-            if direct:
+            if direct_:
                 if "?" in url:
                     url, params = url.split("?")
                     params = urlencode(params)

@@ -12,12 +12,9 @@ except:
     import sha
 
 import pickle
-import re
 import sys
 import struct
-import urllib
 
-from lib.core.enums import PLACE
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 

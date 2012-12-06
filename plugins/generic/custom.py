@@ -13,9 +13,7 @@ from lib.core.common import getSQLSnippet
 from lib.core.common import isTechniqueAvailable
 from lib.core.convert import utf8decode
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.data import queries
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import PAYLOAD
 from lib.core.settings import PARAMETER_SPLITTING_REGEX

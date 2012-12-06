@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
-from lib.core.common import decodeIntToUnicode
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import singleTimeWarnMessage
@@ -21,7 +20,6 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapNoneDataException
-from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import MAX_INT
 from lib.core.unescaper import unescaper
 from lib.request import inject

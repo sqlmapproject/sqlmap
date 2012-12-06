@@ -12,6 +12,7 @@ except ImportError:
 
 import logging
 
+from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.settings import UNICODE_ENCODING

@@ -88,8 +88,6 @@ class Enumeration(GenericEnumeration):
                         kb.data.cachedUsersRoles[user] = list(roles)
 
         if not kb.data.cachedUsersRoles and isInferenceAvailable() and not conf.direct:
-            conditionChar = "="
-
             if conf.user:
                 users = conf.user.split(",")
             else:

@@ -13,7 +13,6 @@ from lib.core.common import filterListValue
 from lib.core.common import getFileItems
 from lib.core.common import Backend
 from lib.core.common import getPageWordSet
-from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
 from lib.core.common import randomStr

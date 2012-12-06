@@ -30,7 +30,6 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import sqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
-from lib.core.unescaper import unescaper
 from lib.request import inject
 
 class xp_cmdshell:

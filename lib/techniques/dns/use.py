@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 import time
-import string
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
@@ -21,7 +20,6 @@ from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import safecharencode
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf

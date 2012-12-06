@@ -93,7 +93,7 @@ class Fingerprint(GenericFingerprint):
 
         randInt = randomInt()
         randStr = randomStr()
-        _ = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
+        inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
 
         if wasLastRequestDBMSError():
             threadData = getCurrentThreadData()

@@ -5,8 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import randomRange
-from lib.core.data import kb
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL

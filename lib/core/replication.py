@@ -10,7 +10,6 @@ import sqlite3
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapValueException
 
 class Replication(object):

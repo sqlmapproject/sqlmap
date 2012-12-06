@@ -13,17 +13,13 @@ import urllib
 import urllib2
 
 from lib.core.common import getUnicode
-from lib.core.common import readInput
-from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import sqlmapConnectionException
 from lib.core.exception import sqlmapGenericException
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.request.basic import decodePage
 
 class Google(object):
@@ -42,9 +38,9 @@ class Google(object):
 
         try:
             conn = self.opener.open("http://www.google.com/ncr")
-            _ = conn.info()  # retrieve session cookie
+            conn.info()  # retrieve session cookie
         except urllib2.HTTPError, e:
-            _ = e.info()
+            e.info()
         except urllib2.URLError:
             errMsg = "unable to connect to Google"
             raise sqlmapConnectionException, errMsg

@@ -5,7 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import binascii
 import codecs
 import os
 import re
@@ -37,7 +36,6 @@ from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapMissingPrivileges
 from lib.core.exception import sqlmapSyntaxException
 from lib.core.exception import sqlmapUserQuitException
-from lib.core.option import authHandler
 from lib.core.option import __setDBMS
 from lib.core.option import __setKnowledgeBaseAttributes
 from lib.core.option import __setAuthCred
@@ -49,7 +47,6 @@ from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_RECOGNITION_REGEX
 from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX

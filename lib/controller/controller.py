@@ -37,7 +37,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
@@ -48,7 +47,6 @@ from lib.core.exception import sqlmapSilentQuitException
 from lib.core.exception import sqlmapValueException
 from lib.core.exception import sqlmapUserQuitException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
-from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
@@ -202,7 +200,6 @@ def __saveToResultsFile():
     if not conf.resultsFP:
         return
 
-    found = False
     results = {}
     techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
 
@@ -255,7 +252,6 @@ def start():
         logger.info(infoMsg)
 
     hostCount = 0
-    cookieStr = ""
 
     for targetUrl, targetMethod, targetData, targetCookie in kb.targets:
         try:

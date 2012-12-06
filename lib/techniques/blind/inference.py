@@ -5,7 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
 import threading
 import time
 
@@ -24,7 +23,6 @@ from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
-from lib.core.common import randomStr
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
