@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 import zipfile
 
-from lib.core.exception import sqlmapDataException
+from lib.core.exception import SqlmapDataException
 from lib.core.settings import UNICODE_ENCODING
 
 class Wordlist(object):
@@ -42,7 +42,7 @@ class Wordlist(object):
                 _ = zipfile.ZipFile(current, 'r')
                 if len(_.namelist()) == 0:
                     errMsg = "no file(s) inside '%s'" % current
-                    raise sqlmapDataException, errMsg
+                    raise SqlmapDataException, errMsg
                 self.fp = _.open(_.namelist()[0])
             else:
                 self.fp = open(current, 'r')

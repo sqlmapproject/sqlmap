@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import copy
 import types
 
-from lib.core.exception import sqlmapDataException
+from lib.core.exception import SqlmapDataException
 
 class AttribDict(dict):
     """
@@ -38,7 +38,7 @@ class AttribDict(dict):
         try:
             return self.__getitem__(item)
         except KeyError:
-            raise sqlmapDataException, "unable to access item '%s'" % item
+            raise SqlmapDataException, "unable to access item '%s'" % item
 
     def __setattr__(self, item, value):
         """

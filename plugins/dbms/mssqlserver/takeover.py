@@ -9,7 +9,7 @@ import binascii
 
 from lib.core.common import Backend
 from lib.core.data import logger
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 from plugins.generic.takeover import Takeover as GenericTakeover
 
@@ -62,7 +62,7 @@ class Takeover(GenericTakeover):
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
             errMsg += "%s Service Pack %d)" % (Backend.getOsVersion(), Backend.getOsServicePack())
-            raise sqlmapUnsupportedFeatureException(errMsg)
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
         shellcodeChar = ""
         hexStr = binascii.hexlify(self.shellcodeString[:-1])

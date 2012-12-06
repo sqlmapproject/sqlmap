@@ -11,7 +11,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import OS
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 from plugins.generic.takeover import Takeover as GenericTakeover
 
@@ -53,7 +53,7 @@ class Takeover(GenericTakeover):
             majorVer = "8.2"
         else:
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException, errMsg
 
         if Backend.isOs(OS.WINDOWS):
             self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (Backend.getArch(), majorVer)

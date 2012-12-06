@@ -35,8 +35,8 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
@@ -116,7 +116,7 @@ class Users:
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
             plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
             indexRange = getLimitRange(count, plusOne=plusOne)
@@ -135,7 +135,7 @@ class Users:
 
         if not kb.data.cachedUsers:
             errMsg = "unable to retrieve the database users"
-            raise sqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException, errMsg
 
         return kb.data.cachedUsers
 
@@ -296,7 +296,7 @@ class Users:
             errMsg += "database users (most probably because the session "
             errMsg += "user has no read privileges over the relevant "
             errMsg += "system database table)"
-            raise sqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException, errMsg
         else:
             for user in kb.data.cachedUsersPasswords:
                 kb.data.cachedUsersPasswords[user] = list(set(kb.data.cachedUsersPasswords[user]))
@@ -310,7 +310,7 @@ class Users:
         if test[0] in ("n", "N"):
             pass
         elif test[0] in ("q", "Q"):
-            raise sqlmapUserQuitException
+            raise SqlmapUserQuitException
         else:
             attackCachedUsersPasswords()
 
@@ -584,7 +584,7 @@ class Users:
         if not kb.data.cachedUsersPrivileges:
             errMsg = "unable to retrieve the privileges "
             errMsg += "for the database users"
-            raise sqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException, errMsg
 
         return (kb.data.cachedUsersPrivileges, areAdmins)
 

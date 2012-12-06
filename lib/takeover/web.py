@@ -84,12 +84,12 @@ class Web:
 
     def webFileUpload(self, fileToUpload, destFileName, directory):
         inputFP = codecs.open(fileToUpload, "rb")
-        retVal = self.__webFileStreamUpload(inputFP, destFileName, directory)
+        retVal = self._webFileStreamUpload(inputFP, destFileName, directory)
         inputFP.close()
 
         return retVal
 
-    def __webFileStreamUpload(self, stream, destFileName, directory):
+    def _webFileStreamUpload(self, stream, destFileName, directory):
         stream.seek(0) # Rewind
 
         if self.webApi in getPublicTypeMembers(WEB_API, True):
@@ -113,7 +113,7 @@ class Web:
             else:
                 return True
 
-    def __webFileInject(self, fileContent, fileName, directory):
+    def _webFileInject(self, fileContent, fileName, directory):
         outFile = posixpath.normpath("%s/%s" % (directory, fileName))
         uplQuery = getUnicode(fileContent).replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
         query = ""
@@ -239,7 +239,7 @@ class Web:
                 uriPath = posixpath.normpath(uriPath).rstrip('/')
 
                 # Upload the file stager
-                self.__webFileInject(stagerContent, stagerName, localPath)
+                self._webFileInject(stagerContent, stagerName, localPath)
 
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
                 self.webStagerUrl = "%s/%s" % (self.webBaseUrl, stagerName)
@@ -306,15 +306,15 @@ class Web:
                     backdoorStream.seek(0)
                     backdoorStream.write(backdoorContent)
 
-                    if self.__webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
-                        self.__webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
+                    if self._webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
+                        self._webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
                         self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl, backdoorName)
                         self.webDirectory = backdoorDirectory
                     else:
                         continue
 
                 else:
-                    if not self.__webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath):
+                    if not self._webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath):
                         warnMsg = "backdoor has not been successfully uploaded "
                         warnMsg += "through the file stager possibly because "
                         warnMsg += "the user running the web server process "
@@ -330,7 +330,7 @@ class Web:
                         getOutput = readInput(message, default="Y")
 
                         if getOutput in ("y", "Y"):
-                            self.__webFileInject(backdoorContent, backdoorName, localPath)
+                            self._webFileInject(backdoorContent, backdoorName, localPath)
                         else:
                             continue
 

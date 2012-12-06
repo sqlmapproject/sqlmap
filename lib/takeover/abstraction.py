@@ -15,7 +15,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.request import inject
 from lib.takeover.udf import UDF
@@ -49,7 +49,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException, errMsg
 
     def evalCmd(self, cmd, first=None, last=None):
         retVal = None
@@ -65,7 +65,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException, errMsg
 
         return safechardecode(retVal)
 
@@ -110,7 +110,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
             else:
                 errMsg = "feature not yet implemented for the back-end DBMS"
-                raise sqlmapUnsupportedFeatureException, errMsg
+                raise SqlmapUnsupportedFeatureException, errMsg
 
             infoMsg = "calling %s OS shell. To quit type " % (Backend.getOs() or "Windows")
             infoMsg += "'x' or 'q' and press ENTER"
@@ -141,7 +141,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
             self.runCmd(command)
 
-    def __initRunAs(self):
+    def _initRunAs(self):
         if not conf.dbmsCred:
             return
 
@@ -172,7 +172,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
         #    inject.goStacked(expression)
 
     def initEnv(self, mandatory=True, detailed=False, web=False):
-        self.__initRunAs()
+        self._initRunAs()
 
         if self.envInitialized:
             return
@@ -201,6 +201,6 @@ class Abstraction(Web, UDF, Xp_cmdshell):
                     self.xpCmdshellInit()
             else:
                 errMsg = "feature not yet implemented for the back-end DBMS"
-                raise sqlmapUnsupportedFeatureException(errMsg)
+                raise SqlmapUnsupportedFeatureException(errMsg)
 
         self.envInitialized = True

@@ -5,79 +5,79 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-class sqlmapCompressionException(Exception):
+class SqlmapCompressionException(Exception):
     pass
 
-class sqlmapConnectionException(Exception):
+class SqlmapConnectionException(Exception):
     pass
 
-class sqlmapDataException(Exception):
+class SqlmapDataException(Exception):
     pass
 
-class sqlmapFilePathException(Exception):
+class SqlmapFilePathException(Exception):
     pass
 
-class sqlmapGenericException(Exception):
+class SqlmapGenericException(Exception):
     pass
 
-class sqlmapMissingDependence(Exception):
+class SqlmapMissingDependence(Exception):
     pass
 
-class sqlmapMissingMandatoryOptionException(Exception):
+class SqlmapMissingMandatoryOptionException(Exception):
     pass
 
-class sqlmapMissingPrivileges(Exception):
+class SqlmapMissingPrivileges(Exception):
     pass
 
-class sqlmapNoneDataException(Exception):
+class SqlmapNoneDataException(Exception):
     pass
 
-class sqlmapNotVulnerableException(Exception):
+class SqlmapNotVulnerableException(Exception):
     pass
 
-class sqlmapSilentQuitException(Exception):
+class SqlmapSilentQuitException(Exception):
     pass
 
-class sqlmapUserQuitException(Exception):
+class SqlmapUserQuitException(Exception):
     pass
 
-class sqlmapRegExprException(Exception):
+class SqlmapRegExprException(Exception):
     pass
 
-class sqlmapSyntaxException(Exception):
+class SqlmapSyntaxException(Exception):
     pass
 
-class sqlmapThreadException(Exception):
+class SqlmapThreadException(Exception):
     pass
 
-class sqlmapUndefinedMethod(Exception):
+class SqlmapUndefinedMethod(Exception):
     pass
 
-class sqlmapUnsupportedDBMSException(Exception):
+class SqlmapUnsupportedDBMSException(Exception):
     pass
 
-class sqlmapUnsupportedFeatureException(Exception):
+class SqlmapUnsupportedFeatureException(Exception):
     pass
 
-class sqlmapValueException(Exception):
+class SqlmapValueException(Exception):
     pass
 
 exceptionsTuple = (
-                    sqlmapCompressionException,
-                    sqlmapConnectionException,
-                    sqlmapDataException,
-                    sqlmapFilePathException,
-                    sqlmapGenericException,
-                    sqlmapMissingDependence,
-                    sqlmapMissingMandatoryOptionException,
-                    sqlmapNoneDataException,
-                    sqlmapRegExprException,
-                    sqlmapSyntaxException,
-                    sqlmapUndefinedMethod,
-                    sqlmapMissingPrivileges,
-                    sqlmapNotVulnerableException,
-                    sqlmapThreadException,
-                    sqlmapUnsupportedDBMSException,
-                    sqlmapUnsupportedFeatureException,
-                    sqlmapValueException,
+                    SqlmapCompressionException,
+                    SqlmapConnectionException,
+                    SqlmapDataException,
+                    SqlmapFilePathException,
+                    SqlmapGenericException,
+                    SqlmapMissingDependence,
+                    SqlmapMissingMandatoryOptionException,
+                    SqlmapNoneDataException,
+                    SqlmapRegExprException,
+                    SqlmapSyntaxException,
+                    SqlmapUndefinedMethod,
+                    SqlmapMissingPrivileges,
+                    SqlmapNotVulnerableException,
+                    SqlmapThreadException,
+                    SqlmapUnsupportedDBMSException,
+                    SqlmapUnsupportedFeatureException,
+                    SqlmapValueException,
                   )

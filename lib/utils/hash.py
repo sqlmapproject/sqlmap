@@ -51,8 +51,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapFilePathException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DUMMY_USER_PREFIX
@@ -394,7 +394,7 @@ def attackDumpedTable():
             if test[0] in ("n", "N"):
                 return
             elif test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
 
             results = dictionaryAttack(attack_dict)
             lut = dict()
@@ -436,7 +436,7 @@ def hashRecognition(value):
 
     return retVal
 
-def __bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
+def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
     count = 0
     rotator = 0
     hashes = set([item[0][1] for item in attack_info])
@@ -505,7 +505,7 @@ def __bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, pro
         if hasattr(proc_count, 'value'):
             proc_count.value -= 1
 
-def __bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
+def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
     count = 0
     rotator = 0
 
@@ -677,7 +677,7 @@ def dictionaryAttack(attack_dict):
 
                     kb.wordlists = dictPaths
 
-                except sqlmapFilePathException, msg:
+                except SqlmapFilePathException, msg:
                     warnMsg = "there was a problem while loading dictionaries"
                     warnMsg += " ('%s')" % msg
                     logger.critical(warnMsg)
@@ -719,7 +719,7 @@ def dictionaryAttack(attack_dict):
                         count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                         for i in xrange(_multiprocessing.cpu_count()):
-                            p = _multiprocessing.Process(target=__bruteProcessVariantA, args=(attack_info, hash_regex, suffix, retVal, i, count, kb.wordlists, custom_wordlist))
+                            p = _multiprocessing.Process(target=_bruteProcessVariantA, args=(attack_info, hash_regex, suffix, retVal, i, count, kb.wordlists, custom_wordlist))
                             processes.append(p)
 
                         for p in processes:
@@ -734,7 +734,7 @@ def dictionaryAttack(attack_dict):
                         singleTimeWarnMessage(warnMsg)
 
                         retVal = Queue()
-                        __bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist)
+                        _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist)
 
                 except KeyboardInterrupt:
                     print
@@ -797,7 +797,7 @@ def dictionaryAttack(attack_dict):
                             count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                             for i in xrange(_multiprocessing.cpu_count()):
-                                p = _multiprocessing.Process(target=__bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, suffix, retVal, found_, i, count, kb.wordlists, custom_wordlist))
+                                p = _multiprocessing.Process(target=_bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, suffix, retVal, found_, i, count, kb.wordlists, custom_wordlist))
                                 processes.append(p)
 
                             for p in processes:
@@ -820,7 +820,7 @@ def dictionaryAttack(attack_dict):
                             found_ = Value()
                             found_.value = False
 
-                            __bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found_, 0, 1, kb.wordlists, custom_wordlist)
+                            _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found_, 0, 1, kb.wordlists, custom_wordlist)
 
                             found = found_.value
 

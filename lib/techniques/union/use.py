@@ -39,7 +39,7 @@ from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -47,7 +47,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
-def __oneShotUnionUse(expression, unpack=True, limited=False):
+def _oneShotUnionUse(expression, unpack=True, limited=False):
     retVal = hashDBRetrieve("%s%s" % (conf.hexConvert, expression), checkConf=True)  # as union data is stored raw unconverted
 
     threadData = getCurrentThreadData()
@@ -106,7 +106,7 @@ def __oneShotUnionUse(expression, unpack=True, limited=False):
     return retVal
 
 def configUnion(char=None, columns=None):
-    def __configUnionChar(char):
+    def _configUnionChar(char):
         if not isinstance(char, basestring):
             return
 
@@ -115,7 +115,7 @@ def configUnion(char=None, columns=None):
         if conf.uChar is not None:
             kb.uChar = char.replace("[CHAR]", conf.uChar if conf.uChar.isdigit() else "'%s'" % conf.uChar.strip("'"))
 
-    def __configUnionCols(columns):
+    def _configUnionCols(columns):
         if not isinstance(columns, basestring):
             return
 
@@ -126,17 +126,17 @@ def configUnion(char=None, columns=None):
             colsStart, colsStop = columns, columns
 
         if not colsStart.isdigit() or not colsStop.isdigit():
-            raise sqlmapSyntaxException, "--union-cols must be a range of integers"
+            raise SqlmapSyntaxException, "--union-cols must be a range of integers"
 
         conf.uColsStart, conf.uColsStop = int(colsStart), int(colsStop)
 
         if conf.uColsStart > conf.uColsStop:
             errMsg = "--union-cols range has to be from lower to "
             errMsg += "higher number of columns"
-            raise sqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException, errMsg
 
-    __configUnionChar(char)
-    __configUnionCols(conf.uCols or columns)
+    _configUnionChar(char)
+    _configUnionCols(conf.uCols or columns)
 
 def unionUse(expression, unpack=True, dump=False):
     """
@@ -239,7 +239,7 @@ def unionUse(expression, unpack=True, dump=False):
                 _ = countedExpression.upper().rindex(" ORDER BY ")
                 countedExpression = countedExpression[:_]
 
-            output = __oneShotUnionUse(countedExpression, unpack)
+            output = _oneShotUnionUse(countedExpression, unpack)
             count = parseUnionPage(output)
 
             if isNumPosStrValue(count):
@@ -300,7 +300,7 @@ def unionUse(expression, unpack=True, dump=False):
                             field = None
 
                         limitedExpr = agent.limitQuery(num, expression, field)
-                        output = __oneShotUnionUse(limitedExpr, unpack, True)
+                        output = _oneShotUnionUse(limitedExpr, unpack, True)
 
                         if not kb.threadContinue:
                             break
@@ -342,7 +342,7 @@ def unionUse(expression, unpack=True, dump=False):
 
     if not value and not abortedFlag:
         expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full union doesn't play well with ORDER BY
-        value = __oneShotUnionUse(expression, unpack)
+        value = _oneShotUnionUse(expression, unpack)
 
     duration = calculateDeltaSeconds(start)
 

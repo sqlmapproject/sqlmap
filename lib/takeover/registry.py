@@ -16,68 +16,68 @@ class Registry:
     This class defines methods to read and write Windows registry keys
     """
 
-    def __initVars(self, regKey, regValue, regType=None, regData=None, parse=False):
-        self.__regKey = regKey
-        self.__regValue = regValue
-        self.__regType = regType
-        self.__regData = regData
+    def _initVars(self, regKey, regValue, regType=None, regData=None, parse=False):
+        self._regKey = regKey
+        self._regValue = regValue
+        self._regType = regType
+        self._regData = regData
 
-        self.__randStr = randomStr(lowercase=True)
-        self.__batPathRemote = "%s/tmpr%s.bat" % (conf.tmpPath, self.__randStr)
-        self.__batPathLocal = os.path.join(conf.outputPath, "tmpr%s.bat" % self.__randStr)
+        self._randStr = randomStr(lowercase=True)
+        self._batPathRemote = "%s/tmpr%s.bat" % (conf.tmpPath, self._randStr)
+        self._batPathLocal = os.path.join(conf.outputPath, "tmpr%s.bat" % self._randStr)
 
         if parse:
-            readParse = "FOR /F \"tokens=*\" %%A IN ('REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
+            readParse = "FOR /F \"tokens=*\" %%A IN ('REG QUERY \"" + self._regKey + "\" /v \"" + self._regValue + "\"') DO SET value=%%A\r\nECHO %value%\r\n"
         else:
-            readParse = "REG QUERY \"" + self.__regKey + "\" /v \"" + self.__regValue + "\""
+            readParse = "REG QUERY \"" + self._regKey + "\" /v \"" + self._regValue + "\""
 
-        self.__batRead = (
+        self._batRead = (
                            "@ECHO OFF\r\n",
                            readParse
                          )
 
-        self.__batAdd = (
+        self._batAdd = (
                            "@ECHO OFF\r\n",
-                           "REG ADD \"%s\" /v \"%s\" /t %s /d %s /f" % (self.__regKey, self.__regValue, self.__regType, self.__regData)
+                           "REG ADD \"%s\" /v \"%s\" /t %s /d %s /f" % (self._regKey, self._regValue, self._regType, self._regData)
                          )
 
-        self.__batDel = (
+        self._batDel = (
                            "@ECHO OFF\r\n",
-                           "REG DELETE \"%s\" /v \"%s\" /f" % (self.__regKey, self.__regValue)
+                           "REG DELETE \"%s\" /v \"%s\" /f" % (self._regKey, self._regValue)
                          )
 
-    def __createLocalBatchFile(self):
-        self.__batPathFp = open(self.__batPathLocal, "w")
+    def _createLocalBatchFile(self):
+        self._batPathFp = open(self._batPathLocal, "w")
 
         if self.__operation == "read":
-            lines = self.__batRead
+            lines = self._batRead
         elif self.__operation == "add":
-            lines = self.__batAdd
+            lines = self._batAdd
         elif self.__operation == "delete":
-            lines = self.__batDel
+            lines = self._batDel
 
         for line in lines:
-            self.__batPathFp.write(line)
+            self._batPathFp.write(line)
 
-        self.__batPathFp.close()
+        self._batPathFp.close()
 
-    def __createRemoteBatchFile(self):
-        logger.debug("creating batch file '%s'" % self.__batPathRemote)
+    def _createRemoteBatchFile(self):
+        logger.debug("creating batch file '%s'" % self._batPathRemote)
 
-        self.__createLocalBatchFile()
-        self.writeFile(self.__batPathLocal, self.__batPathRemote, "text")
+        self._createLocalBatchFile()
+        self.writeFile(self._batPathLocal, self._batPathRemote, "text")
 
-        os.unlink(self.__batPathLocal)
+        os.unlink(self._batPathLocal)
 
     def readRegKey(self, regKey, regValue, parse=False):
         self.__operation = "read"
 
-        self.__initVars(regKey, regValue, parse=parse)
-        self.__createRemoteBatchFile()
+        self._initVars(regKey, regValue, parse=parse)
+        self._createRemoteBatchFile()
 
         logger.debug("reading registry key '%s' value '%s'" % (regKey, regValue))
 
-        data = self.evalCmd(self.__batPathRemote)
+        data = self.evalCmd(self._batPathRemote)
 
         if data and not parse:
             pattern = '    '
@@ -85,32 +85,32 @@ class Registry:
             if index != -1:
                 data = data[index + len(pattern):]
 
-        self.delRemoteFile(self.__batPathRemote)
+        self.delRemoteFile(self._batPathRemote)
 
         return data
 
     def addRegKey(self, regKey, regValue, regType, regData):
         self.__operation = "add"
 
-        self.__initVars(regKey, regValue, regType, regData)
-        self.__createRemoteBatchFile()
+        self._initVars(regKey, regValue, regType, regData)
+        self._createRemoteBatchFile()
 
-        debugMsg = "adding registry key value '%s' " % self.__regValue
-        debugMsg += "to registry key '%s'" % self.__regKey
+        debugMsg = "adding registry key value '%s' " % self._regValue
+        debugMsg += "to registry key '%s'" % self._regKey
         logger.debug(debugMsg)
 
-        self.execCmd(cmd=self.__batPathRemote)
-        self.delRemoteFile(self.__batPathRemote)
+        self.execCmd(cmd=self._batPathRemote)
+        self.delRemoteFile(self._batPathRemote)
 
     def delRegKey(self, regKey, regValue):
         self.__operation = "delete"
 
-        self.__initVars(regKey, regValue)
-        self.__createRemoteBatchFile()
+        self._initVars(regKey, regValue)
+        self._createRemoteBatchFile()
 
-        debugMsg = "deleting registry key value '%s' " % self.__regValue
-        debugMsg += "from registry key '%s'" % self.__regKey
+        debugMsg = "deleting registry key value '%s' " % self._regValue
+        debugMsg += "from registry key '%s'" % self._regKey
         logger.debug(debugMsg)
 
-        self.execCmd(cmd=self.__batPathRemote)
-        self.delRemoteFile(self.__batPathRemote)
+        self.execCmd(cmd=self._batPathRemote)
+        self.delRemoteFile(self._batPathRemote)

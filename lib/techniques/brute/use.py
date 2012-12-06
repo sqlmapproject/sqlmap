@@ -23,8 +23,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
-from lib.core.exception import sqlmapDataException
-from lib.core.exception import sqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapDataException
+from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
@@ -32,7 +32,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
 
-def __addPageTextWords():
+def _addPageTextWords():
     wordsList = []
 
     infoMsg = "adding words used on web page to the check list"
@@ -53,14 +53,14 @@ def tableExists(tableFile, regex=None):
         errMsg = "can't use table existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
         errMsg += "to distinguish errornous results)"
-        raise sqlmapDataException, errMsg
+        raise SqlmapDataException, errMsg
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
-    tables.extend(__addPageTextWords())
+    tables.extend(_addPageTextWords())
     tables = filterListValue(tables, regex)
 
     threadData = getCurrentThreadData()
@@ -138,20 +138,20 @@ def tableExists(tableFile, regex=None):
 def columnExists(columnFile, regex=None):
     if not conf.tbl:
         errMsg = "missing table parameter"
-        raise sqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException, errMsg
 
     result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
         errMsg += "to distinguish errornous results)"
-        raise sqlmapDataException, errMsg
+        raise SqlmapDataException, errMsg
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
 
     columns = getFileItems(columnFile, unique=True)
-    columns.extend(__addPageTextWords())
+    columns.extend(_addPageTextWords())
     columns = filterListValue(columns, regex)
 
     table = safeSQLIdentificatorNaming(conf.tbl, True)

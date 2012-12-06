@@ -22,7 +22,7 @@ from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
 
@@ -150,7 +150,7 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedTables:
             errMsg = "unable to retrieve the tables for any database"
-            raise sqlmapNoneDataException(errMsg)
+            raise SqlmapNoneDataException(errMsg)
         else:
             for db, tables in kb.data.cachedTables.items():
                 kb.data.cachedTables[db] = sorted(tables) if tables else tables

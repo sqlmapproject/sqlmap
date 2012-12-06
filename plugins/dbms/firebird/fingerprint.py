@@ -47,7 +47,7 @@ class Fingerprint(GenericFingerprint):
             value += actVer
             return value
 
-        actVer = Format.getDbms() + " (%s)" % (self.__dialectCheck())
+        actVer = Format.getDbms() + " (%s)" % (self._dialectCheck())
         blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
@@ -67,7 +67,7 @@ class Fingerprint(GenericFingerprint):
 
         return value
 
-    def __sysTablesCheck(self):
+    def _sysTablesCheck(self):
         retVal = None
         table = (
                     ("1.0", ["EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)"]),
@@ -93,7 +93,7 @@ class Fingerprint(GenericFingerprint):
 
         return retVal
 
-    def __dialectCheck(self):
+    def _dialectCheck(self):
         retVal = None
 
         if Backend.getIdentifiedDbms():
@@ -141,7 +141,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.FIREBIRD
             logger.info(infoMsg)
 
-            version = self.__sysTablesCheck()
+            version = self._sysTablesCheck()
 
             if version is not None:
                 Backend.setVersion(version)

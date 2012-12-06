@@ -31,14 +31,14 @@ from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapMissingPrivileges
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapUserQuitException
-from lib.core.option import __setDBMS
-from lib.core.option import __setKnowledgeBaseAttributes
-from lib.core.option import __setAuthCred
+from lib.core.exception import SqlmapFilePathException
+from lib.core.exception import SqlmapGenericException
+from lib.core.exception import SqlmapMissingPrivileges
+from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapUserQuitException
+from lib.core.option import _setDBMS
+from lib.core.option import _setKnowledgeBaseAttributes
+from lib.core.option import _setAuthCred
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import JSON_RECOGNITION_REGEX
@@ -55,7 +55,7 @@ from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
 from thirdparty.odict.odict import OrderedDict
 
-def __setRequestParams():
+def _setRequestParams():
     """
     Check and set the parameters and perform checks on 'data' option for
     HTTP method POST.
@@ -79,7 +79,7 @@ def __setRequestParams():
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and conf.data is None:
         errMsg = "HTTP POST method depends on HTTP data value to be posted"
-        raise sqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException, errMsg
 
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST
@@ -92,7 +92,7 @@ def __setRequestParams():
             message += "Do you want to process it? [Y/n/q] "
             test = readInput(message, default="Y")
             if test and test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
                 conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 conf.data = re.sub(r'("[^"]+"\s*:\s*)(-?\d[\d\.]*\b)', r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
@@ -103,7 +103,7 @@ def __setRequestParams():
             message += "Do you want to process it? [Y/n/q] "
             test = readInput(message, default="Y")
             if test and test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
                 conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
@@ -113,7 +113,7 @@ def __setRequestParams():
             message += "Do you want to process it? [Y/n/q] "
             test = readInput(message, default="Y")
             if test and test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
                 conf.data = re.sub(r"(?si)(Content-Disposition.+?)((\r)?\n--)", r"\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.MULTIPART
@@ -145,7 +145,7 @@ def __setRequestParams():
             conf.url = "%s%s" % (conf.url, CUSTOM_INJECTION_MARK_CHAR)
             kb.processUserMarks = True
         elif test[0] in ("q", "Q"):
-            raise sqlmapUserQuitException
+            raise SqlmapUserQuitException
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data)):
         if CUSTOM_INJECTION_MARK_CHAR in (value or ""):
@@ -155,7 +155,7 @@ def __setRequestParams():
                 message += "'%s'. Do you want to process it? [Y/n/q] " % _[place]
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):
-                    raise sqlmapUserQuitException
+                    raise SqlmapUserQuitException
                 else:
                     kb.processUserMarks = not test or test[0] not in ("n", "N")
 
@@ -236,14 +236,14 @@ def __setRequestParams():
     if not conf.parameters:
         errMsg = "you did not provide any GET, POST and Cookie "
         errMsg += "parameter, neither an User-Agent, Referer or Host header value"
-        raise sqlmapGenericException, errMsg
+        raise SqlmapGenericException, errMsg
 
     elif not testableParameters:
         errMsg = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
-        raise sqlmapGenericException, errMsg
+        raise SqlmapGenericException, errMsg
 
-def __setHashDB():
+def _setHashDB():
     """
     Check and set the HashDB SQLite file for query resume functionality.
     """
@@ -258,11 +258,11 @@ def __setHashDB():
                 logger.info("flushing session file")
             except OSError, msg:
                 errMsg = "unable to flush the session file (%s)" % msg
-                raise sqlmapFilePathException, errMsg
+                raise SqlmapFilePathException, errMsg
 
     conf.hashDB = HashDB(conf.hashDBFile)
 
-def __resumeHashDBValues():
+def _resumeHashDBValues():
     """
     Resume stored data values from HashDB
     """
@@ -287,10 +287,10 @@ def __resumeHashDBValues():
                 if injection not in kb.injections:
                     kb.injections.append(injection)
 
-    __resumeDBMS()
-    __resumeOS()
+    _resumeDBMS()
+    _resumeOS()
 
-def __resumeDBMS():
+def _resumeDBMS():
     """
     Resume stored DBMS information from HashDB
     """
@@ -335,7 +335,7 @@ def __resumeDBMS():
         Backend.setDbms(dbms)
         Backend.setVersionList(dbmsVersion)
 
-def __resumeOS():
+def _resumeOS():
     """
     Resume stored OS information from HashDB
     """
@@ -367,7 +367,7 @@ def __resumeOS():
 
         Backend.setOs(conf.os)
 
-def __setResultsFile():
+def _setResultsFile():
     """
     Create results file for storing results of running in a
     multiple target mode.
@@ -383,7 +383,7 @@ def __setResultsFile():
 
         logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
 
-def __createFilesDir():
+def _createFilesDir():
     """
     Create the file directory.
     """
@@ -396,7 +396,7 @@ def __createFilesDir():
     if not os.path.isdir(conf.filePath):
         os.makedirs(conf.filePath, 0755)
 
-def __createDumpDir():
+def _createDumpDir():
     """
     Create the dump directory.
     """
@@ -409,7 +409,7 @@ def __createDumpDir():
     if not os.path.isdir(conf.dumpPath):
         os.makedirs(conf.dumpPath, 0755)
 
-def __configureDumper():
+def _configureDumper():
     if hasattr(conf, 'xmlFile') and conf.xmlFile:
         conf.dumper = xmldumper
     else:
@@ -417,7 +417,7 @@ def __configureDumper():
 
     conf.dumper.setOutputFile()
 
-def __createTargetDirs():
+def _createTargetDirs():
     """
     Create the output directory.
     """
@@ -459,13 +459,13 @@ def __createTargetDirs():
             errMsg = "something went wrong while trying "
         errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, msg)
 
-        raise sqlmapMissingPrivileges, errMsg
+        raise SqlmapMissingPrivileges, errMsg
 
-    __createDumpDir()
-    __createFilesDir()
-    __configureDumper()
+    _createDumpDir()
+    _createFilesDir()
+    _configureDumper()
 
-def __restoreCmdLineOptions():
+def _restoreCmdLineOptions():
     """
     Restore command line options that could be possibly
     changed during the testing of previous target.
@@ -490,14 +490,14 @@ def initTargetEnv():
         conf.parameters = {}
         conf.hashDBFile = None
 
-        __setKnowledgeBaseAttributes(False)
-        __restoreCmdLineOptions()
-        __setDBMS()
+        _setKnowledgeBaseAttributes(False)
+        _restoreCmdLineOptions()
+        _setDBMS()
 
 def setupTargetEnv():
-    __createTargetDirs()
-    __setRequestParams()
-    __setHashDB()
-    __resumeHashDBValues()
-    __setResultsFile()
-    __setAuthCred()
+    _createTargetDirs()
+    _setRequestParams()
+    _setHashDB()
+    _resumeHashDBValues()
+    _setResultsFile()
+    _setAuthCred()

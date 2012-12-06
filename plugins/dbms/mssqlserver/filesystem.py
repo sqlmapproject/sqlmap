@@ -21,8 +21,8 @@ from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
@@ -31,7 +31,7 @@ class Filesystem(GenericFilesystem):
     def __init__(self):
         GenericFilesystem.__init__(self)
 
-    def __dataToScr(self, fileContent, chunkName):
+    def _dataToScr(self, fileContent, chunkName):
         fileLines = []
         fileSize = len(fileContent)
         lineAddr = 0x100
@@ -62,10 +62,10 @@ class Filesystem(GenericFilesystem):
 
         return fileLines
 
-    def __updateDestChunk(self, fileContent, tmpPath):
+    def _updateDestChunk(self, fileContent, tmpPath):
         randScr = "tmpf%s.scr" % randomStr(lowercase=True)
         chunkName = randomStr(lowercase=True)
-        fileScrLines = self.__dataToScr(fileContent, chunkName)
+        fileScrLines = self._dataToScr(fileContent, chunkName)
 
         logger.debug("uploading debug script to %s\%s, please wait.." % (tmpPath, randScr))
 
@@ -147,7 +147,7 @@ class Filesystem(GenericFilesystem):
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the content of the "
                 errMsg += "file '%s'" % rFile
-                raise sqlmapNoneDataException(errMsg)
+                raise SqlmapNoneDataException(errMsg)
 
             indexRange = getLimitRange(count)
 
@@ -162,9 +162,9 @@ class Filesystem(GenericFilesystem):
     def unionWriteFile(self, wFile, dFile, fileType):
         errMsg = "Microsoft SQL Server does not support file upload with "
         errMsg += "UNION query SQL injection technique"
-        raise sqlmapUnsupportedFeatureException(errMsg)
+        raise SqlmapUnsupportedFeatureException(errMsg)
 
-    def __stackedWriteFilePS(self, tmpPath, wFileContent, dFile, fileType):
+    def _stackedWriteFilePS(self, tmpPath, wFileContent, dFile, fileType):
         infoMsg = "using PowerShell to write the %s file content " % fileType
         infoMsg += "to file '%s', please wait.." % dFile
         logger.info(infoMsg)
@@ -191,7 +191,7 @@ class Filesystem(GenericFilesystem):
 
         self.execCmd(complComm)
 
-    def __stackedWriteFileDebugExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
+    def _stackedWriteFileDebugExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
         infoMsg = "using debug.exe to write the %s " % fileType
         infoMsg += "file content to file '%s', please wait.." % dFile
         logger.info(infoMsg)
@@ -202,7 +202,7 @@ class Filesystem(GenericFilesystem):
         debugSize = 0xFF00
 
         if wFileSize < debugSize:
-            chunkName = self.__updateDestChunk(wFileContent, tmpPath)
+            chunkName = self._updateDestChunk(wFileContent, tmpPath)
 
             debugMsg = "renaming chunk file %s\%s to %s " % (tmpPath, chunkName, fileType)
             debugMsg += "file %s\%s and moving it to %s" % (tmpPath, dFileName, dFile)
@@ -222,7 +222,7 @@ class Filesystem(GenericFilesystem):
 
             for i in xrange(0, wFileSize, debugSize):
                 wFileChunk = wFileContent[i:i + debugSize]
-                chunkName = self.__updateDestChunk(wFileChunk, tmpPath)
+                chunkName = self._updateDestChunk(wFileChunk, tmpPath)
 
                 if i == 0:
                     debugMsg = "renaming chunk "
@@ -246,7 +246,7 @@ class Filesystem(GenericFilesystem):
 
             self.execCmd(complComm)
 
-    def __stackedWriteFileVbs(self, tmpPath, wFileContent, dFile, fileType):
+    def _stackedWriteFileVbs(self, tmpPath, wFileContent, dFile, fileType):
         infoMsg = "using a custom visual basic script to write the "
         infoMsg += "%s file content to file '%s', please wait.." % (fileType, dFile)
         logger.info(infoMsg)
@@ -341,7 +341,7 @@ class Filesystem(GenericFilesystem):
         wFileContent = wFilePointer.read()
         wFilePointer.close()
 
-        self.__stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
+        self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
 
         sameFile = self.askCheckWrittenFile(wFile, dFile, fileType)
 
@@ -351,5 +351,5 @@ class Filesystem(GenericFilesystem):
             choice = readInput(message, default="Y")
 
             if not choice or choice.lower() == "y":
-                self.__stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
-                #self.__stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+                self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
+                #self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)

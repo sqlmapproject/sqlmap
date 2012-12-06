@@ -14,8 +14,8 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapSyntaxException
 from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 
@@ -66,11 +66,11 @@ def configFileParser(configFile):
         config.readfp(configFP)
     except MissingSectionHeaderError:
         errMsg = "you have provided an invalid configuration file"
-        raise sqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException, errMsg
 
     if not config.has_section("Target"):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
-        raise sqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException, errMsg
 
     condition = not config.has_option("Target", "url")
     condition &= not config.has_option("Target", "logFile")
@@ -82,7 +82,7 @@ def configFileParser(configFile):
     if condition:
         errMsg = "missing a mandatory option in the configuration file "
         errMsg += "(url, logFile, bulkFile, googleDork, requestFile or wizard)"
-        raise sqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException, errMsg
 
     for family, optionData in optDict.items():
         for option, datatype in optionData.items():

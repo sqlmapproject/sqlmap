@@ -9,6 +9,7 @@ import doctest
 import os
 import re
 import shutil
+import string
 import sys
 import tempfile
 import time
@@ -22,7 +23,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.option import init
-from lib.core.option import __setVerbosity
+from lib.core.option import _setVerbosity
 from lib.core.optiondict import optDict
 from lib.parse.cmdline import cmdLineParser
 
@@ -45,13 +46,36 @@ def smokeTest():
             continue
 
         for ifile in files:
-            if os.path.splitext(ifile)[1].lower() == ".py" and ifile != "__init__.py":
+            if os.path.splitext(ifile)[1].lower() == ".py":
+                content = None
+                with open(os.path.join(root, ifile), "r+b") as f:
+                    content = f.read()
+                    active = content
+                    active = re.sub(r"(?s)\"\"\".+?\"\"\"", "", active)
+                    active = re.sub(r"\".+?\"", "", active)
+                    active = re.sub(r"\'.+?\'", "", active)
+                    active = re.sub(r"#.+", "", active)
+                    for ss in re.findall(r"\b_*?[a-z]+[A-Z].*?\b", active):
+                        original = ss
+                        if ss.startswith("sqlmap") and any(_ in ss.lower() for _ in ("exception", "sqlmapmissing", "sqlmapundefinedmethod")):
+                            ss = "S" + ss[1:]
+                        if ss.startswith("_"):
+                            ss = "_" + ss.lstrip("_")
+                        content = content.replace(original, ss)
+                if content:
+                    with open(os.path.join(root, ifile), "w+b") as f:
+                        f.write(content)
                 path = os.path.join(root, os.path.splitext(ifile)[0])
                 path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
                 path = path.replace(os.sep, '.').lstrip('.')
                 try:
                     __import__(path)
                     module = sys.modules[path]
+                    #for name in dir(module):
+                        #_ = getattr(module, name)
+                        #if type(_) == type(lambda x: x):
+                            #if re.match(r"\b_*?[a-z]+[A-Z]", name):
+                                #print name
                 except Exception, msg:
                     retVal = False
                     dataToStdout("\r")
@@ -66,7 +90,7 @@ def smokeTest():
 
             count += 1
             status = '%d/%d (%d%s) ' % (count, length, round(100.0*count/length), '%')
-            dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+            #dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
     clearConsoleLine()
     if retVal:
@@ -171,7 +195,7 @@ def initCase(switches=None):
                 cmdLineOptions.__dict__[key] = value
 
     init(cmdLineOptions, True)
-    __setVerbosity()
+    _setVerbosity()
 
 def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
@@ -179,7 +203,7 @@ def cleanCase():
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     conf.verbose = 1
-    __setVerbosity()
+    _setVerbosity()
 
 def runCase(switches=None, log=None):
     retVal = True

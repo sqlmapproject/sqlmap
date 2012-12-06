@@ -19,7 +19,7 @@ from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import SqlmapNoneDataException
 from lib.request import inject
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
@@ -160,6 +160,6 @@ class Enumeration(GenericEnumeration):
         if not kb.data.cachedUsersRoles:
             errMsg = "unable to retrieve the roles "
             errMsg += "for the database users"
-            raise sqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException, errMsg
 
         return kb.data.cachedUsersRoles, areAdmins

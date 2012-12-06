@@ -18,8 +18,8 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import MAX_INT
 from lib.core.unescaper import unescaper
 from lib.request import inject
@@ -83,7 +83,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
 
     if not validColumnList:
         errMsg = "all column name(s) provided are non-existent"
-        raise sqlmapNoneDataException, errMsg
+        raise SqlmapNoneDataException, errMsg
 
     if not validPivotValue:
         warnMsg = "no proper pivot column provided (with unique values)."
@@ -139,7 +139,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
         warnMsg += "will display partial output"
         logger.warn(warnMsg)
 
-    except sqlmapConnectionException, e:
+    except SqlmapConnectionException, e:
         errMsg = "connection exception detected. sqlmap "
         errMsg += "will display partial output"
         errMsg += "'%s'" % e

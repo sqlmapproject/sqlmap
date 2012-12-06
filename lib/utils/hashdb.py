@@ -15,7 +15,7 @@ from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
 from lib.core.data import logger
-from lib.core.exception import sqlmapDataException
+from lib.core.exception import SqlmapDataException
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
@@ -39,7 +39,7 @@ class HashDB(object):
             except Exception, ex:
                 errMsg = "error occurred while opening a session "
                 errMsg += "file '%s' ('%s')" % (self.filepath, ex)
-                raise sqlmapDataException, errMsg
+                raise SqlmapDataException, errMsg
 
         return threadData.hashDBCursor
 

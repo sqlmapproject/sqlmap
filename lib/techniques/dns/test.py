@@ -11,7 +11,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import FROM_DUMMY_TABLE
-from lib.core.exception import sqlmapNotVulnerableException
+from lib.core.exception import SqlmapNotVulnerableException
 from lib.techniques.dns.use import dnsUse
 
 
@@ -28,7 +28,7 @@ def dnsTest(payload):
             errMsg += ". Turning off DNS exfiltration support"
             logger.error(errMsg)
         else:
-            raise sqlmapNotVulnerableException, errMsg
+            raise SqlmapNotVulnerableException, errMsg
     else:
         infoMsg = "data retrieval through DNS channel was successful"
         logger.info(infoMsg)

@@ -17,8 +17,8 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import SYBASE_TYPES
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
 from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
@@ -172,7 +172,7 @@ class Enumeration(GenericEnumeration):
             if  ',' in conf.db:
                 errMsg = "only one database name is allowed when enumerating "
                 errMsg += "the tables' columns"
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise SqlmapMissingMandatoryOptionException, errMsg
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
@@ -197,7 +197,7 @@ class Enumeration(GenericEnumeration):
             else:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl)

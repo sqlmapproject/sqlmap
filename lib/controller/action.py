@@ -13,8 +13,8 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedDBMSException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
@@ -52,7 +52,7 @@ def action():
             errMsg += ". Support for this DBMS will be implemented at "
             errMsg += "some point"
 
-        raise sqlmapUnsupportedDBMSException, errMsg
+        raise SqlmapUnsupportedDBMSException, errMsg
 
     dataToStdout("%s\n" % conf.dbmsHandler.getFingerprint())
 
@@ -79,7 +79,7 @@ def action():
         try:
             conf.dumper.userSettings("database management system users password hashes",
                                     conf.dbmsHandler.getPasswordHashes(), "password hash")
-        except sqlmapNoneDataException, ex:
+        except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
             raise
@@ -88,7 +88,7 @@ def action():
         try:
             conf.dumper.userSettings("database management system users privileges",
                                     conf.dbmsHandler.getPrivileges(), "privilege")
-        except sqlmapNoneDataException, ex:
+        except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
             raise
@@ -97,7 +97,7 @@ def action():
         try:
             conf.dumper.userSettings("database management system users roles",
                                     conf.dbmsHandler.getRoles(), "role")
-        except sqlmapNoneDataException, ex:
+        except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
             raise

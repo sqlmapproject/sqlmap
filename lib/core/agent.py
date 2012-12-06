@@ -24,7 +24,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
-from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import GENERIC_SQL_COMMENT
@@ -252,7 +252,7 @@ class Agent(object):
             else:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
         return payload
 

@@ -16,7 +16,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
-from lib.core.exception import sqlmapNoneDataException
+from lib.core.exception import SqlmapNoneDataException
 from lib.request import inject
 from lib.techniques.union.use import unionUse
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
@@ -63,7 +63,7 @@ class Filesystem(GenericFilesystem):
                 logger.warn(warnMsg)
                 result = self.nonStackedReadFile(rFile)
             else:
-                raise sqlmapNoneDataException, warnMsg
+                raise SqlmapNoneDataException, warnMsg
         else:
             length = int(length)
             sustrLen = 1024

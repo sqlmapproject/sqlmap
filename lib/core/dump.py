@@ -27,8 +27,8 @@ from lib.core.data import logger
 from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import DBMS
 from lib.core.enums import DUMP_FORMAT
-from lib.core.exception import sqlmapGenericException
-from lib.core.exception import sqlmapValueException
+from lib.core.exception import SqlmapGenericException
+from lib.core.exception import SqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import METADB_SUFFIX
@@ -68,7 +68,7 @@ class Dump(object):
             self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
         except IOError, ex:
             errMsg = "error occurred while opening log file ('%s')" % ex
-            raise sqlmapGenericException, errMsg
+            raise SqlmapGenericException, errMsg
 
     def getOutputFile(self):
         return self._outputFile
@@ -490,7 +490,7 @@ class Dump(object):
             if conf.dumpFormat == DUMP_FORMAT.SQLITE:
                 try:
                     rtable.insert(values)
-                except sqlmapValueException:
+                except SqlmapValueException:
                     pass
             elif conf.dumpFormat == DUMP_FORMAT.CSV:
                 dataToDumpFile(dumpFP, "\n")

@@ -16,12 +16,12 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapMissingDependence
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapMissingPrivileges
-from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.exception import sqlmapUndefinedMethod
-from lib.core.exception import sqlmapUnsupportedDBMSException
+from lib.core.exception import SqlmapMissingDependence
+from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapMissingPrivileges
+from lib.core.exception import SqlmapNotVulnerableException
+from lib.core.exception import SqlmapUndefinedMethod
+from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.takeover.abstraction import Abstraction
 from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
@@ -51,7 +51,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         else:
             errMsg = "unable to execute operating system commands via "
             errMsg += "the back-end DBMS"
-            raise sqlmapNotVulnerableException(errMsg)
+            raise SqlmapNotVulnerableException(errMsg)
 
         self.getRemoteTempPath()
         self.initEnv(web=web)
@@ -74,7 +74,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             errMsg = "unable to prompt for an interactive operating "
             errMsg += "system shell via the back-end DBMS because "
             errMsg += "stacked queries SQL injection is not supported"
-            raise sqlmapNotVulnerableException(errMsg)
+            raise SqlmapNotVulnerableException(errMsg)
 
         self.getRemoteTempPath()
         self.initEnv(web=web)
@@ -124,7 +124,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "if you want to establish an out-of-band ICMP "
                 errMsg += "tunnel because icmpsh uses raw sockets to "
                 errMsg += "sniff and craft ICMP packets"
-                raise sqlmapMissingPrivileges, errMsg
+                raise SqlmapMissingPrivileges, errMsg
 
             try:
                 from impacket import ImpactDecoder
@@ -133,7 +133,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg = "sqlmap requires 'impacket' third-party library "
                 errMsg += "in order to run icmpsh master. Download from "
                 errMsg += "http://oss.coresecurity.com/projects/impacket.html"
-                raise sqlmapMissingDependence, errMsg
+                raise SqlmapMissingDependence, errMsg
 
             sysIgnoreIcmp = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
 
@@ -232,7 +232,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         else:
             errMsg = "unable to prompt for an out-of-band session because "
             errMsg += "stacked queries SQL injection is not supported"
-            raise sqlmapNotVulnerableException(errMsg)
+            raise SqlmapNotVulnerableException(errMsg)
 
         if tunnel == 1:
             if not web or (web and self.webBackdoorUrl is not None):
@@ -248,14 +248,14 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             errMsg = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows: it is not possible to perform the SMB "
             errMsg += "relay attack"
-            raise sqlmapUnsupportedDBMSException(errMsg)
+            raise SqlmapUnsupportedDBMSException(errMsg)
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             if Backend.getIdentifiedDbms() in ( DBMS.PGSQL, DBMS.MSSQL ):
                 errMsg = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
                 errMsg += "queries are supported"
-                raise sqlmapUnsupportedDBMSException(errMsg)
+                raise SqlmapUnsupportedDBMSException(errMsg)
 
             elif Backend.isDbms(DBMS.MYSQL):
                 debugMsg = "since stacked queries are not supported, "
@@ -300,7 +300,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             errMsg += "2000 or 2005 to be able to exploit the heap-based "
             errMsg += "buffer overflow in the 'sp_replwritetovarbin' "
             errMsg += "stored procedure (MS09-004)"
-            raise sqlmapUnsupportedDBMSException(errMsg)
+            raise SqlmapUnsupportedDBMSException(errMsg)
 
         infoMsg = "going to exploit the Microsoft SQL Server %s " % Backend.getVersion()
         infoMsg += "'sp_replwritetovarbin' stored procedure heap-based "
@@ -325,9 +325,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     def uncPathRequest(self):
         errMsg = "'uncPathRequest' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
-    def __regInit(self):
+    def _regInit(self):
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
             return
 
@@ -336,13 +336,13 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         if not Backend.isOs(OS.WINDOWS):
             errMsg = "the back-end DBMS underlying operating system is "
             errMsg += "not Windows"
-            raise sqlmapUnsupportedDBMSException(errMsg)
+            raise SqlmapUnsupportedDBMSException(errMsg)
 
         self.initEnv()
         self.getRemoteTempPath()
 
     def regRead(self):
-        self.__regInit()
+        self._regInit()
 
         if not conf.regKey:
             default = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
@@ -364,7 +364,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         return self.readRegKey(regKey, regVal, True)
 
     def regAdd(self):
-        self.__regInit()
+        self._regInit()
 
         errMsg = "missing mandatory option"
 
@@ -373,7 +373,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regKey = readInput(msg)
 
             if not regKey:
-                raise sqlmapMissingMandatoryOptionException(errMsg)
+                raise SqlmapMissingMandatoryOptionException(errMsg)
         else:
             regKey = conf.regKey
 
@@ -382,7 +382,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regVal = readInput(msg)
 
             if not regVal:
-                raise sqlmapMissingMandatoryOptionException(errMsg)
+                raise SqlmapMissingMandatoryOptionException(errMsg)
         else:
             regVal = conf.regVal
 
@@ -391,7 +391,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regData = readInput(msg)
 
             if not regData:
-                raise sqlmapMissingMandatoryOptionException(errMsg)
+                raise SqlmapMissingMandatoryOptionException(errMsg)
         else:
             regData = conf.regData
 
@@ -412,7 +412,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.addRegKey(regKey, regVal, regType, regData)
 
     def regDel(self):
-        self.__regInit()
+        self._regInit()
 
         errMsg = "missing mandatory option"
 
@@ -421,7 +421,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regKey = readInput(msg)
 
             if not regKey:
-                raise sqlmapMissingMandatoryOptionException(errMsg)
+                raise SqlmapMissingMandatoryOptionException(errMsg)
         else:
             regKey = conf.regKey
 
@@ -430,7 +430,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             regVal = readInput(msg)
 
             if not regVal:
-                raise sqlmapMissingMandatoryOptionException(errMsg)
+                raise SqlmapMissingMandatoryOptionException(errMsg)
         else:
             regVal = conf.regVal
 

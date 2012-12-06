@@ -16,8 +16,8 @@ from lib.core.common import getUnicode
 from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapGenericException
+from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapGenericException
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
@@ -43,7 +43,7 @@ class Google(object):
             e.info()
         except urllib2.URLError:
             errMsg = "unable to connect to Google"
-            raise sqlmapConnectionException, errMsg
+            raise SqlmapConnectionException, errMsg
 
     def search(self, dork):
         """
@@ -93,13 +93,13 @@ class Google(object):
                 return None
         except (urllib2.URLError, socket.error, socket.timeout):
             errMsg = "unable to connect to Google"
-            raise sqlmapConnectionException, errMsg
+            raise SqlmapConnectionException, errMsg
 
         retVal = [urllib.unquote(match.group(1)) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
 
         if not retVal and "detected unusual traffic" in page:
             warnMsg = "Google has detected 'unusual' traffic from "
             warnMsg += "this computer disabling further searches"
-            raise sqlmapGenericException, warnMsg
+            raise SqlmapGenericException, warnMsg
 
         return retVal

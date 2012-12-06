@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
@@ -37,7 +37,7 @@ class Connector(GenericConnector):
         try:
             self.connector = psycopg2.connect(host=self.hostname, user=self.user, password=self.password, database=self.db, port=self.port)
         except psycopg2.OperationalError, msg:
-            raise sqlmapConnectionException, msg
+            raise SqlmapConnectionException, msg
 
         self.connector.set_client_encoding('UNICODE')
 
@@ -60,7 +60,7 @@ class Connector(GenericConnector):
         except (psycopg2.OperationalError, psycopg2.ProgrammingError), msg:
             logger.warn(("(remote) %s" % msg).strip())
         except psycopg2.InternalError, msg:
-            raise sqlmapConnectionException, msg
+            raise SqlmapConnectionException, msg
 
         self.connector.commit()
 

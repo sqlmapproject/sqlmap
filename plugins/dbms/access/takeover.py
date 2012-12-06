@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
@@ -14,18 +14,18 @@ class Takeover(GenericTakeover):
 
     def osCmd(self):
         errMsg = "on Microsoft Access it is not possible to execute commands"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg
 
     def osShell(self):
         errMsg = "on Microsoft Access it is not possible to execute commands"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg
 
     def osPwn(self):
         errMsg = "on Microsoft Access it is not possible to establish an "
         errMsg += "out-of-band connection"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg
 
     def osSmb(self):
         errMsg = "on Microsoft Access it is not possible to establish an "
         errMsg += "out-of-band connection"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg

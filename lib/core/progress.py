@@ -15,8 +15,8 @@ class ProgressBar(object):
     """
 
     def __init__(self, minValue=0, maxValue=10, totalWidth=None):
-        self.__progBar = "[]"
-        self.__oldProgBar = ""
+        self._progBar = "[]"
+        self._oldProgBar = ""
         self.__min = int(minValue)
         self.__max = int(maxValue)
         self.__span = self.__max - self.__min
@@ -24,7 +24,7 @@ class ProgressBar(object):
         self.__amount = 0
         self.update()
 
-    def __convertSeconds(self, value):
+    def _convertSeconds(self, value):
         seconds = value
         minutes = seconds / 60
         seconds = seconds - (minutes * 60)
@@ -56,34 +56,34 @@ class ProgressBar(object):
 
         # Build a progress bar with an arrow of equal signs
         if numHashes == 0:
-            self.__progBar = "[>%s]" % (" " * (allFull - 1))
+            self._progBar = "[>%s]" % (" " * (allFull - 1))
         elif numHashes == allFull:
-            self.__progBar = "[%s]" % ("=" * allFull)
+            self._progBar = "[%s]" % ("=" * allFull)
         else:
-            self.__progBar = "[%s>%s]" % ("=" * (numHashes - 1),
+            self._progBar = "[%s>%s]" % ("=" * (numHashes - 1),
                                           " " * (allFull - numHashes))
 
         # Add the percentage at the beginning of the progress bar
         percentString = getUnicode(percentDone) + "%"
-        self.__progBar = "%s %s" % (percentString, self.__progBar)
+        self._progBar = "%s %s" % (percentString, self._progBar)
 
     def draw(self, eta=0):
         """
         This method draws the progress bar if it has changed
         """
 
-        if self.__progBar != self.__oldProgBar:
-            self.__oldProgBar = self.__progBar
+        if self._progBar != self._oldProgBar:
+            self._oldProgBar = self._progBar
 
             if eta and self.__amount < self.__max:
-                dataToStdout("\r%s %d/%d  ETA %s" % (self.__progBar, self.__amount, self.__max, self.__convertSeconds(int(eta))))
+                dataToStdout("\r%s %d/%d  ETA %s" % (self._progBar, self.__amount, self.__max, self._convertSeconds(int(eta))))
             else:
-                blank = " " * (80 - len("\r%s %d/%d" % (self.__progBar, self.__amount, self.__max)))
-                dataToStdout("\r%s %d/%d%s" % (self.__progBar, self.__amount, self.__max, blank))
+                blank = " " * (80 - len("\r%s %d/%d" % (self._progBar, self.__amount, self.__max)))
+                dataToStdout("\r%s %d/%d%s" % (self._progBar, self.__amount, self.__max, blank))
 
     def __str__(self):
         """
         This method returns the progress bar string
         """
 
-        return getUnicode(self.__progBar)
+        return getUnicode(self._progBar)

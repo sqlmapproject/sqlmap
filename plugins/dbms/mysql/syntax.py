@@ -9,7 +9,7 @@ import binascii
 import re
 
 from lib.core.convert import utf8encode
-from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import SqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -41,7 +41,7 @@ class Syntax(GenericSyntax):
             index = expression[firstIndex:].find(")")
 
             if index == -1:
-                raise sqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
+                raise SqlmapSyntaxException, "Unenclosed ) in '%s'" % expression
 
             lastIndex = firstIndex + index + 1
             old = expression[firstIndex:lastIndex]

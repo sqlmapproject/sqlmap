@@ -32,9 +32,9 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
 from lib.techniques.brute.use import columnExists
@@ -166,7 +166,7 @@ class Databases:
                 kb.data.cachedDbs = [kb.data.currentDb]
             else:
                 errMsg = "unable to retrieve the database names"
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
         else:
             kb.data.cachedDbs.sort()
 
@@ -188,7 +188,7 @@ class Databases:
             elif Backend.isDbms(DBMS.ACCESS):
                 try:
                     tables = self.getTables(False)
-                except sqlmapNoneDataException:
+                except SqlmapNoneDataException:
                     tables = None
 
                 if not tables:
@@ -239,7 +239,7 @@ class Databases:
             if test[0] in ("n", "N"):
                 return
             elif test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             else:
                 return tableExists(paths.COMMON_TABLES)
 
@@ -351,7 +351,7 @@ class Databases:
                 logger.error(errMsg)
                 return self.getTables(bruteForce=True)
             else:
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
         else:
             for db, tables in kb.data.cachedTables.items():
                 kb.data.cachedTables[db] = sorted(tables) if tables else tables
@@ -377,7 +377,7 @@ class Databases:
             if  ',' in conf.db:
                 errMsg = "only one database name is allowed when enumerating "
                 errMsg += "the tables' columns"
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise SqlmapMissingMandatoryOptionException, errMsg
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
@@ -415,7 +415,7 @@ class Databases:
             else:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
@@ -466,7 +466,7 @@ class Databases:
             if test[0] in ("n", "N"):
                 return
             elif test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)
 
@@ -708,7 +708,7 @@ class Databases:
 
         return kb.data.cachedColumns
 
-    def __tableGetCount(self, db, table):
+    def _tableGetCount(self, db, table):
         if Backend.isDbms(DBMS.DB2):
             query = "SELECT %s FROM %s.%s--" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db.upper()), safeSQLIdentificatorNaming(table.upper(), True))
         else:
@@ -748,12 +748,12 @@ class Databases:
 
         if conf.tbl:
             for table in conf.tbl.split(","):
-                self.__tableGetCount(conf.db, table)
+                self._tableGetCount(conf.db, table)
         else:
             self.getTables()
 
             for db, tables in kb.data.cachedTables.items():
                 for table in tables:
-                    self.__tableGetCount(db, table)
+                    self._tableGetCount(db, table)
 
         return kb.data.cachedCounts

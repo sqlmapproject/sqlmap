@@ -9,7 +9,7 @@ import binascii
 import re
 
 from lib.core.common import isDBMSVersionAtLeast
-from lib.core.exception import sqlmapSyntaxException
+from lib.core.exception import SqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -42,7 +42,7 @@ class Syntax(GenericSyntax):
             index = expression[firstIndex+2:].find("'")
 
             if index == -1:
-                raise sqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
+                raise SqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
 
             lastIndex = firstIndex + index + 3
             old = expression[firstIndex:lastIndex]

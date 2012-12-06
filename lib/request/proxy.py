@@ -10,7 +10,7 @@ import socket
 import urllib
 import urllib2
 
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import PYVERSION
 
 if PYVERSION >= "2.6":
@@ -117,4 +117,4 @@ else:
     class ProxyHTTPSHandler:
         def __init__(self, *args, **kwargs):
             errMsg = "unsupported feature on versions of Python before 2.6"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException, errMsg

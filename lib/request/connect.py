@@ -50,10 +50,10 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.enums import REDIRECTION
-from lib.core.exception import sqlmapCompressionException
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapSyntaxException
-from lib.core.exception import sqlmapValueException
+from lib.core.exception import SqlmapCompressionException
+from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapValueException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
@@ -87,11 +87,11 @@ class Connect(object):
     """
 
     @staticmethod
-    def __getPageProxy(**kwargs):
+    def _getPageProxy(**kwargs):
         return Connect.getPage(**kwargs)
 
     @staticmethod
-    def __retryProxy(**kwargs):
+    def _retryProxy(**kwargs):
         threadData = getCurrentThreadData()
         threadData.retriesCount += 1
 
@@ -129,10 +129,10 @@ class Connect(object):
         time.sleep(1)
 
         kwargs['retrying'] = True
-        return Connect.__getPageProxy(**kwargs)
+        return Connect._getPageProxy(**kwargs)
 
     @staticmethod
-    def __connReadProxy(conn):
+    def _connReadProxy(conn):
         retVal = ""
 
         if not kb.dnsMode and conn:
@@ -249,7 +249,7 @@ class Connect(object):
 
                 multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(unicodeencode(url), multipart)
-                page = Connect.__connReadProxy(conn)
+                page = Connect._connReadProxy(conn)
                 responseHeaders = conn.info()
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
                 page = decodePage(page, responseHeaders.get(HTTPHEADER.CONTENT_ENCODING), responseHeaders.get(HTTPHEADER.CONTENT_TYPE))
@@ -360,11 +360,11 @@ class Connect(object):
             # Get HTTP response
             if hasattr(conn, 'redurl'):
                 page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
-                  else Connect.__connReadProxy(conn)
+                  else Connect._connReadProxy(conn)
                 skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
                 code = conn.redcode
             else:
-                page = Connect.__connReadProxy(conn)
+                page = Connect._connReadProxy(conn)
 
             code = code or conn.code
             responseHeaders = conn.info()
@@ -399,8 +399,8 @@ class Connect(object):
                     kwargs['post'] = None
 
                     try:
-                        return Connect.__getPageProxy(**kwargs)
-                    except sqlmapSyntaxException:
+                        return Connect._getPageProxy(**kwargs)
+                    except SqlmapSyntaxException:
                         pass
 
             # Explicit closing of connection object
@@ -459,11 +459,11 @@ class Connect(object):
             if e.code == httplib.UNAUTHORIZED:
                 errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
-                raise sqlmapConnectionException, errMsg
+                raise SqlmapConnectionException, errMsg
             elif e.code == httplib.NOT_FOUND:
                 if raise404:
                     errMsg = "page not found (%d)" % code
-                    raise sqlmapConnectionException, errMsg
+                    raise SqlmapConnectionException, errMsg
                 else:
                     debugMsg = "page not found (%d)" % code
                     logger.debug(debugMsg)
@@ -476,22 +476,22 @@ class Connect(object):
                     if threadData.retriesCount < conf.retries and not kb.threadException:
                         warnMsg += ". sqlmap is going to retry the request"
                         logger.critical(warnMsg)
-                        return Connect.__retryProxy(**kwargs)
+                        return Connect._retryProxy(**kwargs)
                     elif kb.testMode:
                         logger.critical(warnMsg)
                         return None, None, None
                     else:
-                        raise sqlmapConnectionException, warnMsg
+                        raise SqlmapConnectionException, warnMsg
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError, sqlmapCompressionException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError, SqlmapCompressionException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
                 warnMsg = "invalid url address used (%s)" % repr(url)
-                raise sqlmapSyntaxException, warnMsg
+                raise SqlmapSyntaxException, warnMsg
             elif "forcibly closed" in tbMsg:
                 warnMsg = "connection was forcibly closed by the target url"
             elif "timed out" in tbMsg:
@@ -519,12 +519,12 @@ class Connect(object):
             elif threadData.retriesCount < conf.retries and not kb.threadException:
                 warnMsg += ". sqlmap is going to retry the request"
                 logger.critical(warnMsg)
-                return Connect.__retryProxy(**kwargs)
+                return Connect._retryProxy(**kwargs)
             elif kb.testMode:
                 logger.critical(warnMsg)
                 return None, None, None
             else:
-                raise sqlmapConnectionException, warnMsg
+                raise SqlmapConnectionException, warnMsg
 
         finally:
             page = page if isinstance(page, unicode) else getUnicode(page)
@@ -593,7 +593,7 @@ class Connect(object):
                     if not isinstance(payload, basestring):
                         errMsg = "tamper function '%s' returns " % function.func_name
                         errMsg += "invalid payload type ('%s')" % type(payload)
-                        raise sqlmapValueException, errMsg
+                        raise SqlmapValueException, errMsg
 
                 value = agent.replacePayload(value, payload)
 

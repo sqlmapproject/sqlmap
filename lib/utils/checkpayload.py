@@ -14,7 +14,7 @@ from lib.core.data import logger
 
 rules = None
 
-def __adjustGrammar(string):
+def _adjustGrammar(string):
     string = re.sub('\ADetects', 'Detected', string)
     string = re.sub('\Afinds', 'Found', string)
     string = re.sub('attempts\Z', 'attempt', string)
@@ -43,7 +43,7 @@ def checkPayload(payload):
 
         for xmlrule in xmlrules.getElementsByTagName("filter"):
             rule = "(?i)%s" % xmlrule.getElementsByTagName('rule')[0].childNodes[0].nodeValue
-            desc = __adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
+            desc = _adjustGrammar(xmlrule.getElementsByTagName('description')[0].childNodes[0].nodeValue)
             rules.append((rule, desc))
 
     if payload:

@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
@@ -14,8 +14,8 @@ class Filesystem(GenericFilesystem):
 
     def readFile(self, rFile):
         errMsg = "on SAP MaxDB reading of files is not supported"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg
 
     def writeFile(self, wFile, dFile, fileType=None):
         errMsg = "on SAP MaxDB writing of files is not supported"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg

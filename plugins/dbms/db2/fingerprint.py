@@ -23,7 +23,7 @@ class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.DB2)
 
-    def __versionCheck(self):
+    def _versionCheck(self):
         minor, major = None, None
 
         for version in reversed(xrange(5, 15)):
@@ -97,7 +97,7 @@ class Fingerprint(GenericFingerprint):
             logMsg = "confirming %s" % DBMS.DB2
             logger.info(logMsg)
 
-            version = self.__versionCheck()
+            version = self._versionCheck()
 
             if version:
                 Backend.setVersion(version)

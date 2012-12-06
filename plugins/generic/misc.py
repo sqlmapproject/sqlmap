@@ -23,8 +23,8 @@ from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 
 class Miscellaneous:
@@ -79,7 +79,7 @@ class Miscellaneous:
             first, last = 29, 9
 
         else:
-            raise sqlmapUnsupportedFeatureException, "unsupported DBMS"
+            raise SqlmapUnsupportedFeatureException, "unsupported DBMS"
 
         query = queries[Backend.getIdentifiedDbms()].substring.query % (queries[Backend.getIdentifiedDbms()].banner.query, first, last)
 
@@ -189,6 +189,6 @@ class Miscellaneous:
             condParam = "='%s'"
         else:
             errMsg = "invalid value"
-            raise sqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException, errMsg
 
         return choice, condParam

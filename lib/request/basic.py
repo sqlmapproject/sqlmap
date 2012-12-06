@@ -25,7 +25,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import PLACE
-from lib.core.exception import sqlmapCompressionException
+from lib.core.exception import SqlmapCompressionException
 from lib.core.htmlentities import htmlEntities
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
@@ -211,7 +211,7 @@ def decodePage(page, contentEncoding, contentType):
             singleTimeWarnMessage(warnMsg)
 
             kb.pageCompress = False
-            raise sqlmapCompressionException
+            raise SqlmapCompressionException
 
     if not conf.charset:
         httpCharset, metaCharset = None, None

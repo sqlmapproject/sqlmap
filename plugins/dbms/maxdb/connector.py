@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
@@ -15,4 +15,4 @@ class Connector(GenericConnector):
     def connect(self):
         errMsg = "on SAP MaxDB it is not possible to establish a "
         errMsg += "direct connection"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg

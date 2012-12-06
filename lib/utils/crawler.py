@@ -17,7 +17,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -50,7 +50,7 @@ class Crawler(object):
                     try:
                         if current:
                             content = Request.getPage(url=current, crawling=True, raise404=False)[0]
-                    except sqlmapConnectionException, e:
+                    except SqlmapConnectionException, e:
                         errMsg = "connection exception detected (%s). skipping " % e
                         errMsg += "url '%s'" % current
                         logger.critical(errMsg)

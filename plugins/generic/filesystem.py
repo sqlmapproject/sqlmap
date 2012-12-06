@@ -24,7 +24,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.exception import SqlmapUndefinedMethod
 from lib.request import inject
 
 class Filesystem:
@@ -36,7 +36,7 @@ class Filesystem:
         self.fileTblName = "sqlmapfile"
         self.tblField = "data"
 
-    def __unhexString(self, hexStr):
+    def _unhexString(self, hexStr):
         if len(hexStr) % 2 != 0:
             errMsg = "for some reason(s) sqlmap retrieved an odd-length "
             errMsg += "hexadecimal string which it is not able to convert "
@@ -53,7 +53,7 @@ class Filesystem:
 
         return cleanStr
 
-    def __checkWrittenFile(self, wFile, dFile, fileType):
+    def _checkWrittenFile(self, wFile, dFile, fileType):
         if Backend.isDbms(DBMS.MYSQL):
             lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % dFile
 
@@ -157,29 +157,29 @@ class Filesystem:
         output = readInput(message, default="Y")
 
         if not output or output in ("y", "Y"):
-            return self.__checkWrittenFile(wFile, dFile, fileType)
+            return self._checkWrittenFile(wFile, dFile, fileType)
 
         return True
 
     def nonStackedReadFile(self, rFile):
         errMsg = "'nonStackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def stackedReadFile(self, rFile):
         errMsg = "'stackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def unionWriteFile(self, wFile, dFile, fileType):
         errMsg = "'unionWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def stackedWriteFile(self, wFile, dFile, fileType):
         errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def readFile(self, rFile):
         fileContent = None
@@ -230,7 +230,7 @@ class Filesystem:
 
             fileContent = newFileContent
 
-        fileContent = self.__unhexString(fileContent)
+        fileContent = self._unhexString(fileContent)
         rFilePath = dataToOutFile(fileContent)
 
         if not Backend.isDbms(DBMS.PGSQL):

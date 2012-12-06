@@ -6,7 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.data import logger
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
@@ -57,7 +57,7 @@ class Enumeration(GenericEnumeration):
 
     def searchColumn(self):
         errMsg = "on SQLite you must specify the table and columns to dump"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg
 
     def getHostname(self):
         warnMsg = "on SQLite it is not possible to enumerate the hostname"

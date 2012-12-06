@@ -9,8 +9,8 @@ import os
 
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapFilePathException
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.exception import SqlmapFilePathException
+from lib.core.exception import SqlmapUndefinedMethod
 
 class Connector:
     """
@@ -59,24 +59,24 @@ class Connector:
     def checkFileDb(self):
         if not os.path.exists(self.db):
             errMsg = "the provided database file '%s' does not exist" % self.db
-            raise sqlmapFilePathException, errMsg
+            raise SqlmapFilePathException, errMsg
 
     def connect(self):
         errMsg = "'connect' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def fetchall(self):
         errMsg = "'fetchall' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def execute(self, query):
         errMsg = "'execute' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def select(self, query):
         errMsg = "'select' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg

@@ -26,7 +26,7 @@ class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.MYSQL)
 
-    def __commentCheck(self):
+    def _commentCheck(self):
         infoMsg = "executing %s comment injection fingerprint" % DBMS.MYSQL
         logger.info(infoMsg)
 
@@ -111,7 +111,7 @@ class Fingerprint(GenericFingerprint):
             value += actVer
             return value
 
-        comVer = self.__commentCheck()
+        comVer = self._commentCheck()
         blank = " " * 15
         value += "active fingerprint: %s" % actVer
 

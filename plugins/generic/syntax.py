@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.exception import SqlmapUndefinedMethod
 
 class Syntax:
     """
@@ -19,10 +19,10 @@ class Syntax:
     def unescape(expression, quote=True):
         errMsg = "'unescape' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     @staticmethod
     def escape(expression):
         errMsg = "'escape' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg

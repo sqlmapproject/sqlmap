@@ -9,7 +9,7 @@ from lib.core.common import Backend
 from lib.core.common import readInput
 from lib.core.data import logger
 from lib.core.enums import OS
-from lib.core.exception import sqlmapUndefinedMethod
+from lib.core.exception import SqlmapUndefinedMethod
 
 class Fingerprint:
     """
@@ -22,17 +22,17 @@ class Fingerprint:
     def getFingerprint(self):
         errMsg = "'getFingerprint' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def checkDbms(self):
         errMsg = "'checkDbms' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def checkDbmsOs(self, detailed=False):
         errMsg = "'checkDbmsOs' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise sqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod, errMsg
 
     def forceDbmsEnum(self):
         pass

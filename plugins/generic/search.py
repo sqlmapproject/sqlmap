@@ -25,8 +25,8 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
 from lib.techniques.brute.use import columnExists
@@ -148,7 +148,7 @@ class Search:
             if test[0] in ("n", "N"):
                 return
             elif test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             else:
                 regex = "|".join(conf.tbl.split(","))
                 return tableExists(paths.COMMON_TABLES, regex)
@@ -306,7 +306,7 @@ class Search:
             if test[0] in ("n", "N"):
                 return
             elif test[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
             else:
                 regex = "|".join(conf.col.split(","))
                 conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS, regex))
@@ -558,4 +558,4 @@ class Search:
         else:
             errMsg = "missing parameter, provide -D, -T or -C along "
             errMsg += "with --search"
-            raise sqlmapMissingMandatoryOptionException, errMsg
+            raise SqlmapMissingMandatoryOptionException, errMsg

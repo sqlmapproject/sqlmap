@@ -10,7 +10,7 @@ import os
 from lib.core.common import randomInt
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
@@ -31,7 +31,7 @@ class Filesystem(GenericFilesystem):
     def unionWriteFile(self, wFile, dFile, fileType):
         errMsg = "PostgreSQL does not support file upload with UNION "
         errMsg += "query SQL injection technique"
-        raise sqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException, errMsg
 
     def stackedWriteFile(self, wFile, dFile, fileType):
         wFileSize = os.path.getsize(wFile)
@@ -39,7 +39,7 @@ class Filesystem(GenericFilesystem):
         if wFileSize > 8192:
             errMsg = "on PostgreSQL it is not possible to write files "
             errMsg += "bigger than 8192 bytes at the moment"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException, errMsg
 
         self.oid = randomInt()
 

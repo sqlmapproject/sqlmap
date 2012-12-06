@@ -47,10 +47,10 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapSilentQuitException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSHIN_MAX_VALUE_LENGTH
@@ -407,7 +407,7 @@ def checkSqlInjection(place, parameter, value):
 
                                         injectable = True
 
-                            except sqlmapConnectionException, msg:
+                            except SqlmapConnectionException, msg:
                                 debugMsg = "problem occured most likely because the "
                                 debugMsg += "server hasn't recovered as expected from the "
                                 debugMsg += "error-based payload used ('%s')" % msg
@@ -546,7 +546,7 @@ def checkSqlInjection(place, parameter, value):
             elif choice[0] in ("e", "E"):
                 kb.endDetection = True
             elif choice[0] in ("q", "Q"):
-                raise sqlmapUserQuitException
+                raise SqlmapUserQuitException
 
         finally:
             # Reset forced back-end DBMS value
@@ -749,7 +749,7 @@ def checkDynParam(place, parameter, value):
             randInt = randomInt()
             payload = agent.payload(place, parameter, value, getUnicode(randInt))
             dynResult = Request.queryPage(payload, place, raise404=False)
-    except sqlmapConnectionException:
+    except SqlmapConnectionException:
         pass
 
     result = None if dynResult is None else not dynResult
@@ -848,7 +848,7 @@ def checkStability():
         test = readInput(message, default="C")
 
         if test and test[0] in ("q", "Q"):
-            raise sqlmapUserQuitException
+            raise SqlmapUserQuitException
 
         elif test and test[0] in ("s", "S"):
             showStaticWords(firstPage, secondPage)
@@ -867,7 +867,7 @@ def checkStability():
                     kb.nullConnection = None
             else:
                 errMsg = "Empty value supplied"
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
         elif test and test[0] in ("r", "R"):
             message = "please enter value for parameter 'regex': "
@@ -884,7 +884,7 @@ def checkStability():
                     kb.nullConnection = None
             else:
                 errMsg = "Empty value supplied"
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
         else:
             checkDynamicContent(firstPage, secondPage)
@@ -1013,9 +1013,9 @@ def checkNullConnection():
                 infoMsg += "'%s'" % kb.nullConnection
                 logger.info(infoMsg)
 
-    except sqlmapConnectionException, errMsg:
+    except SqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
-        raise sqlmapConnectionException, errMsg
+        raise SqlmapConnectionException, errMsg
 
     return kb.nullConnection is not None
 
@@ -1025,7 +1025,7 @@ def checkConnection(suppressOutput=False):
             socket.getaddrinfo(conf.hostname, None)
         except socket.gaierror:
             errMsg = "host '%s' does not exist" % conf.hostname
-            raise sqlmapConnectionException, errMsg
+            raise SqlmapConnectionException, errMsg
 
     if not suppressOutput:
         infoMsg = "testing connection to the target url"
@@ -1039,7 +1039,7 @@ def checkConnection(suppressOutput=False):
 
         if not kb.originalPage and wasLastRequestHTTPError():
             errMsg = "unable to retrieve page content"
-            raise sqlmapConnectionException, errMsg
+            raise SqlmapConnectionException, errMsg
         elif wasLastRequestDBMSError():
             warnMsg = "there is a DBMS error found in the HTTP response body "
             warnMsg += "which could interfere with the results of the tests"
@@ -1051,7 +1051,7 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-    except sqlmapConnectionException, errMsg:
+    except SqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         logger.critical(errMsg)
 
@@ -1069,7 +1069,7 @@ def checkConnection(suppressOutput=False):
 
             msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
             if readInput(msg, default="Y") not in ("n", "N"):
-                raise sqlmapSilentQuitException
+                raise SqlmapSilentQuitException
             else:
                 kb.ignoreNotFound = True
         else:

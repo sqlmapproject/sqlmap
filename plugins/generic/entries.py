@@ -29,10 +29,10 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapConnectionException
-from lib.core.exception import sqlmapMissingMandatoryOptionException
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapUnsupportedFeatureException
+from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import NULL
@@ -67,7 +67,7 @@ class Entries:
             if  ',' in conf.db:
                 errMsg = "only one database name is allowed when enumerating "
                 errMsg += "the tables' columns"
-                raise sqlmapMissingMandatoryOptionException, errMsg
+                raise SqlmapMissingMandatoryOptionException, errMsg
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
@@ -87,7 +87,7 @@ class Entries:
             else:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                raise sqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException, errMsg
 
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
@@ -313,7 +313,7 @@ class Entries:
                     attackDumpedTable()
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
-            except sqlmapConnectionException, e:
+            except SqlmapConnectionException, e:
                 errMsg = "connection exception detected in dumping phase: "
                 errMsg += "'%s'" % e
                 logger.critical(errMsg)
@@ -329,7 +329,7 @@ class Entries:
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
-            raise sqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException, errMsg
 
         infoMsg = "sqlmap will dump entries of all tables from all databases now"
         logger.info(infoMsg)
@@ -353,7 +353,7 @@ class Entries:
                         kb.data.dumpedTable = {}
 
                         self.dumpTable()
-                    except sqlmapNoneDataException:
+                    except SqlmapNoneDataException:
                         infoMsg = "skipping table '%s'" % table
                         logger.info(infoMsg)
 

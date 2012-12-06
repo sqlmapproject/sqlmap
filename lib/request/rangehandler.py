@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import urllib
 import urllib2
 
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 
 class HTTPRangeHandler(urllib2.BaseHandler):
     """
@@ -47,4 +47,4 @@ class HTTPRangeHandler(urllib2.BaseHandler):
     def http_error_416(self, req, fp, code, msg, hdrs):
         # HTTP's Range Not Satisfiable error
         errMsg = "Invalid range"
-        raise sqlmapConnectionException, errMsg
+        raise SqlmapConnectionException, errMsg

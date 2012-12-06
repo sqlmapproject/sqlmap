@@ -41,11 +41,11 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import exceptionsTuple
-from lib.core.exception import sqlmapNoneDataException
-from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapValueException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapNotVulnerableException
+from lib.core.exception import SqlmapSilentQuitException
+from lib.core.exception import SqlmapValueException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
@@ -58,7 +58,7 @@ from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from thirdparty.pagerank.pagerank import get_pagerank
 
-def __selectInjection():
+def _selectInjection():
     """
     Selection function for injection place, parameters and type.
     """
@@ -113,14 +113,14 @@ def __selectInjection():
         if select.isdigit() and int(select) < len(kb.injections) and int(select) >= 0:
             index = int(select)
         elif select[0] in ( "Q", "q" ):
-            raise sqlmapUserQuitException
+            raise SqlmapUserQuitException
         else:
             errMsg = "invalid choice"
-            raise sqlmapValueException, errMsg
+            raise SqlmapValueException, errMsg
 
         kb.injection = kb.injections[index]
 
-def __formatInjection(inj):
+def _formatInjection(inj):
     data = "Place: %s\n" % inj.place
     data += "Parameter: %s\n" % inj.parameter
 
@@ -143,11 +143,11 @@ def __formatInjection(inj):
 
     return data
 
-def __showInjections():
+def _showInjections():
     header = "sqlmap identified the following injection points with "
     header += "a total of %d HTTP(s) requests" % kb.testQueryCount
 
-    data = "".join(set(map(lambda x: __formatInjection(x), kb.injections))).rstrip("\n")
+    data = "".join(set(map(lambda x: _formatInjection(x), kb.injections))).rstrip("\n")
 
     conf.dumper.technic(header, data)
 
@@ -156,7 +156,7 @@ def __showInjections():
         infoMsg += "included in shown payload content(s)"
         logger.info(infoMsg)
 
-def __randomFillBlankFields(value):
+def _randomFillBlankFields(value):
     retVal = value
 
     if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, value):
@@ -173,7 +173,7 @@ def __randomFillBlankFields(value):
 
     return retVal
 
-def __saveToHashDB():
+def _saveToHashDB():
     injections = hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []
     injections.extend(_ for _ in kb.injections if _ and _.place is not None and _.parameter is not None)
 
@@ -196,7 +196,7 @@ def __saveToHashDB():
     if not hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS):
         hashDBWrite(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, kb.dynamicMarkings, True)
 
-def __saveToResultsFile():
+def _saveToResultsFile():
     if not conf.resultsFP:
         return
 
@@ -310,7 +310,7 @@ def start():
                         if conf.method == HTTPMETHOD.POST:
                             message = "Edit POST data [default: %s]%s: " % (urlencode(conf.data) if conf.data else "None", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
-                            conf.data = __randomFillBlankFields(conf.data)
+                            conf.data = _randomFillBlankFields(conf.data)
                             conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
 
                         elif conf.method == HTTPMETHOD.GET:
@@ -319,7 +319,7 @@ def start():
                                 secondPart = targetUrl[targetUrl.find("?")+1:]
                                 message = "Edit GET data [default: %s]: " % secondPart
                                 test = readInput(message, default=secondPart)
-                                test = __randomFillBlankFields(test)
+                                test = _randomFillBlankFields(test)
                                 conf.url = "%s?%s" % (firstPart, test)
 
                         parseTargetUrl()
@@ -493,7 +493,7 @@ def start():
                 if kb.vainRun and not conf.multipleTargets:
                     errMsg = "no parameter(s) found for testing in the provided data "
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
-                    raise sqlmapNoneDataException, errMsg
+                    raise SqlmapNoneDataException, errMsg
                 else:
                     errMsg = "all tested parameters appear to be not injectable."
 
@@ -541,15 +541,15 @@ def start():
                         errMsg += "expression that you have choosen "
                         errMsg += "does not match exclusively True responses"
 
-                    raise sqlmapNotVulnerableException, errMsg
+                    raise SqlmapNotVulnerableException, errMsg
             else:
                 # Flush the flag
                 kb.testMode = False
 
-                __saveToResultsFile()
-                __saveToHashDB()
-                __showInjections()
-                __selectInjection()
+                _saveToResultsFile()
+                _saveToHashDB()
+                _showInjections()
+                _selectInjection()
 
             if kb.injection.place is not None and kb.injection.parameter is not None:
                 if conf.multipleTargets:
@@ -576,14 +576,14 @@ def start():
                 elif test[0] in ("n", "N"):
                     return False
                 elif test[0] in ("q", "Q"):
-                    raise sqlmapUserQuitException
+                    raise SqlmapUserQuitException
             else:
                 raise
 
-        except sqlmapUserQuitException:
+        except SqlmapUserQuitException:
             raise
 
-        except sqlmapSilentQuitException:
+        except SqlmapSilentQuitException:
             raise
 
         except exceptionsTuple, e:

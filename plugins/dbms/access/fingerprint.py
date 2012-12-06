@@ -27,7 +27,7 @@ class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.ACCESS)
 
-    def __sandBoxCheck(self):
+    def _sandBoxCheck(self):
         # Reference: http://milw0rm.com/papers/198
         retVal = None
         table = None
@@ -43,7 +43,7 @@ class Fingerprint(GenericFingerprint):
 
         return retVal
 
-    def __sysTablesCheck(self):
+    def _sysTablesCheck(self):
         infoMsg = "executing system table(s) existence fingerprint"
         logger.info(infoMsg)
 
@@ -85,7 +85,7 @@ class Fingerprint(GenericFingerprint):
 
         return None
 
-    def __getDatabaseDir(self):
+    def _getDatabaseDir(self):
         retVal = None
 
         infoMsg = "searching for database directory"
@@ -126,7 +126,7 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.ACCESS
             return value
 
-        actVer = Format.getDbms() + " (%s)" % (self.__sandBoxCheck())
+        actVer = Format.getDbms() + " (%s)" % (self._sandBoxCheck())
         blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
@@ -144,7 +144,7 @@ class Fingerprint(GenericFingerprint):
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
 
-        value += "\ndatabase directory: '%s'" % self.__getDatabaseDir()
+        value += "\ndatabase directory: '%s'" % self._getDatabaseDir()
 
         return value
 
@@ -178,7 +178,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.ACCESS
             logger.info(infoMsg)
 
-            version = self.__sysTablesCheck()
+            version = self._sysTablesCheck()
 
             if version is not None:
                 Backend.setVersion(version)

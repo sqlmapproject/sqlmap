@@ -36,8 +36,8 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
-from lib.core.exception import sqlmapNotVulnerableException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapNotVulnerableException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
@@ -50,7 +50,7 @@ from lib.techniques.dns.use import dnsUse
 from lib.techniques.error.use import errorUse
 from lib.techniques.union.use import unionUse
 
-def __goDns(payload, expression):
+def _goDns(payload, expression):
     value = None
 
     if conf.dnsName and kb.dnsTest is not False:
@@ -62,12 +62,12 @@ def __goDns(payload, expression):
 
     return value
 
-def __goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None, dump=False, field=None):
+def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar=None, dump=False, field=None):
     start = time.time()
     value = None
     count = 0
 
-    value = __goDns(payload, expression)
+    value = _goDns(payload, expression)
 
     if value:
         return value
@@ -95,7 +95,7 @@ def __goInference(payload, expression, charsetType=None, firstChar=None, lastCha
 
     return value
 
-def __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
+def _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     outputs = []
     origExpr = None
 
@@ -114,7 +114,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        output = __goInference(payload, expressionReplaced, charsetType, firstChar, lastChar, dump, field)
+        output = _goInference(payload, expressionReplaced, charsetType, firstChar, lastChar, dump, field)
 
         if isinstance(num, int):
             expression = origExpr
@@ -123,7 +123,7 @@ def __goInferenceFields(expression, expressionFields, expressionFieldsList, payl
 
     return outputs
 
-def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
+def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
     Retrieve the output of a SQL query characted by character taking
     advantage of an blind SQL injection vulnerability on the affected
@@ -143,7 +143,7 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
     untilOrderChar = None
 
     if not unpack:
-        return __goInference(payload, expression, charsetType, firstChar, lastChar, dump)
+        return _goInference(payload, expression, charsetType, firstChar, lastChar, dump)
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
@@ -233,7 +233,7 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
                     countedExpression = countedExpression[:untilOrderChar]
 
                 if not stopLimit:
-                    count = __goInference(payload, countedExpression, charsetType=CHARSET_TYPE.DIGITS, firstChar=firstChar, lastChar=lastChar)
+                    count = _goInference(payload, countedExpression, charsetType=CHARSET_TYPE.DIGITS, firstChar=firstChar, lastChar=lastChar)
 
                     if isNumPosStrValue(count):
                         count = int(count)
@@ -252,7 +252,7 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
                                 stopLimit = count
 
                             elif test[0] in ("q", "Q"):
-                                raise sqlmapUserQuitException
+                                raise SqlmapUserQuitException
 
                             elif test.isdigit() and int(test) > 0 and int(test) <= count:
                                 stopLimit = int(test)
@@ -302,7 +302,7 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
 
                 try:
                     for num in xrange(startLimit, stopLimit):
-                        output = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
+                        output = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
                         outputs.append(output)
 
                 except KeyboardInterrupt:
@@ -315,11 +315,11 @@ def __goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, cha
     elif Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().startswith("SELECT ") and " FROM " not in expression.upper():
         expression += FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]
 
-    outputs = __goInferenceFields(expression, expressionFields, expressionFieldsList, payload, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
+    outputs = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
 
     return ", ".join(output for output in outputs) if not isNoneValue(outputs) else None
 
-def __goBooleanProxy(expression):
+def _goBooleanProxy(expression):
     """
     Retrieve the output of a boolean based SQL query
     """
@@ -343,7 +343,7 @@ def __goBooleanProxy(expression):
 
     return output
 
-def __goUnion(expression, unpack=True, dump=False):
+def _goUnion(expression, unpack=True, dump=False):
     """
     Retrieve the output of a SQL query taking advantage of an union SQL
     injection vulnerability on the affected parameter.
@@ -399,7 +399,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
             if not conf.forceDns:
                 if union and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                     kb.technique = PAYLOAD.TECHNIQUE.UNION
-                    value = __goUnion(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
+                    value = _goUnion(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
@@ -420,9 +420,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
 
                 if expected == EXPECTED.BOOL:
-                    value = __goBooleanProxy(booleanExpression)
+                    value = _goBooleanProxy(booleanExpression)
                 else:
-                    value = __goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
+                    value = _goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
 
                 count += 1
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
@@ -434,16 +434,16 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     kb.technique = PAYLOAD.TECHNIQUE.STACKED
 
                 if expected == EXPECTED.BOOL:
-                    value = __goBooleanProxy(booleanExpression)
+                    value = _goBooleanProxy(booleanExpression)
                 else:
-                    value = __goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
+                    value = _goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
 
             if value and isinstance(value, basestring):
                 value = value.strip() if value.strip() else value[:1]
         else:
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
-            raise sqlmapNotVulnerableException, errMsg
+            raise SqlmapNotVulnerableException, errMsg
 
     finally:
         kb.resumeValues = True

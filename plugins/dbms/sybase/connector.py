@@ -16,7 +16,7 @@ import logging
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
@@ -42,7 +42,7 @@ class Connector(GenericConnector):
         try:
             self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user, password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
         except pymssql.OperationalError, msg:
-            raise sqlmapConnectionException, msg
+            raise SqlmapConnectionException, msg
 
         self.setCursor()
         self.connected()
@@ -60,7 +60,7 @@ class Connector(GenericConnector):
         except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
         except pymssql.InternalError, msg:
-            raise sqlmapConnectionException, msg
+            raise SqlmapConnectionException, msg
 
     def select(self, query):
         self.execute(query)

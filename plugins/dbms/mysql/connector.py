@@ -14,7 +14,7 @@ import logging
 
 from lib.core.data import conf
 from lib.core.data import logger
-from lib.core.exception import sqlmapConnectionException
+from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
@@ -37,7 +37,7 @@ class Connector(GenericConnector):
         try:
             self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
         except (pymysql.OperationalError, pymysql.InternalError), msg:
-            raise sqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException, msg[1]
 
         self.setCursor()
         self.connected()
@@ -58,7 +58,7 @@ class Connector(GenericConnector):
         except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except pymysql.InternalError, msg:
-            raise sqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException, msg[1]
 
         self.connector.commit()
 

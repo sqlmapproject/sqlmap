@@ -28,8 +28,8 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
-from lib.core.exception import sqlmapSilentQuitException
-from lib.core.exception import sqlmapUserQuitException
+from lib.core.exception import SqlmapSilentQuitException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
@@ -72,11 +72,11 @@ def main():
         else:
             start()
 
-    except sqlmapUserQuitException:
+    except SqlmapUserQuitException:
         errMsg = "user quit"
         logger.error(errMsg)
 
-    except (sqlmapSilentQuitException, bdb.BdbQuit):
+    except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
 
     except exceptionsTuple, e:
