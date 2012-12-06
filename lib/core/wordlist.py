@@ -11,7 +11,7 @@ import zipfile
 from lib.core.exception import sqlmapDataException
 from lib.core.settings import UNICODE_ENCODING
 
-class Wordlist:
+class Wordlist(object):
     """
     Iterator for looping over a large dictionaries
     """

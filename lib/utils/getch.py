@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-class _Getch:
+class _Getch(object):
     """
     Gets a single character from standard input.  Does not echo to
     the screen (reference: http://code.activestate.com/recipes/134892/)
@@ -22,7 +22,7 @@ class _Getch:
     def __call__(self): return self.impl()
 
 
-class _GetchUnix:
+class _GetchUnix(object):
     def __init__(self):
         import tty
 
@@ -38,7 +38,7 @@ class _GetchUnix:
         return ch
 
 
-class _GetchWindows:
+class _GetchWindows(object):
     def __init__(self):
         import msvcrt
 
@@ -47,7 +47,7 @@ class _GetchWindows:
         return msvcrt.getch()
 
 
-class _GetchMacCarbon:
+class _GetchMacCarbon(object):
     """
     A function which returns the current ASCII key that is down;
     if no ASCII key is down, the null string is returned.  The

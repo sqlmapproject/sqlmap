@@ -26,7 +26,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.request.basic import decodePage
 
-class Google:
+class Google(object):
     """
     This class defines methods used to perform Google dorking (command
     line option '-g <google dork>'

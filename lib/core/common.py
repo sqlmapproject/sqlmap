@@ -168,7 +168,7 @@ class UnicodeRawConfigParser(RawConfigParser):
 
             fp.write("\n")
 
-class Format:
+class Format(object):
     @staticmethod
     def humanize(values, chain=" or "):
         return chain.join(values)
@@ -2824,7 +2824,7 @@ def expandMnemonics(mnemonics, parser, args):
     Expands mnemonic options
     """
 
-    class MnemonicNode:
+    class MnemonicNode(object):
         def __init__(self):
             self.next = {}
             self.current = []

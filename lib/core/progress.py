@@ -9,7 +9,7 @@ from lib.core.common import getUnicode
 from lib.core.common import dataToStdout
 from lib.core.data import conf
 
-class ProgressBar:
+class ProgressBar(object):
     """
     This class defines methods to update and draw a progress bar
     """

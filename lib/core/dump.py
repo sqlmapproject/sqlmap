@@ -37,7 +37,7 @@ from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 
-class Dump:
+class Dump(object):
     """
     This class defines methods used to parse and output the results
     of SQL injection actions

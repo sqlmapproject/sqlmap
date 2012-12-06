@@ -11,7 +11,7 @@ import tempfile
 
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 
-class Cache:
+class Cache(object):
     """
     Auxiliary class used for storing cached chunks
     """

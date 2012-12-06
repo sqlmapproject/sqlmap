@@ -12,7 +12,7 @@ import socket
 import threading
 import time
 
-class DNSQuery:
+class DNSQuery(object):
     """
     Used for making fake DNS resolution responses based on received
     raw request
@@ -58,7 +58,7 @@ class DNSQuery:
 
         return retVal
 
-class DNSServer:
+class DNSServer(object):
     def __init__(self):
         self._requests = []
         self._lock = threading.Lock()

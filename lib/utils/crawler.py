@@ -25,7 +25,7 @@ from lib.request.connect import Connect as Request
 from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
 from thirdparty.oset.pyoset import oset
 
-class Crawler:
+class Crawler(object):
     """
     This class defines methods used to perform crawling (command
     line option '--crawl'

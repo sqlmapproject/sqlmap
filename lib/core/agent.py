@@ -34,7 +34,7 @@ from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.unescaper import unescaper
 
-class Agent:
+class Agent(object):
     """
     This class defines the SQL agent methods.
     """

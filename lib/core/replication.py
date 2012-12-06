@@ -13,7 +13,7 @@ from lib.core.exception import sqlmapGenericException
 from lib.core.exception import sqlmapMissingDependence
 from lib.core.exception import sqlmapValueException
 
-class Replication:
+class Replication(object):
     """
     This class holds all methods/classes used for database
     replication purposes.

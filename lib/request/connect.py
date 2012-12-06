@@ -81,7 +81,7 @@ from thirdparty.socks.socks import ProxyError
 from thirdparty.multipart import multipartpost
 
 
-class Connect:
+class Connect(object):
     """
     This class defines methods used to perform HTTP requests
     """

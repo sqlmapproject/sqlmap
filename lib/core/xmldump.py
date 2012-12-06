@@ -74,7 +74,7 @@ SCHEME_NAME_ATTR = "xsi:noNamespaceSchemaLocation"
 CHARACTERS_TO_ENCODE = range(32) + range(127, 256)
 ENTITIES = {'"': '&quot;', "'": "&apos;"}
 
-class XMLDump:
+class XMLDump(object):
     '''
     This class purpose is to dump the data into an xml Format.
     The format of the xml file is described in the scheme file xml/sqlmap.xsd
