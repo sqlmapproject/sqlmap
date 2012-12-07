@@ -14,6 +14,7 @@ from lib.core.common import getHostHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
@@ -60,7 +61,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
         responseMsg += getUnicode(logHeaders)
 
-        logger.log(7, responseMsg)
+        logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
         if "set-cookie" in headers:
             kb.redirectSetCookie = headers["set-cookie"].split("; path")[0]
@@ -74,7 +75,18 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         content = None
         redurl = self._get_header_redirect(headers)
 
-        kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
+        threadData = getCurrentThreadData()
+        redirectMsg = "HTTP redirect "
+        redirectMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
+
+        if headers:
+            logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in headers.items())
+        else:
+            logHeaders = ""
+
+        redirectMsg += getUnicode(logHeaders)
+
+        logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
 
         if redurl:
             if not urlparse.urlsplit(redurl).netloc:
