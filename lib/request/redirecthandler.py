@@ -18,6 +18,7 @@ from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
+from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
 from lib.core.settings import MAX_SINGLE_URL_REDIRECTIONS
 from lib.core.settings import MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
@@ -75,6 +76,13 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         content = None
         redurl = self._get_header_redirect(headers)
 
+        try:
+            content = fp.read()
+        except Exception, msg:
+            dbgMsg = "there was a problem while retrieving "
+            dbgMsg += "redirect response content (%s)" % msg
+            logger.debug(dbgMsg)
+
         threadData = getCurrentThreadData()
         redirectMsg = "HTTP redirect "
         redirectMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
@@ -84,7 +92,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         else:
             logHeaders = ""
 
-        redirectMsg += getUnicode(logHeaders)
+        redirectMsg += "%s\n" % logHeaders
+        if content:
+            redirectMsg += "\n%s" % content[:MAX_CONNECTION_CHUNK_SIZE]
 
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
 
@@ -94,13 +104,6 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
             self._infinite_loop_check(req)
             self._ask_redirect_choice(code, redurl)
-
-        try:
-            content = fp.read()
-        except Exception, msg:
-            dbgMsg = "there was a problem while retrieving "
-            dbgMsg += "redirect response content (%s)" % msg
-            logger.debug(dbgMsg)
 
         if redurl and kb.redirectChoice == REDIRECTION.YES:
             req.headers[HTTPHEADER.HOST] = getHostHeader(redurl)
