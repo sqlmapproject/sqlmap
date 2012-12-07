@@ -16,6 +16,7 @@ from lib.core.common import getUnicode
 from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
 from lib.core.settings import GOOGLE_REGEX
@@ -67,7 +68,7 @@ class Google(object):
 
             requestMsg = "HTTP request:\nGET %s" % url
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
-            logger.log(8, requestMsg)
+            logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
             page = conn.read()
             code = conn.code
@@ -82,7 +83,7 @@ class Google(object):
             elif conf.verbose > 4:
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
-            logger.log(7, responseMsg)
+            logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
         except urllib2.HTTPError, e:
             try:
                 page = e.read()

@@ -21,6 +21,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import SQL_STATEMENTS
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.settings import UNICODE_ENCODING
@@ -44,7 +45,7 @@ def direct(query, content=True):
     if select and not query.upper().startswith("SELECT "):
         query = "SELECT %s" % query
 
-    logger.log(9, query)
+    logger.log(CUSTOM_LOGGING.PAYLOAD, query)
 
     output = hashDBRetrieve(query, True, True)
     start = time.time()
