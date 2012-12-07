@@ -74,6 +74,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         content = None
         redurl = self._get_header_redirect(headers)
 
+        kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
+
         if redurl:
             if not urlparse.urlsplit(redurl).netloc:
                 redurl = urlparse.urljoin(req.get_full_url(), redurl)
