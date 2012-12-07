@@ -44,34 +44,6 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
             kb.redirectChoice = choice.upper()
 
-    def _process_http_redirect(self, result, headers, code, content, msg, redurl):
-        content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
-
-        threadData = getCurrentThreadData()
-        threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
-
-        responseMsg = "HTTP response "
-        responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
-
-        if headers:
-            logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in headers.items())
-        else:
-            logHeaders = ""
-
-        logHTTPTraffic(threadData.lastRequestMsg, "%s%s" % (responseMsg, logHeaders))
-
-        responseMsg += getUnicode(logHeaders)
-
-        logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-
-        if "set-cookie" in headers:
-            kb.redirectSetCookie = headers["set-cookie"].split("; path")[0]
-
-        result.redcode = code
-        result.redurl = redurl
-
-        return result
-
     def http_error_302(self, req, fp, code, msg, headers):
         content = None
         redurl = self._get_header_redirect(headers)
@@ -83,7 +55,11 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
 
+        content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
+
         threadData = getCurrentThreadData()
+        threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
+
         redirectMsg = "HTTP redirect "
         redirectMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
@@ -92,10 +68,11 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         else:
             logHeaders = ""
 
-        redirectMsg += "%s\n" % logHeaders
+        redirectMsg += logHeaders
         if content:
-            redirectMsg += "\n%s" % content[:MAX_CONNECTION_CHUNK_SIZE]
+            redirectMsg += "\n\n%s" % content[:MAX_CONNECTION_CHUNK_SIZE]
 
+        logHTTPTraffic(threadData.lastRequestMsg, redirectMsg)
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
 
         if redurl:
@@ -111,7 +88,13 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         else:
             result = fp
 
-        return self._process_http_redirect(result, headers, code, content, msg, redurl)
+        if HTTPHEADER.SET_COOKIE in headers:
+            kb.redirectSetCookie = headers.get(HTTPHEADER.SET_COOKIE).split("; path")[0]
+
+        result.redcode = code
+        result.redurl = redurl
+
+        return result
 
     http_error_301 = http_error_303 = http_error_307 = http_error_302
 
