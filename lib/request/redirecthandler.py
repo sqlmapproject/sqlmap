@@ -19,6 +19,7 @@ from lib.core.enums import HTTPHEADER
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
+from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import MAX_SINGLE_URL_REDIRECTIONS
 from lib.core.settings import MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
@@ -49,11 +50,18 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         redurl = self._get_header_redirect(headers)
 
         try:
-            content = fp.read()
+            content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
         except Exception, msg:
             dbgMsg = "there was a problem while retrieving "
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
+        finally:
+            if content:
+                try:  # try to write it back to the read buffer so we could reuse it in further steps
+                    fp.fp._rbuf.truncate(0)
+                    fp.fp._rbuf.write(content)
+                except:
+                    pass
 
         content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
 
