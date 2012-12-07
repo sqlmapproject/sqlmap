@@ -11,6 +11,7 @@ import os
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import Backend
+from lib.core.common import decodeHexValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
 from lib.core.common import isTechniqueAvailable
@@ -35,23 +36,6 @@ class Filesystem:
     def __init__(self):
         self.fileTblName = "sqlmapfile"
         self.tblField = "data"
-
-    def _unhexString(self, hexStr):
-        if len(hexStr) % 2 != 0:
-            errMsg = "for some reason(s) sqlmap retrieved an odd-length "
-            errMsg += "hexadecimal string which it is not able to convert "
-            errMsg += "to raw string"
-            logger.error(errMsg)
-
-            return hexStr
-
-        try:
-            cleanStr = hexdecode(hexStr)
-        except TypeError, e:
-            logger.critical("unable to unhex the string ('%s')" % e)
-            return None
-
-        return cleanStr
 
     def _checkWrittenFile(self, wFile, dFile, fileType):
         if Backend.isDbms(DBMS.MYSQL):
@@ -211,7 +195,7 @@ class Filesystem:
 
         kb.fileReadMode = False
 
-        if fileContent in ( None, "" ) and not Backend.isDbms(DBMS.PGSQL):
+        if fileContent in (None, "") and not Backend.isDbms(DBMS.PGSQL):
             self.cleanup(onlyFileTbl=True)
 
             return
@@ -230,7 +214,7 @@ class Filesystem:
 
             fileContent = newFileContent
 
-        fileContent = self._unhexString(fileContent)
+        fileContent = decodeHexValue(fileContent)
         rFilePath = dataToOutFile(fileContent)
 
         if not Backend.isDbms(DBMS.PGSQL):
