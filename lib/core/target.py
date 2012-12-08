@@ -167,6 +167,7 @@ def _setRequestParams():
                         paramDict = paramToDict(PLACE.GET, parameters)
 
                         if paramDict:
+                            conf.url = conf.url.split('?')[0]
                             conf.paramDict[PLACE.GET] = paramDict
                             testableParameters = True
                 continue
