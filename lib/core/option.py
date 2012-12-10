@@ -150,7 +150,7 @@ proxyHandler = urllib2.BaseHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
 
-def __urllib2Opener():
+def _urllib2Opener():
     """
     This function creates the urllib2 OpenerDirector.
     """
@@ -1300,9 +1300,9 @@ def _cleanupOptions():
     width = getConsoleWidth()
 
     if conf.eta:
-        conf.progressWidth = width-26
+        conf.progressWidth = width - 26
     else:
-        conf.progressWidth = width-46
+        conf.progressWidth = width - 46
 
     if conf.testParameter:
         conf.testParameter = urldecode(conf.testParameter)
@@ -2087,7 +2087,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
         _setSafeUrl()
         _setGoogleDorking()
         _setBulkMultipleTargets()
-        __urllib2Opener()
+        _urllib2Opener()
         _checkTor()
         _setCrawler()
         _findPageForms()
