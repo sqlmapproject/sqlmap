@@ -634,13 +634,12 @@ class Connect(object):
                         for splitter in (urlencode(' '), ' '):
                             if splitter in payload:
                                 prefix, suffix = ("*/", "/*") if splitter == ' ' else (urlencode(_) for _ in ("*/", "/*"))
-                                parts = match.group("value").split(splitter)
+                                parts = payload.split(splitter)
                                 parts[0] = "%s%s" % (parts[0], suffix)
                                 parts[-1] = "%s%s=%s%s" % (DEFAULT_GET_POST_DELIMITER, match.group("name"), prefix, parts[-1])
                                 for i in xrange(1, len(parts) - 1):
                                     parts[i] = "%s%s=%s%s%s" % (DEFAULT_GET_POST_DELIMITER, match.group("name"), prefix, parts[i], suffix)
                                 payload = "".join(parts)
-                                break
 
                         for splitter in (urlencode(','), ','):
                             payload = payload.replace(splitter, "%s%s=" % (DEFAULT_GET_POST_DELIMITER, match.group("name")))
