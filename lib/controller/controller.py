@@ -152,9 +152,14 @@ def _showInjections():
     conf.dumper.technic(header, data)
 
     if conf.tamper:
-        infoMsg = "changes made by tampering scripts are not "
-        infoMsg += "included in shown payload content(s)"
-        logger.info(infoMsg)
+        warnMsg = "changes made by tampering scripts are not "
+        warnMsg += "included in shown payload content(s)"
+        logger.warn(warnMsg)
+
+    if conf.hpp:
+        warnMsg = "changes made by HTTP parameter pollution are not "
+        warnMsg += "included in shown payload content(s)"
+        logger.warn(warnMsg)
 
 def _randomFillBlankFields(value):
     retVal = value
