@@ -97,13 +97,13 @@ def _oneShotErrorUse(expression, field=None):
 
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
-                output = reduce(lambda x, y: x if x is not None else y, [ \
+                output = reduce(lambda x, y: x if x is not None else y, ( \
                         extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
                         extractRegexResult(check, listToStrValue(headers.headers \
                         if headers else None), re.DOTALL | re.IGNORECASE), \
                         extractRegexResult(check, threadData.lastRedirectMsg[1] \
                         if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)], \
+                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)), \
                         None)
 
                 if output is not None:
@@ -388,7 +388,7 @@ def errorUse(expression, dump=False):
                         if not kb.threadContinue:
                             break
 
-                        if output and isinstance(output, list) and len(output) == 1:
+                        if output and isListLike(output) and len(output) == 1:
                             output = output[0]
 
                         with kb.locks.outputs:
