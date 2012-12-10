@@ -627,17 +627,16 @@ class Connect(object):
                     singleTimeWarnMessage(warnMsg)
                 if place in (PLACE.GET, PLACE.POST):
                     _ = re.escape(PAYLOAD_DELIMITER)
-                    match = re.search("(\w+)=%s(.+?)%s" % (_, _), value)
+                    match = re.search("(?P<name>\w+)=%s(?P<value>.+?)%s" % (_, _), value)
                     if match:
-                        parameter, content = match.groups()
                         for splitter in (urlencode(' '), ' '):
-                            if splitter in content:
+                            if splitter in match.group("value"):
                                 prefix, suffix = ("*/", "/*") if splitter == ' ' else (urlencode(_) for _ in ("*/", "/*"))
-                                parts = content.split(splitter)
+                                parts = match.group("value").split(splitter)
                                 parts[0] = "%s%s" % (parts[0], suffix)
-                                parts[-1] = "%s%s=%s%s" % (DEFAULT_GET_POST_DELIMITER, parameter, prefix, parts[-1])
+                                parts[-1] = "%s%s=%s%s" % (DEFAULT_GET_POST_DELIMITER, match.group("name"), prefix, parts[-1])
                                 for i in xrange(1, len(parts) - 1):
-                                    parts[i] = "%s%s=%s%s%s" % (DEFAULT_GET_POST_DELIMITER, parameter, prefix, parts[i], suffix)
+                                    parts[i] = "%s%s=%s%s%s" % (DEFAULT_GET_POST_DELIMITER, match.group("name"), prefix, parts[i], suffix)
                                 payload = "".join(parts)
                                 value = agent.replacePayload(value, payload)
                                 break
