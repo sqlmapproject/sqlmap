@@ -197,6 +197,7 @@ optDict = {
                                "dependencies":      "boolean",
                                "disableColoring":   "boolean",
                                "googlePage":        "integer",
+                               "hpp":               "boolean",
                                "mobile":            "boolean",
                                "pageRank":          "boolean",
                                "smart":             "boolean",

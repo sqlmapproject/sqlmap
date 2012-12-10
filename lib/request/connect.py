@@ -18,6 +18,7 @@ import traceback
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
+from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
@@ -43,6 +44,7 @@ from lib.core.data import logger
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CUSTOM_LOGGING
+from lib.core.enums import DBMS
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
@@ -50,12 +52,14 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.enums import REDIRECTION
+from lib.core.enums import WEB_API
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import HTTP_SILENT_TIMEOUT
@@ -66,6 +70,7 @@ from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
+from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PERMISSION_DENIED_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
@@ -617,6 +622,42 @@ class Connect(object):
                     payload = urlencode(payload, '%', False, True) if place in (PLACE.GET, PLACE.COOKIE, PLACE.URI) and not skipUrlEncode else payload
                     value = agent.replacePayload(value, payload)
 
+            if conf.hpp:
+                if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_API.ASP, WEB_API.ASPX)):
+                    warnMsg = "HTTP parameter pollution should work only against "
+                    warnMsg += "ASP(.NET) targets"
+                    singleTimeWarnMessage(warnMsg)
+                if place in (PLACE.GET, PLACE.POST):
+                    _ = re.escape(PAYLOAD_DELIMITER)
+                    match = re.search("(\w+)=%s(.+?)%s" % (_, _), value)
+                    if match:
+                        parameter, content = match.groups()
+                        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.MSSQL, DBMS.PGSQL):  # DBMSes that support inline comments
+                            for splitter in (urlencode(' '), ' '):
+                                if splitter in content:
+                                    prefix, suffix = ("*/", "/*") if splitter == ' ' else (urlencode(_) for _ in ("*/", "/*"))
+                                    parts = content.split(splitter)
+                                    parts[0] = "%s%s" % (parts[0], suffix)
+                                    parts[-1] = "%s%s=%s%s" % (DEFAULT_GET_POST_DELIMITER, parameter, prefix, parts[-1])
+                                    for i in xrange(1, len(parts) - 1):
+                                        parts[i] = "%s%s=%s%s%s" % (DEFAULT_GET_POST_DELIMITER, parameter, prefix, parts[i], suffix)
+                                    payload = "".join(parts)
+                                    value = agent.replacePayload(value, payload)
+                                    break
+                        else:
+                            for splitter in (urlencode(','), ','):  # generic
+                                if splitter in content:
+                                    parts = content.split(splitter)
+                                    for i in xrange(1, len(parts)):
+                                        parts[i] = "%s%s=%s" % (DEFAULT_GET_POST_DELIMITER, parameter, parts[i])
+                                    payload = "".join(parts)
+                                    value = agent.replacePayload(value, payload)
+                                    break
+                else:
+                    warnMsg = "HTTP parameter pollution works only with regular "
+                    warnMsg += "GET and POST parameters"
+                    singleTimeWarnMessage(warnMsg)
+
         if place:
             value = agent.removePayloadDelimiters(value)
 
@@ -669,7 +710,7 @@ class Connect(object):
                             cookie = _randomizeParameter(cookie, randomParameter)
 
         if conf.evalCode:
-            delimiter = conf.pDel or "&"
+            delimiter = conf.pDel or DEFAULT_GET_POST_DELIMITER
             variables = {}
             originals = {}
 

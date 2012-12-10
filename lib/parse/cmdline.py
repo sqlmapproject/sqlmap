@@ -630,6 +630,10 @@ def cmdLineParser():
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
 
+        miscellaneous.add_option("--hpp", dest="hpp",
+                                  action="store_true",
+                                  help="Use HTTP parameter pollution")
+
         miscellaneous.add_option("--mobile", dest="mobile",
                                   action="store_true",
                                   help="Imitate smartphone through HTTP User-Agent header")
