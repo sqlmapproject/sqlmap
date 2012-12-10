@@ -4,4 +4,4 @@
 # See the file 'doc/COPYING' for copying permission
 
 # Removes trailing spaces from blank lines inside project files
-find ../../. -type f -iname '*.py' -exec sed -i 's/^[ \t]*$//' {} \;
+find . -type f -iname '*.py' -exec sed -i 's/^[ \t]*$//' {} \;
