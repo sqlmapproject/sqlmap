@@ -628,8 +628,9 @@ class Connect(object):
                 if place in (PLACE.GET, PLACE.POST):
                     _ = re.escape(PAYLOAD_DELIMITER)
                     match = re.search("(?P<name>\w+)=%s(?P<value>.+?)%s" % (_, _), value)
-                    payload = match.group("value")
                     if match:
+                        payload = match.group("value")
+
                         for splitter in (urlencode(' '), ' '):
                             if splitter in payload:
                                 prefix, suffix = ("*/", "/*") if splitter == ' ' else (urlencode(_) for _ in ("*/", "/*"))
@@ -640,9 +641,10 @@ class Connect(object):
                                     parts[i] = "%s%s=%s%s%s" % (DEFAULT_GET_POST_DELIMITER, match.group("name"), prefix, parts[i], suffix)
                                 payload = "".join(parts)
                                 break
+
                         for splitter in (urlencode(','), ','):
                             payload = payload.replace(splitter, "%s%s=" % (DEFAULT_GET_POST_DELIMITER, match.group("name")))
-                    if payload:
+
                         value = agent.replacePayload(value, payload)
                 else:
                     warnMsg = "HTTP parameter pollution works only with regular "
