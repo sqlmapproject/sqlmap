@@ -188,7 +188,7 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-                if len(Backend.getErrorParsedDBMSes()) > 0 and not intersect(dbms, Backend.getErrorParsedDBMSes()) and kb.skipOthersDbms is None:
+                if conf.dbms is None and len(Backend.getErrorParsedDBMSes()) > 0 and not intersect(dbms, Backend.getErrorParsedDBMSes()) and kb.skipOthersDbms is None:
                     msg = "parsed error message(s) showed that the "
                     msg += "back-end DBMS could be %s. " % Format.getErrorParsedDBMSes()
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
