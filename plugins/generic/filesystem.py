@@ -17,7 +17,6 @@ from lib.core.common import isListLike
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.convert import hexdecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

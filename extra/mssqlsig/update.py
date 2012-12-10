@@ -6,10 +6,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-import difflib
 import os
 import re
-import sys
 import urllib2
 import urlparse
 
