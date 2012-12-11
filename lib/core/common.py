@@ -2467,7 +2467,7 @@ def showHttpErrorCodes():
     """
 
     if kb.httpErrorCodes:
-        warnMsg = "HTTP error codes detected during testing:\n"
+        warnMsg = "HTTP error codes detected during run:\n"
         warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] \
           if code in httplib.responses else '?', count) \
           for code, count in kb.httpErrorCodes.items())
