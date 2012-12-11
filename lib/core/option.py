@@ -1464,7 +1464,6 @@ def _setConfAttributes():
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
-    conf.start = True
     conf.tests = []
     conf.trafficFP = None
     conf.wFileType = None

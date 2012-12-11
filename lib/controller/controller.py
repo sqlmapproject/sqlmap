@@ -234,9 +234,6 @@ def start():
     check if they are dynamic and SQL injection affected
     """
 
-    if not conf.start:
-        return False
-
     if conf.direct:
         initTargetEnv()
         setupTargetEnv()
