@@ -36,6 +36,7 @@ from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
+from lib.utils.xmlrpc import XMLRPCServer
 
 def modulePath():
     """
@@ -61,16 +62,20 @@ def main():
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
 
-        init(cmdLineOptions)
-
-        if conf.profile:
-            profile()
-        elif conf.smokeTest:
-            smokeTest()
-        elif conf.liveTest:
-            liveTest()
+        if cmdLineOptions.xmlRpc:
+            server = XMLRPCServer()
+            server.serve()
         else:
-            start()
+            init(cmdLineOptions)
+
+            if conf.profile:
+                profile()
+            elif conf.smokeTest:
+                smokeTest()
+            elif conf.liveTest:
+                liveTest()
+            else:
+                start()
 
     except SqlmapUserQuitException:
         errMsg = "user quit"
