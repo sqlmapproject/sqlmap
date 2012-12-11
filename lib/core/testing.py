@@ -13,8 +13,8 @@ import sys
 import tempfile
 import time
 
+from extra.beep.beep import beep
 from lib.controller.controller import start
-from lib.core.common import beep
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import readXmlFile

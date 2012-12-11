@@ -2046,50 +2046,6 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
 
     return result
 
-def beep():
-    """
-    Does an audible beep sound
-    Reference: http://de3.aminet.net/dev/src/clr.py.txt
-    """
-
-    def _failsafe():
-        dataToStdout('\a', True)
-
-    if sys.platform == 'linux2':
-        for dev in ('/dev/audio', '/dev/oss', '/dev/dsp', '/dev/sound'):
-            if os.path.exists(dev):
-                try:
-                    audio = file(dev, 'wb')
-
-                    for _ in xrange(250):
-                        audio.write(chr(32) * 4)
-                        audio.write(chr(0) * 4)
-
-                    audio.close()
-                    return
-                except:
-                    pass
-
-        try:
-            import curses
-            curses.initscr()
-            curses.beep()
-            curses.flash()
-            curses.endwin()
-            return
-        except:
-            _failsafe()
-
-    elif sys.platform == 'darwin':
-        try:
-            import Carbon.Snd
-            Carbon.Snd.SysBeep(1)
-        except:
-            _failsafe()
-
-    else:
-        _failsafe()
-
 def runningAsAdmin():
     """
     Returns True if the current process is run under admin privileges

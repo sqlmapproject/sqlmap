@@ -107,7 +107,7 @@ def _oneShotErrorUse(expression, field=None):
                         None)
 
                 if output is not None:
-                    output = getUnicode(output, kb.pageEncoding)
+                    output = getUnicode(output)
                 else:
                     trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
                         or extractRegexResult(trimcheck, listToStrValue(headers.headers \

@@ -192,6 +192,7 @@ optDict = {
             "Miscellaneous": {
                                "mnemonics":         "string",
                                "answers":           "string",
+                               "beep":              "boolean",
                                "checkPayload":      "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",

@@ -12,10 +12,10 @@ import re
 import socket
 import time
 
+from extra.beep.beep import beep
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
-from lib.core.common import beep
 from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
 from lib.core.common import findDynamicContent
