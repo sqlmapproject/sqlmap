@@ -162,6 +162,12 @@ class Enumeration(GenericEnumeration):
 
         return kb.data.cachedColumns
 
+    def getPrivileges(self, *args):
+        warnMsg = "on SAP MaxDB it is not possible to enumerate the user privileges"
+        logger.warn(warnMsg)
+
+        return {}
+
     def searchDb(self):
         warnMsg = "on SAP MaxDB it is not possible to search databases"
         logger.warn(warnMsg)
