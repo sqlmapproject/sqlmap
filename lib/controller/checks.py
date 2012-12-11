@@ -521,15 +521,18 @@ def checkSqlInjection(place, parameter, value):
                         injection.conf.regexp = conf.regexp
                         injection.conf.optimize = conf.optimize
 
-                        if conf.beep:
-                            beep()
+                        if not kb.alerted:
+                            if conf.beep:
+                                beep()
 
-                        if conf.alert:
-                            infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
-                            logger.info(infoMsg)
+                            if conf.alert:
+                                infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
+                                logger.info(infoMsg)
 
-                            process = execute(conf.alert, shell=True)
-                            process.wait()
+                                process = execute(conf.alert, shell=True)
+                                process.wait()
+
+                            kb.alerted = True
 
                         # There is no need to perform this test for other
                         # <where> tags

@@ -1480,6 +1480,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.absFilePaths = set()
     kb.adjustTimeDelay = None
+    kb.alerted = False
     kb.alwaysRefresh = None
     kb.arch = None
     kb.authHeader = None
