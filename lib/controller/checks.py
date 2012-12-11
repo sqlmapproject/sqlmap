@@ -12,6 +12,9 @@ import re
 import socket
 import time
 
+from subprocess import PIPE
+from subprocess import Popen as execute
+
 from extra.beep.beep import beep
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
@@ -520,6 +523,13 @@ def checkSqlInjection(place, parameter, value):
 
                         if conf.beep:
                             beep()
+
+                        if conf.alert:
+                            infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
+                            logger.info(infoMsg)
+
+                            process = execute(conf.alert, shell=True)
+                            process.wait()
 
                         # There is no need to perform this test for other
                         # <where> tags
