@@ -17,6 +17,7 @@ logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_IN, "TRAFFIC IN")
 
 LOGGER = logging.getLogger("sqlmapLog")
 
+LOGGER_HANDLER = None
 try:
     import ctypes
     LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
@@ -31,7 +32,3 @@ FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.WARN)
-
-def setLoggerHandler(handler):
-    LOGGER.handlers = []
-    LOGGER.addHandler(handler)

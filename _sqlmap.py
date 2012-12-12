@@ -12,6 +12,7 @@ import StringIO
 import sys
 import time
 import traceback
+import types
 import warnings
 
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
@@ -34,7 +35,7 @@ from lib.core.exception import exceptionsTuple
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
-from lib.core.log import setLoggerHandler
+from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
@@ -54,16 +55,12 @@ def modulePath():
 
 def xmlRpcServe():
     logger.setLevel(logging.INFO)
+    cmdLineOptions.disableColoring = True
     server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
-    class _(logging.Handler):
-        def emit(self, record):
-            message = stdoutencode(self.format(record))
-            sys.stdout.write("%s\n" % message)
-    handler = _()
-    handler.is_tty = False
-    handler.disableColoring = True
-    handler.setFormatter(FORMATTER)
-    setLoggerHandler(handler)
+    def emit(self, record):
+        message = stdoutencode(FORMATTER.format(record))
+        sys.stdout.write("%s\n" % message)
+    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
     sys.stdout = StringIO.StringIO()
     sys.stderr = StringIO.StringIO()
     server.serve()
