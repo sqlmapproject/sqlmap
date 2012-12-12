@@ -685,6 +685,9 @@ def cmdLineParser():
         parser.add_option("--xmlrpc", dest="xmlRpc", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--xmlrpc-port", dest="xmlRpcPort", type="int",
+                          help=SUPPRESS_HELP)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)

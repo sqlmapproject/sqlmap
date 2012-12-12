@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import bdb
+import logging
 import os
 import sys
 import time
@@ -33,6 +34,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
+from lib.core.settings import XMLRPC_SERVER_PORT
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
@@ -63,7 +65,8 @@ def main():
         cmdLineOptions.update(cmdLineParser().__dict__)
 
         if cmdLineOptions.xmlRpc:
-            server = XMLRPCServer()
+            logger.setLevel(logging.INFO)
+            server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
             server.serve()
         else:
             init(cmdLineOptions)

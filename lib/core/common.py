@@ -421,11 +421,11 @@ class Backend:
             dbms = Backend.getForcedDbms()
         elif Backend.getDbms() is not None:
             dbms = kb.dbms
-        elif conf.get('dbms'):
+        elif conf.get("dbms"):
             dbms = conf.dbms
         elif Backend.getErrorParsedDBMSes():
             dbms = unArrayizeValue(Backend.getErrorParsedDBMSes())
-        elif kb.injection.dbms:
+        elif kb.get("injection") and kb.injection.dbms:
             dbms = unArrayizeValue(kb.injection.dbms)
 
         return aliasToDbmsEnum(dbms)

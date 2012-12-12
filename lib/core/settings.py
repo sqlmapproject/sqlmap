@@ -483,7 +483,7 @@ EVENTVALIDATION_REGEX = r'(?i)(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<re
 LIMITED_ROWS_TEST_NUMBER = 15
 
 # Default TCP port used for XML-RPC server instance
-XML_RPC_SERVER_PORT = 8776
+XMLRPC_SERVER_PORT = 8776
 
 # Regular expression for SOAP-like POST data
 SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2.*>\s*\Z"
