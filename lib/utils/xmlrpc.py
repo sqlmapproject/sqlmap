@@ -19,7 +19,7 @@ try:
     from lib.core.settings import UNICODE_ENCODING
     from lib.core.settings import XMLRPC_SERVER_PORT
 except ImportError:
-    pass
+    XMLRPC_SERVER_PORT = 8776
 
 class XMLRPCServer:
     def __init__(self, port):
@@ -61,8 +61,9 @@ if __name__ == "__main__":
         pass
 
     try:
-        addr = "http://localhost:%d" % (int(sys.argv[1]) if len(sys.argv) > 1 else 8776)
+        addr = "http://localhost:%d" % (int(sys.argv[1]) if len(sys.argv) > 1 else XMLRPC_SERVER_PORT)
         print "[i] Starting debug XML-RPC client to '%s'..." % addr
+
         server = xmlrpclib.ServerProxy(addr)
         print "[i] Available RPC methods: %s" % str(server.system.listMethods()).strip("[]")
         print "[i] Server instance name: 'server'"
