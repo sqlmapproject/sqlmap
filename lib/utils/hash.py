@@ -312,15 +312,23 @@ def storeHashesToFile(attack_dict):
     warnMsg += "for eventual further processing with other tools"
     logger.warn(warnMsg)
 
+    items = set()
+
     with open(filename, "w+") as f:
         for user, hashes in attack_dict.items():
             for hash_ in hashes:
                 if not hash_ or hash_ == NULL or not hashRecognition(hash_):
                     continue
+
+                item = None
                 if user and not user.startswith(DUMMY_USER_PREFIX):
-                    f.write("%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING)))
+                    item = "%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING))
                 else:
-                    f.write("%s\n" % hash_.encode(UNICODE_ENCODING))
+                    item = "%s\n" % hash_.encode(UNICODE_ENCODING)
+
+                if item and item not in items:
+                    f.write(item)
+                    items.add(item)
 
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
