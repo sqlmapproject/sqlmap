@@ -55,6 +55,7 @@ def modulePath():
 
 def xmlRpcServe():
     logger.setLevel(logging.INFO)
+    cmdLineOptions.batch = True
     cmdLineOptions.disableColoring = True
     server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
     def emit(self, record):
