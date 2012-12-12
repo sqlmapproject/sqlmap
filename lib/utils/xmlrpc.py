@@ -60,20 +60,24 @@ if __name__ == "__main__":
     except ImportError:
         pass
 
-    server = xmlrpclib.ServerProxy("http://localhost:%d" % (int(sys.argv[1]) if len(sys.argv) > 1 else 8776))
-
-    print "[o] Server instance: 'server'"
-    print "[i] Available RPC methods: %s" % str(server.system.listMethods()).strip("[]")
-    print "[i] Sample usage: 'server.system.listMethods()'"
-
-    while True:
-        try:
-            _ = raw_input("> ")
-            if not _.startswith("print"):
-                print eval(_) or ""
-            else:
-                exec(_)
-        except KeyboardInterrupt:
-            exit(0)
-        except Exception, ex:
-            print "[x] '%s'" % str(ex)
+    try:
+        addr = "http://localhost:%d" % (int(sys.argv[1]) if len(sys.argv) > 1 else 8776)
+        print "[i] Starting debug XML-RPC client to '%s'..." % addr
+        server = xmlrpclib.ServerProxy(addr)
+        print "[i] Available RPC methods: %s" % str(server.system.listMethods()).strip("[]")
+        print "[i] Server instance name: 'server'"
+        print "[i] Sample usage: 'server.system.listMethods()'"
+    except Exception, ex:
+        print "[x] '%s'" % str(ex)
+    else:
+        while True:
+            try:
+                _ = raw_input("> ")
+                if not _.startswith("print"):
+                    print eval(_) or ""
+                else:
+                    exec(_)
+            except KeyboardInterrupt:
+                exit(0)
+            except Exception, ex:
+                print "[x] '%s'" % str(ex)
