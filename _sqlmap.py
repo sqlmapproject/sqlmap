@@ -59,7 +59,7 @@ def xmlRpcServe():
     server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
     def emit(self, record):
         message = stdoutencode(FORMATTER.format(record))
-        sys.stdout.write("%s\n" % message)
+        sys.stdout.write("%s" % message)
     LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
     sys.stdout = StringIO.StringIO()
     sys.stderr = StringIO.StringIO()

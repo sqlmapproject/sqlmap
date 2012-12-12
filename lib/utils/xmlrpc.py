@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import sys
 import threading
+import types
 import xmlrpclib
 
 try:
@@ -29,11 +30,9 @@ class XMLRPCServer:
         self.reset()
 
         self.server = SimpleXMLRPCServer(addr=("", self.port), logRequests=False, allow_none=True, encoding=UNICODE_ENCODING)
-        self.server.register_function(self.reset)
-        self.server.register_function(self.set_option)
-        self.server.register_function(self.get_option)
-        self.server.register_function(self.get_option_names)
-        self.server.register_function(self.run)
+        for _ in dir(self):
+            if not _.startswith('_') and isinstance(getattr(self, _), types.MethodType):
+                self.server.register_function(getattr(self, _))
         logger.info("Registering RPC methods: %s" % str(self.server.system_listMethods()).strip("[]"))
         self.server.register_introspection_functions()
         logger.info("Running XML-RPC server at '0.0.0.0:%d'..." % self.port)
@@ -43,15 +42,27 @@ class XMLRPCServer:
 
     def set_option(self, name, value):
         self.options[name] = value
+        return value
 
     def get_option(self, name):
         return self.options[name]
 
     def get_option_names(self):
-        return self.options.keys()
+        return sorted(self.options.keys())
 
     def is_busy(self):
         return kb.get("busyFlag")
+
+    def read_output(self):
+        retval = []
+        for _ in ("stdout", "stderr"):
+            stream = getattr(sys, _)
+            stream.seek(0)
+            retval.append(stream.read())
+            stream.truncate(0)
+        if not filter(None, retval) and not self.is_busy():
+            retval = None
+        return retval
 
     def run(self):
         if not self.is_busy():
@@ -85,11 +96,12 @@ if __name__ == "__main__":
     else:
         while True:
             try:
-                _ = raw_input("> ")
-                if not _.startswith("print"):
-                    print eval(_) or ""
-                else:
-                    exec(_)
+                cmd = raw_input("> ")
+                try:
+                    result = eval(cmd)
+                    print result if result is not None else ""
+                except SyntaxError:
+                    exec(cmd)
             except KeyboardInterrupt:
                 exit(0)
             except Exception, ex:
