@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import sys
+import threading
 import xmlrpclib
 
 try:
@@ -14,6 +15,7 @@ try:
     from lib.controller.controller import start
     from lib.core.datatype import AttribDict
     from lib.core.data import cmdLineOptions
+    from lib.core.data import kb
     from lib.core.data import logger
     from lib.core.option import init
     from lib.core.settings import UNICODE_ENCODING
@@ -25,6 +27,16 @@ class XMLRPCServer:
     def __init__(self, port):
         self.port = port
         self.reset()
+
+        self.server = SimpleXMLRPCServer(addr=("", self.port), logRequests=False, allow_none=True, encoding=UNICODE_ENCODING)
+        self.server.register_function(self.reset)
+        self.server.register_function(self.set_option)
+        self.server.register_function(self.get_option)
+        self.server.register_function(self.get_option_names)
+        self.server.register_function(self.run)
+        logger.info("Registering RPC methods: %s" % str(self.server.system_listMethods()).strip("[]"))
+        self.server.register_introspection_functions()
+        logger.info("Running XML-RPC server at '0.0.0.0:%d'..." % self.port)
 
     def reset(self):
         self.options = AttribDict(cmdLineOptions)
@@ -38,21 +50,20 @@ class XMLRPCServer:
     def get_option_names(self):
         return self.options.keys()
 
+    def is_busy(self):
+        return kb.get("busyFlag")
+
     def run(self):
-        init(self.options, True)
-        return start()
+        if not self.is_busy():
+            init(self.options, True)
+            thread = threading.Thread(target=start)
+            thread.daemon = True
+            thread.start()
+        else:
+            raise Exception, "sqlmap busy"
 
     def serve(self):
-        server = SimpleXMLRPCServer(addr=("", self.port), logRequests=False, allow_none=True, encoding=UNICODE_ENCODING)
-        server.register_function(self.reset)
-        server.register_function(self.set_option)
-        server.register_function(self.get_option)
-        server.register_function(self.get_option_names)
-        server.register_function(self.run)
-        logger.info("Registering RPC methods: %s" % str(server.system_listMethods()).strip("[]"))
-        server.register_introspection_functions()
-        logger.info("Running XML-RPC server at '0.0.0.0:%d'..." % self.port)
-        server.serve_forever()
+        self.server.serve_forever()
 
 if __name__ == "__main__":
     try:
@@ -69,7 +80,8 @@ if __name__ == "__main__":
         print "[i] Server instance name: 'server'"
         print "[i] Sample usage: 'server.system.listMethods()'"
     except Exception, ex:
-        print "[x] '%s'" % str(ex)
+        if ex:
+            print "[x] '%s'" % str(ex)
     else:
         while True:
             try:

@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import bdb
 import logging
 import os
+import StringIO
 import sys
 import time
 import traceback
@@ -22,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
+from lib.core.convert import stdoutencode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
@@ -31,6 +33,8 @@ from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.log import FORMATTER
+from lib.core.log import setLoggerHandler
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
@@ -47,6 +51,22 @@ def modulePath():
     """
 
     return os.path.dirname(getUnicode(sys.executable if weAreFrozen() else __file__, sys.getfilesystemencoding()))
+
+def xmlRpcServe():
+    logger.setLevel(logging.INFO)
+    server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
+    class _(logging.Handler):
+        def emit(self, record):
+            message = stdoutencode(self.format(record))
+            sys.stdout.write("%s\n" % message)
+    handler = _()
+    handler.is_tty = False
+    handler.disableColoring = True
+    handler.setFormatter(FORMATTER)
+    setLoggerHandler(handler)
+    sys.stdout = StringIO.StringIO()
+    sys.stderr = StringIO.StringIO()
+    server.serve()
 
 def main():
     """
@@ -65,9 +85,7 @@ def main():
         cmdLineOptions.update(cmdLineParser().__dict__)
 
         if cmdLineOptions.xmlRpc:
-            logger.setLevel(logging.INFO)
-            server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
-            server.serve()
+            xmlRpcServe()
         else:
             init(cmdLineOptions)
 

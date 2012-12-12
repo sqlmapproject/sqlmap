@@ -1487,6 +1487,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.brute = AttribDict({"tables":[], "columns":[]})
     kb.bruteMode = False
+    kb.busyFlag = False
 
     kb.cache = AttribDict()
     kb.cache.content = {}
