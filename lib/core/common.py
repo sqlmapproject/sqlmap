@@ -1518,7 +1518,8 @@ def clearConsoleLine(forceOutput=False):
     Clears current console line
     """
 
-    dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
+    if getattr(LOGGER_HANDLER, "is_tty", False):
+        dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
 
     kb.prependFlag = False
     kb.stickyLevel = None
