@@ -54,14 +54,13 @@ class XMLRPCServer:
         return kb.get("busyFlag")
 
     def read_output(self):
-        retval = []
-        for _ in ("stdout", "stderr"):
-            stream = getattr(sys, _)
-            stream.seek(0)
-            retval.append(stream.read())
-            stream.truncate(0)
-        if not filter(None, retval) and not self.is_busy():
+        sys.stdout.seek(0)
+        retval = sys.stdout.read()
+        sys.stdout.truncate(0)
+
+        if not retval and not self.is_busy():
             retval = None
+
         return retval
 
     def run(self):
