@@ -31,6 +31,8 @@ class XMLRPCServer:
 
         self.server = SimpleXMLRPCServer(addr=("", self.port), logRequests=False, allow_none=True, encoding=UNICODE_ENCODING)
         for _ in dir(self):
+            if _.startswith("serve"):
+                continue
             if not _.startswith('_') and isinstance(getattr(self, _), types.MethodType):
                 self.server.register_function(getattr(self, _))
         logger.info("Registering RPC methods: %s" % str(self.server.system_listMethods()).strip("[]"))
