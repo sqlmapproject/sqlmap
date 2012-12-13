@@ -12,7 +12,6 @@ import re
 import socket
 import time
 
-from subprocess import PIPE
 from subprocess import Popen as execute
 
 from extra.beep.beep import beep

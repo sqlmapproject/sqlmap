@@ -545,9 +545,7 @@ class Metasploit:
         else:
             self.shellcodeexecLocal += "/linux/shellcodeexec.x%s" % Backend.getArch()
 
-        # TODO: until web.py's __webFileStreamUpload() method does not consider the destFileName
-        #__basename = "tmpse%s%s" % (self._randStr, ".exe" if Backend.isOs(OS.WINDOWS) else "")
-        __basename = os.path.basename(self.shellcodeexecLocal)
+        __basename = "tmpse%s%s" % (self._randStr, ".exe" if Backend.isOs(OS.WINDOWS) else "")
 
         if web:
             self.shellcodeexecRemote = "%s/%s" % (self.webDirectory, __basename)
@@ -559,7 +557,7 @@ class Metasploit:
         logger.info("uploading shellcodeexec to '%s'" % self.shellcodeexecRemote)
 
         if web:
-            self.webFileUpload(self.shellcodeexecLocal, self.shellcodeexecRemote, self.webDirectory)
+            self.webUpload(self.shellcodeexecRemote, self.webDirectory, filepath=self.shellcodeexecLocal)
         else:
             self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary")
 

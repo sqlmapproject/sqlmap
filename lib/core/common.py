@@ -38,7 +38,6 @@ from subprocess import Popen as execute
 from xml.dom import minidom
 from xml.sax import parse
 
-from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
 from lib.core.data import conf
@@ -1415,14 +1414,6 @@ def showStaticWords(firstPage, secondPage):
         infoMsg += "None"
 
     logger.info(infoMsg)
-
-def decloakToNamedStream(filepath, name=None):
-    class _(StringIO):
-        __len__ = property(lambda self: self.len)
-    retVal = _(decloak(filepath))
-    retVal.name = name
-
-    return retVal
 
 def isWindowsPath(filepath):
     """

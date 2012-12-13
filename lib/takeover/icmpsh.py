@@ -77,7 +77,7 @@ class ICMPsh:
         logger.info("uploading icmpsh slave to '%s'" % self._icmpslaveRemote)
 
         if web:
-            self.webFileUpload(self.__icmpslave, self._icmpslaveRemote, self.webDirectory)
+            self.webUpload(self._icmpslaveRemote, self.webDirectory, filepath=self.__icmpslave)
         else:
             self.writeFile(self.__icmpslave, self._icmpslaveRemote, "binary")
 
