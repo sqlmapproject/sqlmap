@@ -530,8 +530,7 @@ def paramToDict(place, parameters=None):
                         or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most probably leftover " % element
-                        warnMsg += "chars from manual SQL injection "
-                        warnMsg += "tests (%s) or non-valid numerical value. " % DUMMY_SQL_INJECTION_CHARS
+                        warnMsg += "chars/statements from manual SQL injection test(s). "
                         warnMsg += "Please, always use only valid parameter values "
                         warnMsg += "so sqlmap could be able to properly run "
                         logger.warn(warnMsg)
