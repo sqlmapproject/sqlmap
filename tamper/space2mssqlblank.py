@@ -83,7 +83,7 @@ def tamper(payload, **kwargs):
                     retVal += random.choice(blanks)
 
                 continue        
-                
+
             retVal += payload[i]
 
     return retVal
