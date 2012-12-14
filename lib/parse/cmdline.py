@@ -685,7 +685,7 @@ def cmdLineParser():
         parser.add_option("--restapi", dest="restApi", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--restApi-port", dest="restApiPort", type="int",
+        parser.add_option("--restapi-port", dest="restApiPort", type="int",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--xmlrpc", dest="xmlRpc", action="store_true",

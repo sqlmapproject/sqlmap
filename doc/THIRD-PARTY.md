@@ -277,6 +277,8 @@ be bound by the terms and conditions of this License Agreement.
 
 # MIT
 
+* The bottle web framework library located under extra/bottle/.
+  Copyright (C) 2012, Marcel Hellkamp.
 * The PageRank library located under thirdparty/pagerank/.
   Copyright (C) 2010, Corey Goldberg.
 * The PrettyPrint library located under thirdparty/prettyprint/.
