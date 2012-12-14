@@ -147,6 +147,34 @@ def task_flush(taskid):
 # sqlmap core interact functions #
 ##################################
 
+@get("/status/<taskid>")
+def status(taskid):
+    """
+    Verify the status of the API as well as the core
+    """
+    if is_admin(taskid):
+        busy = kb.get("busyFlag")
+        tasks_num = len(tasks)
+        return jsonize({"busy": busy, "tasks": tasks_num})
+    else:
+        abort(401)
+
+@get("/cleanup/<taskid>")
+def cleanup(taskid):
+    """
+    Destroy all sessions except admin ID and all output directories
+    """
+    global tasks
+    if is_admin(taskid):
+        for task in tasks:
+            if task == adminid:
+                continue
+            os.removedirs(options[task]["oDir"])
+            tasks = [ adminid ]
+        return jsonize({"success": True})
+    else:
+        abort(401)
+
 @get("/option/<taskid>/list")
 def option_list(taskid):
     """
@@ -211,16 +239,6 @@ def scan(taskid):
 
     return jsonize({"success": True})
 
-@get("/scan/<taskid>/status")
-def scan_status(taskid):
-    """
-    Verify if sqlmap core is currently running
-    """
-    if taskid not in tasks:
-        abort(500, "Invalid task ID")
-
-    return jsonize({"busy": kb.get("busyFlag")})
-
 @get("/scan/<taskid>/output")
 def scan_output(taskid):
     """
@@ -242,6 +260,10 @@ def download(taskid, target, filename):
     """
     if taskid not in tasks:
         abort(500, "Invalid task ID")
+
+    # Prevent file path traversal - the lame way
+    if target.startswith("."):
+        abort(500)
 
     path = os.path.join(paths.SQLMAP_OUTPUT_PATH, target)
     if os.path.exists(path):
