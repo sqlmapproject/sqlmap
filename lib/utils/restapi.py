@@ -258,7 +258,7 @@ def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     global tasks
     adminid = hexencode(os.urandom(16))
     options[adminid] = AttribDict(cmdLineOptions)
-    options[taskid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
+    options[adminid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
     tasks.append(adminid)
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("The admin task ID is: %s" % adminid)
