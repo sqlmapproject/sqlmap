@@ -485,6 +485,9 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Default TCP port used for XML-RPC server instance
 XMLRPC_SERVER_PORT = 8776
 
+# Default TCP port used for REST API server instance
+RESTAPI_SERVER_PORT = 8775
+
 # Regular expression for SOAP-like POST data
 SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2.*>\s*\Z"
 

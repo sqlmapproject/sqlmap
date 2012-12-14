@@ -32,6 +32,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
+from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
@@ -39,11 +40,19 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
+from lib.core.settings import RESTAPI_SERVER_PORT
 from lib.core.settings import XMLRPC_SERVER_PORT
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
 from lib.utils.xmlrpc import XMLRPCServer
+
+try:
+    from lib.utils.restapi import restAPIrun
+except SqlmapMissingDependence, e:
+    e = getUnicode(e)
+    logger.critical(e)
+    sys.exit(1)
 
 def modulePath():
     """
@@ -52,6 +61,18 @@ def modulePath():
     """
 
     return os.path.dirname(getUnicode(sys.executable if weAreFrozen() else __file__, sys.getfilesystemencoding()))
+
+def restApiServe():
+    logger.setLevel(logging.INFO)
+    cmdLineOptions.batch = True
+    cmdLineOptions.disableColoring = True
+    restAPIrun(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
+    def emit(self, record):
+        message = stdoutencode(FORMATTER.format(record))
+        sys.stdout.write("%s\n" % message.strip('\r'))
+    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
+    sys.stdout = StringIO.StringIO()
+    sys.stderr = StringIO.StringIO()
 
 def xmlRpcServe():
     logger.setLevel(logging.INFO)
@@ -82,7 +103,9 @@ def main():
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
 
-        if cmdLineOptions.xmlRpc:
+        if cmdLineOptions.restApi:
+            restApiServe()
+        elif cmdLineOptions.xmlRpc:
             xmlRpcServe()
         else:
             init(cmdLineOptions)
@@ -106,6 +129,7 @@ def main():
     except exceptionsTuple, e:
         e = getUnicode(e)
         logger.critical(e)
+        sys.exit(1)
 
     except KeyboardInterrupt:
         print

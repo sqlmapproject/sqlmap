@@ -66,6 +66,7 @@ class XMLRPCServer:
         return retval
 
     def run(self):
+        print "CALLING RUN"
         if not self.is_busy():
             init(self.options, True)
             thread = threading.Thread(target=start)
