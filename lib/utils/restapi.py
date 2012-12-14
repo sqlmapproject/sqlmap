@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import optparse
 import os
 import sys
+import tempfile
 import threading
 
 try:
@@ -101,8 +102,10 @@ def task_new():
     Create new task ID
     """
     global tasks
+    global options
     taskid = hexencode(os.urandom(16))
     options[taskid] = AttribDict(cmdLineOptions)
+    options[taskid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
     tasks.append(taskid)
     return jsonize({"taskid": taskid})
 
@@ -186,7 +189,7 @@ def option_set(taskid):
 
     return jsonize({"success": True})
 
-@post("/scan/<taskid>")
+@post("/scan/<taskid>/start")
 def scan(taskid):
     """
     Launch a scan
@@ -229,9 +232,10 @@ def scan_output(taskid):
     global output
     sys.stdout.seek(len(output))
     output = sys.stdout.read()
+    sys.stdout.truncate(0)
     return jsonize({"output": output})
 
-@post("/download/<taskid>/<target>/<filename:path>")
+@get("/download/<taskid>/<target>/<filename:path>")
 def download(taskid, target, filename):
     """
     Download a certain file from the file system
@@ -250,9 +254,11 @@ def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     Initiate REST-JSON API
     """
     global adminid
+    global options
     global tasks
     adminid = hexencode(os.urandom(16))
     options[adminid] = AttribDict(cmdLineOptions)
+    options[taskid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
     tasks.append(adminid)
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("The admin task ID is: %s" % adminid)
@@ -267,7 +273,7 @@ def client(host, port):
     # TODO: write a simple client with urllib2, for now use curl from command line
     print "[ERROR] Not yet implemented, use curl from command line instead for now, for example:"
     print "\n\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:%s/task/new" % port
-    print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"targetUrl\": \"<target URL>\"}' http://127.0.0.1:%d/scan/<task ID>\n" % port
+    print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"<target URL>\"}' http://127.0.0.1:%d/scan/<task ID>/start\n" % port
 
 if __name__ == "__main__":
     """
