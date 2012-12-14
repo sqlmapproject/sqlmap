@@ -45,6 +45,7 @@ from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
 from lib.utils.restapi import restAPIrun
+from lib.utils.restapi import restAPIsetup
 
 def modulePath():
     """
@@ -58,13 +59,14 @@ def restApiServe():
     logger.setLevel(logging.INFO)
     cmdLineOptions.batch = True
     cmdLineOptions.disableColoring = True
-    restAPIrun(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
+    restAPIsetup(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
     def emit(self, record):
         message = stdoutencode(FORMATTER.format(record))
         sys.stdout.write("%s\n" % message.strip('\r'))
     LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
     sys.stdout = StringIO.StringIO()
-    sys.stderr = StringIO.StringIO()
+    #sys.stderr = StringIO.StringIO()
+    restAPIrun(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
 
 def main():
     """

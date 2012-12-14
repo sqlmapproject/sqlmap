@@ -18,7 +18,6 @@ except ImportError:
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
 
 from extra.bottle.bottle import abort
-from extra.bottle.bottle import debug
 from extra.bottle.bottle import error
 from extra.bottle.bottle import get
 from extra.bottle.bottle import hook
@@ -41,7 +40,8 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import RESTAPI_SERVER_PORT
 
 # Local global variables
-options = AttribDict()
+options = {}
+output = ""
 adminid = ""
 tasks = []
 
@@ -51,8 +51,6 @@ def jsonize(data):
 
 def is_admin(taskid):
     global adminid
-    #print "[INFO] Admin ID:   %s" % adminid
-    #print "[INFO] Task ID: %s" % taskid
     if adminid != taskid:
         return False
     else:
@@ -103,7 +101,8 @@ def task_new():
     Create new task ID
     """
     global tasks
-    taskid = hexencode(os.urandom(32))
+    taskid = hexencode(os.urandom(16))
+    options[taskid] = AttribDict(cmdLineOptions)
     tasks.append(taskid)
     return jsonize({"taskid": taskid})
 
@@ -144,22 +143,63 @@ def task_flush(taskid):
 ##################################
 # sqlmap core interact functions #
 ##################################
+
+@get("/option/<taskid>/list")
+def option_list(taskid):
+    """
+    List options for a certain task ID
+    """
+    global options
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    return jsonize(options[taskid])
+
+@post("/option/<taskid>/get")
+def option_get(taskid):
+    """
+    Get the value of an option (command line switch) for a certain task ID
+    """
+    global options
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    option = request.json.get("option", "")
+
+    if option in options[taskid]:
+        print {option: options[taskid][option]}
+        return jsonize({option: options[taskid][option]})
+    else:
+        return jsonize({option: None})
+
+@post("/option/<taskid>/set")
+def option_set(taskid):
+    """
+    Set an option (command line switch) for a certain task ID
+    """
+    global options
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    for key, value in request.json.items():
+        options[taskid][key] = value
+
+    return jsonize({"success": True})
+
 @post("/scan/<taskid>")
 def scan(taskid):
     """
-    Mount a scan with sqlmap
+    Launch a scan
     """
     global options
-
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
     # Initialize sqlmap engine's options with user's provided options
     # within the JSON request
     for key, value in request.json.items():
-        if key != "taskid":
-            options[key] = value
-    init(options, True)
+        options[taskid][key] = value
+    init(options[taskid], True)
 
     # Launch sqlmap engine in a separate thread
     thread = threading.Thread(target=start)
@@ -167,6 +207,29 @@ def scan(taskid):
     thread.start()
 
     return jsonize({"success": True})
+
+@get("/scan/<taskid>/status")
+def scan_status(taskid):
+    """
+    Verify if sqlmap core is currently running
+    """
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    return jsonize({"busy": kb.get("busyFlag")})
+
+@get("/scan/<taskid>/output")
+def scan_output(taskid):
+    """
+    Read the standard output of sqlmap core execution
+    """
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    global output
+    sys.stdout.seek(len(output))
+    output = sys.stdout.read()
+    return jsonize({"output": output})
 
 @post("/download/<taskid>/<target>/<filename:path>")
 def download(taskid, target, filename):
@@ -182,18 +245,19 @@ def download(taskid, target, filename):
     else:
         abort(500)
 
-def restAPIrun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
     Initiate REST-JSON API
     """
     global adminid
-    global options
     global tasks
-    adminid = hexencode(os.urandom(32))
+    adminid = hexencode(os.urandom(16))
+    options[adminid] = AttribDict(cmdLineOptions)
     tasks.append(adminid)
-    options = AttribDict(cmdLineOptions)
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("The admin task ID is: %s" % adminid)
+
+def restAPIrun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     run(host=host, port=port)
 
 def client(host, port):
