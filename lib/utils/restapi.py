@@ -9,6 +9,7 @@ import sys
 import json
 import os
 
+from extra.bottle.bottle import abort, error, get, post, request, run, template, debug
 from lib.controller.controller import start
 from lib.core.convert import hexencode
 from lib.core.datatype import AttribDict
@@ -19,13 +20,6 @@ from lib.core.exception import SqlmapMissingDependence
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import RESTAPI_SERVER_PORT
-
-try:
-    from bottle import abort, error, get, post, request, run, template, debug
-except ImportError:
-    errMsg = "Missing mandatory library bottle: download from "
-    errMsg += "http://bottlepy.org/ and install it"
-    raise SqlmapMissingDependence, errMsg
 
 
 # local global variables

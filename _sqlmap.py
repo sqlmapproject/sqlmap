@@ -45,14 +45,8 @@ from lib.core.settings import XMLRPC_SERVER_PORT
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
+from lib.utils.restapi import restAPIrun
 from lib.utils.xmlrpc import XMLRPCServer
-
-try:
-    from lib.utils.restapi import restAPIrun
-except SqlmapMissingDependence, e:
-    e = getUnicode(e)
-    logger.critical(e)
-    sys.exit(1)
 
 def modulePath():
     """
