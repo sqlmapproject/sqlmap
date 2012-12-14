@@ -5,16 +5,13 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import json
 import optparse
 import os
+import shutil
 import sys
 import tempfile
 import threading
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
 
@@ -41,13 +38,12 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import RESTAPI_SERVER_PORT
 
 # Local global variables
-options = {}
 adminid = ""
-tasks = {}
+tasks = AttribDict()
 
 # Generic functions
 def jsonize(data):
-    return json.dumps(data, sort_keys=False)
+    return json.dumps(data, sort_keys=False, indent=4)
 
 def is_admin(taskid):
     global adminid
@@ -101,11 +97,13 @@ def task_new():
     Create new task ID
     """
     global tasks
-    global options
+
     taskid = hexencode(os.urandom(16))
-    options[taskid] = AttribDict(cmdLineOptions)
-    options[taskid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
-    tasks[taskid] = {"oDir": options[taskid]["oDir"], "output": ""}
+
+    tasks[taskid] = AttribDict()
+    tasks[taskid].options = AttribDict(cmdLineOptions)
+    tasks[taskid].output = ""
+
     return jsonize({"taskid": taskid})
 
 @get("/task/<taskid>/destroy")
@@ -133,11 +131,16 @@ def task_list(taskid):
 @get("/task/<taskid>/flush")
 def task_flush(taskid):
     """
-    Flush task spool (destroy all tasks)
+    Flush task spool (destroy all tasks except admin)
     """
+    global adminid
     global tasks
+
     if is_admin(taskid):
-        tasks = []
+        admin_task = tasks[adminid]
+        tasks = AttribDict()
+        tasks[adminid] = admin_task
+
         return jsonize({"success": True})
     else:
         abort(401)
@@ -152,7 +155,7 @@ def status(taskid):
     """
     Verify the status of the API as well as the core
     """
-    global tasks
+
     if is_admin(taskid):
         busy = kb.get("busyFlag")
         tasks_num = len(tasks)
@@ -166,13 +169,16 @@ def cleanup(taskid):
     Destroy all sessions except admin ID and all output directories
     """
     global tasks
+
     if is_admin(taskid):
         for task, taskdata in tasks.items():
-            taskdir = taskdata["oDir"]
-            if task == adminid:
-                continue
-            os.removedirs(taskdir)
-        tasks = [ adminid ]
+            if "oDir" in taskdata.options and taskdata.options.oDir is not None:
+                shutil.rmtree(taskdata.options.oDir)
+
+        admin_task = tasks[adminid]
+        tasks = AttribDict()
+        tasks[adminid] = admin_task
+
         return jsonize({"success": True})
     else:
         abort(401)
@@ -183,26 +189,23 @@ def option_list(taskid):
     """
     List options for a certain task ID
     """
-    global options
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize(options[taskid])
+    return jsonize(tasks[taskid].options)
 
 @post("/option/<taskid>/get")
 def option_get(taskid):
     """
     Get the value of an option (command line switch) for a certain task ID
     """
-    global options
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
     option = request.json.get("option", "")
 
-    if option in options[taskid]:
-        print {option: options[taskid][option]}
-        return jsonize({option: options[taskid][option]})
+    if option in tasks[taskid].options:
+        return jsonize({option: tasks[taskid].options[option]})
     else:
         return jsonize({option: None})
 
@@ -211,12 +214,13 @@ def option_set(taskid):
     """
     Set an option (command line switch) for a certain task ID
     """
-    global options
+    global tasks
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
     for key, value in request.json.items():
-        options[taskid][key] = value
+        tasks[taskid].options[key] = value
 
     return jsonize({"success": True})
 
@@ -226,15 +230,20 @@ def scan(taskid):
     """
     Launch a scan
     """
-    global options
+    global tasks
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
     # Initialize sqlmap engine's options with user's provided options
     # within the JSON request
     for key, value in request.json.items():
-        options[taskid][key] = value
-    init(options[taskid], True)
+        tasks[taskid].options[key] = value
+
+    # Overwrite oDir value to a temporary directory
+    tasks[taskid].options.oDir = tempfile.mkdtemp(prefix="sqlmap-")
+
+    init(tasks[taskid].options, True)
 
     # Launch sqlmap engine in a separate thread
     thread = threading.Thread(target=start)
@@ -256,7 +265,23 @@ def scan_output(taskid):
     sys.stdout.seek(len(tasks[taskid]["output"]))
     tasks[taskid]["output"] = sys.stdout.read()
     sys.stdout.truncate(0)
+
     return jsonize({"output": tasks[taskid]["output"]})
+
+@get("/scan/<taskid>/delete")
+def scan_delete(taskid):
+    """
+    Delete a scan and corresponding temporary output directory
+    """
+    global tasks
+
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    if "oDir" in tasks[taskid].options and tasks[taskid].options.oDir is not None:
+        shutil.rmtree(tasks[taskid].options.oDir)
+
+    return jsonize({"success": True})
 
 # Function to handle scans' logs
 @get("/log/<taskid>/info")
@@ -293,12 +318,12 @@ def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     Initiate REST-JSON API
     """
     global adminid
-    global options
     global tasks
+
     adminid = hexencode(os.urandom(16))
-    options[adminid] = AttribDict(cmdLineOptions)
-    options[adminid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
-    tasks[adminid] = {"oDir": options[adminid]["oDir"], "output": ""}
+    tasks[adminid] = AttribDict()
+    tasks[adminid].options = AttribDict(cmdLineOptions)
+    tasks[adminid].output = ""
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("The admin task ID is: %s" % adminid)
 
@@ -312,7 +337,8 @@ def client(host, port):
     # TODO: write a simple client with urllib2, for now use curl from command line
     print "[ERROR] Not yet implemented, use curl from command line instead for now, for example:"
     print "\n\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:%s/task/new" % port
-    print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"<target URL>\"}' http://127.0.0.1:%d/scan/<task ID>/start\n" % port
+    print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://127.0.0.1:%d/scan/<taskID>/start" % port
+    print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/output\n"
 
 if __name__ == "__main__":
     """
