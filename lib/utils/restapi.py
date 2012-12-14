@@ -5,7 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import argparse
+import optparse
 import os
 import sys
 
@@ -184,12 +184,12 @@ if __name__ == "__main__":
     Standalone REST-JSON API wrapper function
     """
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true", required=False)
-    parser.add_argument("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true", required=False)
-    parser.add_argument("-H", "--host", help="Host of the REST-JSON API server", default="0.0.0.0", action="store", required=False)
-    parser.add_argument("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store", required=False)
-    args = parser.parse_args()
+    parser = optparse.OptionParser()
+    parser.add_option("-s", "--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true")
+    parser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true")
+    parser.add_option("-H", "--host", help="Host of the REST-JSON API server", default="0.0.0.0", action="store")
+    parser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store")
+    (args, _) = parser.parse_args()
 
     if args.server is True:
         restAPIrun(args.host, args.port)
