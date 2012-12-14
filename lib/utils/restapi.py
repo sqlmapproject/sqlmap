@@ -14,39 +14,29 @@ try:
 except ImportError:
     import json
 
-try:
-    from extra.bottle.bottle import abort
-    from extra.bottle.bottle import debug
-    from extra.bottle.bottle import error
-    from extra.bottle.bottle import get
-    from extra.bottle.bottle import post
-    from extra.bottle.bottle import request
-    from extra.bottle.bottle import response
-    from extra.bottle.bottle import Response
-    from extra.bottle.bottle import run
-    from extra.bottle.bottle import static_file
-    from extra.bottle.bottle import template
-except ImportError:
-    try:
-        from bottle import *
-    except ImportError, e:
-        print "[x] '%s'" % str(e)
-        sys.exit(1)
+sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
 
-try:
-    sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
-    from lib.controller.controller import start
-    from lib.core.convert import hexencode
-    from lib.core.datatype import AttribDict
-    from lib.core.data import cmdLineOptions
-    from lib.core.data import kb
-    from lib.core.data import logger
-    from lib.core.exception import SqlmapMissingDependence
-    from lib.core.option import init
-    from lib.core.settings import UNICODE_ENCODING
-    from lib.core.settings import RESTAPI_SERVER_PORT
-except ImportError:
-    RESTAPI_SERVER_PORT = 8775
+from extra.bottle.bottle import abort
+from extra.bottle.bottle import debug
+from extra.bottle.bottle import error
+from extra.bottle.bottle import get
+from extra.bottle.bottle import post
+from extra.bottle.bottle import request
+from extra.bottle.bottle import response
+from extra.bottle.bottle import Response
+from extra.bottle.bottle import run
+from extra.bottle.bottle import static_file
+from extra.bottle.bottle import template
+from lib.controller.controller import start
+from lib.core.convert import hexencode
+from lib.core.datatype import AttribDict
+from lib.core.data import cmdLineOptions
+from lib.core.data import kb
+from lib.core.data import logger
+from lib.core.exception import SqlmapMissingDependence
+from lib.core.option import init
+from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import RESTAPI_SERVER_PORT
 
 # local global variables
 session_ids = []
