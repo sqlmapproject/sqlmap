@@ -20,15 +20,16 @@ from extra.bottle.bottle import abort
 from extra.bottle.bottle import debug
 from extra.bottle.bottle import error
 from extra.bottle.bottle import get
+from extra.bottle.bottle import hook
 from extra.bottle.bottle import post
 from extra.bottle.bottle import request
 from extra.bottle.bottle import response
-from extra.bottle.bottle import Response
 from extra.bottle.bottle import run
 from extra.bottle.bottle import static_file
 from extra.bottle.bottle import template
 from lib.controller.controller import start
 from lib.core.convert import hexencode
+from lib.core.data import paths
 from lib.core.datatype import AttribDict
 from lib.core.data import cmdLineOptions
 from lib.core.data import kb
@@ -38,11 +39,10 @@ from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import RESTAPI_SERVER_PORT
 
+
 # local global variables
 session_ids = []
 admin_id = ""
-
-Response(headers={"X-Frame-Options": "sameorigin", "X-XSS-Protection": "1; mode=block"})
 
 
 # Generic functions
@@ -59,6 +59,16 @@ def is_admin(session_id):
         return False
     else:
         return True
+
+
+@hook('after_request')
+def security_headers():
+    """
+    Set some headers across all HTTP responses
+    """
+    response.headers["Server"] = "Server"
+    response.headers["X-Frame-Options"] = "sameorigin"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
 
 
 # HTTP Status Code functions
@@ -107,7 +117,7 @@ def session_destroy():
     session_id = request.json.get("sessionid", "")
     if session_id in session_ids:
         session_ids.remove(session_id)
-        return "Done"
+        return jsonize({"success": True})
     else:
         abort(500)
 
@@ -132,6 +142,7 @@ def session_flush():
     global session_ids
     if is_admin(request.json.get("sessionid", "")):
         session_ids = []
+        return jsonize({"success": True})
     else:
         abort(401)
 
