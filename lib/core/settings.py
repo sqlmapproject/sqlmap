@@ -482,9 +482,6 @@ EVENTVALIDATION_REGEX = r'(?i)(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<re
 # Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
 LIMITED_ROWS_TEST_NUMBER = 15
 
-# Default TCP port used for XML-RPC server instance
-XMLRPC_SERVER_PORT = 8776
-
 # Default TCP port used for REST API server instance
 RESTAPI_SERVER_PORT = 8775
 

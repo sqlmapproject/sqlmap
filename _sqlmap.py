@@ -41,12 +41,10 @@ from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.settings import RESTAPI_SERVER_PORT
-from lib.core.settings import XMLRPC_SERVER_PORT
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
 from lib.utils.restapi import restAPIrun
-from lib.utils.xmlrpc import XMLRPCServer
 
 def modulePath():
     """
@@ -68,19 +66,6 @@ def restApiServe():
     sys.stdout = StringIO.StringIO()
     sys.stderr = StringIO.StringIO()
 
-def xmlRpcServe():
-    logger.setLevel(logging.INFO)
-    cmdLineOptions.batch = True
-    cmdLineOptions.disableColoring = True
-    server = XMLRPCServer(cmdLineOptions.xmlRpcPort or XMLRPC_SERVER_PORT)
-    def emit(self, record):
-        message = stdoutencode(FORMATTER.format(record))
-        sys.stdout.write("%s\n" % message.strip('\r'))
-    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
-    sys.stdout = StringIO.StringIO()
-    sys.stderr = StringIO.StringIO()
-    server.serve()
-
 def main():
     """
     Main function of sqlmap when running from command line.
@@ -99,8 +84,6 @@ def main():
 
         if cmdLineOptions.restApi:
             restApiServe()
-        elif cmdLineOptions.xmlRpc:
-            xmlRpcServe()
         else:
             init(cmdLineOptions)
 

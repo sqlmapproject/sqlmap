@@ -688,12 +688,6 @@ def cmdLineParser():
         parser.add_option("--restapi-port", dest="restApiPort", type="int",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--xmlrpc", dest="xmlRpc", action="store_true",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--xmlrpc-port", dest="xmlRpcPort", type="int",
-                          help=SUPPRESS_HELP)
-
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)
@@ -767,7 +761,7 @@ def cmdLineParser():
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
-            args.restApi, args.xmlRpc, args.purgeOutput)):
+            args.restApi, args.purgeOutput)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help"
             parser.error(errMsg)
