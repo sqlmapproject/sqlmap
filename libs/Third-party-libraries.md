@@ -33,8 +33,8 @@ These listed are libraries and tools not entirely developed by sqlmap developers
 
 | Library / tool | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- |
-| [extra/icmpsh/](https://github.com/inquisb/icmpsh) | LGPL | Used for OS takeover feature via ICMP | --os-pwn |
 | [extra/bottle/](http://bottlepy.org/) | MIT | Used as micro web server for the RESTful API | --restapi and --restapi-port |
+| [extra/icmpsh/](https://github.com/inquisb/icmpsh) | LGPL | Used for OS takeover feature via ICMP | --os-pwn |
 
 <h2 id="notbundled">Dependencies not bundled</h2>
 
