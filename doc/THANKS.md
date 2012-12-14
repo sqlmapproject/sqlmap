@@ -354,7 +354,8 @@ Simone Onofri, <simone.onofri@gmail.com>
 * for patching the PHP web backdoor to make it work properly also on Windows
 
 Michele Orru, <michele.orru@antisnatchor.com>
-* for reporting a minor bug
+* for reporting a couple of bug
+* for suggesting ideas on how to implement the RESTful API
 
 Shaohua Pan, <pan@knownsec.com>
 * for reporting several bugs
