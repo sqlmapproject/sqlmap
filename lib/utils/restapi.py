@@ -27,8 +27,6 @@ except ImportError:
     errMsg += "http://bottlepy.org/ and install it"
     raise SqlmapMissingDependence, errMsg
 
-# bottle in debug mode for now
-debug(True)
 
 # local global variables
 session_ids = []
@@ -63,7 +61,7 @@ def error404(error):
 def error405(error):
     return "Method not allowed"
 
-@error(500) # Not Found
+@error(500) # Internal Server Error
 def error500(error):
     return "Internal server error"
 
