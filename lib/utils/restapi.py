@@ -42,7 +42,6 @@ from lib.core.settings import RESTAPI_SERVER_PORT
 
 # Local global variables
 options = {}
-output = ""
 adminid = ""
 tasks = {}
 
@@ -106,7 +105,7 @@ def task_new():
     taskid = hexencode(os.urandom(16))
     options[taskid] = AttribDict(cmdLineOptions)
     options[taskid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
-    tasks[taskid] = options[adminid]["oDir"]
+    tasks[taskid] = {"oDir": options[taskid]["oDir"], "output": ""}
     return jsonize({"taskid": taskid})
 
 @get("/task/<taskid>/destroy")
@@ -114,8 +113,8 @@ def task_destroy(taskid):
     """
     Destroy own task ID
     """
-    if taskid in tasks:
-        tasks.remove(taskid)
+    if taskid in tasks and not is_admin(taskid):
+        tasks.pop(taskid)
         return jsonize({"success": True})
     else:
         abort(500, "Invalid task ID")
@@ -153,6 +152,7 @@ def status(taskid):
     """
     Verify the status of the API as well as the core
     """
+    global tasks
     if is_admin(taskid):
         busy = kb.get("busyFlag")
         tasks_num = len(tasks)
@@ -167,7 +167,8 @@ def cleanup(taskid):
     """
     global tasks
     if is_admin(taskid):
-        for task, taskdir in tasks.items():
+        for task, taskdata in tasks.items():
+            taskdir = taskdata["oDir"]
             if task == adminid:
                 continue
             os.removedirs(taskdir)
@@ -247,14 +248,15 @@ def scan_output(taskid):
     """
     Read the standard output of sqlmap core execution
     """
+    global tasks
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    global output
-    sys.stdout.seek(len(output))
-    output = sys.stdout.read()
+    sys.stdout.seek(len(tasks[taskid]["output"]))
+    tasks[taskid]["output"] = sys.stdout.read()
     sys.stdout.truncate(0)
-    return jsonize({"output": output})
+    return jsonize({"output": tasks[taskid]["output"]})
 
 # Function to handle scans' logs
 @get("/log/<taskid>/info")
@@ -296,12 +298,12 @@ def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     adminid = hexencode(os.urandom(16))
     options[adminid] = AttribDict(cmdLineOptions)
     options[adminid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
-    tasks[adminid] = options[adminid]["oDir"]
+    tasks[adminid] = {"oDir": options[adminid]["oDir"], "output": ""}
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("The admin task ID is: %s" % adminid)
 
 def restAPIrun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
-    run(host=host, port=port)
+    run(host=host, port=port, quiet=False, debug=False)
 
 def client(host, port):
     addr = "http://%s:%d" % (host, port)
