@@ -44,7 +44,7 @@ from lib.core.settings import RESTAPI_SERVER_PORT
 options = {}
 output = ""
 adminid = ""
-tasks = []
+tasks = {}
 
 # Generic functions
 def jsonize(data):
@@ -57,7 +57,7 @@ def is_admin(taskid):
     else:
         return True
 
-@hook('after_request')
+@hook("after_request")
 def security_headers():
     """
     Set some headers across all HTTP responses
@@ -106,7 +106,7 @@ def task_new():
     taskid = hexencode(os.urandom(16))
     options[taskid] = AttribDict(cmdLineOptions)
     options[taskid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
-    tasks.append(taskid)
+    tasks[taskid] = options[adminid]["oDir"]
     return jsonize({"taskid": taskid})
 
 @get("/task/<taskid>/destroy")
@@ -147,6 +147,7 @@ def task_flush(taskid):
 # sqlmap core interact functions #
 ##################################
 
+# Admin's methods
 @get("/status/<taskid>")
 def status(taskid):
     """
@@ -166,15 +167,16 @@ def cleanup(taskid):
     """
     global tasks
     if is_admin(taskid):
-        for task in tasks:
+        for task, taskdir in tasks.items():
             if task == adminid:
                 continue
-            os.removedirs(options[task]["oDir"])
-            tasks = [ adminid ]
+            os.removedirs(taskdir)
+        tasks = [ adminid ]
         return jsonize({"success": True})
     else:
         abort(401)
 
+# Functions to handle options
 @get("/option/<taskid>/list")
 def option_list(taskid):
     """
@@ -217,6 +219,7 @@ def option_set(taskid):
 
     return jsonize({"success": True})
 
+# Function to handle scans
 @post("/scan/<taskid>/start")
 def scan(taskid):
     """
@@ -253,6 +256,18 @@ def scan_output(taskid):
     sys.stdout.truncate(0)
     return jsonize({"output": output})
 
+# Function to handle scans' logs
+@get("/log/<taskid>/info")
+def log_info(taskid):
+    """
+    Read the informational log messages
+    """
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    pass
+
+# Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
 def download(taskid, target, filename):
     """
@@ -281,7 +296,7 @@ def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     adminid = hexencode(os.urandom(16))
     options[adminid] = AttribDict(cmdLineOptions)
     options[adminid]["oDir"] = tempfile.mkdtemp(prefix="sqlmap-")
-    tasks.append(adminid)
+    tasks[adminid] = options[adminid]["oDir"]
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("The admin task ID is: %s" % adminid)
 
