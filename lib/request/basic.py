@@ -245,7 +245,7 @@ def decodePage(page, contentEncoding, contentType):
         # e.g. &#8217;&#8230;&#8482;
         if "&#" in page:
             page = re.sub('&#(\d+);', lambda _: unichr(int(_.group(1))), page)
-        
+
         # e.g. &zeta;
         page = re.sub('&([^;]+);', lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
