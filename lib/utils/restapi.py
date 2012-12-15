@@ -224,7 +224,7 @@ def option_set(taskid):
 
 # Function to handle scans
 @post("/scan/<taskid>/start")
-def scan(taskid):
+def scan_start(taskid):
     """
     Launch a scan
     """
@@ -337,6 +337,9 @@ def restAPIRun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     run(host=host, port=port, quiet=False, debug=False)
 
 def client(host, port):
+    """
+    REST-JSON API client
+    """
     addr = "http://%s:%d" % (host, port)
     print "[*] starting debug REST-JSON client to '%s'..." % addr
 
@@ -344,13 +347,13 @@ def client(host, port):
     print "[!] not yet implemented, use curl from command line instead for now, for example:"
     print "\n\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:%s/task/new" % port
     print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://127.0.0.1:%d/scan/<taskID>/start" % port
-    print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/output\n"
+    print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/output"
+    print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/log\n"
 
 if __name__ == "__main__":
     """
-    Standalone REST-JSON API wrapper function
+    REST-JSON API wrapper function
     """
-
     parser = optparse.OptionParser()
     parser.add_option("-s", "--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true")
     parser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true")
