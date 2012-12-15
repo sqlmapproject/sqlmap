@@ -32,6 +32,7 @@ from lib.core.datatype import AttribDict
 from lib.core.data import cmdLineOptions
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
@@ -99,10 +100,7 @@ def task_new():
     global tasks
 
     taskid = hexencode(os.urandom(16))
-
-    tasks[taskid] = AttribDict()
-    tasks[taskid].options = AttribDict(cmdLineOptions)
-    tasks[taskid].output = ""
+    tasks[taskid] = AttribDict(cmdLineOptions)
 
     return jsonize({"taskid": taskid})
 
@@ -171,9 +169,9 @@ def cleanup(taskid):
     global tasks
 
     if is_admin(taskid):
-        for task, taskdata in tasks.items():
-            if "oDir" in taskdata.options and taskdata.options.oDir is not None:
-                shutil.rmtree(taskdata.options.oDir)
+        for task, options in tasks.items():
+            if "oDir" in options and options.oDir is not None:
+                shutil.rmtree(options.oDir)
 
         admin_task = tasks[adminid]
         tasks = AttribDict()
@@ -192,7 +190,7 @@ def option_list(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize(tasks[taskid].options)
+    return jsonize(tasks[taskid])
 
 @post("/option/<taskid>/get")
 def option_get(taskid):
@@ -204,8 +202,8 @@ def option_get(taskid):
 
     option = request.json.get("option", "")
 
-    if option in tasks[taskid].options:
-        return jsonize({option: tasks[taskid].options[option]})
+    if option in tasks[taskid]:
+        return jsonize({option: tasks[taskid][option]})
     else:
         return jsonize({option: None})
 
@@ -220,7 +218,7 @@ def option_set(taskid):
         abort(500, "Invalid task ID")
 
     for key, value in request.json.items():
-        tasks[taskid].options[key] = value
+        tasks[taskid][key] = value
 
     return jsonize({"success": True})
 
@@ -238,12 +236,12 @@ def scan(taskid):
     # Initialize sqlmap engine's options with user's provided options
     # within the JSON request
     for key, value in request.json.items():
-        tasks[taskid].options[key] = value
+        tasks[taskid][key] = value
 
-    # Overwrite oDir value to a temporary directory
-    tasks[taskid].options.oDir = tempfile.mkdtemp(prefix="sqlmap-")
+    # Overwrite output directory (oDir) value to a temporary directory
+    tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")
 
-    init(tasks[taskid].options, True)
+    init(tasks[taskid], True)
 
     # Launch sqlmap engine in a separate thread
     thread = threading.Thread(target=start)
@@ -262,11 +260,12 @@ def scan_output(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    sys.stdout.seek(len(tasks[taskid]["output"]))
-    tasks[taskid]["output"] = sys.stdout.read()
+    sys.stdout.seek(0)
+    output = sys.stdout.read()
+    sys.stdout.flush()
     sys.stdout.truncate(0)
 
-    return jsonize({"output": tasks[taskid]["output"]})
+    return jsonize({"output": output})
 
 @get("/scan/<taskid>/delete")
 def scan_delete(taskid):
@@ -278,21 +277,26 @@ def scan_delete(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    if "oDir" in tasks[taskid].options and tasks[taskid].options.oDir is not None:
-        shutil.rmtree(tasks[taskid].options.oDir)
+    if "oDir" in tasks[taskid] and tasks[taskid].oDir is not None:
+        shutil.rmtree(tasks[taskid].oDir)
 
     return jsonize({"success": True})
 
 # Function to handle scans' logs
-@get("/log/<taskid>/info")
-def log_info(taskid):
+@get("/scan/<taskid>/log")
+def scan_log(taskid):
     """
     Read the informational log messages
     """
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    pass
+    LOGGER_OUTPUT.seek(0)
+    output = LOGGER_OUTPUT.read()
+    LOGGER_OUTPUT.flush()
+    LOGGER_OUTPUT.truncate(0)
+
+    return jsonize({"log": output})
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
@@ -313,29 +317,31 @@ def download(taskid, target, filename):
     else:
         abort(500)
 
-def restAPIsetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+def restAPISetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
-    Initiate REST-JSON API
+    Setup REST-JSON API
     """
     global adminid
     global tasks
 
     adminid = hexencode(os.urandom(16))
-    tasks[adminid] = AttribDict()
-    tasks[adminid].options = AttribDict(cmdLineOptions)
-    tasks[adminid].output = ""
-    logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
-    logger.info("The admin task ID is: %s" % adminid)
+    tasks[adminid] = AttribDict(cmdLineOptions)
 
-def restAPIrun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+    logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
+    logger.info("the admin task ID is: %s" % adminid)
+
+def restAPIRun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+    """
+    Run REST-JSON API
+    """
     run(host=host, port=port, quiet=False, debug=False)
 
 def client(host, port):
     addr = "http://%s:%d" % (host, port)
-    print "[INFO] Starting debug REST-JSON client to '%s'..." % addr
+    print "[*] starting debug REST-JSON client to '%s'..." % addr
 
     # TODO: write a simple client with urllib2, for now use curl from command line
-    print "[ERROR] Not yet implemented, use curl from command line instead for now, for example:"
+    print "[!] not yet implemented, use curl from command line instead for now, for example:"
     print "\n\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:%s/task/new" % port
     print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://127.0.0.1:%d/scan/<taskID>/start" % port
     print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/output\n"

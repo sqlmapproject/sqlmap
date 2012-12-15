@@ -37,6 +37,7 @@ from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
+from lib.core.log import LOGGER_OUTPUT
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
@@ -44,8 +45,8 @@ from lib.core.settings import RESTAPI_SERVER_PORT
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
-from lib.utils.restapi import restAPIrun
-from lib.utils.restapi import restAPIsetup
+from lib.utils.restapi import restAPIRun
+from lib.utils.restapi import restAPISetup
 
 def modulePath():
     """
@@ -55,18 +56,29 @@ def modulePath():
 
     return os.path.dirname(getUnicode(sys.executable if weAreFrozen() else __file__, sys.getfilesystemencoding()))
 
-def restApiServe():
-    logger.setLevel(logging.INFO)
+def restAPIServe():
+    # Increase default logging level to debug for RESTful API
+    logger.setLevel(logging.DEBUG)
+
+    # Enforce batch mode and disable coloring for RESTful API
     cmdLineOptions.batch = True
     cmdLineOptions.disableColoring = True
-    restAPIsetup(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
+
+    # Setup RESTful API
+    restAPISetup(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
+
+    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
     def emit(self, record):
         message = stdoutencode(FORMATTER.format(record))
-        sys.stdout.write("%s\n" % message.strip('\r'))
+        print >>LOGGER_OUTPUT, message.strip('\r')
     LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
+
+    # Wrap standard output onto a custom file descriptor
     sys.stdout = StringIO.StringIO()
     #sys.stderr = StringIO.StringIO()
-    restAPIrun(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
+
+    # Run RESTful API
+    restAPIRun(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
 
 def main():
     """
@@ -85,7 +97,7 @@ def main():
         cmdLineOptions.update(cmdLineParser().__dict__)
 
         if cmdLineOptions.restApi:
-            restApiServe()
+            restAPIServe()
         else:
             init(cmdLineOptions)
 
