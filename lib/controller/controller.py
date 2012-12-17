@@ -228,13 +228,6 @@ def _saveToResultsFile():
         conf.resultsFP.writelines(line)
 
 def start():
-    kb.busyFlag = True
-    retVal = _start()
-    kb.busyFlag = False
-
-    return retVal
-
-def _start():
     """
     This function calls a function that performs checks on both URL
     stability and all GET, POST, Cookie and User-Agent parameters to
