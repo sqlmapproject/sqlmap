@@ -257,12 +257,11 @@ class Databases:
                 if not Backend.isDbms(DBMS.SQLITE):
                     query += " WHERE %s" % condition
                     query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
-                if conf.excludeSysDbs:
-                    if Backend.isDbms(DBMS.SQLITE):
-                        query += " WHERE "
-                    query += " AND ".join("%s != '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                    infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
-                    logger.info(infoMsg)
+
+                    if conf.excludeSysDbs:
+                        query += " AND ".join("%s != '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
+                        infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                        logger.info(infoMsg)
 
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
