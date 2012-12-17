@@ -451,6 +451,7 @@ class Users:
             retrievedUsers = set()
 
             for user in users:
+                outuser = user
                 if user in retrievedUsers:
                     continue
 
@@ -458,7 +459,7 @@ class Users:
                     user = "%%%s%%" % user
 
                 infoMsg = "fetching number of privileges "
-                infoMsg += "for user '%s'" % user
+                infoMsg += "for user '%s'" % outuser
                 logger.info(infoMsg)
 
                 if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
@@ -480,11 +481,11 @@ class Users:
                         return self.getPrivileges(query2=True)
 
                     warnMsg = "unable to retrieve the number of "
-                    warnMsg += "privileges for user '%s'" % user
+                    warnMsg += "privileges for user '%s'" % outuser
                     logger.warn(warnMsg)
                     continue
 
-                infoMsg = "fetching privileges for user '%s'" % user
+                infoMsg = "fetching privileges for user '%s'" % outuser
                 logger.info(infoMsg)
 
                 privileges = set()
@@ -576,7 +577,7 @@ class Users:
                     kb.data.cachedUsersPrivileges[user] = list(privileges)
                 else:
                     warnMsg = "unable to retrieve the privileges "
-                    warnMsg += "for user '%s'" % user
+                    warnMsg += "for user '%s'" % outuser
                     logger.warn(warnMsg)
 
                 retrievedUsers.add(user)
