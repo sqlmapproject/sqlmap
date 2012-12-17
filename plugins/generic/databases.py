@@ -254,14 +254,15 @@ class Databases:
             condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
 
             if condition:
+                if not Backend.isDbms(DBMS.SQLITE):
+                    query += " WHERE %s" % condition
+                    query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
                 if conf.excludeSysDbs:
-                    query += " WHERE "
+                    if Backend.isDbms(DBMS.SQLITE):
+                        query += " WHERE "
                     query += " AND ".join("%s != '%s'" % (condition, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
                     infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                     logger.info(infoMsg)
-                elif not Backend.isDbms(DBMS.SQLITE):
-                    query += " WHERE %s" % condition
-                    query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
