@@ -151,7 +151,7 @@ def liveTest():
         if result:
             logger.info("test passed")
         else:
-            logger.error("test failed at parsing item '%s'" % failedItem)
+            logger.error("test failed at parsing item: %s" % failedItem)
             beep()
             if conf.stopFail is True:
                 return retVal
