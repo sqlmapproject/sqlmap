@@ -615,12 +615,9 @@ class Connect(object):
                 value = agent.replacePayload(value, payload)
 
             else:
-                if place != PLACE.URI or (value and payload and '?' in value and re.search(r"\?.*%s" % re.escape(payload), value)):
+                if not skipUrlEncode and place in (PLACE.GET, PLACE.COOKIE, PLACE.URI):
                     # GET, URI and Cookie need to be throughly URL encoded (POST is encoded down below)
-                    payload = urlencode(payload, '%', False, True) if place in (PLACE.GET, PLACE.COOKIE, PLACE.URI) and not skipUrlEncode else payload
-                    value = agent.replacePayload(value, payload)
-                elif place == PLACE.URI and (value and payload and '?' in value and re.search(r"%s.*\?" % re.escape(payload), value)):
-                    payload = urlencode(payload, '%')
+                    payload = urlencode(payload, '%', False, place != PLACE.URI)
                     value = agent.replacePayload(value, payload)
 
             if conf.hpp:
