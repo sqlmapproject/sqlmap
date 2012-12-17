@@ -73,6 +73,9 @@ class Dump(object):
     def getOutputFile(self):
         return self._outputFile
 
+    def singleString(self, data):
+        self._write(data)
+
     def string(self, header, data, sort=True):
         kb.stickyLevel = None
 
@@ -111,9 +114,6 @@ class Dump(object):
 
         if elements:
             self._write("")
-
-    def technic(self, header, data):
-        self.string(header, data)
 
     def banner(self,data):
         self.string("banner", data)

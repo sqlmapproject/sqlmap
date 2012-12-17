@@ -54,7 +54,7 @@ def action():
 
         raise SqlmapUnsupportedDBMSException, errMsg
 
-    dataToStdout("%s\n" % conf.dbmsHandler.getFingerprint())
+    conf.dumper.singleString(conf.dbmsHandler.getFingerprint())
 
     # Enumeration options
     if conf.getBanner:

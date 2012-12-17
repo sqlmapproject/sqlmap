@@ -149,7 +149,7 @@ def _showInjections():
 
     data = "".join(set(map(lambda x: _formatInjection(x), kb.injections))).rstrip("\n")
 
-    conf.dumper.technic(header, data)
+    conf.dumper.string(header, data)
 
     if conf.tamper:
         warnMsg = "changes made by tampering scripts are not "
