@@ -615,13 +615,15 @@ def _setMetasploit():
         if not conf.msfPath:
             def _(key, value):
                 retVal = None
+
                 try:
                     from  _winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
                     _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
                     _ = OpenKey(_, key)
                     retVal = QueryValueEx(_, value)[0]
-                except Exception, ex:
-                    print ex
+                except Exception:
+                    logger.debug("unable to identify Metasploit installation path via registry key")
+
                 return retVal
 
             conf.msfPath = _(r"SOFTWARE\Rapid7\Metasploit", "Location")
