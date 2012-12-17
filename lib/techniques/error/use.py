@@ -53,7 +53,7 @@ def _oneShotErrorUse(expression, field=None):
 
     if retVal and PARTIAL_VALUE_MARKER in retVal:
         partialValue = retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
-        dataToStdout("[%s] [INFO] resuming partial value: '%s'\r\n" % (time.strftime("%X"), _formatPartialContent(partialValue)))
+        logger.info("resuming partial value: '%s'" % _formatPartialContent(partialValue))
         offset += len(partialValue)
 
     threadData.resumed = retVal is not None and not partialValue
@@ -185,7 +185,7 @@ def _errorFields(expression, expressionFields, expressionFieldsList, num=None, e
         if kb.fileReadMode and output and output.strip():
             print
         elif output is not None and not (threadData.resumed and kb.suppressResumeInfo) and not (emptyFields and field in emptyFields):
-            dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(output)))
+            logger.info("%s: %s" % ("resumed" if threadData.resumed else "retrieved", safecharencode(output)))
 
         if isinstance(num, int):
             expression = origExpr
