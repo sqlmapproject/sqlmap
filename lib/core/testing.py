@@ -26,6 +26,8 @@ from lib.core.option import setVerbosity
 from lib.core.optiondict import optDict
 from lib.parse.cmdline import cmdLineParser
 
+failedItem = None
+
 def smokeTest():
     """
     This will run the basic smoke testing of a program
@@ -95,6 +97,8 @@ def liveTest():
     """
     This will run the test of a program against the live testing environment
     """
+    global failedItem
+
     retVal = True
     count = 0
     global_ = {}
@@ -147,8 +151,10 @@ def liveTest():
         if result:
             logger.info("test passed")
         else:
-            logger.error("test failed")
+            logger.error("test failed at parsing item '%s'" % failedItem)
             beep()
+            if conf.stopFail is True:
+                return retVal
 
         retVal &= result
 
@@ -162,6 +168,9 @@ def liveTest():
     return retVal
 
 def initCase(switches=None):
+    global failedItem
+    failedItem = None
+
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-")
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
@@ -187,8 +196,9 @@ def cleanCase():
 
 def runCase(switches=None, parse=None):
     retVal = True
-    initCase(switches)
+    global failedItem
 
+    initCase(switches)
     result = start()
 
     if result == False: # if None, ignore
@@ -203,9 +213,11 @@ def runCase(switches=None, parse=None):
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content, re.DOTALL):
                     retVal = False
+                    failedItem = item
                     break
             elif content.find(item) < 0:
                 retVal = False
+                failedItem = item
                 break
 
     cleanCase()
