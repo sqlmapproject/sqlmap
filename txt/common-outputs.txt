@@ -1143,11 +1143,13 @@ xml
 bigint
 bigserial
 boolean
+bpchar
 bytea
 character
 date
 decimal
 double precision
+int4
 integer
 interval
 money
