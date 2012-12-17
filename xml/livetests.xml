@@ -40,8 +40,8 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
-            <item value="r'database management system users privileges:.+%debian-sys-maint% \(administrator\).+%root% \(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+%debian-sys-maint% \[.+%root% \[.+role: SUPER'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+1 table.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
@@ -49,8 +49,6 @@
             <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
-
-
     <case name="MySQL error-based multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
@@ -85,8 +83,8 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
-            <item value="r'database management system users privileges:.+%debian-sys-maint% \(administrator\).+%root% \(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+%debian-sys-maint% \[.+%root% \[.+role: SUPER'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+1 table.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
