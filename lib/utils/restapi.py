@@ -286,7 +286,7 @@ def scan_delete(taskid):
 @get("/scan/<taskid>/log")
 def scan_log(taskid):
     """
-    Read the informational log messages
+    Retrieve the log messages
     """
     if taskid not in tasks:
         abort(500, "Invalid task ID")
