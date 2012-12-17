@@ -169,7 +169,8 @@ class Dump(object):
 
                 for setting in settings:
                     self._write("    %s: %s" % (subHeader, setting))
-        print
+
+        self.singleString("")
 
     def dbs(self,dbs):
         self.lister("available databases", dbs)
@@ -208,7 +209,7 @@ class Dump(object):
 
                 self._write("+%s+\n" % lines)
         elif dbTables is None or len(dbTables) == 0:
-            print "No tables found"
+            self.singleString("No tables found")
         else:
             self.string("tables", dbTables)
 
