@@ -1731,7 +1731,7 @@ def _saveCmdline():
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
 
-def _setVerbosity():
+def setVerbosity():
     """
     This function set the verbosity of sqlmap output messages.
     """
@@ -2057,7 +2057,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)
     _useWizardInterface()
-    _setVerbosity()
+    setVerbosity()
     _saveCmdline()
     _setRequestFromFile()
     _cleanupOptions()

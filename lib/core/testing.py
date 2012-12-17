@@ -22,7 +22,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.option import init
-from lib.core.option import _setVerbosity
+from lib.core.option import setVerbosity
 from lib.core.optiondict import optDict
 from lib.parse.cmdline import cmdLineParser
 
@@ -118,16 +118,15 @@ def liveTest():
 
     for case in livetests.getElementsByTagName("case"):
         count += 1
-
-        if conf.runCase and conf.runCase != count:
-            continue
-
         name = None
-        log = []
+        parse = []
         switches = dict(global_)
 
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
+
+        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL)):
+            continue
 
         if case.getElementsByTagName("switches"):
             for child in case.getElementsByTagName("switches")[0].childNodes:
@@ -135,22 +134,26 @@ def liveTest():
                     value = replaceVars(child.getAttribute("value"), vars_)
                     switches[child.tagName] = adjustValueType(child.tagName, value)
 
-        if case.getElementsByTagName("log"):
-            for item in case.getElementsByTagName("log")[0].getElementsByTagName("item"):
+        if case.getElementsByTagName("parse"):
+            for item in case.getElementsByTagName("parse")[0].getElementsByTagName("item"):
                 if item.hasAttribute("value"):
-                    log.append(replaceVars(item.getAttribute("value"), vars_))
+                    parse.append(replaceVars(item.getAttribute("value"), vars_))
 
         msg = "running live test case '%s' (%d/%d)" % (name, count, length)
         logger.info(msg)
-        result = runCase(switches, log)
+
+        result = runCase(switches, parse)
+
         if result:
             logger.info("test passed")
         else:
             logger.error("test failed")
             beep()
+
         retVal &= result
 
     dataToStdout("\n")
+
     if retVal:
         logger.info("live test final result: PASSED")
     else:
@@ -159,9 +162,12 @@ def liveTest():
     return retVal
 
 def initCase(switches=None):
-    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp()
+    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-")
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
+
+    logger.debug("using output directory '%s' for this test case" % paths.SQLMAP_OUTPUT_PATH)
+
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
 
@@ -171,29 +177,29 @@ def initCase(switches=None):
                 cmdLineOptions.__dict__[key] = value
 
     init(cmdLineOptions, True)
-    _setVerbosity()
+    conf.verbose = 0
+    setVerbosity()
 
 def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
-    paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
-    paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
-    paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
     conf.verbose = 1
-    _setVerbosity()
+    setVerbosity()
 
-def runCase(switches=None, log=None):
+def runCase(switches=None, parse=None):
     retVal = True
     initCase(switches)
 
     result = start()
-    if result == False: #if None ignore
+
+    if result == False: # if None, ignore
+        logger.error("the test did not run")
         retVal = False
 
-    if log and retVal:
+    if parse and retVal:
         ifile = open(conf.dumper.getOutputFile(), 'r')
         content = ifile.read()
         ifile.close()
-        for item in log:
+        for item in parse:
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content, re.DOTALL):
                     retVal = False

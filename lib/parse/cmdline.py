@@ -679,8 +679,7 @@ def cmdLineParser():
         parser.add_option("--live-test", dest="liveTest", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--run-case", dest="runCase", type="int",
-                          help=SUPPRESS_HELP)
+        parser.add_option("--run-case", dest="runCase", help=SUPPRESS_HELP)
 
         parser.add_option("--restapi", dest="restApi", action="store_true",
                           help=SUPPRESS_HELP)
