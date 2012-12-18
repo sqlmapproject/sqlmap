@@ -357,6 +357,8 @@ def errorUse(expression, dump=False):
             threadData.shared.limits = iter(xrange(startLimit, stopLimit))
             numThreads = min(conf.threads, (stopLimit - startLimit))
             threadData.shared.outputs = BigArray()
+            threadData.shared.buffered = []
+            threadData.shared.lastFlushed = startLimit - 1
 
             if kb.dumpTable and (len(expressionFieldsList) < (stopLimit - startLimit) > CHECK_ZERO_COLUMNS_THRESHOLD):
                 for field in expressionFieldsList:
@@ -392,7 +394,15 @@ def errorUse(expression, dump=False):
                             output = output[0]
 
                         with kb.locks.outputs:
-                            threadData.shared.outputs.append(output)
+                            index = None
+                            for index in xrange(len(threadData.shared.buffered)):
+                                if threadData.shared.buffered[index][0] >= num:
+                                    break
+                            threadData.shared.buffered.insert(index or 0, (num, output))
+                            while threadData.shared.buffered and threadData.shared.lastFlushed + 1 == threadData.shared.buffered[0][0]:
+                                threadData.shared.lastFlushed += 1
+                                threadData.shared.outputs.append(threadData.shared.buffered[0][1])
+                                del threadData.shared.buffered[0]
 
                 runThreads(numThreads, errorThread)
 
@@ -403,6 +413,7 @@ def errorUse(expression, dump=False):
                 logger.warn(warnMsg)
 
             finally:
+                threadData.shared.outputs.extend(_[1] for _ in sorted(threadData.shared.buffered))
                 outputs = threadData.shared.outputs
                 kb.suppressResumeInfo = False
 

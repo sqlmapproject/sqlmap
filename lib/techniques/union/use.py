@@ -274,6 +274,8 @@ def unionUse(expression, unpack=True, dump=False):
             threadData.shared.limits = iter(xrange(startLimit, stopLimit))
             numThreads = min(conf.threads, (stopLimit - startLimit))
             threadData.shared.value = BigArray()
+            threadData.shared.buffered = []
+            threadData.shared.lastFlushed = startLimit - 1
 
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                 kb.suppressResumeInfo = True
@@ -306,14 +308,28 @@ def unionUse(expression, unpack=True, dump=False):
                             break
 
                         if output:
-                            if all(map(lambda x: x in output, [kb.chars.start, kb.chars.stop])):
+                            if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
                                 items = parseUnionPage(output)
-                                if isNoneValue(items):
-                                    continue
+
                                 with kb.locks.value:
-                                    for item in arrayizeValue(items):
-                                        threadData.shared.value.append(item)
+                                    index = None
+                                    for index in xrange(len(threadData.shared.buffered)):
+                                        if threadData.shared.buffered[index][0] >= num:
+                                            break
+                                    threadData.shared.buffered.insert(index or 0, (num, items))
+                                    while threadData.shared.buffered and threadData.shared.lastFlushed + 1 == threadData.shared.buffered[0][0]:
+                                        threadData.shared.lastFlushed += 1
+                                        _ = threadData.shared.buffered[0][1]
+                                        if not isNoneValue(_):
+                                            threadData.shared.value.extend(arrayizeValue(_))
+                                        del threadData.shared.buffered[0]
                             else:
+                                with kb.locks.value:
+                                    index = None
+                                    for index in xrange(len(threadData.shared.buffered)):
+                                        if threadData.shared.buffered[index][0] >= num:
+                                            break
+                                    threadData.shared.buffered.insert(index or 0, (num, None))
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
                             if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo):
@@ -337,6 +353,9 @@ def unionUse(expression, unpack=True, dump=False):
                 logger.warn(warnMsg)
 
             finally:
+                for _ in sorted(threadData.shared.buffered):
+                    if not isNoneValue(_[1]):
+                        threadData.shared.value.extend(arrayizeValue(_[1]))
                 value = threadData.shared.value
                 kb.suppressResumeInfo = False
 

@@ -40,6 +40,10 @@ class BigArray(list):
             self.chunks[-1] = filename
             self.chunks.append([])
 
+    def extend(self, value):
+        for _ in value:
+            self.append(_)
+
     def pop(self):
         if len(self.chunks[-1]) < 1:
             self.chunks.pop()
