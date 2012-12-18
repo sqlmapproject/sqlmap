@@ -534,14 +534,13 @@ class Search:
                             else:
                                 foundCols[column][db] = [tbl]
 
-        if not foundCols:
+        if dbs:
+            conf.dumper.dbColumns(foundCols, colConsider, dbs)
+            self.dumpFoundColumn(dbs, foundCols, colConsider)
+        else:
             warnMsg = "no databases have tables containing any of the "
             warnMsg += "provided columns"
             logger.warn(warnMsg)
-            return
-
-        conf.dumper.dbColumns(foundCols, colConsider, dbs)
-        self.dumpFoundColumn(dbs, foundCols, colConsider)
 
     def search(self):
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
