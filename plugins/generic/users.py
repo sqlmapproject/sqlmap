@@ -428,7 +428,7 @@ class Users:
                         areAdmins.add(user)
 
                     if user in kb.data.cachedUsersPrivileges:
-                        kb.data.cachedUsersPrivileges[user].extend(privileges)
+                        kb.data.cachedUsersPrivileges[user] = list(privileges.union(kb.data.cachedUsersPrivileges[user]))
                     else:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
 
