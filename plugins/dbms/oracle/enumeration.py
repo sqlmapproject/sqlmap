@@ -82,8 +82,8 @@ class Enumeration(GenericEnumeration):
                     if isAdminFromPrivileges(roles):
                         areAdmins.add(user)
 
-                    if kb.data.cachedUsersRoles.has_key(user):
-                        kb.data.cachedUsersRoles[user].extend(roles)
+                    if user in kb.data.cachedUsersRoles:
+                        kb.data.cachedUsersRoles[user] = list(roles.union(kb.data.cachedUsersRoles[user]))
                     else:
                         kb.data.cachedUsersRoles[user] = list(roles)
 
