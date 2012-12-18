@@ -552,7 +552,7 @@ class Dump(object):
         self.string(query, queryRes)
 
     def rFile(self, filePath, fileData):
-        self.string("%s file saved to" % filePath, fileData, sort=False)
+        self.lister("files saved to", fileData, sort=False)
 
     def registerValue(self, registerData):
         self.string("Registry key value data", registerData, sort=False)

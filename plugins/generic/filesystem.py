@@ -179,64 +179,68 @@ class Filesystem:
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod, errMsg
 
-    def readFile(self, remoteFile):
+    def readFile(self, remoteFiles):
         fileContent = None
+        remoteFilePaths = []
 
         self.checkDbmsOs()
 
-        kb.fileReadMode = True
+        for remoteFile in remoteFiles.split(","):
+            kb.fileReadMode = True
 
-        if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-                debugMsg = "going to read the file with stacked query SQL "
-                debugMsg += "injection technique"
+            if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+                    debugMsg = "going to read the file with stacked query SQL "
+                    debugMsg += "injection technique"
+                    logger.debug(debugMsg)
+
+                fileContent = self.stackedReadFile(remoteFile)
+            elif Backend.isDbms(DBMS.MYSQL):
+                debugMsg = "going to read the file with a non-stacked query "
+                debugMsg += "SQL injection technique"
                 logger.debug(debugMsg)
 
-            fileContent = self.stackedReadFile(remoteFile)
-        elif Backend.isDbms(DBMS.MYSQL):
-            debugMsg = "going to read the file with a non-stacked query "
-            debugMsg += "SQL injection technique"
-            logger.debug(debugMsg)
+                fileContent = self.nonStackedReadFile(remoteFile)
+            else:
+                errMsg = "none of the SQL injection techniques detected can "
+                errMsg += "be used to read files from the underlying file "
+                errMsg += "system of the back-end %s server" % Backend.getDbms()
+                logger.error(errMsg)
 
-            fileContent = self.nonStackedReadFile(remoteFile)
-        else:
-            errMsg = "none of the SQL injection techniques detected can "
-            errMsg += "be used to read files from the underlying file "
-            errMsg += "system of the back-end %s server" % Backend.getDbms()
-            logger.error(errMsg)
+                return None
 
-            return None
+            kb.fileReadMode = False
 
-        kb.fileReadMode = False
+            if fileContent in (None, "") and not Backend.isDbms(DBMS.PGSQL):
+                self.cleanup(onlyFileTbl=True)
 
-        if fileContent in (None, "") and not Backend.isDbms(DBMS.PGSQL):
-            self.cleanup(onlyFileTbl=True)
+                return
+            elif isListLike(fileContent):
+                newFileContent = ""
 
-            return
-        elif isListLike(fileContent):
-            newFileContent = ""
+                for chunk in fileContent:
+                    if isListLike(chunk):
+                        if len(chunk) > 0:
+                            chunk = chunk[0]
+                        else:
+                            chunk = ""
 
-            for chunk in fileContent:
-                if isListLike(chunk):
-                    if len(chunk) > 0:
-                        chunk = chunk[0]
-                    else:
-                        chunk = ""
+                    if chunk:
+                        newFileContent += chunk
 
-                if chunk:
-                    newFileContent += chunk
+                fileContent = newFileContent
 
-            fileContent = newFileContent
+            fileContent = decodeHexValue(fileContent)
+            remoteFilePath = dataToOutFile(fileContent)
 
-        fileContent = decodeHexValue(fileContent)
-        remoteFilePath = dataToOutFile(fileContent)
+            if not Backend.isDbms(DBMS.PGSQL):
+                self.cleanup(onlyFileTbl=True)
 
-        if not Backend.isDbms(DBMS.PGSQL):
-            self.cleanup(onlyFileTbl=True)
+            self.askCheckReadFile(remoteFilePath, remoteFile)
 
-        self.askCheckReadFile(remoteFilePath, remoteFile)
+            remoteFilePaths.append(remoteFilePath)
 
-        return remoteFilePath
+        return remoteFilePaths
 
     def writeFile(self, localFile, remoteFile, fileType=None):
         self.checkDbmsOs()
