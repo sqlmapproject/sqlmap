@@ -667,10 +667,10 @@ class Databases:
                         kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
         if not kb.data.cachedColumns:
-            errMsg = "unable to retrieve column names for "
-            errMsg += ("table '%s' " % tblList[0]) if len(tblList) == 1 else "any table "
-            errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-            logger.error(errMsg)
+            warnMsg = "unable to retrieve column names for "
+            warnMsg += ("table '%s' " % tblList[0]) if len(tblList) == 1 else "any table "
+            warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+            logger.warn(warnMsg)
 
             if bruteForce is None:
                 return self.getColumns(onlyColNames=onlyColNames, colTuple=colTuple, bruteForce=True)
