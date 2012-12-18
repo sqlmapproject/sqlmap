@@ -603,9 +603,10 @@ class Agent(object):
             query = query[len("SELECT "):]
 
         limitOriginal = ""
+
         if where == PAYLOAD.WHERE.ORIGINAL:
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, ):
-                limitOriginal = "%s " % (queries[Backend.getIdentifiedDbms()].limit.query % (0, 1))
+                limitOriginal = "%s " % (queries[Backend.getIdentifiedDbms()].limit.query % (0, 0))
 
         unionQuery = self.prefixQuery("%sUNION ALL SELECT " % limitOriginal, prefix=prefix)
 
