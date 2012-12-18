@@ -92,6 +92,178 @@
             <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <case name="MySQL UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="current user:    'root@localhost'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
+            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="MySQL partial UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="current user:    'root@localhost'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
+            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="MySQL time-based single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_nooutput.php?id=1"/>
+            <tech value="T"/>
+            <timeSec value="1"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="current user:    'root@localhost'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
+            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="MySQL inline queries multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_inline.php?id=1"/>
+            <threads value="4"/>
+            <tech value="Q"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: MySQL inline queries"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="current user:    'root@localhost'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
+            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
 
     <!-- Old test cases -->
     <case name="MySQL (--technique=E --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
