@@ -388,6 +388,19 @@ class Databases:
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
+        if conf.col:
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                conf.col = conf.col.upper()
+
+            colList = conf.col.split(",")
+        else:
+            colList = []
+
+        for col in colList:
+            colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
+
+        colList = filter(None, colList)
+
         if conf.tbl:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.tbl = conf.tbl.upper()
@@ -427,19 +440,7 @@ class Databases:
                 logger.error(errMsg)
                 bruteForce = True
 
-        if bruteForce:
-            if conf.col:
-                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    conf.col = conf.col.upper()
-
-                colList = conf.col.split(",")
-            else:
-                colList = []
-
-            for col in colList:
-                colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
-
-            colList = filter(None, colList)
+        if bruteForce or colList:
             resumeAvailable = False
 
             for tbl in tblList:
@@ -490,17 +491,37 @@ class Databases:
 
                     return {conf.db: kb.data.cachedColumns[conf.db]}
 
-                infoMsg = "fetching columns for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                infoMsg = "fetching columns "
+
+                if len(colList) > 0:
+                    if colTuple is None:
+                        colConsider, colCondParam = self.likeOrExact("column")
+                    else:
+                        colConsider, colCondParam = colTuple
+                    condQueryStr = "%%s%s" % colCondParam
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
+
+                    if colConsider == "1":
+                        infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                    else:
+                        infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                else:
+                    condQuery = ""
+
+                infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                    query += condQuery
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
                                                       conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
+                    query += condQuery.replace("[DB]", conf.db)
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.inband.query % tbl
 
@@ -539,19 +560,44 @@ class Databases:
 
                     return {conf.db: kb.data.cachedColumns[conf.db]}
 
-                infoMsg = "fetching columns for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                infoMsg = "fetching columns "
+
+                if len(colList) > 0:
+                    if colTuple is None:
+                        colConsider, colCondParam = self.likeOrExact("column")
+                    else:
+                        colConsider, colCondParam = colTuple
+                    condQueryStr = "%%s%s" % colCondParam
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
+
+                    if colConsider == "1":
+                        infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                    else:
+                        infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                else:
+                    condQuery = ""
+
+                infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                    query += condQuery
+
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query += condQuery
+
                 elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.blind.count % (conf.db, conf.db, \
                         unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
+                    query += condQuery.replace("[DB]", conf.db)
+
                 elif Backend.isDbms(DBMS.FIREBIRD):
                     query = rootQuery.blind.count % (tbl)
+                    query += condQuery
+
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.blind.query % tbl
                     value = inject.getValue(query, union=False, error=False)
@@ -574,15 +620,19 @@ class Databases:
                 for index in getLimitRange(count):
                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                        query += condQuery
                         field = None
                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                        query += condQuery
                         field = None
                     elif Backend.isDbms(DBMS.MSSQL):
                         query = rootQuery.blind.query.replace("'%s'", "'%s'" % unsafeSQLIdentificatorNaming(tbl).split(".")[-1]).replace("%s", conf.db).replace("%d", str(index))
+                        query += condQuery.replace("[DB]", conf.db)
                         field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
                         query = rootQuery.blind.query % (tbl)
+                        query += condQuery
                         field = None
 
                     query = agent.limitQuery(index, query, field, field)
