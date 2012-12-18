@@ -483,6 +483,24 @@ Formats:
         <prefix>%'</prefix>
         <suffix>AND '%'='</suffix>
     </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%00')</prefix>
+        <suffix>AND ('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%00'</prefix>
+        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
     <!-- End of WHERE/HAVING clause boundaries -->
 
 
