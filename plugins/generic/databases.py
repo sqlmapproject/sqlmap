@@ -170,6 +170,9 @@ class Databases:
         else:
             kb.data.cachedDbs.sort()
 
+        if kb.data.cachedDbs:
+            kb.data.cachedDbs = list(set(kb.data.cachedDbs))
+
         return kb.data.cachedDbs
 
     def getTables(self, bruteForce=None):
@@ -355,6 +358,10 @@ class Databases:
         else:
             for db, tables in kb.data.cachedTables.items():
                 kb.data.cachedTables[db] = sorted(tables) if tables else tables
+
+        if kb.data.cachedTables:
+            for db in kb.data.cachedTables.keys():
+                kb.data.cachedTables[db] = list(set(kb.data.cachedTables[db]))
 
         return kb.data.cachedTables
 
