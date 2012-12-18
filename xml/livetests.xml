@@ -6,6 +6,7 @@
         <batch value="True"/>
         <verbose value="1"/>
     </global>
+    <!-- Common enumeration switches across all techniques -->
     <case name="MySQL boolean-based multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
@@ -264,6 +265,186 @@
             <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <!-- End of common enumeration switches across all techniques -->
+
+    <!-- Custom enumeration switches -->
+    <case name="MySQL error-based multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table: users.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table: users.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <!-- TODO: this fails because of issue #304 -->
+    <case name="MySQL boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+        </parse>
+    </case>
+    <!-- End of custom enumeration switches -->
+
+    <!-- Search enumeration switches -->
+    <case name="MySQL boolean-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="e"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] information_schema.+\[\*\] testdb'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="e"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] information_schema.+\[\*\] testdb'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="e"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] information_schema.+\[\*\] testdb'"/>
+        </parse>
+    </case>
+    <case name="MySQL boolean-based multi-threaded search enumeration - tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="testdb"/>
+            <tbl value="a,e,i"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based multi-threaded search enumeration - tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="testdb"/>
+            <tbl value="a,e,i"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded search enumeration - tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="testdb"/>
+            <tbl value="a,e,i"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="MySQL boolean-based multi-threaded search enumeration - columns">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <col value="name"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+surname'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based multi-threaded search enumeration - columns">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <col value="name"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded search enumeration - columns">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <col value="name"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+        </parse>
+    </case>
+    <!-- End of search enumeration switches -->
+
 
     <!-- Old test cases -->
     <case name="MySQL (--technique=E --is-dba --banner --current-user --current-db --dbs --tables -D testdb -T users --columns --dump)">
