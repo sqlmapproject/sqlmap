@@ -71,7 +71,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             return re.search(conf.regexp, rawResponse, re.I | re.M) is not None
 
     # HTTP code to match when the query is valid
-    if isinstance(code, int) and conf.code:
+    if conf.code:
         return conf.code == code
 
     if page:

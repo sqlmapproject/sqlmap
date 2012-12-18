@@ -142,7 +142,11 @@ class Connect(object):
             headers = conn.info()
             if headers and (headers.getheader(HTTPHEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
               or "text" not in headers.getheader(HTTPHEADER.CONTENT_TYPE, "").lower()):
-                retVal = conn.read()
+                retVal = conn.read(MAX_CONNECTION_TOTAL_SIZE)
+                if len(retVal) == MAX_CONNECTION_TOTAL_SIZE:
+                    warnMsg = "large compressed response detected. Disabling compression"
+                    singleTimeWarnMessage(warnMsg)
+                    kb.pageCompress = False
             else:
                 while True:
                     _ = conn.read(MAX_CONNECTION_CHUNK_SIZE)
@@ -794,7 +798,15 @@ class Connect(object):
                     pageLength = int(headers[HTTPHEADER.CONTENT_RANGE][headers[HTTPHEADER.CONTENT_RANGE].find('/') + 1:])
 
         if not pageLength:
-            page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+            try:
+                page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+            except MemoryError:
+                page, headers, code = None, None, None
+                warnMsg = "site returned insanely large response"
+                if kb.testMode:
+                    warnMsg += " in testing phase. This is a common "
+                    warnMsg += "behavior in custom WAF/IDS/IPS solutions"
+                singleTimeWarnMessage(warnMsg)
 
         if conf.secondOrder:
             page, headers, code = Connect.getPage(url=conf.secondOrder, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
