@@ -343,7 +343,7 @@ class Filesystem(GenericFilesystem):
 
         self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
 
-        sameFile = self.askCheckWrittenFile(wFile, dFile, fileType)
+        sameFile = self.askCheckWrittenFile(wFile, dFile)
 
         if sameFile is False:
             message = "do you want to try to upload the file with "
@@ -353,3 +353,4 @@ class Filesystem(GenericFilesystem):
             if not choice or choice.lower() == "y":
                 self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
                 #self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+                self.askCheckWrittenFile(wFile, dFile)

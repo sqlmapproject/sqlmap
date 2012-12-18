@@ -100,7 +100,7 @@ class Filesystem(GenericFilesystem):
         sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
         unionUse(sqlQuery, unpack=False)
 
-        self.askCheckWrittenFile(wFile, dFile, fileType)
+        self.askCheckWrittenFile(wFile, dFile)
 
         warnMsg = "expect junk characters inside the "
         warnMsg += "file as a leftover from UNION query"
@@ -133,4 +133,4 @@ class Filesystem(GenericFilesystem):
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
         inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile), silent=True)
 
-        self.askCheckWrittenFile(wFile, dFile, fileType)
+        self.askCheckWrittenFile(wFile, dFile)

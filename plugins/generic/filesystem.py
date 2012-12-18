@@ -36,40 +36,44 @@ class Filesystem:
         self.fileTblName = "sqlmapfile"
         self.tblField = "data"
 
-    def _checkWrittenFile(self, wFile, dFile, fileType):
+    def _checkFileLength(self, localFile, remoteFile, fileRead=False):
         if Backend.isDbms(DBMS.MYSQL):
-            lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % dFile
+            lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % remoteFile
 
         elif Backend.isDbms(DBMS.PGSQL):
-            lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
+            if fileRead:
+                lengthQuery = True
+            else:
+                lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
         elif Backend.isDbms(DBMS.MSSQL):
             self.createSupportTbl(self.fileTblName, self.tblField, "text")
 
             # Reference: http://msdn.microsoft.com/en-us/library/ms188365.aspx
-            inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.fileTblName, dFile, randomStr(10), randomStr(10)))
+            inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.fileTblName, remoteFile, randomStr(10), randomStr(10)))
 
             lengthQuery = "SELECT DATALENGTH(%s) FROM %s" % (self.tblField, self.fileTblName)
 
-        wFileSize = os.path.getsize(wFile)
+        localFileSize = os.path.getsize(localFile)
 
-        logger.debug("checking if the %s file has been written" % fileType)
-        dFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+        logger.debug("checking the length of the remote file %s" % remoteFile)
+        remoteFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
         sameFile = None
 
-        if isNumPosStrValue(dFileSize):
-            infoMsg = "the file has been successfully written and "
-            infoMsg += "its size is %s bytes" % dFileSize
+        if isNumPosStrValue(remoteFileSize):
+            remoteFileSize = long(remoteFileSize)
+            sameFile = False
 
-            dFileSize = long(dFileSize)
-
-            if wFileSize == dFileSize:
+            if localFileSize == remoteFileSize:
                 sameFile = True
-                infoMsg += ", same size as the local file '%s'" % wFile
+                infoMsg = "the local file %s and the remote file " % localFile
+                infoMsg += "%s have the same size" % remoteFile
+            elif remoteFileSize > localFileSize:
+                infoMsg = "the remote file %s is larger than " % remoteFile
+                infoMsg += "the local file %s" % localFile
             else:
-                sameFile = False
                 infoMsg += ", but the size differs from the local "
-                infoMsg += "file '%s' (%d bytes)" % (wFile, wFileSize)
+                infoMsg += "file '%s' (%d bytes)" % (localFile, localFileSize)
 
             logger.info(infoMsg)
         else:
@@ -133,38 +137,49 @@ class Filesystem:
 
         return retVal
 
-    def askCheckWrittenFile(self, wFile, dFile, fileType):
-        message = "do you want confirmation that the file '%s' " % dFile
+    def askCheckWrittenFile(self, localFile, remoteFile):
+        message = "do you want confirmation that the local file '%s' " % localFile
         message += "has been successfully written on the back-end DBMS "
-        message += "file system? [Y/n] "
+        message += "file system (%s)? [Y/n] " % remoteFile
         output = readInput(message, default="Y")
 
         if not output or output in ("y", "Y"):
-            return self._checkWrittenFile(wFile, dFile, fileType)
+            return self._checkFileLength(localFile, remoteFile)
 
         return True
 
-    def nonStackedReadFile(self, rFile):
+    def askCheckReadFile(self, localFile, remoteFile):
+        message = "do you want confirmation that the remote file '%s' " % remoteFile
+        message += "has been successfully downloaded from the back-end "
+        message += "DBMS file system? [Y/n] "
+        output = readInput(message, default="Y")
+
+        if not output or output in ("y", "Y"):
+            return self._checkFileLength(localFile, remoteFile, True)
+
+        return True
+
+    def nonStackedReadFile(self, remoteFile):
         errMsg = "'nonStackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod, errMsg
 
-    def stackedReadFile(self, rFile):
+    def stackedReadFile(self, remoteFile):
         errMsg = "'stackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod, errMsg
 
-    def unionWriteFile(self, wFile, dFile, fileType):
+    def unionWriteFile(self, localFile, remoteFile, fileType):
         errMsg = "'unionWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod, errMsg
 
-    def stackedWriteFile(self, wFile, dFile, fileType):
+    def stackedWriteFile(self, localFile, remoteFile, fileType):
         errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod, errMsg
 
-    def readFile(self, rFile):
+    def readFile(self, remoteFile):
         fileContent = None
 
         self.checkDbmsOs()
@@ -177,13 +192,13 @@ class Filesystem:
                 debugMsg += "injection technique"
                 logger.debug(debugMsg)
 
-            fileContent = self.stackedReadFile(rFile)
+            fileContent = self.stackedReadFile(remoteFile)
         elif Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to read the file with a non-stacked query "
             debugMsg += "SQL injection technique"
             logger.debug(debugMsg)
 
-            fileContent = self.nonStackedReadFile(rFile)
+            fileContent = self.nonStackedReadFile(remoteFile)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to read files from the underlying file "
@@ -214,14 +229,16 @@ class Filesystem:
             fileContent = newFileContent
 
         fileContent = decodeHexValue(fileContent)
-        rFilePath = dataToOutFile(fileContent)
+        remoteFilePath = dataToOutFile(fileContent)
 
         if not Backend.isDbms(DBMS.PGSQL):
             self.cleanup(onlyFileTbl=True)
 
-        return rFilePath
+        self.askCheckReadFile(remoteFilePath, remoteFile)
 
-    def writeFile(self, wFile, dFile, fileType=None):
+        return remoteFilePath
+
+    def writeFile(self, localFile, remoteFile, fileType=None):
         self.checkDbmsOs()
 
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
@@ -230,14 +247,14 @@ class Filesystem:
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
 
-            self.stackedWriteFile(wFile, dFile, fileType)
+            self.stackedWriteFile(localFile, remoteFile, fileType)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to upload the %s file with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 
-            self.unionWriteFile(wFile, dFile, fileType)
+            self.unionWriteFile(localFile, remoteFile, fileType)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to write files to the underlying file "

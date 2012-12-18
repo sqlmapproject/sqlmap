@@ -110,6 +110,6 @@ class Filesystem(GenericFilesystem):
         # (pg_largeobject 'data' field)
         inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile), silent=True)
 
-        self.askCheckWrittenFile(wFile, dFile, fileType)
+        self.askCheckWrittenFile(wFile, dFile)
 
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
