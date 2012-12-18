@@ -440,7 +440,7 @@ class Databases:
                 logger.error(errMsg)
                 bruteForce = True
 
-        if bruteForce or colList:
+        if bruteForce:
             resumeAvailable = False
 
             for tbl in tblList:
@@ -492,21 +492,20 @@ class Databases:
                     return {conf.db: kb.data.cachedColumns[conf.db]}
 
                 infoMsg = "fetching columns "
+                condQuery = ""
 
                 if len(colList) > 0:
-                    if colTuple is None:
-                        colConsider, colCondParam = self.likeOrExact("column")
-                    else:
-                        colConsider, colCondParam = colTuple
-                    condQueryStr = "%%s%s" % colCondParam
-                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
-
-                    if colConsider == "1":
+                    if colTuple:
+                        _, colCondParam = colTuple
                         infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
+                        colCondParam = "='%s'"
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+
+                    condQueryStr = "%%s%s" % colCondParam
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
                 else:
-                    condQuery = ""
+                    infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
 
                 infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
@@ -561,21 +560,20 @@ class Databases:
                     return {conf.db: kb.data.cachedColumns[conf.db]}
 
                 infoMsg = "fetching columns "
+                condQuery = ""
 
                 if len(colList) > 0:
-                    if colTuple is None:
-                        colConsider, colCondParam = self.likeOrExact("column")
-                    else:
-                        colConsider, colCondParam = colTuple
-                    condQueryStr = "%%s%s" % colCondParam
-                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
-
-                    if colConsider == "1":
+                    if colTuple:
+                        _, colCondParam = colTuple
                         infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
+                        colCondParam = "='%s'"
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+
+                    condQueryStr = "%%s%s" % colCondParam
+                    condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
                 else:
-                    condQuery = ""
+                    infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
 
                 infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
