@@ -690,12 +690,12 @@ class Agent(object):
                 limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
                 if limitGroupStart.isdigit():
-                    if limitRegExp2:
-                        startLimit = 0
-                        stopLimit = limitRegExp2.group(int(limitGroupStart))
-                    else:
+                    if limitRegExp:
                         startLimit = int(limitRegExp.group(int(limitGroupStart)))
                         stopLimit = limitRegExp.group(int(limitGroupStop))
+                    elif limitRegExp2:
+                        startLimit = 0
+                        stopLimit = limitRegExp2.group(int(limitGroupStart))
                 limitCond = int(stopLimit) > 1
 
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
