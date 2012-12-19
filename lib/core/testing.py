@@ -195,32 +195,31 @@ def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
 
 def runCase(switches=None, parse=None):
-    retVal = True
     global failedItem
 
     initCase(switches)
 
+    retVal = True
     exception = None
     result = False
     console = ""
-    stdout = sys.stdout
     LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
 
     try:
         result = start()
     except KeyboardInterrupt:
         raise
-    except Exception, ex:
-        exception = ex
+    except Exception, e:
+        exception = e
     finally:
         sys.stdout.seek(0)
         console = sys.stdout.read()
-        LOGGER_HANDLER.stream = sys.stdout = stdout
+        LOGGER_HANDLER.stream = sys.stdout = sys.__stdout__
 
     if exception:
         logger.error("unhandled exception occurred ('%s')" % str(exception))
         retVal = False
-    elif result == False: # if None, ignore
+    elif result is False: # if None, ignore
         logger.error("the test did not run")
         retVal = False
 
