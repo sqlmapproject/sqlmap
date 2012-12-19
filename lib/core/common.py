@@ -661,6 +661,9 @@ def filePathToString(filePath):
 
     return strRepl
 
+def singleTimeDebugMessage(message):
+    singleTimeLogMessage(message, logging.DEBUG)
+
 def singleTimeWarnMessage(message):
     singleTimeLogMessage(message, logging.WARN)
 

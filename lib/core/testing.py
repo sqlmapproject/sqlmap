@@ -129,7 +129,7 @@ def liveTest():
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
 
-        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL)):
+        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL | re.I)):
             continue
 
         if case.getElementsByTagName("switches"):
@@ -206,7 +206,7 @@ def runCase(switches=None, parse=None):
         retVal = False
 
     if parse and retVal:
-        ifile = open(conf.dumper.getOutputFile(), 'r')
+        ifile = open(conf.dumper.getOutputFile(), "rb")
         content = ifile.read()
         ifile.close()
         for item in parse:

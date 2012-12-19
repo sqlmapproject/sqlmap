@@ -139,8 +139,6 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
     startLimit = 0
     stopLimit = None
     outputs = BigArray()
-    untilLimitChar = None
-    untilOrderChar = None
 
     if not unpack:
         return _goInference(payload, expression, charsetType, firstChar, lastChar, dump)
@@ -160,69 +158,18 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
     # If we have been here from SQL query/shell we have to check if
     # the SQL query might return multiple entries and in such case
-    # forge the SQL limiting the query output one entry per time
-    # NOTE: I assume that only queries that get data from a table
+    # forge the SQL limiting the query output one entry at a time
+    # NOTE: we assume that only queries that get data from a table
     # can return multiple entries
     if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
       not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not \
       expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+        expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression)
 
-        limitCond = True
-        limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
-        limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
-        topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
-
-        if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
-                limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
-                limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
-
-                if limitGroupStart.isdigit():
-                    if limitRegExp2:
-                        startLimit = 0
-                        stopLimit = limitRegExp2.group(int(limitGroupStart))
-                    else:
-                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
-                        stopLimit = limitRegExp.group(int(limitGroupStop))
-                limitCond = int(stopLimit) > 1
-
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                if limitRegExp:
-                    limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
-                    limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
-
-                    if limitGroupStart.isdigit():
-                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
-
-                    stopLimit = limitRegExp.group(int(limitGroupStop))
-                    limitCond = int(stopLimit) > 1
-                elif topLimit:
-                    startLimit = 0
-                    stopLimit = int(topLimit.group(1))
-                    limitCond = int(stopLimit) > 1
-
-            elif Backend.isDbms(DBMS.ORACLE):
-                limitCond = False
-
-        # We assume that only queries NOT containing a "LIMIT #, 1"
-        # (or equivalent depending on the back-end DBMS) can return
-        # multiple entries
         if limitCond:
-            if (limitRegExp or limitRegExp2) and stopLimit is not None:
-                stopLimit = int(stopLimit)
-
-                # From now on we need only the expression until the " LIMIT "
-                # (or equivalent, depending on the back-end DBMS) word
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
-                    stopLimit += startLimit
-                    untilLimitChar = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
-                    expression = expression[:untilLimitChar]
-
-                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                    stopLimit += startLimit
-
             test = True
+
             if not stopLimit or stopLimit <= 1:
                 if Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]):
                     test = False
@@ -232,9 +179,9 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                 countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
                 countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
-                if re.search(" ORDER BY ", expression, re.I):
-                    untilOrderChar = countedExpression.index(" ORDER BY ")
-                    countedExpression = countedExpression[:untilOrderChar]
+                if " ORDER BY " in expression.upper():
+                    _ = countedExpression.upper().rindex(" ORDER BY ")
+                    countedExpression = countedExpression[:_]
 
                 if not stopLimit:
                     count = _goInference(payload, countedExpression, charsetType=CHARSET_TYPE.DIGITS, firstChar=firstChar, lastChar=lastChar)
