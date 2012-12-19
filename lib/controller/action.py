@@ -147,7 +147,7 @@ def action():
 
     # File system options
     if conf.rFile:
-        conf.dumper.rFile(conf.rFile, conf.dbmsHandler.readFile(conf.rFile))
+        conf.dumper.rFile(conf.dbmsHandler.readFile(conf.rFile))
 
     if conf.wFile:
         conf.dbmsHandler.writeFile(conf.wFile, conf.dFile, conf.wFileType)

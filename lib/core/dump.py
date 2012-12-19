@@ -561,7 +561,7 @@ class Dump(object):
     def query(self, query, queryRes):
         self.string(query, queryRes)
 
-    def rFile(self, filePath, fileData):
+    def rFile(self, fileData):
         self.lister("files saved to", fileData, sort=False)
 
     def registerValue(self, registerData):
