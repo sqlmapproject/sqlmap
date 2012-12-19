@@ -9,6 +9,7 @@ import doctest
 import os
 import re
 import shutil
+import StringIO
 import sys
 import tempfile
 import time
@@ -21,8 +22,8 @@ from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
-from lib.core.option import setVerbosity
 from lib.core.optiondict import optDict
 from lib.parse.cmdline import cmdLineParser
 
@@ -129,7 +130,7 @@ def liveTest():
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
 
-        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL | re.I)):
+        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL)):
             continue
 
         if case.getElementsByTagName("switches"):
@@ -151,7 +152,10 @@ def liveTest():
         if result:
             logger.info("test passed")
         else:
-            logger.error("test failed at parsing item: %s" % failedItem)
+            errMsg = "test failed "
+            if failedItem:
+                errMsg += "at parsing item: %s" % failedItem
+            logger.error(errMsg)
             beep()
             if conf.stopFail is True:
                 return retVal
@@ -186,22 +190,37 @@ def initCase(switches=None):
                 cmdLineOptions.__dict__[key] = value
 
     init(cmdLineOptions, True)
-    conf.verbose = 0
-    setVerbosity()
 
 def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
-    conf.verbose = 1
-    setVerbosity()
 
 def runCase(switches=None, parse=None):
     retVal = True
     global failedItem
 
     initCase(switches)
-    result = start()
 
-    if result == False: # if None, ignore
+    exception = None
+    result = False
+    console = ""
+    stdout = sys.stdout
+    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
+
+    try:
+        result = start()
+    except KeyboardInterrupt:
+        raise
+    except Exception, ex:
+        exception = ex
+    finally:
+        sys.stdout.seek(0)
+        console = sys.stdout.read()
+        LOGGER_HANDLER.stream = sys.stdout = stdout
+
+    if exception:
+        logger.error("unhandled exception occurred ('%s')" % str(exception))
+        retVal = False
+    elif result == False: # if None, ignore
         logger.error("the test did not run")
         retVal = False
 
