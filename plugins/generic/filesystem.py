@@ -157,7 +157,7 @@ class Filesystem:
         if not output or output in ("y", "Y"):
             return self._checkFileLength(localFile, remoteFile, True)
 
-        return True
+        return None
 
     def nonStackedReadFile(self, remoteFile):
         errMsg = "'nonStackedReadFile' method must be defined "
@@ -180,12 +180,12 @@ class Filesystem:
         raise SqlmapUndefinedMethod, errMsg
 
     def readFile(self, remoteFiles):
-        fileContent = None
-        remoteFilePaths = []
+        localFilePaths = []
 
         self.checkDbmsOs()
 
         for remoteFile in remoteFiles.split(","):
+            fileContent = None
             kb.fileReadMode = True
 
             if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
@@ -207,14 +207,12 @@ class Filesystem:
                 errMsg += "system of the back-end %s server" % Backend.getDbms()
                 logger.error(errMsg)
 
-                return None
+                fileContent = None
 
             kb.fileReadMode = False
 
             if fileContent in (None, "") and not Backend.isDbms(DBMS.PGSQL):
                 self.cleanup(onlyFileTbl=True)
-
-                return
             elif isListLike(fileContent):
                 newFileContent = ""
 
@@ -230,17 +228,23 @@ class Filesystem:
 
                 fileContent = newFileContent
 
-            fileContent = decodeHexValue(fileContent)
-            remoteFilePath = dataToOutFile(fileContent)
+            if fileContent is not None:
+                fileContent = decodeHexValue(fileContent)
+                localFilePath = dataToOutFile(remoteFile, fileContent)
 
-            if not Backend.isDbms(DBMS.PGSQL):
-                self.cleanup(onlyFileTbl=True)
+                if not Backend.isDbms(DBMS.PGSQL):
+                    self.cleanup(onlyFileTbl=True)
 
-            self.askCheckReadFile(remoteFilePath, remoteFile)
+                sameFile = self.askCheckReadFile(localFilePath, remoteFile)
 
-            remoteFilePaths.append(remoteFilePath)
+                if sameFile is True:
+                    localFilePath += " (same file)"
+                elif sameFile is False:
+                    localFilePath += " (size differs from remote file)"
 
-        return remoteFilePaths
+                localFilePaths.append(localFilePath)
+
+        return localFilePaths
 
     def writeFile(self, localFile, remoteFile, fileType=None):
         self.checkDbmsOs()

@@ -19,6 +19,7 @@ from lib.core.common import isListLike
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
+from lib.core.common import randomInt
 from lib.core.common import safeCSValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -34,6 +35,7 @@ from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
+from thirdparty.magic import magic
 
 class Dump(object):
     """
@@ -476,6 +478,14 @@ class Dump(object):
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
+                    # TODO: this is related to issue #8, but it is not yet working
+                    #mimetype = magic.from_buffer(value, mime=True)
+
+                    #if mimetype.startswith("application") or mimetype.startswith("image"):
+                    #    singleFP = open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb")
+                    #    singleFP.write(value.encode("utf8"))
+                    #    singleFP.close()
+
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
                             dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
@@ -551,7 +561,7 @@ class Dump(object):
     def query(self, query, queryRes):
         self.string(query, queryRes)
 
-    def rFile(self, filePath, fileData):
+    def rFile(self, fileData):
         self.lister("files saved to", fileData, sort=False)
 
     def registerValue(self, registerData):
