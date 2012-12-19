@@ -129,7 +129,7 @@ def liveTest():
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
 
-        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL)):
+        if conf.runCase and ((conf.runCase.isdigit() and conf.runCase != count) or not re.search(conf.runCase, name, re.DOTALL | re.I)):
             continue
 
         if case.getElementsByTagName("switches"):
