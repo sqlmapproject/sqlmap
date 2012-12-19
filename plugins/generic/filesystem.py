@@ -72,7 +72,7 @@ class Filesystem:
                 infoMsg = "the remote file %s is larger than " % remoteFile
                 infoMsg += "the local file %s" % localFile
             else:
-                infoMsg += ", but the size differs from the local "
+                infoMsg = "the remote file %s is smaller than " % remoteFile
                 infoMsg += "file '%s' (%d bytes)" % (localFile, localFileSize)
 
             logger.info(infoMsg)
