@@ -8,7 +8,7 @@
         <isnull query="IFNULL(%s,' ')"/>
         <delimiter query=","/>
         <limit query="LIMIT %d,%d"/>
-        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" LIMIT "/>
@@ -82,7 +82,7 @@
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="OFFSET %d LIMIT %d"/>
-        <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)"/>
+        <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" OFFSET "/>
@@ -311,7 +311,7 @@
         <isnull query="IFNULL(%s,' ')" dbms_version="&gt;=3.0"/>
         <delimiter query="||"/>
         <limit query="LIMIT %d,%d"/>
-        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" LIMIT "/>
