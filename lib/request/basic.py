@@ -222,9 +222,11 @@ def decodePage(page, contentEncoding, contentType):
 
         metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page))
 
-        if ((httpCharset or metaCharset) and not all([httpCharset, metaCharset]))\
-            or (httpCharset == metaCharset and all([httpCharset, metaCharset])):
+        if (any((httpCharset, metaCharset)) and not all((httpCharset, metaCharset)))\
+            or (httpCharset == metaCharset and all((httpCharset, metaCharset))):
             kb.pageEncoding = httpCharset or metaCharset
+            debugMsg = "declared web page charset '%s'" % kb.pageEncoding
+            singleTimeLogMessage(debugMsg, logging.DEBUG, debugMsg)
         else:
             kb.pageEncoding = None
     else:
