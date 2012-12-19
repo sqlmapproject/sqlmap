@@ -478,12 +478,13 @@ class Dump(object):
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    mimetype = magic.from_buffer(value, mime=True)
+                    # TODO: this is related to issue #8, but it is not yet working
+                    #mimetype = magic.from_buffer(value, mime=True)
 
-                    if mimetype.startswith("application") or mimetype.startswith("image"):
-                        singleFP = open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb")
-                        singleFP.write(value.encode("utf8"))
-                        singleFP.close()
+                    #if mimetype.startswith("application") or mimetype.startswith("image"):
+                    #    singleFP = open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb")
+                    #    singleFP.write(value.encode("utf8"))
+                    #    singleFP.close()
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
