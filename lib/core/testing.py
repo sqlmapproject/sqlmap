@@ -191,6 +191,7 @@ def initCase(switches=None):
 
     logger.debug("using output directory '%s' for this test case" % paths.SQLMAP_OUTPUT_PATH)
 
+    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
 
@@ -209,11 +210,11 @@ def runCase(switches=None, parse=None):
 
     initCase(switches)
 
+    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
     retVal = True
     exception = None
     result = False
     console = ""
-    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
 
     try:
         result = start()
