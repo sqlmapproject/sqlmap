@@ -242,7 +242,7 @@ class Web:
                 localPath = posixpath.normpath(localPath).rstrip('/')
                 uriPath = posixpath.normpath(uriPath).rstrip('/')
 
-                # Upload the file stager
+                # Upload the file stager with the LIMIT 0, 1 INTO OUTFILE technique
                 self._webFileInject(stagerContent, stagerName, localPath)
 
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
@@ -252,6 +252,7 @@ class Web:
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
                 uplPage = uplPage or ""
 
+                # Fall-back to UNION queries file upload technique
                 if "sqlmap file uploader" not in uplPage:
                     warnMsg = "unable to upload the file stager "
                     warnMsg += "on '%s'" % localPath
