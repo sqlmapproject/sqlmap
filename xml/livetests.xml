@@ -190,18 +190,6 @@
             <getCurrentDb value="True"/>
             <getHostname value="True"/>
             <isDba value="True"/>
-            <getUsers value="True"/>
-            <getPasswordHashes value="True"/>
-            <getPrivileges value="True"/>
-            <getRoles value="True"/>
-            <getDbs value="True"/>
-            <getTables value="True"/>
-            <getColumns value="True"/>
-            <getCount value="True"/>
-            <dumpTable value="True"/>
-            <db value="testdb"/>
-            <tbl value="users"/>
-            <excludeSysDbs value="True"/>
         </switches>
         <parse>
             <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
@@ -211,15 +199,6 @@
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
-            <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
-            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
-            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
-            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
-            <item value="r'Database: testdb.+3 tables.+users'"/>
-            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
-            <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
-            <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
     <case name="MySQL inline queries multi-threaded enumeration - all entries">
