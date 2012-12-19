@@ -65,7 +65,7 @@ class Dump(object):
         kb.dataOutputFlag = True
 
     def setOutputFile(self):
-        self._outputFile = "%s%sstdout" % (conf.outputPath, os.sep)
+        self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
         try:
             self._outputFP = codecs.open(self._outputFile, "ab" if not conf.flushSession else "wb", UNICODE_ENCODING)
         except IOError, ex:
