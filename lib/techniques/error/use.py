@@ -25,6 +25,7 @@ from lib.core.common import isListLike
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
+from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
@@ -208,16 +209,17 @@ def _errorReplaceChars(value):
 
 def _formatPartialContent(value):
     """
-    Prepares (possibly hex) partial content for safe console output
+    Prepares (possibly hex-encoded) partial content for safe console output
     """
 
     if value and isinstance(value, basestring):
         try:
-            value = value.decode("hex")
+            value = hexdecode(value)
         except:
             pass
         finally:
             value = safecharencode(value)
+
     return value
 
 def errorUse(expression, dump=False):
