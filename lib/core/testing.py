@@ -18,6 +18,7 @@ from extra.beep.beep import beep
 from lib.controller.controller import start
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import randomStr
 from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
@@ -104,6 +105,7 @@ def liveTest():
     count = 0
     global_ = {}
     vars_ = {}
+
     livetests = readXmlFile(paths.LIVE_TESTS_XML)
     length = len(livetests.getElementsByTagName("case"))
 
@@ -119,13 +121,16 @@ def liveTest():
         for item in element:
             for child in item.childNodes:
                 if child.nodeType == child.ELEMENT_NODE and child.hasAttribute("value"):
-                    vars_[child.tagName] = child.getAttribute("value")
+                    var = child.getAttribute("value")
+                    vars_[child.tagName] = randomStr(6) if var == "random" else var
 
     for case in livetests.getElementsByTagName("case"):
+        console_output = False
         count += 1
         name = None
         parse = []
         switches = dict(global_)
+        value = ""
 
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
@@ -142,7 +147,12 @@ def liveTest():
         if case.getElementsByTagName("parse"):
             for item in case.getElementsByTagName("parse")[0].getElementsByTagName("item"):
                 if item.hasAttribute("value"):
-                    parse.append(replaceVars(item.getAttribute("value"), vars_))
+                    value = replaceVars(item.getAttribute("value"), vars_)
+
+                if item.hasAttribute("console_output"):
+                    console_output = bool(item.getAttribute("console_output"))
+
+                parse.append((value, console_output))
 
         msg = "running live test case '%s' (%d/%d)" % (name, count, length)
         logger.info(msg)
@@ -228,14 +238,19 @@ def runCase(switches=None, parse=None):
         content = ifile.read()
         ifile.close()
 
-        for item in parse:
+        for item, console_output in parse:
+            if console_output is True:
+                parse_on = console
+            else:
+                parse_on = content
+
             if item.startswith("r'") and item.endswith("'"):
-                if not re.search(item[2:-1], content, re.DOTALL):
+                if not re.search(item[2:-1], parse_on, re.DOTALL):
                     retVal = False
                     failedItem = item
 
                     break
-            elif content.find(item) < 0:
+            elif parse_on.find(item) < 0:
                 retVal = False
                 failedItem = item
 
