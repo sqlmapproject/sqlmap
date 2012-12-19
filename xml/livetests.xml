@@ -283,11 +283,14 @@
             <item value="r'Database: testdb.+Table: users.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
         </parse>
     </case>
-    <!-- TODO: this fails because of issue #305 -->
     <case name="MySQL boolean-based multi-threaded custom enumeration - substring">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <!-- TODO: this fails because of issue #305 -->
+            <!--
             <threads value="4"/>
+            -->
+            <threads value="1"/>
             <tech value="B"/>
             <dumpTable value="True"/>
             <db value="testdb"/>
@@ -630,6 +633,40 @@
         </switches>
         <parse>
             <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="MySQL boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blissett.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
     <!-- End of user's provided statement enumeration switches -->

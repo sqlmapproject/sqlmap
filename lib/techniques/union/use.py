@@ -29,6 +29,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
+from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.convert import htmlunescape
@@ -158,6 +159,13 @@ def unionUse(expression, unpack=True, dump=False):
     start = time.time()
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
+
+    if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
+        # Removed ORDER BY clause because UNION does not play well with it
+        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I)
+        debugMsg = "stripping ORDER BY clause from statement because "
+        debugMsg += "it does not play well with UNION query SQL injection"
+        singleTimeDebugMessage(debugMsg)
 
     # We have to check if the SQL query might return multiple entries
     # if the technique is partial UNION query and in such case forge the
@@ -301,7 +309,6 @@ def unionUse(expression, unpack=True, dump=False):
                 kb.suppressResumeInfo = False
 
     if not value and not abortedFlag:
-        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full union does not play well with ORDER BY
         value = _oneShotUnionUse(expression, unpack)
 
     duration = calculateDeltaSeconds(start)
