@@ -88,7 +88,6 @@ def exceptionHandledFunction(threadFunction):
         raise
     except Exception, errMsg:
         # thread is just going to be silently killed
-        print
         logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
 
 def setDaemon(thread):
