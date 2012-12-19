@@ -203,7 +203,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if continuousOrder and shiftTable is None:
                 # Used for gradual expanding into unicode charspace
-                shiftTable = [5, 4]
+                shiftTable = [2, 2, 3, 3, 5, 4]
 
             if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
                 charTbl.remove(ord('\n'))
@@ -263,7 +263,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # Going beyond the original charset
                         elif minValue == maxChar:
                             # If the original charTbl was [0,..,127] new one
-                            # will be [128,..,128*16-1] or from 128 to 2047
+                            # will be [128,..,(128 << 4) - 1] or from 128 to 2047
                             # and instead of making a HUGE list with all the
                             # elements we use a xrange, which is a virtual
                             # list
