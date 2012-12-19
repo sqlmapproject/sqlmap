@@ -2501,13 +2501,7 @@ def decodeIntToUnicode(value):
 
     if isinstance(value, int):
         try:
-            # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
-                retVal = getUnicode(struct.pack('B' if value < 256 else '<H', value))
-            elif value > 255:
-                retVal = unichr(value)
-            else:
-                retVal = getUnicode(chr(value))
+            retVal = unichr(value)
         except:
             retVal = INFERENCE_UNKNOWN_CHAR
 
