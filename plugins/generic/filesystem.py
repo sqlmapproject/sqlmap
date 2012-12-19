@@ -180,12 +180,12 @@ class Filesystem:
         raise SqlmapUndefinedMethod, errMsg
 
     def readFile(self, remoteFiles):
-        fileContent = None
-        remoteFilePaths = []
+        localFilePaths = []
 
         self.checkDbmsOs()
 
         for remoteFile in remoteFiles.split(","):
+            fileContent = None
             kb.fileReadMode = True
 
             if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
@@ -207,14 +207,12 @@ class Filesystem:
                 errMsg += "system of the back-end %s server" % Backend.getDbms()
                 logger.error(errMsg)
 
-                return None
+                fileContent = None
 
             kb.fileReadMode = False
 
             if fileContent in (None, "") and not Backend.isDbms(DBMS.PGSQL):
                 self.cleanup(onlyFileTbl=True)
-
-                return
             elif isListLike(fileContent):
                 newFileContent = ""
 
@@ -230,24 +228,23 @@ class Filesystem:
 
                 fileContent = newFileContent
 
-            fileContent = decodeHexValue(fileContent)
-            remoteFilePath = dataToOutFile(fileContent)
+            if fileContent is not None:
+                fileContent = decodeHexValue(fileContent)
+                localFilePath = dataToOutFile(remoteFile, fileContent)
 
-            if not Backend.isDbms(DBMS.PGSQL):
-                self.cleanup(onlyFileTbl=True)
+                if not Backend.isDbms(DBMS.PGSQL):
+                    self.cleanup(onlyFileTbl=True)
 
-            sameFile = self.askCheckReadFile(remoteFilePath, remoteFile)
+                sameFile = self.askCheckReadFile(localFilePath, remoteFile)
 
-            if sameFile is True:
-                remoteFilePath += " (same file)"
-            elif sameFile is False:
-                remoteFilePath += " (size differs from remote file)"
-            elif sameFile is None:
-                remoteFilePath += " (size not compared to remote file)"
+                if sameFile is True:
+                    localFilePath += " (same file)"
+                elif sameFile is False:
+                    localFilePath += " (size differs from remote file)"
 
-            remoteFilePaths.append(remoteFilePath)
+                localFilePaths.append(localFilePath)
 
-        return remoteFilePaths
+        return localFilePaths
 
     def writeFile(self, localFile, remoteFile, fileType=None):
         self.checkDbmsOs()

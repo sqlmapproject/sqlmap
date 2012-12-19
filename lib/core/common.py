@@ -736,11 +736,11 @@ def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
     dumpFile.flush()
 
-def dataToOutFile(data):
+def dataToOutFile(filename, data):
     if not data:
         return "No data retrieved"
 
-    retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToString(conf.rFile))
+    retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToString(filename))
 
     with codecs.open(retVal, "wb") as f:
         f.write(data)
