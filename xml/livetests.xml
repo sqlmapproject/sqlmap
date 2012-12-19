@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
+    <vars>
+        <random value="random"/>
+    </vars>
     <global>
         <ignoreProxy value="True"/>
         <batch value="True"/>
@@ -670,4 +673,80 @@
         </parse>
     </case>
     <!-- End of user's provided statement enumeration switches -->
+
+    <!-- File system access switches -->
+    <case name="MySQL boolean-based multi-threaded file read">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <rFile value="/etc/hosts,/tmp/invalidfile"/>
+        </switches>
+        <parse>
+            <item value="r'files saved to.+files/_etc_hosts \(same file\)'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based multi-threaded file read">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <rFile value="/etc/hosts,/tmp/invalidfile"/>
+        </switches>
+        <parse>
+            <item value="r'files saved to.+files/_etc_hosts \(same file\)'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded file read">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <rFile value="/etc/hosts,/tmp/invalidfile"/>
+        </switches>
+        <parse>
+            <item value="r'files saved to.+files/_etc_hosts \(same file\)'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query multi-threaded file write">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <wFile value="/etc/passwd"/>
+            <dFile value="/tmp/passwd-${random}"/>
+        </switches>
+        <parse>
+            <item value="the remote file /tmp/passwd-${random} is larger than the local file /etc/passwd" console_output="True"/>
+        </parse>
+    </case>
+    <!-- End of file system access switches -->
+
+    <!-- Operating system access switches -->
+    <case name="MySQL web shell - command execution">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <tech value="B"/>
+            <osCmd value="id"/>
+            <answers value="please provide any additional web server=/var/www/test"/>
+        </switches>
+        <parse>
+            <item value="command standard output:    'uid="/>
+        </parse>
+    </case>
+    <!-- TODO: integration with Metasploit cannot be called yet from live testing -->
+    <case name="MySQL shell via Metasploit integration - command execution">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <tech value="B"/>
+            <osPwn value="True"/>
+            <msfPath value="/usr/local/bin/"/>
+            <answers value="please provide any additional web server=/var/www/test"/>
+        </switches>
+        <parse>
+            <item value="r'Sending stage.+Command shell session.+Linux.+uid='"/>
+        </parse>
+    </case>
+    <!-- End of operating system access switches -->
+
 </root>
