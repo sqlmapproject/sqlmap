@@ -157,7 +157,7 @@ class Filesystem:
         if not output or output in ("y", "Y"):
             return self._checkFileLength(localFile, remoteFile, True)
 
-        return True
+        return None
 
     def nonStackedReadFile(self, remoteFile):
         errMsg = "'nonStackedReadFile' method must be defined "
@@ -236,7 +236,14 @@ class Filesystem:
             if not Backend.isDbms(DBMS.PGSQL):
                 self.cleanup(onlyFileTbl=True)
 
-            self.askCheckReadFile(remoteFilePath, remoteFile)
+            sameFile = self.askCheckReadFile(remoteFilePath, remoteFile)
+
+            if sameFile is True:
+                remoteFilePath += " (same file)"
+            elif sameFile is False:
+                remoteFilePath += " (size differs from remote file)"
+            elif sameFile is None:
+                remoteFilePath += " (size not compared to remote file)"
 
             remoteFilePaths.append(remoteFilePath)
 
