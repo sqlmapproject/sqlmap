@@ -65,7 +65,7 @@ class Dump(object):
     def setOutputFile(self):
         self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
         try:
-            self._outputFP = codecs.open(self._outputFile, "ab", UNICODE_ENCODING)
+            self._outputFP = codecs.open(self._outputFile, "ab" if not conf.flushSession else "wb", UNICODE_ENCODING)
         except IOError, ex:
             errMsg = "error occurred while opening log file ('%s')" % ex
             raise SqlmapGenericException, errMsg
