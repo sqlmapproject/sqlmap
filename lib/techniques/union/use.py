@@ -159,10 +159,6 @@ def unionUse(expression, unpack=True, dump=False):
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
-    if expressionFieldsList and len(expressionFieldsList) > 1 and " ORDER BY " in expression.upper():
-        # No need for it in multicolumn dumps (one row is retrieved per request) and just slowing down on large table dumps
-        expression = expression[:expression.upper().rindex(" ORDER BY ")]
-
     # We have to check if the SQL query might return multiple entries
     # if the technique is partial UNION query and in such case forge the
     # SQL limiting the query output one entry at a time
@@ -305,7 +301,7 @@ def unionUse(expression, unpack=True, dump=False):
                 kb.suppressResumeInfo = False
 
     if not value and not abortedFlag:
-        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full union doesn't play well with ORDER BY
+        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I) # full union does not play well with ORDER BY
         value = _oneShotUnionUse(expression, unpack)
 
     duration = calculateDeltaSeconds(start)
