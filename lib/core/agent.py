@@ -732,7 +732,10 @@ class Agent(object):
                 # (or equivalent, depending on the back-end DBMS) word
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
                     stopLimit += startLimit
-                    _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
+                    if expression.find(queries[Backend.getIdentifiedDbms()].limitstring.query) > 0:
+                        _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
+                    else:
+                        _ = expression.index("LIMIT ")
                     expression = expression[:_]
 
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
