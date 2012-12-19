@@ -263,7 +263,7 @@ class Web:
                         logger.info(infoMsg)
 
                         handle, filename = mkstemp()
-                        os.fdopen(handle).close()  # close low level handle (causing problems latter)
+                        os.fdopen(handle).close()  # close low level handle (causing problems later)
 
                         with open(filename, "w+") as f:
                             _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
