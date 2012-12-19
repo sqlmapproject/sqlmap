@@ -317,7 +317,8 @@ def errorUse(expression, dump=False):
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 
             if " ORDER BY " in expression:
-                countedExpression = countedExpression[:countedExpression.index(" ORDER BY ")]
+                _ = countedExpression.upper().rindex(" ORDER BY ")
+                countedExpression = countedExpression[:_]
 
             _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
             count = _oneShotErrorUse(countedExpression, countedExpressionFields)

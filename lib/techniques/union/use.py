@@ -263,7 +263,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                 stopLimit = 1
 
-            elif not count or int(count) == 0:
+            elif (not count or int(count) == 0):
                 if not count:
                     warnMsg = "the SQL query provided does not "
                     warnMsg += "return any output"
