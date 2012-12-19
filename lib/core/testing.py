@@ -228,8 +228,10 @@ def runCase(switches=None, parse=None):
 
 def replaceVars(item, vars_):
     retVal = item
+
     if item and vars_:
         for var in re.findall("\$\{([^}]+)\}", item):
             if var in vars_:
                 retVal = retVal.replace("${%s}" % var, vars_[var])
+
     return retVal
