@@ -366,10 +366,10 @@
             <tech value="B"/>
             <search value="True"/>
             <db value="testdb"/>
-            <tbl value="a,e,i"/>
+            <tbl value="foo,se,bar"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+3 tables.+users'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
             <item value="r'.+5 entries.+wu.+nameisnull'"/>
         </parse>
     </case>
@@ -380,10 +380,10 @@
             <tech value="E"/>
             <search value="True"/>
             <db value="testdb"/>
-            <tbl value="a,e,i"/>
+            <tbl value="foo,se,bar"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+3 tables.+users'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
             <item value="r'.+5 entries.+wu.+nameisnull'"/>
         </parse>
     </case>
@@ -394,10 +394,10 @@
             <tech value="U"/>
             <search value="True"/>
             <db value="testdb"/>
-            <tbl value="a,e,i"/>
+            <tbl value="foo,se,bar"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+3 tables.+users'"/>
+            <item value="r'Database: testdb.+1 table.+users'"/>
             <item value="r'.+5 entries.+wu.+nameisnull'"/>
         </parse>
     </case>
@@ -411,7 +411,7 @@
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+3 tables.+users.+Database: mysql.+1 table.+user '"/>
+            <item value="r'Database: testdb.+1 table.+users.+Database: mysql.+1 table.+user '"/>
         </parse>
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - tables without given database">
@@ -424,7 +424,7 @@
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+3 tables.+users.+Database: mysql.+1 table.+user '"/>
+            <item value="r'Database: testdb.+1 table.+users.+Database: mysql.+1 table.+user '"/>
         </parse>
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - tables without given database">
@@ -437,7 +437,7 @@
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+3 tables.+users.+Database: mysql.+1 table.+user '"/>
+            <item value="r'Database: testdb.+1 table.+users.+Database: mysql.+1 table.+user '"/>
         </parse>
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - column without given db or table">
