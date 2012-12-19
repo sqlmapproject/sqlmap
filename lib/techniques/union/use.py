@@ -164,9 +164,9 @@ def unionUse(expression, unpack=True, dump=False):
         expression = expression[:expression.upper().rindex(" ORDER BY ")]
 
     # We have to check if the SQL query might return multiple entries
-    # and in such case forge the SQL limiting the query output one
-    # entry per time
-    # NOTE: I assume that only queries that get data from a table can
+    # if the technique is partial UNION query and in such case forge the
+    # SQL limiting the query output one entry at a time
+    # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
     if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
        (dump and (conf.limitStart or conf.limitStop))) and \
@@ -174,66 +174,9 @@ def unionUse(expression, unpack=True, dump=False):
        not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE \
        and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
        and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+        expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
-        limitCond = True
-        limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
-        limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
-        topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
-
-        if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
-                limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
-                limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
-
-                if limitGroupStart.isdigit():
-                    if limitRegExp2:
-                        startLimit = 0
-                        stopLimit = limitRegExp2.group(int(limitGroupStart))
-                    else:
-                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
-                        stopLimit = limitRegExp.group(int(limitGroupStop))
-                limitCond = int(stopLimit) > 1
-
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                if limitRegExp:
-                    limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
-                    limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
-
-                    if limitGroupStart.isdigit():
-                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
-
-                    stopLimit = limitRegExp.group(int(limitGroupStop))
-                    limitCond = int(stopLimit) > 1
-                elif topLimit:
-                    startLimit = 0
-                    stopLimit = int(topLimit.group(1))
-                    limitCond = int(stopLimit) > 1
-
-            elif Backend.isDbms(DBMS.ORACLE):
-                limitCond = False
-
-        # I assume that only queries NOT containing a "LIMIT #, 1"
-        # (or equivalent depending on the back-end DBMS) can return
-        # multiple entries
         if limitCond:
-            if (limitRegExp or limitRegExp2) and stopLimit is not None:
-                stopLimit = int(stopLimit)
-
-                # From now on we need only the expression until the " LIMIT "
-                # (or equivalent, depending on the back-end DBMS) word
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
-                    stopLimit += startLimit
-                    untilLimitChar = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
-                    expression = expression[:untilLimitChar]
-
-                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                    stopLimit += startLimit
-            elif dump:
-                if conf.limitStart:
-                    startLimit = conf.limitStart - 1
-                if conf.limitStop:
-                    stopLimit = conf.limitStop
-
             # Count the number of SQL query entries output
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 

@@ -675,6 +675,71 @@ class Agent(object):
 
         return unionQuery
 
+    def limitCondition(self, expression, dump=False):
+        startLimit = 0
+        stopLimit = None
+        limitCond = True
+
+        limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
+        limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
+        topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
+
+        if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+                limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
+                limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
+
+                if limitGroupStart.isdigit():
+                    if limitRegExp2:
+                        startLimit = 0
+                        stopLimit = limitRegExp2.group(int(limitGroupStart))
+                    else:
+                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
+                        stopLimit = limitRegExp.group(int(limitGroupStop))
+                limitCond = int(stopLimit) > 1
+
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                if limitRegExp:
+                    limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
+                    limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
+
+                    if limitGroupStart.isdigit():
+                        startLimit = int(limitRegExp.group(int(limitGroupStart)))
+
+                    stopLimit = limitRegExp.group(int(limitGroupStop))
+                    limitCond = int(stopLimit) > 1
+                elif topLimit:
+                    startLimit = 0
+                    stopLimit = int(topLimit.group(1))
+                    limitCond = int(stopLimit) > 1
+
+            elif Backend.isDbms(DBMS.ORACLE):
+                limitCond = False
+
+        # We assume that only queries NOT containing a "LIMIT #, 1"
+        # (or equivalent depending on the back-end DBMS) can return
+        # multiple entries
+        if limitCond:
+            if (limitRegExp or limitRegExp2) and stopLimit is not None:
+                stopLimit = int(stopLimit)
+
+                # From now on we need only the expression until the " LIMIT "
+                # (or equivalent, depending on the back-end DBMS) word
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+                    stopLimit += startLimit
+                    _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
+                    expression = expression[:_]
+
+                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                    stopLimit += startLimit
+            elif dump:
+                if conf.limitStart:
+                    startLimit = conf.limitStart - 1
+                if conf.limitStop:
+                    stopLimit = conf.limitStop
+
+        return expression, limitCond, topLimit, startLimit, stopLimit
+
     def limitQuery(self, num, query, field=None, uniqueField=None):
         """
         Take in input a query string and return its limited query string.
