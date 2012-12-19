@@ -209,15 +209,18 @@ def runCase(switches=None, parse=None):
         ifile = open(conf.dumper.getOutputFile(), "rb")
         content = ifile.read()
         ifile.close()
+
         for item in parse:
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], content, re.DOTALL):
                     retVal = False
                     failedItem = item
+
                     break
             elif content.find(item) < 0:
                 retVal = False
                 failedItem = item
+
                 break
 
     cleanCase()
