@@ -46,6 +46,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
+from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.convert import stdoutencode
 from lib.core.convert import unicodeencode
@@ -1167,7 +1168,7 @@ def getLimitRange(count, dump=False, plusOne=False):
 
 def parseUnionPage(page):
     """
-    Returns resulting items from union query inside provided page content
+    Returns resulting items from UNION query inside provided page content
     """
 
     if page is None:
@@ -3170,16 +3171,17 @@ def decodeHexValue(value):
 
     def _(value):
         if value and isinstance(value, basestring) and len(value) % 2 == 0:
-            if value.lower().startswith("0x"):
-                value = value[2:]
-            value = value.decode("hex")
+            value = hexdecode(value)
+
             if Backend.isDbms(DBMS.MSSQL):
                 try:
                     value = value.decode("utf-16-le")
                 except UnicodeDecodeError:
                     pass
+
             if not isinstance(value, unicode):
                 value = value.decode("utf8", "replace")
+
         return value
 
     try:
