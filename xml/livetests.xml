@@ -741,7 +741,58 @@
     </case>
     <!-- End of operating system access switches -->
 
-    <!-- Other switches -->
+    <!-- Technique switches -->
+    <case name="MySQL 4 time-based against unresponsive page">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_benchmark.php?id=1"/>
+            <tech value="T"/>
+            <level value="2"/>
+            <risk value="2"/>
+            <timeSec value="2"/>
+        </switches>
+        <parse>
+            <item value="Title: AND/OR time-based blind"/>
+            <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
+        </parse>
+    </case>
+    <case name="MySQL against page protected by custom weak filter">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_filtered.php?id=1"/>
+            <tech value="BE"/>
+            <level value="3"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic boolean-based blind - Parameter replace (original value)"/>
+            <item value="Title: MySQL &gt;= 5.1 error-based - Parameter replace (EXTRACTVALUE)"/>
+        </parse>
+    </case>
+    <case name="MySQL injection in GROUP BY clause">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_groupby.php?id=1"/>
+            <tech value="B"/>
+            <level value="3"/>
+        </switches>
+        <parse>
+            <item value="MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)"/>
+        </parse>
+    </case>
+    <!-- TODO: this crashes the library that parses XML as it has UTF-8 characters
+    <case name="MySQL boolean-based multi-threaded enumeration - international data">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_international.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <getBanner value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="international"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+река Москва'"/>
+        </parse>
+    </case>
+    -->
     <case name="MySQL partial UNION query multi-threaded enumeration - invalid bignum">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
@@ -772,6 +823,9 @@
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
+    <!-- End of technique switches -->
+
+    <!-- Other switches -->
     <case name="MySQL error-based HTTP basic authentication">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/basic/get_int.php?id=1"/>
