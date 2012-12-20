@@ -6,14 +6,15 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import json
+import logging
 import optparse
 import os
 import shutil
 import sys
+import StringIO
 import tempfile
 import threading
-
-sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
+import types
 
 from extra.bottle.bottle import abort
 from extra.bottle.bottle import error
@@ -26,17 +27,24 @@ from extra.bottle.bottle import run
 from extra.bottle.bottle import static_file
 from extra.bottle.bottle import template
 from lib.controller.controller import start
+from lib.core.common import setPaths
 from lib.core.convert import hexencode
+from lib.core.convert import stdoutencode
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
 from lib.core.data import cmdLineOptions
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.log import FORMATTER
+from lib.core.log import LOGGER_HANDLER
 from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import RESTAPI_SERVER_PORT
+from _sqlmap import modulePath
+
+RESTAPI_SERVER_HOST = "127.0.0.1"
+RESTAPI_SERVER_PORT = 8775
 
 # Local global variables
 adminid = ""
@@ -238,6 +246,8 @@ def scan_start(taskid):
     for key, value in request.json.items():
         tasks[taskid][key] = value
 
+    print "TASKS:", tasks
+
     # Overwrite output directory (oDir) value to a temporary directory
     tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")
 
@@ -317,9 +327,9 @@ def download(taskid, target, filename):
     else:
         abort(500)
 
-def restAPISetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+def restAPIRun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
-    Setup REST-JSON API
+    REST-JSON API server
     """
     global adminid
     global tasks
@@ -330,38 +340,56 @@ def restAPISetup(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("the admin task ID is: %s" % adminid)
 
-def restAPIRun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
-    """
-    Run REST-JSON API
-    """
+    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
+    def emit(self, record):
+        message = stdoutencode(FORMATTER.format(record))
+        print >>LOGGER_OUTPUT, message.strip('\r')
+
+    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
+
+    # Wrap standard output onto a custom file descriptor
+    sys.stdout = StringIO.StringIO()
+    #sys.stderr = StringIO.StringIO()
+
+    # Run RESTful API
     run(host=host, port=port, quiet=False, debug=False)
 
-def client(host, port):
+def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API client
     """
     addr = "http://%s:%d" % (host, port)
-    print "[*] starting debug REST-JSON client to '%s'..." % addr
+    logger.info("starting debug REST-JSON client to '%s'..." % addr)
 
-    # TODO: write a simple client with urllib2, for now use curl from command line
-    print "[!] not yet implemented, use curl from command line instead for now, for example:"
-    print "\n\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:%s/task/new" % port
-    print "\t$ curl --proxy http://127.0.0.1:8080 -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://127.0.0.1:%d/scan/<taskID>/start" % port
-    print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/output"
-    print "\t$ curl --proxy http://127.0.0.1:8080 http://127.0.0.1:8775/scan/<taskID>/log\n"
+    # TODO: write a simple client with requests, for now use curl from command line
+    logger.error("not yet implemented, use curl from command line instead for now, for example:")
+    print "\n\t$ curl http://%s:%d/task/new" % (host, port)
+    print "\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://%s:%d/scan/:taskid/start" % (host, port)
+    print "\t$ curl http://%s:%d/scan/:taskid/output" % (host, port)
+    print "\t$ curl http://%s:%d/scan/:taskid/log\n" % (host, port)
 
 if __name__ == "__main__":
     """
-    REST-JSON API wrapper function
+    REST-JSON API main function
     """
+    # Set default logging level to debug
+    logger.setLevel(logging.DEBUG)
+
+    paths.SQLMAP_ROOT_PATH = modulePath()
+    setPaths()
+
+    # Enforce batch mode and disable coloring
+    cmdLineOptions.batch = True
+    cmdLineOptions.disableColoring = True
+
     parser = optparse.OptionParser()
     parser.add_option("-s", "--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true")
     parser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true")
-    parser.add_option("-H", "--host", help="Host of the REST-JSON API server", default="0.0.0.0", action="store")
-    parser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store")
+    parser.add_option("-H", "--host", help="Host of the REST-JSON API server", default=RESTAPI_SERVER_HOST, action="store")
+    parser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, type="int", action="store")
     (args, _) = parser.parse_args()
 
     if args.server is True:
-        restAPIrun(args.host, args.port)
+        restAPIRun(args.host, args.port)
     elif args.client is True:
         client(args.host, args.port)

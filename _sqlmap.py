@@ -8,11 +8,9 @@ See the file 'doc/COPYING' for copying permission
 import bdb
 import logging
 import os
-import StringIO
 import sys
 import time
 import traceback
-import types
 import warnings
 
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
@@ -24,7 +22,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
-from lib.core.convert import stdoutencode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
@@ -35,18 +32,12 @@ from lib.core.exception import exceptionsTuple
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
-from lib.core.log import FORMATTER
-from lib.core.log import LOGGER_HANDLER
-from lib.core.log import LOGGER_OUTPUT
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
-from lib.core.settings import RESTAPI_SERVER_PORT
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
-from lib.utils.restapi import restAPIRun
-from lib.utils.restapi import restAPISetup
 
 def modulePath():
     """
@@ -55,30 +46,6 @@ def modulePath():
     """
 
     return os.path.dirname(getUnicode(sys.executable if weAreFrozen() else __file__, sys.getfilesystemencoding()))
-
-def restAPIServe():
-    # Increase default logging level to debug for RESTful API
-    logger.setLevel(logging.DEBUG)
-
-    # Enforce batch mode and disable coloring for RESTful API
-    cmdLineOptions.batch = True
-    cmdLineOptions.disableColoring = True
-
-    # Setup RESTful API
-    restAPISetup(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
-
-    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
-    def emit(self, record):
-        message = stdoutencode(FORMATTER.format(record))
-        print >>LOGGER_OUTPUT, message.strip('\r')
-    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
-
-    # Wrap standard output onto a custom file descriptor
-    sys.stdout = StringIO.StringIO()
-    #sys.stderr = StringIO.StringIO()
-
-    # Run RESTful API
-    restAPIRun(port=cmdLineOptions.restApiPort or RESTAPI_SERVER_PORT)
 
 def main():
     """
@@ -96,19 +63,16 @@ def main():
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
 
-        if cmdLineOptions.restApi:
-            restAPIServe()
-        else:
-            init(cmdLineOptions)
+        init(cmdLineOptions)
 
-            if conf.profile:
-                profile()
-            elif conf.smokeTest:
-                smokeTest()
-            elif conf.liveTest:
-                liveTest()
-            else:
-                start()
+        if conf.profile:
+            profile()
+        elif conf.smokeTest:
+            smokeTest()
+        elif conf.liveTest:
+            liveTest()
+        else:
+            start()
 
     except SqlmapUserQuitException:
         errMsg = "user quit"
