@@ -1589,9 +1589,7 @@ def readXmlFile(xmlFile):
     """
 
     checkFile(xmlFile)
-
-    with codecs.open(xmlFile, 'r', UNICODE_ENCODING) as f:
-        retVal = minidom.parse(f).documentElement
+    retVal = minidom.parse(xmlFile).documentElement
 
     return retVal
 
