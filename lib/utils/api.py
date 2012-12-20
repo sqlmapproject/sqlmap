@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import json
 import logging
-import optparse
 import os
 import shutil
 import sys
@@ -27,20 +26,21 @@ from extra.bottle.bottle import run
 from extra.bottle.bottle import static_file
 from extra.bottle.bottle import template
 from lib.controller.controller import start
+from lib.core.common import unArrayizeValue
 from lib.core.convert import hexencode
 from lib.core.convert import stdoutencode
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
-from lib.core.data import cmdLineOptions
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.defaults import _defaults
 from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
 from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
+from lib.core.optiondict import optDict
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
-from lib.parse.cmdline import cmdLineParser
 
 RESTAPI_SERVER_HOST = "127.0.0.1"
 RESTAPI_SERVER_PORT = 8775
@@ -59,6 +59,21 @@ def is_admin(taskid):
         return False
     else:
         return True
+
+def init_options():
+    dataype = {"boolean": False, "string": "", "integer": 0, "float": 0.0}
+    options = AttribDict()
+
+    for _ in optDict:
+        for name, type_ in optDict[_].items():
+            type_ = unArrayizeValue(type_)
+            options[name] = _defaults.get(name, dataype[type_])
+
+    # Enforce batch mode and disable coloring
+    options.batch = True
+    options.disableColoring = True
+
+    return options
 
 @hook("after_request")
 def security_headers():
@@ -106,10 +121,8 @@ def task_new():
     """
     global tasks
 
-    optset()
-
     taskid = hexencode(os.urandom(16))
-    tasks[taskid] = AttribDict(cmdLineOptions)
+    tasks[taskid] = init_options()
 
     return jsonize({"taskid": taskid})
 
@@ -247,7 +260,7 @@ def scan_start(taskid):
     for key, value in request.json.items():
         tasks[taskid][key] = value
 
-    print "TASKS:", tasks
+    print "DEBUG TASKS:", tasks
 
     # Overwrite output directory (oDir) value to a temporary directory
     tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")
@@ -328,10 +341,6 @@ def download(taskid, target, filename):
     else:
         abort(500)
 
-def optset():
-    # Store original command line options for possible later restoration
-    cmdLineOptions.update(cmdLineParser().__dict__)
-
 def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API server
@@ -339,12 +348,8 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     global adminid
     global tasks
 
-    # Enforce batch mode and disable coloring
-    cmdLineOptions.batch = True
-    cmdLineOptions.disableColoring = True
-
     adminid = hexencode(os.urandom(16))
-    tasks[adminid] = AttribDict(cmdLineOptions)
+    tasks[adminid] = init_options()
 
     logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("the admin task ID is: %s" % adminid)

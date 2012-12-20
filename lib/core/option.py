@@ -1784,7 +1784,7 @@ def _mergeOptions(inputOptions, overrideOptions):
             kb.explicitSettings.add(key)
 
     for key, value in defaults.items():
-        if conf[key] is None:
+        if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
 def _setTrafficOutputFP():
