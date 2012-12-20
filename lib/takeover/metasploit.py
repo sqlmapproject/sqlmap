@@ -486,6 +486,9 @@ class Metasploit:
                         else:
                             proc.stdin.write("uname -a ; id\n")
 
+                        if conf.liveTest:
+                            proc.stdin.write("exit\n")
+
                     metSess = re.search("Meterpreter session ([\d]+) opened", out)
 
                     if metSess:

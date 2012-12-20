@@ -18,6 +18,7 @@ from extra.beep.beep import beep
 from lib.controller.controller import start
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getUnicode
 from lib.core.common import randomStr
 from lib.core.common import readXmlFile
 from lib.core.data import conf
@@ -26,6 +27,7 @@ from lib.core.data import paths
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.optiondict import optDict
+from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
 
 failedItem = None
@@ -239,8 +241,6 @@ def runCase(switches=None, parse=None):
         ifile.close()
 
         for item, console_output in parse:
-            from lib.core.common import getUnicode
-            from lib.core.settings import UNICODE_ENCODING
             if console_output is True:
                 parse_on = getUnicode(console, UNICODE_ENCODING)
             else:
