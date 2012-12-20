@@ -1815,7 +1815,11 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
         if isinstance(value, unicode):
             return value
         elif isinstance(value, basestring):
-            return unicode(value, encoding or kb.pageEncoding or UNICODE_ENCODING, "replace")
+            while True:
+                try:
+                    return unicode(value, encoding or kb.pageEncoding or UNICODE_ENCODING)
+                except UnicodeDecodeError, ex:
+                    value = value[:ex.start] + "".join("\\x%02x" % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
         else:
             return unicode(value)  # encoding ignored for non-basestring instances
     else:
