@@ -500,7 +500,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
             except (UnicodeEncodeError, UnicodeDecodeError):
                 pass # ignore possible encoding problems caused by some words in custom dictionaries
 
-            except Exception, e:
+            except Exception:
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
                 warnMsg += "Please report by e-mail to %s" % ML
                 logger.critical(warnMsg)

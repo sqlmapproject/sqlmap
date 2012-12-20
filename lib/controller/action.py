@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.controller.handler import setHandler
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import dataToStdout
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

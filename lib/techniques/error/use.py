@@ -236,7 +236,6 @@ def errorUse(expression, dump=False):
     start = time.time()
     startLimit = 0
     stopLimit = None
-    output = None
     value = None
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)

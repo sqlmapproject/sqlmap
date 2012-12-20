@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import bdb
-import logging
 import os
 import sys
 import time
@@ -29,7 +28,6 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import exceptionsTuple
-from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import init
