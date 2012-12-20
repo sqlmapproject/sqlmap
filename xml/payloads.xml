@@ -717,7 +717,7 @@ Formats:
     </test>
 
     <test>
-        <title>MySQL boolean-based blind - WHERE or HAVING clause (RLIKE)</title>
+        <title>MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>

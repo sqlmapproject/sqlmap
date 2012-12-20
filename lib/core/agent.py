@@ -680,9 +680,14 @@ class Agent(object):
         stopLimit = None
         limitCond = True
 
-        limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
-        limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
         topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
+
+        limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
+
+        if hasattr(queries[Backend.getIdentifiedDbms()].limitregexp, "query2"):
+            limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
+        else:
+            limitRegExp2 = None
 
         if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
@@ -727,7 +732,10 @@ class Agent(object):
                 # (or equivalent, depending on the back-end DBMS) word
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
                     stopLimit += startLimit
-                    _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
+                    if expression.find(queries[Backend.getIdentifiedDbms()].limitstring.query) > 0:
+                        _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
+                    else:
+                        _ = expression.index("LIMIT ")
                     expression = expression[:_]
 
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
