@@ -7,7 +7,7 @@
     <global>
         <ignoreProxy value="True"/>
         <batch value="True"/>
-        <verbose value="2"/>
+        <verbose value="1"/>
     </global>
     <!-- Common enumeration switches across all techniques -->
     <case name="MySQL boolean-based multi-threaded enumeration - all entries">
@@ -741,7 +741,7 @@
     </case>
     <!-- End of operating system access switches -->
 
-    <!-- Technique switches -->
+    <!-- Technique switches and corner cases -->
     <case name="MySQL 4 time-based against unresponsive page">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_benchmark.php?id=1"/>
@@ -776,7 +776,6 @@
             <item value="MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)"/>
         </parse>
     </case>
-    <!-- TODO: this crashes the library that parses XML as it has UTF-8 characters
     <case name="MySQL boolean-based multi-threaded enumeration - international data">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_international.php?id=1"/>
@@ -792,7 +791,37 @@
             <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+река Москва'"/>
         </parse>
     </case>
-    -->
+    <case name="MySQL against highly dynamic page">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_rand.php?id=1"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
+            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+        </parse>
+    </case>
+    <case name="MySQL against a page that returns a 302 redirect page when SQL statement return no output">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_redirected.php?id=1"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
+            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+        </parse>
+    </case>
+    <case name="MySQL against a page that returns a 302 redirect page when SQL statement returns output">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_redirected_true.php?id=1"/>
+            <tech value="E"/>
+        </switches>
+        <parse>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
+        </parse>
+    </case>
     <case name="MySQL partial UNION query multi-threaded enumeration - invalid bignum">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
