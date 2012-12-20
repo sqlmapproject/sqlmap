@@ -37,7 +37,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user:    'root@localhost'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
@@ -80,7 +80,7 @@
         <parse>
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user:    'root@localhost'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
@@ -123,7 +123,7 @@
         <parse>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user:    'root@localhost'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
@@ -166,7 +166,7 @@
         <parse>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user:    'root@localhost'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
@@ -192,7 +192,7 @@
         </switches>
         <parse>
             <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -223,7 +223,7 @@
         <parse>
             <item value="Title: MySQL inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user:    'root@localhost'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
@@ -702,6 +702,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded file write">
         <switches>
+            <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
@@ -756,6 +757,21 @@
             <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
         </parse>
     </case>
+    <case name="MySQL OR boolean-base multi-threaded enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <testFilter value="OR boolean"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: OR boolean-based blind - WHERE or HAVING clause"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
     <case name="MySQL against page protected by custom weak filter">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_filtered.php?id=1"/>
@@ -788,7 +804,7 @@
             <tbl value="international"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+река Москва'"/>
         </parse>
     </case>
@@ -846,7 +862,7 @@
         <parse>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
             <item value="r'Payload: id=[\d]+\.[\d]+ UNION'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -861,7 +877,7 @@
         <parse>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
             <item value="r'Payload: id=1 AND [\d]+=[\d]+ UNION'"/>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -877,7 +893,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
     <case name="MySQL error-based HTTP digest authentication">
@@ -889,22 +905,21 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
     <case name="MySQL boolean-based predict output enumeration">
         <switches>
+            <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <predictOutput value="True"/>
             <tech value="B"/>
             <getBanner value="True"/>
-            <verbose value="2"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
     <!-- End of other switches -->
-
 </root>
