@@ -898,6 +898,7 @@
             <predictOutput value="True"/>
             <tech value="B"/>
             <getBanner value="True"/>
+            <verbose value="2"/>
         </switches>
         <parse>
             <item value="banner:    '5.1.63-0+squeeze1'"/>
