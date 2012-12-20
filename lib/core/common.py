@@ -3185,7 +3185,7 @@ def decodeHexValue(value):
                     pass
 
             if not isinstance(value, unicode):
-                value = value.decode("utf8", "replace")
+                value = getUnicode(value, "utf8")
 
         return value
 
