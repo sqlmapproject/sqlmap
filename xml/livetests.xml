@@ -726,7 +726,7 @@
             <item value="command standard output:    'uid="/>
         </parse>
     </case>
-    <!-- TODO: integration with Metasploit cannot be called yet from live testing -->
+    <!-- TODO: integration with Metasploit cannot be called yet from live testing
     <case name="MySQL shell via Metasploit integration - command execution">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
@@ -739,6 +739,7 @@
             <item value="r'Sending stage.+Command shell session.+Linux.+uid='"/>
         </parse>
     </case>
+    -->
     <!-- End of operating system access switches -->
 
     <!-- Technique switches and corner cases -->
@@ -751,7 +752,7 @@
             <timeSec value="2"/>
         </switches>
         <parse>
-            <item value="Title: AND/OR time-based blind"/>
+            <item value="Type: AND/OR time-based blind"/>
             <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
         </parse>
     </case>
@@ -794,6 +795,7 @@
     <case name="MySQL against highly dynamic page">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_rand.php?id=1"/>
+            <timeSec value="2"/>
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
@@ -805,11 +807,22 @@
     <case name="MySQL against a page that returns a 302 redirect page when SQL statement return no output">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_redirected.php?id=1"/>
+            <timeSec value="2"/>
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+        </parse>
+    </case>
+    <case name="MySQL against a page that returns an image">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int_img.php?id=1"/>
+            <tech value="BT"/>
+            <timeSec value="2"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
         </parse>
     </case>
