@@ -66,7 +66,7 @@ def tableExists(tableFile, regex=None):
     threadData = getCurrentThreadData()
     threadData.shared.count = 0
     threadData.shared.limit = len(tables)
-    threadData.shared.values = []
+    threadData.shared.value = []
     threadData.shared.unique = set()
 
     def tableExistsThread():
@@ -92,7 +92,7 @@ def tableExists(tableFile, regex=None):
             kb.locks.io.acquire()
 
             if result and table.lower() not in threadData.shared.unique:
-                threadData.shared.values.append(table)
+                threadData.shared.value.append(table)
                 threadData.shared.unique.add(table.lower())
 
                 if conf.verbose in (1, 2):
@@ -117,17 +117,17 @@ def tableExists(tableFile, regex=None):
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not threadData.shared.values:
+    if not threadData.shared.value:
         warnMsg = "no table(s) found"
         logger.warn(warnMsg)
     else:
-        for item in threadData.shared.values:
+        for item in threadData.shared.value:
             if conf.db not in kb.data.cachedTables:
                 kb.data.cachedTables[conf.db] = [item]
             else:
                 kb.data.cachedTables[conf.db].append(item)
 
-    for _ in map(lambda x: (conf.db, x), threadData.shared.values):
+    for _ in map(lambda x: (conf.db, x), threadData.shared.value):
         if _ not in kb.brute.tables:
             kb.brute.tables.append(_)
 
@@ -164,7 +164,7 @@ def columnExists(columnFile, regex=None):
     threadData = getCurrentThreadData()
     threadData.shared.count = 0
     threadData.shared.limit = len(columns)
-    threadData.shared.values = []
+    threadData.shared.value = []
 
     def columnExistsThread():
         threadData = getCurrentThreadData()
@@ -184,7 +184,7 @@ def columnExists(columnFile, regex=None):
             kb.locks.io.acquire()
 
             if result:
-                threadData.shared.values.append(column)
+                threadData.shared.value.append(column)
 
                 if conf.verbose in (1, 2):
                     clearConsoleLine(True)
@@ -208,13 +208,13 @@ def columnExists(columnFile, regex=None):
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not threadData.shared.values:
+    if not threadData.shared.value:
         warnMsg = "no column(s) found"
         logger.warn(warnMsg)
     else:
         columns = {}
 
-        for column in threadData.shared.values:
+        for column in threadData.shared.value:
             result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
             if result:
