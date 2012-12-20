@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import json
 import logging
-import optparse
 import os
 import shutil
 import sys
@@ -15,6 +14,17 @@ import StringIO
 import tempfile
 import threading
 import types
+
+_multiprocessing = None
+try:
+    import multiprocessing
+
+    # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
+    _ = multiprocessing.Queue()
+except (ImportError, OSError):
+    pass
+else:
+    _multiprocessing = multiprocessing
 
 from extra.bottle.bottle import abort
 from extra.bottle.bottle import error
@@ -27,20 +37,21 @@ from extra.bottle.bottle import run
 from extra.bottle.bottle import static_file
 from extra.bottle.bottle import template
 from lib.controller.controller import start
+from lib.core.common import unArrayizeValue
 from lib.core.convert import hexencode
 from lib.core.convert import stdoutencode
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
-from lib.core.data import cmdLineOptions
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.defaults import _defaults
 from lib.core.log import FORMATTER
 from lib.core.log import LOGGER_HANDLER
 from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
+from lib.core.optiondict import optDict
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
-from lib.parse.cmdline import cmdLineParser
 
 RESTAPI_SERVER_HOST = "127.0.0.1"
 RESTAPI_SERVER_PORT = 8775
@@ -59,6 +70,37 @@ def is_admin(taskid):
         return False
     else:
         return True
+
+def init_options():
+    dataype = {"boolean": False, "string": None, "integer": None, "float": None}
+    options = AttribDict()
+
+    for _ in optDict:
+        for name, type_ in optDict[_].items():
+            type_ = unArrayizeValue(type_)
+            options[name] = _defaults.get(name, dataype[type_])
+
+    # Enforce batch mode and disable coloring
+    options.batch = True
+    options.disableColoring = True
+
+    return options
+
+def start_scan():
+    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
+    def emit(self, record):
+        message = stdoutencode(FORMATTER.format(record))
+        print >>LOGGER_OUTPUT, message.strip('\r')
+
+    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
+
+    # Wrap standard output onto a custom file descriptor
+    sys.stdout = open(str(os.getpid()) + ".out", "wb")
+    #sys.stderr = StringIO.StringIO()
+
+    taskid = multiprocessing.current_process().name
+    init(tasks[taskid], True)
+    start()
 
 @hook("after_request")
 def security_headers():
@@ -106,10 +148,8 @@ def task_new():
     """
     global tasks
 
-    optset()
-
     taskid = hexencode(os.urandom(16))
-    tasks[taskid] = AttribDict(cmdLineOptions)
+    tasks[taskid] = init_options()
 
     return jsonize({"taskid": taskid})
 
@@ -247,17 +287,18 @@ def scan_start(taskid):
     for key, value in request.json.items():
         tasks[taskid][key] = value
 
-    print "TASKS:", tasks
-
     # Overwrite output directory (oDir) value to a temporary directory
     tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")
 
-    init(tasks[taskid], True)
-
     # Launch sqlmap engine in a separate thread
-    thread = threading.Thread(target=start)
-    thread.daemon = True
-    thread.start()
+    logger.debug("starting a scan for task ID %s" % taskid)
+
+    if _multiprocessing:
+        #_multiprocessing.log_to_stderr(logging.DEBUG)
+        p = _multiprocessing.Process(name=taskid, target=start_scan)
+        p.daemon = True
+        p.start()
+        p.join()
 
     return jsonize({"success": True})
 
@@ -328,10 +369,6 @@ def download(taskid, target, filename):
     else:
         abort(500)
 
-def optset():
-    # Store original command line options for possible later restoration
-    cmdLineOptions.update(cmdLineParser().__dict__)
-
 def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API server
@@ -339,26 +376,11 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     global adminid
     global tasks
 
-    # Enforce batch mode and disable coloring
-    cmdLineOptions.batch = True
-    cmdLineOptions.disableColoring = True
-
     adminid = hexencode(os.urandom(16))
-    tasks[adminid] = AttribDict(cmdLineOptions)
+    tasks[adminid] = init_options()
 
     logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("the admin task ID is: %s" % adminid)
-
-    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
-    def emit(self, record):
-        message = stdoutencode(FORMATTER.format(record))
-        print >>LOGGER_OUTPUT, message.strip('\r')
-
-    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
-
-    # Wrap standard output onto a custom file descriptor
-    sys.stdout = StringIO.StringIO()
-    #sys.stderr = StringIO.StringIO()
 
     # Run RESTful API
     run(host=host, port=port, quiet=False, debug=False)

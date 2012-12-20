@@ -183,6 +183,7 @@ optDict = {
                                "hexConvert":        "boolean",
                                "oDir":              "string",
                                "parseErrors":       "boolean",
+                               "saveCmdline":       "boolean",
                                "updateAll":         "boolean",
                                "tor":               "boolean",
                                "torPort":           "integer",
@@ -202,9 +203,19 @@ optDict = {
                                "hpp":               "boolean",
                                "mobile":            "boolean",
                                "pageRank":          "boolean",
+                               "purgeOutput":       "boolean",
                                "smart":             "boolean",
                                "testFilter":        "string",
                                "wizard":            "boolean",
                                "verbose":           "integer"
                              },
+            "Hidden": {
+                               "profile":           "boolean",
+                               "cpuThrottle":       "integer",
+                               "forceDns":          "boolean",
+                               "smokeTest":         "boolean",
+                               "liveTest":          "boolean",
+                               "stopFail":          "boolean",
+                               "runCase":           "string"
+                      }
           }
