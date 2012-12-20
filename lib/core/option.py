@@ -1538,7 +1538,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "count", "index", "io", "limits", "log", "outputs", "value"):
+    for _ in ("cache", "count", "index", "io", "limit", "log", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None

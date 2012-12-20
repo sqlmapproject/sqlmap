@@ -237,7 +237,7 @@ def unionUse(expression, unpack=True, dump=False):
                     threadData = getCurrentThreadData()
 
                     while kb.threadContinue:
-                        with kb.locks.limits:
+                        with kb.locks.limit:
                             try:
                                 num = threadData.shared.limits.next()
                             except StopIteration:

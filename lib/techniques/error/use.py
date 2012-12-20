@@ -158,7 +158,7 @@ def _oneShotErrorUse(expression, field=None):
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
 def _errorFields(expression, expressionFields, expressionFieldsList, num=None, emptyFields=None):
-    outputs = []
+    values = []
     origExpr = None
 
     threadData = getCurrentThreadData()
@@ -191,9 +191,9 @@ def _errorFields(expression, expressionFields, expressionFieldsList, num=None, e
         if isinstance(num, int):
             expression = origExpr
 
-        outputs.append(output)
+        values.append(output)
 
-    return outputs
+    return values
 
 def _errorReplaceChars(value):
     """
@@ -237,7 +237,7 @@ def errorUse(expression, dump=False):
     startLimit = 0
     stopLimit = None
     output = None
-    outputs = None
+    value = None
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
@@ -290,21 +290,21 @@ def errorUse(expression, dump=False):
                     warnMsg += "return any output"
                     logger.warn(warnMsg)
                 else:
-                    outputs = []  # for empty tables
-                return outputs
+                    value = []  # for empty tables
+                return value
 
             if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
                 message = "due to huge table size do you want to remove "
                 message += "ORDER BY clause gaining speed over consistency? [y/N] "
-                output = readInput(message, default="N")
+                _ = readInput(message, default="N")
 
-                if output and output[0] in ("y", "Y"):
+                if _ and _[0] in ("y", "Y"):
                     expression = expression[:expression.index(" ORDER BY ")]
 
             threadData = getCurrentThreadData()
             threadData.shared.limits = iter(xrange(startLimit, stopLimit))
             numThreads = min(conf.threads, (stopLimit - startLimit))
-            threadData.shared.outputs = BigArray()
+            threadData.shared.value = BigArray()
             threadData.shared.buffered = []
             threadData.shared.lastFlushed = startLimit - 1
 
@@ -327,7 +327,7 @@ def errorUse(expression, dump=False):
                     threadData = getCurrentThreadData()
 
                     while kb.threadContinue:
-                        with kb.locks.limits:
+                        with kb.locks.limit:
                             try:
                                 num = threadData.shared.limits.next()
                             except StopIteration:
@@ -341,7 +341,7 @@ def errorUse(expression, dump=False):
                         if output and isListLike(output) and len(output) == 1:
                             output = output[0]
 
-                        with kb.locks.outputs:
+                        with kb.locks.value:
                             index = None
                             for index in xrange(len(threadData.shared.buffered)):
                                 if threadData.shared.buffered[index][0] >= num:
@@ -349,7 +349,7 @@ def errorUse(expression, dump=False):
                             threadData.shared.buffered.insert(index or 0, (num, output))
                             while threadData.shared.buffered and threadData.shared.lastFlushed + 1 == threadData.shared.buffered[0][0]:
                                 threadData.shared.lastFlushed += 1
-                                threadData.shared.outputs.append(threadData.shared.buffered[0][1])
+                                threadData.shared.value.append(threadData.shared.buffered[0][1])
                                 del threadData.shared.buffered[0]
 
                 runThreads(numThreads, errorThread)
@@ -361,15 +361,15 @@ def errorUse(expression, dump=False):
                 logger.warn(warnMsg)
 
             finally:
-                threadData.shared.outputs.extend(_[1] for _ in sorted(threadData.shared.buffered))
-                outputs = threadData.shared.outputs
+                threadData.shared.value.extend(_[1] for _ in sorted(threadData.shared.buffered))
+                value = threadData.shared.value
                 kb.suppressResumeInfo = False
 
-    if not outputs and not abortedFlag:
-        outputs = _errorFields(expression, expressionFields, expressionFieldsList)
+    if not value and not abortedFlag:
+        value = _errorFields(expression, expressionFields, expressionFieldsList)
 
-    if outputs and isListLike(outputs) and len(outputs) == 1 and isinstance(outputs[0], basestring):
-        outputs = outputs[0]
+    if value and isListLike(value) and len(value) == 1 and isinstance(value[0], basestring):
+        value = value[0]
 
     duration = calculateDeltaSeconds(start)
 
@@ -377,4 +377,4 @@ def errorUse(expression, dump=False):
         debugMsg = "performed %d queries in %d seconds" % (kb.counters[kb.technique], duration)
         logger.debug(debugMsg)
 
-    return outputs
+    return value

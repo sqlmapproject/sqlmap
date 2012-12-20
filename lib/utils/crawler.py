@@ -34,13 +34,13 @@ class Crawler(object):
     def getTargetUrls(self):
         try:
             threadData = getCurrentThreadData()
-            threadData.shared.outputs = oset()
+            threadData.shared.values = oset()
 
             def crawlThread():
                 threadData = getCurrentThreadData()
 
                 while kb.threadContinue:
-                    with kb.locks.limits:
+                    with kb.locks.limit:
                         if threadData.shared.unprocessed:
                             current = threadData.shared.unprocessed.pop()
                         else:
@@ -79,10 +79,10 @@ class Crawler(object):
                                         continue
 
                                     if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
-                                        with kb.locks.outputs:
+                                        with kb.locks.value:
                                             threadData.shared.deeper.add(url)
                                             if re.search(r"(.*?)\?(.+)", url):
-                                                threadData.shared.outputs.add(url)
+                                                threadData.shared.values.add(url)
                         except UnicodeEncodeError: # for non-HTML files
                             pass
                         finally:
@@ -121,9 +121,9 @@ class Crawler(object):
         finally:
             clearConsoleLine(True)
 
-            if not threadData.shared.outputs:
+            if not threadData.shared.values:
                 warnMsg = "no usable links found (with GET parameters)"
                 logger.warn(warnMsg)
             else:
-                for url in threadData.shared.outputs:
+                for url in threadData.shared.values:
                     kb.targets.add(( url, None, None, None ))
