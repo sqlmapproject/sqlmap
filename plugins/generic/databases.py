@@ -504,8 +504,6 @@ class Databases:
 
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
-                else:
-                    infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
 
                 infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
@@ -572,8 +570,6 @@ class Databases:
 
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
-                else:
-                    infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
 
                 infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
