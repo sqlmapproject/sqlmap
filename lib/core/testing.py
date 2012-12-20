@@ -5,6 +5,7 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import codecs
 import doctest
 import os
 import re
@@ -18,6 +19,7 @@ from extra.beep.beep import beep
 from lib.controller.controller import start
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getUnicode
 from lib.core.common import randomStr
 from lib.core.common import readXmlFile
 from lib.core.data import conf
@@ -26,6 +28,7 @@ from lib.core.data import paths
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.optiondict import optDict
+from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
 
 failedItem = None
@@ -235,26 +238,22 @@ def runCase(switches=None, parse=None):
         retVal = False
 
     if parse and retVal:
-        ifile = open(conf.dumper.getOutputFile(), "rb")
-        content = ifile.read()
-        ifile.close()
+        console = getUnicode(console, system=True)
+        with codecs.open(conf.dumper.getOutputFile(), "rb", UNICODE_ENCODING) as f:
+            content = f.read()
 
         for item, console_output in parse:
-            if console_output is True:
-                parse_on = console
-            else:
-                parse_on = content
+            parse_on = console if console_output else content
 
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
                     retVal = False
                     failedItem = item
-
                     break
-            elif parse_on.find(item) < 0:
+
+            elif item not in parse_on:
                 retVal = False
                 failedItem = item
-
                 break
 
     cleanCase()
