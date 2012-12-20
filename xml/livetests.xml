@@ -756,6 +756,21 @@
             <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
         </parse>
     </case>
+    <case name="MySQL OR boolean-base multi-threaded enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <testFilter value="OR boolean"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: OR boolean-based blind - WHERE or HAVING clause"/>
+            <item value="banner:    '5.1.63-0+squeeze1'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
     <case name="MySQL against page protected by custom weak filter">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_filtered.php?id=1"/>
@@ -906,5 +921,4 @@
         </parse>
     </case>
     <!-- End of other switches -->
-
 </root>
