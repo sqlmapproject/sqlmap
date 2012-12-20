@@ -42,7 +42,7 @@ def safecharencode(value):
 
     if isinstance(value, basestring):
         if any(_ not in SAFE_CHARS for _ in value):
-            retVal = retVal.replace('\\', SLASH_MARKER)
+            retVal = re.sub(r'(?i)(?!\\x[0-9A-F]{2})\\', SLASH_MARKER, value)
 
             for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
                 retVal = retVal.replace(char, repr(char).strip('\''))
