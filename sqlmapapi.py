@@ -5,8 +5,8 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import argparse
 import logging
+import optparse
 
 from _sqlmap import modulePath
 from lib.core.common import setPaths
@@ -28,12 +28,12 @@ if __name__ == "__main__":
     paths.SQLMAP_ROOT_PATH = modulePath()
     setPaths()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true")
-    parser.add_argument("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true")
-    parser.add_argument("-H", "--host", help="Host of the REST-JSON API server", default=RESTAPI_SERVER_HOST, action="store")
-    parser.add_argument("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store")
-    args = parser.parse_args()
+    apiparser = optparse.OptionParser()
+    apiparser.add_option("--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true")
+    apiparser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true")
+    apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server", default=RESTAPI_SERVER_HOST, action="store")
+    apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, type="int", action="store")
+    (args, _) = apiparser.parse_args()
 
     if args.server is True:
         server(args.host, args.port)
