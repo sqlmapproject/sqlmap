@@ -49,7 +49,7 @@ def safecharencode(value):
 
             retVal = retVal.replace(SLASH_MARKER, '\\\\')
 
-            retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, unicode())
+            retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, (unicode if isinstance(value, unicode) else str)())
     elif isinstance(value, list):
         for i in xrange(len(value)):
             retVal[i] = safecharencode(value[i])
@@ -68,7 +68,7 @@ def safechardecode(value):
         while True:
             match = regex.search(retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), unichr(ord(binascii.unhexlify(match.group("result").lstrip('\\x')))))
+                retVal = retVal.replace(match.group("result"), (unichr if isinstance(value, unicode) else chr)(ord(binascii.unhexlify(match.group("result").lstrip('\\x')))))
             else:
                 break
 
