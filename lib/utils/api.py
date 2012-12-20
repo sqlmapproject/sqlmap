@@ -15,6 +15,17 @@ import tempfile
 import threading
 import types
 
+_multiprocessing = None
+try:
+    import multiprocessing
+
+    # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
+    _ = multiprocessing.Queue()
+except (ImportError, OSError):
+    pass
+else:
+    _multiprocessing = multiprocessing
+
 from extra.bottle.bottle import abort
 from extra.bottle.bottle import error
 from extra.bottle.bottle import get
@@ -74,6 +85,22 @@ def init_options():
     options.disableColoring = True
 
     return options
+
+def start_scan():
+    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
+    def emit(self, record):
+        message = stdoutencode(FORMATTER.format(record))
+        print >>LOGGER_OUTPUT, message.strip('\r')
+
+    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
+
+    # Wrap standard output onto a custom file descriptor
+    sys.stdout = open(str(os.getpid()) + ".out", "wb")
+    #sys.stderr = StringIO.StringIO()
+
+    taskid = multiprocessing.current_process().name
+    init(tasks[taskid], True)
+    start()
 
 @hook("after_request")
 def security_headers():
@@ -263,12 +290,15 @@ def scan_start(taskid):
     # Overwrite output directory (oDir) value to a temporary directory
     tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")
 
-    init(tasks[taskid], True)
-
     # Launch sqlmap engine in a separate thread
-    thread = threading.Thread(target=start)
-    thread.daemon = True
-    thread.start()
+    logger.debug("starting a scan for task ID %s" % taskid)
+
+    if _multiprocessing:
+        #_multiprocessing.log_to_stderr(logging.DEBUG)
+        p = _multiprocessing.Process(name=taskid, target=start_scan)
+        p.daemon = True
+        p.start()
+        p.join()
 
     return jsonize({"success": True})
 
@@ -351,17 +381,6 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
 
     logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("the admin task ID is: %s" % adminid)
-
-    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
-    def emit(self, record):
-        message = stdoutencode(FORMATTER.format(record))
-        print >>LOGGER_OUTPUT, message.strip('\r')
-
-    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
-
-    # Wrap standard output onto a custom file descriptor
-    sys.stdout = StringIO.StringIO()
-    #sys.stderr = StringIO.StringIO()
 
     # Run RESTful API
     run(host=host, port=port, quiet=False, debug=False)
