@@ -191,7 +191,6 @@ def initCase(switches=None):
 
     logger.debug("using output directory '%s' for this test case" % paths.SQLMAP_OUTPUT_PATH)
 
-    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
     cmdLineOptions = cmdLineParser()
     cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
 
@@ -210,7 +209,7 @@ def runCase(switches=None, parse=None):
 
     initCase(switches)
 
-    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
+    LOGGER_HANDLER.stream = sys.stdout = tempfile.SpooledTemporaryFile()
     retVal = True
     exception = None
     result = False
@@ -240,10 +239,12 @@ def runCase(switches=None, parse=None):
         ifile.close()
 
         for item, console_output in parse:
+            from lib.core.common import getUnicode
+            from lib.core.settings import UNICODE_ENCODING
             if console_output is True:
-                parse_on = console
+                parse_on = getUnicode(console, UNICODE_ENCODING)
             else:
-                parse_on = content
+                parse_on = getUnicode(content, UNICODE_ENCODING)
 
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
