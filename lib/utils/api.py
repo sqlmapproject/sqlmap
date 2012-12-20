@@ -27,7 +27,6 @@ from extra.bottle.bottle import run
 from extra.bottle.bottle import static_file
 from extra.bottle.bottle import template
 from lib.controller.controller import start
-from lib.core.common import setPaths
 from lib.core.convert import hexencode
 from lib.core.convert import stdoutencode
 from lib.core.data import paths
@@ -41,7 +40,7 @@ from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
-from _sqlmap import modulePath
+from lib.parse.cmdline import cmdLineParser
 
 RESTAPI_SERVER_HOST = "127.0.0.1"
 RESTAPI_SERVER_PORT = 8775
@@ -106,6 +105,8 @@ def task_new():
     Create new task ID
     """
     global tasks
+
+    optset()
 
     taskid = hexencode(os.urandom(16))
     tasks[taskid] = AttribDict(cmdLineOptions)
@@ -327,12 +328,20 @@ def download(taskid, target, filename):
     else:
         abort(500)
 
-def restAPIRun(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+def optset():
+    # Store original command line options for possible later restoration
+    cmdLineOptions.update(cmdLineParser().__dict__)
+
+def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API server
     """
     global adminid
     global tasks
+
+    # Enforce batch mode and disable coloring
+    cmdLineOptions.batch = True
+    cmdLineOptions.disableColoring = True
 
     adminid = hexencode(os.urandom(16))
     tasks[adminid] = AttribDict(cmdLineOptions)
@@ -367,29 +376,3 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
     print "\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://%s:%d/scan/:taskid/start" % (host, port)
     print "\t$ curl http://%s:%d/scan/:taskid/output" % (host, port)
     print "\t$ curl http://%s:%d/scan/:taskid/log\n" % (host, port)
-
-if __name__ == "__main__":
-    """
-    REST-JSON API main function
-    """
-    # Set default logging level to debug
-    logger.setLevel(logging.DEBUG)
-
-    paths.SQLMAP_ROOT_PATH = modulePath()
-    setPaths()
-
-    # Enforce batch mode and disable coloring
-    cmdLineOptions.batch = True
-    cmdLineOptions.disableColoring = True
-
-    parser = optparse.OptionParser()
-    parser.add_option("-s", "--server", help="Act as a REST-JSON API server", default=RESTAPI_SERVER_PORT, action="store_true")
-    parser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_SERVER_PORT, action="store_true")
-    parser.add_option("-H", "--host", help="Host of the REST-JSON API server", default=RESTAPI_SERVER_HOST, action="store")
-    parser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_SERVER_PORT, type="int", action="store")
-    (args, _) = parser.parse_args()
-
-    if args.server is True:
-        restAPIRun(args.host, args.port)
-    elif args.client is True:
-        client(args.host, args.port)
