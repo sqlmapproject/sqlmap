@@ -61,7 +61,7 @@ def is_admin(taskid):
         return True
 
 def init_options():
-    dataype = {"boolean": False, "string": "", "integer": 0, "float": 0.0}
+    dataype = {"boolean": False, "string": None, "integer": None, "float": None}
     options = AttribDict()
 
     for _ in optDict:
@@ -259,8 +259,6 @@ def scan_start(taskid):
     # within the JSON request
     for key, value in request.json.items():
         tasks[taskid][key] = value
-
-    print "DEBUG TASKS:", tasks
 
     # Overwrite output directory (oDir) value to a temporary directory
     tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")

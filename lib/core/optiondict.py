@@ -209,4 +209,13 @@ optDict = {
                                "wizard":            "boolean",
                                "verbose":           "integer"
                              },
+            "Hidden": {
+                               "profile":           "boolean",
+                               "cpuThrottle":       "integer",
+                               "forceDns":          "boolean",
+                               "smokeTest":         "boolean",
+                               "liveTest":          "boolean",
+                               "stopFail":          "boolean",
+                               "runCase":           "string"
+                      }
           }
