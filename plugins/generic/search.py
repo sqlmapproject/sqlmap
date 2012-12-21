@@ -15,6 +15,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -127,7 +128,7 @@ class Search:
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query, dbCond)
 
-                    value = inject.getValue(query, union=False, error=False)
+                    value = unArrayizeValue(inject.getValue(query, union=False, error=False))
                     value = safeSQLIdentificatorNaming(value)
                     foundDbs.append(value)
 
@@ -234,7 +235,7 @@ class Search:
                         query += ") AS foobar"
                     query = agent.limitQuery(index, query)
 
-                    foundDb = inject.getValue(query, union=False, error=False)
+                    foundDb = unArrayizeValue(inject.getValue(query, union=False, error=False))
                     foundDb = safeSQLIdentificatorNaming(foundDb)
 
                     if foundDb not in foundTbls:
@@ -278,7 +279,7 @@ class Search:
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query)
 
-                        foundTbl = inject.getValue(query, union=False, error=False)
+                        foundTbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         kb.hintValue = foundTbl
                         foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
                         foundTbls[db].append(foundTbl)
@@ -452,7 +453,7 @@ class Search:
                         if Backend.isDbms(DBMS.DB2):
                             query += ") AS foobar"
                         query = agent.limitQuery(index, query)
-                        db = inject.getValue(query, union=False, error=False)
+                        db = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         db = safeSQLIdentificatorNaming(db)
 
                         if db not in dbs:
@@ -507,7 +508,7 @@ class Search:
                             query += " AND %s" % colQuery
                             query += whereTblsQuery
                             query = agent.limitQuery(index, query)
-                            tbl = inject.getValue(query, union=False, error=False)
+                            tbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
                             kb.hintValue = tbl
 
                             tbl = safeSQLIdentificatorNaming(tbl, True)

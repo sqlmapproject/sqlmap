@@ -98,10 +98,10 @@ class Users:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
-            value = inject.getValue(query, blind=False, time=False)
+            values = inject.getValue(query, blind=False, time=False)
 
-            if not isNoneValue(value):
-                kb.data.cachedUsers = arrayizeValue(value)
+            if not isNoneValue(values):
+                kb.data.cachedUsers = arrayizeValue(values)
 
         if not kb.data.cachedUsers and isInferenceAvailable() and not conf.direct:
             infoMsg = "fetching number of database users"
@@ -128,7 +128,7 @@ class Users:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
-                user = inject.getValue(query, union=False, error=False)
+                user = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                 if user:
                     kb.data.cachedUsers.append(user)
@@ -195,9 +195,9 @@ class Users:
 
                 getCurrentThreadData().disableStdOut = False
             else:
-                value = inject.getValue(query, blind=False, time=False)
+                values = inject.getValue(query, blind=False, time=False)
 
-                for user, password in filterPairValues(value):
+                for user, password in filterPairValues(values):
                     if not user or user == " ":
                         continue
 
@@ -278,7 +278,7 @@ class Users:
                         else:
                             query = rootQuery.blind.query % (user, index)
 
-                        password = inject.getValue(query, union=False, error=False)
+                        password = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         password = parsePasswordHash(password)
                         passwords.append(password)
 
@@ -504,7 +504,7 @@ class Users:
                         query = rootQuery.blind.query % (index, user)
                     else:
                         query = rootQuery.blind.query % (user, index)
-                    privilege = inject.getValue(query, union=False, error=False)
+                    privilege = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise
