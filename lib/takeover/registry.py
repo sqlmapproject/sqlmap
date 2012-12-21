@@ -49,11 +49,11 @@ class Registry:
     def _createLocalBatchFile(self):
         self._batPathFp = open(self._batPathLocal, "w")
 
-        if self.__operation == "read":
+        if self._operation == "read":
             lines = self._batRead
-        elif self.__operation == "add":
+        elif self._operation == "add":
             lines = self._batAdd
-        elif self.__operation == "delete":
+        elif self._operation == "delete":
             lines = self._batDel
 
         for line in lines:
@@ -70,9 +70,9 @@ class Registry:
         os.unlink(self._batPathLocal)
 
     def readRegKey(self, regKey, regValue, parse=False):
-        self.__operation = "read"
+        self._operation = "read"
 
-        self._initVars(regKey, regValue, parse=parse)
+        Registry._initVars(self, regKey, regValue, parse=parse)
         self._createRemoteBatchFile()
 
         logger.debug("reading registry key '%s' value '%s'" % (regKey, regValue))
@@ -90,9 +90,9 @@ class Registry:
         return data
 
     def addRegKey(self, regKey, regValue, regType, regData):
-        self.__operation = "add"
+        self._operation = "add"
 
-        self._initVars(regKey, regValue, regType, regData)
+        Registry._initVars(self, regKey, regValue, regType, regData)
         self._createRemoteBatchFile()
 
         debugMsg = "adding registry key value '%s' " % self._regValue
@@ -103,9 +103,9 @@ class Registry:
         self.delRemoteFile(self._batPathRemote)
 
     def delRegKey(self, regKey, regValue):
-        self.__operation = "delete"
+        self._operation = "delete"
 
-        self._initVars(regKey, regValue)
+        Registry._initVars(self, regKey, regValue)
         self._createRemoteBatchFile()
 
         debugMsg = "deleting registry key value '%s' " % self._regValue

@@ -503,7 +503,7 @@ class Metasploit:
         self._randStr = randomStr(lowercase=True)
         self._shellcodeFilePath = os.path.join(conf.outputPath, "tmpm%s" % self._randStr)
 
-        self._initVars()
+        Metasploit._initVars(self)
         self._prepareIngredients(encode=encode)
         self._forgeMsfPayloadCmd(exitfunc, format, self._shellcodeFilePath, extra)
 
@@ -583,7 +583,7 @@ class Metasploit:
             self.delRemoteFile(self.shellcodeexecRemote)
 
     def smb(self):
-        self._initVars()
+        Metasploit._initVars(self)
         self._randFile = "tmpu%s.txt" % randomStr(lowercase=True)
 
         self._runMsfCliSmbrelay()

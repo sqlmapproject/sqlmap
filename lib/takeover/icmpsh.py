@@ -30,7 +30,7 @@ class ICMPsh:
         self.rhostStr = None
         self.localIP = getLocalIP()
         self.remoteIP = getRemoteIP()
-        self.__icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe"))
+        self._icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe"))
 
     def _selectRhost(self):
         message = "what is the back-end DBMS address? [%s] " % self.remoteIP
@@ -63,7 +63,7 @@ class ICMPsh:
         self.execCmd(cmd, silent=True)
 
     def uploadIcmpshSlave(self, web=False):
-        self._initVars()
+        ICMPsh._initVars(self)
         self._randStr = randomStr(lowercase=True)
         self._icmpslaveRemoteBase = "tmpi%s.exe" % self._randStr
 
@@ -77,9 +77,9 @@ class ICMPsh:
         logger.info("uploading icmpsh slave to '%s'" % self._icmpslaveRemote)
 
         if web:
-            self.webUpload(self._icmpslaveRemote, self.webDirectory, filepath=self.__icmpslave)
+            self.webUpload(self._icmpslaveRemote, self.webDirectory, filepath=self._icmpslave)
         else:
-            self.writeFile(self.__icmpslave, self._icmpslaveRemote, "binary")
+            self.writeFile(self._icmpslave, self._icmpslaveRemote, "binary")
 
     def icmpPwn(self):
         self._prepareIngredients()
