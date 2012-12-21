@@ -584,8 +584,6 @@ class Databases:
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.MSSQL):
-                    import pdb
-                    pdb.set_trace()
                     query = rootQuery.blind.count % (conf.db, conf.db, \
                         unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                     query += condQuery.replace("[DB]", conf.db)
