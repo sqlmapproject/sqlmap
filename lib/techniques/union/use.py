@@ -28,6 +28,7 @@ from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
+from lib.core.common import prioritySortColumns
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
@@ -244,7 +245,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 break
 
                         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                            field = expressionFieldsList[0]
+                            field = prioritySortColumns(expressionFieldsList)[0]
                         elif Backend.isDbms(DBMS.ORACLE):
                             field = expressionFieldsList
                         else:

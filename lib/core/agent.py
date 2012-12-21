@@ -833,10 +833,10 @@ class Agent(object):
                     if " WHERE " in limitedQuery:
                         limitedQuery = "%s AND %s " % (limitedQuery, self.nullAndCastField(uniqueField or field))
                     else:
-                        limitedQuery = "%s WHERE ISNULL(%s,' ') " % (limitedQuery, uniqueField or field)
+                        limitedQuery = "%s WHERE %s " % (limitedQuery, self.nullAndCastField(uniqueField or field))
 
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
-                    limitedQuery += "%s %s ORDER BY %s) ORDER BY %s" % (self.nullAndCastField(uniqueField or field), fromFrom, uniqueField or "1", uniqueField or "1")
+                    limitedQuery += "%s %s ORDER BY %s) ORDER BY %s" % (self.nullAndCastField(uniqueField or field), fromFrom, uniqueField or field, uniqueField or field)
                 else:
                     if " WHERE " in limitedQuery:
                         limitedQuery = "%s AND %s " % (limitedQuery, field)
