@@ -478,13 +478,16 @@ class Dump(object):
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    # TODO: this is related to issue #8, but it is not yet working
-                    #mimetype = magic.from_buffer(value, mime=True)
-
-                    #if mimetype.startswith("application") or mimetype.startswith("image"):
-                    #    singleFP = open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb")
-                    #    singleFP.write(value.encode("utf8"))
-                    #    singleFP.close()
+                    if len(value) > 10 and r'\x' in value:
+                        mimetype = magic.from_buffer(value, mime=True)
+                        if mimetype.startswith("application") or mimetype.startswith("image"):
+                            with open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb") as f:
+                                import pdb
+                                pdb.set_trace()
+                                from extra.safe2bin.safe2bin import safechardecode
+                                _ = _.encode(UNICODE_ENCODING)
+                                _ = safechardecode(value)
+                                f.write(_)
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
