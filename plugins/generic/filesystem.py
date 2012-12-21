@@ -25,6 +25,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUndefinedMethod
+from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
 class Filesystem:
@@ -112,7 +113,7 @@ class Filesystem:
         """
 
         retVal = []
-        with codecs.open(fileName, "rb") as f:
+        with codecs.open(fileName, "rb", UNICODE_ENCODING) as f:
             content = f.read().encode(encoding).replace("\n", "")
 
         if not single:
@@ -230,19 +231,24 @@ class Filesystem:
 
             if fileContent is not None:
                 fileContent = decodeHexValue(fileContent)
-                localFilePath = dataToOutFile(remoteFile, fileContent)
 
-                if not Backend.isDbms(DBMS.PGSQL):
-                    self.cleanup(onlyFileTbl=True)
+                if fileContent:
+                    localFilePath = dataToOutFile(remoteFile, fileContent)
 
-                sameFile = self.askCheckReadFile(localFilePath, remoteFile)
+                    if not Backend.isDbms(DBMS.PGSQL):
+                        self.cleanup(onlyFileTbl=True)
 
-                if sameFile is True:
-                    localFilePath += " (same file)"
-                elif sameFile is False:
-                    localFilePath += " (size differs from remote file)"
+                    sameFile = self.askCheckReadFile(localFilePath, remoteFile)
 
-                localFilePaths.append(localFilePath)
+                    if sameFile is True:
+                        localFilePath += " (same file)"
+                    elif sameFile is False:
+                        localFilePath += " (size differs from remote file)"
+
+                    localFilePaths.append(localFilePath)
+                else:
+                    errMsg = "no data retrieved"
+                    logger.error(errMsg)
 
         return localFilePaths
 

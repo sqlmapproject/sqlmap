@@ -531,7 +531,7 @@ class Metasploit:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", " ").replace("\r", "")
             raise SqlmapFilePathException, errMsg
 
-        self._shellcodeFP = codecs.open(self._shellcodeFilePath, "rb")
+        self._shellcodeFP = codecs.open(self._shellcodeFilePath, "rb", UNICODE_ENCODING)
         self.shellcodeString = self._shellcodeFP.read()
         self._shellcodeFP.close()
 

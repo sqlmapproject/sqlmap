@@ -737,13 +737,13 @@ def dataToDumpFile(dumpFile, data):
     dumpFile.flush()
 
 def dataToOutFile(filename, data):
-    if not data:
-        return "No data retrieved"
+    retVal = None
 
-    retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToString(filename))
+    if data:
+        retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToString(filename))
 
-    with codecs.open(retVal, "wb") as f:
-        f.write(data)
+        with codecs.open(retVal, "wb", UNICODE_ENCODING) as f:
+            f.write(data)
 
     return retVal
 
@@ -3170,19 +3170,20 @@ def decodeHexValue(value):
     retVal = value
 
     def _(value):
+        retVal = value
         if value and isinstance(value, basestring) and len(value) % 2 == 0:
-            value = hexdecode(value)
+            retVal = hexdecode(retVal)
 
-            if Backend.isDbms(DBMS.MSSQL):
+            if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
                 try:
-                    value = value.decode("utf-16-le")
+                    retVal = retVal.decode("utf-16-le")
                 except UnicodeDecodeError:
                     pass
 
-            if not isinstance(value, unicode):
-                value = getUnicode(value, "utf8")
+            if not isinstance(retVal, unicode):
+                retVal = getUnicode(retVal, "utf8")
 
-        return value
+        return retVal
 
     try:
         retVal = applyFunctionRecursively(value, _)
