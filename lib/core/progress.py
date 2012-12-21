@@ -17,11 +17,11 @@ class ProgressBar(object):
     def __init__(self, minValue=0, maxValue=10, totalWidth=None):
         self._progBar = "[]"
         self._oldProgBar = ""
-        self.__min = int(minValue)
-        self.__max = int(maxValue)
-        self.__span = self.__max - self.__min
-        self.__width = totalWidth if totalWidth else conf.progressWidth
-        self.__amount = 0
+        self._min = int(minValue)
+        self._max = int(maxValue)
+        self._span = self._max - self._min
+        self._width = totalWidth if totalWidth else conf.progressWidth
+        self._amount = 0
         self.update()
 
     def _convertSeconds(self, value):
@@ -36,21 +36,21 @@ class ProgressBar(object):
         This method updates the progress bar
         """
 
-        if newAmount < self.__min:
-            newAmount = self.__min
-        elif newAmount > self.__max:
-            newAmount = self.__max
+        if newAmount < self._min:
+            newAmount = self._min
+        elif newAmount > self._max:
+            newAmount = self._max
 
-        self.__amount = newAmount
+        self._amount = newAmount
 
         # Figure out the new percent done, round to an integer
-        diffFromMin = float(self.__amount - self.__min)
-        percentDone = (diffFromMin / float(self.__span)) * 100.0
+        diffFromMin = float(self._amount - self._min)
+        percentDone = (diffFromMin / float(self._span)) * 100.0
         percentDone = round(percentDone)
         percentDone = int(percentDone)
 
         # Figure out how many hash bars the percentage should be
-        allFull = self.__width - 2
+        allFull = self._width - 2
         numHashes = (percentDone / 100.0) * allFull
         numHashes = int(round(numHashes))
 
@@ -75,11 +75,11 @@ class ProgressBar(object):
         if self._progBar != self._oldProgBar:
             self._oldProgBar = self._progBar
 
-            if eta and self.__amount < self.__max:
-                dataToStdout("\r%s %d/%d  ETA %s" % (self._progBar, self.__amount, self.__max, self._convertSeconds(int(eta))))
+            if eta and self._amount < self._max:
+                dataToStdout("\r%s %d/%d  ETA %s" % (self._progBar, self._amount, self._max, self._convertSeconds(int(eta))))
             else:
-                blank = " " * (80 - len("\r%s %d/%d" % (self._progBar, self.__amount, self.__max)))
-                dataToStdout("\r%s %d/%d%s" % (self._progBar, self.__amount, self.__max, blank))
+                blank = " " * (80 - len("\r%s %d/%d" % (self._progBar, self._amount, self._max)))
+                dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, blank))
 
     def __str__(self):
         """
