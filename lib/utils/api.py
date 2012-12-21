@@ -26,16 +26,16 @@ except (ImportError, OSError):
 else:
     _multiprocessing = multiprocessing
 
-from extra.bottle.bottle import abort
-from extra.bottle.bottle import error
-from extra.bottle.bottle import get
-from extra.bottle.bottle import hook
-from extra.bottle.bottle import post
-from extra.bottle.bottle import request
-from extra.bottle.bottle import response
-from extra.bottle.bottle import run
-from extra.bottle.bottle import static_file
-from extra.bottle.bottle import template
+from thirdparty.bottle.bottle import abort
+from thirdparty.bottle.bottle import error
+from thirdparty.bottle.bottle import get
+from thirdparty.bottle.bottle import hook
+from thirdparty.bottle.bottle import post
+from thirdparty.bottle.bottle import request
+from thirdparty.bottle.bottle import response
+from thirdparty.bottle.bottle import run
+from thirdparty.bottle.bottle import static_file
+from thirdparty.bottle.bottle import template
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
 from lib.core.convert import hexencode
