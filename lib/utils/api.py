@@ -26,16 +26,6 @@ except (ImportError, OSError):
 else:
     _multiprocessing = multiprocessing
 
-from thirdparty.bottle.bottle import abort
-from thirdparty.bottle.bottle import error
-from thirdparty.bottle.bottle import get
-from thirdparty.bottle.bottle import hook
-from thirdparty.bottle.bottle import post
-from thirdparty.bottle.bottle import request
-from thirdparty.bottle.bottle import response
-from thirdparty.bottle.bottle import run
-from thirdparty.bottle.bottle import static_file
-from thirdparty.bottle.bottle import template
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
 from lib.core.convert import hexencode
@@ -52,6 +42,16 @@ from lib.core.exception import SqlmapMissingDependence
 from lib.core.optiondict import optDict
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
+from thirdparty.bottle.bottle import abort
+from thirdparty.bottle.bottle import error
+from thirdparty.bottle.bottle import get
+from thirdparty.bottle.bottle import hook
+from thirdparty.bottle.bottle import post
+from thirdparty.bottle.bottle import request
+from thirdparty.bottle.bottle import response
+from thirdparty.bottle.bottle import run
+from thirdparty.bottle.bottle import static_file
+from thirdparty.bottle.bottle import template
 
 RESTAPI_SERVER_HOST = "127.0.0.1"
 RESTAPI_SERVER_PORT = 8775
