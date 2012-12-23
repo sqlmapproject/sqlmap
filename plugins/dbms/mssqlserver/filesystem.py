@@ -5,7 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
 import ntpath
 import os
 
@@ -23,7 +22,6 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
-from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
@@ -338,9 +336,8 @@ class Filesystem(GenericFilesystem):
 
         tmpPath = posixToNtSlashes(conf.tmpPath)
         dFile = posixToNtSlashes(dFile)
-        wFilePointer = codecs.open(wFile, "rb", UNICODE_ENCODING)
-        wFileContent = wFilePointer.read()
-        wFilePointer.close()
+        with open(wFile, "rb") as f:
+            wFileContent = f.read()
 
         self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
 

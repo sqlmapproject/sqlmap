@@ -5,7 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
 import os
 
 from lib.core.agent import agent
@@ -25,7 +24,6 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUndefinedMethod
-from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
 class Filesystem:
@@ -113,7 +111,7 @@ class Filesystem:
         """
 
         retVal = []
-        with codecs.open(fileName, "rb", UNICODE_ENCODING) as f:
+        with open(fileName, "rb") as f:
             content = f.read().encode(encoding).replace("\n", "")
 
         if not single:

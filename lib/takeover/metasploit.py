@@ -5,7 +5,6 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
 import os
 import re
 import sys
@@ -531,7 +530,7 @@ class Metasploit:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", " ").replace("\r", "")
             raise SqlmapFilePathException, errMsg
 
-        self._shellcodeFP = codecs.open(self._shellcodeFilePath, "rb", UNICODE_ENCODING)
+        self._shellcodeFP = open(self._shellcodeFilePath, "rb")
         self.shellcodeString = self._shellcodeFP.read()
         self._shellcodeFP.close()
 
