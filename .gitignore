@@ -1,4 +1,5 @@
-*.py[cod~]
+*.py[cod]
 output/
 .sqlmap_history
 traffic.txt
+*~
