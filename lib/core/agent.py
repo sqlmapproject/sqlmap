@@ -602,13 +602,7 @@ class Agent(object):
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]
 
-        limitOriginal = ""
-
-        if where == PAYLOAD.WHERE.ORIGINAL:
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, ):
-                limitOriginal = "%s " % (queries[Backend.getIdentifiedDbms()].limit.query % (0, kb.testMode))
-
-        unionQuery = self.prefixQuery("%sUNION ALL SELECT " % limitOriginal, prefix=prefix)
+        unionQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if limited:
             unionQuery += ','.join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
