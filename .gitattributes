@@ -1,0 +1,10 @@
+* text eol=lf
+
+*_ binary
+*.dll binary
+*.pdf binary
+*.so binary
+*.wav binary
+*.zip binary
+*.x32 binary
+*.x64 binary
