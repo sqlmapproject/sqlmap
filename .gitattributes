@@ -8,3 +8,4 @@
 *.zip binary
 *.x32 binary
 *.x64 binary
+*.exe binary
