@@ -94,6 +94,7 @@ from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
+from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
@@ -1811,9 +1812,9 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
         elif isinstance(value, basestring):
             while True:
                 try:
-                    return unicode(value, encoding or kb.pageEncoding or UNICODE_ENCODING)
+                    return unicode(value, encoding or kb.get("pageEncoding") or UNICODE_ENCODING)
                 except UnicodeDecodeError, ex:
-                    value = value[:ex.start] + "".join("\\x%02x" % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
+                    value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
         else:
             return unicode(value)  # encoding ignored for non-basestring instances
     else:
@@ -3260,6 +3261,7 @@ def prioritySortColumns(columns):
     Sorts given column names by length in ascending order while those containing
     string 'id' go first
     """
+
     _ = lambda x: x and "id" in x.lower()
     return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
 

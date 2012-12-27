@@ -42,14 +42,14 @@ def safecharencode(value):
 
     if isinstance(value, basestring):
         if any(_ not in SAFE_CHARS for _ in value):
-            retVal = re.sub(r'(?i)(?!\\x[0-9A-F]{2})\\', SLASH_MARKER, value)
+            retVal = retVal.replace('\\', SLASH_MARKER)
 
             for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
                 retVal = retVal.replace(char, repr(char).strip('\''))
 
-            retVal = retVal.replace(SLASH_MARKER, '\\\\')
-
             retVal = reduce(lambda x, y: x + (y if (y in string.printable or ord(y) > 255) else '\\x%02x' % ord(y)), retVal, (unicode if isinstance(value, unicode) else str)())
+
+            retVal = retVal.replace(SLASH_MARKER, '\\\\')
     elif isinstance(value, list):
         for i in xrange(len(value)):
             retVal[i] = safecharencode(value[i])
@@ -63,16 +63,14 @@ def safechardecode(value):
 
     retVal = value
     if isinstance(value, basestring):
-        regex = re.compile(HEX_ENCODED_CHAR_REGEX)
+        retVal = retVal.replace('\\\\', SLASH_MARKER)
 
         while True:
-            match = regex.search(retVal)
+            match = re.search(HEX_ENCODED_CHAR_REGEX, retVal)
             if match:
                 retVal = retVal.replace(match.group("result"), (unichr if isinstance(value, unicode) else chr)(ord(binascii.unhexlify(match.group("result").lstrip('\\x')))))
             else:
                 break
-
-        retVal = retVal.replace('\\\\', SLASH_MARKER)
 
         for char in SAFE_ENCODE_SLASH_REPLACEMENTS[::-1]:
             retVal = retVal.replace(repr(char).strip('\''), char)
