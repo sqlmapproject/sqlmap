@@ -1,4 +1,4 @@
-* text eol=lf
+*.py text eol=lf
 
 *_ binary
 *.dll binary
@@ -9,3 +9,5 @@
 *.x32 binary
 *.x64 binary
 *.exe binary
+*.sln binary
+*.vcproj binary
