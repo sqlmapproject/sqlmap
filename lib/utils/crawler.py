@@ -64,10 +64,21 @@ class Crawler(object):
 
                     if isinstance(content, unicode):
                         try:
+                            match = re.search(r"(?si)<html[^>]*>(.+)</html>", content)
+                            if match:
+                                content = "<html>%s</html>" % match.group(1)
+
                             soup = BeautifulSoup(content)
-                            for tag in soup('a'):
-                                if tag.get("href"):
-                                    url = urlparse.urljoin(conf.url, tag.get("href"))
+                            tags = soup('a')
+
+                            if not tags:
+                                tags = re.finditer(r'(?si)<a[^>]+href="(?P<href>[^>"]+)"', content)
+
+                            for tag in tags:
+                                href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
+
+                                if href:
+                                    url = urlparse.urljoin(conf.url, href)
 
                                     # flag to know if we are dealing with the same target host
                                     _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (url, conf.url)))
