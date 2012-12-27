@@ -29,6 +29,7 @@ from lib.core.common import intersect
 from lib.core.common import parseTargetUrl
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import safeCSValue
 from lib.core.common import showHttpErrorCodes
 from lib.core.common import urlencode
 from lib.core.common import urldecode
@@ -220,7 +221,7 @@ def _saveToResultsFile():
 
     for key, value in results.items():
         place, parameter = key
-        line = "%s,%s,%s,%s%s" % (conf.url, place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), os.linesep)
+        line = "%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), os.linesep)
         conf.resultsFP.writelines(line)
 
     if not results:
