@@ -86,7 +86,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             singleTimeWarnMessage(warnMsg)
             page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
 
-        retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
+        retVal = _("(?P<result>%s.*?%s)" % (kb.chars.start, kb.chars.stop))
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
