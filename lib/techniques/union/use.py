@@ -31,6 +31,7 @@ from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastRequestDBMSError
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
@@ -86,7 +87,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             singleTimeWarnMessage(warnMsg)
             page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
 
-        retVal = _("(?P<result>%s.*?%s)" % (kb.chars.start, kb.chars.stop))
+        retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
@@ -189,7 +190,7 @@ def unionUse(expression, unpack=True, dump=False):
                 countedExpression = countedExpression[:_]
 
             output = _oneShotUnionUse(countedExpression, unpack)
-            count = parseUnionPage(output)
+            count = unArrayizeValue(parseUnionPage(output))
 
             if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
