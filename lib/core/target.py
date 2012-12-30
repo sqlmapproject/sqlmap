@@ -426,10 +426,10 @@ def _createTargetDirs():
     if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
         try:
             os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
-        except OSError, msg:
+        except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix='output')
             warnMsg = "unable to create default root output directory "
-            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, msg)
+            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, ex)
             warnMsg += "using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
@@ -440,10 +440,10 @@ def _createTargetDirs():
     if not os.path.isdir(conf.outputPath):
         try:
             os.makedirs(conf.outputPath, 0755)
-        except OSError, msg:
+        except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix='output')
             warnMsg = "unable to create output directory "
-            warnMsg += "'%s' (%s). " % (conf.outputPath, msg)
+            warnMsg += "'%s' (%s). " % (conf.outputPath, ex)
             warnMsg += "using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
@@ -453,12 +453,12 @@ def _createTargetDirs():
         with open(os.path.join(conf.outputPath, "target.txt"), "w+") as f:
             _ = kb.originalUrls.get(conf.url) or conf.url or conf.hostname
             f.write(_.encode(UNICODE_ENCODING))
-    except IOError, msg:
-        if "denied" in str(msg):
+    except IOError, ex:
+        if "denied" in str(ex):
             errMsg = "you don't have enough permissions "
         else:
             errMsg = "something went wrong while trying "
-        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, msg)
+        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, ex)
 
         raise SqlmapMissingPrivileges, errMsg
 

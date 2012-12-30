@@ -730,8 +730,13 @@ def dataToTrafficFile(data):
     if not conf.trafficFile:
         return
 
-    conf.trafficFP.write(data)
-    conf.trafficFP.flush()
+    try:
+        conf.trafficFP.write(data)
+        conf.trafficFP.flush()
+    except IOError, ex:
+        errMsg = "something went wrong while trying "
+        errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, ex)
+        raise SqlmapGenericException, errMsg
 
 def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
