@@ -25,6 +25,7 @@ from lib.core.common import isListLike
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
+from lib.core.common import unArrayizeValue
 from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
@@ -262,7 +263,7 @@ def errorUse(expression, dump=False):
                 countedExpression = countedExpression[:_]
 
             _, _, _, _, _, _, countedExpressionFields, _ = agent.getFields(countedExpression)
-            count = _oneShotErrorUse(countedExpression, countedExpressionFields)
+            count = unArrayizeValue(_oneShotErrorUse(countedExpression, countedExpressionFields))
 
             if isNumPosStrValue(count):
                 if isinstance(stopLimit, int) and stopLimit > 0:
