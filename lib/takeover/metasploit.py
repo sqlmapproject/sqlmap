@@ -513,13 +513,10 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        if Backend.isOs(OS.WINDOWS) or extra == "BufferRegister=EAX":
-            payloadSize = re.search("size ([\d]+)", payloadStderr, re.I)
-        else:
-            payloadSize = re.search("Length\:\s([\d]+)", payloadStderr, re.I)
+        match = re.search("(Total size:|Length:|succeeded with size) ([\d]+)", payloadStderr)
 
-        if payloadSize:
-            payloadSize = int(payloadSize.group(1))
+        if match:
+            payloadSize = int(match.group(2))
 
             if extra == "BufferRegister=EAX":
                 payloadSize = payloadSize / 2
