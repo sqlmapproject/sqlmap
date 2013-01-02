@@ -666,7 +666,7 @@ def _setMetasploit():
 
     if not msfEnvPathExists:
         warnMsg = "sqlmap is going to look for Metasploit Framework "
-        warnMsg += "installation into the environment paths"
+        warnMsg += "installation inside the environment path(s)"
         logger.warn(warnMsg)
 
         envPaths = os.environ.get("PATH", "").split(";" if IS_WIN else ":")
