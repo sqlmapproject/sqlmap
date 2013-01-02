@@ -657,10 +657,10 @@ def getDirs():
     return list(directories)
 
 def filePathToString(filePath):
-    strRepl = filePath.replace("/", "_").replace("\\", "_")
-    strRepl = strRepl.replace(" ", "_").replace(":", "_")
+    retVal = filePath.replace("/", "_").replace("\\", "_")
+    retVal = retVal.replace(" ", "_").replace(":", "_")
 
-    return strRepl
+    return retVal
 
 def singleTimeDebugMessage(message):
     singleTimeLogMessage(message, logging.DEBUG)
@@ -832,7 +832,7 @@ def randomInt(length=4):
     Returns random integer value with provided number of digits
     """
 
-    return int("".join(random.choice(string.digits if i!=0 else string.digits.replace('0', '')) for i in xrange(0, length)))
+    return int("".join(random.choice(string.digits if _ != 0 else string.digits.replace('0', '')) for _ in xrange(0, length)))
 
 def randomStr(length=4, lowercase=False, alphabet=None):
     """

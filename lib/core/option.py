@@ -686,7 +686,7 @@ def _setMetasploit():
 
     if not msfEnvPathExists:
         errMsg = "unable to locate Metasploit Framework installation. "
-        errMsg += "Get it from http://metasploit.com/framework/download/"
+        errMsg += "You can get it at 'http://metasploit.com/framework/download/'"
         raise SqlmapFilePathException, errMsg
 
 def _setWriteFile():
