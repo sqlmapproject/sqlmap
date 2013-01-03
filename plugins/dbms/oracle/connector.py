@@ -46,7 +46,7 @@ class Connector(GenericConnector):
             try:
                 self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password)
             except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError), msg:
-                raise SqlmapConnectionException, msg
+                raise SqlmapConnectionException(msg)
 
         self.setCursor()
         self.connected()
@@ -67,7 +67,7 @@ class Connector(GenericConnector):
         except (cx_Oracle.DatabaseError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
         except cx_Oracle.InternalError, msg:
-            raise SqlmapConnectionException, msg
+            raise SqlmapConnectionException(msg)
 
         self.connector.commit()
 

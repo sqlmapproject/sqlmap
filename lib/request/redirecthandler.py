@@ -110,4 +110,4 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= MAX_SINGLE_URL_REDIRECTIONS or len(req.redirect_dict) >= MAX_TOTAL_REDIRECTIONS):
             errMsg = "infinite redirect loop detected (%s). " % ", ".join(item for item in req.redirect_dict.keys())
             errMsg += "please check all provided parameters and/or provide missing ones."
-            raise SqlmapConnectionException, errMsg
+            raise SqlmapConnectionException(errMsg)

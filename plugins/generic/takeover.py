@@ -124,7 +124,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "if you want to establish an out-of-band ICMP "
                 errMsg += "tunnel because icmpsh uses raw sockets to "
                 errMsg += "sniff and craft ICMP packets"
-                raise SqlmapMissingPrivileges, errMsg
+                raise SqlmapMissingPrivileges(errMsg)
 
             try:
                 from impacket import ImpactDecoder
@@ -133,7 +133,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg = "sqlmap requires 'impacket' third-party library "
                 errMsg += "in order to run icmpsh master. Download from "
                 errMsg += "http://oss.coresecurity.com/projects/impacket.html"
-                raise SqlmapMissingDependence, errMsg
+                raise SqlmapMissingDependence(errMsg)
 
             sysIgnoreIcmp = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
 
@@ -325,7 +325,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     def uncPathRequest(self):
         errMsg = "'uncPathRequest' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def _regInit(self):
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:

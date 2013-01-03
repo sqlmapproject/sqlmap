@@ -466,11 +466,11 @@ class Connect(object):
             if e.code == httplib.UNAUTHORIZED:
                 errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
-                raise SqlmapConnectionException, errMsg
+                raise SqlmapConnectionException(errMsg)
             elif e.code == httplib.NOT_FOUND:
                 if raise404:
                     errMsg = "page not found (%d)" % code
-                    raise SqlmapConnectionException, errMsg
+                    raise SqlmapConnectionException(errMsg)
                 else:
                     debugMsg = "page not found (%d)" % code
                     logger.debug(debugMsg)
@@ -488,7 +488,7 @@ class Connect(object):
                         logger.critical(warnMsg)
                         return None, None, None
                     else:
-                        raise SqlmapConnectionException, warnMsg
+                        raise SqlmapConnectionException(warnMsg)
             else:
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
@@ -498,7 +498,7 @@ class Connect(object):
 
             if "no host given" in tbMsg:
                 warnMsg = "invalid url address used (%s)" % repr(url)
-                raise SqlmapSyntaxException, warnMsg
+                raise SqlmapSyntaxException(warnMsg)
             elif "forcibly closed" in tbMsg:
                 warnMsg = "connection was forcibly closed by the target url"
             elif "timed out" in tbMsg:
@@ -531,7 +531,7 @@ class Connect(object):
                 logger.critical(warnMsg)
                 return None, None, None
             else:
-                raise SqlmapConnectionException, warnMsg
+                raise SqlmapConnectionException(warnMsg)
 
         finally:
             page = page if isinstance(page, unicode) else getUnicode(page)
@@ -600,7 +600,7 @@ class Connect(object):
                     if not isinstance(payload, basestring):
                         errMsg = "tamper function '%s' returns " % function.func_name
                         errMsg += "invalid payload type ('%s')" % type(payload)
-                        raise SqlmapValueException, errMsg
+                        raise SqlmapValueException(errMsg)
 
                 value = agent.replacePayload(value, payload)
 

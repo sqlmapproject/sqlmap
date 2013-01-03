@@ -116,7 +116,7 @@ class Users:
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
 
             plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
             indexRange = getLimitRange(count, plusOne=plusOne)
@@ -135,7 +135,7 @@ class Users:
 
         if not kb.data.cachedUsers:
             errMsg = "unable to retrieve the database users"
-            raise SqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException(errMsg)
 
         return kb.data.cachedUsers
 
@@ -296,7 +296,7 @@ class Users:
             errMsg += "database users (most probably because the session "
             errMsg += "user has no read privileges over the relevant "
             errMsg += "system database table)"
-            raise SqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException(errMsg)
         else:
             for user in kb.data.cachedUsersPasswords:
                 kb.data.cachedUsersPasswords[user] = list(set(kb.data.cachedUsersPasswords[user]))
@@ -585,7 +585,7 @@ class Users:
         if not kb.data.cachedUsersPrivileges:
             errMsg = "unable to retrieve the privileges "
             errMsg += "for the database users"
-            raise SqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException(errMsg)
 
         return (kb.data.cachedUsersPrivileges, areAdmins)
 

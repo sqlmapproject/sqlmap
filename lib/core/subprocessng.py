@@ -40,7 +40,7 @@ def blockingReadFromFD(fd):
         break
 
     if not output:
-        raise EOFError, "fd %s has been closed." % fd 
+        raise EOFError("fd %s has been closed." % fd )
 
     return output
 

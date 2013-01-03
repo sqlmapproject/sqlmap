@@ -49,7 +49,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
-            raise SqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
     def evalCmd(self, cmd, first=None, last=None):
         retVal = None
@@ -65,7 +65,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
-            raise SqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
         return safechardecode(retVal)
 
@@ -110,7 +110,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
             else:
                 errMsg = "feature not yet implemented for the back-end DBMS"
-                raise SqlmapUnsupportedFeatureException, errMsg
+                raise SqlmapUnsupportedFeatureException(errMsg)
 
             infoMsg = "calling %s OS shell. To quit type " % (Backend.getOs() or "Windows")
             infoMsg += "'x' or 'q' and press ENTER"

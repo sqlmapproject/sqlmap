@@ -394,7 +394,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         else:
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
-            raise SqlmapNotVulnerableException, errMsg
+            raise SqlmapNotVulnerableException(errMsg)
 
     finally:
         kb.resumeValues = True

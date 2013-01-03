@@ -160,6 +160,6 @@ class Enumeration(GenericEnumeration):
         if not kb.data.cachedUsersRoles:
             errMsg = "unable to retrieve the roles "
             errMsg += "for the database users"
-            raise SqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException(errMsg)
 
         return kb.data.cachedUsersRoles, areAdmins

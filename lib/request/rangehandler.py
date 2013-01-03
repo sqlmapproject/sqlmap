@@ -47,4 +47,4 @@ class HTTPRangeHandler(urllib2.BaseHandler):
     def http_error_416(self, req, fp, code, msg, hdrs):
         # HTTP's Range Not Satisfiable error
         errMsg = "Invalid range"
-        raise SqlmapConnectionException, errMsg
+        raise SqlmapConnectionException(errMsg)

@@ -64,7 +64,7 @@ class Replication(object):
                 self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?']*len(values))), safechardecode(values))
             else:
                 errMsg = "wrong number of columns used in replicating insert"
-                raise SqlmapValueException, errMsg
+                raise SqlmapValueException(errMsg)
 
         def execute(self, sql, parameters=[]):
             try:
@@ -73,7 +73,7 @@ class Replication(object):
                 errMsg = "problem occurred ('%s') while accessing sqlite database " % ex
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
                 errMsg += "it's not used by some other program"
-                raise SqlmapGenericException, errMsg
+                raise SqlmapGenericException(errMsg)
 
         def beginTransaction(self):
             """

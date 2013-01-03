@@ -22,17 +22,17 @@ class Fingerprint:
     def getFingerprint(self):
         errMsg = "'getFingerprint' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def checkDbms(self):
         errMsg = "'checkDbms' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def checkDbmsOs(self, detailed=False):
         errMsg = "'checkDbmsOs' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def forceDbmsEnum(self):
         pass

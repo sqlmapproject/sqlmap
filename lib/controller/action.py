@@ -51,7 +51,7 @@ def action():
             errMsg += ". Support for this DBMS will be implemented at "
             errMsg += "some point"
 
-        raise SqlmapUnsupportedDBMSException, errMsg
+        raise SqlmapUnsupportedDBMSException(errMsg)
 
     conf.dumper.singleString(conf.dbmsHandler.getFingerprint())
 

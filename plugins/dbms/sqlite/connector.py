@@ -56,12 +56,12 @@ class Connector(GenericConnector):
                 except ImportError:
                     errMsg = "sqlmap requires 'python-sqlite2' third-party library "
                     errMsg += "in order to directly connect to the database '%s'" % self.db
-                    raise SqlmapMissingDependence, errMsg
+                    raise SqlmapMissingDependence(errMsg)
 
                 self.__sqlite = sqlite
                 self.connector = self.__sqlite.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
             except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
-                raise SqlmapConnectionException, msg[0]
+                raise SqlmapConnectionException(msg[0])
 
         self.setCursor()
         self.connected()
@@ -79,7 +79,7 @@ class Connector(GenericConnector):
         except self.__sqlite.OperationalError, msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
         except self.__sqlite.DatabaseError, msg:
-            raise SqlmapConnectionException, msg[0]
+            raise SqlmapConnectionException(msg[0])
 
         self.connector.commit()
 

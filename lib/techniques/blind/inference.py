@@ -549,7 +549,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             logger.info(infoMsg)
 
     if kb.threadException:
-        raise SqlmapThreadException, "something unexpected happened inside the threads"
+        raise SqlmapThreadException("something unexpected happened inside the threads")
 
     if abortedFlag:
         raise KeyboardInterrupt

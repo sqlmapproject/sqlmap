@@ -67,7 +67,7 @@ class Entries:
             if  ',' in conf.db:
                 errMsg = "only one database name is allowed when enumerating "
                 errMsg += "the tables' columns"
-                raise SqlmapMissingMandatoryOptionException, errMsg
+                raise SqlmapMissingMandatoryOptionException(errMsg)
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
@@ -87,7 +87,7 @@ class Entries:
             else:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
 
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
@@ -329,7 +329,7 @@ class Entries:
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
-            raise SqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
         infoMsg = "sqlmap will dump entries of all tables from all databases now"
         logger.info(infoMsg)

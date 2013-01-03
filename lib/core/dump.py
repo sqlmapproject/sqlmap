@@ -70,7 +70,7 @@ class Dump(object):
             self._outputFP = codecs.open(self._outputFile, "ab" if not conf.flushSession else "wb", UNICODE_ENCODING)
         except IOError, ex:
             errMsg = "error occurred while opening log file ('%s')" % ex
-            raise SqlmapGenericException, errMsg
+            raise SqlmapGenericException(errMsg)
 
     def getOutputFile(self):
         return self._outputFile

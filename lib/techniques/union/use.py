@@ -128,14 +128,14 @@ def configUnion(char=None, columns=None):
             colsStart, colsStop = columns, columns
 
         if not colsStart.isdigit() or not colsStop.isdigit():
-            raise SqlmapSyntaxException, "--union-cols must be a range of integers"
+            raise SqlmapSyntaxException("--union-cols must be a range of integers")
 
         conf.uColsStart, conf.uColsStop = int(colsStart), int(colsStop)
 
         if conf.uColsStart > conf.uColsStop:
             errMsg = "--union-cols range has to be from lower to "
             errMsg += "higher number of columns"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
     _configUnionChar(char)
     _configUnionCols(conf.uCols or columns)

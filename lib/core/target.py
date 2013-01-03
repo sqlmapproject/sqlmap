@@ -79,7 +79,7 @@ def _setRequestParams():
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and conf.data is None:
         errMsg = "HTTP POST method depends on HTTP data value to be posted"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST
@@ -237,12 +237,12 @@ def _setRequestParams():
     if not conf.parameters:
         errMsg = "you did not provide any GET, POST and Cookie "
         errMsg += "parameter, neither an User-Agent, Referer or Host header value"
-        raise SqlmapGenericException, errMsg
+        raise SqlmapGenericException(errMsg)
 
     elif not testableParameters:
         errMsg = "all testable parameters you provided are not present "
         errMsg += "within the GET, POST and Cookie parameters"
-        raise SqlmapGenericException, errMsg
+        raise SqlmapGenericException(errMsg)
 
 def _setHashDB():
     """
@@ -259,7 +259,7 @@ def _setHashDB():
                 logger.info("flushing session file")
             except OSError, msg:
                 errMsg = "unable to flush the session file (%s)" % msg
-                raise SqlmapFilePathException, errMsg
+                raise SqlmapFilePathException(errMsg)
 
     conf.hashDB = HashDB(conf.hashDBFile)
 
@@ -460,7 +460,7 @@ def _createTargetDirs():
             errMsg = "something went wrong while trying "
         errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, ex)
 
-        raise SqlmapMissingPrivileges, errMsg
+        raise SqlmapMissingPrivileges(errMsg)
 
     _createDumpDir()
     _createFilesDir()

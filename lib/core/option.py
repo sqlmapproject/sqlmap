@@ -388,7 +388,7 @@ def _setMultipleTargets():
 
     if not os.path.exists(conf.logFile):
         errMsg = "the specified list of targets does not exist"
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
     if os.path.isfile(conf.logFile):
         _feedTargetsDict(conf.logFile, addedTargetUrls)
@@ -406,7 +406,7 @@ def _setMultipleTargets():
     else:
         errMsg = "the specified list of targets is not a file "
         errMsg += "nor a directory"
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
     updatedTargetsCount = len(kb.targets)
 
@@ -453,7 +453,7 @@ def _setRequestFromFile():
     if not os.path.isfile(conf.requestFile):
         errMsg = "the specified HTTP request file "
         errMsg += "does not exist"
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
     _feedTargetsDict(conf.requestFile, addedTargetUrls)
 
@@ -504,7 +504,7 @@ def _setGoogleDorking():
         if not links:
             errMsg = "unable to find results for your "
             errMsg += "Google dork expression"
-            raise SqlmapGenericException, errMsg
+            raise SqlmapGenericException(errMsg)
 
         for link in links:
             link = urldecode(link)
@@ -560,7 +560,7 @@ def _setBulkMultipleTargets():
     if not os.path.isfile(conf.bulkFile):
         errMsg = "the specified bulk file "
         errMsg += "does not exist"
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
     for line in getFileItems(conf.bulkFile):
         if re.search(r"[^ ]+\?(.+)", line, re.I):
@@ -597,7 +597,7 @@ def _setDBMSAuthentication():
     if not match:
         errMsg = "DBMS authentication credentials value must be in format "
         errMsg += "username:password"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     conf.dbmsUsername = match.group(1)
     conf.dbmsPassword = match.group(2)
@@ -638,7 +638,7 @@ def _setMetasploit():
             errMsg += "if you want to perform a SMB relay attack because "
             errMsg += "it will need to listen on a user-specified SMB "
             errMsg += "TCP port for incoming connection attempts"
-            raise SqlmapMissingPrivileges, errMsg
+            raise SqlmapMissingPrivileges(errMsg)
 
     if conf.msfPath:
         for path in (conf.msfPath, os.path.join(conf.msfPath, "bin")):
@@ -687,7 +687,7 @@ def _setMetasploit():
     if not msfEnvPathExists:
         errMsg = "unable to locate Metasploit Framework installation. "
         errMsg += "You can get it at 'http://metasploit.com/framework/download/'"
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
 def _setWriteFile():
     if not conf.wFile:
@@ -698,12 +698,12 @@ def _setWriteFile():
 
     if not os.path.exists(conf.wFile):
         errMsg = "the provided local file '%s' does not exist" % conf.wFile
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
     if not conf.dFile:
         errMsg = "you did not provide the back-end DBMS absolute path "
         errMsg += "where you want to write the local file '%s'" % conf.wFile
-        raise SqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException(errMsg)
 
     conf.wFileType = getFileType(conf.wFile)
 
@@ -722,7 +722,7 @@ def _setOS():
         errMsg += "If you do not know the back-end DBMS underlying OS, "
         errMsg += "do not provide it and sqlmap will fingerprint it for "
         errMsg += "you."
-        raise SqlmapUnsupportedDBMSException, errMsg
+        raise SqlmapUnsupportedDBMSException(errMsg)
 
     debugMsg = "forcing back-end DBMS operating system to user defined "
     debugMsg += "value '%s'" % conf.os
@@ -742,7 +742,7 @@ def _setTechnique():
                 errMsg = "value for --technique must be a string composed "
                 errMsg += "by the letters %s. Refer to the " % ", ".join(validLetters)
                 errMsg += "user's manual for details"
-                raise SqlmapSyntaxException, errMsg
+                raise SqlmapSyntaxException(errMsg)
 
             for validTech, validInt in validTechniques:
                 if letter == validTech[0]:
@@ -774,7 +774,7 @@ def _setDBMS():
         errMsg += "system. The supported DBMS are %s. " % ', '.join([d for d in DBMS_DICT])
         errMsg += "If you do not know the back-end DBMS, do not provide "
         errMsg += "it and sqlmap will fingerprint it for you."
-        raise SqlmapUnsupportedDBMSException, errMsg
+        raise SqlmapUnsupportedDBMSException(errMsg)
 
     for aliases in (MSSQL_ALIASES, MYSQL_ALIASES, PGSQL_ALIASES, ORACLE_ALIASES, \
                     SQLITE_ALIASES, ACCESS_ALIASES, FIREBIRD_ALIASES, \
@@ -808,11 +808,11 @@ def _setTamperingFunctions():
 
             elif not os.path.exists(tfile):
                 errMsg = "tamper script '%s' does not exist" % tfile
-                raise SqlmapFilePathException, errMsg
+                raise SqlmapFilePathException(errMsg)
 
             elif not tfile.endswith('.py'):
                 errMsg = "tamper script '%s' should have an extension '.py'" % tfile
-                raise SqlmapSyntaxException, errMsg
+                raise SqlmapSyntaxException(errMsg)
 
             dirname, filename = os.path.split(tfile)
             dirname = os.path.abspath(dirname)
@@ -823,7 +823,7 @@ def _setTamperingFunctions():
             if not os.path.exists(os.path.join(dirname, '__init__.py')):
                 errMsg = "make sure that there is an empty file '__init__.py' "
                 errMsg += "inside of tamper scripts directory '%s'" % dirname
-                raise SqlmapGenericException, errMsg
+                raise SqlmapGenericException(errMsg)
 
             if dirname not in sys.path:
                 sys.path.insert(0, dirname)
@@ -831,7 +831,7 @@ def _setTamperingFunctions():
             try:
                 module = __import__(filename[:-3])
             except ImportError, msg:
-                raise SqlmapSyntaxException, "cannot import tamper script '%s' (%s)" % (filename[:-3], msg)
+                raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], msg))
 
             priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
 
@@ -866,7 +866,7 @@ def _setTamperingFunctions():
             if not found:
                 errMsg = "missing function 'tamper(payload, headers)' "
                 errMsg += "in tamper script '%s'" % tfile
-                raise SqlmapGenericException, errMsg
+                raise SqlmapGenericException(errMsg)
 
         if resolve_priorities and priorities:
             priorities.sort(reverse=True)
@@ -929,14 +929,14 @@ def _setHTTPProxy():
 
     if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
         errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.pCred:
         _ = re.search("^(.*?):(.*?)$", conf.pCred)
         if not _:
             errMsg = "Proxy authentication credentials "
             errMsg += "value must be in format username:password"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
         else:
             username = _.group(1)
             password = _.group(2)
@@ -979,7 +979,7 @@ def _setSafeUrl():
 
     if conf.saFreq <= 0:
         errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe url feature"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
 def _setPrefixSuffix():
     if conf.prefix is not None and conf.suffix is not None:
@@ -1033,12 +1033,12 @@ def _setHTTPAuthentication():
     elif conf.aType and not conf.aCred:
         errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     elif not conf.aType and conf.aCred:
         errMsg = "you specified the HTTP authentication credentials, "
         errMsg += "but did not provide the type"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if not conf.aCert:
         debugMsg = "setting the HTTP authentication type and credentials"
@@ -1049,7 +1049,7 @@ def _setHTTPAuthentication():
         if aTypeLower not in ( "basic", "digest", "ntlm" ):
             errMsg = "HTTP authentication type value must be "
             errMsg += "Basic, Digest or NTLM"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
         elif aTypeLower in ( "basic", "digest" ):
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % aTypeLower
@@ -1062,7 +1062,7 @@ def _setHTTPAuthentication():
         aCredRegExp = re.search(regExp, conf.aCred)
 
         if not aCredRegExp:
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
         conf.authUsername = aCredRegExp.group(1)
         conf.authPassword = aCredRegExp.group(2)
@@ -1084,7 +1084,7 @@ def _setHTTPAuthentication():
                 errMsg = "sqlmap requires Python NTLM third-party library "
                 errMsg += "in order to authenticate via NTLM, "
                 errMsg += "http://code.google.com/p/python-ntlm/"
-                raise SqlmapMissingDependence, errMsg
+                raise SqlmapMissingDependence(errMsg)
 
             authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
     else:
@@ -1096,7 +1096,7 @@ def _setHTTPAuthentication():
         if not aCertRegExp:
             errMsg = "HTTP authentication certificate option "
             errMsg += "must be in format key_file,cert_file"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
         # os.path.expanduser for support of paths with ~
         key_file = os.path.expanduser(aCertRegExp.group(1))
@@ -1105,7 +1105,7 @@ def _setHTTPAuthentication():
         for ifile in (key_file, cert_file):
             if not os.path.exists(ifile):
                 errMsg = "File '%s' does not exist" % ifile
-                raise SqlmapSyntaxException, errMsg
+                raise SqlmapSyntaxException(errMsg)
 
         authHandler = HTTPSCertAuthHandler(key_file, cert_file)
 
@@ -1134,7 +1134,7 @@ def _setHTTPExtraHeaders():
                     conf.httpHeaders.append((header, value))
             else:
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
-                raise SqlmapSyntaxException, errMsg
+                raise SqlmapSyntaxException(errMsg)
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
         conf.httpHeaders.append((HTTPHEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
@@ -1810,13 +1810,13 @@ def _setDNSServer():
         except socket.error, msg:
             errMsg = "there was an error while setting up "
             errMsg += "DNS server instance ('%s')" % msg
-            raise SqlmapGenericException, errMsg
+            raise SqlmapGenericException(errMsg)
     else:
         errMsg = "you need to run sqlmap as an administrator "
         errMsg += "if you want to perform a DNS data exfiltration attack "
         errMsg += "as it will need to listen on privileged UDP port 53 "
         errMsg += "for incoming address resolution attempts"
-        raise SqlmapMissingPrivileges, errMsg
+        raise SqlmapMissingPrivileges(errMsg)
 
 def _setTorProxySettings():
     if not conf.tor:
@@ -1857,7 +1857,7 @@ def _setTorHttpProxySettings():
         else:
             errMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
 
-        raise SqlmapConnectionException, errMsg
+        raise SqlmapConnectionException(errMsg)
 
     if not conf.checkTor:
         warnMsg = "use switch '--check-tor' at "
@@ -1886,7 +1886,7 @@ def _checkTor():
     page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
     if not page or 'Congratulations' not in page:
         errMsg = "it seems that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
-        raise SqlmapConnectionException, errMsg
+        raise SqlmapConnectionException(errMsg)
     else:
         infoMsg = "Tor is properly being used"
         logger.info(infoMsg)
@@ -1894,135 +1894,135 @@ def _checkTor():
 def _basicOptionValidation():
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
         errMsg = "value for option '--start' (limitStart) must be an integer value greater than zero (>0)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.limitStop is not None and not (isinstance(conf.limitStop, int) and conf.limitStop > 0):
         errMsg = "value for option '--stop' (limitStop) must be an integer value greater than zero (>0)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.level is not None and not (isinstance(conf.level, int) and conf.level > 0):
         errMsg = "value for option '--level' must be an integer value greater than zero (>0)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.risk is not None and not (isinstance(conf.risk, int) and conf.risk > 0):
         errMsg = "value for option '--risk' must be an integer value greater than zero (>0)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
        conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
         errMsg = "value for option '--start' (limitStart) must be smaller or equal than value for --stop (limitStop) option"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.firstChar is not None and isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
        conf.lastChar is not None and isinstance(conf.lastChar, int) and conf.lastChar < conf.firstChar:
         errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
         errMsg = "value for option '--cpu-throttle' (cpuThrottle) must be in range [0,100]"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.titles and conf.nullConnection:
         errMsg = "switch '--titles' is incompatible with switch '--null-connection'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.data and conf.nullConnection:
         errMsg = "option '--data' is incompatible with switch '--null-connection'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.string and conf.nullConnection:
         errMsg = "option '--string' is incompatible with switch '--null-connection'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.notString and conf.nullConnection:
         errMsg = "option '--not-string' is incompatible with switch '--null-connection'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.string and conf.notString:
         errMsg = "option '--string' is incompatible with switch '--not-string'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.regexp and conf.nullConnection:
         errMsg = "option '--regexp' is incompatible with switch '--null-connection'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.dumpTable and conf.dumpAll:
         errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.predictOutput and (conf.threads > 1 or conf.optimize):
         errMsg = "switch '--predict-output' is incompatible with option '--threads' and switch '-o'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.threads > MAX_NUMBER_OF_THREADS:
         errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.forms and not conf.url:
         errMsg = "switch '--forms' requires usage of option '-u' (--url)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url:
         errMsg = "option '-r' is incompatible with option '-u' (--url)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.tor and conf.ignoreProxy:
         errMsg = "switch '--tor' is incompatible with switch '--ignore-proxy'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.tor and conf.proxy:
         errMsg = "switch '--tor' is incompatible with option '--proxy'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.checkTor and not any((conf.tor, conf.proxy)):
         errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.torPort is not None and not (isinstance(conf.torPort, int) and conf.torPort > 0):
         errMsg = "value for option '--tor-port' must be a positive integer"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.torType not in getPublicTypeMembers(PROXY_TYPE, True):
         errMsg = "option '--tor-type' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(PROXY_TYPE, True))
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.dumpFormat not in getPublicTypeMembers(DUMP_FORMAT, True):
         errMsg = "option '--dump-format' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(DUMP_FORMAT, True))
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.skip and conf.testParameter:
         errMsg = "option '--skip' is incompatible with option '-p'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.mobile and conf.agent:
         errMsg = "switch '--mobile' is incompatible with option '--user-agent'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.proxy and conf.ignoreProxy:
         errMsg = "option '--proxy' is incompatible with switch '--ignore-proxy'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
         errMsg = "switch '--forms' is compatible only with option '-u' (--url)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.timeSec < 1:
         errMsg = "value for option '--time-sec' must be a positive integer"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if conf.uChar and not re.match(UNION_CHAR_REGEX, conf.uChar):
         errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if isinstance(conf.uCols, basestring):
         if not conf.uCols.isdigit() and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
             errMsg = "value for option '--union-cols' must be a range with hyphon "
             errMsg += "(e.g. 1-10) or integer value (e.g. 5)"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
     if conf.charset:
         _ = checkCharEncoding(conf.charset, False)
@@ -2030,14 +2030,14 @@ def _basicOptionValidation():
             errMsg = "unknown charset '%s'. Please visit " % conf.charset
             errMsg += "'%s' to get the full list of " % CODECS_LIST_PAGE
             errMsg += "supported charsets"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
         else:
             conf.charset = _
 
     if conf.loadCookies:
         if not os.path.exists(conf.loadCookies):
             errMsg = "cookies file '%s' does not exist" % conf.loadCookies
-            raise SqlmapFilePathException, errMsg
+            raise SqlmapFilePathException(errMsg)
 
 def _resolveCrossReferences():
     lib.core.threads.readInput = readInput

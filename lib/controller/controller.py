@@ -117,7 +117,7 @@ def _selectInjection():
             raise SqlmapUserQuitException
         else:
             errMsg = "invalid choice"
-            raise SqlmapValueException, errMsg
+            raise SqlmapValueException(errMsg)
 
         kb.injection = kb.injections[index]
 
@@ -496,7 +496,7 @@ def start():
                 if kb.vainRun and not conf.multipleTargets:
                     errMsg = "no parameter(s) found for testing in the provided data "
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
-                    raise SqlmapNoneDataException, errMsg
+                    raise SqlmapNoneDataException(errMsg)
                 else:
                     errMsg = "all tested parameters appear to be not injectable."
 
@@ -544,7 +544,7 @@ def start():
                         errMsg += "expression that you have choosen "
                         errMsg += "does not match exclusively True responses"
 
-                    raise SqlmapNotVulnerableException, errMsg
+                    raise SqlmapNotVulnerableException(errMsg)
             else:
                 # Flush the flag
                 kb.testMode = False

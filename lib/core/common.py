@@ -736,7 +736,7 @@ def dataToTrafficFile(data):
     except IOError, ex:
         errMsg = "something went wrong while trying "
         errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, ex)
-        raise SqlmapGenericException, errMsg
+        raise SqlmapGenericException(errMsg)
 
 def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
@@ -861,7 +861,7 @@ def checkFile(filename):
     """
 
     if not os.path.isfile(filename):
-        raise SqlmapFilePathException, "unable to read file '%s'" % filename
+        raise SqlmapFilePathException("unable to read file '%s'" % filename)
 
 def banner():
     """
@@ -997,7 +997,7 @@ def parseTargetDirect():
         errMsg = "invalid target details, valid syntax is for instance "
         errMsg += "'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' "
         errMsg += "or 'access://DATABASE_FILEPATH'"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     for dbmsName, data in DBMS_DICT.items():
         if conf.dbms in data[0]:
@@ -1012,7 +1012,7 @@ def parseTargetDirect():
                         conf.port = 0
                 elif not remote:
                         errMsg = "missing remote connection details"
-                        raise SqlmapSyntaxException, errMsg
+                        raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
                     import _mssql
@@ -1022,7 +1022,7 @@ def parseTargetDirect():
                         errMsg = "'%s' third-party library must be " % data[1]
                         errMsg += "version >= 1.0.2 to work properly. "
                         errMsg += "Download from '%s'" % data[2]
-                        raise SqlmapMissingDependence, errMsg
+                        raise SqlmapMissingDependence(errMsg)
 
                 elif dbmsName == DBMS.MYSQL:
                     import pymysql
@@ -1040,7 +1040,7 @@ def parseTargetDirect():
                 errMsg = "sqlmap requires '%s' third-party library " % data[1]
                 errMsg += "in order to directly connect to the database "
                 errMsg += "%s. Download from '%s'" % (dbmsName, data[2])
-                raise SqlmapMissingDependence, errMsg
+                raise SqlmapMissingDependence(errMsg)
 
 def parseTargetUrl():
     """
@@ -1055,7 +1055,7 @@ def parseTargetUrl():
     if re.search("\[.+\]", conf.url) and not socket.has_ipv6:
         errMsg = "IPv6 addressing is not supported "
         errMsg += "on this platform"
-        raise SqlmapGenericException, errMsg
+        raise SqlmapGenericException(errMsg)
 
     if not re.search("^http[s]*://", conf.url, re.I):
         if ":443/" in conf.url:
@@ -1083,14 +1083,14 @@ def parseTargetUrl():
 
     if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'))):
         errMsg = "invalid target url"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if len(hostnamePort) == 2:
         try:
             conf.port = int(hostnamePort[1])
         except:
             errMsg = "invalid target url"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
     elif conf.scheme == "https":
         conf.port = 443
     else:
@@ -1353,7 +1353,7 @@ def safeStringFormat(format_, params):
                 if count < len(params):
                     retVal = retVal[:index] + getUnicode(params[count]) + retVal[index + 2:]
                 else:
-                    raise SqlmapNoneDataException, "wrong number of parameters during string formatting"
+                    raise SqlmapNoneDataException("wrong number of parameters during string formatting")
                 count += 1
 
     return retVal
@@ -2377,7 +2377,7 @@ def initTechnique(technique=None):
         errMsg = "missing data in old session file(s). "
         errMsg += "Please use '--flush-session' to deal "
         errMsg += "with this error"
-        raise SqlmapNoneDataException, errMsg
+        raise SqlmapNoneDataException(errMsg)
 
 def arrayizeValue(value):
     """
@@ -2496,7 +2496,7 @@ def openFile(filename, mode='r'):
         errMsg += "Please check %s permissions on a file " % ("write" if \
           mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
-        raise SqlmapFilePathException, errMsg
+        raise SqlmapFilePathException(errMsg)
 
 def decodeIntToUnicode(value):
     """
@@ -2810,7 +2810,7 @@ def expandMnemonics(mnemonics, parser, args):
 
         if pointer in (None, head):
             errMsg = "mnemonic '%s' can't be resolved to any parameter name" % name
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
         elif len(pointer.current) > 1:
             options = {}
@@ -2849,7 +2849,7 @@ def expandMnemonics(mnemonics, parser, args):
                 setattr(args, found.dest, True)
             else:
                 errMsg = "mnemonic '%s' requires value of type '%s'" % (name, found.type)
-                raise SqlmapSyntaxException, errMsg
+                raise SqlmapSyntaxException(errMsg)
 
 def safeCSValue(value):
     """
@@ -2997,7 +2997,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     if not content:
         errMsg = "can't parse forms as the page content appears to be blank"
         if raise_:
-            raise SqlmapGenericException, errMsg
+            raise SqlmapGenericException(errMsg)
         else:
             logger.debug(errMsg)
 
@@ -3017,7 +3017,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         except ParseError:
             errMsg = "no success"
             if raise_:
-                raise SqlmapGenericException, errMsg
+                raise SqlmapGenericException(errMsg)
             else:
                 logger.debug(errMsg)
 
@@ -3038,7 +3038,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 errMsg = "there has been a problem while "
                 errMsg += "processing page forms ('%s')" % ex
                 if raise_:
-                    raise SqlmapGenericException, errMsg
+                    raise SqlmapGenericException(errMsg)
                 else:
                     logger.debug(errMsg)
             else:
@@ -3057,7 +3057,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     else:
         errMsg = "there were no forms found at the given target url"
         if raise_:
-            raise SqlmapGenericException, errMsg
+            raise SqlmapGenericException(errMsg)
         else:
             logger.debug(errMsg)
 
@@ -3105,7 +3105,7 @@ def checkDeprecatedOptions(args):
             errMsg = "switch/option '%s' is deprecated" % _
             if _ in DEPRECATED_HINTS:
                 errMsg += " (hint: %s)" % DEPRECATED_HINTS[_]
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
 def evaluateCode(code, variables=None):
     """
@@ -3118,7 +3118,7 @@ def evaluateCode(code, variables=None):
         raise
     except Exception, ex:
         errMsg = "an error occured while evaluating provided code ('%s'). " % ex
-        raise SqlmapGenericException, errMsg
+        raise SqlmapGenericException(errMsg)
 
 def serializeObject(object_):
     """
@@ -3259,7 +3259,7 @@ def resetCookieJar(cookieJar):
         except cookielib.LoadError, msg:
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % msg
-            raise SqlmapGenericException, errMsg
+            raise SqlmapGenericException(errMsg)
 
 def prioritySortColumns(columns):
     """

@@ -166,7 +166,7 @@ class Databases:
                 kb.data.cachedDbs = [kb.data.currentDb]
             else:
                 errMsg = "unable to retrieve the database names"
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
         else:
             kb.data.cachedDbs.sort()
 
@@ -354,7 +354,7 @@ class Databases:
                 logger.error(errMsg)
                 return self.getTables(bruteForce=True)
             else:
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
         else:
             for db, tables in kb.data.cachedTables.items():
                 kb.data.cachedTables[db] = sorted(tables) if tables else tables
@@ -384,7 +384,7 @@ class Databases:
             if  ',' in conf.db:
                 errMsg = "only one database name is allowed when enumerating "
                 errMsg += "the tables' columns"
-                raise SqlmapMissingMandatoryOptionException, errMsg
+                raise SqlmapMissingMandatoryOptionException(errMsg)
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
@@ -422,7 +422,7 @@ class Databases:
             else:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
 
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)

@@ -53,7 +53,7 @@ def tableExists(tableFile, regex=None):
         errMsg = "can't use table existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
         errMsg += "to distinguish errornous results)"
-        raise SqlmapDataException, errMsg
+        raise SqlmapDataException(errMsg)
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
 
@@ -138,14 +138,14 @@ def tableExists(tableFile, regex=None):
 def columnExists(columnFile, regex=None):
     if not conf.tbl:
         errMsg = "missing table parameter"
-        raise SqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException(errMsg)
 
     result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
         errMsg += "to distinguish errornous results)"
-        raise SqlmapDataException, errMsg
+        raise SqlmapDataException(errMsg)
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)

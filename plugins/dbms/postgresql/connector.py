@@ -37,7 +37,7 @@ class Connector(GenericConnector):
         try:
             self.connector = psycopg2.connect(host=self.hostname, user=self.user, password=self.password, database=self.db, port=self.port)
         except psycopg2.OperationalError, msg:
-            raise SqlmapConnectionException, msg
+            raise SqlmapConnectionException(msg)
 
         self.connector.set_client_encoding('UNICODE')
 
@@ -60,7 +60,7 @@ class Connector(GenericConnector):
         except (psycopg2.OperationalError, psycopg2.ProgrammingError), msg:
             logger.warn(("(remote) %s" % msg).strip())
         except psycopg2.InternalError, msg:
-            raise SqlmapConnectionException, msg
+            raise SqlmapConnectionException(msg)
 
         self.connector.commit()
 

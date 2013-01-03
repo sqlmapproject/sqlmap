@@ -63,7 +63,7 @@ class Filesystem(GenericFilesystem):
                 logger.warn(warnMsg)
                 result = self.nonStackedReadFile(rFile)
             else:
-                raise SqlmapNoneDataException, warnMsg
+                raise SqlmapNoneDataException(warnMsg)
         else:
             length = int(length)
             sustrLen = 1024

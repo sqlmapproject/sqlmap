@@ -25,7 +25,7 @@ class ProxyHTTPConnection(httplib.HTTPConnection):
         proto, rest = urllib.splittype(url)
 
         if proto is None:
-            raise ValueError, "unknown URL type: %s" % url
+            raise ValueError("unknown URL type: %s" % url)
 
         # Get host
         host, rest = urllib.splithost(rest)
@@ -38,7 +38,7 @@ class ProxyHTTPConnection(httplib.HTTPConnection):
             try:
                 port = self._ports[proto]
             except KeyError:
-                raise ValueError, "unknown protocol for: %s" % url
+                raise ValueError("unknown protocol for: %s" % url)
 
         self._real_host = host
         self._real_port = int(port)
@@ -117,4 +117,4 @@ else:
     class ProxyHTTPSHandler:
         def __init__(self, *args, **kwargs):
             errMsg = "unsupported feature on versions of Python before 2.6"
-            raise SqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException(errMsg)

@@ -38,7 +38,7 @@ class AttribDict(dict):
         try:
             return self.__getitem__(item)
         except KeyError:
-            raise SqlmapDataException, "unable to access item '%s'" % item
+            raise SqlmapDataException("unable to access item '%s'" % item)
 
     def __setattr__(self, item, value):
         """

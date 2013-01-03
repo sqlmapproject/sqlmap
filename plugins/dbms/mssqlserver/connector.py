@@ -42,7 +42,7 @@ class Connector(GenericConnector):
         try:
             self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user, password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
         except pymssql.OperationalError, msg:
-            raise SqlmapConnectionException, msg
+            raise SqlmapConnectionException(msg)
 
         self.setCursor()
         self.connected()
@@ -63,7 +63,7 @@ class Connector(GenericConnector):
         except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % str(msg).replace("\n", " "))
         except pymssql.InternalError, msg:
-            raise SqlmapConnectionException, msg
+            raise SqlmapConnectionException(msg)
 
         return retVal
 

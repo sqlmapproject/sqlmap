@@ -879,7 +879,7 @@ def checkStability():
                     kb.nullConnection = None
             else:
                 errMsg = "Empty value supplied"
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
 
         elif test and test[0] in ("r", "R"):
             message = "please enter value for parameter 'regex': "
@@ -896,7 +896,7 @@ def checkStability():
                     kb.nullConnection = None
             else:
                 errMsg = "Empty value supplied"
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
 
         else:
             checkDynamicContent(firstPage, secondPage)
@@ -1027,7 +1027,7 @@ def checkNullConnection():
 
     except SqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
-        raise SqlmapConnectionException, errMsg
+        raise SqlmapConnectionException(errMsg)
 
     return kb.nullConnection is not None
 
@@ -1037,7 +1037,7 @@ def checkConnection(suppressOutput=False):
             socket.getaddrinfo(conf.hostname, None)
         except socket.gaierror:
             errMsg = "host '%s' does not exist" % conf.hostname
-            raise SqlmapConnectionException, errMsg
+            raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput:
         infoMsg = "testing connection to the target url"
@@ -1051,7 +1051,7 @@ def checkConnection(suppressOutput=False):
 
         if not kb.originalPage and wasLastRequestHTTPError():
             errMsg = "unable to retrieve page content"
-            raise SqlmapConnectionException, errMsg
+            raise SqlmapConnectionException(errMsg)
         elif wasLastRequestDBMSError():
             warnMsg = "there is a DBMS error found in the HTTP response body "
             warnMsg += "which could interfere with the results of the tests"

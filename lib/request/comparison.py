@@ -92,7 +92,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             errMsg = "problem occured while retrieving original page content "
             errMsg += "which prevents sqlmap from continuation. Please rerun, "
             errMsg += "and if the problem persists turn off any optimization switches"
-            raise SqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException(errMsg)
 
         ratio = 1. * pageLength / len(seqMatcher.a)
 

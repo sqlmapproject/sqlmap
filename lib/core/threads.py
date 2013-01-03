@@ -165,7 +165,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                 pass
 
         except KeyboardInterrupt:
-            raise SqlmapThreadException, "user aborted (Ctrl+C was pressed multiple times)"
+            raise SqlmapThreadException("user aborted (Ctrl+C was pressed multiple times)")
 
         if forwardException:
             raise

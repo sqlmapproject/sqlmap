@@ -252,7 +252,7 @@ class Agent(object):
             else:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
-                raise SqlmapNoneDataException, errMsg
+                raise SqlmapNoneDataException(errMsg)
 
         return payload
 

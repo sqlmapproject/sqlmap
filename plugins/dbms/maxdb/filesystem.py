@@ -14,8 +14,8 @@ class Filesystem(GenericFilesystem):
 
     def readFile(self, rFile):
         errMsg = "on SAP MaxDB reading of files is not supported"
-        raise SqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, wFile, dFile, fileType=None):
         errMsg = "on SAP MaxDB writing of files is not supported"
-        raise SqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException(errMsg)

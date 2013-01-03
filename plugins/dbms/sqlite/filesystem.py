@@ -14,8 +14,8 @@ class Filesystem(GenericFilesystem):
 
     def readFile(self, rFile):
         errMsg = "on SQLite it is not possible to read files"
-        raise SqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, wFile, dFile, fileType=None):
         errMsg = "on SQLite it is not possible to write files"
-        raise SqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException(errMsg)
