@@ -365,7 +365,7 @@ def start():
                     # a warning message to the user in case the page is not stable
                     checkStability()
 
-                # Do a little prioritization reorder of a testable parameter list 
+                # Do a little prioritization reorder of a testable parameter list
                 parameters = conf.parameters.keys()
 
                 # Order of testing list (last to first)

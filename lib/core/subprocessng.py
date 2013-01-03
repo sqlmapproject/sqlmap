@@ -34,7 +34,7 @@ def blockingReadFromFD(fd):
                 # Uncomment the following line if the process seems to
                 # take a huge amount of cpu time
                 # time.sleep(0.01)
-                continue 
+                continue
             else:
                 raise
         break
@@ -52,9 +52,9 @@ def blockingWriteToFD(fd, data):
             wrote_data = os.write(fd, data)
         except (OSError, IOError), io:
             if io.errno in (errno.EAGAIN, errno.EINTR):
-                continue    
+                continue
             else:
-                raise 
+                raise
 
         if wrote_data < data_length:
             blockingWriteToFD(fd, data[wrote_data:])

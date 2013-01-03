@@ -24,7 +24,7 @@ class SORT_ORDER:
 
 class DBMS:
     ACCESS = "Microsoft Access"
-    DB2 = "IBM DB2"    
+    DB2 = "IBM DB2"
     FIREBIRD = "Firebird"
     MAXDB = "SAP MaxDB"
     MSSQL = "Microsoft SQL Server"

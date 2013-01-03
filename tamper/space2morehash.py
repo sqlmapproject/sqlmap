@@ -51,7 +51,7 @@ def tamper(payload, **kwargs):
         else:
             return match.group()
 
-    retVal = "" 
+    retVal = ""
 
     if payload:
         payload = re.sub(r"(?<=\W)(?P<word>[A-Za-z_]+)(?=\W|\Z)", lambda match: process(match), payload)
