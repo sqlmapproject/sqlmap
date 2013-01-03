@@ -145,7 +145,7 @@ class Enumeration(GenericEnumeration):
 
                 if retVal:
                     for table in retVal[0].values()[0]:
-                        if not kb.data.cachedTables.has_key(db):
+                        if db not in kb.data.cachedTables:
                             kb.data.cachedTables[db] = [table]
                         else:
                             kb.data.cachedTables[db].append(table)

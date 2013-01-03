@@ -47,11 +47,11 @@ class AttribDict(dict):
         """
 
         # This test allows attributes to be set in the __init__ method
-        if not self.__dict__.has_key('_AttribDict__initialised'):
+        if "_AttribDict__initialised" not in self.__dict__:
             return dict.__setattr__(self, item, value)
 
         # Any normal attributes are handled normally
-        elif self.__dict__.has_key(item):
+        elif item in self.__dict__:
             dict.__setattr__(self, item, value)
 
         else:
