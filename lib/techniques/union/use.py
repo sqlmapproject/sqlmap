@@ -24,6 +24,7 @@ from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
+from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
@@ -262,6 +263,8 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = parseUnionPage(output)
 
                                 with kb.locks.value:
+                                    if isListLike(items) and len(items) > 1 and len(expressionFieldsList) > 1:
+                                        items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
                                     index = None
                                     for index in xrange(len(threadData.shared.buffered)):
                                         if threadData.shared.buffered[index][0] >= num:
