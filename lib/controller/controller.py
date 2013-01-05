@@ -368,10 +368,10 @@ def start():
                 # Do a little prioritization reorder of a testable parameter list
                 parameters = conf.parameters.keys()
 
-                # Order of testing list (last to first)
-                orderList = (PLACE.URI, PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST)
+                # Order of testing list (first to last)
+                orderList = (PLACE.CUSTOM_POST, PLACE.URI, PLACE.POST, PLACE.GET)
 
-                for place in orderList:
+                for place in orderList[::-1]:
                     if place in parameters:
                         parameters.remove(place)
                         parameters.insert(0, place)
