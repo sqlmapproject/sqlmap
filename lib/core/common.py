@@ -919,7 +919,6 @@ def setPaths():
     paths.SQLMAP_OUTPUT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "output")
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
-    paths.SQLMAP_SEXEC_PATH = os.path.join(paths.SQLMAP_EXTRAS_PATH, "shellcodeexec")
 
     # sqlmap files
     paths.SQLMAP_HISTORY = os.path.join(paths.SQLMAP_ROOT_PATH, ".sqlmap_history")

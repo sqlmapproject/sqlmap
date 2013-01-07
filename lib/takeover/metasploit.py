@@ -534,12 +534,12 @@ class Metasploit:
         os.unlink(self._shellcodeFilePath)
 
     def uploadShellcodeexec(self, web=False):
-        self.shellcodeexecLocal = paths.SQLMAP_SEXEC_PATH
+        self.shellcodeexecLocal = os.path.join(paths.SQLMAP_EXTRAS_PATH, "shellcodeexec")
 
         if Backend.isOs(OS.WINDOWS):
-            self.shellcodeexecLocal += "/windows/shellcodeexec.x%s.exe" % "32"
+            self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "windows", "shellcodeexec.x%s.exe" % "32")
         else:
-            self.shellcodeexecLocal += "/linux/shellcodeexec.x%s" % Backend.getArch()
+            self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "linux", "shellcodeexec.x%s" % Backend.getArch())
 
         __basename = "tmpse%s%s" % (self._randStr, ".exe" if Backend.isOs(OS.WINDOWS) else "")
 
