@@ -199,7 +199,7 @@ def decodePage(page, contentEncoding, contentType):
                 data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
                 size = struct.unpack("<l", page[-4:])[0]  # Reference: http://pydoc.org/get.cgi/usr/local/lib/python2.5/gzip.py
                 if size > MAX_CONNECTION_TOTAL_SIZE:
-                    raise Exception, "size too large"
+                    raise Exception("size too large")
 
             page = data.read()
         except Exception, msg:

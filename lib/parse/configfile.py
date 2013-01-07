@@ -66,11 +66,11 @@ def configFileParser(configFile):
         config.readfp(configFP)
     except MissingSectionHeaderError:
         errMsg = "you have provided an invalid configuration file"
-        raise SqlmapSyntaxException, errMsg
+        raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
-        raise SqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException(errMsg)
 
     condition = not config.has_option("Target", "url")
     condition &= not config.has_option("Target", "logFile")
@@ -82,7 +82,7 @@ def configFileParser(configFile):
     if condition:
         errMsg = "missing a mandatory option in the configuration file "
         errMsg += "(url, logFile, bulkFile, googleDork, requestFile or wizard)"
-        raise SqlmapMissingMandatoryOptionException, errMsg
+        raise SqlmapMissingMandatoryOptionException(errMsg)
 
     for family, optionData in optDict.items():
         for option, datatype in optionData.items():

@@ -15,4 +15,4 @@ class Connector(GenericConnector):
     def connect(self):
         errMsg = "on SAP MaxDB it is not possible to establish a "
         errMsg += "direct connection"
-        raise SqlmapUnsupportedFeatureException, errMsg
+        raise SqlmapUnsupportedFeatureException(errMsg)

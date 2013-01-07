@@ -79,7 +79,7 @@ class Miscellaneous:
             first, last = 29, 9
 
         else:
-            raise SqlmapUnsupportedFeatureException, "unsupported DBMS"
+            raise SqlmapUnsupportedFeatureException("unsupported DBMS")
 
         query = queries[Backend.getIdentifiedDbms()].substring.query % (queries[Backend.getIdentifiedDbms()].banner.query, first, last)
 
@@ -189,6 +189,6 @@ class Miscellaneous:
             condParam = "='%s'"
         else:
             errMsg = "invalid value"
-            raise SqlmapNoneDataException, errMsg
+            raise SqlmapNoneDataException(errMsg)
 
         return choice, condParam

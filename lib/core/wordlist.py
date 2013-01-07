@@ -42,7 +42,7 @@ class Wordlist(object):
                 _ = zipfile.ZipFile(current, 'r')
                 if len(_.namelist()) == 0:
                     errMsg = "no file(s) inside '%s'" % current
-                    raise SqlmapDataException, errMsg
+                    raise SqlmapDataException(errMsg)
                 self.fp = _.open(_.namelist()[0])
             else:
                 self.fp = open(current, 'r')

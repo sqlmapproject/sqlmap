@@ -59,24 +59,24 @@ class Connector:
     def checkFileDb(self):
         if not os.path.exists(self.db):
             errMsg = "the provided database file '%s' does not exist" % self.db
-            raise SqlmapFilePathException, errMsg
+            raise SqlmapFilePathException(errMsg)
 
     def connect(self):
         errMsg = "'connect' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def fetchall(self):
         errMsg = "'fetchall' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def execute(self, query):
         errMsg = "'execute' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def select(self, query):
         errMsg = "'select' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)

@@ -28,7 +28,7 @@ def dnsTest(payload):
             errMsg += ". Turning off DNS exfiltration support"
             logger.error(errMsg)
         else:
-            raise SqlmapNotVulnerableException, errMsg
+            raise SqlmapNotVulnerableException(errMsg)
     else:
         infoMsg = "data retrieval through DNS channel was successful"
         logger.info(infoMsg)

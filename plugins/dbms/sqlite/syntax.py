@@ -42,7 +42,7 @@ class Syntax(GenericSyntax):
             index = expression[firstIndex+2:].find("'")
 
             if index == -1:
-                raise SqlmapSyntaxException, "Unenclosed ' in '%s'" % expression
+                raise SqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
 
             lastIndex = firstIndex + index + 3
             old = expression[firstIndex:lastIndex]

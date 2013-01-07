@@ -53,7 +53,7 @@ class Takeover(GenericTakeover):
             majorVer = "8.2"
         else:
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
-            raise SqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
         if Backend.isOs(OS.WINDOWS):
             self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (Backend.getArch(), majorVer)

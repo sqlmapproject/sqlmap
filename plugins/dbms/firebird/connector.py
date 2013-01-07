@@ -42,7 +42,7 @@ class Connector(GenericConnector):
             self.connector = kinterbasdb.connect(host=self.hostname.encode(UNICODE_ENCODING), database=self.db.encode(UNICODE_ENCODING), \
                 user=self.user.encode(UNICODE_ENCODING), password=self.password.encode(UNICODE_ENCODING), charset="UTF8") #http://www.daniweb.com/forums/thread248499.html
         except kinterbasdb.OperationalError, msg:
-            raise SqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException(msg[1])
         self.setCursor()
         self.connected()
 
@@ -59,7 +59,7 @@ class Connector(GenericConnector):
         except kinterbasdb.OperationalError, msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except kinterbasdb.Error, msg:
-            raise SqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException(msg[1])
 
         self.connector.commit()
 

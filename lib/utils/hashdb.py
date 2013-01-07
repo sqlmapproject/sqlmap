@@ -39,7 +39,7 @@ class HashDB(object):
             except Exception, ex:
                 errMsg = "error occurred while opening a session "
                 errMsg += "file '%s' ('%s')" % (self.filepath, ex)
-                raise SqlmapDataException, errMsg
+                raise SqlmapDataException(errMsg)
 
         return threadData.hashDBCursor
 

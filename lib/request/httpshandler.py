@@ -57,7 +57,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
                 logger.debug("SSL connection error occured ('%s')" % errMsg)
 
         if not success:
-            raise SqlmapConnectionException, "can't establish SSL connection"
+            raise SqlmapConnectionException("can't establish SSL connection")
 
 class HTTPSHandler(urllib2.HTTPSHandler):
     def https_open(self, req):

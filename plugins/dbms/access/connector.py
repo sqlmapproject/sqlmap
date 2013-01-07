@@ -35,7 +35,7 @@ class Connector(GenericConnector):
         if not IS_WIN:
             errMsg = "currently, direct connection to Microsoft Access database(s) "
             errMsg += "is restricted to Windows platforms"
-            raise SqlmapUnsupportedFeatureException, errMsg
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
         self.initConnection()
         self.checkFileDb()
@@ -43,7 +43,7 @@ class Connector(GenericConnector):
         try:
             self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db)
         except (pyodbc.Error, pyodbc.OperationalError), msg:
-            raise SqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException(msg[1])
 
         self.setCursor()
         self.connected()
@@ -61,7 +61,7 @@ class Connector(GenericConnector):
         except (pyodbc.OperationalError, pyodbc.ProgrammingError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except pyodbc.Error, msg:
-            raise SqlmapConnectionException, msg[1]
+            raise SqlmapConnectionException(msg[1])
 
         self.connector.commit()
 

@@ -42,16 +42,16 @@ def tamper(payload, **kwargs):
     #   STX     02      start of text
     #   ETX     03      end of text
     #   EOT     04      end of transmission
-    #   ENQ     05      enquiry     
-    #   ACK     06      acknowledge              
+    #   ENQ     05      enquiry
+    #   ACK     06      acknowledge
     #   BEL     07      bell
     #   BS      08      backspace
     #   TAB     09      horizontal tab
     #   LF      0A      new line
-    #   VT      0B      vertical TAB     
-    #   FF      0C      new page   
-    #   CR      0D      carriage return                
-    #   SO      0E      shift out 
+    #   VT      0B      vertical TAB
+    #   FF      0C      new page
+    #   CR      0D      carriage return
+    #   SO      0E      shift out
     #   SI      0F      shift in
     blanks = ('%01', '%02', '%03', '%04', '%05', '%06', '%07', '%08', '%09', '%0B', '%0C', '%0D', '%0E', '%0F', '%0A')
     retVal = payload
@@ -82,7 +82,7 @@ def tamper(payload, **kwargs):
                 else:
                     retVal += random.choice(blanks)
 
-                continue        
+                continue
 
             retVal += payload[i]
 

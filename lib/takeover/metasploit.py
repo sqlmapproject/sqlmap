@@ -280,7 +280,7 @@ class Metasploit:
             return None
 
         else:
-            raise SqlmapDataException, "unexpected connection type"
+            raise SqlmapDataException("unexpected connection type")
 
     def _selectLhost(self):
         if self.connectionStr.startswith("reverse"):
@@ -296,7 +296,7 @@ class Metasploit:
             return None
 
         else:
-            raise SqlmapDataException, "unexpected connection type"
+            raise SqlmapDataException("unexpected connection type")
 
     def _selectConnection(self):
         return self._skeletonSelection("connection type", self._msfConnectionsList)
@@ -320,7 +320,7 @@ class Metasploit:
         elif self.connectionStr.startswith("reverse"):
             self._cliCmd += " LHOST=%s" % self.lhostStr
         else:
-            raise SqlmapDataException, "unexpected connection type"
+            raise SqlmapDataException("unexpected connection type")
 
         if Backend.isOs(OS.WINDOWS) and self.payloadStr == "windows/vncinject":
             self._cliCmd += " DisableCourtesyShell=true"
@@ -341,7 +341,7 @@ class Metasploit:
         elif self.connectionStr.startswith("reverse"):
             self._cliCmd += " LHOST=%s" % self.lhostStr
         else:
-            raise SqlmapDataException, "unexpected connection type"
+            raise SqlmapDataException("unexpected connection type")
 
         self._cliCmd += " E"
 
@@ -353,7 +353,7 @@ class Metasploit:
         if self.connectionStr.startswith("reverse"):
             self._payloadCmd += " LHOST=%s" % self.lhostStr
         elif not self.connectionStr.startswith("bind"):
-            raise SqlmapDataException, "unexpected connection type"
+            raise SqlmapDataException("unexpected connection type")
 
         if Backend.isOs(OS.LINUX) and conf.privEsc:
             self._payloadCmd += " PrependChrootBreak=true PrependSetuid=true"
@@ -525,7 +525,7 @@ class Metasploit:
             logger.debug(debugMsg)
         else:
             errMsg = "failed to create the shellcode (%s)" % payloadStderr.replace("\n", " ").replace("\r", "")
-            raise SqlmapFilePathException, errMsg
+            raise SqlmapFilePathException(errMsg)
 
         self._shellcodeFP = open(self._shellcodeFilePath, "rb")
         self.shellcodeString = self._shellcodeFP.read()

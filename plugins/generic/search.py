@@ -558,4 +558,4 @@ class Search:
         else:
             errMsg = "missing parameter, provide -D, -T or -C along "
             errMsg += "with --search"
-            raise SqlmapMissingMandatoryOptionException, errMsg
+            raise SqlmapMissingMandatoryOptionException(errMsg)

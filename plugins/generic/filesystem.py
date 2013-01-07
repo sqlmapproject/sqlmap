@@ -161,22 +161,22 @@ class Filesystem:
     def nonStackedReadFile(self, remoteFile):
         errMsg = "'nonStackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def stackedReadFile(self, remoteFile):
         errMsg = "'stackedReadFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def unionWriteFile(self, localFile, remoteFile, fileType):
         errMsg = "'unionWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def stackedWriteFile(self, localFile, remoteFile, fileType):
         errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod, errMsg
+        raise SqlmapUndefinedMethod(errMsg)
 
     def readFile(self, remoteFiles):
         localFilePaths = []

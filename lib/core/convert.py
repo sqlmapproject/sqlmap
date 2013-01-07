@@ -47,7 +47,7 @@ def hexencode(value):
     return utf8encode(value).encode("hex")
 
 def md5hash(value):
-    if sys.modules.has_key('hashlib'):
+    if "hashlib" in sys.modules:
         return hashlib.md5(value).hexdigest()
     else:
         return md5.new(value).hexdigest()
@@ -60,7 +60,7 @@ def ordencode(value):
     return tuple(ord(char) for char in value)
 
 def sha1hash(value):
-    if sys.modules.has_key('hashlib'):
+    if "hashlib" in sys.modules:
         return hashlib.sha1(value).hexdigest()
     else:
         return sha.new(value).hexdigest()

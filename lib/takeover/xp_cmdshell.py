@@ -276,7 +276,7 @@ class Xp_cmdshell:
 
             if not kb.xpCmdshellAvailable:
                 errMsg = "unable to proceed without xp_cmdshell"
-                raise SqlmapUnsupportedFeatureException, errMsg
+                raise SqlmapUnsupportedFeatureException(errMsg)
 
         debugMsg = "creating a support table to write commands standard "
         debugMsg += "output to"

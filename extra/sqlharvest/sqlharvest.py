@@ -92,7 +92,7 @@ def main():
                     req = urllib2.Request(sqlfile)
                     response = urllib2.urlopen(req)
 
-                    if response.headers.has_key("Content-Length"):
+                    if "Content-Length" in response.headers:
                         if int(response.headers.get("Content-Length")) > MAX_FILE_SIZE:
                             continue
 

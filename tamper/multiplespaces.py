@@ -22,7 +22,7 @@ def tamper(payload, **kwargs):
 
     Example:
         * Input: UNION SELECT
-        * Output:  UNION   SELECT  
+        * Output:  UNION   SELECT
 
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls

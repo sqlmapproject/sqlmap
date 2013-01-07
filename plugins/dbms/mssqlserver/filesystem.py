@@ -261,22 +261,22 @@ class Filesystem(GenericFilesystem):
         Set file = fs.GetFile(inputFilePath)
         If file.Size Then
             Wscript.Echo "Loading from: " & inputFilePath
-            Wscript.Echo 
+            Wscript.Echo
             Set fd = fs.OpenTextFile(inputFilePath, 1)
             data = fd.ReadAll
             fd.Close
             data = Replace(data, " ", "")
             data = Replace(data, vbCr, "")
             data = Replace(data, vbLf, "")
-            Wscript.Echo "Fixed Input: " 
+            Wscript.Echo "Fixed Input: "
             Wscript.Echo data
-            Wscript.Echo 
+            Wscript.Echo
             decodedData = base64_decode(data)
-            Wscript.Echo "Output: " 
+            Wscript.Echo "Output: "
             Wscript.Echo decodedData
-            Wscript.Echo 
+            Wscript.Echo
             Wscript.Echo "Writing output in: " & outputFilePath
-            Wscript.Echo 
+            Wscript.Echo
             Set ofs = CreateObject("Scripting.FileSystemObject").OpenTextFile(outputFilePath, 2, True)
             ofs.Write decodedData
             ofs.close

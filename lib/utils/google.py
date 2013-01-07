@@ -44,7 +44,7 @@ class Google(object):
             e.info()
         except urllib2.URLError:
             errMsg = "unable to connect to Google"
-            raise SqlmapConnectionException, errMsg
+            raise SqlmapConnectionException(errMsg)
 
     def search(self, dork):
         """
@@ -94,13 +94,13 @@ class Google(object):
                 return None
         except (urllib2.URLError, socket.error, socket.timeout):
             errMsg = "unable to connect to Google"
-            raise SqlmapConnectionException, errMsg
+            raise SqlmapConnectionException(errMsg)
 
         retVal = [urllib.unquote(match.group(1)) for match in re.finditer(GOOGLE_REGEX, page, re.I | re.S)]
 
         if not retVal and "detected unusual traffic" in page:
             warnMsg = "Google has detected 'unusual' traffic from "
             warnMsg += "this computer disabling further searches"
-            raise SqlmapGenericException, warnMsg
+            raise SqlmapGenericException(warnMsg)
 
         return retVal
