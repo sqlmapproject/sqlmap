@@ -10,6 +10,7 @@
 | ------------ | ----------- | ----------- | ----------- |
 | [thirdparty/ansistrm/](http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html) | BSD | Used to colourize logging messages | - |
 | [thirdparty/beautifulsoup/](http://www.crummy.com/software/BeautifulSoup/) | BSD | Used to crawl the target site | --crawl |
+| [thirdparty/bottle/](http://bottlepy.org/) | MIT | Used as micro web server for the RESTful API | sqlmapapi.py |
 | [thirdparty/chardet/](http://pypi.python.org/pypi/chardet) | LGPL | Used to heuristically detect the HTTP response body charset | - |
 | [thirdparty/clientform/](http://wwwsearch.sourceforge.net/old/ClientForm/) | BSD | Used to parse HTML forms | --forms |
 | [thirdparty/colorama/](http://pypi.python.org/pypi/colorama) | BSD | Used to make output colouring cross-platform | - |
@@ -33,7 +34,6 @@ These listed are libraries and tools not entirely developed by sqlmap developers
 
 | Library / tool | License | Notes | Switch |
 | ------------ | ----------- | ----------- | ----------- |
-| [thirdparty/bottle/](http://bottlepy.org/) | MIT | Used as micro web server for the RESTful API | sqlmapapi.py |
 | [extra/icmpsh/](https://github.com/inquisb/icmpsh) | LGPL | Used for OS takeover feature via ICMP | --os-pwn |
 
 <h2 id="notbundled">Dependencies not bundled</h2>
