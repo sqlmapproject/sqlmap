@@ -10,21 +10,11 @@ import logging
 import os
 import shutil
 import sys
-import StringIO
 import tempfile
-import threading
 import types
 
-_multiprocessing = None
-try:
-    import multiprocessing
-
-    # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
-    _ = multiprocessing.Queue()
-except (ImportError, OSError):
-    pass
-else:
-    _multiprocessing = multiprocessing
+from subprocess import PIPE
+from subprocess import Popen
 
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
@@ -85,22 +75,6 @@ def init_options():
     options.disableColoring = True
 
     return options
-
-def start_scan():
-    # Wrap logger stdout onto a custom file descriptor (LOGGER_OUTPUT)
-    def emit(self, record):
-        message = stdoutencode(FORMATTER.format(record))
-        print >>LOGGER_OUTPUT, message.strip('\r')
-
-    LOGGER_HANDLER.emit = types.MethodType(emit, LOGGER_HANDLER, type(LOGGER_HANDLER))
-
-    # Wrap standard output onto a custom file descriptor
-    sys.stdout = open(str(os.getpid()) + ".out", "wb")
-    #sys.stderr = StringIO.StringIO()
-
-    taskid = multiprocessing.current_process().name
-    init(tasks[taskid], True)
-    start()
 
 @hook("after_request")
 def security_headers():
@@ -204,9 +178,8 @@ def status(taskid):
     """
 
     if is_admin(taskid):
-        busy = kb.get("busyFlag")
         tasks_num = len(tasks)
-        return jsonize({"busy": busy, "tasks": tasks_num})
+        return jsonize({"tasks": tasks_num})
     else:
         abort(401)
 
@@ -293,12 +266,8 @@ def scan_start(taskid):
     # Launch sqlmap engine in a separate thread
     logger.debug("starting a scan for task ID %s" % taskid)
 
-    if _multiprocessing:
-        #_multiprocessing.log_to_stderr(logging.DEBUG)
-        p = _multiprocessing.Process(name=taskid, target=start_scan)
-        p.daemon = True
-        p.start()
-        p.join()
+    proc = Popen("python sqlmap.py -c %s" % config_file, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = proc.communicate()
 
     return jsonize({"success": True})
 
