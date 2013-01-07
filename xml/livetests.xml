@@ -281,11 +281,7 @@
     <case name="MySQL boolean-based multi-threaded custom enumeration - substring">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
-            <!-- TODO: this fails because of issue #305 -->
-            <!--
             <threads value="4"/>
-            -->
-            <threads value="1"/>
             <tech value="B"/>
             <dumpTable value="True"/>
             <db value="testdb"/>
