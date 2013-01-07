@@ -6,7 +6,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import tempfile
 
+from extra.cloak.cloak import decloak
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import Backend
@@ -252,6 +254,15 @@ class Filesystem:
 
     def writeFile(self, localFile, remoteFile, fileType=None):
         self.checkDbmsOs()
+
+        if localFile.endswith("_"):
+            content = decloak(localFile)
+            _ = os.path.split(localFile[:-1])[-1]
+            prefix, suffix = os.path.splitext(_)
+            handle, localFile = tempfile.mkstemp(prefix=prefix, suffix=suffix)
+            os.close(handle)
+            with open(localFile, "w+b") as f:
+                f.write(content)
 
         if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):

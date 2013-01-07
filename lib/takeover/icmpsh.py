@@ -30,7 +30,7 @@ class ICMPsh:
         self.rhostStr = None
         self.localIP = getLocalIP()
         self.remoteIP = getRemoteIP()
-        self._icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe"))
+        self._icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe_"))
 
     def _selectRhost(self):
         message = "what is the back-end DBMS address? [%s] " % self.remoteIP
