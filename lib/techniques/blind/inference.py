@@ -116,7 +116,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if length == 0:
             return 0, ""
 
-        if (lastChar > 0 or firstChar > 0):
+        if length and (lastChar > 0 or firstChar > 0):
             length = min(length, lastChar or length) - firstChar
 
         showEta = conf.eta and isinstance(length, int)
