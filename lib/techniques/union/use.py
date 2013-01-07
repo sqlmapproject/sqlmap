@@ -263,6 +263,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = parseUnionPage(output)
 
                                 with kb.locks.value:
+                                    # in case that we requested N columns and we get M!=N then we have to filter a bit
                                     if isListLike(items) and len(items) > 1 and len(expressionFieldsList) > 1:
                                         items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
                                     index = None
