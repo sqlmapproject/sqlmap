@@ -132,7 +132,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             except ImportError:
                 errMsg = "sqlmap requires 'python-impacket' third-party library "
                 errMsg += "in order to run icmpsh master. You can get it at "
-                errMsg += "'http://oss.coresecurity.com/projects/impacket.html'"
+                errMsg += "http://code.google.com/p/impacket/downloads/list"
                 raise SqlmapMissingDependence(errMsg)
 
             sysIgnoreIcmp = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
