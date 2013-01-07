@@ -45,8 +45,8 @@ class ICMPsh:
         return address
 
     def _prepareIngredients(self, encode=True):
-        self.lhostStr = self._selectLhost()
-        self.rhostStr = self._selectRhost()
+        self.lhostStr = ICMPsh._selectLhost(self)
+        self.rhostStr = ICMPsh._selectRhost(self)
 
     def _runIcmpshMaster(self):
         infoMsg = "running icmpsh master locally"
@@ -82,7 +82,7 @@ class ICMPsh:
             self.writeFile(self._icmpslave, self._icmpslaveRemote, "binary")
 
     def icmpPwn(self):
-        self._prepareIngredients()
+        ICMPsh._prepareIngredients(self)
         self._runIcmpshSlaveRemote()
         self._runIcmpshMaster()
 
