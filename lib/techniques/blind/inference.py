@@ -410,9 +410,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     output = output[:-2] + '..'
 
                                 if conf.verbose in (1, 2) and not showEta:
+                                    _ = count - firstChar
                                     output += '_' * (min(length, conf.progressWidth) - len(output))
-                                    status = ' %d/%d (%d%s)' % (count, length, round(100.0*count/length), '%')
-                                    output += status if count != length else " " * len(status)
+                                    status = ' %d/%d (%d%s)' % (_, length, round(100.0 * _ / length), '%')
+                                    output += status if _ != length else " " * len(status)
 
                                     dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
 
