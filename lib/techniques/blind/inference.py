@@ -116,8 +116,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if length == 0:
             return 0, ""
 
-        if lastChar > 0 and length > ( lastChar - firstChar ):
-            length = lastChar - firstChar
+        if (lastChar > 0 or firstChar > 0):
+            length = min(length, lastChar or length) - firstChar
 
         showEta = conf.eta and isinstance(length, int)
         numThreads = min(conf.threads, length)
@@ -358,7 +358,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     while kb.threadContinue:
                         kb.locks.index.acquire()
 
-                        if threadData.shared.index[0] >= length:
+                        if threadData.shared.index[0] - firstChar >= length:
                             kb.locks.index.release()
 
                             return
@@ -376,7 +376,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             break
 
                         with kb.locks.value:
-                            threadData.shared.value[curidx - 1] = val
+                            threadData.shared.value[curidx - 1 - firstChar] = val
                             currentValue = list(threadData.shared.value)
 
                         if kb.threadContinue:
