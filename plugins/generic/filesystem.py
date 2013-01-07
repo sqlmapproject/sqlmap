@@ -48,10 +48,8 @@ class Filesystem:
                 lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
         elif Backend.isDbms(DBMS.MSSQL):
-            self.createSupportTbl(self.fileTblName, self.tblField, "text")
-
-            # Reference: http://msdn.microsoft.com/en-us/library/ms188365.aspx
-            inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.fileTblName, remoteFile, randomStr(10), randomStr(10)))
+            self.createSupportTbl(self.fileTblName, self.tblField, "VARBINARY(MAX)")
+            inject.goStacked("INSERT INTO %s(%s) SELECT %s FROM OPENROWSET(BULK '%s', SINGLE_BLOB) AS %s(%s)" % (self.fileTblName, self.tblField, self.tblField, remoteFile, self.fileTblName, self.tblField));
 
             lengthQuery = "SELECT DATALENGTH(%s) FROM %s" % (self.tblField, self.fileTblName)
 
