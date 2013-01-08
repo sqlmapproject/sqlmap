@@ -22,6 +22,7 @@
                    * http://dev.mysql.com/doc/refman/5.1/en/miscellaneous-functions.html#function_sleep
         -->
         <substring query="MID((%s),%d,%d)"/>
+        <concatenate query="CONCAT(%s,%s)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
         <inference query="ORD(MID((%s),%d,1)) > %d"/>
@@ -95,6 +96,7 @@
                    * http://www.postgresql.org/docs/8.3/interactive/functions-datetime.html#FUNCTIONS-DATETIME-DELAY
         -->
         <substring query="SUBSTR((%s)::text,%d,%d)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="ENCODE(CONVERT_TO((%s),'UTF8'),'HEX')"/>
         <inference query="ASCII(SUBSTR((%s)::text,%d,1)) > %d"/>
@@ -162,6 +164,7 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
         <substring query="SUBSTRING((%s),%d,%d)"/>
+        <concatenate query="%s+%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="master.sys.fn_varbintohexstr(CAST(%s AS VARBINARY(MAX)))"/>
         <inference query="UNICODE(SUBSTRING((%s),%d,1)) > %d"/>
@@ -227,6 +230,7 @@
         <count query="COUNT(%s)"/>
         <comment query="--"/>
         <substring query="SUBSTRC((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="RAWTOHEX(%s)"/>
         <inference query="ASCII(SUBSTRC((%s),%d,1)) > %d"/>
@@ -315,6 +319,7 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
         <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
@@ -361,6 +366,7 @@
         <count query="COUNT(%s)"/>
         <comment query="%00"/>
         <substring query="MID((%s),%d,%d)"/>
+        <concatenate query="%s&amp;%s"/>
         <case query="SELECT (IIF(%s,1,0))"/>
         <banner/>
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
@@ -403,6 +409,7 @@
         <comment query="--"/>
         <count query="COUNT(%s)"/>
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT IIF(%s,1,0)"/>
         <banner query="SELECT RDB$GET_CONTEXT('SYSTEM','ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
@@ -447,21 +454,23 @@
    <!-- SAP MaxDB -->
    <dbms value="SAP MaxDB">
         <length query="LENGTH(%s)"/>
-        <banner query="SELECT ID FROM SYSINFO.VERSION"/>
         <isnull query="VALUE(%s,' ')" query2="IFNULL(%s,' ')"/>
-        <comment query="--" query2="#"/>
-        <count query="COUNT(%s)"/>
+        <delimiter query=","/>
         <!-- No real cast on SAP MaxDB -->
         <cast query="REPLACE(CHR(%s),' ','_')"/>
-        <current_user query="SELECT USER() FROM DUAL"/>
-        <current_db query="SELECT DATABASE() FROM DUAL"/>
-        <hostname/>
         <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="#"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="CONCAT(%s,%s)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>
-        <delimiter query=","/>
-        <substring query="SUBSTR((%s),%d,%d)"/>
+        <banner query="SELECT ID FROM SYSINFO.VERSION"/>
+        <current_user query="SELECT USER() FROM DUAL"/>
+        <current_db query="SELECT DATABASE() FROM DUAL"/>
+        <hostname/>
+        <is_dba/>
         <users>
             <inband query="SELECT username FROM domain.users"/>
             <blind query="SELECT MIN(username) FROM domain.users WHERE username>'%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
@@ -503,6 +512,7 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
         <substring query="SUBSTRING((%s),%d,%d)"/>
+        <concatenate query="%s+%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="BINTOSTR(CONVERT(VARBINARY,%s))"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
@@ -571,6 +581,7 @@
         <comment query="--"/>
         <!-- TODO -->
         <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSIBM.SYSDUMMY1"/>
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1) > '%c'"/>

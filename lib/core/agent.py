@@ -444,19 +444,9 @@ class Agent(object):
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr, fieldsExists
 
-    def simpleConcatQuery(self, query1, query2):
-        concatenatedQuery = ""
-
-        if Backend.isDbms(DBMS.MYSQL):
-            concatenatedQuery = "CONCAT(%s,%s)" % (query1, query2)
-
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):
-            concatenatedQuery = "%s||%s" % (query1, query2)
-
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-            concatenatedQuery = "%s+%s" % (query1, query2)
-
-        return concatenatedQuery
+    def simpleConcatenate(self, first, second):
+        rootQuery = queries[Backend.getIdentifiedDbms()]
+        return rootQuery.concatenate.query % (first, second)
 
     def concatQuery(self, query, unpack=True):
         """

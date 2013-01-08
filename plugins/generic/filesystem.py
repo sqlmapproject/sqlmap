@@ -97,7 +97,7 @@ class Filesystem:
             if counter == 0:
                 sqlQueries.append("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, fcEncodedLine))
             else:
-                updatedField = agent.simpleConcatQuery(self.tblField, fcEncodedLine)
+                updatedField = agent.simpleConcatenate(self.tblField, fcEncodedLine)
                 sqlQueries.append("UPDATE %s SET %s=%s" % (self.fileTblName, self.tblField, updatedField))
 
             counter += 1
