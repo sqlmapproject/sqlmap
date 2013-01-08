@@ -22,6 +22,7 @@ import socket
 import string
 import struct
 import sys
+import tempfile
 import time
 import urllib
 import urlparse
@@ -38,6 +39,7 @@ from subprocess import Popen as execute
 from xml.dom import minidom
 from xml.sax import parse
 
+from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
 from lib.core.data import conf
@@ -3259,6 +3261,21 @@ def resetCookieJar(cookieJar):
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % msg
             raise SqlmapGenericException(errMsg)
+
+def decloakToTemp(filename):
+    """
+    Decloaks content of a given file to a temporary file with similar name and extension
+    """
+
+    content = decloak(filename)
+    _ = os.path.split(filename[:-1])[-1]
+    prefix, suffix = os.path.splitext(_)
+    prefix = prefix.split(os.extsep)[0]
+    handle, filename = tempfile.mkstemp(prefix=prefix, suffix=suffix)
+    os.close(handle)
+    with open(filename, "w+b") as f:
+        f.write(content)
+    return filename
 
 def prioritySortColumns(columns):
     """
