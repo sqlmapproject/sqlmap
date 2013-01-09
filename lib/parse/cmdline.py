@@ -664,6 +664,8 @@ def cmdLineParser():
                                   help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
+        parser.add_option("--pickle", dest="pickledOptions", help=SUPPRESS_HELP)
+
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
 
@@ -757,7 +759,7 @@ def cmdLineParser():
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
-            args.purgeOutput)):
+            args.purgeOutput, args.pickledOptions)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help"
             parser.error(errMsg)

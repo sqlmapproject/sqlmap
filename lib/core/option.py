@@ -51,6 +51,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.common import urldecode
 from lib.core.common import urlencode
+from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -1769,6 +1770,9 @@ def _mergeOptions(inputOptions, overrideOptions):
     @type inputOptions: C{instance}
     """
 
+    if inputOptions.pickledOptions:
+        inputOptions = base64unpickle(inputOptions.pickledOptions)
+
     if inputOptions.configFile:
         configFileParser(inputOptions.configFile)
 
@@ -2054,9 +2058,9 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
 
     if not inputOptions.disableColoring:
         coloramainit()
-    else:
-        if hasattr(LOGGER_HANDLER, "disable_coloring"):
-            LOGGER_HANDLER.disable_coloring = True
+    elif hasattr(LOGGER_HANDLER, "disable_coloring"):
+        LOGGER_HANDLER.disable_coloring = True
+
     _setConfAttributes()
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)
