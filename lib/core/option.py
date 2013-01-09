@@ -14,6 +14,7 @@ import socket
 import string
 import sys
 import threading
+import time
 import urllib2
 import urlparse
 
@@ -580,10 +581,16 @@ def _findPageForms():
         page, _ = Request.queryPage(content=True)
         findPageForms(page, conf.url, True, True)
     else:
-        for target in getFileItems(conf.bulkFile):
+        targets = getFileItems(conf.bulkFile)
+        for i in xrange(len(targets)):
             try:
+                target = targets[i]
                 page, _, _= Request.getPage(url=target.strip(), crawling=True, raise404=False)
                 findPageForms(page, target, False, True)
+
+                if conf.verbose in (1, 2):
+                    status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except Exception, ex:
                 errMsg = "problem occured while searching for forms at '%s' ('%s')" % (target, ex)
                 logger.error(errMsg)
