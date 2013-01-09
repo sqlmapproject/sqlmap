@@ -15,8 +15,11 @@ from lib.core.common import dataToStdout
 from lib.core.settings import IS_WIN
 
 if IS_WIN:
-    from win32file import ReadFile, WriteFile
-    from win32pipe import PeekNamedPipe
+    try:
+        from win32file import ReadFile, WriteFile
+        from win32pipe import PeekNamedPipe
+    except ImportError:
+        pass
     import msvcrt
 else:
     import select
