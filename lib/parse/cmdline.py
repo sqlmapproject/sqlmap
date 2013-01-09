@@ -664,7 +664,7 @@ def cmdLineParser():
                                   help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
-        parser.add_option("--pickle", dest="pickledOptions", help=SUPPRESS_HELP)
+        parser.add_option("--pickled-options", dest="pickledOptions", help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)

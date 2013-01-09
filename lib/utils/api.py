@@ -19,16 +19,15 @@ from subprocess import Popen
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
+from lib.core.convert import base64unpickle
 from lib.core.convert import hexencode
+from lib.core.convert import jsonize
 from lib.core.convert import stdoutencode
 from lib.core.data import paths
-from lib.core.datatype import AttribDict
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
-from lib.core.log import FORMATTER
-from lib.core.log import LOGGER_HANDLER
-from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.optiondict import optDict
 from lib.core.option import init
@@ -49,13 +48,11 @@ RESTAPI_SERVER_PORT = 8775
 
 # Local global variables
 adminid = ""
+pipes = dict()
 procs = dict()
 tasks = AttribDict()
 
 # Generic functions
-def jsonize(data):
-    return json.dumps(data, sort_keys=False, indent=4)
-
 def is_admin(taskid):
     global adminid
     if adminid != taskid:
@@ -254,6 +251,7 @@ def scan_start(taskid):
     """
     global tasks
     global procs
+    global pipes
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
@@ -269,8 +267,13 @@ def scan_start(taskid):
     # Launch sqlmap engine in a separate thread
     logger.debug("starting a scan for task ID %s" % taskid)
 
-    procs[taskid] = Popen("python sqlmap.py --pickle %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = procs[taskid].communicate()
+    pipes[taskid] = os.pipe()
+
+    # Provide sqlmap engine with the writable pipe for logging
+    tasks[taskid]["fdLog"] = pipes[taskid][1]
+
+    # Launch sqlmap engine
+    procs[taskid] = Popen("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
     return jsonize({"success": True})
 
@@ -279,17 +282,17 @@ def scan_output(taskid):
     """
     Read the standard output of sqlmap core execution
     """
+    global pipes
     global tasks
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    sys.stdout.seek(0)
-    output = sys.stdout.read()
-    sys.stdout.flush()
-    sys.stdout.truncate(0)
+    stdout, stderr = procs[taskid].communicate()
 
-    return jsonize({"output": output})
+    print "stderr:", stderr
+
+    return jsonize({"stdout": stdout, "stderr": stderr})
 
 @get("/scan/<taskid>/delete")
 def scan_delete(taskid):
@@ -315,12 +318,7 @@ def scan_log(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    LOGGER_OUTPUT.seek(0)
-    output = LOGGER_OUTPUT.read()
-    LOGGER_OUTPUT.flush()
-    LOGGER_OUTPUT.truncate(0)
-
-    return jsonize({"log": output})
+    return jsonize({"log": base64unpickle(os.read(pipes[taskid][0], 100000))})
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
