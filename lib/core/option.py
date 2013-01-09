@@ -580,9 +580,13 @@ def _findPageForms():
         page, _ = Request.queryPage(content=True)
         findPageForms(page, conf.url, True, True)
     else:
-        for target, _, _, _ in kb.targets[:]:
-            page, _, _= Request.getPage(url=target, crawling=True, raise404=False)
-            findPageForms(page, target, False, True)
+        for target in getFileItems(conf.bulkFile):
+            try:
+                page, _, _= Request.getPage(url=target.strip(), crawling=True, raise404=False)
+                findPageForms(page, target, False, True)
+            except Exception, ex:
+                errMsg = "problem occured while searching for forms at '%s' ('%s')" % (target, ex)
+                logger.error(errMsg)
 
 def _setDBMSAuthentication():
     """
