@@ -196,6 +196,7 @@ optDict = {
                                "answers":           "string",
                                "beep":              "boolean",
                                "checkPayload":      "boolean",
+                               "checkWaf":          "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",
                                "disableColoring":   "boolean",
