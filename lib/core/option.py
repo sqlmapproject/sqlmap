@@ -134,7 +134,7 @@ from lib.request.httpshandler import HTTPSHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
-from lib.utils.crawler import Crawler
+from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
 from thirdparty.colorama.initialise import init as coloramainit
@@ -461,8 +461,7 @@ def _setCrawler():
     if not conf.crawlDepth:
         return
 
-    crawler = Crawler()
-    crawler.getTargetUrls()
+    crawl(conf.url)
 
 def _setGoogleDorking():
     """
@@ -570,15 +569,19 @@ def _findPageForms():
     if not conf.forms or conf.crawlDepth:
         return
 
-    if not checkConnection():
+    if conf.url and not checkConnection():
         return
 
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    page, _ = Request.queryPage(content=True)
-
-    findPageForms(page, conf.url, True, True)
+    if not conf.bulkFile:
+        page, _ = Request.queryPage(content=True)
+        findPageForms(page, conf.url, True, True)
+    else:
+        for target, _, _, _ in kb.targets[:]:
+            page, _, _= Request.getPage(url=target, crawling=True, raise404=False)
+            findPageForms(page, target, False, True)
 
 def _setDBMSAuthentication():
     """
@@ -1961,8 +1964,8 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not conf.url:
-        errMsg = "switch '--forms' requires usage of option '-u' (--url)"
+    if conf.forms and not any ((conf.url, conf.bulkFile)):
+        errMsg = "switch '--forms' requires usage of option '-u' (--url) or '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url:
@@ -2005,8 +2008,8 @@ def _basicOptionValidation():
         errMsg = "option '--proxy' is incompatible with switch '--ignore-proxy'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
-        errMsg = "switch '--forms' is compatible only with option '-u' (--url)"
+    if conf.forms and any([conf.logFile, conf.direct, conf.requestFile, conf.googleDork]):
+        errMsg = "switch '--forms' is compatible only with options '-u' (--url) and '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.timeSec < 1:
