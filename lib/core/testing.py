@@ -14,6 +14,7 @@ import StringIO
 import sys
 import tempfile
 import time
+import traceback
 
 from extra.beep.beep import beep
 from lib.controller.controller import start
@@ -231,6 +232,7 @@ def runCase(switches=None, parse=None):
 
     if exception:
         logger.error("unhandled exception occurred ('%s')" % str(exception))
+        tback = traceback.format_exc()
         retVal = False
     elif result is False: # if None, ignore
         logger.error("the test did not run")
