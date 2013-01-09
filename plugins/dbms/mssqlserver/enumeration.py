@@ -59,7 +59,7 @@ class Enumeration(GenericEnumeration):
 
             kb.data.cachedUsersPrivileges[user] = None
 
-        return ( kb.data.cachedUsersPrivileges, areAdmins )
+        return (kb.data.cachedUsersPrivileges, areAdmins)
 
     def getTables(self):
         if len(kb.data.cachedTables) > 0:

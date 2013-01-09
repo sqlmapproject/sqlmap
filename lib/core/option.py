@@ -14,6 +14,7 @@ import socket
 import string
 import sys
 import threading
+import time
 import urllib2
 import urlparse
 
@@ -135,7 +136,7 @@ from lib.request.httpshandler import HTTPSHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
-from lib.utils.crawler import Crawler
+from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
 from thirdparty.colorama.initialise import init as coloramainit
@@ -307,7 +308,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in ( HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION ):
+                    elif key not in (HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION):
                         conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
 
             if getPostReq and (params or cookie):
@@ -462,8 +463,7 @@ def _setCrawler():
     if not conf.crawlDepth:
         return
 
-    crawler = Crawler()
-    crawler.getTargetUrls()
+    crawl(conf.url)
 
 def _setGoogleDorking():
     """
@@ -571,15 +571,29 @@ def _findPageForms():
     if not conf.forms or conf.crawlDepth:
         return
 
-    if not checkConnection():
+    if conf.url and not checkConnection():
         return
 
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    page, _ = Request.queryPage(content=True)
+    if not conf.bulkFile:
+        page, _ = Request.queryPage(content=True)
+        findPageForms(page, conf.url, True, True)
+    else:
+        targets = getFileItems(conf.bulkFile)
+        for i in xrange(len(targets)):
+            try:
+                target = targets[i]
+                page, _, _= Request.getPage(url=target.strip(), crawling=True, raise404=False)
+                findPageForms(page, target, False, True)
 
-    findPageForms(page, conf.url, True, True)
+                if conf.verbose in (1, 2):
+                    status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+            except Exception, ex:
+                errMsg = "problem occured while searching for forms at '%s' ('%s')" % (target, ex)
+                logger.error(errMsg)
 
 def _setDBMSAuthentication():
     """
@@ -1047,11 +1061,11 @@ def _setHTTPAuthentication():
 
         aTypeLower = conf.aType.lower()
 
-        if aTypeLower not in ( "basic", "digest", "ntlm" ):
+        if aTypeLower not in ("basic", "digest", "ntlm"):
             errMsg = "HTTP authentication type value must be "
             errMsg += "Basic, Digest or NTLM"
             raise SqlmapSyntaxException(errMsg)
-        elif aTypeLower in ( "basic", "digest" ):
+        elif aTypeLower in ("basic", "digest"):
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % aTypeLower
             errMsg += "value must be in format username:password"
@@ -1712,8 +1726,8 @@ def _saveCmdline():
             if value is None:
                 if datatype == "boolean":
                     value = "False"
-                elif datatype in ( "integer", "float" ):
-                    if option in ( "threads", "verbose" ):
+                elif datatype in ("integer", "float"):
+                    if option in ("threads", "verbose"):
                         value = "1"
                     elif option == "timeout":
                         value = "10"
@@ -1836,7 +1850,7 @@ def _setTorHttpProxySettings():
 
     found = None
 
-    for port in (DEFAULT_TOR_HTTP_PORTS if not conf.torPort else (conf.torPort, )):
+    for port in (DEFAULT_TOR_HTTP_PORTS if not conf.torPort else (conf.torPort,)):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((LOCALHOST, port))
@@ -1965,8 +1979,8 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not conf.url:
-        errMsg = "switch '--forms' requires usage of option '-u' (--url)"
+    if conf.forms and not any ((conf.url, conf.bulkFile)):
+        errMsg = "switch '--forms' requires usage of option '-u' (--url) or '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url:
@@ -2009,8 +2023,8 @@ def _basicOptionValidation():
         errMsg = "option '--proxy' is incompatible with switch '--ignore-proxy'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and any([conf.logFile, conf.bulkFile, conf.direct, conf.requestFile, conf.googleDork]):
-        errMsg = "switch '--forms' is compatible only with option '-u' (--url)"
+    if conf.forms and any([conf.logFile, conf.direct, conf.requestFile, conf.googleDork]):
+        errMsg = "switch '--forms' is compatible only with options '-u' (--url) and '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.timeSec < 1:

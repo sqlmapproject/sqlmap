@@ -72,7 +72,7 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("generating chunk file %s\%s from debug script %s" % (tmpPath, chunkName, randScr))
 
-        commands = ( "cd %s" % tmpPath, "debug < %s" % randScr, "del /F /Q %s" % randScr )
+        commands = ("cd %s" % tmpPath, "debug < %s" % randScr, "del /F /Q %s" % randScr)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
@@ -183,9 +183,9 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("converting the file utilizing PowerShell EncodedCommand")
 
-        commands = ( "cd %s" % tmpPath,
+        commands = ("cd %s" % tmpPath,
                      "powershell -EncodedCommand %s" % psString,
-                     "del /F /Q %s" % randFilePath )
+                     "del /F /Q %s" % randFilePath)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
@@ -319,9 +319,9 @@ class Filesystem(GenericFilesystem):
 
         self.xpCmdshellWriteFile(vbs, tmpPath, randVbs)
 
-        commands = ( "cd %s" % tmpPath, "cscript //nologo %s" % randVbs,
+        commands = ("cd %s" % tmpPath, "cscript //nologo %s" % randVbs,
                      "del /F /Q %s" % randVbs,
-                     "del /F /Q %s" % randFile )
+                     "del /F /Q %s" % randFile)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)

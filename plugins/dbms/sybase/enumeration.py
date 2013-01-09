@@ -77,7 +77,7 @@ class Enumeration(GenericEnumeration):
 
             kb.data.cachedUsersPrivileges[user] = None
 
-        return ( kb.data.cachedUsersPrivileges, areAdmins )
+        return (kb.data.cachedUsersPrivileges, areAdmins)
 
     def getDbs(self):
         if len(kb.data.cachedDbs) > 0:

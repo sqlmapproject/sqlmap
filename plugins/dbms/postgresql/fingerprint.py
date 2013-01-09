@@ -155,7 +155,7 @@ class Fingerprint(GenericFingerprint):
 
         # Windows executables should always have ' Visual C++' or ' mingw'
         # patterns within the banner
-        osWindows = ( " Visual C++", "mingw" )
+        osWindows = (" Visual C++", "mingw")
 
         for osPattern in osWindows:
             query = "(SELECT LENGTH(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)

@@ -86,20 +86,20 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             firstChar = len(partialValue)
         elif "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
             firstChar = 0
-        elif dump and conf.firstChar is not None and ( isinstance(conf.firstChar, int) or ( isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit() ) ):
+        elif dump and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
         elif firstChar is None:
             firstChar = 0
-        elif ( isinstance(firstChar, basestring) and firstChar.isdigit() ) or isinstance(firstChar, int):
+        elif (isinstance(firstChar, basestring) and firstChar.isdigit()) or isinstance(firstChar, int):
             firstChar = int(firstChar) - 1
 
         if "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
             lastChar = 0
-        elif dump and conf.lastChar is not None and ( isinstance(conf.lastChar, int) or ( isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit() ) ):
+        elif dump and conf.lastChar is not None and (isinstance(conf.lastChar, int) or (isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
-        elif lastChar in ( None, "0" ):
+        elif lastChar in (None, "0"):
             lastChar = 0
-        elif ( isinstance(lastChar, basestring) and lastChar.isdigit() ) or isinstance(lastChar, int):
+        elif (isinstance(lastChar, basestring) and lastChar.isdigit()) or isinstance(lastChar, int):
             lastChar = int(lastChar)
 
         if Backend.getDbms():
@@ -332,7 +332,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         return None
 
         def etaProgressUpdate(charTime, index):
-            if len(progressTime) <= ( (length * 3) / 100 ):
+            if len(progressTime) <= ((length * 3) / 100):
                 eta = 0
             else:
                 midTime = sum(progressTime) / len(progressTime)
@@ -412,7 +412,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 if conf.verbose in (1, 2) and not showEta:
                                     _ = count - firstChar
                                     output += '_' * (min(length, conf.progressWidth) - len(output))
-                                    status = ' %d/%d (%d%s)' % (_, length, round(100.0 * _ / length), '%')
+                                    status = ' %d/%d (%d%%)' % (_, length, round(100.0 * _ / length))
                                     output += status if _ != length else " " * len(status)
 
                                     dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
@@ -507,7 +507,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     val = getChar(index, asciiTbl)
 
-                if val is None or ( lastChar > 0 and index > lastChar ):
+                if val is None or (lastChar > 0 and index > lastChar):
                     finalValue = partialValue
                     break
 
@@ -545,7 +545,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if conf.verbose in (1, 2) or showEta:
             dataToStdout("\n")
 
-        if ( conf.verbose in ( 1, 2 ) and showEta ) or conf.verbose >= 3:
+        if (conf.verbose in (1, 2) and showEta) or conf.verbose >= 3:
             infoMsg = "retrieved: %s" % filterControlChars(finalValue)
             logger.info(infoMsg)
 

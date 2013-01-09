@@ -131,43 +131,43 @@ PLATFORM = os.name
 PYVERSION = sys.version.split()[0]
 
 # Database management system specific variables
-MSSQL_SYSTEM_DBS = ( "Northwind", "master", "model", "msdb", "pubs", "tempdb" )
-MYSQL_SYSTEM_DBS = ( "information_schema", "mysql" )                   # Before MySQL 5.0 only "mysql"
-PGSQL_SYSTEM_DBS = ( "information_schema", "pg_catalog", "pg_toast" )
-ORACLE_SYSTEM_DBS = ( "SYSTEM", "SYSAUX", "SYS" )                      # These are TABLESPACE_NAME
-SQLITE_SYSTEM_DBS = ( "sqlite_master", "sqlite_temp_master" )
-ACCESS_SYSTEM_DBS = ( "MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
-                        "MSysAccessXML", "MSysModules", "MSysModules2" )
-FIREBIRD_SYSTEM_DBS = ( "RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE",\
+MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb")
+MYSQL_SYSTEM_DBS = ("information_schema", "mysql")                   # Before MySQL 5.0 only "mysql"
+PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast")
+ORACLE_SYSTEM_DBS = ("SYSTEM", "SYSAUX", "SYS")                      # These are TABLESPACE_NAME
+SQLITE_SYSTEM_DBS = ("sqlite_master", "sqlite_temp_master")
+ACCESS_SYSTEM_DBS = ("MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
+                        "MSysAccessXML", "MSysModules", "MSysModules2")
+FIREBIRD_SYSTEM_DBS = ("RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE",\
                         "RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS",\
                         "RDB$FORMATS", "RDB$FUNCTIONS", "RDB$FUNCTION_ARGUMENTS", "RDB$GENERATORS", "RDB$INDEX_SEGMENTS", "RDB$INDICES",\
                         "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS",\
                         "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS",\
-                        "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS" )
-MAXDB_SYSTEM_DBS = ( "SYSINFO", "DOMAIN" )
-SYBASE_SYSTEM_DBS = ( "master", "model", "sybsystemdb", "sybsystemprocs" )
-DB2_SYSTEM_DBS = ( "NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS",\
-                   "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS" )
+                        "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS")
+MAXDB_SYSTEM_DBS = ("SYSINFO", "DOMAIN")
+SYBASE_SYSTEM_DBS = ("master", "model", "sybsystemdb", "sybsystemprocs")
+DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS",\
+                   "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS")
 
-MSSQL_ALIASES = ( "microsoft sql server", "mssqlserver", "mssql", "ms" )
-MYSQL_ALIASES = ( "mysql", "my" )
-PGSQL_ALIASES = ( "postgresql", "postgres", "pgsql", "psql", "pg" )
-ORACLE_ALIASES = ( "oracle", "orcl", "ora", "or" )
-SQLITE_ALIASES = ( "sqlite", "sqlite3" )
-ACCESS_ALIASES = ( "msaccess", "access", "jet", "microsoft access" )
-FIREBIRD_ALIASES = ( "firebird", "mozilla firebird", "interbase", "ibase", "fb" )
-MAXDB_ALIASES = ( "maxdb", "sap maxdb", "sap db" )
-SYBASE_ALIASES = ( "sybase", "sybase sql server" )
-DB2_ALIASES = ( "db2", "ibm db2", "ibmdb2" )
+MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
+MYSQL_ALIASES = ("mysql", "my")
+PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg")
+ORACLE_ALIASES = ("oracle", "orcl", "ora", "or")
+SQLITE_ALIASES = ("sqlite", "sqlite3")
+ACCESS_ALIASES = ("msaccess", "access", "jet", "microsoft access")
+FIREBIRD_ALIASES = ("firebird", "mozilla firebird", "interbase", "ibase", "fb")
+MAXDB_ALIASES = ("maxdb", "sap maxdb", "sap db")
+SYBASE_ALIASES = ("sybase", "sybase sql server")
+DB2_ALIASES = ("db2", "ibm db2", "ibmdb2")
 
 DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 
 SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
-SUPPORTED_OS = ( "linux", "windows" )
+SUPPORTED_OS = ("linux", "windows")
 
-USER_AGENT_ALIASES = ( "ua", "useragent", "user-agent" )
-REFERER_ALIASES = ( "ref", "referer", "referrer" )
-HOST_ALIASES = ( "host", )
+USER_AGENT_ALIASES = ("ua", "useragent", "user-agent")
+REFERER_ALIASES = ("ref", "referer", "referrer")
+HOST_ALIASES = ("host",)
 
 # Items displayed in basic help (-h) output
 BASIC_HELP_ITEMS = (

@@ -73,7 +73,7 @@ def smokeTest():
                         retVal = False
 
             count += 1
-            status = '%d/%d (%d%s) ' % (count, length, round(100.0*count/length), '%')
+            status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
             dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
     clearConsoleLine()
