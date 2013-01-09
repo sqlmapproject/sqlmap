@@ -18,6 +18,7 @@ from subprocess import Popen
 
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
+from lib.core.convert import base64pickle
 from lib.core.convert import hexencode
 from lib.core.convert import stdoutencode
 from lib.core.data import paths
@@ -48,6 +49,7 @@ RESTAPI_SERVER_PORT = 8775
 
 # Local global variables
 adminid = ""
+procs = dict()
 tasks = AttribDict()
 
 # Generic functions
@@ -251,6 +253,7 @@ def scan_start(taskid):
     Launch a scan
     """
     global tasks
+    global procs
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
@@ -266,8 +269,8 @@ def scan_start(taskid):
     # Launch sqlmap engine in a separate thread
     logger.debug("starting a scan for task ID %s" % taskid)
 
-    proc = Popen("python sqlmap.py -c %s" % config_file, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = proc.communicate()
+    procs[taskid] = Popen("python sqlmap.py --pickle %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = procs[taskid].communicate()
 
     return jsonize({"success": True})
 
