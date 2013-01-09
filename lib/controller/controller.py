@@ -113,7 +113,7 @@ def _selectInjection():
 
         if select.isdigit() and int(select) < len(kb.injections) and int(select) >= 0:
             index = int(select)
-        elif select[0] in ( "Q", "q" ):
+        elif select[0] in ("Q", "q"):
             raise SqlmapUserQuitException
         else:
             errMsg = "invalid choice"

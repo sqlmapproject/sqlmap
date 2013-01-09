@@ -41,7 +41,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             self.webBackdoorRunCmd(cmd)
 
-        elif Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+        elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
             self.udfExecCmd(cmd, silent=silent)
 
         elif Backend.isDbms(DBMS.MSSQL):
@@ -57,7 +57,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
         if self.webBackdoorUrl and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
             retVal = self.webBackdoorRunCmd(cmd)
 
-        elif Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+        elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
             retVal = self.udfEvalCmd(cmd, first, last)
 
         elif Backend.isDbms(DBMS.MSSQL):
@@ -97,7 +97,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
             logger.info(infoMsg)
 
         else:
-            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 infoMsg = "going to use injected sys_eval and sys_exec "
                 infoMsg += "user-defined functions for operating system "
                 infoMsg += "command execution"
@@ -136,7 +136,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
             if not command:
                 continue
 
-            if command.lower() in ( "x", "q", "exit", "quit" ):
+            if command.lower() in ("x", "q", "exit", "quit"):
                 break
 
             self.runCmd(command)
@@ -186,7 +186,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
                 warnMsg = "functionality requested probably does not work because "
                 warnMsg += "the curent session user is not a database administrator"
 
-                if not conf.dbmsCred and Backend.getIdentifiedDbms() in ( DBMS.MSSQL, DBMS.PGSQL ):
+                if not conf.dbmsCred and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
                     warnMsg += ". You can try to use option '--dbms-cred' "
                     warnMsg += "to execute statements as a DBA user if you "
                     warnMsg += "were able to extract and crack a DBA "
@@ -194,7 +194,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
                 logger.warn(warnMsg)
 
-            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 self.udfInjectSys()
             elif Backend.isDbms(DBMS.MSSQL):
                 if mandatory:

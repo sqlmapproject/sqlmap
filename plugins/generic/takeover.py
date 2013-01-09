@@ -94,7 +94,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             msg = "how do you want to establish the tunnel?"
             msg += "\n[1] TCP: Metasploit Framework (default)"
             msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
-            valids = ( 1, 2 )
+            valids = (1, 2)
 
             while True:
                 tunnel = readInput(msg, default=1)
@@ -150,7 +150,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "is unlikely to receive commands sent from you"
                 logger.error(errMsg)
 
-            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 self.sysUdfs.pop("sys_bineval")
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
@@ -160,7 +160,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.initEnv(web=web)
 
             if tunnel == 1:
-                if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                     msg = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
@@ -169,11 +169,11 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     while True:
                         choice = readInput(msg, default=1)
 
-                        if isinstance(choice, basestring) and choice.isdigit() and int(choice) in ( 1, 2 ):
+                        if isinstance(choice, basestring) and choice.isdigit() and int(choice) in (1, 2):
                             choice = int(choice)
                             break
 
-                        elif isinstance(choice, int) and choice in ( 1, 2 ):
+                        elif isinstance(choice, int) and choice in (1, 2):
                             break
 
                         else:
@@ -251,7 +251,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             raise SqlmapUnsupportedDBMSException(errMsg)
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
-            if Backend.getIdentifiedDbms() in ( DBMS.PGSQL, DBMS.MSSQL ):
+            if Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.MSSQL):
                 errMsg = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
                 errMsg += "queries are supported"
@@ -438,7 +438,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         message += "registry path '%s\%s? [y/N] " % (regKey, regVal)
         output = readInput(message, default="N")
 
-        if output and output[0] not in ( "Y", "y" ):
+        if output and output[0] not in ("Y", "y"):
             return
 
         infoMsg = "deleting Windows registry path '%s\%s'. " % (regKey, regVal)

@@ -39,7 +39,7 @@ class MSSQLBannerHandler(ContentHandler):
     def _feedInfo(self, key, value):
         value = sanitizeStr(value)
 
-        if value in ( None, "None" ):
+        if value in (None, "None"):
             return
 
         self._info[key] = value

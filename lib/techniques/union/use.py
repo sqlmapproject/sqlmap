@@ -76,7 +76,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         # Parse the returned page to get the exact union-based
         # SQL injection output
         def _(regex):
-            return reduce(lambda x, y: x if x is not None else y, ( \
+            return reduce(lambda x, y: x if x is not None else y, (\
                     extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
                     extractRegexResult(regex, removeReflectiveValues(listToStrValue(headers.headers \
                     if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), \

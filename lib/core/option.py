@@ -307,7 +307,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in ( HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION ):
+                    elif key not in (HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION):
                         conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
 
             if getPostReq and (params or cookie):
@@ -1050,11 +1050,11 @@ def _setHTTPAuthentication():
 
         aTypeLower = conf.aType.lower()
 
-        if aTypeLower not in ( "basic", "digest", "ntlm" ):
+        if aTypeLower not in ("basic", "digest", "ntlm"):
             errMsg = "HTTP authentication type value must be "
             errMsg += "Basic, Digest or NTLM"
             raise SqlmapSyntaxException(errMsg)
-        elif aTypeLower in ( "basic", "digest" ):
+        elif aTypeLower in ("basic", "digest"):
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % aTypeLower
             errMsg += "value must be in format username:password"
@@ -1715,8 +1715,8 @@ def _saveCmdline():
             if value is None:
                 if datatype == "boolean":
                     value = "False"
-                elif datatype in ( "integer", "float" ):
-                    if option in ( "threads", "verbose" ):
+                elif datatype in ("integer", "float"):
+                    if option in ("threads", "verbose"):
                         value = "1"
                     elif option == "timeout":
                         value = "10"
@@ -1839,7 +1839,7 @@ def _setTorHttpProxySettings():
 
     found = None
 
-    for port in (DEFAULT_TOR_HTTP_PORTS if not conf.torPort else (conf.torPort, )):
+    for port in (DEFAULT_TOR_HTTP_PORTS if not conf.torPort else (conf.torPort,)):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((LOCALHOST, port))

@@ -855,13 +855,13 @@ class Agent(object):
         else:
             query = expression
 
-        if ( select and re.search("\A(COUNT|LTRIM)\(", query, re.I) ) or len(query) <= 1:
+        if (select and re.search("\A(COUNT|LTRIM)\(", query, re.I)) or len(query) <= 1:
             return query
 
         if selectDistinctExpr:
             lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % query, expression)
 
-            if Backend.getIdentifiedDbms() in ( DBMS.MYSQL, DBMS.PGSQL ):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 lengthExpr += " AS %s" % randomStr(lowercase=True)
         elif select:
             lengthExpr = expression.replace(query, lengthQuery % query, 1)

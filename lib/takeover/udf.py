@@ -112,7 +112,7 @@ class UDF:
         return output
 
     def udfCheckNeeded(self):
-        if ( not conf.rFile or ( conf.rFile and not Backend.isDbms(DBMS.PGSQL) ) ) and "sys_fileread" in self.sysUdfs:
+        if (not conf.rFile or (conf.rFile and not Backend.isDbms(DBMS.PGSQL))) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:
@@ -164,7 +164,7 @@ class UDF:
         self.udfInjectCore(self.sysUdfs)
 
     def udfInjectCustom(self):
-        if Backend.getIdentifiedDbms() not in ( DBMS.MYSQL, DBMS.PGSQL ):
+        if Backend.getIdentifiedDbms() not in (DBMS.MYSQL, DBMS.PGSQL):
             errMsg = "UDF injection feature is not yet implemented on %s" % Backend.getIdentifiedDbms()
             raise SqlmapUnsupportedFeatureException(errMsg)
 
@@ -300,10 +300,10 @@ class UDF:
         msg += "functions now? [Y/n/q] "
         choice = readInput(msg, default="Y")
 
-        if choice[0] in ( "n", "N" ):
+        if choice[0] in ("n", "N"):
             self.cleanup(udfDict=self.udfs)
             return
-        elif choice[0] in ( "q", "Q" ):
+        elif choice[0] in ("q", "Q"):
             self.cleanup(udfDict=self.udfs)
             raise SqlmapUserQuitException
 
@@ -320,7 +320,7 @@ class UDF:
             while True:
                 choice = readInput(msg)
 
-                if choice and choice[0] in ( "q", "Q" ):
+                if choice and choice[0] in ("q", "Q"):
                     break
                 elif isinstance(choice, basestring) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)

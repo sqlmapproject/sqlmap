@@ -29,7 +29,7 @@ class FingerprintHandler(ContentHandler):
     def _feedInfo(self, key, value):
         value = sanitizeStr(value)
 
-        if value in ( None, "None" ):
+        if value in (None, "None"):
             return
 
         if key == "dbmsVersion":
