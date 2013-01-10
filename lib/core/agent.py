@@ -223,7 +223,7 @@ class Agent(object):
         _ = (
                 ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
                 ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
-                ("[HASH_REPLACE]", kb.chars.hash_)
+                ("[HASH_REPLACE]", kb.chars.hash_),
             )
         payload = reduce(lambda x, y: x.replace(y[0], y[1]), _, payload)
 

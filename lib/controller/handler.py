@@ -56,7 +56,7 @@ def setHandler():
                   ("Firebird", FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
                   ("SAP MaxDB", MAXDB_ALIASES, MaxDBMap, MaxDBConn),
                   ("Sybase", SYBASE_ALIASES, SybaseMap, SybaseConn),
-                  ("IBM DB2", DB2_ALIASES, DB2Map, DB2Conn)
+                  ("IBM DB2", DB2_ALIASES, DB2Map, DB2Conn),
             ]
 
     _ = max(_ if (Backend.getIdentifiedDbms() or "").lower() in _[1] else None for _ in items)

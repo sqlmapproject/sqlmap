@@ -298,7 +298,7 @@ __functions__ = {
                     HASH.MD5_GENERIC: md5_generic_passwd,
                     HASH.SHA1_GENERIC: sha1_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
-                    HASH.WORDPRESS: wordpress_passwd
+                    HASH.WORDPRESS: wordpress_passwd,
                 }
 
 def storeHashesToFile(attack_dict):

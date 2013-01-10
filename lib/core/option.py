@@ -244,7 +244,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             else:
                 scheme, port = None, None
 
-            if not re.search (r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
+            if not re.search(r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
                 continue
 
             if re.search(r"^[\n]*(GET|POST).*?\.(%s)\sHTTP\/" % "|".join(CRAWL_EXCLUDE_EXTENSIONS), request, re.I | re.M):
@@ -353,6 +353,7 @@ def _loadQueries():
         class DictObject(object):
             def __init__(self):
                 self.__dict__ = {}
+
             def __contains__(self, name):
                 return name in self.__dict__
 
@@ -1247,7 +1248,7 @@ def _setHTTPUserAgent():
         if count == 1:
             userAgent = kb.userAgents[0]
         else:
-            userAgent = kb.userAgents[randomRange(stop=count-1)]
+            userAgent = kb.userAgents[randomRange(stop=count - 1)]
 
         userAgent = sanitizeStr(userAgent)
         conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
@@ -1821,7 +1822,7 @@ class LogRecorder(logging.StreamHandler):
         """
         self.loghist.append({'levelname': record.levelname,
                              'text': record.msg % record.args if record.args else record.msg,
-                             'id': len(self.loghist)+1})
+                             'id': len(self.loghist) + 1})
 
         if conf.fdLog:
             # TODO: this is very heavy operation and slows down a lot the
@@ -2009,7 +2010,7 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any ((conf.url, conf.bulkFile)):
+    if conf.forms and not any((conf.url, conf.bulkFile)):
         errMsg = "switch '--forms' requires usage of option '-u' (--url) or '-m'"
         raise SqlmapSyntaxException(errMsg)
 

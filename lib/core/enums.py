@@ -178,7 +178,7 @@ class PAYLOAD:
                         3: "UNION query",
                         4: "stacked queries",
                         5: "AND/OR time-based blind",
-                        6: "inline query"
+                        6: "inline query",
                    }
 
     PARAMETER = {
@@ -186,14 +186,14 @@ class PAYLOAD:
                     2: "Single quoted string",
                     3: "LIKE single quoted string",
                     4: "Double quoted string",
-                    5: "LIKE double quoted string"
+                    5: "LIKE double quoted string",
                 }
 
     RISK = {
                 0: "No risk",
                 1: "Low risk",
                 2: "Medium risk",
-                3: "High risk"
+                3: "High risk",
            }
 
     CLAUSE = {
@@ -205,7 +205,7 @@ class PAYLOAD:
                 5: "OFFSET",
                 6: "TOP",
                 7: "Table name",
-                8: "Column name"
+                8: "Column name",
              }
 
     class METHOD:

@@ -28,7 +28,10 @@ class _GetchUnix(object):
         import tty
 
     def __call__(self):
-        import sys, tty, termios
+        import sys
+        import termios
+        import tty
+
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:

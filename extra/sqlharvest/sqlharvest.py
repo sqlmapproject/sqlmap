@@ -43,7 +43,7 @@ def main():
     if not config.has_option("options", "index"):
         config.set("options", "index", "0")
 
-    i = int(config.get("options",  "index"))
+    i = int(config.get("options", "index"))
 
     try:
         with open(TABLES_FILE, 'r') as f:

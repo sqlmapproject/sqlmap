@@ -34,7 +34,7 @@ FIREBIRD_TYPES = {
                     "12": "DATE",
                     "13": "TIME",
                     "35": "TIMESTAMP",
-                    "37": "VARCHAR"
+                    "37": "VARCHAR",
                 }
 
 SYBASE_TYPES = {
@@ -109,7 +109,7 @@ FIREBIRD_PRIVS = {
                     "U": "UPDATE",
                     "D": "DELETE",
                     "R": "REFERENCES",
-                    "E": "EXECUTE"
+                    "E": "EXECUTE",
                 }
 
 DB2_PRIVS = {
@@ -120,7 +120,7 @@ DB2_PRIVS = {
                     5: "INSERTAUTH",
                     6: "REFAUTH",
                     7: "SELECTAUTH",
-                    8: "UPDATEAUTH"
+                    8: "UPDATEAUTH",
            }
 
 DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
@@ -135,7 +135,7 @@ DBMS_DICT = {
                 DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"),
                 DBMS.MAXDB: (MAXDB_ALIASES, None, None),
                 DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
-                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/")
+                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/"),
             }
 
 FROM_DUMMY_TABLE = {
@@ -143,11 +143,11 @@ FROM_DUMMY_TABLE = {
                         DBMS.ACCESS: " FROM MSysAccessObjects",
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
-                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
+                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
                    }
 
 SQL_STATEMENTS = {
-                       "SQL SELECT statement":  (
+                        "SQL SELECT statement":  (
                              "select ",
                              "show ",
                              " top ",
@@ -162,44 +162,46 @@ SQL_STATEMENTS = {
                              " offset ",
                              " union all ",
                              " rownum as ",
-                             "(case ",          ),
+                             "(case ",           ),
 
-                       "SQL data definition":   (
+                         "SQL data definition":  (
                              "create ",
                              "declare ",
                              "drop ",
                              "truncate ",
-                             "alter ",          ),
+                             "alter ",           ),
 
-                       "SQL data manipulation": (
+                        "SQL data manipulation": (
                              "bulk ",
                              "insert ",
                              "update ",
                              "delete ",
                              "merge ",
-                             "load ",           ),
+                             "load ",            ),
 
-                       "SQL data control":      (
+                        "SQL data control":      (
                              "grant ",
-                             "revoke ",         ),
+                             "revoke ",          ),
 
-                       "SQL data execution":    (
+                        "SQL data execution":    (
                              "exec ",
-                             "execute ",        ),
+                             "execute ",         ),
 
-                       "SQL transaction":       (
+                        "SQL transaction":       (
                              "start transaction ",
                              "begin work ",
                              "begin transaction ",
                              "commit ",
-                             "rollback ",       ),
+                             "rollback ",        ),
                      }
 
 POST_HINT_CONTENT_TYPES = {
                                 POST_HINT.JSON: "application/json",
                                 POST_HINT.MULTIPART: "multipart/form-data",
                                 POST_HINT.SOAP: "application/soap+xml",
-                                POST_HINT.XML: "application/xml"
+                                POST_HINT.XML: "application/xml",
                           }
 
-DEPRECATED_HINTS = {"--replicate": "use '--dump-format=SQLITE' instead"}
+DEPRECATED_HINTS = {
+                        "--replicate": "use '--dump-format=SQLITE' instead",
+                   }

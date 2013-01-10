@@ -201,7 +201,7 @@ BASIC_HELP_ITEMS = (
                         "checkTor",
                         "flushSession",
                         "tor",
-                        "wizard"
+                        "wizard",
                    )
 
 # String representation for NULL value
@@ -218,7 +218,7 @@ ERROR_PARSING_REGEXES = (
                           r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
                           r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>.+?)$",
                           r"<li>Error Type:<br>(?P<result>.+?)</li>",
-                          r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)"
+                          r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
                         )
 
 # Regular expression used for parsing charset info from meta html headers

@@ -517,7 +517,7 @@ def cmdLineParser():
 
         # General options
         general = OptionGroup(parser, "General", "These options can be used "
-                             "to set some general working parameters" )
+                             "to set some general working parameters")
 
         #general.add_option("-x", dest="xmlFile",
         #                    help="Dump the data into an XML file")

@@ -86,7 +86,7 @@ class Metasploit:
                                                    2: ("Reverse TCP: Try to connect back from the database host to this machine, on all ports between the specified and 65535", "reverse_tcp_allports"),
                                                    3: ("Reverse HTTP: Connect back from the database host to this machine tunnelling traffic over HTTP", "reverse_http"),
                                                    4: ("Reverse HTTPS: Connect back from the database host to this machine tunnelling traffic over HTTPS", "reverse_https"),
-                                                   5: ("Bind TCP: Listen on the database host for a connection", "bind_tcp")
+                                                   5: ("Bind TCP: Listen on the database host for a connection", "bind_tcp"),
                                                  },
                                       "linux":   {
                                                    1: ("Reverse TCP: Connect back from the database host to this machine (default)", "reverse_tcp"),
