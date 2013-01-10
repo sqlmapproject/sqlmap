@@ -14,7 +14,6 @@ import tempfile
 import types
 
 from subprocess import PIPE
-from subprocess import STDOUT
 
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
@@ -276,7 +275,7 @@ def scan_start(taskid):
     tasks[taskid]["fdLog"] = pipes[taskid][1]
 
     # Launch sqlmap engine
-    procs[taskid] = execute("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=False)
+    procs[taskid] = execute("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
     return jsonize({"success": True})
 
@@ -291,9 +290,10 @@ def scan_output(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    stdout = recv_some(procs[taskid], t=1, e=0)
+    stdout = recv_some(procs[taskid], t=1, e=0, stderr=0)
+    stderr = recv_some(procs[taskid], t=1, e=0, stderr=1)
 
-    return jsonize({"stdout": stdout})
+    return jsonize({"stdout": stdout, "stderr": stderr})
 
 @get("/scan/<taskid>/delete")
 def scan_delete(taskid):
