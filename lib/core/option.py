@@ -1820,7 +1820,7 @@ class LogRecorder(logging.StreamHandler):
         """
         self.loghist.append({'levelname': record.levelname,
                              'text': record.message % record.args if record.args else record.message,
-                             'id': len(self.loghist)})
+                             'id': len(self.loghist)+1})
 
         if conf.fdLog:
             os.write(conf.fdLog, base64pickle(self.loghist))
