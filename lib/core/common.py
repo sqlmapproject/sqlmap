@@ -2978,7 +2978,7 @@ def isAdminFromPrivileges(privileges):
     # In Firebird there is no specific privilege that means
     # that the user is DBA
     # TODO: confirm
-    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges)
+    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and all(_ in privileges for _ in ("SELECT", "INSERT", "UPDATE", "DELETE", "REFERENCES", "EXECUTE")))
 
     return retVal
 
