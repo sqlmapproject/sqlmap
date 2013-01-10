@@ -33,6 +33,3 @@ FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.WARN)
-
-# to handle logger with the RESTful API
-LOGGER_OUTPUT = StringIO.StringIO()

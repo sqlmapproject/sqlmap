@@ -11,6 +11,7 @@ except:
     import md5
     import sha
 
+import json
 import pickle
 import sys
 import struct
@@ -126,3 +127,6 @@ def stdoutencode(data):
         retVal = data.encode(UNICODE_ENCODING)
 
     return retVal
+
+def jsonize(data):
+    return json.dumps(data, sort_keys=False, indent=4)

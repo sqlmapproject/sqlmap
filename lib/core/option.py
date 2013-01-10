@@ -52,7 +52,9 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.common import urldecode
 from lib.core.common import urlencode
+from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
+from lib.core.convert import jsonize
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -1804,6 +1806,33 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
+# Logger recorder object, which keeps the log structure
+class LogRecorder(logging.StreamHandler):
+    """
+    Logging handler class which only records CUSTOM_LOGGING.PAYLOAD entries
+    to a global list.
+    """
+    loghist = []
+
+    def emit(self, record):
+        """
+        Simply record the emitted events.
+        """
+        self.loghist.append({'levelname': record.levelname,
+                             'text': record.msg % record.args if record.args else record.msg,
+                             'id': len(self.loghist)+1})
+
+        if conf.fdLog:
+            # TODO: this is very heavy operation and slows down a lot the
+            # whole execution of the sqlmap engine, find an alternative
+            os.write(conf.fdLog, base64pickle(self.loghist))
+
+def _setRestAPILog():
+    if hasattr(conf, "fdLog") and conf.fdLog:
+        logger.removeHandler(LOGGER_HANDLER)
+        LOGGER_RECORDER = LogRecorder()
+        logger.addHandler(LOGGER_RECORDER)
+
 def _setTrafficOutputFP():
     if conf.trafficFile:
         infoMsg = "setting file for logging HTTP traffic"
@@ -2069,14 +2098,13 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
 
     if not inputOptions.disableColoring:
         coloramainit()
-    elif hasattr(LOGGER_HANDLER, "disable_coloring"):
-        LOGGER_HANDLER.disable_coloring = True
 
     _setConfAttributes()
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)
     _useWizardInterface()
     setVerbosity()
+    _setRestAPILog()
     _saveCmdline()
     _setRequestFromFile()
     _cleanupOptions()

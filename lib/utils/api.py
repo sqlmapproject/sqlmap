@@ -14,25 +14,26 @@ import tempfile
 import types
 
 from subprocess import PIPE
-from subprocess import Popen
 
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
+from lib.core.convert import base64unpickle
 from lib.core.convert import hexencode
+from lib.core.convert import jsonize
 from lib.core.convert import stdoutencode
 from lib.core.data import paths
-from lib.core.datatype import AttribDict
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
-from lib.core.log import FORMATTER
-from lib.core.log import LOGGER_HANDLER
-from lib.core.log import LOGGER_OUTPUT
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.optiondict import optDict
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.subprocessng import Popen as execute
+from lib.core.subprocessng import send_all
+from lib.core.subprocessng import recv_some
 from thirdparty.bottle.bottle import abort
 from thirdparty.bottle.bottle import error
 from thirdparty.bottle.bottle import get
@@ -49,13 +50,11 @@ RESTAPI_SERVER_PORT = 8775
 
 # Local global variables
 adminid = ""
+pipes = dict()
 procs = dict()
 tasks = AttribDict()
 
 # Generic functions
-def jsonize(data):
-    return json.dumps(data, sort_keys=False, indent=4)
-
 def is_admin(taskid):
     global adminid
     if adminid != taskid:
@@ -254,6 +253,7 @@ def scan_start(taskid):
     """
     global tasks
     global procs
+    global pipes
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
@@ -269,8 +269,13 @@ def scan_start(taskid):
     # Launch sqlmap engine in a separate thread
     logger.debug("starting a scan for task ID %s" % taskid)
 
-    procs[taskid] = Popen("python sqlmap.py --pickle %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = procs[taskid].communicate()
+    pipes[taskid] = os.pipe()
+
+    # Provide sqlmap engine with the writable pipe for logging
+    tasks[taskid]["fdLog"] = pipes[taskid][1]
+
+    # Launch sqlmap engine
+    procs[taskid] = execute("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
     return jsonize({"success": True})
 
@@ -279,17 +284,16 @@ def scan_output(taskid):
     """
     Read the standard output of sqlmap core execution
     """
+    global pipes
     global tasks
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    sys.stdout.seek(0)
-    output = sys.stdout.read()
-    sys.stdout.flush()
-    sys.stdout.truncate(0)
+    stdout = recv_some(procs[taskid], t=1, e=0, stderr=0)
+    stderr = recv_some(procs[taskid], t=1, e=0, stderr=1)
 
-    return jsonize({"output": output})
+    return jsonize({"stdout": stdout, "stderr": stderr})
 
 @get("/scan/<taskid>/delete")
 def scan_delete(taskid):
@@ -306,21 +310,50 @@ def scan_delete(taskid):
 
     return jsonize({"success": True})
 
-# Function to handle scans' logs
+# Functions to handle scans' logs
+@get("/scan/<taskid>/log/<start>/<end>")
+def scan_log_limited(taskid, start, end):
+    """
+    Retrieve the log messages
+    """
+    log = None
+
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    if not start.isdigit() or not end.isdigit() or end <= start:
+        abort(500, "Invalid start or end value, must be digits")
+
+    start = max(0, int(start)-1)
+    end = max(1, int(end))
+    pickledLog = os.read(pipes[taskid][0], 100000)
+
+    try:
+        log = base64unpickle(pickledLog)
+        log = log[slice(start, end)]
+    except (KeyError, IndexError, TypeError), e:
+        logger.error("handled exception when trying to unpickle logger dictionary in scan_log_limited(): %s" % str(e))
+
+    return jsonize({"log": log})
+
 @get("/scan/<taskid>/log")
 def scan_log(taskid):
     """
     Retrieve the log messages
     """
+    log = None
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    LOGGER_OUTPUT.seek(0)
-    output = LOGGER_OUTPUT.read()
-    LOGGER_OUTPUT.flush()
-    LOGGER_OUTPUT.truncate(0)
+    pickledLog = os.read(pipes[taskid][0], 100000)
 
-    return jsonize({"log": output})
+    try:
+        log = base64unpickle(pickledLog)
+    except (KeyError, IndexError, TypeError), e:
+        logger.error("handled exception when trying to unpickle logger dictionary in scan_log(): %s" % str(e))
+
+    return jsonize({"log": log})
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
