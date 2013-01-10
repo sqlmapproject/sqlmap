@@ -327,7 +327,6 @@ class Dump(object):
     def dbTableValues(self, tableValues):
         replication = None
         rtable = None
-        documentNode, tableNode, bodyNode, headNode, rowNode = (0,) * 5
         dumpFP = None
 
         if tableValues is None:
