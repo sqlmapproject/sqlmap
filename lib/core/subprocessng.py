@@ -178,9 +178,10 @@ def recv_some(p, t=.1, e=1, tr=5, stderr=0):
     x = time.time()+t
     y = []
     r = ''
-    pr = p.recv
     if stderr:
         pr = p.recv_err
+    else:
+        pr = p.recv
     while time.time() < x or r:
         r = pr()
         if r is None:
