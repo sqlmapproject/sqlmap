@@ -275,7 +275,7 @@ class Databases:
                 values = filter(None, arrayizeValue(values))
 
                 if len(values) > 0 and not isListLike(values[0]):
-                    values = map(lambda x: (dbs[0], x), values)
+                    values = ((dbs[0], _) for _ in values)
 
                 for db, table in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)

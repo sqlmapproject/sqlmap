@@ -1011,8 +1011,8 @@ def parseTargetDirect():
                         conf.hostname = "localhost"
                         conf.port = 0
                 elif not remote:
-                        errMsg = "missing remote connection details"
-                        raise SqlmapSyntaxException(errMsg)
+                    errMsg = "missing remote connection details"
+                    raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
                     import _mssql

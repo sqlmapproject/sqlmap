@@ -127,7 +127,7 @@ def tableExists(tableFile, regex=None):
             else:
                 kb.data.cachedTables[conf.db].append(item)
 
-    for _ in map(lambda x: (conf.db, x), threadData.shared.value):
+    for _ in ((conf.db, item) for item in threadData.shared.value):
         if _ not in kb.brute.tables:
             kb.brute.tables.append(_)
 

@@ -221,7 +221,7 @@ class Enumeration(GenericEnumeration):
 
             if colList:
                 table = {}
-                table[safeSQLIdentificatorNaming(tbl)] = dict(map(lambda x: (x, None), colList))
+                table[safeSQLIdentificatorNaming(tbl)] = dict((_, None) for _ in colList)
                 kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
                 continue
 
