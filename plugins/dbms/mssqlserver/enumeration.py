@@ -42,7 +42,7 @@ class Enumeration(GenericEnumeration):
         areAdmins = set()
 
         if conf.user:
-            users = [ conf.user ]
+            users = [conf.user]
         elif not len(kb.data.cachedUsers):
             users = self.getUsers()
         else:
@@ -203,7 +203,7 @@ class Enumeration(GenericEnumeration):
 
                     if not isNoneValue(values):
                         if isinstance(values, basestring):
-                            values = [ values ]
+                            values = [values]
 
                         for foundTbl in values:
                             if foundTbl is None:
@@ -325,7 +325,7 @@ class Enumeration(GenericEnumeration):
 
                     if not isNoneValue(values):
                         if isinstance(values, basestring):
-                            values = [ values ]
+                            values = [values]
 
                         for foundTbl in values:
                             foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
@@ -353,7 +353,7 @@ class Enumeration(GenericEnumeration):
                             if db in foundCols[column]:
                                 foundCols[column][db].append(foundTbl)
                             else:
-                                foundCols[column][db] = [ foundTbl ]
+                                foundCols[column][db] = [foundTbl]
                 else:
                     foundCols[column][db] = []
 

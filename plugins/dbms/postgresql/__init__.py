@@ -24,10 +24,10 @@ class PostgreSQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous,
         self.excludeDbsList = PGSQL_SYSTEM_DBS
         self.sysUdfs = {
                          # UDF name:     UDF parameters' input data-type and return data-type
-                         "sys_exec":     { "input":  [ "text" ], "return": "int4" },
-                         "sys_eval":     { "input":  [ "text" ], "return": "text" },
-                         "sys_bineval":  { "input":  [ "text" ], "return": "int4" },
-                         "sys_fileread": { "input":  [ "text" ], "return": "text" }
+                         "sys_exec":     { "input":  ["text"], "return": "int4" },
+                         "sys_eval":     { "input":  ["text"], "return": "text" },
+                         "sys_bineval":  { "input":  ["text"], "return": "int4" },
+                         "sys_fileread": { "input":  ["text"], "return": "text" }
                        }
 
         Syntax.__init__(self)

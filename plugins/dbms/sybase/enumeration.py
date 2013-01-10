@@ -60,7 +60,7 @@ class Enumeration(GenericEnumeration):
         areAdmins = set()
 
         if conf.user:
-            users = [ conf.user ]
+            users = [conf.user]
         elif not len(kb.data.cachedUsers):
             users = self.getUsers()
         else:

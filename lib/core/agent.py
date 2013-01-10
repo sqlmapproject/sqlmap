@@ -166,9 +166,9 @@ class Agent(object):
         # after the prefix or it is in GROUP BY / ORDER BY (<clause>)
         elif kb.technique == PAYLOAD.TECHNIQUE.STACKED:
             query = kb.injection.prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ] or kb.injection.clause == [ 3 ]:
+        elif kb.injection.clause == [2, 3] or kb.injection.clause == [2] or kb.injection.clause == [3]:
             query = kb.injection.prefix
-        elif clause == [2, 3] or clause == [ 2 ] or clause == [ 3 ]:
+        elif clause == [2, 3] or clause == [2] or clause == [3]:
             query = prefix
 
         # In any other case prepend with the full prefix

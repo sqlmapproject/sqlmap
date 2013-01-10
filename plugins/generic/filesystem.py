@@ -132,7 +132,7 @@ class Filesystem:
             elif encoding == "base64":
                 content = "'%s'" % content
 
-            retVal = [ content ]
+            retVal = [content]
 
         return retVal
 

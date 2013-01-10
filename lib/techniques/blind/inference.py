@@ -347,8 +347,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if conf.threads > 1 and isinstance(length, int) and length > 1:
             threadData = getCurrentThreadData()
 
-            threadData.shared.value = [ None ] * length
-            threadData.shared.index = [ firstChar ]    # As list for python nested function scoping
+            threadData.shared.value = [None] * length
+            threadData.shared.index = [firstChar]    # As list for python nested function scoping
             threadData.shared.start = firstChar
 
             try:

@@ -484,7 +484,7 @@ def _setGoogleDorking():
     infoMsg = "first request to Google to get the session cookie"
     logger.info(infoMsg)
 
-    handlers = [ proxyHandler ]
+    handlers = [proxyHandler]
 
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
     if conf.keepAlive:
@@ -1003,8 +1003,8 @@ def _setPrefixSuffix():
         boundary = AttribDict()
 
         boundary.level = 1
-        boundary.clause = [ 0 ]
-        boundary.where = [ 1, 2, 3 ]
+        boundary.clause = [0]
+        boundary.where = [1, 2, 3]
         boundary.prefix = conf.prefix
         boundary.suffix = conf.suffix
 
@@ -1022,7 +1022,7 @@ def _setPrefixSuffix():
 
         # user who provides --prefix/--suffix does not want other boundaries
         # to be tested for
-        conf.boundaries = [ boundary ]
+        conf.boundaries = [boundary]
 
 def _setAuthCred():
     """
@@ -1523,7 +1523,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     # Active back-end DBMS fingerprint
     kb.dbms = None
-    kb.dbmsVersion = [ UNKNOWN_DBMS_VERSION ]
+    kb.dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
     kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]
     kb.dep = None
