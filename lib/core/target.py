@@ -161,7 +161,7 @@ def _setRequestParams():
 
             if not kb.processUserMarks:
                 if place == PLACE.URI:
-                    query = urlparse.urlsplit(value)[3]
+                    query = urlparse.urlsplit(value).query
                     if query:
                         parameters = conf.parameters[PLACE.GET] = query
                         paramDict = paramToDict(PLACE.GET, parameters)

@@ -1067,10 +1067,10 @@ def parseTargetUrl():
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     urlSplit = urlparse.urlsplit(conf.url)
-    hostnamePort = urlSplit[1].split(":") if not re.search("\[.+\]", urlSplit[1]) else filter(None, (re.search("\[.+\]", urlSplit[1]).group(0), re.search("\](:(?P<port>\d+))?", urlSplit[1]).group("port")))
+    hostnamePort = urlSplit.netloc.split(":") if not re.search("\[.+\]", urlSplit.netloc) else filter(None, (re.search("\[.+\]", urlSplit.netloc).group(0), re.search("\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
-    conf.scheme = urlSplit[0].strip().lower() if not conf.forceSSL else "https"
-    conf.path = urlSplit[2].strip()
+    conf.scheme = urlSplit.scheme.strip().lower() if not conf.forceSSL else "https"
+    conf.path = urlSplit.path.strip()
     conf.hostname = hostnamePort[0].strip()
 
     conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
@@ -1096,8 +1096,8 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
-    if urlSplit[3]:
-        conf.parameters[PLACE.GET] = urldecode(urlSplit[3]) if urlSplit[3] and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit[3] else urlSplit[3]
+    if urlSplit.query:
+        conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')

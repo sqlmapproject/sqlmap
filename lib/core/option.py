@@ -931,9 +931,9 @@ def _setHTTPProxy():
     logger.debug(debugMsg)
 
     proxySplit = urlparse.urlsplit(conf.proxy)
-    hostnamePort = proxySplit[1].split(":")
+    hostnamePort = proxySplit.netloc.split(":")
 
-    scheme = proxySplit[0].upper()
+    scheme = proxySplit.scheme.upper()
     hostname = hostnamePort[0]
     port = None
     username = None
