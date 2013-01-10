@@ -1823,6 +1823,8 @@ class LogRecorder(logging.StreamHandler):
                              'id': len(self.loghist)+1})
 
         if conf.fdLog:
+            # TODO: this is very heavy operation and slows down a lot the
+            # whole execution of the sqlmap engine, find an alternative
             os.write(conf.fdLog, base64pickle(self.loghist))
 
 def _setRestAPILog():
