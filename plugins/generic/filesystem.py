@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
-import tempfile
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
@@ -16,7 +15,6 @@ from lib.core.common import decodeHexValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
 from lib.core.common import isTechniqueAvailable
-from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb

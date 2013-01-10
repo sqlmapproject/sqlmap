@@ -20,7 +20,6 @@ import random
 import re
 import socket
 import string
-import struct
 import sys
 import tempfile
 import time
