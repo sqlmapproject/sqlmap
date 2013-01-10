@@ -755,7 +755,7 @@ def cmdLineParser():
         # Expand given mnemonic options (e.g. -z "ign,flu,bat")
         for i in xrange(len(sys.argv) - 1):
             if sys.argv[i] == '-z':
-                expandMnemonics(sys.argv[i+1], parser, args)
+                expandMnemonics(sys.argv[i + 1], parser, args)
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \

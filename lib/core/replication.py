@@ -61,7 +61,7 @@ class Replication(object):
             """
 
             if len(values) == len(self.columns):
-                self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?']*len(values))), safechardecode(values))
+                self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?'] * len(values))), safechardecode(values))
             else:
                 errMsg = "wrong number of columns used in replicating insert"
                 raise SqlmapValueException(errMsg)

@@ -81,7 +81,7 @@ def mysql_passwd(password, uppercase=True):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def mysql_old_passwd(password, uppercase=True): # prior to version '4.1'
+def mysql_old_passwd(password, uppercase=True):  # prior to version '4.1'
     """
     Reference(s):
         http://www.sfr-fresh.com/unix/privat/tpop3d-1.5.5.tar.gz:a/tpop3d-1.5.5/password.c
@@ -136,7 +136,7 @@ def mssql_passwd(password, salt, uppercase=False):
 
     return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
 
-def mssql_old_passwd(password, salt, uppercase=True): # prior to version '2005'
+def mssql_old_passwd(password, salt, uppercase=True):  # prior to version '2005'
     """
     Reference(s):
         www.exploit-db.com/download_pdf/15537/
@@ -167,11 +167,11 @@ def oracle_passwd(password, salt, uppercase=True):
 
     binsalt = hexdecode(salt)
 
-    retVal="s:%s%s" % (sha1(utf8encode(password) + binsalt).hexdigest(), salt)
+    retVal = "s:%s%s" % (sha1(utf8encode(password) + binsalt).hexdigest(), salt)
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def oracle_old_passwd(password, username, uppercase=True): # prior to version '11g'
+def oracle_old_passwd(password, username, uppercase=True):  # prior to version '11g'
     """
     Reference(s):
         http://www.notesbit.com/index.php/scripts-oracle/oracle-11g-new-password-algorithm-is-revealed-by-seclistsorg/
@@ -180,10 +180,10 @@ def oracle_old_passwd(password, username, uppercase=True): # prior to version '1
     'F894844C34402B67'
     """
 
-    IV, pad = "\0"*8, "\0"
+    IV, pad = "\0" * 8, "\0"
 
     if isinstance(username, unicode):
-        username = unicode.encode(username, UNICODE_ENCODING) #pyDes has issues with unicode strings
+        username = unicode.encode(username, UNICODE_ENCODING)  # pyDes has issues with unicode strings
 
     unistr = "".join("\0%s" % c for c in (username + password).upper())
 
@@ -255,7 +255,7 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
             if i < count:
                 value = value | (ord(input_[i]) << 8)
 
-            output = output + ITOA64[(value>>6) & 0x3f]
+            output = output + ITOA64[(value >> 6) & 0x3f]
 
             i += 1
             if i >= count:
@@ -264,13 +264,13 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
             if i < count:
                 value = value | (ord(input_[i]) << 16)
 
-            output = output + ITOA64[(value>>12) & 0x3f]
+            output = output + ITOA64[(value >> 12) & 0x3f]
 
             i += 1
             if i >= count:
                 break
 
-            output = output + ITOA64[(value>>18) & 0x3f]
+            output = output + ITOA64[(value >> 18) & 0x3f]
 
         return output
 
@@ -463,7 +463,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 word = word + suffix
 
             try:
-                current = __functions__[hash_regex](password = word, uppercase = False)
+                current = __functions__[hash_regex](password=word, uppercase=False)
 
                 count += 1
 
@@ -498,7 +498,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 raise
 
             except (UnicodeEncodeError, UnicodeDecodeError):
-                pass # ignore possible encoding problems caused by some words in custom dictionaries
+                pass  # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception:
                 warnMsg = "there was a problem while hashing entry: %s. " % repr(word)
@@ -523,7 +523,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
             if found.value:
                 break
 
-            current = __functions__[hash_regex](password = word, uppercase = False, **kwargs)
+            current = __functions__[hash_regex](password=word, uppercase=False, **kwargs)
             count += 1
 
             if not isinstance(word, basestring):
@@ -534,7 +534,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
             try:
                 if hash_ == current:
-                    if hash_regex == HASH.ORACLE_OLD: #only for cosmetic purposes
+                    if hash_regex == HASH.ORACLE_OLD:  # only for cosmetic purposes
                         word = word.upper()
 
                     retVal.put((user, hash_, word))
@@ -565,7 +565,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                 raise
 
             except (UnicodeEncodeError, UnicodeDecodeError):
-                pass # ignore possible encoding problems caused by some words in custom dictionaries
+                pass  # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
@@ -629,7 +629,7 @@ def dictionaryAttack(attack_dict):
                     elif hash_regex in (HASH.CRYPT_GENERIC):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
                     elif hash_regex in (HASH.WORDPRESS):
-                        item = [(user, hash_), {'salt': hash_[4:12], 'count': 1<<ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
+                        item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
 
                     if item and hash_ not in keys:
                         resumed = hashDBRetrieve(hash_)

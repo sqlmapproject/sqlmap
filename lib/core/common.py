@@ -560,7 +560,7 @@ def paramToDict(place, parameters=None):
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
             if parameter not in testableParameters:
-                warnMsg =  "provided parameter '%s' " % parameter
+                warnMsg = "provided parameter '%s' " % parameter
                 warnMsg += "is not inside the %s" % place
                 logger.warn(warnMsg)
 
@@ -1489,7 +1489,7 @@ def getConsoleWidth(default=80):
     if os.getenv("COLUMNS", "").isdigit():
         width = int(os.getenv("COLUMNS"))
     else:
-        output=execute('stty size', shell=True, stdout=PIPE, stderr=PIPE).stdout.read()
+        output = execute("stty size", shell=True, stdout=PIPE, stderr=PIPE).stdout.read()
         items = output.split()
 
         if len(items) == 2 and items[1].isdigit():

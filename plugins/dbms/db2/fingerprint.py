@@ -47,7 +47,7 @@ class Fingerprint(GenericFingerprint):
             return None
 
     def getFingerprint(self):
-        value  = ""
+        value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
         if wsOsFp:

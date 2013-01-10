@@ -398,7 +398,7 @@ class Connect(object):
                     if url.lower().startswith('http://'):
                         kwargs['url'] = url
                     else:
-                        kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
+                        kwargs['url'] = conf.url[:conf.url.rfind('/') + 1] + url
 
                     threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                     kwargs['refreshing'] = True

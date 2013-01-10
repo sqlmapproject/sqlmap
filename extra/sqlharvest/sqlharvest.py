@@ -20,7 +20,7 @@ CONFIG_FILE = 'sqlharvest.cfg'
 TABLES_FILE = 'tables.txt'
 USER_AGENT = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; AskTB5.3)'
 SEARCH_URL = 'http://www.google.com/m?source=mobileproducts&dc=gorganic'
-MAX_FILE_SIZE = 2 * 1024 * 1024 # if a result (.sql) file for downloading is more than 2MB in size just skip it
+MAX_FILE_SIZE = 2 * 1024 * 1024  # if a result (.sql) file for downloading is more than 2MB in size just skip it
 QUERY = 'CREATE TABLE ext:sql'
 REGEX_URLS = r';u=([^"]+?)&amp;q='
 REGEX_RESULT = r'(?i)CREATE TABLE\s*(/\*.*\*/)?\s*(IF NOT EXISTS)?\s*(?P<result>[^\(;]+)'
@@ -33,7 +33,7 @@ def main():
     opener.addheaders = [("User-Agent", USER_AGENT)]
 
     conn = opener.open(SEARCH_URL)
-    page = conn.read() #set initial cookie values
+    page = conn.read()  # set initial cookie values
 
     config = ConfigParser.ConfigParser()
     config.read(CONFIG_FILE)
@@ -82,7 +82,7 @@ def main():
                 break
 
             sys.stdout.write("\n---------------\n")
-            sys.stdout.write("Result page #%d\n" % (i+1))
+            sys.stdout.write("Result page #%d\n" % (i + 1))
             sys.stdout.write("---------------\n")
 
             for sqlfile in files:

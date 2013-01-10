@@ -115,7 +115,7 @@ class Filesystem:
         if not single:
             if len(content) > 256:
                 for i in xrange(0, len(content), 256):
-                    _ = content[i:i+256]
+                    _ = content[i:i + 256]
 
                     if encoding == "hex":
                         _ = "0x%s" % _

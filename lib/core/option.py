@@ -272,7 +272,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                         index = 5
 
                     url = line[index:line.index(" HTTP/")]
-                    method = line[:index-1]
+                    method = line[:index - 1]
 
                     if "?" in line and "=" in line:
                         params = True
@@ -587,7 +587,7 @@ def _findPageForms():
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
-                page, _, _= Request.getPage(url=target.strip(), crawling=True, raise404=False)
+                page, _, _ = Request.getPage(url=target.strip(), crawling=True, raise404=False)
                 findPageForms(page, target, False, True)
 
                 if conf.verbose in (1, 2):
@@ -942,7 +942,7 @@ def _setHTTPProxy():
         try:
             port = int(hostnamePort[1])
         except:
-            pass #drops into the next check block
+            pass  # drops into the next check block
 
     if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
         errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
@@ -1373,8 +1373,9 @@ def _cleanupOptions():
         conf.data = re.sub(INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.data, re.I)
 
         if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
+            class _(unicode):
+                pass
             original = conf.data
-            class _(unicode): pass
             conf.data = _(urldecode(conf.data))
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
         else:
@@ -1409,7 +1410,7 @@ def _cleanupOptions():
         conf.code = int(conf.code)
 
     if conf.csvDel:
-        conf.csvDel = conf.csvDel.decode("string_escape") # e.g. '\\t' -> '\t'
+        conf.csvDel = conf.csvDel.decode("string_escape")  # e.g. '\\t' -> '\t'
 
     if conf.torPort and conf.torPort.isdigit():
         conf.torPort = int(conf.torPort)
@@ -1504,7 +1505,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.authHeader = None
     kb.bannerFp = AttribDict()
 
-    kb.brute = AttribDict({"tables":[], "columns":[]})
+    kb.brute = AttribDict({"tables": [], "columns": []})
     kb.bruteMode = False
 
     kb.cache = AttribDict()
@@ -1592,7 +1593,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.redirectChoice = None
     kb.redirectSetCookie = None
     kb.reflectiveMechanism = True
-    kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS:0, REFLECTIVE_COUNTER.HIT:0}
+    kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
     kb.responseTimes = []
     kb.resumeValues = True
     kb.safeCharEncode = False

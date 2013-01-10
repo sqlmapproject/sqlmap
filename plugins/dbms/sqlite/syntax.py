@@ -39,7 +39,7 @@ class Syntax(GenericSyntax):
                 break
 
             firstIndex = index
-            index = expression[firstIndex+2:].find("'")
+            index = expression[firstIndex + 2:].find("'")
 
             if index == -1:
                 raise SqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
@@ -49,8 +49,8 @@ class Syntax(GenericSyntax):
             oldUpper = old.upper()
             oldUpper = oldUpper.replace("X'", "").replace("'", "")
 
-            for i in xrange(len(oldUpper)/2):
-                char = oldUpper[i*2:i*2+2]
+            for i in xrange(len(oldUpper) / 2):
+                char = oldUpper[i * 2:i * 2 + 2]
                 escaped = "'%s'" % chr(int(char, 16))
             expression = expression.replace(old, escaped)
 

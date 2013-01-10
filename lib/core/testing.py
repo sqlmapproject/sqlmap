@@ -234,7 +234,7 @@ def runCase(switches=None, parse=None):
         logger.error("unhandled exception occurred ('%s')" % str(exception))
         tback = traceback.format_exc()
         retVal = False
-    elif result is False: # if None, ignore
+    elif result is False:  # if None, ignore
         logger.error("the test did not run")
         retVal = False
 

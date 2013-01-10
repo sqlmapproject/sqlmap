@@ -54,8 +54,8 @@ def md5hash(value):
         return md5.new(value).hexdigest()
 
 def orddecode(value):
-    packedString = struct.pack("!"+"I" * len(value), *value)
-    return "".join(chr(char) for char in struct.unpack("!"+"I"*(len(packedString)/4), packedString))
+    packedString = struct.pack("!" + "I" * len(value), *value)
+    return "".join(chr(char) for char in struct.unpack("!" + "I" * (len(packedString) / 4), packedString))
 
 def ordencode(value):
     return tuple(ord(char) for char in value)

@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.datatype import AttribDict
 
-_defaults =  {
+_defaults = {
                "csvDel":       ",",
                "timeSec":      5,
                "googlePage":   1,
@@ -23,6 +23,6 @@ _defaults =  {
                "dumpFormat":   "CSV",
                "tech":         "BEUSTQ",
                "torType":      "HTTP"
-             }
+            }
 
 defaults = AttribDict(_defaults)

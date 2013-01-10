@@ -18,15 +18,15 @@ def check(module):
     if module[-3:] == ".py":
 
         print "CHECKING ", module
-        pout = os.popen('pylint --rcfile=/dev/null %s'% module, 'r')
+        pout = os.popen("pylint --rcfile=/dev/null %s" % module, 'r')
         for line in pout:
             if  re.match("E....:.", line):
                 print line
             if __RATING__ and "Your code has been rated at" in line:
-               print line
-               score = re.findall("\d.\d\d", line)[0]
-               total += float(score)
-               count += 1
+                print line
+                score = re.findall("\d.\d\d", line)[0]
+                total += float(score)
+                count += 1
 
 if __name__ == "__main__":
     try:
@@ -46,5 +46,5 @@ if __name__ == "__main__":
 
     if __RATING__:
         print "==" * 50
-        print "%d modules found"% count
-        print "AVERAGE SCORE = %.02f"% (total / count)
+        print "%d modules found" % count
+        print "AVERAGE SCORE = %.02f" % (total / count)

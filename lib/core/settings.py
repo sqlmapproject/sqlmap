@@ -234,7 +234,7 @@ EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=(&|\Z))'
 COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18")
 
 # Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
-COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@")
+COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ", ", "@")
 
 # Splitter used between requests in WebScarab log files
 WEBSCARAB_SPLITTER = "### Conversation"
@@ -363,7 +363,7 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = ("gif","jpg","jar","tif","bmp","war","ear","mpg","wmv","mpeg","scm","iso","dmp","dll","cab","so","avi","bin","exe","iso","tar","png","pdf","ps","mp3","zip","rar","gz")
+CRAWL_EXCLUDE_EXTENSIONS = ("gif", "jpg", "jar", "tif", "bmp", "war", "ear", "mpg", "wmv", "mpeg", "scm", "iso", "dmp", "dll", "cab", "so", "avi", "bin", "exe", "iso", "tar", "png", "pdf", "ps", "mp3", "zip", "rar", "gz")
 
 # Template used for common table existence check
 BRUTE_TABLE_EXISTS_TEMPLATE = "EXISTS(SELECT %d FROM %s)"
@@ -420,7 +420,7 @@ HASHDB_FLUSH_RETRIES = 3
 HASHDB_MILESTONE_VALUE = "cAWxkLYCQT"  # r5129 "".join(random.sample(string.letters, 10))
 
 # Warn user of possible delay due to large page dump in full UNION query injections
-LARGE_OUTPUT_THRESHOLD = 1024**2
+LARGE_OUTPUT_THRESHOLD = 1024 ** 2
 
 # On huge tables there is a considerable slowdown if every row retrieval requires ORDER BY (most noticable in table dumping using ERROR injections)
 SLOW_ORDER_COUNT_THRESHOLD = 10000

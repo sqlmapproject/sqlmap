@@ -21,7 +21,7 @@ class HTTPSCertAuthHandler(urllib2.HTTPSHandler):
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host):
-        if sys.version_info >= (2,6):
+        if sys.version_info >= (2, 6):
             retVal = httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file, timeout=conf.timeout)
         else:
             retVal = httplib.HTTPSConnection(host, key_file=self.key_file, cert_file=self.cert_file)

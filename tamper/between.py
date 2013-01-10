@@ -55,9 +55,9 @@ def tamper(payload, **kwargs):
                 doublequote = not doublequote
 
             elif payload[i] == ">" and not doublequote and not quote:
-                retVal += " " if i > 0 and not payload[i-1].isspace() else ""
-                retVal += "NOT BETWEEN %s AND" % ('0' if re.search(r"\A[^\w]*\d", payload[i+1:]) else "NULL")
-                retVal += " " if i < len(payload) - 1 and not payload[i+1:i+2].isspace() else ""
+                retVal += " " if i > 0 and not payload[i - 1].isspace() else ""
+                retVal += "NOT BETWEEN %s AND" % ('0' if re.search(r"\A[^\w]*\d", payload[i + 1:]) else "NULL")
+                retVal += " " if i < len(payload) - 1 and not payload[i + 1:i + 2].isspace() else ""
 
                 continue
 

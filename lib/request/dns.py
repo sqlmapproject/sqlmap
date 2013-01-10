@@ -32,7 +32,7 @@ class DNSQuery(object):
             j = ord(raw[i])
 
             while j != 0:
-                self._query += raw[i+1:i+j+1] + '.'
+                self._query += raw[i + 1:i + j + 1] + '.'
                 i = i + j + 1
                 j = ord(raw[i])
 
@@ -137,4 +137,3 @@ if __name__ == "__main__":
     finally:
         if server:
             server._running = False
-

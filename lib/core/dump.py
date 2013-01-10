@@ -117,13 +117,13 @@ class Dump(object):
         if elements:
             self._write("")
 
-    def banner(self,data):
+    def banner(self, data):
         self.string("banner", data)
 
-    def currentUser(self,data):
+    def currentUser(self, data):
         self.string("current user", data)
 
-    def currentDb(self,data):
+    def currentDb(self, data):
         if Backend.isDbms(DBMS.MAXDB):
             self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data)
         elif Backend.isDbms(DBMS.ORACLE):
@@ -131,13 +131,13 @@ class Dump(object):
         else:
             self.string("current database", data)
 
-    def hostname(self,data):
+    def hostname(self, data):
         self.string("hostname", data)
 
-    def dba(self,data):
+    def dba(self, data):
         self.string("current user is DBA", data)
 
-    def users(self,users):
+    def users(self, users):
         self.lister("database management system users", users)
 
     def userSettings(self, header, userSettings, subHeader):
@@ -174,7 +174,7 @@ class Dump(object):
 
         self.singleString("")
 
-    def dbs(self,dbs):
+    def dbs(self, dbs):
         self.lister("available databases", dbs)
 
     def dbTables(self, dbTables):

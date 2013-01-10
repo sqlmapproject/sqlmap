@@ -233,7 +233,7 @@ class Enumeration(GenericEnumeration):
             for blind in blinds:
                 randStr = randomStr()
                 query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
-                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.usertype' % randStr], blind=blind)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.usertype' % randStr], blind=blind)
 
                 if retVal:
                     table = {}

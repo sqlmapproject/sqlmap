@@ -131,7 +131,7 @@ def _setRequestParams():
     kb.processUserMarks = True if kb.postHint else kb.processUserMarks
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(map(lambda place: place in conf.parameters, [PLACE.GET, PLACE.POST])):
-        warnMsg  = "you've provided target url without any GET "
+        warnMsg = "you've provided target url without any GET "
         warnMsg += "parameters (e.g. www.site.com/article.php?id=1) "
         warnMsg += "and without providing any POST parameters "
         warnMsg += "through --data option"

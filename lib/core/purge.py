@@ -64,7 +64,7 @@ def purge(directory):
         except:
             pass
 
-    dirpaths.sort(cmp = lambda x, y: y.count(os.path.sep) - x.count(os.path.sep))
+    dirpaths.sort(cmp=lambda x, y: y.count(os.path.sep) - x.count(os.path.sep))
 
     logger.debug("renaming directory names to random values...")
     for dirpath in dirpaths:

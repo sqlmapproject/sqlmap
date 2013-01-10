@@ -206,7 +206,7 @@ class Fingerprint(GenericFingerprint):
                 elif inject.checkBooleanExpression("@@table_open_cache=@@table_open_cache"):
                     if inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.GLOBAL_STATUS LIMIT 0, 1)" % (randInt, randInt)):
                         Backend.setVersionList([">= 5.1.12", "< 5.5.0"])
-                    elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1)" % (randInt,randInt)):
+                    elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1)" % (randInt, randInt)):
                         Backend.setVersionList([">= 5.1.7", "< 5.1.12"])
                     elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1)" % (randInt, randInt)):
                         Backend.setVersion("= 5.1.6")

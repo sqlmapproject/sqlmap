@@ -110,7 +110,7 @@ def checkCharEncoding(encoding, warn=True):
     else:
         return encoding
 
-    # http://www.destructor.de/charsets/index.htm
+    # Reference: http://www.destructor.de/charsets/index.htm
     translate = { "windows-874": "iso-8859-11", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8",  "utc8": "utf8", "ebcdic": "ebcdic-cp-be"}
 
     for delimiter in (';', ',', '('):
@@ -119,17 +119,17 @@ def checkCharEncoding(encoding, warn=True):
 
     # popular typos/errors
     if "8858" in encoding:
-        encoding = encoding.replace("8858", "8859") # iso-8858 -> iso-8859
+        encoding = encoding.replace("8858", "8859")  # iso-8858 -> iso-8859
     elif "8559" in encoding:
-        encoding = encoding.replace("8559", "8859") # iso-8559 -> iso-8859
+        encoding = encoding.replace("8559", "8859")  # iso-8559 -> iso-8859
     elif "5889" in encoding:
-        encoding = encoding.replace("5889", "8859") # iso-5889 -> iso-8859
+        encoding = encoding.replace("5889", "8859")  # iso-5889 -> iso-8859
     elif "5589" in encoding:
-        encoding = encoding.replace("5589", "8859") # iso-5589 -> iso-8859
+        encoding = encoding.replace("5589", "8859")  # iso-5589 -> iso-8859
     elif "2313" in encoding:
-        encoding = encoding.replace("2313", "2312") # gb2313 -> gb2312
+        encoding = encoding.replace("2313", "2312")  # gb2313 -> gb2312
     elif "x-euc" in encoding:
-        encoding = encoding.replace("x-euc", "euc") # x-euc-kr -> euc-kr
+        encoding = encoding.replace("x-euc", "euc")  # x-euc-kr -> euc-kr
 
     # name adjustment for compatibility
     if encoding.startswith("8859"):
@@ -149,14 +149,14 @@ def checkCharEncoding(encoding, warn=True):
     elif encoding.find("utf8") > 0:
         encoding = "utf8"
 
-    # http://philip.html5.org/data/charsets-2.html
+    # Reference: http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
     elif encoding in ("null", "{charset}", "*"):
         return None
 
-    # http://www.iana.org/assignments/character-sets
-    # http://docs.python.org/library/codecs.html
+    # Reference: http://www.iana.org/assignments/character-sets
+    # Reference: http://docs.python.org/library/codecs.html
     try:
         codecs.lookup(encoding)
     except LookupError:
@@ -216,7 +216,7 @@ def decodePage(page, contentEncoding, contentType):
     if not conf.charset:
         httpCharset, metaCharset = None, None
 
-        # http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
+        # Reference: http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
         if contentType and (contentType.find("charset=") != -1):
             httpCharset = checkCharEncoding(contentType.split("charset=")[-1])
 

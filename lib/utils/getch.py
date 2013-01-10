@@ -19,7 +19,8 @@ class _Getch(object):
             except(AttributeError, ImportError):
                 self.impl = _GetchUnix()
 
-    def __call__(self): return self.impl()
+    def __call__(self):
+        return self.impl()
 
 
 class _GetchUnix(object):
@@ -56,11 +57,11 @@ class _GetchMacCarbon(object):
     """
     def __init__(self):
         import Carbon
-        Carbon.Evt #see if it has this (in Unix, it doesn't)
+        Carbon.Evt  # see if it has this (in Unix, it doesn't)
 
     def __call__(self):
         import Carbon
-        if Carbon.Evt.EventAvail(0x0008)[0]==0: # 0x0008 is the keyDownMask
+        if Carbon.Evt.EventAvail(0x0008)[0] == 0:  # 0x0008 is the keyDownMask
             return ''
         else:
             #
@@ -72,8 +73,9 @@ class _GetchMacCarbon(object):
             # number is converted to an ASCII character with chr() and
             # returned
             #
-            (what,msg,when,where,mod)=Carbon.Evt.GetNextEvent(0x0008)[1]
+            (what, msg, when, where, mod) = Carbon.Evt.GetNextEvent(0x0008)[1]
             return chr(msg & 0x000000FF)
 
 
 getch = _Getch()
+

@@ -68,7 +68,7 @@ class Takeover(GenericTakeover):
         hexStr = binascii.hexlify(self.shellcodeString[:-1])
 
         for hexPair in xrange(0, len(hexStr), 2):
-            shellcodeChar += "CHAR(0x%s)+" % hexStr[hexPair:hexPair+2]
+            shellcodeChar += "CHAR(0x%s)+" % hexStr[hexPair:hexPair + 2]
 
         shellcodeChar = shellcodeChar[:-1]
 

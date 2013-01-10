@@ -758,7 +758,7 @@ class Agent(object):
         limitStr = queries[Backend.getIdentifiedDbms()].limit.query
         fromIndex = limitedQuery.index(" FROM ")
         untilFrom = limitedQuery[:fromIndex]
-        fromFrom = limitedQuery[fromIndex+1:]
+        fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = False
 
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
@@ -766,7 +766,7 @@ class Agent(object):
             limitedQuery += " %s" % limitStr
 
         elif Backend.isDbms(DBMS.FIREBIRD):
-            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num+1, num+1)
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, num + 1)
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
