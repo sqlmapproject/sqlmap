@@ -14,7 +14,7 @@ import tempfile
 import types
 
 from subprocess import PIPE
-from subprocess import Popen
+from subprocess import STDOUT
 
 from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
@@ -32,6 +32,9 @@ from lib.core.exception import SqlmapMissingDependence
 from lib.core.optiondict import optDict
 from lib.core.option import init
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.subprocessng import Popen as execute
+from lib.core.subprocessng import send_all
+from lib.core.subprocessng import recv_some
 from thirdparty.bottle.bottle import abort
 from thirdparty.bottle.bottle import error
 from thirdparty.bottle.bottle import get
@@ -273,7 +276,7 @@ def scan_start(taskid):
     tasks[taskid]["fdLog"] = pipes[taskid][1]
 
     # Launch sqlmap engine
-    procs[taskid] = Popen("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
+    procs[taskid] = execute("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=False)
 
     return jsonize({"success": True})
 
@@ -288,11 +291,9 @@ def scan_output(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    stdout, stderr = procs[taskid].communicate()
+    stdout = recv_some(procs[taskid], t=1, e=0)
 
-    print "stderr:", stderr
-
-    return jsonize({"stdout": stdout, "stderr": stderr})
+    return jsonize({"stdout": stdout})
 
 @get("/scan/<taskid>/delete")
 def scan_delete(taskid):
@@ -309,16 +310,50 @@ def scan_delete(taskid):
 
     return jsonize({"success": True})
 
-# Function to handle scans' logs
+# Functions to handle scans' logs
+@get("/scan/<taskid>/log/<start>/<end>")
+def scan_log_limited(taskid, start, end):
+    """
+    Retrieve the log messages
+    """
+    log = None
+
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    if not start.isdigit() or not end.isdigit() or end <= start:
+        abort(500, "Invalid start or end value, must be digits")
+
+    start = max(0, int(start)-1)
+    end = max(1, int(end))
+    pickledLog = os.read(pipes[taskid][0], 100000)
+
+    try:
+        log = base64unpickle(pickledLog)
+        log = log[slice(start, end)]
+    except (KeyError, IndexError, TypeError), e:
+        logger.error("handled exception when trying to unpickle logger dictionary in scan_log_limited(): %s" % str(e))
+
+    return jsonize({"log": log})
+
 @get("/scan/<taskid>/log")
 def scan_log(taskid):
     """
     Retrieve the log messages
     """
+    log = None
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize({"log": base64unpickle(os.read(pipes[taskid][0], 100000))})
+    pickledLog = os.read(pipes[taskid][0], 100000)
+
+    try:
+        log = base64unpickle(pickledLog)
+    except (KeyError, IndexError, TypeError), e:
+        logger.error("handled exception when trying to unpickle logger dictionary in scan_log(): %s" % str(e))
+
+    return jsonize({"log": log})
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
