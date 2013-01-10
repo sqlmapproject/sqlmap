@@ -3192,7 +3192,7 @@ def decodeHexValue(value):
 
     try:
         retVal = applyFunctionRecursively(value, _)
-    except Exception:
+    except:
         singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
 
     return retVal

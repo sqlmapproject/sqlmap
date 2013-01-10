@@ -639,7 +639,7 @@ def _setMetasploit():
                     _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
                     _ = OpenKey(_, key)
                     retVal = QueryValueEx(_, value)[0]
-                except Exception:
+                except:
                     logger.debug("unable to identify Metasploit installation path via registry key")
 
                 return retVal

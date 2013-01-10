@@ -24,7 +24,7 @@ def beep():
             _linux_wav_play(BEEP_WAV_FILENAME)
         else:
             _speaker_beep()
-    except Exception:
+    except:
         _speaker_beep()
 
 def _speaker_beep():
