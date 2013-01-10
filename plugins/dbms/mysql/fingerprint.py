@@ -174,7 +174,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.MYSQL
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("USER()=USER()")
+            result = inject.checkBooleanExpression("USER() LIKE USER()")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
