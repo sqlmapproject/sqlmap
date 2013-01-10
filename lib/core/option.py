@@ -1819,7 +1819,7 @@ class LogRecorder(logging.StreamHandler):
         Simply record the emitted events.
         """
         self.loghist.append({'levelname': record.levelname,
-                             'text': record.message % record.args if record.args else record.message,
+                             'text': record.msg % record.args if record.args else record.msg,
                              'id': len(self.loghist)+1})
 
         if conf.fdLog:
@@ -1827,7 +1827,7 @@ class LogRecorder(logging.StreamHandler):
 
 def _setRestAPILog():
     if hasattr(conf, "fdLog") and conf.fdLog:
-        #logger.removeHandler(LOGGER_HANDLER)
+        logger.removeHandler(LOGGER_HANDLER)
         LOGGER_RECORDER = LogRecorder()
         logger.addHandler(LOGGER_RECORDER)
 
