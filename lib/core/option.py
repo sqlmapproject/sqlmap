@@ -750,7 +750,7 @@ def _setOS():
 
 def _setTechnique():
     validTechniques = sorted(getPublicTypeMembers(PAYLOAD.TECHNIQUE), key=lambda x: x[1])
-    validLetters = (_[0][0].upper() for _ in validTechniques)
+    validLetters = [_[0][0].upper() for _ in validTechniques]
 
     if conf.tech and isinstance(conf.tech, basestring):
         _ = []
