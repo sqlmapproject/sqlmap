@@ -37,6 +37,8 @@ from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty.magic import magic
 
+from extra.safe2bin.safe2bin import safechardecode
+
 class Dump(object):
     """
     This class defines methods used to parse and output the results
@@ -479,13 +481,11 @@ class Dump(object):
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
                     #if len(value) > 10 and r'\x' in value:
-                        #mimetype = magic.from_buffer(value, mime=True)
-                        #if mimetype.startswith("application") or mimetype.startswith("image"):
-                            #with open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb") as f:
-                                #from extra.safe2bin.safe2bin import safechardecode
-                                #_ = _.encode(UNICODE_ENCODING)
-                                #_ = safechardecode(value)
-                                #f.write(_)
+                    #    mimetype = magic.from_buffer(value, mime=True)
+                    #    if mimetype.startswith("application") or mimetype.startswith("image"):
+                    #        with codecs.open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb", UNICODE_ENCODING) as f:
+                    #            _ = safechardecode(value)
+                    #            f.write(_)
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
