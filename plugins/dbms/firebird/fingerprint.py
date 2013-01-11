@@ -70,16 +70,16 @@ class Fingerprint(GenericFingerprint):
     def _sysTablesCheck(self):
         retVal = None
         table = (
-                    ("1.0", ["EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)"]),
-                    ("1.5", ["NULLIF(%d,%d) IS NULL", "EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)"]),
-                    ("2.0", ["EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "BIT_LENGTH(%d)>0", "CHAR_LENGTH(%d)>0"]),
-                    ("2.1", ["BIN_XOR(%d,%d)=0", "PI()>0.%d", "RAND()<1.%d", "FLOOR(1.%d)>=0"])
+                    ("1.0", ("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)",)),
+                    ("1.5", ("NULLIF(%d,%d) IS NULL", "EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)")),
+                    ("2.0", ("EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "BIT_LENGTH(%d)>0", "CHAR_LENGTH(%d)>0")),
+                    ("2.1", ("BIN_XOR(%d,%d)=0", "PI()>0.%d", "RAND()<1.%d", "FLOOR(1.%d)>=0")),
                  )
 
         for i in xrange(len(table)):
             version, checks = table[i]
             failed = False
-            check = checks[randomRange(0, len(checks)-1)].replace("%d", getUnicode(randomRange(1,100)))
+            check = checks[randomRange(0, len(checks) - 1)].replace("%d", getUnicode(randomRange(1, 100)))
             result = inject.checkBooleanExpression(check)
 
             if result:

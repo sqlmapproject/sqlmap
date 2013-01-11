@@ -93,7 +93,7 @@ class Web:
         return self._webFileStreamUpload(stream, destFileName, directory)
 
     def _webFileStreamUpload(self, stream, destFileName, directory):
-        stream.seek(0) # Rewind
+        stream.seek(0)  # Rewind
 
         try:
             setattr(stream, "name", destFileName)

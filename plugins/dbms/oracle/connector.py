@@ -64,10 +64,8 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(utf8encode(query))
             retVal = True
-        except (cx_Oracle.DatabaseError), msg:
+        except cx_Oracle.DatabaseError, msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
-        except cx_Oracle.InternalError, msg:
-            raise SqlmapConnectionException(msg)
 
         self.connector.commit()
 

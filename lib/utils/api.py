@@ -95,19 +95,19 @@ def security_headers():
 # HTTP Status Code functions #
 ##############################
 
-@error(401) # Access Denied
+@error(401)  # Access Denied
 def error401(error=None):
     return "Access denied"
 
-@error(404) # Not Found
+@error(404)  # Not Found
 def error404(error=None):
     return "Nothing here"
 
-@error(405) # Method Not Allowed (e.g. when requesting a POST method via GET)
+@error(405)  # Method Not Allowed (e.g. when requesting a POST method via GET)
 def error405(error=None):
     return "Method not allowed"
 
-@error(500) # Internal Server Error
+@error(500)  # Internal Server Error
 def error500(error=None):
     return "Internal server error"
 
@@ -324,7 +324,7 @@ def scan_log_limited(taskid, start, end):
     if not start.isdigit() or not end.isdigit() or end <= start:
         abort(500, "Invalid start or end value, must be digits")
 
-    start = max(0, int(start)-1)
+    start = max(0, int(start) - 1)
     end = max(1, int(end))
     pickledLog = os.read(pipes[taskid][0], 100000)
 

@@ -88,7 +88,7 @@ def crawl(target):
                                         threadData.shared.deeper.add(url)
                                         if re.search(r"(.*?)\?(.+)", url):
                                             threadData.shared.value.add(url)
-                    except UnicodeEncodeError: # for non-HTML files
+                    except UnicodeEncodeError:  # for non-HTML files
                         pass
                     finally:
                         if conf.forms:

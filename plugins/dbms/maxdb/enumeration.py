@@ -148,7 +148,7 @@ class Enumeration(GenericEnumeration):
 
             randStr = randomStr()
             query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), ("'%s'" % unsafeSQLIdentificatorNaming(conf.db)) if unsafeSQLIdentificatorNaming(conf.db) != "USER" else 'USER')
-            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.columnname' % randStr,'%s.datatype' % randStr,'%s.len' % randStr], blind=True)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.columnname' % randStr, '%s.datatype' % randStr, '%s.len' % randStr], blind=True)
 
             if retVal:
                 table = {}

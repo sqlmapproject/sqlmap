@@ -174,7 +174,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.MYSQL
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("USER()=USER()")
+            result = inject.checkBooleanExpression("USER() LIKE USER()")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
@@ -206,7 +206,7 @@ class Fingerprint(GenericFingerprint):
                 elif inject.checkBooleanExpression("@@table_open_cache=@@table_open_cache"):
                     if inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.GLOBAL_STATUS LIMIT 0, 1)" % (randInt, randInt)):
                         Backend.setVersionList([">= 5.1.12", "< 5.5.0"])
-                    elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1)" % (randInt,randInt)):
+                    elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PROCESSLIST LIMIT 0, 1)" % (randInt, randInt)):
                         Backend.setVersionList([">= 5.1.7", "< 5.1.12"])
                     elif inject.checkBooleanExpression("%s=(SELECT %s FROM information_schema.PARTITIONS LIMIT 0, 1)" % (randInt, randInt)):
                         Backend.setVersion("= 5.1.6")

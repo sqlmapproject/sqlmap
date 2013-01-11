@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
-import tempfile
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
@@ -16,7 +15,6 @@ from lib.core.common import decodeHexValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
 from lib.core.common import isTechniqueAvailable
-from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import kb
@@ -117,7 +115,7 @@ class Filesystem:
         if not single:
             if len(content) > 256:
                 for i in xrange(0, len(content), 256):
-                    _ = content[i:i+256]
+                    _ = content[i:i + 256]
 
                     if encoding == "hex":
                         _ = "0x%s" % _
@@ -132,7 +130,7 @@ class Filesystem:
             elif encoding == "base64":
                 content = "'%s'" % content
 
-            retVal = [ content ]
+            retVal = [content]
 
         return retVal
 

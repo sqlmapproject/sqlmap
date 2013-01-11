@@ -157,16 +157,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if hintValue is not None and len(hintValue) >= idx:
                 if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
-                    posValue = hintValue[idx-1]
+                    posValue = hintValue[idx - 1]
                 else:
-                    posValue = ord(hintValue[idx-1])
+                    posValue = ord(hintValue[idx - 1])
 
                 forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)
 
                 if result:
-                    return hintValue[idx-1]
+                    return hintValue[idx - 1]
 
             with hintlock:
                 kb.hintValue = None
@@ -347,8 +347,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if conf.threads > 1 and isinstance(length, int) and length > 1:
             threadData = getCurrentThreadData()
 
-            threadData.shared.value = [ None ] * length
-            threadData.shared.index = [ firstChar ]    # As list for python nested function scoping
+            threadData.shared.value = [None] * length
+            threadData.shared.index = [firstChar]    # As list for python nested function scoping
             threadData.shared.start = firstChar
 
             try:
@@ -406,7 +406,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 if startCharIndex > 0:
                                     output = '..' + output[2:]
 
-                                if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length-1):
+                                if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length - 1):
                                     output = output[:-2] + '..'
 
                                 if conf.verbose in (1, 2) and not showEta:
@@ -423,7 +423,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 abortedFlag = True
 
             finally:
-                value = map(lambda _: partialValue[_] if _ < len(partialValue) else threadData.shared.value[_], xrange(length))
+                value = [partialValue[_] if _ < len(partialValue) else threadData.shared.value[_] for _ in xrange(length)]
 
             infoMsg = None
 
@@ -471,7 +471,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             if showEta:
                                 etaProgressUpdate(time.time() - charStart, len(commonValue))
                             elif conf.verbose in (1, 2):
-                                dataToStdout(filterControlChars(commonValue[index-1:]))
+                                dataToStdout(filterControlChars(commonValue[index - 1:]))
 
                             finalValue = commonValue
 
@@ -490,8 +490,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         # Did we have luck?
                         if result:
-                            val = commonPattern[index-1:]
-                            index += len(val)-1
+                            val = commonPattern[index - 1:]
+                            index += len(val) - 1
 
                     # Otherwise if there is no commonValue (single match from
                     # txt/common-outputs.txt) and no commonPattern

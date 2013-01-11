@@ -189,7 +189,7 @@ class Connect(object):
         ua = kwargs.get('ua',                       None)
         referer = kwargs.get('referer',             None)
         host = kwargs.get('host',                   conf.host)
-        direct_ = kwargs.get('direct',               False)
+        direct_ = kwargs.get('direct',              False)
         multipart = kwargs.get('multipart',         False)
         silent = kwargs.get('silent',               False)
         raise404 = kwargs.get('raise404',           True)
@@ -398,7 +398,7 @@ class Connect(object):
                     if url.lower().startswith('http://'):
                         kwargs['url'] = url
                     else:
-                        kwargs['url'] = conf.url[:conf.url.rfind('/')+1] + url
+                        kwargs['url'] = conf.url[:conf.url.rfind('/') + 1] + url
 
                     threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                     kwargs['refreshing'] = True

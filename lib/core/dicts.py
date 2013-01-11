@@ -34,7 +34,7 @@ FIREBIRD_TYPES = {
                     "12": "DATE",
                     "13": "TIME",
                     "35": "TIMESTAMP",
-                    "37": "VARCHAR"
+                    "37": "VARCHAR",
                 }
 
 SYBASE_TYPES = {
@@ -69,38 +69,38 @@ SYBASE_TYPES = {
                 }
 
 MYSQL_PRIVS = {
-                    1:"select_priv",
-                    2:"insert_priv",
-                    3:"update_priv",
-                    4:"delete_priv",
-                    5:"create_priv",
-                    6:"drop_priv",
-                    7:"reload_priv",
-                    8:"shutdown_priv",
-                    9:"process_priv",
-                    10:"file_priv",
-                    11:"grant_priv",
-                    12:"references_priv",
-                    13:"index_priv",
-                    14:"alter_priv",
-                    15:"show_db_priv",
-                    16:"super_priv",
-                    17:"create_tmp_table_priv",
-                    18:"lock_tables_priv",
-                    19:"execute_priv",
-                    20:"repl_slave_priv",
-                    21:"repl_client_priv",
-                    22:"create_view_priv",
-                    23:"show_view_priv",
-                    24:"create_routine_priv",
-                    25:"alter_routine_priv",
-                    26:"create_user_priv",
+                    1: "select_priv",
+                    2: "insert_priv",
+                    3: "update_priv",
+                    4: "delete_priv",
+                    5: "create_priv",
+                    6: "drop_priv",
+                    7: "reload_priv",
+                    8: "shutdown_priv",
+                    9: "process_priv",
+                    10: "file_priv",
+                    11: "grant_priv",
+                    12: "references_priv",
+                    13: "index_priv",
+                    14: "alter_priv",
+                    15: "show_db_priv",
+                    16: "super_priv",
+                    17: "create_tmp_table_priv",
+                    18: "lock_tables_priv",
+                    19: "execute_priv",
+                    20: "repl_slave_priv",
+                    21: "repl_client_priv",
+                    22: "create_view_priv",
+                    23: "show_view_priv",
+                    24: "create_routine_priv",
+                    25: "alter_routine_priv",
+                    26: "create_user_priv",
                 }
 
 PGSQL_PRIVS = {
-                    1:"createdb",
-                    2:"super",
-                    3:"catupd",
+                    1: "createdb",
+                    2: "super",
+                    3: "catupd",
                 }
 
 FIREBIRD_PRIVS = {
@@ -109,7 +109,7 @@ FIREBIRD_PRIVS = {
                     "U": "UPDATE",
                     "D": "DELETE",
                     "R": "REFERENCES",
-                    "E": "EXECUTE"
+                    "E": "EXECUTE",
                 }
 
 DB2_PRIVS = {
@@ -120,7 +120,7 @@ DB2_PRIVS = {
                     5: "INSERTAUTH",
                     6: "REFAUTH",
                     7: "SELECTAUTH",
-                    8: "UPDATEAUTH"
+                    8: "UPDATEAUTH",
            }
 
 DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
@@ -135,7 +135,7 @@ DBMS_DICT = {
                 DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"),
                 DBMS.MAXDB: (MAXDB_ALIASES, None, None),
                 DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
-                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/")
+                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/"),
             }
 
 FROM_DUMMY_TABLE = {
@@ -143,11 +143,11 @@ FROM_DUMMY_TABLE = {
                         DBMS.ACCESS: " FROM MSysAccessObjects",
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
-                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1"
+                        DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
                    }
 
 SQL_STATEMENTS = {
-                       "SQL SELECT statement":  (
+                        "SQL SELECT statement":  (
                              "select ",
                              "show ",
                              " top ",
@@ -162,44 +162,46 @@ SQL_STATEMENTS = {
                              " offset ",
                              " union all ",
                              " rownum as ",
-                             "(case ",          ),
+                             "(case ",           ),
 
-                       "SQL data definition":   (
+                         "SQL data definition":  (
                              "create ",
                              "declare ",
                              "drop ",
                              "truncate ",
-                             "alter ",          ),
+                             "alter ",           ),
 
-                       "SQL data manipulation": (
+                        "SQL data manipulation": (
                              "bulk ",
                              "insert ",
                              "update ",
                              "delete ",
                              "merge ",
-                             "load ",           ),
+                             "load ",            ),
 
-                       "SQL data control":      (
+                        "SQL data control":      (
                              "grant ",
-                             "revoke ",         ),
+                             "revoke ",          ),
 
-                       "SQL data execution":    (
+                        "SQL data execution":    (
                              "exec ",
-                             "execute ",        ),
+                             "execute ",         ),
 
-                       "SQL transaction":       (
+                        "SQL transaction":       (
                              "start transaction ",
                              "begin work ",
                              "begin transaction ",
                              "commit ",
-                             "rollback ",       ),
+                             "rollback ",        ),
                      }
 
 POST_HINT_CONTENT_TYPES = {
                                 POST_HINT.JSON: "application/json",
                                 POST_HINT.MULTIPART: "multipart/form-data",
                                 POST_HINT.SOAP: "application/soap+xml",
-                                POST_HINT.XML: "application/xml"
+                                POST_HINT.XML: "application/xml",
                           }
 
-DEPRECATED_HINTS = {"--replicate": "use '--dump-format=SQLITE' instead"}
+DEPRECATED_HINTS = {
+                        "--replicate": "use '--dump-format=SQLITE' instead",
+                   }

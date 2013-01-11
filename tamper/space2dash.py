@@ -40,7 +40,7 @@ def tamper(payload, **kwargs):
             if payload[i].isspace():
                 randomStr = ''.join(random.choice(string.ascii_uppercase + string.lowercase) for _ in xrange(random.randint(6, 12)))
                 retVal += "--%s%%0A" % randomStr
-            elif payload[i] == '#' or payload[i:i+3] == '-- ':
+            elif payload[i] == '#' or payload[i:i + 3] == '-- ':
                 retVal += payload[i:]
                 break
             else:

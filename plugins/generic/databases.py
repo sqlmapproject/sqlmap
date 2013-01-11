@@ -13,6 +13,7 @@ from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isListLike
 from lib.core.common import isNoneValue
+from lib.core.common import isNullValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseSqliteTableSchema
@@ -275,7 +276,7 @@ class Databases:
                 values = filter(None, arrayizeValue(values))
 
                 if len(values) > 0 and not isListLike(values[0]):
-                    values = map(lambda x: (dbs[0], x), values)
+                    values = [(dbs[0], _) for _ in values]
 
                 for db, table in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
@@ -524,6 +525,17 @@ class Databases:
 
                 values = inject.getValue(query, blind=False, time=False)
 
+                if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
+                    index, values = 1, []
+                    while True:
+                        query = rootQuery.inband.query2 % (conf.db, tbl, index)
+                        value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+                        if isNoneValue(value) or value == " ":
+                            break
+                        else:
+                            values.append((value,))
+                            index += 1
+
                 if Backend.isDbms(DBMS.SQLITE):
                     parseSqliteTableSchema(unArrayizeValue(values))
                 elif not isNoneValue(values):
@@ -536,7 +548,7 @@ class Databases:
 
                             if name:
                                 if len(columnData) == 1:
-                                    columns[name] = ""
+                                    columns[name] = None
                                 else:
                                     columns[name] = columnData[1]
 
@@ -600,16 +612,27 @@ class Databases:
 
                 count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-                if not isNumPosStrValue(count):
-                    errMsg = "unable to retrieve the number of columns "
-                    errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                    logger.error(errMsg)
-
-                    continue
-
                 table = {}
                 columns = {}
+
+                if not isNumPosStrValue(count):
+                    if Backend.isDbms(DBMS.MSSQL):
+                        count, index, values = 0, 1, []
+                        while True:
+                            query = rootQuery.blind.query3 % (conf.db, tbl, index)
+                            value = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                            if isNoneValue(value) or value == " ":
+                                break
+                            else:
+                                columns[safeSQLIdentificatorNaming(value)] = None
+                                index += 1
+
+                    if not columns:
+                        errMsg = "unable to retrieve the %scolumns " % ("number of " if not Backend.isDbms(DBMS.MSSQL) else "")
+                        errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                        errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                        logger.error(errMsg)
+                        continue
 
                 for index in getLimitRange(count):
                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):

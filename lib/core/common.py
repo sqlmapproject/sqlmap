@@ -20,7 +20,6 @@ import random
 import re
 import socket
 import string
-import struct
 import sys
 import tempfile
 import time
@@ -561,7 +560,7 @@ def paramToDict(place, parameters=None):
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
             if parameter not in testableParameters:
-                warnMsg =  "provided parameter '%s' " % parameter
+                warnMsg = "provided parameter '%s' " % parameter
                 warnMsg += "is not inside the %s" % place
                 logger.warn(warnMsg)
 
@@ -1012,8 +1011,8 @@ def parseTargetDirect():
                         conf.hostname = "localhost"
                         conf.port = 0
                 elif not remote:
-                        errMsg = "missing remote connection details"
-                        raise SqlmapSyntaxException(errMsg)
+                    errMsg = "missing remote connection details"
+                    raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
                     import _mssql
@@ -1068,10 +1067,10 @@ def parseTargetUrl():
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     urlSplit = urlparse.urlsplit(conf.url)
-    hostnamePort = urlSplit[1].split(":") if not re.search("\[.+\]", urlSplit[1]) else filter(None, (re.search("\[.+\]", urlSplit[1]).group(0), re.search("\](:(?P<port>\d+))?", urlSplit[1]).group("port")))
+    hostnamePort = urlSplit.netloc.split(":") if not re.search("\[.+\]", urlSplit.netloc) else filter(None, (re.search("\[.+\]", urlSplit.netloc).group(0), re.search("\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
-    conf.scheme = urlSplit[0].strip().lower() if not conf.forceSSL else "https"
-    conf.path = urlSplit[2].strip()
+    conf.scheme = urlSplit.scheme.strip().lower() if not conf.forceSSL else "https"
+    conf.path = urlSplit.path.strip()
     conf.hostname = hostnamePort[0].strip()
 
     conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
@@ -1097,8 +1096,8 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
-    if urlSplit[3]:
-        conf.parameters[PLACE.GET] = urldecode(urlSplit[3]) if urlSplit[3] and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit[3] else urlSplit[3]
+    if urlSplit.query:
+        conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
@@ -1490,7 +1489,7 @@ def getConsoleWidth(default=80):
     if os.getenv("COLUMNS", "").isdigit():
         width = int(os.getenv("COLUMNS"))
     else:
-        output=execute('stty size', shell=True, stdout=PIPE, stderr=PIPE).stdout.read()
+        output = execute("stty size", shell=True, stdout=PIPE, stderr=PIPE).stdout.read()
         items = output.split()
 
         if len(items) == 2 and items[1].isdigit():
@@ -2979,7 +2978,7 @@ def isAdminFromPrivileges(privileges):
     # In Firebird there is no specific privilege that means
     # that the user is DBA
     # TODO: confirm
-    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and "SELECT" in privileges and "INSERT" in privileges and "UPDATE" in privileges and "DELETE" in privileges and "REFERENCES" in privileges and "EXECUTE" in privileges)
+    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and all(_ in privileges for _ in ("SELECT", "INSERT", "UPDATE", "DELETE", "REFERENCES", "EXECUTE")))
 
     return retVal
 
@@ -3193,7 +3192,7 @@ def decodeHexValue(value):
 
     try:
         retVal = applyFunctionRecursively(value, _)
-    except Exception:
+    except:
         singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
 
     return retVal

@@ -294,7 +294,7 @@ def start():
                 if conf.forms:
                     message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
                 else:
-                    message = "url %d:\n%s %s%s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl,  " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
+                    message = "url %d:\n%s %s%s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl, " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
@@ -319,7 +319,7 @@ def start():
                         elif conf.method == HTTPMETHOD.GET:
                             if targetUrl.find("?") > -1:
                                 firstPart = targetUrl[:targetUrl.find("?")]
-                                secondPart = targetUrl[targetUrl.find("?")+1:]
+                                secondPart = targetUrl[targetUrl.find("?") + 1:]
                                 message = "Edit GET data [default: %s]: " % secondPart
                                 test = readInput(message, default=secondPart)
                                 test = _randomFillBlankFields(test)
@@ -603,7 +603,7 @@ def start():
             showHttpErrorCodes()
 
             if kb.maxConnectionsFlag:
-                warnMsg  = "it appears that the target "
+                warnMsg = "it appears that the target "
                 warnMsg += "has a maximum connections "
                 warnMsg += "constraint"
                 logger.warn(warnMsg)
@@ -612,7 +612,7 @@ def start():
         logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
 
     if conf.multipleTargets and conf.resultsFilename:
-        infoMsg  = "you can find results of scanning in multiple targets "
+        infoMsg = "you can find results of scanning in multiple targets "
         infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
         logger.info(infoMsg)
 

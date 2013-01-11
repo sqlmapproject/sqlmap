@@ -32,7 +32,7 @@ def tamper(payload, **kwargs):
         for i in xrange(len(payload)):
             if payload[i].isspace():
                 retVal += "%23%0A"
-            elif payload[i] == '#' or payload[i:i+3] == '-- ':
+            elif payload[i] == '#' or payload[i:i + 3] == '-- ':
                 retVal += payload[i:]
                 break
             else:

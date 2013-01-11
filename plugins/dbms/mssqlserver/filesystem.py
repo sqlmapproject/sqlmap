@@ -44,7 +44,7 @@ class Filesystem(GenericFilesystem):
         for fileLine in xrange(0, len(fileContent), lineLen):
             scrString = ""
 
-            for lineChar in fileContent[fileLine:fileLine+lineLen]:
+            for lineChar in fileContent[fileLine:fileLine + lineLen]:
                 strLineChar = hexencode(lineChar)
 
                 if not scrString:

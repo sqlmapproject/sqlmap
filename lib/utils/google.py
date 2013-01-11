@@ -61,7 +61,7 @@ class Google(object):
         url = "http://www.google.com/search?"
         url += "q=%s&" % urlencode(dork, convall=True)
         url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
-        url += "&start=%d" % ((gpage-1) * 100)
+        url += "&start=%d" % ((gpage - 1) * 100)
 
         try:
             conn = self.opener.open(url)

@@ -184,9 +184,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                         goUdf = True
 
                 if goUdf:
-                    exitfunc="thread"
+                    exitfunc = "thread"
                 else:
-                    exitfunc="process"
+                    exitfunc = "process"
 
                 self.createMsfShellcode(exitfunc=exitfunc, format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
 

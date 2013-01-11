@@ -166,9 +166,9 @@ class Agent(object):
         # after the prefix or it is in GROUP BY / ORDER BY (<clause>)
         elif kb.technique == PAYLOAD.TECHNIQUE.STACKED:
             query = kb.injection.prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [ 2 ] or kb.injection.clause == [ 3 ]:
+        elif kb.injection.clause == [2, 3] or kb.injection.clause == [2] or kb.injection.clause == [3]:
             query = kb.injection.prefix
-        elif clause == [2, 3] or clause == [ 2 ] or clause == [ 3 ]:
+        elif clause == [2, 3] or clause == [2] or clause == [3]:
             query = prefix
 
         # In any other case prepend with the full prefix
@@ -223,7 +223,7 @@ class Agent(object):
         _ = (
                 ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
                 ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
-                ("[HASH_REPLACE]", kb.chars.hash_)
+                ("[HASH_REPLACE]", kb.chars.hash_),
             )
         payload = reduce(lambda x, y: x.replace(y[0], y[1]), _, payload)
 
@@ -376,7 +376,18 @@ class Agent(object):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ',')
-            fieldsSplitted = fields.split(',')
+            commas = [0, len(fields)]
+            depth = 0
+            for index in xrange(len(fields)):
+                char = fields[index]
+                if char == '(':
+                    depth += 1
+                elif char == ')':
+                    depth -= 1
+                elif depth == 0 and char == ',':
+                    commas.append(index)
+            commas = sorted(commas)
+            fieldsSplitted = [fields[x:y] for (x, y) in zip(commas, commas[1:])]
             dbmsDelimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
             nulledCastedFields = []
 
@@ -758,7 +769,7 @@ class Agent(object):
         limitStr = queries[Backend.getIdentifiedDbms()].limit.query
         fromIndex = limitedQuery.index(" FROM ")
         untilFrom = limitedQuery[:fromIndex]
-        fromFrom = limitedQuery[fromIndex+1:]
+        fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = False
 
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
@@ -766,7 +777,7 @@ class Agent(object):
             limitedQuery += " %s" % limitStr
 
         elif Backend.isDbms(DBMS.FIREBIRD):
-            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num+1, num+1)
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, num + 1)
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):

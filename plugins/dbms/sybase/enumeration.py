@@ -60,7 +60,7 @@ class Enumeration(GenericEnumeration):
         areAdmins = set()
 
         if conf.user:
-            users = [ conf.user ]
+            users = [conf.user]
         elif not len(kb.data.cachedUsers):
             users = self.getUsers()
         else:
@@ -221,7 +221,7 @@ class Enumeration(GenericEnumeration):
 
             if colList:
                 table = {}
-                table[safeSQLIdentificatorNaming(tbl)] = dict(map(lambda x: (x, None), colList))
+                table[safeSQLIdentificatorNaming(tbl)] = dict((_, None) for _ in colList)
                 kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
                 continue
 
@@ -233,7 +233,7 @@ class Enumeration(GenericEnumeration):
             for blind in blinds:
                 randStr = randomStr()
                 query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
-                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr,'%s.usertype' % randStr], blind=blind)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.usertype' % randStr], blind=blind)
 
                 if retVal:
                     table = {}

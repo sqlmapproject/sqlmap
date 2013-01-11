@@ -244,7 +244,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             else:
                 scheme, port = None, None
 
-            if not re.search (r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
+            if not re.search(r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
                 continue
 
             if re.search(r"^[\n]*(GET|POST).*?\.(%s)\sHTTP\/" % "|".join(CRAWL_EXCLUDE_EXTENSIONS), request, re.I | re.M):
@@ -272,7 +272,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                         index = 5
 
                     url = line[index:line.index(" HTTP/")]
-                    method = line[:index-1]
+                    method = line[:index - 1]
 
                     if "?" in line and "=" in line:
                         params = True
@@ -353,6 +353,7 @@ def _loadQueries():
         class DictObject(object):
             def __init__(self):
                 self.__dict__ = {}
+
             def __contains__(self, name):
                 return name in self.__dict__
 
@@ -486,7 +487,7 @@ def _setGoogleDorking():
     infoMsg = "first request to Google to get the session cookie"
     logger.info(infoMsg)
 
-    handlers = [ proxyHandler ]
+    handlers = [proxyHandler]
 
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
     if conf.keepAlive:
@@ -587,7 +588,7 @@ def _findPageForms():
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
-                page, _, _= Request.getPage(url=target.strip(), crawling=True, raise404=False)
+                page, _, _ = Request.getPage(url=target.strip(), crawling=True, raise404=False)
                 findPageForms(page, target, False, True)
 
                 if conf.verbose in (1, 2):
@@ -638,7 +639,7 @@ def _setMetasploit():
                     _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
                     _ = OpenKey(_, key)
                     retVal = QueryValueEx(_, value)[0]
-                except Exception:
+                except:
                     logger.debug("unable to identify Metasploit installation path via registry key")
 
                 return retVal
@@ -749,7 +750,7 @@ def _setOS():
 
 def _setTechnique():
     validTechniques = sorted(getPublicTypeMembers(PAYLOAD.TECHNIQUE), key=lambda x: x[1])
-    validLetters = map(lambda x: x[0][0].upper(), validTechniques)
+    validLetters = [_[0][0].upper() for _ in validTechniques]
 
     if conf.tech and isinstance(conf.tech, basestring):
         _ = []
@@ -930,9 +931,9 @@ def _setHTTPProxy():
     logger.debug(debugMsg)
 
     proxySplit = urlparse.urlsplit(conf.proxy)
-    hostnamePort = proxySplit[1].split(":")
+    hostnamePort = proxySplit.netloc.split(":")
 
-    scheme = proxySplit[0].upper()
+    scheme = proxySplit.scheme.upper()
     hostname = hostnamePort[0]
     port = None
     username = None
@@ -942,7 +943,7 @@ def _setHTTPProxy():
         try:
             port = int(hostnamePort[1])
         except:
-            pass #drops into the next check block
+            pass  # drops into the next check block
 
     if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
         errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
@@ -1005,8 +1006,8 @@ def _setPrefixSuffix():
         boundary = AttribDict()
 
         boundary.level = 1
-        boundary.clause = [ 0 ]
-        boundary.where = [ 1, 2, 3 ]
+        boundary.clause = [0]
+        boundary.where = [1, 2, 3]
         boundary.prefix = conf.prefix
         boundary.suffix = conf.suffix
 
@@ -1024,7 +1025,7 @@ def _setPrefixSuffix():
 
         # user who provides --prefix/--suffix does not want other boundaries
         # to be tested for
-        conf.boundaries = [ boundary ]
+        conf.boundaries = [boundary]
 
 def _setAuthCred():
     """
@@ -1247,7 +1248,7 @@ def _setHTTPUserAgent():
         if count == 1:
             userAgent = kb.userAgents[0]
         else:
-            userAgent = kb.userAgents[randomRange(stop=count-1)]
+            userAgent = kb.userAgents[randomRange(stop=count - 1)]
 
         userAgent = sanitizeStr(userAgent)
         conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
@@ -1373,8 +1374,9 @@ def _cleanupOptions():
         conf.data = re.sub(INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.data, re.I)
 
         if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
+            class _(unicode):
+                pass
             original = conf.data
-            class _(unicode): pass
             conf.data = _(urldecode(conf.data))
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
         else:
@@ -1409,7 +1411,7 @@ def _cleanupOptions():
         conf.code = int(conf.code)
 
     if conf.csvDel:
-        conf.csvDel = conf.csvDel.decode("string_escape") # e.g. '\\t' -> '\t'
+        conf.csvDel = conf.csvDel.decode("string_escape")  # e.g. '\\t' -> '\t'
 
     if conf.torPort and conf.torPort.isdigit():
         conf.torPort = int(conf.torPort)
@@ -1504,7 +1506,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.authHeader = None
     kb.bannerFp = AttribDict()
 
-    kb.brute = AttribDict({"tables":[], "columns":[]})
+    kb.brute = AttribDict({"tables": [], "columns": []})
     kb.bruteMode = False
 
     kb.cache = AttribDict()
@@ -1525,7 +1527,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     # Active back-end DBMS fingerprint
     kb.dbms = None
-    kb.dbmsVersion = [ UNKNOWN_DBMS_VERSION ]
+    kb.dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
     kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]
     kb.dep = None
@@ -1592,7 +1594,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.redirectChoice = None
     kb.redirectSetCookie = None
     kb.reflectiveMechanism = True
-    kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS:0, REFLECTIVE_COUNTER.HIT:0}
+    kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
     kb.responseTimes = []
     kb.resumeValues = True
     kb.safeCharEncode = False
@@ -1820,7 +1822,7 @@ class LogRecorder(logging.StreamHandler):
         """
         self.loghist.append({'levelname': record.levelname,
                              'text': record.msg % record.args if record.args else record.msg,
-                             'id': len(self.loghist)+1})
+                             'id': len(self.loghist) + 1})
 
         if conf.fdLog:
             # TODO: this is very heavy operation and slows down a lot the
@@ -2008,7 +2010,7 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any ((conf.url, conf.bulkFile)):
+    if conf.forms and not any((conf.url, conf.bulkFile)):
         errMsg = "switch '--forms' requires usage of option '-u' (--url) or '-m'"
         raise SqlmapSyntaxException(errMsg)
 

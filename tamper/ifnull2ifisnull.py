@@ -57,7 +57,7 @@ def tamper(payload, **kwargs):
                 _ = payload[index + len("IFNULL("):comma]
                 __ = payload[comma + 1:end]
                 newVal = "IF(ISNULL(%s),%s,%s)" % (_, __, _)
-                payload = payload[:index] + newVal + payload[end+1:]
+                payload = payload[:index] + newVal + payload[end + 1:]
             else:
                 break
 

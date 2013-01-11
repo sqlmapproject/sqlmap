@@ -73,7 +73,7 @@ def tamper(payload, **kwargs):
             elif payload[i] == '"':
                 doublequote = not doublequote
 
-            elif payload[i] == '#' or payload[i:i+3] == '-- ':
+            elif payload[i] == '#' or payload[i:i + 3] == '-- ':
                 end = True
 
             elif payload[i] == " " and not doublequote and not quote:

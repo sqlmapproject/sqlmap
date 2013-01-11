@@ -18,7 +18,7 @@ optDict = {
                                "requestFile":       "string",
                                "sessionFile":       "string",
                                "googleDork":        "string",
-                               "configFile":        "string"
+                               "configFile":        "string",
                              },
 
             "Request":       {
@@ -47,7 +47,7 @@ optDict = {
                                "safUrl":            "string",
                                "saFreq":            "integer",
                                "skipUrlEncode":     "boolean",
-                               "evalCode":          "string"
+                               "evalCode":          "string",
                              },
 
             "Optimization":  {
@@ -55,7 +55,7 @@ optDict = {
                                "predictOutput":     "boolean",
                                "keepAlive":         "boolean",
                                "nullConnection":    "boolean",
-                               "threads":           "integer"
+                               "threads":           "integer",
                              },
 
             "Injection":     {
@@ -69,7 +69,7 @@ optDict = {
                                "prefix":            "string",
                                "suffix":            "string",
                                "skip":              "string",
-                               "tamper":            "string"
+                               "tamper":            "string",
                              },
 
             "Detection":     {
@@ -80,7 +80,7 @@ optDict = {
                                "regexp":            "string",
                                "code":              "integer",
                                "textOnly":          "boolean",
-                               "titles":            "boolean"
+                               "titles":            "boolean",
                              },
 
             "Techniques":    {
@@ -89,11 +89,11 @@ optDict = {
                                "uCols":             "string",
                                "uChar":             "string",
                                "dnsName":           "string",
-                               "secondOrder":       "string"
+                               "secondOrder":       "string",
                              },
 
             "Fingerprint":   {
-                               "extensiveFp":       "boolean"
+                               "extensiveFp":       "boolean",
                              },
 
             "Enumeration":   {
@@ -126,23 +126,23 @@ optDict = {
                                "lastChar":          "integer",
                                "query":             "string",
                                "sqlShell":          "boolean",
-                               "sqlFile":           "string"
+                               "sqlFile":           "string",
                              },
 
             "Brute":         {
                                "commonTables":       "boolean",
-                               "commonColumns":      "boolean"
+                               "commonColumns":      "boolean",
                              },
 
             "User-defined function": {
                                "udfInject":         "boolean",
-                               "shLib":             "string"
+                               "shLib":             "string",
                              },
 
             "File system":   {
                                "rFile":             "string",
                                "wFile":             "string",
-                               "dFile":             "string"
+                               "dFile":             "string",
                              },
 
             "Takeover":      {
@@ -153,7 +153,7 @@ optDict = {
                                "osBof":             "boolean",
                                "privEsc":           "boolean",
                                "msfPath":           "string",
-                               "tmpPath":           "string"
+                               "tmpPath":           "string",
                              },
 
             "Windows":       {
@@ -163,7 +163,7 @@ optDict = {
                                "regKey":            "string",
                                "regVal":            "string",
                                "regData":           "string",
-                               "regType":           "string"
+                               "regType":           "string",
                              },
 
             "General":       {
@@ -208,7 +208,7 @@ optDict = {
                                "smart":             "boolean",
                                "testFilter":        "string",
                                "wizard":            "boolean",
-                               "verbose":           "integer"
+                               "verbose":           "integer",
                              },
             "Hidden": {
                                "profile":           "boolean",
@@ -217,6 +217,6 @@ optDict = {
                                "smokeTest":         "boolean",
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",
-                               "runCase":           "string"
+                               "runCase":           "string",
                       }
           }

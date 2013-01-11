@@ -17,7 +17,7 @@ if PYVERSION >= "2.6":
     import ssl
 
 class ProxyHTTPConnection(httplib.HTTPConnection):
-    _ports = {"http" : 80, "https" : 443}
+    _ports = {"http": 80, "https": 443}
 
     def request(self, method, url, body=None, headers={}):
         # Request is called before connect, so can interpret url and get

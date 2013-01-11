@@ -560,6 +560,7 @@ Kyprianos Vasilopoulos, <kyprianos.vasilopoulos@gmail.com>
 
 Vlado Velichkovski, <ketejadam@hotmail.com>
 * for reporting considerable amount of bugs
+* for suggesting an enhancement
 
 Johnny Venter, <johnny.venter@zoho.com>
 * for reporting a couple of bugs

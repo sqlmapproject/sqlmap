@@ -40,7 +40,7 @@ class CompleterNG(rlcompleter.Completer):
         matches = []
         n = len(text)
 
-        for ns in [ self.namespace ]:
+        for ns in (self.namespace,):
             for word in ns:
                 if word[:n] == text:
                     matches.append(word)
