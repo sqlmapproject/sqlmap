@@ -33,6 +33,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
 
 failedItem = None
+failedParseOn = None
 
 def smokeTest():
     """
@@ -104,6 +105,7 @@ def liveTest():
     This will run the test of a program against the live testing environment
     """
     global failedItem
+    global failedParseOn
 
     retVal = True
     count = 0
@@ -165,12 +167,18 @@ def liveTest():
 
         if result:
             logger.info("test passed")
+            cleanCase()
         else:
             errMsg = "test failed "
             if failedItem:
-                errMsg += "at parsing item: %s" % failedItem
+                errMsg += "at parsing item: %s - scan folder is %s" % (failedItem, paths.SQLMAP_OUTPUT_PATH)
+                console_output_fd = open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb")
+                console_output_fd.write(failedParseOn)
+                console_output_fd.close()
+
             logger.error(errMsg)
             beep()
+
             if conf.stopFail is True:
                 return retVal
 
@@ -187,7 +195,9 @@ def liveTest():
 
 def initCase(switches=None):
     global failedItem
+    global failedParseOn
     failedItem = None
+    failedParseOn = None
 
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-")
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
@@ -210,6 +220,7 @@ def cleanCase():
 
 def runCase(switches=None, parse=None):
     global failedItem
+    global failedParseOn
 
     initCase(switches)
 
@@ -257,7 +268,9 @@ def runCase(switches=None, parse=None):
                 failedItem = item
                 break
 
-    cleanCase()
+        if failedItem is not None:
+            failedParseOn = console
+
     return retVal
 
 def replaceVars(item, vars_):
