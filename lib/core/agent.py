@@ -90,6 +90,10 @@ class Agent(object):
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             origValue = extractRegexResult(r"(?s)(?P<result>(\W+\Z|\w+\Z))", origValue)
+        elif place == PLACE.CUSTOM_HEADER:
+            paramString = origValue
+            origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            origValue = origValue[origValue.index(',') + 1:]
 
         if value is None:
             if where == PAYLOAD.WHERE.ORIGINAL:
@@ -115,7 +119,7 @@ class Agent(object):
 
         newValue = self.cleanupPayload(newValue, origValue)
 
-        if place in (PLACE.URI, PLACE.CUSTOM_POST):
+        if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
             _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
             if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and not '"%s"' % _ in paramString:
                 newValue = '"%s"' % newValue

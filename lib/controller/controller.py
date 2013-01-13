@@ -129,6 +129,9 @@ def _formatInjection(inj):
         title = sdata.title
         vector = sdata.vector
         comment = sdata.comment
+        payload = agent.adjustLateValues(sdata.payload)
+        if inj.place == PLACE.CUSTOM_HEADER:
+            payload = payload.split(',', 1)[1]
         if stype == PAYLOAD.TECHNIQUE.UNION:
             count = re.sub(r"(?i)(\(.+\))|(\blimit[^A-Za-z]+)", "", sdata.payload).count(',') + 1
             title = re.sub(r"\d+ to \d+", str(count), title)
@@ -139,7 +142,7 @@ def _formatInjection(inj):
             vector = "%s%s" % (vector, comment)
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
-        data += "    Payload: %s\n" % agent.adjustLateValues(sdata.payload)
+        data += "    Payload: %s\n" % payload
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
@@ -369,7 +372,7 @@ def start():
                 parameters = conf.parameters.keys()
 
                 # Order of testing list (first to last)
-                orderList = (PLACE.CUSTOM_POST, PLACE.URI, PLACE.POST, PLACE.GET)
+                orderList = (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER, PLACE.URI, PLACE.POST, PLACE.GET)
 
                 for place in orderList[::-1]:
                     if place in parameters:
@@ -377,7 +380,6 @@ def start():
                         parameters.insert(0, place)
 
                 proceed = True
-
                 for place in parameters:
                     # Test User-Agent and Referer headers only if
                     # --level >= 3
@@ -444,15 +446,15 @@ def start():
                             logger.info(infoMsg)
 
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
-                                check = checkDynParam(place, parameter, value)
+                            check = checkDynParam(place, parameter, value)
 
-                                if not check:
-                                    warnMsg = "%s parameter '%s' does not appear dynamic" % (place, parameter)
-                                    logger.warn(warnMsg)
+                            if not check:
+                                warnMsg = "%s parameter '%s' does not appear dynamic" % (place, parameter)
+                                logger.warn(warnMsg)
 
-                                else:
-                                    infoMsg = "%s parameter '%s' is dynamic" % (place, parameter)
-                                    logger.info(infoMsg)
+                            else:
+                                infoMsg = "%s parameter '%s' is dynamic" % (place, parameter)
+                                logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
 

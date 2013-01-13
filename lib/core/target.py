@@ -147,10 +147,10 @@ def _setRequestParams():
         elif test[0] in ("q", "Q"):
             raise SqlmapUserQuitException
 
-    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data)):
+    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, re.sub(r"\bq=[^;']+", "", str(conf.httpHeaders)))):
         if CUSTOM_INJECTION_MARK_CHAR in (value or ""):
             if kb.processUserMarks is None:
-                _ = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data'}
+                _ = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer'}
                 message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
                 message += "'%s'. Do you want to process it? [Y/n/q] " % _[place]
                 test = readInput(message, default="Y")
@@ -170,21 +170,28 @@ def _setRequestParams():
                             conf.url = conf.url.split('?')[0]
                             conf.paramDict[PLACE.GET] = paramDict
                             testableParameters = True
-                continue
+            else:
+                conf.parameters[place] = value
+                conf.paramDict[place] = OrderedDict()
 
-            conf.parameters[place] = value
-            conf.paramDict[place] = OrderedDict()
-            parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
+                if place == PLACE.CUSTOM_HEADER:
+                    for index in xrange(len(conf.httpHeaders)):
+                        header, value = conf.httpHeaders[index]
+                        if CUSTOM_INJECTION_MARK_CHAR in re.sub(r"\bq=[^;']+", "", value):
+                            conf.paramDict[place][header] = "%s,%s" % (header, value)
+                            conf.httpHeaders[index] = (header, value.replace(CUSTOM_INJECTION_MARK_CHAR, ""))
+                else:
+                    parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
 
-            for i in xrange(len(parts) - 1):
-                conf.paramDict[place]["%s#%d%s" % (("%s " % kb.postHint) if kb.postHint else "", i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
+                    for i in xrange(len(parts) - 1):
+                        conf.paramDict[place]["%s#%d%s" % (("%s " % kb.postHint) if kb.postHint else "", i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
 
-            if place == PLACE.URI and PLACE.GET in conf.paramDict:
-                del conf.paramDict[PLACE.GET]
-            elif place == PLACE.CUSTOM_POST and PLACE.POST in conf.paramDict:
-                del conf.paramDict[PLACE.POST]
+                    if place == PLACE.URI and PLACE.GET in conf.paramDict:
+                        del conf.paramDict[PLACE.GET]
+                    elif place == PLACE.CUSTOM_POST and PLACE.POST in conf.paramDict:
+                        del conf.paramDict[PLACE.POST]
 
-            testableParameters = True
+                testableParameters = True
 
     if kb.processUserMarks:
         conf.url = conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, "")

@@ -64,6 +64,7 @@ class PLACE:
     REFERER = "Referer"
     HOST = "Host"
     CUSTOM_POST = "(custom) POST"
+    CUSTOM_HEADER = "(custom) HEADER"
 
 class POST_HINT:
     SOAP = "SOAP"

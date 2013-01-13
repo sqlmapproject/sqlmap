@@ -617,7 +617,6 @@ class Connect(object):
                     else:
                         payload = json.dumps(payload)[1:-1]
                 value = agent.replacePayload(value, payload)
-
             else:
                 if not skipUrlEncode and place in (PLACE.GET, PLACE.COOKIE, PLACE.URI):
                     # GET, URI and Cookie need to be throughly URL encoded (POST is encoded down below)
@@ -685,6 +684,11 @@ class Connect(object):
             uri = conf.url if place != PLACE.URI or not value else value
         else:
             uri = conf.url
+
+        if place == PLACE.CUSTOM_HEADER:
+            if not auxHeaders:
+                auxHeaders = {}
+            auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
 
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):
