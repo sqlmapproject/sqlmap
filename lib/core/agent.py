@@ -380,7 +380,7 @@ class Agent(object):
             nulledCastedConcatFields = fields
         else:
             fields = fields.replace(", ", ',')
-            commas = [0, len(fields)]
+            commas = [-1, len(fields)]
             depth = 0
             for index in xrange(len(fields)):
                 char = fields[index]
@@ -391,7 +391,7 @@ class Agent(object):
                 elif depth == 0 and char == ',':
                     commas.append(index)
             commas = sorted(commas)
-            fieldsSplitted = [fields[x:y].strip(",") for (x, y) in zip(commas, commas[1:])]
+            fieldsSplitted = [fields[x + 1:y] for (x, y) in zip(commas, commas[1:])]
             dbmsDelimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
             nulledCastedFields = []
 
