@@ -130,7 +130,7 @@ class Agent(object):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
             retVal = paramString.replace("%s=%s" % (parameter, origValue),
-                                           "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
+                                         "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
 
         return retVal
 
@@ -391,7 +391,7 @@ class Agent(object):
                 elif depth == 0 and char == ',':
                     commas.append(index)
             commas = sorted(commas)
-            fieldsSplitted = [fields[x:y] for (x, y) in zip(commas, commas[1:])]
+            fieldsSplitted = [fields[x:y].strip(",") for (x, y) in zip(commas, commas[1:])]
             dbmsDelimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
             nulledCastedFields = []
 
