@@ -1079,20 +1079,19 @@
             <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
         </parse>
     </case>
-    <!-- TODO:
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given tables">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
-            <tbl value="users,plugin"/>
+            <tbl value="users,sql_parts"/>
             <col value="name"/>
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+surname'"/>
-            <item value="r'Database: mysql.+Table: plugin.+1 column.+name'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - column given tables">
@@ -1101,13 +1100,13 @@
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
-            <tbl value="users,plugin"/>
+            <tbl value="users,sql_parts"/>
             <col value="name"/>
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
-            <item value="r'Database: mysql.+Table: plugin.+1 column.+name.+char\(64\)'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+bpchar.+surname.+bpchar'"/>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - column given tables">
@@ -1116,13 +1115,13 @@
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
-            <tbl value="users,plugin"/>
+            <tbl value="users,sql_parts"/>
             <col value="name"/>
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
-            <item value="r'Database: mysql.+Table: plugin.+1 column.+name.+char\(64\)'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+bpchar.+surname.+bpchar'"/>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given databases and table">
@@ -1131,13 +1130,14 @@
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
-            <db value="mysql,testdb"/>
-            <tbl value="users"/>
+            <db value="public,information_schema"/>
+            <tbl value="users,sql_parts"/>
             <col value="name"/>
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+surname'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - column given databases and table">
@@ -1146,13 +1146,14 @@
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
-            <db value="mysql,testdb"/>
-            <tbl value="users"/>
+            <db value="public,information_schema"/>
+            <tbl value="users,sql_parts"/>
             <col value="name"/>
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+bpchar.+surname.+bpchar'"/>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - column given databases and table">
@@ -1161,16 +1162,16 @@
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
-            <db value="mysql,testdb"/>
-            <tbl value="users"/>
+            <db value="public,information_schema"/>
+            <tbl value="users,sql_parts"/>
             <col value="name"/>
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+bpchar.+surname.+bpchar'"/>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
-    -->
     <!-- End of search enumeration switches -->
 
     <!-- User's provided statement enumeration switches -->
@@ -1232,6 +1233,75 @@
     <case name="MySQL UNION query multi-threaded custom ordered SQL query enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blissett.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+
+
+    <case name="PostgreSQL boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users LIMIT 0, 2"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users LIMIT 0, 2"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users LIMIT 0, 2"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
