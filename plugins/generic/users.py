@@ -347,7 +347,7 @@ class Users:
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if not kb.data.cachedUsersPrivileges and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -423,9 +423,6 @@ class Users:
                                     i += 1
 
                                 privileges.add(privilege)
-
-                    if isAdminFromPrivileges(privileges):
-                        areAdmins.add(user)
 
                     if user in kb.data.cachedUsersPrivileges:
                         kb.data.cachedUsersPrivileges[user] = list(privileges.union(kb.data.cachedUsersPrivileges[user]))
@@ -564,9 +561,6 @@ class Users:
 
                         privileges.add(privilege)
 
-                    if isAdminFromPrivileges(privileges):
-                        areAdmins.add(user)
-
                     # In MySQL < 5.0 we break the cycle after the first
                     # time we get the user's privileges otherwise we
                     # duplicate the same query
@@ -586,6 +580,10 @@ class Users:
             errMsg = "unable to retrieve the privileges "
             errMsg += "for the database users"
             raise SqlmapNoneDataException(errMsg)
+
+        for user, privileges in kb.data.cachedUsersPrivileges.items():
+            if isAdminFromPrivileges(privileges):
+                areAdmins.add(user)
 
         return (kb.data.cachedUsersPrivileges, areAdmins)
 
