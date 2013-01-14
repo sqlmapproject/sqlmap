@@ -1242,17 +1242,15 @@
             <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blissett.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
-
-
     <case name="PostgreSQL boolean-based multi-threaded custom SQL query enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
-            <query value="SELECT * FROM users LIMIT 0, 2"/>
+            <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based multi-threaded custom SQL query enumeration">
@@ -1260,10 +1258,10 @@
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
-            <query value="SELECT * FROM users LIMIT 0, 2"/>
+            <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query multi-threaded custom SQL query enumeration">
@@ -1271,10 +1269,10 @@
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
-            <query value="SELECT * FROM users LIMIT 0, 2"/>
+            <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="PostgreSQL boolean-based multi-threaded custom ordered SQL query enumeration">
@@ -1360,6 +1358,56 @@
             <item value="the remote file /tmp/passwd-${random} is larger than the local file /etc/passwd" console_output="True"/>
         </parse>
     </case>
+    <case name="PostgreSQL boolean-based multi-threaded file read">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="BS"/>
+            <timeSec value="2"/>
+            <rFile value="/etc/hosts,/tmp/invalidfile"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="r'files saved to.+files/_etc_hosts \(same file\)'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded file read">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="ES"/>
+            <rFile value="/etc/hosts,/tmp/invalidfile"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="r'files saved to.+files/_etc_hosts \(same file\)'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded file read">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="US"/>
+            <rFile value="/etc/hosts,/tmp/invalidfile"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="r'files saved to.+files/_etc_hosts \(same file\)'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL multi-threaded file write">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <wFile value="/etc/passwd"/>
+            <dFile value="/tmp/passwd-${random}"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="the local file /etc/passwd and the remote file /tmp/passwd-${random} have the same size" console_output="True"/>
+        </parse>
+    </case>
     <!-- End of file system access switches -->
 
     <!-- Operating system access switches -->
@@ -1374,20 +1422,41 @@
             <item value="command standard output:    'uid="/>
         </parse>
     </case>
-    <!-- TODO: integration with Metasploit cannot be called yet from live testing
     <case name="MySQL shell via Metasploit integration - command execution">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
-            <tech value="B"/>
+            <tech value="BU"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
-            <answers value="please provide any additional web server=/var/www/test"/>
+            <answers value="please provide any additional web server=/var/www/test,do you want to overwrite it=Y"/>
         </switches>
         <parse>
-            <item value="r'Sending stage.+Command shell session.+Linux.+uid='"/>
+            <item value="r'Sending stage.+Linux.+uid=.+www-data'" console_output="True"/>
         </parse>
     </case>
-    -->
+    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <tech value="US"/>
+            <osCmd value="id"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="command standard output:    'uid="/>
+        </parse>
+    </case>
+    <case name="PostgreSQL shell via Metasploit integration - command execution">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <tech value="US"/>
+            <osPwn value="True"/>
+            <msfPath value="/usr/local/bin/"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="r'Sending stage.+Linux.+uid=.+postgres'" console_output="True"/>
+        </parse>
+    </case>
     <!-- End of operating system access switches -->
 
     <!-- Technique switches and corner cases -->

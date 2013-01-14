@@ -444,6 +444,7 @@ class Metasploit:
 
     def _controlMsfCmd(self, proc, func):
         stdin_fd = sys.stdin.fileno()
+        initiated_properly = False
 
         while True:
             returncode = proc.poll()
@@ -493,6 +494,14 @@ class Metasploit:
                 out = recv_some(proc, t=.1, e=0)
                 blockingWriteToFD(sys.stdout.fileno(), out)
 
+                # Dirty hack to allow Metasploit integration to be tested
+                # in --live-test mode
+                if initiated_properly and conf.liveTest:
+                    try:
+                        send_all(proc, "exit\n")
+                    except TypeError:
+                        continue
+
                 # For --os-pwn and --os-bof
                 pwnBofCond = self.connectionStr.startswith("reverse")
                 pwnBofCond &= "Starting the payload handler" in out
@@ -508,6 +517,9 @@ class Metasploit:
                         send_all(proc, "whoami\n")
                     else:
                         send_all(proc, "uname -a ; id\n")
+
+                    time.sleep(2)
+                    initiated_properly = True
 
                 metSess = re.search("Meterpreter session ([\d]+) opened", out)
 

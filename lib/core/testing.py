@@ -10,7 +10,6 @@ import doctest
 import os
 import re
 import shutil
-import StringIO
 import sys
 import tempfile
 import time
@@ -172,18 +171,20 @@ def liveTest():
             logger.info("test passed")
             cleanCase()
         else:
-            errMsg = "test failed"
-            if failedItem:
-                errMsg += " at parsing item: %s - scan folder is %s" % (failedItem, paths.SQLMAP_OUTPUT_PATH)
-                console_output_fd = codecs.open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
-                console_output_fd.write(failedParseOn)
-                console_output_fd.close()
-            elif failedTraceBack:
-                errMsg += ": got a traceback - scan folder is %s" % paths.SQLMAP_OUTPUT_PATH
+            errMsg = "test failed "
+            if failedTraceBack:
+                errMsg += "(got a traceback)"
                 traceback_fd = codecs.open("%s%straceback" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
                 traceback_fd.write(failedTraceBack)
                 traceback_fd.close()
+            if failedItem:
+                errMsg += "at parsing item: %s" % failedItem
+            if failedParseOn:
+                console_output_fd = codecs.open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
+                console_output_fd.write(failedParseOn)
+                console_output_fd.close()
 
+            errMsg += " - scan folder is %s" % paths.SQLMAP_OUTPUT_PATH
             logger.error(errMsg)
             beep()
 
@@ -217,7 +218,6 @@ def initCase(switches=None):
     logger.debug("using output directory '%s' for this test case" % paths.SQLMAP_OUTPUT_PATH)
 
     cmdLineOptions = cmdLineParser()
-    cmdLineOptions.liveTest = cmdLineOptions.smokeTest = False
 
     if switches:
         for key, value in switches.items():
@@ -236,7 +236,7 @@ def runCase(switches=None, parse=None):
 
     initCase(switches)
 
-    LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
+    LOGGER_HANDLER.stream = sys.stdout = tempfile.SpooledTemporaryFile(max_size=0, mode="w+b", prefix="sqlmapstdout-")
     retVal = True
     handled_exception = None
     unhandled_exception = None
@@ -269,8 +269,9 @@ def runCase(switches=None, parse=None):
         logger.error("the test did not run")
         retVal = False
 
+    console = getUnicode(console, system=True)
+
     if parse and retVal:
-        console = getUnicode(console, system=True)
         with codecs.open(conf.dumper.getOutputFile(), "rb", UNICODE_ENCODING) as f:
             content = f.read()
 
@@ -292,6 +293,7 @@ def runCase(switches=None, parse=None):
             failedParseOn = console
 
     elif retVal is False and tback is not None:
+        failedParseOn = console
         failedTraceBack = tback
 
     return retVal
