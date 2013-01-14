@@ -26,6 +26,7 @@ from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.exception import SqlmapBaseException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.optiondict import optDict
@@ -34,6 +35,7 @@ from lib.parse.cmdline import cmdLineParser
 
 failedItem = None
 failedParseOn = None
+failedTraceBack = None
 
 def smokeTest():
     """
@@ -106,6 +108,7 @@ def liveTest():
     """
     global failedItem
     global failedParseOn
+    global failedTraceBack
 
     retVal = True
     count = 0
@@ -160,7 +163,7 @@ def liveTest():
 
                 parse.append((value, console_output))
 
-        msg = "running live test case '%s' (%d/%d)" % (name, count, length)
+        msg = "running live test case: %s (%d/%d)" % (name, count, length)
         logger.info(msg)
 
         result = runCase(switches, parse)
@@ -169,12 +172,17 @@ def liveTest():
             logger.info("test passed")
             cleanCase()
         else:
-            errMsg = "test failed "
+            errMsg = "test failed"
             if failedItem:
-                errMsg += "at parsing item: %s - scan folder is %s" % (failedItem, paths.SQLMAP_OUTPUT_PATH)
+                errMsg += " at parsing item: %s - scan folder is %s" % (failedItem, paths.SQLMAP_OUTPUT_PATH)
                 console_output_fd = codecs.open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
                 console_output_fd.write(failedParseOn)
                 console_output_fd.close()
+            elif failedTraceBack:
+                errMsg += ": got a traceback - scan folder is %s" % paths.SQLMAP_OUTPUT_PATH
+                traceback_fd = codecs.open("%s%straceback" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
+                traceback_fd.write(failedTraceBack)
+                traceback_fd.close()
 
             logger.error(errMsg)
             beep()
@@ -196,8 +204,11 @@ def liveTest():
 def initCase(switches=None):
     global failedItem
     global failedParseOn
+    global failedTraceBack
+
     failedItem = None
     failedParseOn = None
+    failedTraceBack = None
 
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-")
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
@@ -221,28 +232,38 @@ def cleanCase():
 def runCase(switches=None, parse=None):
     global failedItem
     global failedParseOn
+    global failedTraceBack
 
     initCase(switches)
 
     LOGGER_HANDLER.stream = sys.stdout = StringIO.StringIO()
     retVal = True
-    exception = None
+    handled_exception = None
+    unhandled_exception = None
     result = False
     console = ""
+    tback = None
 
     try:
         result = start()
     except KeyboardInterrupt:
         raise
+    except SqlmapBaseException, e:
+        print "AHAHAHAH:", e
+        handled_exception = e
     except Exception, e:
-        exception = e
+        unhandled_exception = e
     finally:
         sys.stdout.seek(0)
         console = sys.stdout.read()
         LOGGER_HANDLER.stream = sys.stdout = sys.__stdout__
 
-    if exception:
-        logger.error("unhandled exception occurred ('%s')" % str(exception))
+    if unhandled_exception:
+        logger.error("unhandled exception occurred")
+        tback = traceback.format_exc()
+        retVal = False
+    elif handled_exception:
+        logger.error("handled exception occurred")
         tback = traceback.format_exc()
         retVal = False
     elif result is False:  # if None, ignore
@@ -270,6 +291,9 @@ def runCase(switches=None, parse=None):
 
         if failedItem is not None:
             failedParseOn = console
+
+    elif retVal is False and tback is not None:
+        failedTraceBack = tback
 
     return retVal
 
