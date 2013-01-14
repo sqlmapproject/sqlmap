@@ -14,7 +14,7 @@ class xrange(object):
     __slots__ = ['_slice']
 
     def __init__(self, *args):
-        if args and isinstance(args[0], xrange):
+        if args and isinstance(args[0], type(self)):
             self._slice = slice(args[0].start, args[0].stop, args[0].step)
         else:
             self._slice = slice(*args)
