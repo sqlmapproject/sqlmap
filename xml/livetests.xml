@@ -47,7 +47,7 @@
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
@@ -91,7 +91,7 @@
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
@@ -135,7 +135,7 @@
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
@@ -179,7 +179,7 @@
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
@@ -237,7 +237,7 @@
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
-            <item value="r'database management system users roles:.+debian-sys-maint.+\[.+root.+\[.+role: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
             <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
@@ -282,7 +282,7 @@
             <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
             <item value="r'available databases \[.+template0.+template1.+testdb'"/>
             <item value="r'Database: public.+1 table.+users'"/>
-            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+surname.+bpchar'"/>
             <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
             <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
@@ -325,7 +325,7 @@
             <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
             <item value="r'available databases \[.+template0.+template1.+testdb'"/>
             <item value="r'Database: public.+1 table.+users'"/>
-            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+surname.+bpchar'"/>
             <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
             <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
@@ -368,7 +368,7 @@
             <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
             <item value="r'available databases \[.+template0.+template1.+testdb'"/>
             <item value="r'Database: public.+1 table.+users'"/>
-            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+surname.+bpchar'"/>
             <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
             <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
@@ -411,7 +411,7 @@
             <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
             <item value="r'available databases \[.+template0.+template1.+testdb'"/>
             <item value="r'Database: public.+1 table.+users'"/>
-            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+surname.+bpchar'"/>
             <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
             <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
@@ -468,7 +468,7 @@
             <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
             <item value="r'available databases \[.+template0.+template1.+testdb'"/>
             <item value="r'Database: public.+1 table.+users'"/>
-            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+surname.+bpchar'"/>
             <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
             <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
@@ -1334,7 +1334,7 @@
             <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
         </parse>
     </case>
-    <case name="MySQL OR boolean-base multi-threaded enumeration">
+    <case name="MySQL OR boolean-based multi-threaded enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
