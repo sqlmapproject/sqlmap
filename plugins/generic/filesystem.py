@@ -40,9 +40,6 @@ class Filesystem:
             lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % remoteFile
 
         elif Backend.isDbms(DBMS.PGSQL):
-            if fileRead:
-                lengthQuery = True
-            else:
                 lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
 
         elif Backend.isDbms(DBMS.MSSQL):
@@ -53,32 +50,36 @@ class Filesystem:
 
         localFileSize = os.path.getsize(localFile)
 
-        logger.debug("checking the length of the remote file %s" % remoteFile)
-        remoteFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-        sameFile = None
-
-        if isNumPosStrValue(remoteFileSize):
-            remoteFileSize = long(remoteFileSize)
-            sameFile = False
-
-            if localFileSize == remoteFileSize:
-                sameFile = True
-                infoMsg = "the local file %s and the remote file " % localFile
-                infoMsg += "%s have the same size" % remoteFile
-            elif remoteFileSize > localFileSize:
-                infoMsg = "the remote file %s is larger than " % remoteFile
-                infoMsg += "the local file %s" % localFile
-            else:
-                infoMsg = "the remote file %s is smaller than " % remoteFile
-                infoMsg += "file '%s' (%d bytes)" % (localFile, localFileSize)
-
-            logger.info(infoMsg)
+        if fileRead and Backend.isDbms(DBMS.PGSQL):
+            logger.info("length of read file %s cannot be checked on PostgreSQL" % remoteFile)
+            sameFile = True
         else:
-            sameFile = False
-            warnMsg = "it looks like the file has not been written, this "
-            warnMsg += "can occur if the DBMS process' user has no write "
-            warnMsg += "privileges in the destination path"
-            logger.warn(warnMsg)
+            logger.debug("checking the length of the remote file %s" % remoteFile)
+            remoteFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            sameFile = None
+
+            if isNumPosStrValue(remoteFileSize):
+                remoteFileSize = long(remoteFileSize)
+                sameFile = False
+
+                if localFileSize == remoteFileSize:
+                    sameFile = True
+                    infoMsg = "the local file %s and the remote file " % localFile
+                    infoMsg += "%s have the same size" % remoteFile
+                elif remoteFileSize > localFileSize:
+                    infoMsg = "the remote file %s is larger than " % remoteFile
+                    infoMsg += "the local file %s" % localFile
+                else:
+                    infoMsg = "the remote file %s is smaller than " % remoteFile
+                    infoMsg += "file '%s' (%d bytes)" % (localFile, localFileSize)
+
+                logger.info(infoMsg)
+            else:
+                sameFile = False
+                warnMsg = "it looks like the file has not been written, this "
+                warnMsg += "can occur if the DBMS process' user has no write "
+                warnMsg += "privileges in the destination path"
+                logger.warn(warnMsg)
 
         return sameFile
 
