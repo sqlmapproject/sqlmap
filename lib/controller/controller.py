@@ -41,7 +41,7 @@ from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
-from lib.core.exception import exceptionsTuple
+from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSilentQuitException
@@ -591,7 +591,7 @@ def start():
         except SqlmapSilentQuitException:
             raise
 
-        except exceptionsTuple, e:
+        except SqlmapBaseException, e:
             e = getUnicode(e)
 
             if conf.multipleTargets:

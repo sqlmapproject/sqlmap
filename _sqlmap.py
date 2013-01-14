@@ -27,7 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.common import unhandledExceptionMessage
-from lib.core.exception import exceptionsTuple
+from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import init
@@ -79,7 +79,7 @@ def main():
     except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
 
-    except exceptionsTuple, e:
+    except SqlmapBaseException, e:
         e = getUnicode(e)
         logger.critical(e)
         sys.exit(1)
