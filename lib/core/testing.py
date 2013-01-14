@@ -249,7 +249,6 @@ def runCase(switches=None, parse=None):
     except KeyboardInterrupt:
         raise
     except SqlmapBaseException, e:
-        print "AHAHAHAH:", e
         handled_exception = e
     except Exception, e:
         unhandled_exception = e
