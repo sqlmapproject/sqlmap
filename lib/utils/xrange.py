@@ -45,7 +45,7 @@ class xrange(object):
                 cmp(self._slice, other._slice))
 
     def __repr__(self):
-        return '%s(%r, %r, %r)' % (self.__class__.__name__,
+        return '%s(%r, %r, %r)' % (type(self).__name__,
                                    self.start, self.stop, self.step)
 
     def __len__(self):
