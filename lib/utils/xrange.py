@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 class xrange(object):
     """
-    Advanced implementation of xrange (supports slice/copy/etc.)
+    Advanced (re)implementation of xrange (supports slice/copy/etc.)
     Reference: http://code.activestate.com/recipes/521885-a-pythonic-implementation-of-xrange/
     """
 
