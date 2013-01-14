@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+
+"""
+Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
+See the file 'doc/COPYING' for copying permission
+"""
+
 class xrange(object):
     """
     Advanced implementation of xrange (supports slice/copy/etc.)
@@ -47,11 +54,7 @@ class xrange(object):
         return self._len()
 
     def _len(self):
-        try:
-            return max(0, int((self.stop - self.start) / self.step))
-        except Exception, ex:
-            import pdb
-            pdb.set_trace()
+        return max(0, int((self.stop - self.start) / self.step))
 
     def __getitem__(self, index):
         if isinstance(index, slice):
