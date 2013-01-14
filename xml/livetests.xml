@@ -7,6 +7,8 @@
     <global>
         <ignoreProxy value="True"/>
         <batch value="True"/>
+        <flushSession value="True"/>
+        <disableColoring value="True"/>
         <verbose value="1"/>
     </global>
     <!-- Common enumeration switches across all techniques -->
@@ -243,6 +245,234 @@
             <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <case name="PostgreSQL boolean-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
+            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user:    'postgres'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+postgres'"/>
+            <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4.+clear-text password: testpass'"/>
+            <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
+            <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
+            <item value="r'available databases \[.+template0.+template1.+testdb'"/>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: PostgreSQL AND error-based - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
+            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user:    'postgres'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+postgres'"/>
+            <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
+            <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
+            <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
+            <item value="r'available databases \[.+template0.+template1.+testdb'"/>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
+            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user:    'postgres'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+postgres'"/>
+            <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
+            <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
+            <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
+            <item value="r'available databases \[.+template0.+template1.+testdb'"/>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL partial UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
+            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user:    'postgres'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+postgres'"/>
+            <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
+            <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
+            <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
+            <item value="r'available databases \[.+template0.+template1.+testdb'"/>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL time-based single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
+            <tech value="T"/>
+            <timeSec value="2"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: PostgreSQL &gt; 8.1 AND time-based blind"/>
+            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL inline queries multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_inline.php?id=1"/>
+            <threads value="4"/>
+            <tech value="Q"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: PostgreSQL inline queries"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
+            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user:    'postgres'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+postgres'"/>
+            <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
+            <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
+            <item value="r'database management system users roles:.+postgres.+\(administrator\).+role: super'"/>
+            <item value="r'available databases \[.+template0.+template1.+testdb'"/>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'Database: public.+Table: users.+3 columns.+id.+int4.+username.+bpchar'"/>
+            <item value="r'Database: public.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
     <!-- End of common enumeration switches across all techniques -->
 
     <!-- Custom enumeration switches -->
@@ -295,6 +525,57 @@
         </switches>
         <parse>
             <item value="r'Database: testdb.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+Table: users.+3 columns.+surname.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+Table: users.+3 columns.+surname.+bpchar'"/>
+            <item value="r'Database: public.+Table: users.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
     <!-- End of custom enumeration switches -->
@@ -594,6 +875,302 @@
             <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
         </parse>
     </case>
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="te"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] template0.+\[\*\] testdb'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="te"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] template0.+\[\*\] testdb'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="te"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] template0.+\[\*\] testdb'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="public"/>
+            <tbl value="foo,se,bar"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="public"/>
+            <tbl value="foo,se,bar"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="public"/>
+            <tbl value="foo,se,bar"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+1 table.+users'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: pg_catalog.+1 table.+pg_user_mapping.+Database: public.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: pg_catalog.+1 table.+pg_user_mapping.+Database: public.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: pg_catalog.+1 table.+pg_user_mapping.+Database: public.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <col value="name"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <col value="name"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+bpchar.+surname.+bpchar'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <col value="name"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+bpchar.+surname.+bpchar'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="information_schema,public"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="information_schema,public"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="information_schema,public"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
+            <item value="r'Database: public.+Table: users.+2 columns.+name.+surname'"/>
+        </parse>
+    </case>
+    <!-- TODO:
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users,plugin"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+surname'"/>
+            <item value="r'Database: mysql.+Table: plugin.+1 column.+name'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <tbl value="users,plugin"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: mysql.+Table: plugin.+1 column.+name.+char\(64\)'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="users,plugin"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: mysql.+Table: plugin.+1 column.+name.+char\(64\)'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="mysql,testdb"/>
+            <tbl value="users"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+surname'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="mysql,testdb"/>
+            <tbl value="users"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="mysql,testdb"/>
+            <tbl value="users"/>
+            <col value="name"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+Table: users.+2 columns.+name.+varchar\(500\).+surname.+varchar\(1000\)'"/>
+        </parse>
+    </case>
+    -->
     <!-- End of search enumeration switches -->
 
     <!-- User's provided statement enumeration switches -->
