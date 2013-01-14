@@ -48,6 +48,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
+from lib.utils.xrange import xrange
 
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
@@ -197,9 +198,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 return result
 
             if charTbl is None:
-                charTbl = list(asciiTbl)
+                charTbl = type(asciiTbl)(asciiTbl)
 
-            originalTbl = list(charTbl)
+            originalTbl = type(asciiTbl)(charTbl)
 
             if continuousOrder and shiftTable is None:
                 # Used for gradual expanding into unicode charspace
@@ -269,7 +270,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             # list
                             if expand and shiftTable:
                                 charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
-                                originalTbl = list(charTbl)
+                                originalTbl = xrange(charTbl)
                                 maxChar = maxValue = charTbl[-1]
                                 minChar = minValue = charTbl[0]
                             else:
