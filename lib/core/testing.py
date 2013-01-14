@@ -172,7 +172,7 @@ def liveTest():
             errMsg = "test failed "
             if failedItem:
                 errMsg += "at parsing item: %s - scan folder is %s" % (failedItem, paths.SQLMAP_OUTPUT_PATH)
-                console_output_fd = open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb")
+                console_output_fd = codecs.open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
                 console_output_fd.write(failedParseOn)
                 console_output_fd.close()
 
