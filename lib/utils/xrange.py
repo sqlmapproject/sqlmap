@@ -19,8 +19,6 @@ class xrange(object):
         else:
             self._slice = slice(*args)
         if self._slice.stop is None:
-            # slice(*args) will never put None in stop unless it was
-            # given as None explicitly.
             raise TypeError("xrange stop must not be None")
         
     @property
