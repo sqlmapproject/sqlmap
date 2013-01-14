@@ -347,7 +347,10 @@
             <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
-        <search_table/>
+        <search_table>
+            <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table' AND " condition="tbl_name" condition2=""/>
+            <blind query="" query2="SELECT tbl_name FROM sqlite_master WHERE type='table'" count="" count2="SELECT COUNT(tbl_name) FROM sqlite_master WHERE type='table'" condition="tbl_name" condition2=""/>
+        </search_table>
         <search_column/>
     </dbms>
 
