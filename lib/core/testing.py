@@ -292,9 +292,10 @@ def runCase(switches=None, parse=None):
         if failedItem is not None:
             failedParseOn = console
 
-    elif retVal is False and tback is not None:
+    elif retVal is False:
         failedParseOn = console
-        failedTraceBack = tback
+        if tback:
+            failedTraceBack = tback
 
     return retVal
 
