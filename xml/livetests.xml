@@ -956,6 +956,57 @@
             <item value="r'Database: public.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
+    <case name="Oracle error-based multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+        </parse>
+    </case>
     <case name="SQLite UNION query multi-threaded custom enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
