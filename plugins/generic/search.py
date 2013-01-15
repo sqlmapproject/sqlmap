@@ -91,7 +91,7 @@ class Search:
                         value = safeSQLIdentificatorNaming(value)
                         foundDbs.append(value)
             else:
-                infoMsg = "fetching number of databases"
+                infoMsg = "fetching number of database"
                 if dbConsider == "1":
                     infoMsg += "s like"
                 infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(db)
