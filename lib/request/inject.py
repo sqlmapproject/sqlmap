@@ -75,7 +75,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     if not (timeBasedCompare and kb.dnsTest):
-        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
+        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not timeBasedCompare:
             length = queryOutputLength(expression, payload)
         else:
             length = None

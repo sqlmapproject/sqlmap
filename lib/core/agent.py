@@ -891,9 +891,6 @@ class Agent(object):
         else:
             query = expression
 
-        if (select and re.search("\A(COUNT|LTRIM)\(", query, re.I)) or len(query) <= 1:
-            return query
-
         if selectDistinctExpr:
             lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % query, expression)
 
