@@ -76,7 +76,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
 
     if not (timeBasedCompare and kb.dnsTest):
         if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not timeBasedCompare:
-            if field:
+            if field and conf.hexConvert:
                 nulledCastedField = agent.nullAndCastField(field)
                 injExpression = expression.replace(field, nulledCastedField, 1)
             else:
