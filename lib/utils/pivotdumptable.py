@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from extra.safe2bin.safe2bin import safechardecode
+from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import isNoneValue
@@ -101,9 +102,9 @@ def pivotDumpTable(table, colList, count=None, blind=True):
             for column in colList:
                 def _(pivotValue):
                     if column == colList[0]:
-                        query = dumpNode.query.replace("'%s'", "%s") % (column, table, column, unescaper.unescape(pivotValue, False))
+                        query = dumpNode.query.replace("'%s'", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, column), unescaper.unescape(pivotValue, False))
                     else:
-                        query = dumpNode.query2.replace("'%s'", "%s") % (column, table, colList[0], unescaper.unescape(pivotValue, False))
+                        query = dumpNode.query2.replace("'%s'", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]), unescaper.unescape(pivotValue, False))
 
                     return unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))
 

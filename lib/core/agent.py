@@ -15,10 +15,12 @@ from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
+from lib.core.dicts import DUMP_DATA_PREPROCESS
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
@@ -462,6 +464,25 @@ class Agent(object):
     def simpleConcatenate(self, first, second):
         rootQuery = queries[Backend.getIdentifiedDbms()]
         return rootQuery.concatenate.query % (first, second)
+
+    def preprocessField(self, table, field):
+        """
+        Does a field preprocessing (if needed) based on it's type (e.g. image to text)
+        Note: used primarily in dumping of custom tables
+        """
+
+        retVal = field
+        if conf.db in table:
+            table = table.split(conf.db)[-1].strip('.')
+        try:
+            columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(table, True)]
+            for name, type_ in columns.items():
+                if type_ and type_.upper() in DUMP_DATA_PREPROCESS.get(Backend.getDbms(), {}) and name == field:
+                    retVal = DUMP_DATA_PREPROCESS[Backend.getDbms()][type_.upper()] % name
+                    break
+        except KeyError:
+            pass
+        return retVal
 
     def concatQuery(self, query, unpack=True):
         """

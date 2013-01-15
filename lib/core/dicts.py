@@ -205,3 +205,8 @@ POST_HINT_CONTENT_TYPES = {
 DEPRECATED_HINTS = {
                         "--replicate": "use '--dump-format=SQLITE' instead",
                    }
+
+DUMP_DATA_PREPROCESS = {
+                            DBMS.ORACLE: {"XMLTYPE": "(%s).getStringVal()"},  # Reference: https://www.tibcommunity.com/docs/DOC-3643
+                            DBMS.MSSQL: {"IMAGE": "CONVERT(VARBINARY(MAX),%s)"},
+                       }

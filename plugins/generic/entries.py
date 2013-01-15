@@ -5,6 +5,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
+
+from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
@@ -117,16 +120,22 @@ class Entries:
 
                     continue
 
-                colList = sorted(filter(None, kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)].keys()))
-                colString = ", ".join(column for column in colList)
+                columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]
+                colList = sorted(filter(None, columns.keys()))
+                colNames = colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
                 infoMsg = "fetching entries"
                 if conf.col:
-                    infoMsg += " of column(s) '%s'" % colString
+                    infoMsg += " of column(s) '%s'" % colNames
                 infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
+
+                for column in colList:
+                    _ = agent.preprocessField(tbl, column)
+                    if _ != column:
+                        colString = re.sub(r"\b%s\b" % column, _, colString)
 
                 entriesCount = 0
 
@@ -190,7 +199,7 @@ class Entries:
                 if not kb.data.dumpedTable and isInferenceAvailable() and not conf.direct:
                     infoMsg = "fetching number of "
                     if conf.col:
-                        infoMsg += "column(s) '%s' " % colString
+                        infoMsg += "column(s) '%s' " % colNames
                     infoMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
@@ -224,7 +233,7 @@ class Entries:
                     elif not isNumPosStrValue(count):
                         warnMsg = "unable to retrieve the number of "
                         if conf.col:
-                            warnMsg += "column(s) '%s' " % colString
+                            warnMsg += "column(s) '%s' " % colNames
                         warnMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                         logger.warn(warnMsg)
@@ -269,16 +278,16 @@ class Entries:
                                         entries[column] = BigArray()
 
                                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                                        query = rootQuery.blind.query % (column, conf.db, conf.tbl, sorted(colList, key=len)[0], index)
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                                        query = rootQuery.blind.query % (column, column,
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column),
                                                                         tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())),
                                                                         index)
                                     elif Backend.isDbms(DBMS.SQLITE):
-                                        query = rootQuery.blind.query % (column, tbl, index)
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
 
                                     elif Backend.isDbms(DBMS.FIREBIRD):
-                                        query = rootQuery.blind.query % (index, column, tbl)
+                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
 
                                     value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
                                     value = '' if value is None else value
@@ -302,7 +311,7 @@ class Entries:
                 if len(kb.data.dumpedTable) == 0 or (entriesCount == 0 and kb.permissionFlag):
                     warnMsg = "unable to retrieve the entries "
                     if conf.col:
-                        warnMsg += "of columns '%s' " % colString
+                        warnMsg += "of columns '%s' " % colNames
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += "in database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
                     logger.warn(warnMsg)
