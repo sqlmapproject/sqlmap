@@ -1952,8 +1952,8 @@
     </case>
     <!-- End of operating system access switches -->
 
-    <!-- Technique switches and corner cases -->
-    <case name="MySQL 4 time-based against unresponsive page">
+    <!-- Corner cases -->
+    <case name="Time-based (heavy query)">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_benchmark.php?id=1"/>
             <tech value="T"/>
@@ -1966,7 +1966,7 @@
             <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
         </parse>
     </case>
-    <case name="MySQL OR boolean-based multi-threaded enumeration">
+    <case name="OR boolean-based">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
@@ -1981,7 +1981,7 @@
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
-    <case name="MySQL against page protected by custom weak filter">
+    <case name="Page protected by custom (weak) filter">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_filtered.php?id=1"/>
             <tech value="BE"/>
@@ -1992,7 +1992,7 @@
             <item value="Title: MySQL &gt;= 5.1 error-based - Parameter replace (EXTRACTVALUE)"/>
         </parse>
     </case>
-    <case name="MySQL injection in GROUP BY clause">
+    <case name="GROUP BY clause">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_groupby.php?id=1"/>
             <tech value="B"/>
@@ -2002,7 +2002,7 @@
             <item value="MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)"/>
         </parse>
     </case>
-    <case name="MySQL boolean-based multi-threaded enumeration - international data">
+    <case name="International data">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_international.php?id=1"/>
             <threads value="4"/>
@@ -2017,7 +2017,7 @@
             <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+река Москва'"/>
         </parse>
     </case>
-    <case name="MySQL against highly dynamic page">
+    <case name="Highly dynamic page">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_rand.php?id=1"/>
             <timeSec value="2"/>
@@ -2029,7 +2029,7 @@
             <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
         </parse>
     </case>
-    <case name="MySQL against a page that returns a 302 redirect page when SQL statement return no output">
+    <case name="302 redirect page when SQL statement return no output">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_redirected.php?id=1"/>
             <timeSec value="2"/>
@@ -2040,7 +2040,7 @@
             <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
         </parse>
     </case>
-    <case name="MySQL against a page that returns an image">
+    <case name="Page that returns an image">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_img.php?id=1"/>
             <tech value="BT"/>
@@ -2051,7 +2051,7 @@
             <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
         </parse>
     </case>
-    <case name="MySQL against a page that returns a 302 redirect page when SQL statement returns output">
+    <case name="302 redirect page when SQL statement returns output">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_redirected_true.php?id=1"/>
             <tech value="E"/>
@@ -2060,7 +2060,7 @@
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
         </parse>
     </case>
-    <case name="MySQL partial UNION query multi-threaded enumeration - invalid bignum">
+    <case name="Invalid bignum">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <tech value="U"/>
@@ -2075,7 +2075,7 @@
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
-    <case name="MySQL partial UNION query multi-threaded enumeration - invalid logical">
+    <case name="Invalid logical">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <tech value="U"/>
@@ -2090,10 +2090,10 @@
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
-    <!-- End of technique switches -->
+    <!-- End of corner cases -->
 
     <!-- Other switches -->
-    <case name="MySQL error-based HTTP basic authentication">
+    <case name="HTTP basic authentication">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/basic/get_int.php?id=1"/>
             <tech value="E"/>
@@ -2105,7 +2105,7 @@
             <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
-    <case name="MySQL error-based HTTP digest authentication">
+    <case name="HTTP digest authentication">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/digest/get_int.php?id=1"/>
             <tech value="E"/>
@@ -2117,7 +2117,7 @@
             <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
-    <case name="MySQL boolean-based predict output enumeration">
+    <case name="Predict output enumeration">
         <switches>
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
