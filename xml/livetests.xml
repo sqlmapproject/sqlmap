@@ -501,7 +501,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -545,7 +545,7 @@
         <parse>
             <item value="Title: Oracle AND error-based - WHERE or HAVING clause (XMLType)"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -589,7 +589,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -633,7 +633,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -659,7 +659,7 @@
         </switches>
         <parse>
             <item value="Title: Oracle AND time-based blind"/>
-            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -691,7 +691,7 @@
         <parse>
             <item value="Title: Oracle inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
