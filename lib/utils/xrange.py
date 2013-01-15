@@ -7,20 +7,18 @@ See the file 'doc/COPYING' for copying permission
 
 class xrange(object):
     """
-    Advanced implementation of xrange (supports slice/copy/etc.)
+    Advanced (re)implementation of xrange (supports slice/copy/etc.)
     Reference: http://code.activestate.com/recipes/521885-a-pythonic-implementation-of-xrange/
     """
 
     __slots__ = ['_slice']
 
     def __init__(self, *args):
-        if args and isinstance(args[0], xrange):
+        if args and isinstance(args[0], type(self)):
             self._slice = slice(args[0].start, args[0].stop, args[0].step)
         else:
             self._slice = slice(*args)
         if self._slice.stop is None:
-            # slice(*args) will never put None in stop unless it was
-            # given as None explicitly.
             raise TypeError("xrange stop must not be None")
         
     @property
@@ -47,7 +45,7 @@ class xrange(object):
                 cmp(self._slice, other._slice))
 
     def __repr__(self):
-        return '%s(%r, %r, %r)' % (self.__class__.__name__,
+        return '%s(%r, %r, %r)' % (type(self).__name__,
                                    self.start, self.stop, self.step)
 
     def __len__(self):

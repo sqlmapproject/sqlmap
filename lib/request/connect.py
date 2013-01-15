@@ -736,7 +736,9 @@ class Connect(object):
                         else:
                             get += "%s%s=%s" % (delimiter, name, value)
 
-        get = urlencode(get, limit=True)
+        if not skipUrlEncode:
+            get = urlencode(get, limit=True)
+
         if post is not None:
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)

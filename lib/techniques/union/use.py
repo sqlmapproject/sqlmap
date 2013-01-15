@@ -102,7 +102,8 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             trimmed = _("%s(?P<result>.*?)<" % (kb.chars.start))
 
             if trimmed:
-                warnMsg = "possible server trimmed output detected (probably due to its length): "
+                warnMsg = "possible server trimmed output detected "
+                warnMsg += "(probably due to its length and/or content): "
                 warnMsg += safecharencode(trimmed)
                 logger.warn(warnMsg)
 
