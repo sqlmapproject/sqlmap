@@ -193,6 +193,16 @@ class Search:
                 query += whereDbsQuery
                 values = inject.getValue(query, blind=False, time=False)
 
+                if Backend.isDbms(DBMS.SQLITE):
+                    newValues = []
+
+                    if isinstance(values, basestring):
+                        values = [values]
+                    for value in values:
+                        newValues.append(["SQLite_masterdb", value])
+
+                    values = newValues
+
                 for foundDb, foundTbl in filterPairValues(values):
                     foundDb = safeSQLIdentificatorNaming(foundDb)
                     foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
@@ -205,47 +215,50 @@ class Search:
                     else:
                         foundTbls[foundDb] = [foundTbl]
             else:
-                infoMsg = "fetching number of databases with table"
-                if tblConsider == "1":
-                    infoMsg += "s like"
-                infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                logger.info(infoMsg)
-
-                query = rootQuery.blind.count
-                query += tblQuery
-                query += whereDbsQuery
-                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-
-                if not isNumPosStrValue(count):
-                    warnMsg = "no databases have table"
+                if not Backend.isDbms(DBMS.SQLITE):
+                    infoMsg = "fetching number of databases with table"
                     if tblConsider == "1":
-                        warnMsg += "s like"
-                    warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                    logger.warn(warnMsg)
+                        infoMsg += "s like"
+                    infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    logger.info(infoMsg)
 
-                    continue
-
-                indexRange = getLimitRange(count)
-
-                for index in indexRange:
-                    query = rootQuery.blind.query
+                    query = rootQuery.blind.count
                     query += tblQuery
                     query += whereDbsQuery
-                    if Backend.isDbms(DBMS.DB2):
-                        query += ") AS foobar"
-                    query = agent.limitQuery(index, query)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-                    foundDb = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                    foundDb = safeSQLIdentificatorNaming(foundDb)
+                    if not isNumPosStrValue(count):
+                        warnMsg = "no databases have table"
+                        if tblConsider == "1":
+                            warnMsg += "s like"
+                        warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                        logger.warn(warnMsg)
 
-                    if foundDb not in foundTbls:
-                        foundTbls[foundDb] = []
+                        continue
+
+                    indexRange = getLimitRange(count)
+
+                    for index in indexRange:
+                        query = rootQuery.blind.query
+                        query += tblQuery
+                        query += whereDbsQuery
+                        if Backend.isDbms(DBMS.DB2):
+                            query += ") AS foobar"
+                        query = agent.limitQuery(index, query)
+
+                        foundDb = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                        foundDb = safeSQLIdentificatorNaming(foundDb)
+
+                        if foundDb not in foundTbls:
+                            foundTbls[foundDb] = []
+
+                        if tblConsider == "2":
+                            foundTbls[foundDb].append(tbl)
 
                     if tblConsider == "2":
-                        foundTbls[foundDb].append(tbl)
-
-                if tblConsider == "2":
-                    continue
+                        continue
+                else:
+                    foundTbls["SQLite_masterdb"] = []
 
                 for db in foundTbls.keys():
                     db = safeSQLIdentificatorNaming(db)
@@ -257,7 +270,8 @@ class Search:
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
-                    query = query % unsafeSQLIdentificatorNaming(db)
+                    if not Backend.isDbms(DBMS.SQLITE):
+                        query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
@@ -275,7 +289,8 @@ class Search:
 
                     for index in indexRange:
                         query = rootQuery.blind.query2
-                        query = query % unsafeSQLIdentificatorNaming(db)
+                        if not Backend.isDbms(DBMS.SQLITE):
+                            query = query % unsafeSQLIdentificatorNaming(db)
                         query += " AND %s" % tblQuery
                         query = agent.limitQuery(index, query)
 

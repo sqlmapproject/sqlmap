@@ -56,7 +56,7 @@ class Enumeration(GenericEnumeration):
         return []
 
     def searchColumn(self):
-        errMsg = "on SQLite you must specify the table and columns to dump"
+        errMsg = "on SQLite it is not possible to search columns"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def getHostname(self):

@@ -10,6 +10,7 @@
         <flushSession value="True"/>
         <disableColoring value="True"/>
         <verbose value="1"/>
+        <cleanup value="1"/>
     </global>
     <!-- Common enumeration switches across all techniques -->
     <case name="MySQL boolean-based multi-threaded enumeration - all entries">
@@ -48,7 +49,7 @@
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
             <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
-            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
             <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
@@ -92,7 +93,7 @@
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
             <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
-            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
             <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
@@ -136,7 +137,7 @@
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
             <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
-            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
             <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
@@ -180,7 +181,7 @@
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
             <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
-            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
             <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
@@ -238,7 +239,7 @@
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
             <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
-            <item value="r'available databases \[.+information_schema.+mysql.+owasp10.+testdb'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+testdb'"/>
             <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
             <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
@@ -473,6 +474,383 @@
             <item value="r'Database: public.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <case name="Oracle boolean-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user:    'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+clear-text password: CHANGE_ON_INSTALL.+SYS \[.+password hash: 2D5A0C491B634F1B.+clear-text password: TESTPASS'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
+            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
+            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: Oracle AND error-based - WHERE or HAVING clause (XMLType)"/>
+            <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user:    'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
+            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
+            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user:    'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
+            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
+            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Oracle partial UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user:    'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
+            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
+            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Oracle time-based single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int_nooutput.php?id=1"/>
+            <tech value="T"/>
+            <timeSec value="2"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: Oracle AND time-based blind"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
+    <case name="Oracle inline queries multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int_inline.php?id=1"/>
+            <threads value="4"/>
+            <tech value="Q"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="scott"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: Oracle inline queries"/>
+            <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
+            <item value="banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'"/>
+            <item value="current user:    'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
+            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
+            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="SQLite boolean-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
+            <item value="banner:    '2.8.17'"/>
+            <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="SQLite UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
+            <item value="banner:    '2.8.17'"/>
+            <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+4 entries.+luther.+user agent.+'"/>
+        </parse>
+    </case>
+    <case name="SQLite partial UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_partialunion.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
+            <item value="banner:    '2.8.17'"/>
+            <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+4 entries.+luther.+user agent.+'"/>
+        </parse>
+    </case>
+    <case name="SQLite 3 time-based single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3_nooutput.php?id=1"/>
+            <tech value="T"/>
+            <level value="3"/>
+            <risk value="2"/>
+            <timeSec value="2"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: SQLite &gt; 2.0 AND time-based blind (heavy query)"/>
+            <item value="banner:    '3.7.3'"/>
+        </parse>
+    </case>
+    <case name="SQLite inline queries multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_inline.php?id=1"/>
+            <threads value="4"/>
+            <tech value="Q"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: SQLite inline queries"/>
+            <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
+            <item value="banner:    '2.8.17'"/>
+            <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
     <!-- End of common enumeration switches across all techniques -->
 
     <!-- Custom enumeration switches -->
@@ -576,6 +954,39 @@
         </switches>
         <parse>
             <item value="r'Database: public.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+        </parse>
+    </case>
+    <case name="SQLite UNION query multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="SQLite boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
     <!-- End of custom enumeration switches -->
@@ -1172,6 +1583,43 @@
             <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
+    <case name="SQLite multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <search value="True"/>
+            <db value="e"/>
+        </switches>
+        <parse>
+            <item value="on SQLite it is not possible to search databases" console_output="True"/>
+        </parse>
+    </case>
+    <case name="SQLite boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="SQLite UNION query multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+        </parse>
+    </case>
     <!-- End of search enumeration switches -->
 
     <!-- User's provided statement enumeration switches -->
@@ -1183,7 +1631,7 @@
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="MySQL error-based multi-threaded custom SQL query enumeration">
@@ -1194,7 +1642,7 @@
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="MySQL UNION query multi-threaded custom SQL query enumeration">
@@ -1205,7 +1653,7 @@
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="MySQL boolean-based multi-threaded custom ordered SQL query enumeration">
@@ -1216,7 +1664,7 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blisset.+3, wu, ming'"/>
         </parse>
     </case>
     <case name="MySQL error-based multi-threaded custom ordered SQL query enumeration">
@@ -1227,7 +1675,7 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blisset.+3, wu, ming'"/>
         </parse>
     </case>
     <case name="MySQL UNION query multi-threaded custom ordered SQL query enumeration">
@@ -1239,7 +1687,7 @@
         </switches>
         <parse>
             <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blissett.+2, fluffy, bunny.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
     <case name="PostgreSQL boolean-based multi-threaded custom SQL query enumeration">
@@ -1250,7 +1698,7 @@
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based multi-threaded custom SQL query enumeration">
@@ -1261,7 +1709,7 @@
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query multi-threaded custom SQL query enumeration">
@@ -1272,7 +1720,7 @@
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blissett.+2, fluffy, bunny'"/>
+            <item value="r'SELECT \* FROM users OFFSET 0 LIMIT 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
         </parse>
     </case>
     <case name="PostgreSQL boolean-based multi-threaded custom ordered SQL query enumeration">
@@ -1283,7 +1731,7 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blisset.+3, wu, ming'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based multi-threaded custom ordered SQL query enumeration">
@@ -1294,7 +1742,7 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blissett.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blisset.+3, wu, ming'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query multi-threaded custom ordered SQL query enumeration">
@@ -1306,7 +1754,52 @@
         </switches>
         <parse>
             <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blissett.+2, fluffy, bunny.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users LIMIT 0, 2"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="SQLite UNION query multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users LIMIT 0, 2"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users LIMIT 0, 2 \[2\].+1, luther, blisset.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="SQLite boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blisset.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="SQLite UNION query multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
+            <item value="r'SELECT \* FROM users ORDER BY name \[4\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
     <!-- End of user's provided statement enumeration switches -->
