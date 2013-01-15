@@ -134,7 +134,7 @@ PYVERSION = sys.version.split()[0]
 MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb")
 MYSQL_SYSTEM_DBS = ("information_schema", "mysql")                   # Before MySQL 5.0 only "mysql"
 PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast")
-ORACLE_SYSTEM_DBS = ("SYSTEM", "SYSAUX", "SYS")                      # These are TABLESPACE_NAME
+ORACLE_SYSTEM_DBS = ("CTXSYS", "DBSNMP", "DMSYS", "EXFSYS", "MDSYS", "OLAPSYS", "ORDSYS", "OUTLN", "SYS", "SYSAUX", "SYSMAN", "SYSTEM", "TSMSYS", "WMSYS", "XDB")                      # These are TABLESPACE_NAME
 SQLITE_SYSTEM_DBS = ("sqlite_master", "sqlite_temp_master")
 ACCESS_SYSTEM_DBS = ("MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
                         "MSysAccessXML", "MSysModules", "MSysModules2")
