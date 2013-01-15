@@ -76,12 +76,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
 
     if not (timeBasedCompare and kb.dnsTest):
         if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not timeBasedCompare:
-            if field:
-                nulledCastedField = agent.nullAndCastField(field)
-                injExpression = expression.replace(field, nulledCastedField, 1)
-            else:
-                injExpression = expression
-            length = queryOutputLength(injExpression, payload)
+            length = queryOutputLength(expression, payload)
         else:
             length = None
 
