@@ -1972,7 +1972,7 @@
             <item value="r'Sending stage.+Linux.+uid=.+www-data'" console_output="True"/>
         </parse>
     </case>
-    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution">
+    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (UNION)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="US"/>
@@ -1981,6 +1981,17 @@
         </switches>
         <parse>
             <item value="command standard output:    'uid="/>
+        </parse>
+    </case>
+    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (boolean)">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <tech value="BS"/>
+            <osCmd value="ls -1"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="r'command standard output:.+base.+PG_VERSION.+server.key'"/>
         </parse>
     </case>
     <case name="PostgreSQL shell via Metasploit integration - command execution">
