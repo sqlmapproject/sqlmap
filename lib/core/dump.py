@@ -483,7 +483,7 @@ class Dump(object):
                     #    mimetype = magic.from_buffer(value, mime=True)
                     #    if mimetype.startswith("application") or mimetype.startswith("image"):
                     #        with codecs.open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb", UNICODE_ENCODING) as f:
-                    #            _ = safechardecode(value)
+                    #            _ = safechardecode(value, True)
                     #            f.write(_)
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
