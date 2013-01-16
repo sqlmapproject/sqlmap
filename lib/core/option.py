@@ -1556,7 +1556,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "count", "index", "io", "limit", "log", "value"):
+    for _ in ("cache", "count", "index", "io", "limit", "log", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -1595,6 +1595,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.redirectSetCookie = None
     kb.reflectiveMechanism = True
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
+    kb.requestCounter = 0
     kb.responseTimes = []
     kb.resumeValues = True
     kb.safeCharEncode = False
