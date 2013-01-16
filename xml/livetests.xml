@@ -507,7 +507,7 @@
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
-            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+clear-text password: CHANGE_ON_INSTALL.+SYS \[.+password hash: 2D5A0C491B634F1B.+clear-text password: TESTPASS'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+clear-text password: ORACLE.+DBSNMP \[.+password hash: E066D214D5421CCC.+clear-text password: DBSNMP.+SYS \[.+password hash: 2D5A0C491B634F1B.+clear-text password: TESTPASS'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
             <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
@@ -551,7 +551,7 @@
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
-            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
             <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
@@ -595,7 +595,7 @@
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
-            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
             <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
@@ -639,7 +639,7 @@
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
-            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
             <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
@@ -697,7 +697,7 @@
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
-            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: 71E687F036AD56E5.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
+            <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
             <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
