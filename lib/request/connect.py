@@ -179,7 +179,9 @@ class Connect(object):
             cpuThrottle(conf.cpuThrottle)
 
         threadData = getCurrentThreadData()
-        threadData.lastRequestUID += 1
+        with kb.locks.request:
+            kb.requestCounter += 1
+            threadData.lastRequestUID = kb.requestCounter
 
         url = kwargs.get('url',                     conf.url)
         get = kwargs.get('get',                     None)

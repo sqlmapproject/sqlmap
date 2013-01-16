@@ -1556,7 +1556,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "count", "index", "io", "limit", "log", "value"):
+    for _ in ("cache", "count", "index", "io", "limit", "log", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -1595,6 +1595,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.redirectSetCookie = None
     kb.reflectiveMechanism = True
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
+    kb.requestCounter = 0
     kb.responseTimes = []
     kb.resumeValues = True
     kb.safeCharEncode = False
@@ -2007,7 +2008,7 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.threads > MAX_NUMBER_OF_THREADS:
-        errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
+        errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
     if conf.forms and not any((conf.url, conf.bulkFile)):
