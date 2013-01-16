@@ -479,12 +479,16 @@ class Dump(object):
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    #if len(value) > 10 and r'\x' in value:
-                    #    mimetype = magic.from_buffer(value, mime=True)
-                    #    if mimetype.startswith("application") or mimetype.startswith("image"):
-                    #        with codecs.open("%s%s%s" % (dumpDbPath, os.sep, "%s-%d.bin" % (column, randomInt(8))), "wb", UNICODE_ENCODING) as f:
-                    #            _ = safechardecode(value)
-                    #            f.write(_)
+                    if len(value) > 10 and r'\x' in value:
+                        mimetype = magic.from_buffer(value, mime=True)
+                        if any(mimetype.startswith(_) for _ in ("application", "image")):
+                            filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (column, randomInt(8)))
+                            warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
+                            logger.warn(warnMsg)
+
+                            with open(filepath, "wb") as f:
+                                _ = safechardecode(value, True)
+                                f.write(_)
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
