@@ -11,8 +11,6 @@ import ssl
 import urllib
 import urllib2
 
-from lib.core.exception import SqlmapUnsupportedFeatureException
-
 
 class ProxyHTTPConnection(httplib.HTTPConnection):
     _ports = {"http": 80, "https": 443}

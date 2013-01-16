@@ -54,7 +54,6 @@ from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
-from lib.core.convert import jsonize
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

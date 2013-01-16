@@ -6,11 +6,9 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import logging
-import StringIO
 import sys
 
 from lib.core.enums import CUSTOM_LOGGING
-from thirdparty.ansistrm.ansistrm import ColorizingStreamHandler
 
 logging.addLevelName(CUSTOM_LOGGING.PAYLOAD, "PAYLOAD")
 logging.addLevelName(CUSTOM_LOGGING.TRAFFIC_OUT, "TRAFFIC OUT")
@@ -20,7 +18,8 @@ LOGGER = logging.getLogger("sqlmapLog")
 
 LOGGER_HANDLER = None
 try:
-    import ctypes
+    from thirdparty.ansistrm.ansistrm import ColorizingStreamHandler
+
     LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
     LOGGER_HANDLER.level_map[logging.getLevelName("PAYLOAD")] = (None, "cyan", False)
     LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC OUT")] = (None, "magenta", False)
