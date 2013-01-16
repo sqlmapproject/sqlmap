@@ -588,7 +588,23 @@ class Agent(object):
                 concatenatedQuery = "'%s'&%s&'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
         else:
-            concatenatedQuery = query
+            warnMsg = "applying generic concatenation with double pipes ('||')"
+            singleTimeWarnMessage(warnMsg)
+
+            if fieldsExists:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
+                concatenatedQuery += "||'%s'" % kb.chars.stop
+            elif fieldsSelectCase:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||(SELECT " % kb.chars.start, 1)
+                concatenatedQuery += ")||'%s'" % kb.chars.stop
+            elif fieldsSelectFrom:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
+                concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.chars.stop, 1)
+            elif fieldsSelect:
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
+                concatenatedQuery += "||'%s'" % kb.chars.stop
+            elif fieldsNoSelect:
+                concatenatedQuery = "'%s'||%s||'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
         return concatenatedQuery
 
