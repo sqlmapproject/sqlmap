@@ -55,7 +55,7 @@ from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
-from lib.core.settings import SUHOSHIN_MAX_VALUE_LENGTH
+from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
@@ -579,7 +579,7 @@ def checkSqlInjection(place, parameter, value):
         injection = None
 
     if injection:
-        checkSuhoshinPatch(injection)
+        checkSuhosinPatch(injection)
 
     return injection
 
@@ -591,8 +591,8 @@ def checkFalsePositives(injection):
     retVal = injection
 
     if len(injection.data) == 1 and any(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED]))\
-      or len(injection.data) == 2 and all(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED]))\
-      or len(injection.data) == 1 and 'Generic' in injection.data.values()[0].title and not Backend.getDbms():
+      or len(injection.data) == 2 and all(map(lambda x: x in injection.data, [PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED])):
+#      or len(injection.data) == 1 and 'Generic' in injection.data.values()[0].title and not Backend.getIdentifiedDbms():
         pushValue(kb.injection)
 
         infoMsg = "checking if the injection point on %s " % injection.place
@@ -634,9 +634,9 @@ def checkFalsePositives(injection):
 
     return retVal
 
-def checkSuhoshinPatch(injection):
+def checkSuhosinPatch(injection):
     """
-    Checks for existence of Suhoshin-patch (and alike) protection mechanism(s)
+    Checks for existence of Suhosin-patch (and alike) protection mechanism(s)
     """
 
     if injection.place == PLACE.GET:
@@ -645,10 +645,10 @@ def checkSuhoshinPatch(injection):
         kb.injection = injection
         randInt = randomInt()
 
-        _ = " " * (SUHOSHIN_MAX_VALUE_LENGTH / 2)
+        _ = " " * (SUHOSIN_MAX_VALUE_LENGTH / 2)
         if not checkBooleanExpression("%d%s=%s%d" % (randInt, _, _, randInt)):
             warnMsg = "parameter length constraint "
-            warnMsg += "mechanism detected (e.g. Suhoshin patch). "
+            warnMsg += "mechanism detected (e.g. Suhosin patch). "
             warnMsg += "Potential problems in enumeration phase can be expected"
             logger.warn(warnMsg)
 
