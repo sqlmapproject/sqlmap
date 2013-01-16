@@ -10,7 +10,7 @@
         <flushSession value="True"/>
         <disableColoring value="True"/>
         <verbose value="1"/>
-        <cleanup value="1"/>
+        <cleanup value="True"/>
     </global>
     <!-- Common enumeration switches across all techniques -->
     <case name="MySQL boolean-based multi-threaded enumeration - all entries">
