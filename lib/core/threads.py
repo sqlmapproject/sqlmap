@@ -110,7 +110,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             choice = readInput(message, default=str(numThreads))
             if choice and choice.isdigit():
                 if int(choice) > MAX_NUMBER_OF_THREADS:
-                    errMsg = "maximum number of used threads is %d avoiding possible connection issues" % MAX_NUMBER_OF_THREADS
+                    errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
                     logger.critical(errMsg)
                 else:
                     numThreads = int(choice)
