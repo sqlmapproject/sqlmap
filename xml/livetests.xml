@@ -595,7 +595,7 @@
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
             <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
-            <item value="r'Database: SYS.+ tables.+JOBS.+REGIONS'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
             <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
             <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
@@ -638,7 +638,7 @@
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
             <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
-            <item value="r'Database: SYS.+ tables.+JOBS.+REGIONS'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
             <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
             <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
@@ -695,7 +695,7 @@
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
             <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
-            <item value="r'Database: SYS.+ tables.+JOBS.+REGIONS'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
             <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
             <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
