@@ -734,7 +734,6 @@
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+DB2INST1'"/>
-            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
             <item value="r'database management system users privileges:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
             <item value="r'database management system users roles:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
             <item value="r'available databases \[.+DB2INST1.+SYSIBM.+SYSTOOLS'"/>
