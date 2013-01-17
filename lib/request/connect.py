@@ -105,8 +105,8 @@ class Connect(object):
             warnMsg += "from previous timed based payload. If the problem "
             warnMsg += "persists please wait for few minutes and rerun "
             warnMsg += "without flag T in option '--technique' "
-            warnMsg += "(e.g. --flush-session --technique=BEUS) or try to "
-            warnMsg += "lower the value of option '--time-sec' (e.g. --time-sec=2)"
+            warnMsg += "(e.g. '--flush-session --technique=BEUS') or try to "
+            warnMsg += "lower the value of option '--time-sec' (e.g. '--time-sec=2')"
             singleTimeWarnMessage(warnMsg)
         elif kb.originalPage is None:
             if conf.tor:
@@ -115,18 +115,18 @@ class Connect(object):
                 warnMsg += "you could successfully use "
                 warnMsg += "switch '--tor' "
                 if IS_WIN:
-                    warnMsg += "(e.g. https://www.torproject.org/download/download.html.en)"
+                    warnMsg += "(e.g. 'https://www.torproject.org/download/download.html.en')"
                 else:
-                    warnMsg += "(e.g. https://help.ubuntu.com/community/Tor)"
+                    warnMsg += "(e.g. 'https://help.ubuntu.com/community/Tor')"
             else:
                 warnMsg = "if the problem persists please check that the provided "
                 warnMsg += "target url is valid. In case that it is, you can try to rerun "
                 warnMsg += "with the switch '--random-agent' turned on "
-                warnMsg += "and/or proxy switches (--ignore-proxy, --proxy,...)"
+                warnMsg += "and/or proxy switches ('--ignore-proxy', '--proxy',...)"
             singleTimeWarnMessage(warnMsg)
         elif conf.threads > 1:
             warnMsg = "if the problem persists please try to lower "
-            warnMsg += "the number of used threads (--threads)"
+            warnMsg += "the number of used threads (option '--threads')"
             singleTimeWarnMessage(warnMsg)
 
         time.sleep(1)
