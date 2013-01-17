@@ -1597,6 +1597,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.reflectiveMechanism = True
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
     kb.requestCounter = 0
+    kb.resendPostOnRedirect = None
     kb.responseTimes = []
     kb.resumeValues = True
     kb.safeCharEncode = False
