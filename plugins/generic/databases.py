@@ -732,11 +732,11 @@ class Databases:
         return kb.data.cachedColumns
 
     def _tableGetCount(self, db, table):
-        if Backend.isDbms(DBMS.DB2):
-            query = "SELECT %s FROM %s.%s--" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db.upper()), safeSQLIdentificatorNaming(table.upper(), True))
-        else:
-            query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            db = db.upper()
+            table = table.upper()
 
+        query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if isNumPosStrValue(count):
