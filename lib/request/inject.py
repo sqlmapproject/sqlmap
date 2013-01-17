@@ -328,9 +328,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
             forgeCaseExpression = booleanExpression = expression
 
             if expression.upper().startswith("SELECT "):
-                booleanExpression = expression[len("SELECT "):]
-                if re.search(r"(?i)\(.+\)\Z", booleanExpression):
-                    booleanExpression = "%s=%s" % (booleanExpression, "'1'" if "'1'" in booleanExpression else '1')
+                booleanExpression = "(%s)=%s" % (booleanExpression, "'1'" if "'1'" in booleanExpression else "1")
             else:
                 forgeCaseExpression = agent.forgeCaseStatement(expression)
 
