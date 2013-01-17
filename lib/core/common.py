@@ -1128,7 +1128,8 @@ def parseTargetUrl():
         conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.HOST, conf.httpHeaders)
         conf.httpHeaders.append((HTTPHEADER.HOST, getHostHeader(conf.url)))
 
-    kb.originalUrls[conf.url] = originalUrl
+    if conf.url != originalUrl:
+        kb.originalUrls[conf.url] = originalUrl
 
 def expandAsteriskForColumns(expression):
     """

@@ -457,9 +457,11 @@ def _createTargetDirs():
             conf.outputPath = tempDir
 
     try:
-        with open(os.path.join(conf.outputPath, "target.txt"), "w+") as f:
-            _ = kb.originalUrls.get(conf.url) or conf.url or conf.hostname
-            f.write(_.encode(UNICODE_ENCODING))
+        with codecs.open(os.path.join(conf.outputPath, "target.txt"), "w+", UNICODE_ENCODING) as f:
+            f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
+            f.write(" (%s)" % (HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET))
+            if conf.data:
+                f.write("\n\n%s" % conf.data)
     except IOError, ex:
         if "denied" in str(ex):
             errMsg = "you don't have enough permissions "
