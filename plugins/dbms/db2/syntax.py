@@ -15,6 +15,9 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
+        if expression == "'"
+            return expression
+
         if quote:
             while True:
                 index = expression.find("'")
