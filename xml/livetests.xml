@@ -490,11 +490,10 @@
             <getPrivileges value="True"/>
             <getRoles value="True"/>
             <getDbs value="True"/>
-            <getTables value="True"/>
             <getColumns value="True"/>
             <getCount value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
             <excludeSysDbs value="True"/>
         </switches>
@@ -508,13 +507,12 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+clear-text password: ORACLE.+DBSNMP \[.+password hash: E066D214D5421CCC.+clear-text password: DBSNMP.+SYS \[.+password hash: 2D5A0C491B634F1B.+clear-text password: TESTPASS'"/>
-            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
-            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
-            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
-            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
+            <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
     <case name="Oracle error-based multi-threaded enumeration - all entries">
@@ -537,9 +535,8 @@
             <getColumns value="True"/>
             <getCount value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
-            <excludeSysDbs value="True"/>
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
@@ -552,13 +549,13 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
-            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
-            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
-            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
-            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
+            <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
     <case name="Oracle UNION query multi-threaded enumeration - all entries">
@@ -581,9 +578,8 @@
             <getColumns value="True"/>
             <getCount value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
-            <excludeSysDbs value="True"/>
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
@@ -596,13 +592,13 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
-            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
-            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
-            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
-            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
+            <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
     <case name="Oracle partial UNION query multi-threaded enumeration - all entries">
@@ -625,9 +621,8 @@
             <getColumns value="True"/>
             <getCount value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
-            <excludeSysDbs value="True"/>
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
@@ -640,13 +635,13 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
-            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
-            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
-            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
-            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
+            <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
     <case name="Oracle time-based single-threaded enumeration - all entries">
@@ -683,9 +678,8 @@
             <getColumns value="True"/>
             <getCount value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
-            <excludeSysDbs value="True"/>
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
@@ -698,13 +692,13 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
-            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ADMINISTER ANY SQL TUNING SET'"/>
-            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+JAVA_DEPLOY'"/>
-            <item value="r'available databases \[.+CTXSYS.+SCOTT.+WMSYS'"/>
-            <item value="r'Database: SCOTT.+ tables.+USERS'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table.+Entries.+USERS.+5'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+            <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
+            <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
+            <item value="r'available databases \[.+CTXSYS.+MDSYS.+SYSTEM'"/>
+            <item value="r'Database: SYS.+ tables.+USERS'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
     <case name="SQLite boolean-based multi-threaded enumeration - all entries">
@@ -963,15 +957,15 @@
             <tech value="E"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
             <limitStart value="2"/>
             <limitStop value="4"/>
             <excludeSysDbs value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
         </parse>
     </case>
     <case name="Oracle UNION query multi-threaded custom enumeration">
@@ -981,15 +975,15 @@
             <tech value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
             <limitStart value="2"/>
             <limitStop value="4"/>
             <excludeSysDbs value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
-            <item value="r'Database: SCOTT.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: SYS.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
         </parse>
     </case>
     <case name="Oracle boolean-based multi-threaded custom enumeration - substring">
@@ -998,13 +992,13 @@
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
-            <db value="scott"/>
+            <db value="sys"/>
             <tbl value="users"/>
             <firstChar value="3"/>
             <lastChar value="5"/>
         </switches>
         <parse>
-            <item value="r'Database: SCOTT.+Table: USERS.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+            <item value="r'Database: SYS.+Table: USERS.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
     <case name="SQLite UNION query multi-threaded custom enumeration">
@@ -1978,7 +1972,7 @@
             <item value="r'Sending stage.+Linux.+uid=.+www-data'" console_output="True"/>
         </parse>
     </case>
-    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution">
+    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (UNION)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="US"/>
@@ -1987,6 +1981,17 @@
         </switches>
         <parse>
             <item value="command standard output:    'uid="/>
+        </parse>
+    </case>
+    <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (boolean)">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <tech value="BS"/>
+            <osCmd value="ls -1"/>
+            <answers value="do you want to overwrite it=Y"/>
+        </switches>
+        <parse>
+            <item value="r'command standard output:.+base.+PG_VERSION.+server.key'"/>
         </parse>
     </case>
     <case name="PostgreSQL shell via Metasploit integration - command execution">
