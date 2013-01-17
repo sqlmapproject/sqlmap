@@ -500,6 +500,9 @@ DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded"
 # Length used while checking for existence of Suhosin-patch (like) protection mechanism
 SUHOSIN_MAX_VALUE_LENGTH = 512
 
+# Minimum size of an (binary) entry before it can be considered for dumping to disk
+MIN_BINARY_DISK_DUMP_SIZE = 100
+
 # Regular expression used for extracting form tags
 FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
 

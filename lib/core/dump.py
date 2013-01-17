@@ -33,6 +33,7 @@ from lib.core.exception import SqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import METADB_SUFFIX
+from lib.core.settings import MIN_BINARY_DISK_DUMP_SIZE
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty.magic import magic
@@ -479,7 +480,7 @@ class Dump(object):
                     blank = " " * (maxlength - len(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    if len(value) > 10 and r'\x' in value:
+                    if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
                         mimetype = magic.from_buffer(value, mime=True)
                         if any(mimetype.startswith(_) for _ in ("application", "image")):
                             filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (column, randomInt(8)))
