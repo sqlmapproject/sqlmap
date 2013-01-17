@@ -15,7 +15,7 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
-        if expression == "'"
+        if expression == "'":
             return expression
 
         if quote:

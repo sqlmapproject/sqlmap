@@ -701,6 +701,49 @@
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <case name="IBM DB2 boolean-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="db2inst1"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: IBM DB2 9.5'"/>
+            <item value="banner:    'DB2 v9.5.0.0'"/>
+            <item value="current user:    'DB2INST1'"/>
+            <item value="current database:    'TESTDB'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+DB2INST1'"/>
+            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
+            <item value="r'database management system users privileges:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
+            <item value="r'database management system users roles:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
+            <item value="r'available databases \[.+DB2INST1.+SYSIBM.+SYSTOOLS'"/>
+            <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
+            <item value="r'Database: DB2INST1.+Table: USERS.+3 columns.+SURNAME.+VARCHAR\(1000\)'"/>
+            <item value="r'Database: DB2INST1.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: DB2INST1.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
     <case name="SQLite boolean-based multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
