@@ -48,6 +48,7 @@ from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
+from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.common import urldecode
@@ -1420,6 +1421,7 @@ def _cleanupOptions():
 
     if conf.oDir:
         paths.SQLMAP_OUTPUT_PATH = conf.oDir
+        setPaths()
 
     if conf.string:
         try:
