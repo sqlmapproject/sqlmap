@@ -16,6 +16,7 @@ from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTPMETHOD
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
@@ -37,7 +38,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
         return retVal
 
-    def _ask_redirect_choice(self, redcode, redurl):
+    def _ask_redirect_choice(self, redcode, redurl, method):
         with kb.locks.redirect:
             if kb.redirectChoice is None:
                 msg = "sqlmap got a %d redirect to " % redcode
@@ -45,6 +46,20 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 choice = readInput(msg, default="Y")
 
                 kb.redirectChoice = choice.upper()
+
+                if kb.redirectChoice == REDIRECTION.YES and method == HTTPMETHOD.POST:
+                    msg = "redirect is a result of a "
+                    msg += "POST request. Do you want to "
+                    msg += "resend original POST data to a new "
+                    msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
+                    choice = readInput(msg, default=("Y" if not kb.originalPage else "N"))
+
+                    if choice.upper() == 'Y':
+                        self.redirect_request = self._redirect_request
+
+    def _redirect_request(self, req, fp, code, msg, headers, newurl):
+        newurl = newurl.replace(' ', '%20')
+        return urllib2.Request(newurl, data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
 
     def http_error_302(self, req, fp, code, msg, headers):
         content = None
@@ -89,7 +104,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 redurl = urlparse.urljoin(req.get_full_url(), redurl)
 
             self._infinite_loop_check(req)
-            self._ask_redirect_choice(code, redurl)
+            self._ask_redirect_choice(code, redurl, req.get_method())
 
         if redurl and kb.redirectChoice == REDIRECTION.YES:
             req.headers[HTTPHEADER.HOST] = getHostHeader(redurl)
