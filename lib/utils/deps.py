@@ -39,6 +39,8 @@ def checkDependencies():
                 import pyodbc
             elif dbmsName == DBMS.FIREBIRD:
                 import kinterbasdb
+            elif dbmsName == DBMS.DB2:
+                import ibm_db_dbi
         except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the database "
