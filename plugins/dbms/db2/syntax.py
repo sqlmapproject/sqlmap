@@ -15,8 +15,8 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def unescape(expression, quote=True):
-        if expression == "'":
-            return expression
+        if expression == u"'''":
+            return "CHR(%d)" % (ord("'"))
 
         if quote:
             while True:
