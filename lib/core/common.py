@@ -516,16 +516,16 @@ def paramToDict(place, parameters=None):
 
     for element in splitParams:
         element = re.sub(r"%s(.+?)%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), r"&\g<1>;", element)
-        elem = element.split("=")
+        parts = element.split("=")
 
-        if len(elem) >= 2:
-            parameter = elem[0].replace(" ", "")
+        if len(parts) >= 2:
+            parameter = parts[0].replace(" ", "")
 
             condition = not conf.testParameter
             condition |= parameter in conf.testParameter
 
             if condition:
-                testableParameters[parameter] = "=".join(elem[1:])
+                testableParameters[parameter] = "=".join(parts[1:])
                 if not conf.multipleTargets:
                     _ = urldecode(testableParameters[parameter], convall=True)
                     if _.strip(DUMMY_SQL_INJECTION_CHARS) != _\
@@ -563,6 +563,20 @@ def paramToDict(place, parameters=None):
                 warnMsg = "provided parameter '%s' " % parameter
                 warnMsg += "is not inside the %s" % place
                 logger.warn(warnMsg)
+
+    if testableParameters:
+        for parameter, value in testableParameters.items():
+            if value and not value.isdigit():
+                for encoding in ("hex", "base64"):
+                    try:
+                        decoded = value.decode(encoding)
+                        if all(_ in string.printable for _ in decoded):
+                            warnMsg = "provided parameter '%s' " % parameter
+                            warnMsg += "seems to be '%s' encoded" % encoding
+                            logger.warn(warnMsg)
+                            break
+                    except:
+                        pass
 
     return testableParameters
 
