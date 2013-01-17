@@ -86,6 +86,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DEPRECATED_OPTIONS
 from lib.core.settings import DESCRIPTION
+from lib.core.settings import DOLLAR_MARKER
 from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
@@ -2041,6 +2042,10 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
         if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
             value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
 
+        if '$' in value and '$' not in safe:
+            for match in re.finditer(r"\b([\w$]*\$[\w$]*)=", value):
+                value = value.replace(match.group(1), match.group(1).replace('$', DOLLAR_MARKER))
+
         while True:
             result = urllib.quote(utf8encode(value), safe)
 
@@ -2055,6 +2060,9 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
                         break
             else:
                 break
+
+    if result:
+        result = result.replace(DOLLAR_MARKER, '$')
 
     return result
 

@@ -620,8 +620,8 @@ class Connect(object):
                         payload = json.dumps(payload)[1:-1]
                 value = agent.replacePayload(value, payload)
             else:
-                if not skipUrlEncode and place in (PLACE.GET, PLACE.COOKIE, PLACE.URI):
-                    # GET, URI and Cookie need to be throughly URL encoded (POST is encoded down below)
+                if not skipUrlEncode and place in (PLACE.GET, PLACE.POST, PLACE.COOKIE, PLACE.URI):
+                    # GET, POST, URI and Cookie payload needs to be throughly URL encoded
                     payload = urlencode(payload, '%', False, place != PLACE.URI)
                     value = agent.replacePayload(value, payload)
 
