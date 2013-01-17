@@ -38,12 +38,13 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         return retVal
 
     def _ask_redirect_choice(self, redcode, redurl):
-        if kb.redirectChoice is None:
-            msg = "sqlmap got a %d redirect to " % redcode
-            msg += "'%s'. Do you want to follow? [Y/n] " % redurl
-            choice = readInput(msg, default="Y")
+        with kb.locks.redirect:
+            if kb.redirectChoice is None:
+                msg = "sqlmap got a %d redirect to " % redcode
+                msg += "'%s'. Do you want to follow? [Y/n] " % redurl
+                choice = readInput(msg, default="Y")
 
-            kb.redirectChoice = choice.upper()
+                kb.redirectChoice = choice.upper()
 
     def http_error_302(self, req, fp, code, msg, headers):
         content = None
