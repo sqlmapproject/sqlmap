@@ -47,15 +47,17 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
                 kb.redirectChoice = choice.upper()
 
-                if kb.redirectChoice == REDIRECTION.YES and method == HTTPMETHOD.POST:
-                    msg = "redirect is a result of a "
-                    msg += "POST request. Do you want to "
-                    msg += "resend original POST data to a new "
-                    msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
-                    choice = readInput(msg, default=("Y" if not kb.originalPage else "N"))
+            if kb.redirectChoice == REDIRECTION.YES and method == HTTPMETHOD.POST and kb.resendPostOnRedirect is None:
+                msg = "redirect is a result of a "
+                msg += "POST request. Do you want to "
+                msg += "resend original POST data to a new "
+                msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
+                choice = readInput(msg, default=("Y" if not kb.originalPage else "N"))
 
-                    if choice.upper() == 'Y':
-                        self.redirect_request = self._redirect_request
+                kb.resendPostOnRedirect = choice.upper() == 'Y'
+
+                if kb.resendPostOnRedirect:
+                    self.redirect_request = self._redirect_request
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
         newurl = newurl.replace(' ', '%20')
