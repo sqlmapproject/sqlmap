@@ -273,7 +273,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -316,7 +316,7 @@
         <parse>
             <item value="Title: PostgreSQL AND error-based - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -359,7 +359,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -402,7 +402,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -427,7 +427,7 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 AND time-based blind"/>
-            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -459,7 +459,7 @@
         <parse>
             <item value="Title: PostgreSQL inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.15 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -505,7 +505,7 @@
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
-            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+clear-text password: ORACLE.+DBSNMP \[.+password hash: E066D214D5421CCC.+clear-text password: DBSNMP.+SYS \[.+password hash: 2D5A0C491B634F1B.+clear-text password: TESTPASS'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
@@ -547,7 +547,7 @@
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
-            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
@@ -590,7 +590,7 @@
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
-            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
@@ -606,6 +606,7 @@
             <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
+            <dbms value="Oracle"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -633,7 +634,7 @@
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
-            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
@@ -690,7 +691,7 @@
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
-            <item value="r'database management system users \[.+ANONYMOUS.+SCOTT.+SYS.+XDB'"/>
+            <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
             <item value="r'database management system users roles:.+MDSYS.+CONNECT.+SYS \(administrator\).+DBA.+XDBADMIN'"/>
