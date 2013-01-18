@@ -888,6 +888,219 @@
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <case name="Firebird boolean-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="current database:    '/'"/>
+            <item value="hostname:    None"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <!-- TODO: this test case fails because of issue #358 -->
+    <case name="Firebird error-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="current database:    '/'"/>
+            <item value="hostname:    None"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Firebird UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="current database:    '/'"/>
+            <item value="hostname:    None"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Firebird partial UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="current database:    '/'"/>
+            <item value="hostname:    None"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Firebird time-based single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int_nooutput.php?id=1"/>
+            <tech value="T"/>
+            <level value="4"/>
+            <risk value="2"/>
+            <timeSec value="2"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: Firebird AND time-based blind \(heavy query\)"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
+    <case name="Firebird inline queries multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int_inline.php?id=1"/>
+            <threads value="4"/>
+            <tech value="Q"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Firebird inline queries"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="current database:    '/'"/>
+            <item value="hostname:    None"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
     <!-- End of common enumeration switches across all techniques -->
 
     <!-- Custom enumeration switches -->
