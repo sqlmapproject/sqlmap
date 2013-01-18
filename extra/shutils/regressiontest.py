@@ -20,17 +20,18 @@ SMTP_SERVER = "127.0.0.1"
 SMTP_PORT = 25
 SMTP_TIMEOUT = 30
 FROM = "regressiontest@sqlmap.org"
-#TO = "dev@sqlmap.org"
-TO = "bernardo.damele@gmail.com"
+TO = "dev@sqlmap.org"
 SUBJECT = "Regression test results on %s" % TIME
 CONTENT = ""
 TEST_COUNTS = []
 ATTACHMENTS = {}
 
-command_line = "cd ../../ ; rm -f $REGRESSION_FILE ; python sqlmap.py --live-test --run-case 'Invalid'"
+command_line = "cd ../../ ; rm -f $REGRESSION_FILE ; python sqlmap.py --live-test"
 proc = subprocess.Popen(command_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 proc.wait()
 stdout, stderr = proc.communicate()
+
 failed_tests = re.findall("running live test case: (.+?) \((\d+)\/\d+\)[\r]*\n.+test failed (at parsing item \"(.+)\" )?\- scan folder: (\/.+) \- traceback: (.*?)( - SQL injection not detected)?[\r]*\n", stdout, re.M)
 
 for failed_test in failed_tests:
