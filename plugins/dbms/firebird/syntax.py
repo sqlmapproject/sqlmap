@@ -16,6 +16,9 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         if isDBMSVersionAtLeast('2.1'):
+            if expression == u"'''":
+                return "ASCII_CHAR(%d)" % (ord("'"))
+
             if quote:
                 while True:
                     index = expression.find("'")
