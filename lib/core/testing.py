@@ -266,7 +266,7 @@ def runCase(switches=None, parse=None):
         tback = traceback.format_exc()
         retVal = False
     elif result is False:  # if None, ignore
-        logger.error("the test did not run")
+        logger.error("the test did not identify the SQL injection")
         retVal = False
 
     console = getUnicode(console, system=True)

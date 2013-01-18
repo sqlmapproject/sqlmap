@@ -736,7 +736,7 @@
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+DB2INST1'"/>
             <item value="r'database management system users privileges:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
-            <item value="r'database management system users roles:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
+            <item value="r'database management system users roles:.+DB2INST1.+role: DB2INST1.USERS.+role: SYSTOOLS.POLICY'"/>
             <item value="r'available databases \[.+DB2INST1.+SYSIBM.+SYSTOOLS'"/>
             <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
             <item value="r'Database: DB2INST1.+Table: USERS.+3 columns.+SURNAME.+VARCHAR\(1000\)'"/>
@@ -1007,7 +1007,7 @@
             <excludeSysDbs value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: HR.+Table: JOBS.+4 columns.+MIN_SALARY.+NUMBER'"/>
             <item value="r'Database: SYS.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
         </parse>
     </case>
@@ -1025,7 +1025,7 @@
             <excludeSysDbs value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: SYS.+Table: USERS.+3 columns.+SURNAME.+VARCHAR2'"/>
+            <item value="r'Database: HR.+Table: JOBS.+4 columns.+MIN_SALARY.+NUMBER'"/>
             <item value="r'Database: SYS.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
         </parse>
     </case>
@@ -2098,7 +2098,7 @@
             <level value="3"/>
         </switches>
         <parse>
-            <item value="MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)"/>
+            <item value="Title: MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)"/>
         </parse>
     </case>
     <case name="International data">
