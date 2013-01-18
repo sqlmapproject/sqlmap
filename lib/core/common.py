@@ -1307,20 +1307,6 @@ def getCharset(charsetType=None):
 
     return asciiTbl
 
-def searchEnvPath(filename):
-    retVal = None
-    path = os.environ.get("PATH", "")
-    paths = path.split(";") if IS_WIN else path.split(":")
-
-    for _ in paths:
-        _ = _.replace(";", "")
-        retVal = os.path.exists(os.path.normpath(os.path.join(_, filename)))
-
-        if retVal:
-            break
-
-    return retVal
-
 def directoryPath(filepath):
     """
     Returns directory path for a given filepath
@@ -1427,13 +1413,6 @@ def showStaticWords(firstPage, secondPage):
         infoMsg += "None"
 
     logger.info(infoMsg)
-
-def isWindowsPath(filepath):
-    """
-    Returns True if given filepath is in Windows format
-    """
-
-    return re.search("\A[\w]\:\\\\", filepath) is not None
 
 def isWindowsDriveLetterPath(filepath):
     """
@@ -2467,20 +2446,6 @@ def showHttpErrorCodes():
           for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
 
-def getComparePageRatio(firstPage, secondPage, filtered=False):
-    """
-    Returns comparison ratio between two given pages
-    """
-
-    if filtered:
-        (firstPage, secondPage) = map(getFilteredPageContent, (firstPage, secondPage))
-
-    seqMatcher = getCurrentThreadData().seqMatcher
-    seqMatcher.set_seq1(firstPage)
-    seqMatcher.set_seq2(secondPage)
-
-    return seqMatcher.quick_ratio()
-
 def openFile(filename, mode='r'):
     """
     Returns file handle of a given filename
@@ -2732,16 +2697,6 @@ def unsafeSQLIdentificatorNaming(name):
             if retVal.startswith(prefix):
                 retVal = retVal[len(prefix):]
 
-    return retVal
-
-def isBinaryData(value):
-    """
-    Tests given value for binary content
-    """
-
-    retVal = False
-    if isinstance(value, basestring):
-        retVal = reduce(lambda x, y: x or not (y in string.printable or ord(y) > 255), value, False)
     return retVal
 
 def isNoneValue(value):
