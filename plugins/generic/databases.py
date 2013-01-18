@@ -513,7 +513,7 @@ class Databases:
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
@@ -526,9 +526,11 @@ class Databases:
 
                 if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
                     index, values = 1, []
+
                     while True:
                         query = rootQuery.inband.query2 % (conf.db, tbl, index)
                         value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+
                         if isNoneValue(value) or value == " ":
                             break
                         else:
