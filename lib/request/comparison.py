@@ -47,6 +47,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     threadData = getCurrentThreadData()
 
     if kb.testMode:
+        threadData.lastComparisonHeaders = listToStrValue(headers.headers) if headers else ""
         threadData.lastComparisonPage = page
 
     if page is None and pageLength is None:
@@ -56,7 +57,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     seqMatcher.set_seq1(kb.pageTemplate)
 
     if any((conf.string, conf.notString, conf.regexp)):
-        rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
+        rawResponse = "%s%s" % (listToStrValue(headers.headers) if headers else "", page)
 
         # String to match in page when the query is True and/or valid
         if conf.string:
