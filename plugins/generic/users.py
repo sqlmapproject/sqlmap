@@ -21,8 +21,8 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import parsePasswordHash
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.common import strToHex
 from lib.core.common import unArrayizeValue
+from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -187,7 +187,6 @@ class Users:
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
-                        # password = "0x%s" % strToHex(password)
                         if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
@@ -229,7 +228,7 @@ class Users:
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
-                        password = "0x%s" % strToHex(password)
+                        password = "0x%s" % hexencode(password).upper()
 
                         if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]

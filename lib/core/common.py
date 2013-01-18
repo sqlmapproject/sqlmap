@@ -768,13 +768,6 @@ def dataToOutFile(filename, data):
 
     return retVal
 
-def strToHex(value):
-    """
-    Converts string value to it's hexadecimal representation
-    """
-
-    return (value if not isinstance(value, unicode) else value.encode(UNICODE_ENCODING)).encode("hex").upper()
-
 def readInput(message, default=None, checkBatch=True):
     """
     Reads input from terminal
