@@ -79,7 +79,7 @@ if CONTENT:
     msg["From"] = FROM
     msg["To"] = TO
 
-    for test_count, attachment in ATTACHMENTS:
+    for test_count, attachment in ATTACHMENTS.items():
         attachment = MIMEText(attachment)
         attachment.add_header('Content-Disposition', 'attachment', filename="test_case_%d_console_output.txt" % test_count)
         msg.attach(attachment)
