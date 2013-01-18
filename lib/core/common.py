@@ -1463,18 +1463,6 @@ def ntToPosixSlashes(filepath):
 
     return filepath.replace('\\', '/')
 
-def isBase64EncodedString(subject):
-    """
-    Checks if the provided string is Base64 encoded
-
-    >>> isBase64EncodedString('dGVzdA==')
-    True
-    >>> isBase64EncodedString('123456')
-    False
-    """
-
-    return re.match(r"\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z", subject) is not None
-
 def isHexEncodedString(subject):
     """
     Checks if the provided string is hex encoded
