@@ -173,18 +173,18 @@ def liveTest():
         else:
             errMsg = "test failed "
             if failedTraceBack:
-                errMsg += "(got a traceback)"
+                errMsg += "(got a traceback) "
                 traceback_fd = codecs.open("%s%straceback" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
                 traceback_fd.write(failedTraceBack)
                 traceback_fd.close()
             if failedItem:
-                errMsg += "at parsing item: %s" % failedItem
+                errMsg += "at parsing item: %s " % failedItem
             if failedParseOn:
                 console_output_fd = codecs.open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
                 console_output_fd.write(failedParseOn)
                 console_output_fd.close()
 
-            errMsg += " - scan folder is %s" % paths.SQLMAP_OUTPUT_PATH
+            errMsg += "- scan folder is %s" % paths.SQLMAP_OUTPUT_PATH
             logger.error(errMsg)
             beep()
 
