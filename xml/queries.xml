@@ -359,12 +359,12 @@
         <substring query="MID((%s),%d,%d)"/>
         <concatenate query="%s&amp;%s"/>
         <case query="SELECT (IIF(%s,1,0))"/>
+        <inference query="ASCW(MID((%s),%d,1)) > %d"/>
         <banner/>
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
         <current_db/>
         <hostname/>
-        <inference query="ASCW(MID((%s),%d,1)) > %d"/>
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->
@@ -401,16 +401,16 @@
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT IIF(%s,1,0)"/>
+        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
         <banner query="SELECT RDB$GET_CONTEXT('SYSTEM','ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
         <hostname/>
+        <is_dba query="CURRENT_USER='SYSDBA'"/>
         <users>
             <inband query="SELECT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
         </users>
-        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
-        <is_dba query="CURRENT_USER='SYSDBA'"/>
         <tables>
             <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
             <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
