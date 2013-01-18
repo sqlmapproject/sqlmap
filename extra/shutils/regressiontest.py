@@ -37,7 +37,7 @@ for failed_test in failed_tests:
     test_count = int(failed_test[1])
     parse = failed_test[3] if failed_test[3] else None
     output_folder = failed_test[4]
-    traceback = bool(failed_test[5])
+    traceback = False if failed_test[5] == "False" else bool(failed_test[5])
     detection = True if failed_test[6] else False
 
     TEST_COUNTS.append(test_count)
