@@ -172,26 +172,34 @@ def liveTest():
             cleanCase()
         else:
             errMsg = "test failed "
-            if failedTraceBack:
-                errMsg += "(got a traceback) "
-                traceback_fd = codecs.open("%s%straceback" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
-                traceback_fd.write(failedTraceBack)
-                traceback_fd.close()
+
             if failedItem:
-                errMsg += "at parsing item: %s " % failedItem
+                errMsg += "at parsing item \"%s\" " % failedItem
+
+            errMsg += "- scan folder: %s " % paths.SQLMAP_OUTPUT_PATH
+            errMsg += "- traceback: %s" % bool(failedTraceBack)
+
+            if result is False:
+                errMsg += " - SQL injection not detected"
+
+            logger.error(errMsg)
+
             if failedParseOn:
-                console_output_fd = codecs.open("%s%sconsole_output" % (paths.SQLMAP_OUTPUT_PATH, os.sep), "wb", UNICODE_ENCODING)
+                console_output_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "console_output"), "wb", UNICODE_ENCODING)
                 console_output_fd.write(failedParseOn)
                 console_output_fd.close()
 
-            errMsg += "- scan folder is %s" % paths.SQLMAP_OUTPUT_PATH
-            logger.error(errMsg)
+            if failedTraceBack:
+                traceback_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "traceback"), "wb", UNICODE_ENCODING)
+                traceback_fd.write(failedTraceBack)
+                traceback_fd.close()
+
             beep()
 
             if conf.stopFail is True:
                 return retVal
 
-        retVal &= result
+        retVal &= bool(result)
 
     dataToStdout("\n")
 
@@ -242,7 +250,6 @@ def runCase(switches=None, parse=None):
     unhandled_exception = None
     result = False
     console = ""
-    tback = None
 
     try:
         result = start()
@@ -258,15 +265,12 @@ def runCase(switches=None, parse=None):
         LOGGER_HANDLER.stream = sys.stdout = sys.__stdout__
 
     if unhandled_exception:
-        logger.error("unhandled exception occurred")
-        tback = traceback.format_exc()
-        retVal = False
+        failedTraceBack = "unhandled exception: %s" % str(traceback.format_exc())
+        retVal = None
     elif handled_exception:
-        logger.error("handled exception occurred")
-        tback = traceback.format_exc()
-        retVal = False
-    elif result is False:  # if None, ignore
-        logger.error("the test did not identify the SQL injection")
+        failedTraceBack = "handled exception: %s" % str(traceback.format_exc())
+        retVal = None
+    elif result is False:  # this means no SQL injection has been detected - if None, ignore
         retVal = False
 
     console = getUnicode(console, system=True)
@@ -280,12 +284,12 @@ def runCase(switches=None, parse=None):
 
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
-                    retVal = False
+                    retVal = None
                     failedItem = item
                     break
 
             elif item not in parse_on:
-                retVal = False
+                retVal = None
                 failedItem = item
                 break
 
@@ -294,8 +298,6 @@ def runCase(switches=None, parse=None):
 
     elif retVal is False:
         failedParseOn = console
-        if tback:
-            failedTraceBack = tback
 
     return retVal
 
