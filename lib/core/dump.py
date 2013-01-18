@@ -175,7 +175,8 @@ class Dump(object):
                 for setting in settings:
                     self._write("    %s: %s" % (subHeader, setting))
 
-        self.singleString("")
+        if userSettings:
+            self.singleString("")
 
     def dbs(self, dbs):
         self.lister("available databases", dbs)
