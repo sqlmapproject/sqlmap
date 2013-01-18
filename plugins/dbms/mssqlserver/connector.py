@@ -44,7 +44,7 @@ class Connector(GenericConnector):
         except pymssql.OperationalError, msg:
             raise SqlmapConnectionException(msg)
 
-        self.setCursor()
+        self.initCursor()
         self.connected()
 
     def fetchall(self):

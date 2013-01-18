@@ -47,25 +47,6 @@ def hexdecode(value):
 def hexencode(value):
     return utf8encode(value).encode("hex")
 
-def md5hash(value):
-    if "hashlib" in sys.modules:
-        return hashlib.md5(value).hexdigest()
-    else:
-        return md5.new(value).hexdigest()
-
-def orddecode(value):
-    packedString = struct.pack("!" + "I" * len(value), *value)
-    return "".join(chr(char) for char in struct.unpack("!" + "I" * (len(packedString) / 4), packedString))
-
-def ordencode(value):
-    return tuple(ord(char) for char in value)
-
-def sha1hash(value):
-    if "hashlib" in sys.modules:
-        return hashlib.sha1(value).hexdigest()
-    else:
-        return sha.new(value).hexdigest()
-
 def unicodeencode(value, encoding=None):
     """
     Return 8-bit string representation of the supplied unicode value:

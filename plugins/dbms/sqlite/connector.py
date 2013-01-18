@@ -63,7 +63,7 @@ class Connector(GenericConnector):
             except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
                 raise SqlmapConnectionException(msg[0])
 
-        self.setCursor()
+        self.initCursor()
         self.connected()
 
     def fetchall(self):

@@ -99,6 +99,7 @@ from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
+from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import ML
 from lib.core.settings import NULL
@@ -570,7 +571,7 @@ def paramToDict(place, parameters=None):
                 for encoding in ("hex", "base64"):
                     try:
                         decoded = value.decode(encoding)
-                        if all(_ in string.printable for _ in decoded):
+                        if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in string.printable for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
                             warnMsg += "seems to be '%s' encoded" % encoding
                             logger.warn(warnMsg)
@@ -767,13 +768,6 @@ def dataToOutFile(filename, data):
             f.write(data)
 
     return retVal
-
-def strToHex(value):
-    """
-    Converts string value to it's hexadecimal representation
-    """
-
-    return (value if not isinstance(value, unicode) else value.encode(UNICODE_ENCODING)).encode("hex").upper()
 
 def readInput(message, default=None, checkBatch=True):
     """
@@ -1313,20 +1307,6 @@ def getCharset(charsetType=None):
 
     return asciiTbl
 
-def searchEnvPath(filename):
-    retVal = None
-    path = os.environ.get("PATH", "")
-    paths = path.split(";") if IS_WIN else path.split(":")
-
-    for _ in paths:
-        _ = _.replace(";", "")
-        retVal = os.path.exists(os.path.normpath(os.path.join(_, filename)))
-
-        if retVal:
-            break
-
-    return retVal
-
 def directoryPath(filepath):
     """
     Returns directory path for a given filepath
@@ -1434,13 +1414,6 @@ def showStaticWords(firstPage, secondPage):
 
     logger.info(infoMsg)
 
-def isWindowsPath(filepath):
-    """
-    Returns True if given filepath is in Windows format
-    """
-
-    return re.search("\A[\w]\:\\\\", filepath) is not None
-
 def isWindowsDriveLetterPath(filepath):
     """
     Returns True if given filepath starts with a Windows drive letter
@@ -1469,18 +1442,6 @@ def ntToPosixSlashes(filepath):
     """
 
     return filepath.replace('\\', '/')
-
-def isBase64EncodedString(subject):
-    """
-    Checks if the provided string is Base64 encoded
-
-    >>> isBase64EncodedString('dGVzdA==')
-    True
-    >>> isBase64EncodedString('123456')
-    False
-    """
-
-    return re.match(r"\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z", subject) is not None
 
 def isHexEncodedString(subject):
     """
@@ -2485,20 +2446,6 @@ def showHttpErrorCodes():
           for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
 
-def getComparePageRatio(firstPage, secondPage, filtered=False):
-    """
-    Returns comparison ratio between two given pages
-    """
-
-    if filtered:
-        (firstPage, secondPage) = map(getFilteredPageContent, (firstPage, secondPage))
-
-    seqMatcher = getCurrentThreadData().seqMatcher
-    seqMatcher.set_seq1(firstPage)
-    seqMatcher.set_seq2(secondPage)
-
-    return seqMatcher.quick_ratio()
-
 def openFile(filename, mode='r'):
     """
     Returns file handle of a given filename
@@ -2750,16 +2697,6 @@ def unsafeSQLIdentificatorNaming(name):
             if retVal.startswith(prefix):
                 retVal = retVal[len(prefix):]
 
-    return retVal
-
-def isBinaryData(value):
-    """
-    Tests given value for binary content
-    """
-
-    retVal = False
-    if isinstance(value, basestring):
-        retVal = reduce(lambda x, y: x or not (y in string.printable or ord(y) > 255), value, False)
     return retVal
 
 def isNoneValue(value):
