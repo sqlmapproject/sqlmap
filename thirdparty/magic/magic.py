@@ -195,7 +195,7 @@ try:
     magic_compile.argtypes = [magic_t, c_char_p]
 
 except ImportError:
-    pass
+    from_file = from_buffer = lambda *args, **kwargs: "unknown"
 
 MAGIC_NONE = 0x000000 # No flags
 MAGIC_DEBUG = 0x000001 # Turn on debugging
