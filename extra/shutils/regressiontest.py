@@ -15,6 +15,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 TIME = time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
+SQLMAP_HOME = "/opt/sqlmap"
 
 SMTP_SERVER = "127.0.0.1"
 SMTP_PORT = 25
@@ -26,7 +27,7 @@ CONTENT = ""
 TEST_COUNTS = []
 ATTACHMENTS = {}
 
-command_line = "cd ../../ ; rm -f $REGRESSION_FILE ; python sqlmap.py --live-test"
+command_line = "cd %s && python sqlmap.py --live-test" % SQLMAP_HOME
 proc = subprocess.Popen(command_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 proc.wait()
