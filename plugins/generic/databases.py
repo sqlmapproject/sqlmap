@@ -761,7 +761,7 @@ class Databases:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
 
-        if conf.tbl is not None and conf.db is None:
+        if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
             warnMsg = "missing database parameter. sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
             warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
