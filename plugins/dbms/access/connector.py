@@ -45,7 +45,7 @@ class Connector(GenericConnector):
         except (pyodbc.Error, pyodbc.OperationalError), msg:
             raise SqlmapConnectionException(msg[1])
 
-        self.setCursor()
+        self.initCursor()
         self.connected()
 
     def fetchall(self):

@@ -39,7 +39,7 @@ class Connector(GenericConnector):
         except (pymysql.OperationalError, pymysql.InternalError), msg:
             raise SqlmapConnectionException(msg[1])
 
-        self.setCursor()
+        self.initCursor()
         self.connected()
 
     def fetchall(self):

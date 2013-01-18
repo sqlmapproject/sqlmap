@@ -41,11 +41,8 @@ class Connector:
         self.connector = None
         self.cursor = None
 
-    def setCursor(self):
+    def initCursor(self):
         self.cursor = self.connector.cursor()
-
-    def getCursor(self):
-        return self.cursor
 
     def close(self):
         try:

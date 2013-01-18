@@ -38,7 +38,7 @@ class Connector(GenericConnector):
             raise SqlmapConnectionException(msg)
 
 
-        self.setCursor()
+        self.initCursor()
         self.connected()
 
     def fetchall(self):

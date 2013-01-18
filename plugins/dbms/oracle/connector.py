@@ -48,7 +48,7 @@ class Connector(GenericConnector):
             except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError), msg:
                 raise SqlmapConnectionException(msg)
 
-        self.setCursor()
+        self.initCursor()
         self.connected()
 
     def fetchall(self):
