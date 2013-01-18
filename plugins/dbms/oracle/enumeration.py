@@ -79,9 +79,6 @@ class Enumeration(GenericEnumeration):
                             # In Oracle we get the list of roles as string
                             roles.add(role)
 
-                    if isAdminFromPrivileges(roles):
-                        areAdmins.add(user)
-
                     if user in kb.data.cachedUsersRoles:
                         kb.data.cachedUsersRoles[user] = list(roles.union(kb.data.cachedUsersRoles[user]))
                     else:
@@ -161,5 +158,9 @@ class Enumeration(GenericEnumeration):
             errMsg = "unable to retrieve the roles "
             errMsg += "for the database users"
             raise SqlmapNoneDataException(errMsg)
+
+        for user, privileges in kb.data.cachedUsersRoles.items():
+            if isAdminFromPrivileges(privileges):
+                areAdmins.add(user)
 
         return kb.data.cachedUsersRoles, areAdmins
