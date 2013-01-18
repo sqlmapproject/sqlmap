@@ -1928,7 +1928,6 @@
             <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
         </parse>
     </case>
-
     <case name="Oracle boolean-based multi-threaded search enumeration - column given databases and table">
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
@@ -1974,7 +1973,6 @@
             <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
         </parse>
     </case>
-
     <!-- TODO: add IBM DB2 test cases -->
     <case name="SQLite multi-threaded search enumeration - database">
         <switches>
@@ -2150,6 +2148,73 @@
             <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
+    <case name="Oracle boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users WHERE ROWNUM=1"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[1\].+1, luther, blisset'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users WHERE ROWNUM=1"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[1\].+1, luther, blisset'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users WHERE ROWNUM=1"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[1\].+1, luther, blisset'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <!-- TODO: add IBM DB2 test cases -->
     <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -2191,7 +2256,6 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
             <item value="r'SELECT \* FROM users ORDER BY name \[4\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
