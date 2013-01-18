@@ -157,7 +157,7 @@ class Agent(object):
             return self.payloadDirect(expression)
 
         expression = self.cleanupPayload(expression)
-        expression = unescaper.unescape(expression)
+        expression = unescaper.escape(expression)
         query = None
 
         if where is None and kb.technique and kb.technique in kb.injection.data:
@@ -917,7 +917,7 @@ class Agent(object):
         else:
             lengthExpr = lengthQuery % expression
 
-        return unescaper.unescape(lengthExpr)
+        return unescaper.escape(lengthExpr)
 
     def forgeCaseStatement(self, expression):
         """

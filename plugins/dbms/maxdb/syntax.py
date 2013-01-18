@@ -12,9 +12,5 @@ class Syntax(GenericSyntax):
         GenericSyntax.__init__(self)
 
     @staticmethod
-    def unescape(expression, quote=True):
-        return expression
-
-    @staticmethod
     def escape(expression):
         return expression

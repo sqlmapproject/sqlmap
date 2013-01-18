@@ -84,7 +84,7 @@ class UDF:
         if udfName is None:
             udfName = "sys_exec"
 
-        cmd = unescaper.unescape(self.udfForgeCmd(cmd))
+        cmd = unescaper.escape(self.udfForgeCmd(cmd))
 
         return inject.goStacked("SELECT %s(%s)" % (udfName, cmd), silent)
 
@@ -103,7 +103,7 @@ class UDF:
 
                 output = new_output
         else:
-            cmd = unescaper.unescape(self.udfForgeCmd(cmd))
+            cmd = unescaper.escape(self.udfForgeCmd(cmd))
 
             inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
             output = unArrayizeValue(inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False))

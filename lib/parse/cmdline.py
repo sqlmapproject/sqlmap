@@ -209,9 +209,9 @@ def cmdLineParser():
                              action="store_true",
                              help="Turn off payload casting mechanism")
 
-        injection.add_option("--no-unescape", dest="noUnescape",
+        injection.add_option("--no-escape", dest="noEscape",
                              action="store_true",
-                             help="Turn off string unescaping mechanism")
+                             help="Turn off string escaping mechanism")
 
         injection.add_option("--prefix", dest="prefix",
                              help="Injection payload prefix string")

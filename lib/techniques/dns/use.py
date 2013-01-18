@@ -66,7 +66,7 @@ def dnsUse(payload, expression):
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
 
                 expressionRequest = getSQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsName)
-                expressionUnescaped = unescaper.unescape(expressionRequest)
+                expressionUnescaped = unescaper.escape(expressionRequest)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
                     query = agent.prefixQuery("; %s" % expressionUnescaped)

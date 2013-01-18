@@ -278,7 +278,7 @@ MYSQL_ERROR_CHUNK_LENGTH = 50
 # Maximum length used for retrieving data over MSSQL error based payload due to trimming problems with longer result strings
 MSSQL_ERROR_CHUNK_LENGTH = 100
 
-# Do not unescape the injected statement if it contains any of the following SQL words
+# Do not escape the injected statement if it contains any of the following SQL keywords
 EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", "'%s'" % CHAR_INFERENCE_MARK)
 
 # Mark used for replacement of reflected values
@@ -307,9 +307,6 @@ HASH_MOD_ITEM_DISPLAY = 11
 
 # Maximum integer value
 MAX_INT = sys.maxint
-
-# List of deprecated options
-DEPRECATED_OPTIONS = ("--replicate",)
 
 # Parameters to be ignored in detection phase (upper case)
 IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")

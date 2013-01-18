@@ -172,7 +172,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
         randQuery = randomStr(UNION_MIN_RESPONSE_CHARS)
         phrase = "%s%s%s".lower() % (kb.chars.start, randQuery, kb.chars.stop)
         randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
-        randQueryUnescaped = unescaper.unescape(randQueryProcessed)
+        randQueryUnescaped = unescaper.escape(randQueryProcessed)
 
         # Forge the union SQL injection request
         query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
@@ -194,7 +194,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                 randQuery2 = randomStr(UNION_MIN_RESPONSE_CHARS)
                 phrase2 = "%s%s%s".lower() % (kb.chars.start, randQuery2, kb.chars.stop)
                 randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
-                randQueryUnescaped2 = unescaper.unescape(randQueryProcessed2)
+                randQueryUnescaped2 = unescaper.escape(randQueryProcessed2)
 
                 # Confirm that it is a full union SQL injection
                 query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)

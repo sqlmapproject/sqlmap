@@ -30,4 +30,4 @@ class SQLiteMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Tak
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-    unescaper[DBMS.SQLITE] = Syntax.unescape
+    unescaper[DBMS.SQLITE] = Syntax.escape

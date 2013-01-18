@@ -17,7 +17,7 @@ class Syntax(GenericSyntax):
         GenericSyntax.__init__(self)
 
     @staticmethod
-    def unescape(expression, quote=True):
+    def escape(expression, quote=True):
         unescaped = expression
 
         if isDBMSVersionAtLeast('3'):
@@ -28,30 +28,3 @@ class Syntax(GenericSyntax):
                 unescaped = "X'%s'" % binascii.hexlify(expression)
 
         return unescaped
-
-    @staticmethod
-    def escape(expression):
-        # Example on SQLite 3, not supported on SQLite 2:
-        # select X'48'||X'656c6c6f20576f726c6400'; -- Hello World
-        while True:
-            index = expression.find("X'")
-            if index == -1:
-                break
-
-            firstIndex = index
-            index = expression[firstIndex + 2:].find("'")
-
-            if index == -1:
-                raise SqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
-
-            lastIndex = firstIndex + index + 3
-            old = expression[firstIndex:lastIndex]
-            oldUpper = old.upper()
-            oldUpper = oldUpper.replace("X'", "").replace("'", "")
-
-            for i in xrange(len(oldUpper) / 2):
-                char = oldUpper[i * 2:i * 2 + 2]
-                escaped = "'%s'" % chr(int(char, 16))
-            expression = expression.replace(old, escaped)
-
-        return expression

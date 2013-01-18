@@ -14,7 +14,7 @@ class Syntax(GenericSyntax):
         GenericSyntax.__init__(self)
 
     @staticmethod
-    def unescape(expression, quote=True):
+    def escape(expression, quote=True):
         if isDBMSVersionAtLeast('2.1'):
             if quote:
                 while True:
@@ -47,26 +47,3 @@ class Syntax(GenericSyntax):
 
         return expression
 
-    @staticmethod
-    def escape(expression):
-        while True:
-            index = expression.find("ASCII_CHAR(")
-            if index == -1:
-                break
-
-            firstIndex = index
-            index = expression[firstIndex:].find(")")
-
-            if index == -1:
-                raise SqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
-
-            lastIndex = firstIndex + index + 1
-            old = expression[firstIndex:lastIndex]
-            oldUpper = old.upper()
-            oldUpper = oldUpper.lstrip("ASCII_CHAR(").rstrip(")")
-            oldUpper = oldUpper.split("||")
-
-            escaped = "'%s'" % "".join(chr(int(char)) for char in oldUpper)
-            expression = expression.replace(old, escaped).replace("'||'", "")
-
-        return expression

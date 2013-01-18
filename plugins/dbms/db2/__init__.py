@@ -31,4 +31,4 @@ class DB2Map(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeov
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-    unescaper[DBMS.DB2] = Syntax.unescape
+    unescaper[DBMS.DB2] = Syntax.escape

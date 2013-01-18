@@ -107,9 +107,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
             nulledCastedField = agent.nullAndCastField(fieldToCastStr)
             expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
-            expressionUnescaped = unescaper.unescape(expressionReplaced)
+            expressionUnescaped = unescaper.escape(expressionReplaced)
         else:
-            expressionUnescaped = unescaper.unescape(expression)
+            expressionUnescaped = unescaper.escape(expression)
 
         if length and isinstance(length, basestring) and length.isdigit():
             length = int(length)
@@ -234,7 +234,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     # e.g.: ... > '%c' -> ... > ORD(..)
                     markingValue = "'%s'" % CHAR_INFERENCE_MARK
-                    unescapedCharValue = unescaper.unescape("'%s'" % decodeIntToUnicode(posValue))
+                    unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
@@ -461,7 +461,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     # it via equal against the query output
                     if commonValue is not None:
                         # One-shot query containing equals commonValue
-                        testValue = unescaper.unescape("'%s'" % commonValue) if "'" not in commonValue else unescaper.unescape("%s" % commonValue, quote=False)
+                        testValue = unescaper.escape("'%s'" % commonValue) if "'" not in commonValue else unescaper.escape("%s" % commonValue, quote=False)
                         query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
                         query = agent.suffixQuery(query)
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
@@ -483,7 +483,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if commonPattern is not None:
                         # Substring-query containing equals commonPattern
                         subquery = queries[Backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
-                        testValue = unescaper.unescape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.unescape("%s" % commonPattern, quote=False)
+                        testValue = unescaper.escape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.escape("%s" % commonPattern, quote=False)
                         query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
                         query = agent.suffixQuery(query)
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)

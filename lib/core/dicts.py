@@ -202,9 +202,10 @@ POST_HINT_CONTENT_TYPES = {
                                 POST_HINT.XML: "application/xml",
                           }
 
-DEPRECATED_HINTS = {
+DEPRECATED_OPTIONS = {
                         "--replicate": "use '--dump-format=SQLITE' instead",
-                   }
+                        "--no-unescape": "use '--no-escape' instead",
+                     }
 
 DUMP_DATA_PREPROCESS = {
                             DBMS.ORACLE: {"XMLTYPE": "(%s).getStringVal()"},  # Reference: https://www.tibcommunity.com/docs/DOC-3643

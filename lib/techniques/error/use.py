@@ -88,7 +88,7 @@ def _oneShotErrorUse(expression, field=None):
                 query = agent.prefixQuery(vector)
                 query = agent.suffixQuery(query)
                 injExpression = expression.replace(field, nulledCastedField, 1) if field else expression
-                injExpression = unescaper.unescape(injExpression)
+                injExpression = unescaper.escape(injExpression)
                 injExpression = query.replace("[QUERY]", injExpression)
                 payload = agent.payload(newValue=injExpression)
 

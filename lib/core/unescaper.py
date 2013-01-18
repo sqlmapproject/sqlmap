@@ -11,8 +11,8 @@ from lib.core.datatype import AttribDict
 from lib.core.settings import EXCLUDE_UNESCAPE
 
 class Unescaper(AttribDict):
-    def unescape(self, expression, quote=True, dbms=None):
-        if conf.noUnescape:
+    def escape(self, expression, quote=True, dbms=None):
+        if conf.noEscape:
             return expression
 
         if expression is None:

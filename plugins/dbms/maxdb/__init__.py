@@ -30,4 +30,4 @@ class MaxDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Take
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-    unescaper[DBMS.MAXDB] = Syntax.unescape
+    unescaper[DBMS.MAXDB] = Syntax.escape

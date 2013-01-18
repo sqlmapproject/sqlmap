@@ -13,7 +13,7 @@ class Syntax(GenericSyntax):
         GenericSyntax.__init__(self)
 
     @staticmethod
-    def unescape(expression, quote=True):
+    def escape(expression, quote=True):
         if quote:
             while True:
                 index = expression.find("'")
@@ -33,29 +33,5 @@ class Syntax(GenericSyntax):
                 expression = expression.replace(old, unescaped)
         else:
             expression = "+".join("CHAR(%d)" % ord(c) for c in expression)
-
-        return expression
-
-    @staticmethod
-    def escape(expression):
-        while True:
-            index = expression.find("CHAR(")
-            if index == -1:
-                break
-
-            firstIndex = index
-            index = expression[firstIndex:].find("))")
-
-            if index == -1:
-                raise SqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
-
-            lastIndex = firstIndex + index + 1
-            old = expression[firstIndex:lastIndex]
-            oldUpper = old.upper()
-            oldUpper = oldUpper.replace("CHAR(", "").replace(")", "")
-            oldUpper = oldUpper.split("+")
-
-            escaped = "'%s'" % "".join(chr(int(char)) for char in oldUpper)
-            expression = expression.replace(old, escaped)
 
         return expression

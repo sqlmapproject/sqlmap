@@ -16,13 +16,7 @@ class Syntax:
         pass
 
     @staticmethod
-    def unescape(expression, quote=True):
-        errMsg = "'unescape' method must be defined "
-        errMsg += "into the specific DBMS plugin"
-        raise SqlmapUndefinedMethod(errMsg)
-
-    @staticmethod
     def escape(expression):
         errMsg = "'escape' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg += "inside the specific DBMS plugin"
         raise SqlmapUndefinedMethod(errMsg)

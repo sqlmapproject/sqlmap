@@ -55,7 +55,7 @@ _arguments -C -s \
   '(--invalid-bignum)'--invalid-bignum'[Use big numbers for invalidating values]' \
   '(--invalid-logical)'--invalid-logical'[Use logical operations for invalidating values]' \
   '(--no-cast)'--no-cast'[Turn off payload casting mechanism]' \
-  '(--no-unescape)'--no-unescape'[Turn off string unescaping mechanism]' \
+  '(--no-escape)'--no-unescape'[Turn off string escaping mechanism]' \
   '(--prefix)'--prefix=-'[Injection payload prefix string]:PREFIX' \
   '(--suffix)'--suffix=-'[Injection payload suffix string]:SUFFIX' \
   '(--skip)'--skip=-'[Skip testing for given parameter(s)]:SKIP' \

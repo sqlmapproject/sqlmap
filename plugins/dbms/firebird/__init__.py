@@ -30,4 +30,4 @@ class FirebirdMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, T
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-    unescaper[DBMS.FIREBIRD] = Syntax.unescape
+    unescaper[DBMS.FIREBIRD] = Syntax.escape

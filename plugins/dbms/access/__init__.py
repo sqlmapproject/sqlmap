@@ -30,4 +30,4 @@ class AccessMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Tak
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-    unescaper[DBMS.ACCESS] = Syntax.unescape
+    unescaper[DBMS.ACCESS] = Syntax.escape

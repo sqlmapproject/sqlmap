@@ -58,7 +58,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
     if retVal is None:
         # Prepare expression with delimiters
-        injExpression = unescaper.unescape(agent.concatQuery(expression, unpack))
+        injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
 
         where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else None
 

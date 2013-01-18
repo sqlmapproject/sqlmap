@@ -14,7 +14,7 @@ class Syntax(GenericSyntax):
         GenericSyntax.__init__(self)
 
     @staticmethod
-    def unescape(expression, quote=True):
+    def escape(expression, quote=True):
         if expression == u"'''":
             return "CHR(%d)" % (ord("'"))
 
@@ -42,31 +42,5 @@ class Syntax(GenericSyntax):
                 expression = expression.replace(old, unescaped)
         else:
             expression = "||".join("CHR(%d)" % ord(c) for c in expression)
-
-        return expression
-
-    @staticmethod
-    def escape(expression):
-        logMsg = "escaping %s" % expression
-        logger.info(logMsg)
-        while True:
-            index = expression.find("CHR(")
-            if index == -1:
-                break
-
-            firstIndex = index
-            index = expression[firstIndex:].find(")")
-
-            if index == -1:
-                raise SqlmapSyntaxException("Unenclosed ) in '%s'" % expression)
-
-            lastIndex = firstIndex + index + 1
-            old = expression[firstIndex:lastIndex]
-            oldUpper = old.upper()
-            oldUpper = oldUpper.lstrip("CHR(").rstrip(")")
-            oldUpper = oldUpper.split("||")
-
-            escaped = "'%s'" % "".join(chr(int(char)) for char in oldUpper)
-            expression = expression.replace(old, escaped)
 
         return expression
