@@ -88,7 +88,7 @@ if CONTENT:
 
     for test_count, attachment in ATTACHMENTS.items():
         attachment = MIMEText(attachment)
-        attachment.add_header('Content-Disposition', 'attachment', filename="test_case_%d_console_output.txt" % test_count)
+        attachment.add_header("Content-Disposition", "attachment", filename="test_case_%d_console_output.txt" % test_count)
         msg.attach(attachment)
 
     s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT, timeout=SMTP_TIMEOUT)
