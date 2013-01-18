@@ -3,7 +3,6 @@
 # Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 # See the file 'doc/COPYING' for copying permission
 
-# Removes duplicate entries in wordlist like files
 import codecs
 import os
 import re
