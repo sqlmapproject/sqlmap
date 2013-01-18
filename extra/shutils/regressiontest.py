@@ -39,7 +39,7 @@ for failed_test in failed_tests:
     parse = failed_test[3] if failed_test[3] else None
     output_folder = failed_test[4]
     traceback = False if failed_test[5] == "False" else bool(failed_test[5])
-    detected = True if failed_test[6] else False
+    detected = False if failed_test[6] else True
 
     TEST_COUNTS.append(test_count)
 
