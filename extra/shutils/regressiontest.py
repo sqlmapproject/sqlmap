@@ -27,7 +27,7 @@ CONTENT = ""
 TEST_COUNTS = []
 ATTACHMENTS = {}
 
-command_line = "cd ../../ ; rm -f $REGRESSION_FILE ; python sqlmap.py --live-test --run-case 'Invalid logic'"
+command_line = "cd ../../ ; rm -f $REGRESSION_FILE ; python sqlmap.py --live-test --run-case 'Invalid'"
 proc = subprocess.Popen(command_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 proc.wait()
 stdout, stderr = proc.communicate()
@@ -62,19 +62,21 @@ for failed_test in failed_tests:
 
     if parse:
         CONTENT += " at parsing: %s:\n\n" % parse
-        CONTENT += "### LOG FILE:\n\n"
+        CONTENT += "### Log file:\n\n"
         CONTENT += "%s\n" % log
     elif not detected:
         CONTENT += " - SQL injection not detected\n\n"
 
     if traceback:
-        CONTENT += "### TRACEBACK:\n\n"
+        CONTENT += "### Traceback:\n\n"
         CONTENT += "%s\n" % str(traceback)
 
-    CONTENT += "\n#######################################\n\n"
+    CONTENT += "#######################################################################\n\n"
 
 if CONTENT:
     SUBJECT += " (%s)" % ", ".join("#%d" % count for count in TEST_COUNTS)
+    CONTENT += "\n\nRegression test finished at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
+
     msg = MIMEMultipart()
     msg["Subject"] = SUBJECT
     msg["From"] = FROM
