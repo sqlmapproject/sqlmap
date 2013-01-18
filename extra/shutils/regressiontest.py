@@ -91,7 +91,11 @@ if CONTENT:
         attachment.add_header("Content-Disposition", "attachment", filename="test_case_%d_console_output.txt" % test_count)
         msg.attach(attachment)
 
-    s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT, timeout=SMTP_TIMEOUT)
-    #s.set_debuglevel(1)
-    s.sendmail(FROM, TO, msg.as_string())
-    s.quit()
+    try:
+        s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT, timeout=SMTP_TIMEOUT)
+        #s.set_debuglevel(1)
+        s.sendmail(FROM, TO, msg.as_string())
+        s.quit()
+    # Catch all for SMTP exceptions
+    except smtplib.SMTPException, e:
+        print "Failure to send email: %s" % str(e)
