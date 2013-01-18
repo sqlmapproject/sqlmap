@@ -5,32 +5,22 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import json
-import logging
 import os
 import shutil
-import sys
 import tempfile
-import types
 
 from subprocess import PIPE
 
-from lib.controller.controller import start
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.convert import hexencode
 from lib.core.convert import jsonize
-from lib.core.convert import stdoutencode
 from lib.core.data import paths
-from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
-from lib.core.exception import SqlmapMissingDependence
 from lib.core.optiondict import optDict
-from lib.core.option import init
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import Popen as execute
 from lib.core.subprocessng import send_all
 from lib.core.subprocessng import recv_some
@@ -43,7 +33,6 @@ from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
 from thirdparty.bottle.bottle import static_file
-from thirdparty.bottle.bottle import template
 
 RESTAPI_SERVER_HOST = "127.0.0.1"
 RESTAPI_SERVER_PORT = 8775
