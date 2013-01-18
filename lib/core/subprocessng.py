@@ -11,7 +11,6 @@ import subprocess
 import sys
 import time
 
-from lib.core.common import dataToStdout
 from lib.core.settings import IS_WIN
 
 if IS_WIN:

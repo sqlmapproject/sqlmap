@@ -111,7 +111,6 @@ from lib.core.settings import NULL
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import PYVERSION
 from lib.core.settings import SITE
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SUPPORTED_DBMS

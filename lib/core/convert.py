@@ -5,16 +5,9 @@ Copyright (c) 2006-2012 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-try:
-    import hashlib
-except:
-    import md5
-    import sha
-
 import json
 import pickle
 import sys
-import struct
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
