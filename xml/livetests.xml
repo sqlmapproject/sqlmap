@@ -916,7 +916,7 @@
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
-            <item value="current database:    '/'"/>
+            <item value="r'current database:    '/'"/>
             <item value="hostname:    None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
@@ -956,7 +956,7 @@
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
-            <item value="current database:    '/'"/>
+            <item value="r'current database:    '/'"/>
             <item value="hostname:    None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
@@ -996,7 +996,7 @@
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
-            <item value="current database:    '/'"/>
+            <item value="r'current database:    '/'"/>
             <item value="hostname:    None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
@@ -1036,7 +1036,7 @@
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
-            <item value="current database:    '/'"/>
+            <item value="r'current database:    '/'"/>
             <item value="hostname:    None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
@@ -1091,7 +1091,7 @@
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
-            <item value="current database:    '/'"/>
+            <item value="r'current database:    '/'"/>
             <item value="hostname:    None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
