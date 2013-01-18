@@ -90,7 +90,7 @@
 * Major code cleanup.
 * Added simple file encryption/compression utility, extra/cloak/cloak.py, used by sqlmap to decrypt on the fly Churrasco, UPX executable and web shells consequently reducing drastically the number of anti-virus softwares that mistakenly mark sqlmap as a malware.
 * Updated user's manual.
-* Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://www.sqlmap.org/demo.html.
+* Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://sqlmap.org/demo.html.
 
 # Version 0.8 release candidate (2009-09-21)
 
@@ -262,7 +262,7 @@
 * Added Microsoft SQL Server extensive DBMS fingerprint checks based upon accurate '@@version' parsing matching on an XML file to get also the exact patching level of the DBMS;
 * Added support for query ETA (Estimated Time of Arrival) real time calculation (--eta);
 * Added support to extract database management system users password hash on MySQL and PostgreSQL (--passwords);
-* Added docstrings to all functions, classes and methods, consequently released the sqlmap development documentation <http://www.sqlmap.org/dev/>;
+* Added docstrings to all functions, classes and methods, consequently released the sqlmap development documentation <http://sqlmap.org/dev/>;
 * Implemented Google dorking feature (-g) to take advantage of Google results affected by SQL injection to perform other command line argument on their DBMS;
 * Improved logging functionality: passed from banal 'print' to Python native logging library;
 * Added support for more than one parameter in '-p' command line option;
