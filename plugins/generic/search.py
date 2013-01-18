@@ -29,6 +29,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
+from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 from lib.techniques.brute.use import columnExists
 from lib.techniques.brute.use import tableExists
@@ -199,7 +200,7 @@ class Search:
                     if isinstance(values, basestring):
                         values = [values]
                     for value in values:
-                        newValues.append(["SQLite_masterdb", value])
+                        newValues.append(["SQLite_%s" % METADB_SUFFIX, value])
 
                     values = newValues
 
@@ -258,7 +259,7 @@ class Search:
                     if tblConsider == "2":
                         continue
                 else:
-                    foundTbls["SQLite_masterdb"] = []
+                    foundTbls["SQLite_%s" % METADB_SUFFIX] = []
 
                 for db in foundTbls.keys():
                     db = safeSQLIdentificatorNaming(db)
