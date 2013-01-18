@@ -2156,7 +2156,7 @@
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[1\].+1, luther, blisset'"/>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1.+1, luther, blisset'"/>
         </parse>
     </case>
     <case name="Oracle error-based multi-threaded custom SQL query enumeration">
@@ -2167,7 +2167,7 @@
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[1\].+1, luther, blisset'"/>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[.+1.+luther'"/>
         </parse>
     </case>
     <case name="Oracle UNION query multi-threaded custom SQL query enumeration">
