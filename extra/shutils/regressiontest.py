@@ -12,6 +12,7 @@ import subprocess
 import time
 
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 TIME = time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
 
@@ -38,7 +39,7 @@ for failed_test in failed_tests:
     parse = failed_test[3] if failed_test[3] else None
     output_folder = failed_test[4]
     traceback = False if failed_test[5] == "False" else bool(failed_test[5])
-    detection = True if failed_test[6] else False
+    detection = False if failed_test[6] == "False" else bool(failed_test[5])
 
     TEST_COUNTS.append(test_count)
 
@@ -74,10 +75,12 @@ for failed_test in failed_tests:
 
 if CONTENT:
     SUBJECT += " (%s)" % ", ".join("#%d" % count for count in TEST_COUNTS)
-    msg = MIMEText(CONTENT)
+    msg = MIMEMultipart()
     msg["Subject"] = SUBJECT
     msg["From"] = FROM
     msg["To"] = TO
+
+    msg.attach(MIMEText(CONTENT))
 
     for test_count, attachment in ATTACHMENTS.items():
         attachment = MIMEText(attachment)
