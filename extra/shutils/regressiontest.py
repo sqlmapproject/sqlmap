@@ -30,6 +30,10 @@ TO = "dev@sqlmap.org"
 SUBJECT = "Regression test results on %s using revision %s" % (TIME, REVISION)
 
 def prepare_email(content):
+    global FROM
+    global TO
+    global SUBJECT
+
     msg = MIMEMultipart()
     msg["Subject"] = SUBJECT
     msg["From"] = FROM
@@ -40,6 +44,10 @@ def prepare_email(content):
     return msg
 
 def send_email(msg):
+    global SMTP_SERVER
+    global SMTP_PORT
+    global SMTP_TIMEOUT
+
     try:
         s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT, timeout=SMTP_TIMEOUT)
         #s.set_debuglevel(1)
@@ -50,6 +58,8 @@ def send_email(msg):
         print "Failure to send email: %s" % str(e)
 
 def main():
+    global SUBJECT
+
     content = ""
     test_counts = []
     attachments = {}
