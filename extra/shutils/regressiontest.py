@@ -37,7 +37,7 @@ for failed_test in failed_tests:
     test_count = int(failed_test[1])
     parse = failed_test[3] if failed_test[3] else None
     output_folder = failed_test[4]
-    traceback = failed_test[5]
+    traceback = bool(failed_test[5])
     detection = True if failed_test[6] else False
 
     TEST_COUNTS.append(test_count)
@@ -81,7 +81,7 @@ if CONTENT:
 
     for test_count, attachment in ATTACHMENTS:
         attachment = MIMEText(attachment)
-        attachment.add_header('Content-Disposition', 'attachment', filename="%d.console_output.txt" % test_count)
+        attachment.add_header('Content-Disposition', 'attachment', filename="test_case_%d_console_output.txt" % test_count)
         msg.attach(attachment)
 
     s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT, timeout=SMTP_TIMEOUT)
