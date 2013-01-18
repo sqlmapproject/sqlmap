@@ -131,7 +131,6 @@ from lib.parse.payloads import loadPayloads
 from lib.request.basic import checkCharEncoding
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
-from lib.request.proxy import ProxyHTTPSHandler
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.httpshandler import HTTPSHandler
@@ -970,17 +969,7 @@ def _setHTTPProxy():
             proxyString = ""
 
         proxyString += "%s:%d" % (hostname, port)
-
-        # Workaround for http://bugs.python.org/issue1424152 (urllib/urllib2:
-        # HTTPS over (Squid) Proxy fails) as long as HTTP over SSL requests
-        # can't be tunneled over an HTTP proxy natively by Python (<= 2.5)
-        # urllib2 standard library
-        if PYVERSION >= "2.6":
-            proxyHandler = urllib2.ProxyHandler({"http": proxyString, "https": proxyString})
-        elif conf.scheme == "https":
-            proxyHandler = ProxyHTTPSHandler(proxyString)
-        else:
-            proxyHandler = urllib2.ProxyHandler({"http": proxyString})
+        proxyHandler = urllib2.ProxyHandler({"http": proxyString, "https": proxyString})
 
 def _setSafeUrl():
     """
