@@ -41,7 +41,7 @@ class _ThreadData(threading.local):
         self.disableStdOut = False
         self.hashDBCursor = None
         self.inTransaction = False
-        self.lastComparisonPage = None
+        self.lastComparisonContent = None
         self.lastErrorPage = None
         self.lastHTTPError = None
         self.lastRedirectMsg = None

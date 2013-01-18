@@ -46,8 +46,8 @@ def _adjust(condition, getRatioValue):
 def _comparison(page, headers, code, getRatioValue, pageLength):
     threadData = getCurrentThreadData()
 
-    if kb.testMode:
-        threadData.lastComparisonPage = page
+    if kb.testMode or any((conf.string, conf.notString, conf.regexp)):
+        threadData.lastComparisonContent = "%s%s" % (listToStrValue(headers.headers if headers else ""), page or "")
 
     if page is None and pageLength is None:
         return None
@@ -55,20 +55,17 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
-    if any((conf.string, conf.notString, conf.regexp)):
-        rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
+    # String to match in page when the query is True and/or valid
+    if conf.string:
+        return conf.string in threadData.lastComparisonContent
 
-        # String to match in page when the query is True and/or valid
-        if conf.string:
-            return conf.string in rawResponse
+    # String to match in page when the query is False and/or invalid
+    if conf.notString:
+        return conf.notString not in threadData.lastComparisonContent
 
-        # String to match in page when the query is False and/or invalid
-        if conf.notString:
-            return conf.notString not in rawResponse
-
-        # Regular expression to match in page when the query is True and/or valid
-        if conf.regexp:
-            return re.search(conf.regexp, rawResponse, re.I | re.M) is not None
+    # Regular expression to match in page when the query is True and/or valid
+    if conf.regexp:
+        return re.search(conf.regexp, threadData.lastComparisonContent, re.I | re.M) is not None
 
     # HTTP code to match when the query is valid
     if conf.code:
