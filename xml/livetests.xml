@@ -913,7 +913,7 @@
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="current database:    '/'"/>
@@ -953,7 +953,7 @@
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="current database:    '/'"/>
@@ -968,6 +968,7 @@
             <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <!-- TODO: this test case fails because of issue #357 -->
     <case name="Firebird UNION query multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
@@ -992,7 +993,7 @@
         </switches>
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
-            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="current database:    '/'"/>
@@ -1007,6 +1008,7 @@
             <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <!-- TODO: this test case fails because of issue #357 -->
     <case name="Firebird partial UNION query multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
@@ -1031,7 +1033,7 @@
         </switches>
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
-            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="current database:    '/'"/>
@@ -1057,7 +1059,7 @@
             <isDba value="True"/>
         </switches>
         <parse>
-            <item value="Title: Firebird AND time-based blind \(heavy query\)"/>
+            <item value="Title: Firebird AND time-based blind (heavy query)"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user is DBA:    True"/>
         </parse>
@@ -1086,7 +1088,7 @@
         </switches>
         <parse>
             <item value="Title: Firebird inline queries"/>
-            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 (dialect 3)'"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="current database:    '/'"/>

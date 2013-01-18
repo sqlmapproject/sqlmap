@@ -275,6 +275,9 @@ def runCase(switches=None, parse=None):
 
     console = getUnicode(console, system=True)
 
+    print "result:", result
+    print "console:", console
+
     if parse and retVal:
         with codecs.open(conf.dumper.getOutputFile(), "rb", UNICODE_ENCODING) as f:
             content = f.read()
