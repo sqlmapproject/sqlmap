@@ -99,6 +99,7 @@ from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
+from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import ML
 from lib.core.settings import NULL
@@ -570,7 +571,7 @@ def paramToDict(place, parameters=None):
                 for encoding in ("hex", "base64"):
                     try:
                         decoded = value.decode(encoding)
-                        if all(_ in string.printable for _ in decoded):
+                        if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in string.printable for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
                             warnMsg += "seems to be '%s' encoded" % encoding
                             logger.warn(warnMsg)
