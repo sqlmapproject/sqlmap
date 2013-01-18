@@ -39,7 +39,7 @@ for failed_test in failed_tests:
     parse = failed_test[3] if failed_test[3] else None
     output_folder = failed_test[4]
     traceback = False if failed_test[5] == "False" else bool(failed_test[5])
-    detection = False if failed_test[6] == "False" else bool(failed_test[5])
+    detected = True if failed_test[6] else False
 
     TEST_COUNTS.append(test_count)
 
@@ -64,7 +64,7 @@ for failed_test in failed_tests:
         CONTENT += " at parsing: %s:\n\n" % parse
         CONTENT += "### LOG FILE:\n\n"
         CONTENT += "%s\n" % log
-    elif not detection:
+    elif not detected:
         CONTENT += " - SQL injection not detected\n\n"
 
     if traceback:
