@@ -917,7 +917,7 @@
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="r'current database:    '/'"/>
-            <item value="hostname:    None"/>
+            <item value="hostname:       None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
@@ -957,7 +957,7 @@
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="r'current database:    '/'"/>
-            <item value="hostname:    None"/>
+            <item value="hostname:       None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
@@ -997,7 +997,7 @@
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="r'current database:    '/'"/>
-            <item value="hostname:    None"/>
+            <item value="hostname:       None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
@@ -1037,7 +1037,7 @@
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="r'current database:    '/'"/>
-            <item value="hostname:    None"/>
+            <item value="hostname:       None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
@@ -1092,7 +1092,7 @@
             <item value="banner:    '2.5.0'"/>
             <item value="current user:    'SYSDBA'"/>
             <item value="r'current database:    '/'"/>
-            <item value="hostname:    None"/>
+            <item value="hostname:       None"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
