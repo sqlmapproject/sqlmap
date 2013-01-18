@@ -360,11 +360,11 @@ def checkSqlInjection(place, parameter, value):
                             kb.matchRatio = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             Request.queryPage(genCmpPayload(), place, raise404=False)
-                            falsePage = threadData.lastComparisonPage or ""
+                            falseContent = threadData.lastComparisonContent
 
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
-                            truePage = threadData.lastComparisonPage or ""
+                            trueContent = threadData.lastComparisonContent
 
                             if trueResult:
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
@@ -377,11 +377,11 @@ def checkSqlInjection(place, parameter, value):
                                     injectable = True
 
                             if not injectable and not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
-                                trueSet = set(extractTextTagContent(truePage))
-                                falseSet = set(extractTextTagContent(falsePage))
-                                candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage else None for _ in (trueSet - falseSet)))
+                                trueSet = set(extractTextTagContent(trueContent))
+                                falseSet = set(extractTextTagContent(falseContent))
+                                candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falseContent else None for _ in (trueSet - falseSet)))
                                 if candidates:
-                                    conf.string = random.sample(candidates, 1)[0]
+                                    conf.string = candidates[0]
                                     infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (place, parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                     logger.info(infoMsg)
 
