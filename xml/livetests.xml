@@ -1044,6 +1044,21 @@
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
+    <case name="IBM DB2 boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <db value="db2inst1"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+5 entries.+the  | iss.+NULL | mei'"/>
+        </parse>
+    </case>
     <case name="SQLite UNION query multi-threaded custom enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -1671,6 +1686,296 @@
             <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] CTXSYS.+\[\*\] SYS.+\[\*\] TSMSYS'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] CTXSYS.+\[\*\] SYS.+\[\*\] TSMSYS'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] CTXSYS.+\[\*\] SYS.+\[\*\] TSMSYS'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys"/>
+            <tbl value="user,aux,wrong"/>
+            <answer value="do you want to dump tables=N,do you want to crack them via a dictionary-based attack=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys"/>
+            <tbl value="user,aux,wrong"/>
+            <answer value="do you want to crack them via a dictionary-based attack=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys"/>
+            <tbl value="user,aux,wrong"/>
+            <answer value="do you want to crack them via a dictionary-based attack=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+1 table.+USERS.+Database: FLOWS_020100.+2 table.+WWV_FLOW_PICK_END_USERS'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+1 table.+USERS.+Database: FLOWS_020100.+2 table.+WWV_FLOW_PICK_END_USERS'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+1 table.+USERS.+Database: FLOWS_020100.+2 table.+WWV_FLOW_PICK_END_USERS'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+
+    <case name="Oracle boolean-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+
+    <!-- TODO: add IBM DB2 test cases -->
     <case name="SQLite multi-threaded search enumeration - database">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
