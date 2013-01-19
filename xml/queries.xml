@@ -209,7 +209,7 @@
         <length query="LENGTH(%s)"/>
         <isnull query="NVL(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="ROWNUM AS LIMIT %s ORDER BY 1 ASC) WHERE LIMIT"/>
+        <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
         <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
         <limitgroupstart/>
         <limitgroupstop/>
@@ -269,8 +269,8 @@
             <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME,ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE OWNER='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE OWNER='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
-            <blind query="SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'" condition="COLUMN_NAME"/>
+            <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND OWNER='%s'" condition="COLUMN_NAME"/>
+            <blind query="SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND OWNER='%s'" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND OWNER='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND OWNER='%s'" condition="COLUMN_NAME"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
@@ -359,12 +359,12 @@
         <substring query="MID((%s),%d,%d)"/>
         <concatenate query="%s&amp;%s"/>
         <case query="SELECT (IIF(%s,1,0))"/>
+        <inference query="ASCW(MID((%s),%d,1)) > %d"/>
         <banner/>
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
         <current_db/>
         <hostname/>
-        <inference query="ASCW(MID((%s),%d,1)) > %d"/>
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->
@@ -401,16 +401,16 @@
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT IIF(%s,1,0)"/>
+        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
         <banner query="SELECT RDB$GET_CONTEXT('SYSTEM','ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
         <hostname/>
+        <is_dba query="CURRENT_USER='SYSDBA'"/>
         <users>
             <inband query="SELECT RDB$USER FROM RDB$USER_PRIVILEGES"/>
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
         </users>
-        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
-        <is_dba query="CURRENT_USER='SYSDBA'"/>
         <tables>
             <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
             <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
@@ -603,8 +603,8 @@
             <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,tabname FROM sysstat.tables WHERE tabschema='%s') AS foobar WHERE LIMIT=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT name,RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s'" condition="name"/>
-            <blind query="SELECT name FROM sysibm.syscolumns WHERE tbname='%s'" query2="SELECT RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s' AND name='%s'" count="SELECT COUNT(name) FROM sysibm.syscolumns WHERE tbname='%s'" condition="name"/>
+            <inband query="SELECT name,RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
+            <blind query="SELECT name FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" query2="SELECT RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s' AND name='%s' AND tbcreator='%s'" count="SELECT COUNT(name) FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>

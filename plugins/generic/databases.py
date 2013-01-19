@@ -513,22 +513,24 @@ class Databases:
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
                 elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
                                                       conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                     query += condQuery.replace("[DB]", conf.db)
-                elif Backend.isDbms(DBMS.SQLITE):
+                elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     query = rootQuery.inband.query % tbl
 
                 values = inject.getValue(query, blind=False, time=False)
 
                 if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
                     index, values = 1, []
+
                     while True:
                         query = rootQuery.inband.query2 % (conf.db, tbl, index)
                         value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+
                         if isNoneValue(value) or value == " ":
                             break
                         else:
@@ -591,7 +593,7 @@ class Databases:
                     query += condQuery
 
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                    query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl.upper())
+                    query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.MSSQL):
@@ -639,7 +641,7 @@ class Databases:
                         query += condQuery
                         field = None
                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                        query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl.upper())
+                        query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                         query += condQuery
                         field = None
                     elif Backend.isDbms(DBMS.MSSQL):
@@ -659,7 +661,7 @@ class Databases:
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
                             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                                query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column)
+                                query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column, unsafeSQLIdentificatorNaming(conf.db.upper()))
                             elif Backend.isDbms(DBMS.MSSQL):
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
                                                                 conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
@@ -736,7 +738,11 @@ class Databases:
             db = db.upper()
             table = table.upper()
 
-        query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+        if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+            query = "SELECT %s FROM %s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(table, True))
+        else:
+            query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
+
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if isNumPosStrValue(count):
@@ -759,7 +765,7 @@ class Databases:
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split(".")
 
-        if conf.tbl is not None and conf.db is None:
+        if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
             warnMsg = "missing database parameter. sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
             warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)

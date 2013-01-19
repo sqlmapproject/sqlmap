@@ -167,6 +167,9 @@ def liveTest():
 
         result = runCase(switches, parse)
 
+        test_case_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "test_case"), "wb", UNICODE_ENCODING)
+        test_case_fd.write("%s\n" % name)
+
         if result:
             logger.info("test passed")
             cleanCase()
@@ -183,6 +186,7 @@ def liveTest():
                 errMsg += " - SQL injection not detected"
 
             logger.error(errMsg)
+            test_case_fd.write("%s\n" % errMsg)
 
             if failedParseOn:
                 console_output_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "console_output"), "wb", UNICODE_ENCODING)
@@ -199,6 +203,7 @@ def liveTest():
             if conf.stopFail is True:
                 return retVal
 
+        test_case_fd.close()
         retVal &= bool(result)
 
     dataToStdout("\n")

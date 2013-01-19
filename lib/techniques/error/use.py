@@ -23,6 +23,7 @@ from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
 from lib.core.common import isListLike
 from lib.core.common import isNumPosStrValue
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
@@ -34,6 +35,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
@@ -179,6 +181,9 @@ def _errorFields(expression, expressionFields, expressionFieldsList, num=None, e
             expressionReplaced = expression
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
+
+        if kb.technique == PAYLOAD.TECHNIQUE.QUERY and Backend.isDbms(DBMS.FIREBIRD) and expressionReplaced.startswith("SELECT "):
+            expressionReplaced = "SELECT %s" % agent.concatQuery(expressionReplaced)
 
         output = NULL if emptyFields and field in emptyFields else _oneShotErrorUse(expressionReplaced, field)
 

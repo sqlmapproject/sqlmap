@@ -888,6 +888,217 @@
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
+    <case name="Firebird boolean-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="r'current database:    '/'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <!-- TODO: this test case fails because of issue #358 -->
+    <case name="Firebird error-based multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="r'current database:    '/'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <!-- TODO: this test case fails because of issue #357 -->
+    <case name="Firebird UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="r'current database:    '/'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <!-- TODO: this test case fails because of issue #357 -->
+    <case name="Firebird partial UNION query multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="r'current database:    '/'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
+    <case name="Firebird time-based single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int_nooutput.php?id=1"/>
+            <tech value="T"/>
+            <level value="4"/>
+            <risk value="2"/>
+            <timeSec value="2"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: Firebird AND time-based blind (heavy query)"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
+    <case name="Firebird inline queries multi-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int_inline.php?id=1"/>
+            <threads value="4"/>
+            <tech value="Q"/>
+            <level value="2"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+        </switches>
+        <parse>
+            <item value="Title: Firebird inline queries"/>
+            <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
+            <item value="banner:    '2.5.0'"/>
+            <item value="current user:    'SYSDBA'"/>
+            <item value="r'current database:    '/'"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
+            <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
+            <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+3 columns.+SURNAME.+VARCHAR'"/>
+            <item value="r'Database: Firebird_masterdb.+Table.+Entries.+USERS.+5'"/>
+            <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
     <!-- End of common enumeration switches across all techniques -->
 
     <!-- Custom enumeration switches -->
@@ -1042,6 +1253,21 @@
         </switches>
         <parse>
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <db value="db2inst1"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+5 entries.+the  | iss.+NULL | mei'"/>
         </parse>
     </case>
     <case name="SQLite UNION query multi-threaded custom enumeration">
@@ -1671,6 +1897,294 @@
             <item value="r'Database: information_schema.+Table: sql_parts.+1 column.+feature_name.+character_data'"/>
         </parse>
     </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] CTXSYS.+\[\*\] SYS.+\[\*\] TSMSYS'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] CTXSYS.+\[\*\] SYS.+\[\*\] TSMSYS'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] CTXSYS.+\[\*\] SYS.+\[\*\] TSMSYS'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys"/>
+            <tbl value="user,aux,wrong"/>
+            <answer value="do you want to dump tables=N,do you want to crack them via a dictionary-based attack=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys"/>
+            <tbl value="user,aux,wrong"/>
+            <answer value="do you want to crack them via a dictionary-based attack=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys"/>
+            <tbl value="user,aux,wrong"/>
+            <answer value="do you want to crack them via a dictionary-based attack=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
+            <item value="r'.+5 entries.+wu.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+1 table.+USERS.+Database: FLOWS_020100.+2 table.+WWV_FLOW_PICK_END_USERS'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+1 table.+USERS.+Database: FLOWS_020100.+2 table.+WWV_FLOW_PICK_END_USERS'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+1 table.+USERS.+Database: FLOWS_020100.+2 table.+WWV_FLOW_PICK_END_USERS'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <db value="sys,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
+        </parse>
+    </case>
+    <!-- TODO: add IBM DB2 test cases -->
     <case name="SQLite multi-threaded search enumeration - database">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -1845,6 +2359,73 @@
             <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
+    <case name="Oracle boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users WHERE ROWNUM=1"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1.+1, luther, blisset'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users WHERE ROWNUM=1"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[.+1.+luther'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users WHERE ROWNUM=1"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users WHERE ROWNUM=1 \[1\].+1, luther, blisset'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <!-- TODO: add IBM DB2 test cases -->
     <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -1886,7 +2467,6 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <!-- NOTE: it is not sorted on purpose because UNION does not play well with ORDER BY and it is stripped -->
             <item value="r'SELECT \* FROM users ORDER BY name \[4\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>

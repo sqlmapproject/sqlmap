@@ -74,6 +74,7 @@ class Fingerprint(GenericFingerprint):
                     ("1.5", ("NULLIF(%d,%d) IS NULL", "EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)")),
                     ("2.0", ("EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "BIT_LENGTH(%d)>0", "CHAR_LENGTH(%d)>0")),
                     ("2.1", ("BIN_XOR(%d,%d)=0", "PI()>0.%d", "RAND()<1.%d", "FLOOR(1.%d)>=0")),
+                    # TODO: add test for Firebird 2.5
                  )
 
         for i in xrange(len(table)):
@@ -122,7 +123,7 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         randInt = randomInt()
-        result = inject.checkBooleanExpression("EXISTS(SELECT * FROM RDB$DATABASE WHERE %d=%d)" % (randInt, randInt))
+        result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM RDB$DATABASE WHERE %d=%d)>0" % (randInt, randInt))
 
         if result:
             infoMsg = "confirming %s" % DBMS.FIREBIRD

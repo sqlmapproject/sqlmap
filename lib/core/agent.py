@@ -535,7 +535,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -822,8 +822,7 @@ class Agent(object):
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-            if " ORDER BY " in limitedQuery and "(SELECT " in limitedQuery:
-                orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
+            if " ORDER BY " in limitedQuery and "SELECT " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
             if query.startswith("SELECT "):
@@ -831,6 +830,7 @@ class Agent(object):
                 limitedQuery = "%s FROM (%s,%s" % (untilFrom, untilFrom.replace(delimiter, ','), limitStr)
             else:
                 limitedQuery = "%s FROM (SELECT %s,%s" % (untilFrom, ','.join(f for f in field), limitStr)
+
             limitedQuery = limitedQuery % fromFrom
             limitedQuery += "=%d" % (num + 1)
 
