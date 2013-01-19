@@ -2003,7 +2003,6 @@ Formats:
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
-        <!-- TODO: this vector does not work in Firebird -->
         <vector>[QUERY]</vector>
         <request>
             <payload>SELECT '[DELIMITER_START]'||(CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END)||'[DELIMITER_STOP]' FROM RDB$DATABASE</payload>
