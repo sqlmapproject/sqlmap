@@ -304,7 +304,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     # Avoid to add a static content length header to
                     # conf.httpHeaders and consider the following lines as
                     # POSTed data
-                    if key == HTTPHEADER.CONTENT_LENGTH:
+                    if key.upper() == HTTPHEADER.CONTENT_LENGTH.upper():
                         params = True
 
                     # Avoid proxy and connection type related headers
