@@ -100,8 +100,6 @@ class Filesystem(GenericFilesystem):
         sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
         unionUse(sqlQuery, unpack=False)
 
-        self.askCheckWrittenFile(wFile, dFile)
-
         warnMsg = "expect junk characters inside the "
         warnMsg += "file as a leftover from UNION query"
         singleTimeWarnMessage(warnMsg)

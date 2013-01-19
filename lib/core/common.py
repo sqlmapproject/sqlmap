@@ -622,17 +622,40 @@ def getDocRoot():
         warnMsg = "unable to retrieve the web server document root"
         logger.warn(warnMsg)
 
-        message = "please provide the web server document root "
-        message += "[%s]: " % ",".join(root for root in defaultDocRoot)
-        inputDocRoot = readInput(message, default=defaultDocRoot)
+        docRoot = []
 
-        if inputDocRoot:
-            if isinstance(inputDocRoot, basestring):
-                docRoot = inputDocRoot.split(',')
+        message = "do you want to provide a text file with a list of "
+        message += "directories to try? [y/N] "
+        answer = readInput(message, default="N")
+
+        if answer and answer.lower() == "y":
+            message = "please provide the directories list file to try: "
+            dirFilePath = readInput(message)
+
+            if dirFilePath:
+                if os.path.isfile(dirFilePath):
+                    fd = codecs.open(dirFilePath, "rb", UNICODE_ENCODING)
+
+                    for filepath in fd.readlines():
+                        docRoot.append(normalizePath(filepath))
+
+                else:
+                    errMsg = "provided directory list file %s " % dirFilePath
+                    errMsg += "is not a valid file"
+                    logger.error(errMsg)
+
+        if len(docRoot) == 0:
+            message = "please provide the web server document root "
+            message += "[%s]: " % ", ".join(root for root in defaultDocRoot)
+            inputDocRoot = readInput(message, default=defaultDocRoot)
+
+            if inputDocRoot:
+                if isinstance(inputDocRoot, basestring):
+                    docRoot = inputDocRoot.split(',')
+                else:
+                    docRoot = inputDocRoot
             else:
-                docRoot = inputDocRoot
-        else:
-            docRoot = defaultDocRoot
+                docRoot = defaultDocRoot
 
     return docRoot
 
@@ -657,8 +680,9 @@ def getDirs():
     if webDir:
         directories.add(webDir)
 
-    message = "please provide any additional web server full path to try "
-    message += "to upload the agent [Enter for None]: "
+    message = "please provide additional comma separated file paths to "
+    message += "try to upload the agent inside the possible document "
+    message += "root%s [Enter for None]: " % "s" if len(kb.docRoot) > 1 else ""
     inputDirs = readInput(message)
 
     if inputDirs:
@@ -1325,8 +1349,9 @@ def normalizePath(filepath):
 
     retVal = filepath
 
-    if filepath:
-        retVal = ntpath.normpath(filepath) if isWindowsDriveLetterPath(filepath) else posixpath.normpath(filepath)
+    if retVal:
+        retVal = retVal.strip("\r").strip("\n")
+        retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else posixpath.normpath(retVal)
 
     return retVal
 
