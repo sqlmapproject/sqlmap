@@ -6,9 +6,18 @@
 SQLMAP_HOME="/opt/sqlmap"
 REGRESSION_SCRIPT="${SQLMAP_HOME}/extra/shutils"
 
+FROM="regressiontest@sqlmap.org"
+TO="bernardo.damele@gmail.com, miroslav.stampar@gmail.com"
+SUBJECT="Automated regression test failed on $(date)"
+
 cd $SQLMAP_HOME
 git pull
 rm -f output 2>/dev/null
 
 cd $REGRESSION_SCRIPT
-python regressiontest.py
+python regressiontest.py 1>/tmp/regressiontest.log 2>&1
+
+if [ $? -ne 0 ]
+then
+    cat /tmp/regressiontest.log | mailx -s "${SUBJECT}" -aFrom:${FROM} ${TO}
+fi
