@@ -506,16 +506,14 @@ def initTargetEnv():
         _setDBMS()
 
     if conf.data:
-        kb.postSpaceToPlus = '+' in conf.data
+        class _(unicode):
+            pass
 
-        if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
-            class _(unicode):
-                pass
-            original = conf.data
-            conf.data = _(urldecode(conf.data))
-            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
-        else:
-            conf.data = urldecode(conf.data)
+        original = conf.data
+        conf.data = _(urldecode(conf.data))
+        setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
+
+        kb.postSpaceToPlus = '+' in original
 
 def setupTargetEnv():
     _createTargetDirs()
