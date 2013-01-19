@@ -87,18 +87,23 @@ def main():
 
         test_counts.append(test_count)
 
-        console_output_fd = codecs.open(os.path.join(output_folder, "console_output"), "rb", "utf8")
-        console_output = console_output_fd.read()
-        console_output_fd.close()
+        console_output_file = os.path.join(output_folder, "console_output")
+        log_file = os.path.join(output_folder, "debiandev", "log")
+        traceback_file = os.path.join(output_folder, "traceback")
 
-        attachments[test_count] = str(console_output)
+        if os.path.exists(console_output_file):
+            console_output_fd = codecs.open(console_output_file, "rb", "utf8")
+            console_output = console_output_fd.read()
+            console_output_fd.close()
+            attachments[test_count] = str(console_output)
 
-        log_fd = codecs.open(os.path.join(output_folder, "debiandev", "log"), "rb", "utf8")
-        log = log_fd.read()
-        log_fd.close()
+        if os.path.exists(log_file):
+            log_fd = codecs.open(log_file, "rb", "utf8")
+            log = log_fd.read()
+            log_fd.close()
 
-        if traceback:
-            traceback_fd = codecs.open(os.path.join(output_folder, "traceback"), "rb", "utf8")
+        if os.path.exists(traceback_file):
+            traceback_fd = codecs.open(traceback_file, "rb", "utf8")
             traceback = traceback_fd.read()
             traceback_fd.close()
 
