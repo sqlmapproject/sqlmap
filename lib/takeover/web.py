@@ -191,7 +191,7 @@ class Web:
                 self.webApi = choices[int(choice) - 1]
                 break
 
-        kb.docRoot = getDocRoot()
+        kb.docRoot = arrayizeValue(getDocRoot())
         directories = sorted(getDirs())
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
@@ -202,7 +202,7 @@ class Web:
 
         success = False
 
-        for docRoot in arrayizeValue(kb.docRoot):
+        for docRoot in kb.docRoot:
             if success:
                 break
 
