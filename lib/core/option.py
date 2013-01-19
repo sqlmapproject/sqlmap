@@ -290,9 +290,9 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     key, value = line.split(": ", 1)
 
                     # Cookie and Host headers
-                    if key.lower() == "cookie":
+                    if key.upper() == HTTPHEADER.COOKIE.upper():
                         cookie = value
-                    elif key.lower() == "host":
+                    elif key.upper() == HTTPHEADER.HOST.upper():
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
                         splitValue = value.split(":")
