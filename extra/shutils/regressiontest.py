@@ -26,7 +26,7 @@ SMTP_SERVER = "127.0.0.1"
 SMTP_PORT = 25
 SMTP_TIMEOUT = 30
 FROM = "regressiontest@sqlmap.org"
-TO = "dev@sqlmap.org"
+TO = ["bernardo.damele@gmail.com", "miroslav.stampar@gmail.com"]
 SUBJECT = "Regression test results on %s using revision %s" % (TIME, REVISION)
 
 def prepare_email(content):
