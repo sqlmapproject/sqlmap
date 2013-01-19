@@ -15,7 +15,9 @@ git pull
 rm -f output 2>/dev/null
 
 cd $REGRESSION_SCRIPT
+echo "Regression test started at $(date)"
 python regressiontest.py 1>/tmp/regressiontest.log 2>&1
+echo "Regression test finished at $(date)"
 
 if [ $? -ne 0 ]
 then
