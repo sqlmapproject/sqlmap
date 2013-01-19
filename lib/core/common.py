@@ -1984,7 +1984,7 @@ def findMultipartPostBoundary(post):
 
     return retVal
 
-def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False):
+def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, plusspace=True):
     result = value
 
     if value:
@@ -2002,14 +2002,16 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                     char = chr(ord(match.group(1).decode("hex")))
                     return char if char in charset else match.group(0)
                 result = re.sub("%([0-9a-fA-F]{2})", _, value)
-                result = result.replace("+", " ")  # plus sign has a special meaning in url encoded data (hence the usage of urllib.unquote_plus in convall case)
+
+                if plusspace:
+                    result = result.replace("+", " ")  # plus sign has a special meaning in url encoded data (hence the usage of urllib.unquote_plus in convall case)
 
     if isinstance(result, str):
         result = unicode(result, encoding or UNICODE_ENCODING, "replace")
 
     return result
 
-def urlencode(value, safe="%&=", convall=False, limit=False):
+def urlencode(value, safe="%&=", convall=False, limit=False, spaceplus=False):
     if conf.direct:
         return value
 
@@ -2040,6 +2042,9 @@ def urlencode(value, safe="%&=", convall=False, limit=False):
                         break
             else:
                 break
+
+        if spaceplus:
+            result = result.replace(urllib.quote(' '), '+')
 
     return result
 
@@ -3021,7 +3026,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 url = urldecode(request.get_full_url(), kb.pageEncoding)
                 method = request.get_method()
                 data = request.get_data() if request.has_data() else None
-                data = urldecode(data, kb.pageEncoding) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data
+                data = urldecode(data, kb.pageEncoding, plusspace=False)
 
                 if not data and method and method.upper() == HTTPMETHOD.POST:
                     debugMsg = "invalid POST form with blank data detected"

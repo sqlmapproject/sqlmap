@@ -304,7 +304,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     # Avoid to add a static content length header to
                     # conf.httpHeaders and consider the following lines as
                     # POSTed data
-                    if key == HTTPHEADER.CONTENT_LENGTH:
+                    if key.upper() == HTTPHEADER.CONTENT_LENGTH.upper():
                         params = True
 
                     # Avoid proxy and connection type related headers
@@ -328,7 +328,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     if not kb.targets or url not in addedTargetUrls:
-                        kb.targets.add((url, method, urldecode(data) if data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in data else data, cookie))
+                        kb.targets.add((url, method, data, cookie))
                         addedTargetUrls.add(url)
 
     fp = openFile(reqFile, "rb")
@@ -1361,15 +1361,6 @@ def _cleanupOptions():
     if conf.data:
         conf.data = re.sub(INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.data, re.I)
 
-        if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
-            class _(unicode):
-                pass
-            original = conf.data
-            conf.data = _(urldecode(conf.data))
-            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
-        else:
-            conf.data = urldecode(conf.data)
-
     if conf.url:
         conf.url = re.sub(INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.url, re.I)
 
@@ -1591,6 +1582,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.safeCharEncode = False
     kb.singleLogFlags = set()
     kb.skipOthersDbms = None
+    kb.postSpaceToPlus = False
     kb.stickyDBMS = False
     kb.stickyLevel = None
     kb.suppressResumeInfo = False
