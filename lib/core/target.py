@@ -47,6 +47,7 @@ from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_RECOGNITION_REGEX
 from lib.core.settings import SUPPORTED_DBMS
+from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX
@@ -503,6 +504,18 @@ def initTargetEnv():
         _setKnowledgeBaseAttributes(False)
         _restoreCmdLineOptions()
         _setDBMS()
+
+    if conf.data:
+        kb.postSpaceToPlus = '+' in conf.data
+
+        if re.search(r'%[0-9a-f]{2}', conf.data, re.I):
+            class _(unicode):
+                pass
+            original = conf.data
+            conf.data = _(urldecode(conf.data))
+            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
+        else:
+            conf.data = urldecode(conf.data)
 
 def setupTargetEnv():
     _createTargetDirs()

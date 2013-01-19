@@ -745,7 +745,7 @@ class Connect(object):
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
             elif not skipUrlEncode and kb.postHint not in POST_HINT_CONTENT_TYPES.keys():
-                post = urlencode(post)
+                post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
         if timeBasedCompare:
             if len(kb.responseTimes) < MIN_TIME_RESPONSES:
