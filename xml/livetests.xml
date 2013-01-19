@@ -1065,6 +1065,7 @@
             <url value="http://debiandev/sqlmap/firebird/get_int_inline.php?id=1"/>
             <threads value="4"/>
             <tech value="Q"/>
+            <level value="2"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
