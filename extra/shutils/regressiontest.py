@@ -37,7 +37,7 @@ def prepare_email(content):
     msg = MIMEMultipart()
     msg["Subject"] = SUBJECT
     msg["From"] = FROM
-    msg["To"] = TO
+    msg["To"] = ",".join(TO)
 
     msg.attach(MIMEText(content))
 
