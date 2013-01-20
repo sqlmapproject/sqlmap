@@ -2577,7 +2577,7 @@
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <tech value="B"/>
             <osCmd value="id"/>
-            <answers value="please provide additional comma separated file=test"/>
+            <answers value="please provide additional comma separated file paths to=test"/>
         </switches>
         <parse>
             <item value="command standard output:    'uid="/>
@@ -2589,7 +2589,7 @@
             <tech value="BU"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
-            <answers value="please provide any additional web server=/var/www/test,do you want to overwrite it=Y"/>
+            <answers value="please provide additional comma separated file paths to=/var/www/test,do you want to overwrite it=Y"/>
         </switches>
         <parse>
             <item value="r'Sending stage.+Linux.+uid=.+www-data'" console_output="True"/>
