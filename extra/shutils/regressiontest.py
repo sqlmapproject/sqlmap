@@ -26,8 +26,9 @@ SMTP_SERVER = "127.0.0.1"
 SMTP_PORT = 25
 SMTP_TIMEOUT = 30
 FROM = "regressiontest@sqlmap.org"
+#TO = "dev@sqlmap.org"
 TO = ["bernardo.damele@gmail.com", "miroslav.stampar@gmail.com"]
-SUBJECT = "Regression test results on %s using revision %s" % (TIME, REVISION)
+SUBJECT = "Regression test on %s using revision %s" % (TIME, REVISION)
 
 def prepare_email(content):
     global FROM
@@ -37,7 +38,7 @@ def prepare_email(content):
     msg = MIMEMultipart()
     msg["Subject"] = SUBJECT
     msg["From"] = FROM
-    msg["To"] = ",".join(TO)
+    msg["To"] = TO if isinstance(TO, basestring) else ",".join(TO)
 
     msg.attach(MIMEText(content))
 
@@ -50,7 +51,6 @@ def send_email(msg):
 
     try:
         s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT, timeout=SMTP_TIMEOUT)
-        #s.set_debuglevel(1)
         s.sendmail(FROM, TO, msg.as_string())
         s.quit()
     # Catch all for SMTP exceptions
@@ -123,8 +123,8 @@ def main():
         content += "#######################################################################\n\n"
 
     if content:
+        content += "Regression test finished at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
         SUBJECT += " (%s)" % ", ".join("#%d" % count for count in test_counts)
-        content += "\n\nRegression test finished at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
 
         msg = prepare_email(content)
 
