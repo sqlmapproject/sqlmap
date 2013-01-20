@@ -15,9 +15,11 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         def escaper(value):
-            retVal = value
-            if isDBMSVersionAtLeast('2.1'):
-                retVal = "||".join("ASCII_CHAR(%d)" % ord(_) for _ in value)
-            return retVal
+            return "||".join("ASCII_CHAR(%d)" % ord(_) for _ in value)
 
-        return Syntax._escape(expression, quote, escaper)
+        retVal = expression
+
+        if isDBMSVersionAtLeast('2.1'):
+            retVal = Syntax._escape(expression, quote, escaper)
+
+        return retVal

@@ -17,9 +17,11 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         def escaper(value):
-            retVal = value
-            if isDBMSVersionAtLeast('3'):
-                retVal = "X'%s'" % binascii.hexlify(value)
-            return retVal
+            return "X'%s'" % binascii.hexlify(value)
 
-        return Syntax._escape(expression, quote, escaper)
+        retVal = expression
+
+        if isDBMSVersionAtLeast('3'):
+            retVal = Syntax._escape(expression, quote, escaper)
+
+        return retVal
