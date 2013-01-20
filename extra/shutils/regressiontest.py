@@ -107,7 +107,7 @@ def main():
             traceback = traceback_fd.read()
             traceback_fd.close()
 
-        content += "Failed test case '%s'" % title
+        content += "Failed test case '%s' (#%d)" % (title, test_count)
 
         if parse:
             content += " at parsing: %s:\n\n" % parse
