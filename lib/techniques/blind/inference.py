@@ -180,7 +180,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             value are not equal there will be a deliberate delay).
             """
 
-            forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
+            if CHAR_INFERENCE_MARK not in payload:
+                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
+            else:
+                # e.g.: ... > '%c' -> ... > ORD(..)
+                markingValue = "'%s'" % CHAR_INFERENCE_MARK
+                unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(value))
+                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
+
             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
             incrementCounter(kb.technique)
 
