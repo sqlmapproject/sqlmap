@@ -200,7 +200,7 @@ class Search:
                     if isinstance(values, basestring):
                         values = [values]
                     for value in values:
-                        newValues.append(["SQLite_%s" % METADB_SUFFIX, value])
+                        newValues.append(["SQLite%s" % METADB_SUFFIX, value])
 
                     values = newValues
 
@@ -259,7 +259,7 @@ class Search:
                     if tblConsider == "2":
                         continue
                 else:
-                    foundTbls["SQLite_%s" % METADB_SUFFIX] = []
+                    foundTbls["SQLite%s" % METADB_SUFFIX] = []
 
                 for db in foundTbls.keys():
                     db = safeSQLIdentificatorNaming(db)
