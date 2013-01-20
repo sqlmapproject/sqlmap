@@ -2577,7 +2577,7 @@
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <tech value="B"/>
             <osCmd value="id"/>
-            <answers value="please provide any additional web server=/var/www/test"/>
+            <answers value="please provide additional comma separated file=test"/>
         </switches>
         <parse>
             <item value="command standard output:    'uid="/>

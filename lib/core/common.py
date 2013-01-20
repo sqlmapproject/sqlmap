@@ -619,7 +619,8 @@ def getDocRoot():
         infoMsg = "retrieved the web server document root: '%s'" % docRoot
         logger.info(infoMsg)
     else:
-        warnMsg = "unable to retrieve the web server document root"
+        warnMsg = "unable to retrieve automatically the web server "
+        warnMsg += "document root"
         logger.warn(warnMsg)
 
         docRoot = []
@@ -673,7 +674,7 @@ def getDirs():
                 directory = ntToPosixSlashes(directory)
                 directories.add(directory)
     else:
-        warnMsg = "unable to retrieve any web server path"
+        warnMsg = "unable to retrieve automatically any web server path"
         logger.warn(warnMsg)
 
     webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/.", conf.url)
@@ -681,7 +682,7 @@ def getDirs():
         directories.add(webDir)
 
     message = "please provide additional comma separated file paths to "
-    message += "try to upload the agent inside the possible document "
+    message += "try to upload the agent inside the possible document: "
     message += "root%s [Enter for None]: " % "s" if len(kb.docRoot) > 1 else ""
     inputDirs = readInput(message)
 
