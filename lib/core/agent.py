@@ -822,7 +822,9 @@ class Agent(object):
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-            if " ORDER BY " in limitedQuery and "SELECT " in limitedQuery:
+            if not " ORDER BY " in limitedQuery:
+                limitStr = limitStr.replace(") WHERE LIMIT", " ORDER BY 1 ASC) WHERE LIMIT")
+            elif " ORDER BY " in limitedQuery and "SELECT " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
             if query.startswith("SELECT "):
