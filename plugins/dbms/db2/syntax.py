@@ -5,8 +5,6 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.data import logger
-from lib.core.exception import SqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -15,32 +13,7 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def escape(expression, quote=True):
-        if expression == u"'''":
-            return "CHR(%d)" % (ord("'"))
+        def escaper(value):
+            return "||".join("CHR(%d)" % ord(_) for _ in value)
 
-        if quote:
-            while True:
-                index = expression.find("'")
-                if index == -1:
-                    break
-
-                firstIndex = index + 1
-                index = expression[firstIndex:].find("'")
-
-                if index == -1:
-                    raise SqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
-
-                lastIndex = firstIndex + index
-                old = "'%s'" % expression[firstIndex:lastIndex]
-                unescaped = ""
-
-                for i in xrange(firstIndex, lastIndex):
-                    unescaped += "CHR(%d)" % (ord(expression[i]))
-                    if i < lastIndex - 1:
-                        unescaped += "||"
-
-                expression = expression.replace(old, unescaped)
-        else:
-            expression = "||".join("CHR(%d)" % ord(c) for c in expression)
-
-        return expression
+        return Syntax._escape(expression, quote, escaper)

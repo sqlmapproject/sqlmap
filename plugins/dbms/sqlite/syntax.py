@@ -6,10 +6,8 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import binascii
-import re
 
 from lib.core.common import isDBMSVersionAtLeast
-from lib.core.exception import SqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -18,13 +16,10 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def escape(expression, quote=True):
-        unescaped = expression
+        def escaper(value):
+            retVal = value
+            if isDBMSVersionAtLeast('3'):
+                retVal = "X'%s'" % binascii.hexlify(value)
+            return retVal
 
-        if isDBMSVersionAtLeast('3'):
-            if quote:
-                for item in re.findall(r"'[^']+'", expression, re.S):
-                    unescaped = unescaped.replace(item, "X'%s'" % binascii.hexlify(item.strip("'")))
-            else:
-                unescaped = "X'%s'" % binascii.hexlify(expression)
-
-        return unescaped
+        return Syntax._escape(expression, quote, escaper)

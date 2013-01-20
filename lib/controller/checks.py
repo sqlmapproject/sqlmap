@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import copy
 import httplib
-import random
 import re
 import socket
 import time

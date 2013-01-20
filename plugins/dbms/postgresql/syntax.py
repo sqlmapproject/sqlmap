@@ -5,7 +5,6 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.exception import SqlmapSyntaxException
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -19,24 +18,7 @@ class Syntax(GenericSyntax):
               e.g. SELECT 1 WHERE 'a'!='a'||'b' will trigger error ("argument of WHERE must be type boolean, not type text")
         """
 
-        if quote:
-            while True:
-                index = expression.find("'")
-                if index == -1:
-                    break
+        def escaper(value):
+            return "(%s)"  % "||".join("CHR(%d)" % ord(_) for _ in value)  # Postgres CHR() function already accepts Unicode code point of character(s)
 
-                firstIndex = index + 1
-                index = expression[firstIndex:].find("'")
-
-                if index == -1:
-                    raise SqlmapSyntaxException("Unenclosed ' in '%s'" % expression)
-
-                lastIndex = firstIndex + index
-                old = "'%s'" % expression[firstIndex:lastIndex]
-                unescaped = "(%s)" % "||".join("CHR(%d)" % (ord(expression[i])) for i in xrange(firstIndex, lastIndex))  # Postgres CHR() function already accepts Unicode code point of character(s)
-
-                expression = expression.replace(old, unescaped)
-        else:
-            expression = "(%s)" % "||".join("CHR(%d)" % ord(c) for c in expression)
-
-        return expression
+        return Syntax._escape(expression, quote, escaper)

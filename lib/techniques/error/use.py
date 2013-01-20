@@ -23,7 +23,6 @@ from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
 from lib.core.common import isListLike
 from lib.core.common import isNumPosStrValue
-from lib.core.common import isTechniqueAvailable
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
