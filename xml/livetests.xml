@@ -2524,10 +2524,10 @@
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
-            <query value="SELECT * FROM users"/>
+            <query value="SELECT * FROM db2inst1.users"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users.+1, luther, blisset.+nameisnull'"/>
+            <item value="r'SELECT \* FROM db2inst1.users.+1, luther, blisset.+nameisnull'"/>
         </parse>
     </case>
     <case name="IBM DB2 boolean-based multi-threaded custom ordered SQL query enumeration">
@@ -2535,10 +2535,10 @@
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
-            <query value="SELECT * FROM users ORDER BY name"/>
+            <query value="SELECT * FROM db2inst1.users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM db2inst1.users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
     <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
