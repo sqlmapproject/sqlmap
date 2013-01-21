@@ -443,7 +443,7 @@ class Agent(object):
         elif fieldsSelectFrom:
             _ = zeroDepthSearch(query, " FROM ")
             fieldsToCastStr = query[:unArrayizeValue(_)] if _ else query
-            fieldsToCastStr = re.sub(r"\ASELECT\s+", "", fieldsToCastStr)
+            fieldsToCastStr = re.sub(r"\ASELECT%s\s+" % prefixRegex, "", fieldsToCastStr)
         elif fieldsSelect:
             fieldsToCastStr = fieldsSelect.groups()[0]
         else:
