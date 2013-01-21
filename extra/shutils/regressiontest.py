@@ -117,7 +117,7 @@ def main():
             content += " - SQL injection not detected\n\n"
 
         if traceback:
-            content += "### Traceback:\n\n"
+            content += "\n\n### Traceback:\n\n"
             content += "%s\n" % str(traceback)
 
         content += "#######################################################################\n\n"
