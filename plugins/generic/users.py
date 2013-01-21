@@ -404,6 +404,10 @@ class Users:
                                 if privilege.upper() == "Y":
                                     privileges.add(MYSQL_PRIVS[count])
 
+                            # In Firebird we get one letter for each privilege
+                            elif Backend.isDbms(DBMS.FIREBIRD):
+                                privileges.add(FIREBIRD_PRIVS[privilege.strip()])
+
                             # In DB2 we get Y or G if the privilege is
                             # True, N otherwise
                             elif Backend.isDbms(DBMS.DB2):
