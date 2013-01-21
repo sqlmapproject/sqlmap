@@ -71,7 +71,7 @@ def main():
     stdout, stderr = proc.communicate()
 
     if stderr:
-        msg = prepare_email("Execution of regression test failed with error: %s" % stderr)
+        msg = prepare_email("Execution of regression test failed with error:\n\n%s" % stderr)
         send_email(msg)
         sys.exit(1)
 
@@ -112,13 +112,15 @@ def main():
         if parse:
             content += " at parsing: %s:\n\n" % parse
             content += "### Log file:\n\n"
-            content += "%s\n" % log
+            content += "%s\n\n" % log
         elif not detected:
             content += " - SQL injection not detected\n\n"
+        else:
+            content += "\n\n"
 
         if traceback:
-            content += "\n\n### Traceback:\n\n"
-            content += "%s\n" % str(traceback)
+            content += "### Traceback:\n\n"
+            content += "%s\n\n" % str(traceback)
 
         content += "#######################################################################\n\n"
 
@@ -137,4 +139,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
