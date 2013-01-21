@@ -386,7 +386,7 @@
 
    <!-- Firebird -->
    <dbms value="Firebird">
-        <cast query="CAST(%s AS VARCHAR(10000))"/>
+        <cast query="TRIM(CAST(%s AS VARCHAR(10000)))"/>
         <length query="CHAR_LENGTH(%s)"/>
         <delimiter query="||"/>
         <limit query="ROWS %d TO %d"/>
