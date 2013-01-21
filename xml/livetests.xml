@@ -2184,7 +2184,101 @@
             <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
         </parse>
     </case>
-    <!-- TODO: add IBM DB2 test cases -->
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="d"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] DB2INST1.+\[\*\] SYSIBMADM'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="db2inst1"/>
+            <tbl value="user,wrong"/>
+            <answer value="do you want to dump tables=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="db2inst1,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="db2inst1,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
     <case name="SQLite multi-threaded search enumeration - database">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -2425,7 +2519,28 @@
             <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
-    <!-- TODO: add IBM DB2 test cases -->
+    <case name="IBM DB2 boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users.+1, luther, blisset.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
     <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
