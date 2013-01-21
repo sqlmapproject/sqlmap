@@ -394,7 +394,7 @@
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" ROWS "/>
-        <isnull query="%s"/>
+        <isnull query="COALESCE(%s, ' ')"/>
         <order query="ORDER BY %s ASC"/>
         <comment query="--"/>
         <count query="COUNT(%s)"/>
