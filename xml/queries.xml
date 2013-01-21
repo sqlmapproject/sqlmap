@@ -296,7 +296,7 @@
         <cast query="CAST(%s AS VARCHAR(8000))" dbms_version="&gt;=3.0"/>
         <!-- NOTE: On SQLite version 2 everything is stored as a string (Reference: http://www.mono-project.com/SQLite) -->
         <length query="LENGTH(%s)"/>
-        <isnull query="IFNULL(%s,' ')" dbms_version="&gt;=3.0"/>
+        <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="LIMIT %d,%d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
