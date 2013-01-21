@@ -529,7 +529,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 elif conf.verbose in (1, 2):
                     dataToStdout(filterControlChars(val))
 
-                if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
+                if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace() and partialValue.strip(' ')[-1:] != '\n':
                     finalValue = partialValue
                     break
 
