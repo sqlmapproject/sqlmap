@@ -335,7 +335,7 @@ class Agent(object):
                 nulledCastedField = field
             else:
                 nulledCastedField = rootQuery.cast.query % field
-                if Backend.isDbms(DBMS.ACCESS):
+                if Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
                     nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
                 else:
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
