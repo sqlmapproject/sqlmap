@@ -140,6 +140,7 @@ def liveTest():
         switches = dict(global_)
         value = ""
         vulnerable = True
+        result = None
 
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
@@ -167,14 +168,14 @@ def liveTest():
         logger.info(msg)
 
         try:
-            runCase(switches, parse)
+            result = runCase(switches, parse)
         except SqlmapNotVulnerableException:
             vulnerable = False
 
         test_case_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "test_case"), "wb", UNICODE_ENCODING)
         test_case_fd.write("%s\n" % name)
 
-        if result:
+        if result is True:
             logger.info("test passed")
             cleanCase()
         else:
