@@ -2467,7 +2467,7 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[4\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
     <!-- End of user's provided statement enumeration switches -->
