@@ -551,6 +551,9 @@ class Databases:
                                 if len(columnData) == 1:
                                     columns[name] = None
                                 else:
+                                    if Backend.isDbms(DBMS.FIREBIRD):
+                                        columnData[1] = FIREBIRD_TYPES.get(columnData[1], columnData[1])
+
                                     columns[name] = columnData[1]
 
                     if conf.db in kb.data.cachedColumns:
