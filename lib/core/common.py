@@ -3296,6 +3296,7 @@ def zeroDepthSearch(expression, value):
     Searches occurances of value inside expression at 0-depth level
     regarding the parentheses
     """
+
     retVal = []
 
     depth = 0
