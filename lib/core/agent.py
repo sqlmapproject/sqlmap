@@ -17,6 +17,8 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import unArrayizeValue
+from lib.core.common import zeroDepthSearch
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
@@ -384,15 +386,7 @@ class Agent(object):
         else:
             fields = fields.replace(", ", ',')
             commas = [-1, len(fields)]
-            depth = 0
-            for index in xrange(len(fields)):
-                char = fields[index]
-                if char == '(':
-                    depth += 1
-                elif char == ')':
-                    depth -= 1
-                elif depth == 0 and char == ',':
-                    commas.append(index)
+            commas.extend(zeroDepthSearch(fields, ','))
             commas = sorted(commas)
             fieldsSplitted = [fields[x + 1:y] for (x, y) in zip(commas, commas[1:])]
             dbmsDelimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
@@ -423,15 +417,15 @@ class Agent(object):
         @rtype: C{str}
         """
 
-        prefixRegex = "(?:\s+(?:FIRST|SKIP)\s+\d+)*"
-        fieldsSelectTop = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
-        fieldsSelectDistinct = re.search("\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
-        fieldsSelectCase = re.search("\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
-        fieldsSelectFrom = re.search("\ASELECT%s\s+(.+?)\s+FROM\s+" % prefixRegex, query, re.I)
-        fieldsExists = re.search("EXISTS(.*)", query, re.I)
-        fieldsSelect = re.search("\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
-        fieldsSubstr = re.search("\A(SUBSTR|MID\()", query, re.I)
-        fieldsMinMaxstr = re.search("(?:MIN|MAX)\(([^\(\)]+)\)", query, re.I)
+        prefixRegex = r"(?:\s+(?:FIRST|SKIP)\s+\d+)*"
+        fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
+        fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
+        fieldsSelectCase = re.search(r"\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
+        fieldsSelectFrom = re.search(r"\ASELECT%s\s+(.+?)\s+FROM " % prefixRegex, query, re.I)
+        fieldsExists = re.search(r"EXISTS\(([^)]*)\)\Z", query, re.I)
+        fieldsSelect = re.search(r"\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
+        fieldsSubstr = re.search(r"\A(SUBSTR|MID\()", query, re.I)
+        fieldsMinMaxstr = re.search(r"(?:MIN|MAX)\(([^\(\)]+)\)", query, re.I)
         fieldsNoSelect = query
 
         if fieldsSubstr:
@@ -447,7 +441,9 @@ class Agent(object):
         elif fieldsSelectCase:
             fieldsToCastStr = fieldsSelectCase.groups()[0]
         elif fieldsSelectFrom:
-            fieldsToCastStr = fieldsSelectFrom.groups()[0]
+            _ = zeroDepthSearch(query, " FROM ")
+            fieldsToCastStr = query[:unArrayizeValue(_)] if _ else query
+            fieldsToCastStr = re.sub(r"\ASELECT\s+", "", fieldsToCastStr)
         elif fieldsSelect:
             fieldsToCastStr = fieldsSelect.groups()[0]
         else:
@@ -528,8 +524,8 @@ class Agent(object):
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += ",'%s')" % kb.chars.stop
             elif fieldsSelectFrom:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", ",'%s') FROM " % kb.chars.stop, 1)
+                _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
+                concatenatedQuery = "%s,'%s')%s" % (concatenatedQuery[:_].replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1), kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += ",'%s')" % kb.chars.stop
@@ -545,7 +541,8 @@ class Agent(object):
                 concatenatedQuery += ")||'%s'" % kb.chars.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.chars.stop, 1)
+                _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
+                concatenatedQuery = "%s||'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -565,7 +562,8 @@ class Agent(object):
                 concatenatedQuery += "+'%s'" % kb.chars.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.chars.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.chars.stop, 1)
+                _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
+                concatenatedQuery = "%s+'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.chars.start, 1)
                 concatenatedQuery += "+'%s'" % kb.chars.stop
@@ -581,7 +579,8 @@ class Agent(object):
                 concatenatedQuery += ")&'%s'" % kb.chars.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'&" % kb.chars.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "&'%s' FROM " % kb.chars.stop, 1)
+                _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
+                concatenatedQuery = "%s&'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'&" % kb.chars.start, 1)
                 concatenatedQuery += "&'%s'" % kb.chars.stop
@@ -600,7 +599,8 @@ class Agent(object):
                 concatenatedQuery += ")||'%s'" % kb.chars.stop
             elif fieldsSelectFrom:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
-                concatenatedQuery = concatenatedQuery.replace(" FROM ", "||'%s' FROM " % kb.chars.stop, 1)
+                _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
+                concatenatedQuery = "%s||'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -653,6 +653,13 @@ class Agent(object):
             unionQuery = self.suffixQuery(unionQuery, comment, suffix)
 
             return unionQuery
+        else:
+            _ = zeroDepthSearch(query, " FROM ")
+            if _:
+                fromTable = query[_[0]:]
+
+            if fromTable and query.endswith(fromTable):
+                query = query[:-len(fromTable)]
 
         topNumRegex = re.search("\ATOP\s+([\d]+)\s+", query, re.I)
         if topNumRegex:
@@ -666,29 +673,17 @@ class Agent(object):
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
-        if fromTable and unionQuery.endswith(fromTable):
-            unionQuery = unionQuery[:-len(fromTable)]
-
         for element in xrange(0, count):
             if element > 0:
                 unionQuery += ','
 
             if element == position:
-                if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
-                    conditionIndex = query.index(" FROM ")
-                    unionQuery += query[:conditionIndex]
-                else:
-                    unionQuery += query
+                unionQuery += query
             else:
                 unionQuery += char
 
-        if " FROM " in query and ("(CASE " not in query or ("(CASE " in query and "WHEN use" in query)) and "EXISTS(" not in query and not query.startswith("SELECT "):
-            conditionIndex = query.index(" FROM ")
-            unionQuery += query[conditionIndex:]
-
-        if fromTable:
-            if " FROM " not in unionQuery or "(CASE " in unionQuery or "(IIF" in unionQuery:
-                unionQuery += fromTable
+        if fromTable and not unionQuery.endswith(fromTable):
+            unionQuery += fromTable
 
         if intoRegExp:
             unionQuery += intoRegExp
