@@ -3291,6 +3291,24 @@ def isNumber(value):
     else:
         return True
 
+def zeroDepthSearch(expression, value):
+    """
+    Searches occurances of value inside expression at 0-depth level
+    regarding the parentheses
+    """
+    retVal = []
+
+    depth = 0
+    for index in xrange(len(expression)):
+        if expression[index] == '(':
+            depth += 1
+        elif expression[index] == ')':
+            depth -= 1
+        elif depth == 0 and expression[index:index + len(value)] == value:
+            retVal.append(index)
+
+    return retVal
+
 def pollProcess(process, suppress_errors=False):
     while True:
         dataToStdout(".")
