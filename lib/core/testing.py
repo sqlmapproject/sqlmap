@@ -26,6 +26,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import SqlmapBaseException
+from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.optiondict import optDict
