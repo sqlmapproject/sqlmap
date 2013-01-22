@@ -2860,6 +2860,7 @@
             <item value="r'Sending stage.+Linux.+uid=.+postgres'" console_output="True"/>
         </parse>
     </case>
+    <!-- TODO: add Microsoft SQL Server command execution test cases -->
     <!-- End of operating system access switches -->
 
     <!-- Corner cases -->
@@ -3038,6 +3039,19 @@
         <parse>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
+        </parse>
+    </case>
+    <case name="Estimated time of arrival">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <tech value="B"/>
+            <eta value="True"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+            <item value="r'100% \[===.+=\] 17/17 ETA 00:00'" console_output="True"/>
         </parse>
     </case>
     <!-- End of other switches -->
