@@ -119,9 +119,6 @@ def _goInferenceFields(expression, expressionFields, expressionFieldsList, paylo
         if isinstance(num, int):
             expression = origExpr
 
-        if output and isinstance(output, basestring):
-            output = output.strip() if output.strip() else output[:1]
-
         outputs.append(output)
 
     return outputs
@@ -390,8 +387,6 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 else:
                     value = _goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
 
-            if value and isinstance(value, basestring):
-                value = value.strip() if value.strip() else value[:1]
         else:
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
