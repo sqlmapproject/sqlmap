@@ -807,7 +807,7 @@
             <item value="banner:    '2.8.17'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
-            <item value="r'Database: SQLite_masterdb.+Table: users.+4 entries.+luther.+user agent.+'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+user agent.+'"/>
         </parse>
     </case>
     <case name="SQLite partial UNION query multi-threaded enumeration - all entries">
@@ -839,7 +839,7 @@
             <item value="banner:    '2.8.17'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
-            <item value="r'Database: SQLite_masterdb.+Table: users.+4 entries.+luther.+user agent.+'"/>
+            <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+user agent.+'"/>
         </parse>
     </case>
     <case name="SQLite 3 time-based single-threaded enumeration - all entries">
@@ -927,7 +927,7 @@
             <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
-    <!-- TODO: this test case fails because of issue #358 -->
+    <!-- TODO: this test case fails because of issue #358
     <case name="Firebird error-based multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
@@ -966,7 +966,7 @@
             <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
-    <!-- TODO: this test case fails because of issue #357 -->
+    -->
     <case name="Firebird UNION query multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
@@ -1005,7 +1005,7 @@
             <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
-    <!-- TODO: this test case fails because of issue #357 -->
+    <!-- TODO: this test case fails because of a bug whereby partial UNION is no longer detected on Firebird -->
     <case name="Firebird partial UNION query multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
@@ -2184,7 +2184,101 @@
             <item value="r'Database: SYS.+Table: USERS.+1 column.+SURNAME.+VARCHAR2'"/>
         </parse>
     </case>
-    <!-- TODO: add IBM DB2 test cases -->
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="d"/>
+        </switches>
+        <parse>
+            <item value="r'found databases.+:.+\[\*\] DB2INST1.+\[\*\] SYSIBMADM'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - tables given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="db2inst1"/>
+            <tbl value="user,wrong"/>
+            <answer value="do you want to dump tables=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column without given db or table">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <col value="surname,foobar"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given databases">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="db2inst1,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given tables">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="users,foobar"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given databases and table">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <db value="db2inst1,foobar"/>
+            <tbl value="users"/>
+            <col value="surname"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: DB2INST1.+Table: USERS.+1 column.+SURNAME'"/>
+        </parse>
+    </case>
     <case name="SQLite multi-threaded search enumeration - database">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -2220,6 +2314,43 @@
         </switches>
         <parse>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="Firebird multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <search value="True"/>
+            <db value="e"/>
+        </switches>
+        <parse>
+            <item value="on Firebird it is not possible to search databases" console_output="True"/>
+        </parse>
+    </case>
+    <case name="Firebird boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+        </parse>
+    </case>
+    <case name="Firebird UNION query multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
         </parse>
     </case>
     <!-- End of search enumeration switches -->
@@ -2425,7 +2556,28 @@
             <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
-    <!-- TODO: add IBM DB2 test cases -->
+    <case name="IBM DB2 boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM db2inst1.users"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM db2inst1.users.+1, luther, blisset.+nameisnull'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM db2inst1.users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM db2inst1.users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
     <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
@@ -2467,7 +2619,7 @@
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
-            <item value="r'SELECT \* FROM users ORDER BY name \[4\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
     <!-- End of user's provided statement enumeration switches -->

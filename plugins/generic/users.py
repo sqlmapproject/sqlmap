@@ -135,7 +135,7 @@ class Users:
 
         if not kb.data.cachedUsers:
             errMsg = "unable to retrieve the database users"
-            raise SqlmapNoneDataException(errMsg)
+            logger.error(errMsg)
 
         return kb.data.cachedUsers
 

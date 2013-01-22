@@ -431,17 +431,19 @@
             <blind query="SELECT FIRST 1 SKIP %d %s FROM %s" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
-        <search_table/>
+        <search_table>
+            <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0) AND " condition="RDB$RELATION_NAME" condition2=""/>
+            <blind query="" query2="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="" count2="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" condition="RDB$RELATION_NAME" condition2=""/>
+        </search_table>
         <search_column/>
    </dbms>
 
+   <!-- SAP MaxDB -->
    <!-- http://dev.mysql.com/tech-resources/articles/maxdb-php-ready-for-web.html -->
    <!-- http://dev.mysql.com/doc/refman/5.0/es/maxdb-reserved-words.html -->
    <!-- http://maxdb.sap.com/doc/7_6/default.htm -->
    <!-- http://www.sapdb.org/7.4/htmhelp/35/f8823cb7e5d42be10000000a114027/content.htm -->
    <!-- http://www.ximido.de/research/PenTestingMaxDB.pdf -->
-
-   <!-- SAP MaxDB -->
    <dbms value="SAP MaxDB">
         <length query="LENGTH(%s)"/>
         <isnull query="VALUE(%s,' ')" query2="IFNULL(%s,' ')"/>

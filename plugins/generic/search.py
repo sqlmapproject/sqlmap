@@ -10,6 +10,7 @@ from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
+from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -91,7 +92,8 @@ class Search:
                     for value in values:
                         value = safeSQLIdentificatorNaming(value)
                         foundDbs.append(value)
-            else:
+
+            if len(foundDbs) == 0 and isInferenceAvailable() and not conf.direct:
                 infoMsg = "fetching number of database"
                 if dbConsider == "1":
                     infoMsg += "s like"
@@ -166,7 +168,7 @@ class Search:
         for tbl in tblList:
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD):
                 tbl = tbl.upper()
 
             infoMsg = "searching table"
@@ -194,13 +196,14 @@ class Search:
                 query += whereDbsQuery
                 values = inject.getValue(query, blind=False, time=False)
 
-                if Backend.isDbms(DBMS.SQLITE):
+                if values and Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     newValues = []
 
                     if isinstance(values, basestring):
                         values = [values]
                     for value in values:
-                        newValues.append(["SQLite%s" % METADB_SUFFIX, value])
+                        dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
+                        newValues.append(["%s%s" % (dbName, METADB_SUFFIX), value])
 
                     values = newValues
 
@@ -215,8 +218,9 @@ class Search:
                         foundTbls[foundDb].append(foundTbl)
                     else:
                         foundTbls[foundDb] = [foundTbl]
-            else:
-                if not Backend.isDbms(DBMS.SQLITE):
+
+            if len(foundTbls) == 0 and isInferenceAvailable() and not conf.direct:
+                if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                     infoMsg = "fetching number of databases with table"
                     if tblConsider == "1":
                         infoMsg += "s like"
@@ -259,7 +263,8 @@ class Search:
                     if tblConsider == "2":
                         continue
                 else:
-                    foundTbls["SQLite%s" % METADB_SUFFIX] = []
+                    dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
+                    foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
 
                 for db in foundTbls.keys():
                     db = safeSQLIdentificatorNaming(db)
@@ -271,7 +276,7 @@ class Search:
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
-                    if not Backend.isDbms(DBMS.SQLITE):
+                    if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -290,10 +295,17 @@ class Search:
 
                     for index in indexRange:
                         query = rootQuery.blind.query2
-                        if not Backend.isDbms(DBMS.SQLITE):
+
+                        if Backend.isDbms(DBMS.FIREBIRD):
+                            query = query % index
+
+                        if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                             query = query % unsafeSQLIdentificatorNaming(db)
+
                         query += " AND %s" % tblQuery
-                        query = agent.limitQuery(index, query)
+
+                        if not Backend.isDbms(DBMS.FIREBIRD):
+                            query = agent.limitQuery(index, query)
 
                         foundTbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         kb.hintValue = foundTbl
@@ -436,7 +448,8 @@ class Search:
                                 foundCols[column][db] = [tbl]
 
                         kb.data.cachedColumns = {}
-            else:
+
+            if len(dbs) == 0 and isInferenceAvailable() and not conf.direct:
                 if not conf.db:
                     infoMsg = "fetching number of databases with tables containing column"
                     if colConsider == "1":

@@ -139,6 +139,8 @@ def liveTest():
         parse = []
         switches = dict(global_)
         value = ""
+        vulnerable = True
+        result = None
 
         if case.hasAttribute("name"):
             name = case.getAttribute("name")
@@ -165,12 +167,15 @@ def liveTest():
         msg = "running live test case: %s (%d/%d)" % (name, count, length)
         logger.info(msg)
 
-        result = runCase(switches, parse)
+        try:
+            result = runCase(switches, parse)
+        except SqlmapNotVulnerableException:
+            vulnerable = False
 
         test_case_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "test_case"), "wb", UNICODE_ENCODING)
         test_case_fd.write("%s\n" % name)
 
-        if result:
+        if result is True:
             logger.info("test passed")
             cleanCase()
         else:
@@ -182,7 +187,7 @@ def liveTest():
             errMsg += "- scan folder: %s " % paths.SQLMAP_OUTPUT_PATH
             errMsg += "- traceback: %s" % bool(failedTraceBack)
 
-            if result is False:
+            if not vulnerable:
                 errMsg += " - SQL injection not detected"
 
             logger.error(errMsg)
