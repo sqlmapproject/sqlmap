@@ -91,7 +91,8 @@ class Search:
                     for value in values:
                         value = safeSQLIdentificatorNaming(value)
                         foundDbs.append(value)
-            else:
+
+            if len(foundDbs) == 0 and isInferenceAvailable() and not conf.direct:
                 infoMsg = "fetching number of database"
                 if dbConsider == "1":
                     infoMsg += "s like"
@@ -166,7 +167,7 @@ class Search:
         for tbl in tblList:
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD):
                 tbl = tbl.upper()
 
             infoMsg = "searching table"
@@ -194,7 +195,7 @@ class Search:
                 query += whereDbsQuery
                 values = inject.getValue(query, blind=False, time=False)
 
-                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
+                if values and Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     newValues = []
 
                     if isinstance(values, basestring):
@@ -216,7 +217,8 @@ class Search:
                         foundTbls[foundDb].append(foundTbl)
                     else:
                         foundTbls[foundDb] = [foundTbl]
-            else:
+
+            if len(foundTbls) == 0 and isInferenceAvailable() and not conf.direct:
                 if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                     infoMsg = "fetching number of databases with table"
                     if tblConsider == "1":
@@ -445,7 +447,8 @@ class Search:
                                 foundCols[column][db] = [tbl]
 
                         kb.data.cachedColumns = {}
-            else:
+
+            if len(dbs) == 0 and isInferenceAvailable() and not conf.direct:
                 if not conf.db:
                     infoMsg = "fetching number of databases with tables containing column"
                     if colConsider == "1":
