@@ -181,9 +181,6 @@ def _errorFields(expression, expressionFields, expressionFieldsList, num=None, e
         else:
             expressionReplaced = expression.replace(expressionFields, field, 1)
 
-        if kb.technique == PAYLOAD.TECHNIQUE.QUERY and Backend.isDbms(DBMS.FIREBIRD) and expressionReplaced.startswith("SELECT "):
-            expressionReplaced = "SELECT %s" % agent.concatQuery(expressionReplaced)
-
         output = NULL if emptyFields and field in emptyFields else _oneShotErrorUse(expressionReplaced, field)
 
         if not kb.threadContinue:
