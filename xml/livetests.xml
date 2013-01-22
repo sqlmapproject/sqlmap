@@ -1150,6 +1150,7 @@
             <lastChar value="5"/>
         </switches>
         <parse>
+            <item value="r'fetching number of entries for table .+retrieving the length of query output\n[\r]*\[.+?\] \[INFO\] retrieved: [\d]+'" console_output="True"/>
             <item value="r'Database: testdb.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
@@ -1201,6 +1202,7 @@
             <lastChar value="5"/>
         </switches>
         <parse>
+            <item value="r'fetching number of entries for table .+retrieving the length of query output\n[\r]*\[.+?\] \[INFO\] retrieved: [\d]+'" console_output="True"/>
             <item value="r'Database: public.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
@@ -1252,6 +1254,7 @@
             <lastChar value="5"/>
         </switches>
         <parse>
+            <item value="r'fetching number of entries for table .+retrieving the length of query output\n[\r]*\[.+?\] \[INFO\] retrieved: [\d]+'" console_output="True"/>
             <item value="r'Database: SYS.+Table: USERS.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
         </parse>
     </case>
@@ -1267,6 +1270,7 @@
             <lastChar value="5"/>
         </switches>
         <parse>
+            <item value="r'fetching number of entries for table .+retrieving the length of query output\n[\r]*\[.+?\] \[INFO\] retrieved: [\d]+'" console_output="True"/>
             <item value="r'Database: DB2INST1.+Table: USERS.+5 entries.+the  | iss.+NULL | mei'"/>
         </parse>
     </case>
@@ -1277,7 +1281,6 @@
             <tech value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
-            <db value="testdb"/>
             <tbl value="users"/>
             <limitStart value="2"/>
             <limitStop value="4"/>
@@ -1294,13 +1297,45 @@
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
-            <db value="testdb"/>
             <tbl value="users"/>
             <firstChar value="3"/>
             <lastChar value="5"/>
         </switches>
         <parse>
+            <item value="r'fetching number of entries for table .+retrieving the length of query output\n[\r]*\[.+?\] \[INFO\] retrieved: [\d]+'" console_output="True"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+the     | iss.+&lt;blank&gt; | mei'"/>
+        </parse>
+    </case>
+    <case name="Fiebird UNION query multi-threaded custom enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <getSchema value="True"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+            <limitStart value="2"/>
+            <limitStop value="4"/>
+            <excludeSysDbs value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: Fiebird_masterdb.+Table: USERS.+3 columns.+surname.+VARCHAR'"/>
+            <item value="r'Database: Fiebird_masterdb.+Table: USERS.+3 entries.+fluffy.+bunny.+wu.+ming'"/>
+        </parse>
+    </case>
+    <case name="Fiebird boolean-based multi-threaded custom enumeration - substring">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <dumpTable value="True"/>
+            <tbl value="users"/>
+            <firstChar value="3"/>
+            <lastChar value="5"/>
+        </switches>
+        <parse>
+            <item value="r'fetching number of entries for table .+retrieving the length of query output\n[\r]*\[.+?\] \[INFO\] retrieved: [\d]+'" console_output="True"/>
+            <item value="r'Database: Fiebird_masterdb.+Table: USERS.+5 entries.+the .+| iss.+   | mei'"/>
         </parse>
     </case>
     <!-- End of custom enumeration switches -->
