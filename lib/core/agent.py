@@ -893,15 +893,10 @@ class Agent(object):
         selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
         selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
 
+        _, _, _, _, _, _, fieldsStr, _ = self.getFields(expression)
+
         if any((selectTopExpr, selectDistinctExpr, selectFromExpr, selectExpr)):
-            if selectTopExpr:
-                query = selectTopExpr.group(1)
-            elif selectDistinctExpr:
-                query = selectDistinctExpr.group(1)
-            elif selectFromExpr:
-                query = selectFromExpr.group(1)
-            elif selectExpr:
-                query = selectExpr.group(1)
+            query = fieldsStr
         else:
             query = expression
 
