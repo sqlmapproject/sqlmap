@@ -119,6 +119,9 @@ def _goInferenceFields(expression, expressionFields, expressionFieldsList, paylo
         if isinstance(num, int):
             expression = origExpr
 
+        if output and isinstance(output, basestring):
+            output = output.strip() if output.strip() else output[:1]
+
         outputs.append(output)
 
     return outputs
