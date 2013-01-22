@@ -165,10 +165,13 @@ class UDF:
 
     def udfInjectCustom(self):
         if Backend.getIdentifiedDbms() not in (DBMS.MYSQL, DBMS.PGSQL):
-            errMsg = "UDF injection feature is not yet implemented on %s" % Backend.getIdentifiedDbms()
-            raise SqlmapUnsupportedFeatureException(errMsg)
+            errMsg = "UDF injection feature only works on MySQL and PostgreSQL"
+            logger.error(errMsg)
+            return
 
         if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+            errMsg = "UDF injection feature requires stacked queries SQL injection"
+            logger.error(errMsg)
             return
 
         self.checkDbmsOs()
