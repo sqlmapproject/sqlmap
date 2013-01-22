@@ -2316,6 +2316,43 @@
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
         </parse>
     </case>
+    <case name="Firebird multi-threaded search enumeration - database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <search value="True"/>
+            <db value="e"/>
+        </switches>
+        <parse>
+            <item value="on Firebird it is not possible to search databases" console_output="True"/>
+        </parse>
+    </case>
+    <case name="Firebird boolean-based multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+        </parse>
+    </case>
+    <case name="Firebird UNION query multi-threaded search enumeration - tables without given database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <search value="True"/>
+            <tbl value="user"/>
+            <answers value="do you want to dump=N"/>
+        </switches>
+        <parse>
+            <item value="r'Database: Firebird_masterdb.+1 table.+USERS'"/>
+        </parse>
+    </case>
     <!-- End of search enumeration switches -->
 
     <!-- User's provided statement enumeration switches -->
