@@ -387,7 +387,7 @@
    <!-- Firebird -->
    <dbms value="Firebird">
         <cast query="TRIM(CAST(%s AS VARCHAR(10000)))"/>
-        <length query="CHAR_LENGTH(%s)"/>
+        <length query="CHAR_LENGTH(TRIM(%s))"/>
         <delimiter query="||"/>
         <limit query="ROWS %d TO %d"/>
         <limitregexp query="\s+ROWS\s+([\d]+)(\s+\TO\s+([\d]+))?"/>
