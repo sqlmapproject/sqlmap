@@ -2622,6 +2622,50 @@
             <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
         </parse>
     </case>
+    <case name="Firebird boolean-based multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users \[.+1, luther, blisset.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="Firebird UNION query multi-threaded custom SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users \[.+1, luther, blisset.+2, fluffy, bunny'"/>
+        </parse>
+    </case>
+    <case name="Firebird boolean-based multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+2, fluffy, bunny.+1, luther, blisset.+3, wu, ming'"/>
+        </parse>
+    </case>
+    <case name="Firebird UNION query multi-threaded custom ordered SQL query enumeration">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <query value="SELECT * FROM users ORDER BY name"/>
+        </switches>
+        <parse>
+            <item value="r'SELECT \* FROM users ORDER BY name \[5\].+1, luther, blisset.+2, fluffy, bunny.+3, wu, ming'"/>
+        </parse>
+    </case>
     <!-- End of user's provided statement enumeration switches -->
 
     <!-- File system access switches -->
