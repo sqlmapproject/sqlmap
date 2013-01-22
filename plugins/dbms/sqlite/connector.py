@@ -22,10 +22,10 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     """
-    Homepage: http://pysqlite.googlecode.com/
+    Homepage: http://pysqlite.googlecode.com/ and http://packages.ubuntu.com/quantal/python-sqlite
     User guide: http://docs.python.org/release/2.5/lib/module-sqlite3.html
     API: http://docs.python.org/library/sqlite3.html
-    Debian package: python-pysqlite2 (SQLite 2), python-pysqlite3 (SQLite 3)
+    Debian package: python-sqlite (SQLite 2), python-pysqlite3 (SQLite 3)
     License: MIT
 
     Possible connectors: http://wiki.python.org/moin/SQLite
@@ -54,7 +54,7 @@ class Connector(GenericConnector):
                 try:
                     import sqlite
                 except ImportError:
-                    errMsg = "sqlmap requires 'python-sqlite2' third-party library "
+                    errMsg = "sqlmap requires 'python-sqlite' third-party library "
                     errMsg += "in order to directly connect to the database '%s'" % self.db
                     raise SqlmapMissingDependence(errMsg)
 
