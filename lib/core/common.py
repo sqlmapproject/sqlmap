@@ -3310,6 +3310,18 @@ def zeroDepthSearch(expression, value):
 
     return retVal
 
+def splitFields(fields, delimiter=','):
+    """
+    Returns list of fields splitted by delimiter
+    """
+
+    fields = fields.replace("%s " % delimiter, delimiter)
+    commas = [-1, len(fields)]
+    commas.extend(zeroDepthSearch(fields, ','))
+    commas = sorted(commas)
+
+    return [fields[x + 1:y] for (x, y) in zip(commas, commas[1:])]
+
 def pollProcess(process, suppress_errors=False):
     while True:
         dataToStdout(".")

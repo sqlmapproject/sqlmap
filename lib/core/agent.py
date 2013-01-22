@@ -17,6 +17,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import splitFields
 from lib.core.common import unArrayizeValue
 from lib.core.common import zeroDepthSearch
 from lib.core.data import conf
@@ -384,11 +385,7 @@ class Agent(object):
         if fields.startswith("(CASE") or fields.startswith("(IIF") or fields.startswith("SUBSTR") or fields.startswith("MID(") or re.search(r"\A'[^']+'\Z", fields):
             nulledCastedConcatFields = fields
         else:
-            fields = fields.replace(", ", ',')
-            commas = [-1, len(fields)]
-            commas.extend(zeroDepthSearch(fields, ','))
-            commas = sorted(commas)
-            fieldsSplitted = [fields[x + 1:y] for (x, y) in zip(commas, commas[1:])]
+            fieldsSplitted = splitFields(fields)
             dbmsDelimiter = queries[Backend.getIdentifiedDbms()].delimiter.query
             nulledCastedFields = []
 
@@ -453,8 +450,7 @@ class Agent(object):
         if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]
         else:
-            fieldsToCastList = fieldsToCastStr.replace(", ", ',')
-            fieldsToCastList = fieldsToCastList.split(',')
+            fieldsToCastList = splitFields(fieldsToCastStr)
 
         return fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, fieldsToCastList, fieldsToCastStr, fieldsExists
 
