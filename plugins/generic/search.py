@@ -194,13 +194,14 @@ class Search:
                 query += whereDbsQuery
                 values = inject.getValue(query, blind=False, time=False)
 
-                if Backend.isDbms(DBMS.SQLITE):
+                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     newValues = []
 
                     if isinstance(values, basestring):
                         values = [values]
                     for value in values:
-                        newValues.append(["SQLite%s" % METADB_SUFFIX, value])
+                        dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
+                        newValues.append(["%s%s" % (dbName, METADB_SUFFIX), value])
 
                     values = newValues
 
@@ -216,7 +217,7 @@ class Search:
                     else:
                         foundTbls[foundDb] = [foundTbl]
             else:
-                if not Backend.isDbms(DBMS.SQLITE):
+                if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                     infoMsg = "fetching number of databases with table"
                     if tblConsider == "1":
                         infoMsg += "s like"
@@ -259,7 +260,8 @@ class Search:
                     if tblConsider == "2":
                         continue
                 else:
-                    foundTbls["SQLite%s" % METADB_SUFFIX] = []
+                    dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
+                    foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
 
                 for db in foundTbls.keys():
                     db = safeSQLIdentificatorNaming(db)
@@ -271,7 +273,7 @@ class Search:
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
-                    if not Backend.isDbms(DBMS.SQLITE):
+                    if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -290,10 +292,17 @@ class Search:
 
                     for index in indexRange:
                         query = rootQuery.blind.query2
-                        if not Backend.isDbms(DBMS.SQLITE):
+
+                        if Backend.isDbms(DBMS.FIREBIRD):
+                            query = query % index
+
+                        if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                             query = query % unsafeSQLIdentificatorNaming(db)
+
                         query += " AND %s" % tblQuery
-                        query = agent.limitQuery(index, query)
+
+                        if not Backend.isDbms(DBMS.FIREBIRD):
+                            query = agent.limitQuery(index, query)
 
                         foundTbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         kb.hintValue = foundTbl

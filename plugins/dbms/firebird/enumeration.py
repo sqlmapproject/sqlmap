@@ -30,21 +30,11 @@ class Enumeration(GenericEnumeration):
 
         return []
 
-    def searchTable(self):
-        warnMsg = "on Firebird searching of tables is not implemented"
-        logger.warn(warnMsg)
-
-        return []
-
     def searchColumn(self):
         warnMsg = "on Firebird searching of columns is not implemented"
         logger.warn(warnMsg)
 
         return []
-
-    def search(self):
-        warnMsg = "on Firebird search option is not available"
-        logger.warn(warnMsg)
 
     def getHostname(self):
         warnMsg = "on Firebird it is not possible to enumerate the hostname"
