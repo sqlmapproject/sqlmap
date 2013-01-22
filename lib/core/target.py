@@ -171,6 +171,14 @@ def _setRequestParams():
                             conf.url = conf.url.split('?')[0]
                             conf.paramDict[PLACE.GET] = paramDict
                             testableParameters = True
+                elif place == PLACE.CUSTOM_POST:
+                    conf.parameters[PLACE.POST] = conf.data
+                    paramDict = paramToDict(PLACE.POST, conf.data)
+
+                    if paramDict:
+                        conf.paramDict[PLACE.POST] = paramDict
+                        testableParameters = True
+
             else:
                 conf.parameters[place] = value
                 conf.paramDict[place] = OrderedDict()
