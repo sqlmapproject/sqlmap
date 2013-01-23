@@ -190,16 +190,16 @@
             <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
         </dump_table>
         <search_db>
-            <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
-            <blind query="SELECT name FROM master..sysdatabases WHERE %s" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE %s" condition="name"/>
+            <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
+            <blind query="SELECT name FROM master..sysdatabases WHERE " count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
         </search_db>
         <search_table>
-            <inband query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') AND %s" condition="name" condition2="name"/>
-            <blind query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') AND %s" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" condition="name" condition2="name"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') AND " condition="name" condition2="name"/>
+            <blind query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') " count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" condition="name" condition2="name"/>
         </search_table>
         <search_column>
-            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype in ('u','v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
-            <blind query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u','v')" count="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id  AND %s..sysobjects.xtype in ('u','v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
+            <inband query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype IN ('u','v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
+            <blind query="SELECT %s..sysobjects.name FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype IN ('u','v')" count="SELECT COUNT(%s..sysobjects.name) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.xtype IN ('u','v')" condition="[DB]..syscolumns.name" condition2="[DB]..sysobjects.name"/>
         </search_column>
     </dbms>
 
@@ -543,11 +543,11 @@
             <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s) AS value_table"/>
         </dump_table>
         <search_db>
-            <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
+            <inband query="SELECT name FROM master..sysdatabases WHERE " condition="name"/>
             <blind/>
         </search_db>
         <search_table>
-            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') AND %s" condition="name" condition2="name"/>
+            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U') AND " condition="name" condition2="name"/>
             <blind/>
         </search_table>
         <search_column>

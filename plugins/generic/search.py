@@ -160,7 +160,6 @@ class Search:
         rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
-        whereDbsQuery = ""
         tblConsider, tblCondParam = self.likeOrExact("table")
 
         for tbl in tblList:
@@ -175,7 +174,7 @@ class Search:
                 infoMsg += "s like"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
 
-            if conf.db and conf.db != CURRENT_DB:
+            if dbCond and conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
                 infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
@@ -183,6 +182,8 @@ class Search:
                 whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
                 infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg2)
+            else:
+                whereDbsQuery = ""
 
             logger.info(infoMsg)
 
@@ -191,6 +192,7 @@ class Search:
 
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 query = rootQuery.inband.query
+
                 query = query % (tblQuery + whereDbsQuery)
                 values = inject.getValue(query, blind=False, time=False)
 
