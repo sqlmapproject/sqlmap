@@ -83,8 +83,8 @@ class Search:
                     query = rootQuery.inband.query2
                 else:
                     query = rootQuery.inband.query
-                query += dbQuery
-                query += exclDbsQuery
+
+                query = query % (dbQuery + exclDbsQuery)
                 values = inject.getValue(query, blind=False, time=False)
 
                 if not isNoneValue(values):
@@ -106,8 +106,7 @@ class Search:
                 else:
                     query = rootQuery.blind.count
 
-                query += dbQuery
-                query += exclDbsQuery
+                query = query % (dbQuery + exclDbsQuery)
                 count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
@@ -126,10 +125,8 @@ class Search:
                         query = rootQuery.blind.query2
                     else:
                         query = rootQuery.blind.query
-                    query += dbQuery
-                    query += exclDbsQuery
-                    if Backend.isDbms(DBMS.DB2):
-                        query += ") AS foobar"
+
+                    query = query % (dbQuery + exclDbsQuery)
                     query = agent.limitQuery(index, query, dbCond)
 
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
@@ -194,8 +191,7 @@ class Search:
 
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 query = rootQuery.inband.query
-                query += tblQuery
-                query += whereDbsQuery
+                query = query % (tblQuery + whereDbsQuery)
                 values = inject.getValue(query, blind=False, time=False)
 
                 if values and Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
@@ -231,8 +227,7 @@ class Search:
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count
-                        query += tblQuery
-                        query += whereDbsQuery
+                        query = query % (tblQuery + whereDbsQuery)
                         count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
@@ -248,10 +243,7 @@ class Search:
 
                         for index in indexRange:
                             query = rootQuery.blind.query
-                            query += tblQuery
-                            query += whereDbsQuery
-                            if Backend.isDbms(DBMS.DB2):
-                                query += ") AS foobar"
+                            query = query % (tblQuery + whereDbsQuery)
                             query = agent.limitQuery(index, query)
 
                             foundDb = unArrayizeValue(inject.getValue(query, union=False, error=False))
@@ -286,6 +278,7 @@ class Search:
                     if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
+
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
@@ -412,9 +405,7 @@ class Search:
                     # Enumerate tables containing the column provided if
                     # either of database(s) or table(s) is not provided
                     query = rootQuery.inband.query
-                    query += colQuery
-                    query += whereDbsQuery
-                    query += whereTblsQuery
+                    query = query % (colQuery + whereDbsQuery + whereTblsQuery)
                     values = inject.getValue(query, blind=False, time=False)
                 else:
                     # Assume provided databases' tables contain the
@@ -466,9 +457,7 @@ class Search:
                     logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
                     query = rootQuery.blind.count
-                    query += colQuery
-                    query += whereDbsQuery
-                    query += whereTblsQuery
+                    query = query % (colQuery + whereDbsQuery + whereTblsQuery)
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
@@ -484,12 +473,9 @@ class Search:
 
                     for index in indexRange:
                         query = rootQuery.blind.query
-                        query += colQuery
-                        query += whereDbsQuery
-                        query += whereTblsQuery
-                        if Backend.isDbms(DBMS.DB2):
-                            query += ") AS foobar"
+                        query = query % (colQuery + whereDbsQuery + whereTblsQuery)
                         query = agent.limitQuery(index, query)
+
                         db = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         db = safeSQLIdentificatorNaming(db)
 
@@ -525,6 +511,7 @@ class Search:
                         query = query % db
                         query += " AND %s" % colQuery
                         query += whereTblsQuery
+
                         count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
@@ -545,6 +532,7 @@ class Search:
                             query += " AND %s" % colQuery
                             query += whereTblsQuery
                             query = agent.limitQuery(index, query)
+
                             tbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
                             kb.hintValue = tbl
 
