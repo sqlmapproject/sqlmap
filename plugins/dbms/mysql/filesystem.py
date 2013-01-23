@@ -104,7 +104,7 @@ class Filesystem(GenericFilesystem):
         warnMsg += "file as a leftover from UNION query"
         singleTimeWarnMessage(warnMsg)
 
-    def stackedWriteFile(self, wFile, dFile, fileType):
+    def stackedWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         debugMsg = "creating a support table to write the hexadecimal "
         debugMsg += "encoded file to"
         logger.debug(debugMsg)
@@ -131,4 +131,4 @@ class Filesystem(GenericFilesystem):
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
         inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, dFile), silent=True)
 
-        self.askCheckWrittenFile(wFile, dFile)
+        return self.askCheckWrittenFile(wFile, dFile, forceCheck)

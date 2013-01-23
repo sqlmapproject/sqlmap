@@ -33,7 +33,7 @@ class Filesystem(GenericFilesystem):
         errMsg += "query SQL injection technique"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
-    def stackedWriteFile(self, wFile, dFile, fileType):
+    def stackedWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         wFileSize = os.path.getsize(wFile)
 
         if wFileSize > 8192:
@@ -110,6 +110,8 @@ class Filesystem(GenericFilesystem):
         # (pg_largeobject 'data' field)
         inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile), silent=True)
 
-        self.askCheckWrittenFile(wFile, dFile)
+        written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
+
+        return written

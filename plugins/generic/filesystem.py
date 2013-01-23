@@ -135,13 +135,17 @@ class Filesystem:
 
         return retVal
 
-    def askCheckWrittenFile(self, localFile, remoteFile):
-        message = "do you want confirmation that the local file '%s' " % localFile
-        message += "has been successfully written on the back-end DBMS "
-        message += "file system (%s)? [Y/n] " % remoteFile
-        output = readInput(message, default="Y")
+    def askCheckWrittenFile(self, localFile, remoteFile, forceCheck=False):
+        output = None
+        if forceCheck is not True:
+            message = "do you want confirmation that the local file '%s' " % localFile
+            message += "has been successfully written on the back-end DBMS "
+            message += "file system (%s)? [Y/n] " % remoteFile
+            output = readInput(message, default="Y")
 
-        if not output or output in ("y", "Y"):
+        readInput("press ENTER to continue :)")
+
+        if forceCheck or (not output or output in ("y", "Y")):
             return self._checkFileLength(localFile, remoteFile)
 
         return True
@@ -249,7 +253,9 @@ class Filesystem:
 
         return localFilePaths
 
-    def writeFile(self, localFile, remoteFile, fileType=None):
+    def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
+        written = False
+
         self.checkDbmsOs()
 
         if localFile.endswith('_'):
@@ -261,7 +267,7 @@ class Filesystem:
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
 
-            self.stackedWriteFile(localFile, remoteFile, fileType)
+            written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to upload the %s file with " % fileType
@@ -276,3 +282,5 @@ class Filesystem:
             logger.error(errMsg)
 
             return None
+
+        return written

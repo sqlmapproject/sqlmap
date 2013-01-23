@@ -326,7 +326,7 @@ class Filesystem(GenericFilesystem):
 
         self.execCmd(complComm)
 
-    def stackedWriteFile(self, wFile, dFile, fileType):
+    def stackedWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         # NOTE: this is needed here because we use xp_cmdshell extended
         # procedure to write a file on the back-end Microsoft SQL Server
         # file system
@@ -341,9 +341,9 @@ class Filesystem(GenericFilesystem):
 
         self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
 
-        sameFile = self.askCheckWrittenFile(wFile, dFile)
+        written = self.askCheckWrittenFile(wFile, dFile)
 
-        if sameFile is False:
+        if written is False:
             message = "do you want to try to upload the file with "
             message += "another technique? [Y/n] "
             choice = readInput(message, default="Y")
@@ -351,4 +351,6 @@ class Filesystem(GenericFilesystem):
             if not choice or choice.lower() == "y":
                 self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
                 #self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
-                self.askCheckWrittenFile(wFile, dFile)
+                written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
+
+        return written

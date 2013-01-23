@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
 from lib.request import inject
@@ -195,7 +196,11 @@ class Abstraction(Web, UDF, Xp_cmdshell):
                 logger.warn(warnMsg)
 
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                self.udfInjectSys()
+                success = self.udfInjectSys()
+
+                if success is not True:
+                    msg = "unable to mount the operating system takeover"
+                    raise SqlmapFilePathException(msg)
             elif Backend.isDbms(DBMS.MSSQL):
                 if mandatory:
                     self.xpCmdshellInit()

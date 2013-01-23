@@ -137,6 +137,8 @@ class UDF:
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def udfInjectCore(self, udfDict):
+        written = False
+
         for udf in udfDict.keys():
             if udf in self.createdUdf:
                 continue
@@ -145,7 +147,22 @@ class UDF:
 
         if len(self.udfToCreate) > 0:
             self.udfSetRemotePath()
-            self.writeFile(self.udfLocalFile, self.udfRemoteFile, "binary")
+            written = self.writeFile(self.udfLocalFile, self.udfRemoteFile, "binary", forceCheck=True)
+
+            if written is not True:
+                errMsg = "there has been a problem uploading the shared library, "
+                errMsg += "it looks like the binary file has not been written "
+                errMsg += "on the database underlying file system"
+                logger.error(errMsg)
+
+                message = "do you want to proceed anyway? Beware that the "
+                message += "operating system takeover will fail [y/N] "
+                choice = readInput(message, default="N")
+
+                if choice and choice.lower() == "y":
+                    written = True
+                else:
+                    return False
 
         for udf, inpRet in udfDict.items():
             if udf in self.udfToCreate and udf not in self.createdUdf:
@@ -158,10 +175,12 @@ class UDF:
 
         self.udfCreateSupportTbl(supportTblType)
 
+        return written
+
     def udfInjectSys(self):
         self.udfSetLocalPaths()
         self.udfCheckNeeded()
-        self.udfInjectCore(self.sysUdfs)
+        return self.udfInjectCore(self.sysUdfs)
 
     def udfInjectCustom(self):
         if Backend.getIdentifiedDbms() not in (DBMS.MYSQL, DBMS.PGSQL):
@@ -297,7 +316,11 @@ class UDF:
                     self.udfs[udfName]["return"] = retType
                     break
 
-        self.udfInjectCore(self.udfs)
+        success = self.udfInjectCore(self.udfs)
+
+        if success is False:
+            self.cleanup(udfDict=self.udfs)
+            return False
 
         msg = "do you want to call your injected user-defined "
         msg += "functions now? [Y/n/q] "
