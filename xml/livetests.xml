@@ -12,6 +12,26 @@
         <verbose value="1"/>
         <cleanup value="True"/>
     </global>
+
+    <!-- Preventive cleanup of database management system from sqlmap temporary tables and user-defined functions -->
+    <case name="PostgreSQL cleanup from sqlmap temporary tables and user-defined functions (UDFs)">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <tech value="US"/>
+            <cleanup value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="Title: PostgreSQL &gt; 8.1 stacked queries"/>
+            <item value="r'\[DEBUG\] removing support tables'" console_output="True"/>
+            <item value="r'\[DEBUG\] removing UDF 'sys_fileread'"/>
+            <item value="r'\[DEBUG\] removing UDF 'sys_bineval'"/>
+            <item value="r'\[DEBUG\] removing UDF 'sys_eval'"/>
+            <item value="r'\[DEBUG\] removing UDF 'sys_exec'"/>
+        </parse>
+    </case>
+    <!-- End of preventive cleanup of database management system from sqlmap temporary tables and user-defined functions -->
+
     <!-- Common enumeration switches across all techniques -->
     <case name="MySQL boolean-based multi-threaded enumeration - all entries">
         <switches>
