@@ -3063,7 +3063,6 @@
         </switches>
         <parse>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="testing for SQL injection on GET parameter 'Section'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 'pAram'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 's'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 'id'" console_output="True"/>
