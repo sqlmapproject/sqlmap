@@ -56,6 +56,7 @@ class Search:
         dbConsider, dbCondParam = self.likeOrExact("database")
 
         for db in dbList:
+            values = []
             db = safeSQLIdentificatorNaming(db)
 
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -93,7 +94,7 @@ class Search:
                         value = safeSQLIdentificatorNaming(value)
                         foundDbs.append(value)
 
-            if len(foundDbs) == 0 and isInferenceAvailable() and not conf.direct:
+            if not values and isInferenceAvailable() and not conf.direct:
                 infoMsg = "fetching number of database"
                 if dbConsider == "1":
                     infoMsg += "s like"
@@ -166,6 +167,7 @@ class Search:
         tblConsider, tblCondParam = self.likeOrExact("table")
 
         for tbl in tblList:
+            values = []
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD):
@@ -219,49 +221,53 @@ class Search:
                     else:
                         foundTbls[foundDb] = [foundTbl]
 
-            if len(foundTbls) == 0 and isInferenceAvailable() and not conf.direct:
+            if not values and isInferenceAvailable() and not conf.direct:
                 if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
-                    infoMsg = "fetching number of databases with table"
-                    if tblConsider == "1":
-                        infoMsg += "s like"
-                    infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                    logger.info(infoMsg)
-
-                    query = rootQuery.blind.count
-                    query += tblQuery
-                    query += whereDbsQuery
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-
-                    if not isNumPosStrValue(count):
-                        warnMsg = "no databases have table"
+                    if len(whereDbsQuery) == 0:
+                        infoMsg = "fetching number of databases with table"
                         if tblConsider == "1":
-                            warnMsg += "s like"
-                        warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                        logger.warn(warnMsg)
+                            infoMsg += "s like"
+                        infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                        logger.info(infoMsg)
 
-                        continue
-
-                    indexRange = getLimitRange(count)
-
-                    for index in indexRange:
-                        query = rootQuery.blind.query
+                        query = rootQuery.blind.count
                         query += tblQuery
                         query += whereDbsQuery
-                        if Backend.isDbms(DBMS.DB2):
-                            query += ") AS foobar"
-                        query = agent.limitQuery(index, query)
+                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-                        foundDb = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                        foundDb = safeSQLIdentificatorNaming(foundDb)
+                        if not isNumPosStrValue(count):
+                            warnMsg = "no databases have table"
+                            if tblConsider == "1":
+                                warnMsg += "s like"
+                            warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                            logger.warn(warnMsg)
 
-                        if foundDb not in foundTbls:
-                            foundTbls[foundDb] = []
+                            continue
+
+                        indexRange = getLimitRange(count)
+
+                        for index in indexRange:
+                            query = rootQuery.blind.query
+                            query += tblQuery
+                            query += whereDbsQuery
+                            if Backend.isDbms(DBMS.DB2):
+                                query += ") AS foobar"
+                            query = agent.limitQuery(index, query)
+
+                            foundDb = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                            foundDb = safeSQLIdentificatorNaming(foundDb)
+
+                            if foundDb not in foundTbls:
+                                foundTbls[foundDb] = []
+
+                            if tblConsider == "2":
+                                foundTbls[foundDb].append(tbl)
 
                         if tblConsider == "2":
-                            foundTbls[foundDb].append(tbl)
-
-                    if tblConsider == "2":
-                        continue
+                            continue
+                    else:
+                        for db in conf.db.split(","):
+                            foundTbls[db] = []
                 else:
                     dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
                     foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
@@ -364,6 +370,7 @@ class Search:
         colConsider, colCondParam = self.likeOrExact("column")
 
         for column in colList:
+            values = []
             column = safeSQLIdentificatorNaming(column)
             conf.db = origDb
             conf.tbl = origTbl
@@ -449,7 +456,7 @@ class Search:
 
                         kb.data.cachedColumns = {}
 
-            if len(dbs) == 0 and isInferenceAvailable() and not conf.direct:
+            if not values and isInferenceAvailable() and not conf.direct:
                 if not conf.db:
                     infoMsg = "fetching number of databases with tables containing column"
                     if colConsider == "1":
