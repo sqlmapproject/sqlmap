@@ -17,9 +17,11 @@ rm -f output 2>/dev/null
 cd $REGRESSION_SCRIPT
 echo "Regression test started at $(date)" 1>/tmp/regressiontest.log 2>&1
 python regressiontest.py 1>>/tmp/regressiontest.log 2>&1
-echo "Regression test finished at $(date)" 1>>/tmp/regressiontest.log 2>&1
 
 if [ $? -ne 0 ]
 then
+    echo "Regression test finished at $(date)" 1>>/tmp/regressiontest.log 2>&1
     cat /tmp/regressiontest.log | mailx -s "${SUBJECT}" -aFrom:${FROM} ${TO}
+else
+    echo "Regression test finished at $(date)" 1>>/tmp/regressiontest.log 2>&1
 fi
