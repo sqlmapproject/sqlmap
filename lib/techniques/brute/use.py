@@ -50,6 +50,9 @@ def _addPageTextWords():
 def tableExists(tableFile, regex=None):
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
 
+    if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        conf.db = conf.db.upper()
+
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
@@ -141,7 +144,11 @@ def columnExists(columnFile, regex=None):
         errMsg = "missing table parameter"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
+    if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        conf.db = conf.db.upper()
+
     result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))
+
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
