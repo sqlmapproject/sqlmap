@@ -271,7 +271,7 @@ class Web:
                             _ = _.replace("WRITABLE_DIR", localPath.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else localPath)
                             f.write(utf8encode(_))
 
-                        self.unionWriteFile(filename, self.webStagerFilePath, "text")
+                        self.unionWriteFile(filename, self.webStagerFilePath, "text", forceCheck=True)
 
                         uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
                         uplPage = uplPage or ""

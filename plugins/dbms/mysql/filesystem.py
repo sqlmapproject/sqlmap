@@ -80,7 +80,7 @@ class Filesystem(GenericFilesystem):
 
         return result
 
-    def unionWriteFile(self, wFile, dFile, fileType):
+    def unionWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         logger.debug("encoding file to its hexadecimal string value")
 
         fcEncodedList = self.fileEncode(wFile, "hex", True)
@@ -103,6 +103,8 @@ class Filesystem(GenericFilesystem):
         warnMsg = "expect junk characters inside the "
         warnMsg += "file as a leftover from UNION query"
         singleTimeWarnMessage(warnMsg)
+
+        return self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
     def stackedWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         debugMsg = "creating a support table to write the hexadecimal "

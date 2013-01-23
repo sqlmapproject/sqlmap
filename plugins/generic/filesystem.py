@@ -137,15 +137,14 @@ class Filesystem:
 
     def askCheckWrittenFile(self, localFile, remoteFile, forceCheck=False):
         output = None
+
         if forceCheck is not True:
             message = "do you want confirmation that the local file '%s' " % localFile
             message += "has been successfully written on the back-end DBMS "
             message += "file system (%s)? [Y/n] " % remoteFile
             output = readInput(message, default="Y")
 
-        readInput("press ENTER to continue :)")
-
-        if forceCheck or (not output or output in ("y", "Y")):
+        if forceCheck or (output and output.lower() == "y"):
             return self._checkFileLength(localFile, remoteFile)
 
         return True
@@ -274,7 +273,7 @@ class Filesystem:
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 
-            self.unionWriteFile(localFile, remoteFile, fileType)
+            written = self.unionWriteFile(localFile, remoteFile, fileType, forceCheck)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to write files to the underlying file "
