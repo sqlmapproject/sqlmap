@@ -2010,7 +2010,7 @@
             <search value="True"/>
             <db value="sys"/>
             <tbl value="user,aux,wrong"/>
-            <answer value="do you want to dump tables=N,do you want to crack them via a dictionary-based attack=N"/>
+            <answers value="do you want to dump tables=N,do you want to crack them via a dictionary-based attack=N"/>
         </switches>
         <parse>
             <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
@@ -2024,7 +2024,7 @@
             <search value="True"/>
             <db value="sys"/>
             <tbl value="user,aux,wrong"/>
-            <answer value="do you want to crack them via a dictionary-based attack=N"/>
+            <answers value="do you want to crack them via a dictionary-based attack=N"/>
         </switches>
         <parse>
             <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
@@ -2039,7 +2039,7 @@
             <search value="True"/>
             <db value="sys"/>
             <tbl value="user,aux,wrong"/>
-            <answer value="do you want to crack them via a dictionary-based attack=N"/>
+            <answers value="do you want to crack them via a dictionary-based attack=N"/>
         </switches>
         <parse>
             <item value="r'Database: SYS.+9 tables.+AUX_STATS.+USERS.+AUX_HISTORY'"/>
@@ -2273,7 +2273,7 @@
             <search value="True"/>
             <db value="db2inst1"/>
             <tbl value="user,wrong"/>
-            <answer value="do you want to dump tables=N"/>
+            <answers value="do you want to dump tables=N"/>
         </switches>
         <parse>
             <item value="r'Database: DB2INST1.+1 table.+USERS'"/>
@@ -3104,4 +3104,12 @@
         </parse>
     </case>
     <!-- End of other switches -->
+
+    <!-- TODO: add the following test cases:
+            * Test against a web service with XML POST data
+            * Test against a web application with generic XML POST data
+            * Test against a web application with JSON POST data
+            * Test against a web application with Multipart POST DATA
+            * Test direct connection against all supported DBMSes
+    -->
 </root>
