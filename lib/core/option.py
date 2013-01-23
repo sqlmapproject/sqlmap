@@ -255,10 +255,13 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             data = None
             cookie = None
             params = False
-            lines = request.split("\n")
+            newline = None
+            lines = request.split('\n')
 
             for line in lines:
-                if len(line) == 0 or line == "\n":
+                newline = "\r\n" if line.endswith('\r') else '\n'
+                line = line.strip('\r')
+                if len(line) == 0:
                     if method == HTTPMETHOD.POST and data is None:
                         data = ""
                         params = True
@@ -279,7 +282,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 # POST parameters
                 elif data is not None and params:
-                    data += "%s%s" % ("\n" if data else "", line)
+                    data += "%s%s" % (line, newline)
 
                 # GET parameters
                 elif "?" in line and "=" in line and ": " not in line:
@@ -299,7 +302,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                         host = splitValue[0]
 
                         if len(splitValue) > 1:
-                            port = filterStringValue(splitValue[1], '[0-9]')
+                            port = filterStringValue(splitValue[1], "[0-9]")
 
                     # Avoid to add a static content length header to
                     # conf.httpHeaders and consider the following lines as
@@ -334,7 +337,6 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
     fp = openFile(reqFile, "rb")
 
     content = fp.read()
-    content = content.replace("\r", "")
 
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)
