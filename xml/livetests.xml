@@ -1374,6 +1374,283 @@
     </case>
     <!-- End of custom enumeration switches -->
 
+    <!-- Brute force switches -->
+    <case name="MySQL boolean-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+2 tables.+data.+users'"/>
+        </parse>
+    </case>
+    <case name="MySQL boolean-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <db value="testdb"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+2 tables.+data.+users'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+2 tables.+data.+users'"/>
+        </parse>
+    </case>
+    <case name="MySQL error-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <db value="testdb"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+2 tables.+data.+users'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+2 tables.+data.+users'"/>
+        </parse>
+    </case>
+    <case name="MySQL UNION query brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <db value="testdb"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: testdb.+2 tables.+data.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL boolean-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <db value="public"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL error-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <db value="public"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="PostgreSQL UNION query brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <db value="public"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+6 tables.+users'"/>
+        </parse>
+    </case>
+    <case name="Oracle boolean-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <db value="sys"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+6 tables.+users'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+6 tables.+users'"/>
+        </parse>
+    </case>
+    <case name="Oracle error-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <db value="sys"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+6 tables.+users'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+6 tables.+users'"/>
+        </parse>
+    </case>
+    <case name="Oracle UNION query brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <db value="sys"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: public.+6 tables.+users'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table+users'"/>
+        </parse>
+    </case>
+    <case name="IBM DB2 boolean-based brute-force tables enumeration - provided database">
+        <switches>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <db value="db2inst1"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Database: db2inst1.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="SQLite 3 boolean-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="SQLite 3 UNION query brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="Firebird boolean-based brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="B"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <case name="Firebird UNION query brute-force tables enumeration - provided no database">
+        <switches>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="U"/>
+            <commonTables value="True"/>
+        </switches>
+        <parse>
+            <item value="r'Current database.+1 table.+users'"/>
+        </parse>
+    </case>
+    <!-- End of brute force switches -->
+
     <!-- Search enumeration switches -->
     <case name="MySQL boolean-based multi-threaded search enumeration - database">
         <switches>
