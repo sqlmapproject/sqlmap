@@ -451,6 +451,20 @@
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
+    <case name="PostgreSQL stacked queries single-threaded enumeration - all entries">
+        <switches>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
+            <tech value="S"/>
+            <timeSec value="2"/>
+            <getBanner value="True"/>
+            <isDba value="True"/>
+        </switches>
+        <parse>
+            <item value="Title: PostgreSQL &gt; 8.1 stacked queries"/>
+            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="current user is DBA:    True"/>
+        </parse>
+    </case>
     <case name="PostgreSQL inline queries multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_inline.php?id=1"/>
