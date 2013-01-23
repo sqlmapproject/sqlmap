@@ -267,7 +267,8 @@ class Search:
                             continue
                     else:
                         for db in conf.db.split(","):
-                            foundTbls[db] = []
+                            if db not in foundTbls:
+                                foundTbls[db] = []
                 else:
                     dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
                     foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
