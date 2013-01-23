@@ -1602,7 +1602,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: db2inst1.+1 table.+users'"/>
+            <item value="r'Database: DB2INST1.+1 table.+users'"/>
         </parse>
     </case>
     <case name="SQLite 3 boolean-based brute-force tables enumeration - provided no database">
@@ -1649,6 +1649,7 @@
             <item value="r'Current database.+1 table.+users'"/>
         </parse>
     </case>
+    <!-- TODO: add test cases to brute-force columns -->
     <!-- End of brute force switches -->
 
     <!-- Search enumeration switches -->
