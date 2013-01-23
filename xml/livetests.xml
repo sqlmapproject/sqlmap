@@ -3054,5 +3054,21 @@
             <item value="r'100% \[===.+=\] 17/17 ETA 00:00'" console_output="True"/>
         </parse>
     </case>
+    <case name="Multiple parameters">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?pAram=value&amp;s=3&amp;id=1&amp;Par=VALUE"/>
+            <tech value="B"/>
+            <getBanner value="True"/>
+            <answers value="Do you want to keep testing the others=Y"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+            <item value="testing for SQL injection on GET parameter 'Section'" console_output="True"/>
+            <item value="testing for SQL injection on GET parameter 'pAram'" console_output="True"/>
+            <item value="testing for SQL injection on GET parameter 's'" console_output="True"/>
+            <item value="testing for SQL injection on GET parameter 'id'" console_output="True"/>
+            <item value="testing for SQL injection on GET parameter 'Par'" console_output="True"/>
+        </parse>
+    </case>
     <!-- End of other switches -->
 </root>
