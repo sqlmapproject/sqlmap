@@ -49,6 +49,7 @@ def _addPageTextWords():
 
 def tableExists(tableFile, regex=None):
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
+
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
         errMsg += "(most probably caused by inability of the used injection "
@@ -82,7 +83,7 @@ def tableExists(tableFile, regex=None):
                 kb.locks.count.release()
                 break
 
-            if conf.db and METADB_SUFFIX not in conf.db:
+            if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                 fullTableName = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', table)
             else:
                 fullTableName = table
@@ -155,7 +156,8 @@ def columnExists(columnFile, regex=None):
     columns = filterListValue(columns, regex)
 
     table = safeSQLIdentificatorNaming(conf.tbl, True)
-    if conf.db and METADB_SUFFIX not in conf.db:
+
+    if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
         table = "%s.%s" % (safeSQLIdentificatorNaming(conf.db), table)
 
     kb.threadContinue = True
