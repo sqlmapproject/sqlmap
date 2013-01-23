@@ -1452,7 +1452,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+1 table.+users'"/>
+            <item value="r'Current database.+3 tables.+users'"/>
         </parse>
     </case>
     <case name="PostgreSQL boolean-based brute-force tables enumeration - provided database">
@@ -1475,7 +1475,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+1 table.+users'"/>
+            <item value="r'Current database.+3 tables.+users'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based brute-force tables enumeration - provided database">
@@ -1498,7 +1498,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+1 table.+users'"/>
+            <item value="r'Current database.+3 tables.+users'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query brute-force tables enumeration - provided database">
@@ -1533,7 +1533,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: public.+6 tables.+users'"/>
+            <item value="r'Database: SYS.+6 tables.+users'"/>
         </parse>
     </case>
     <case name="Oracle error-based brute-force tables enumeration - provided no database">
@@ -1556,7 +1556,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: public.+6 tables.+users'"/>
+            <item value="r'Database: SYS.+6 tables.+users'"/>
         </parse>
     </case>
     <case name="Oracle UNION query brute-force tables enumeration - provided no database">
@@ -1579,7 +1579,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Database: public.+6 tables.+users'"/>
+            <item value="r'Database: SYS.+6 tables.+users'"/>
         </parse>
     </case>
     <case name="IBM DB2 boolean-based brute-force tables enumeration - provided no database">
@@ -1590,7 +1590,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+1 table+users'"/>
+            <item value="r'Current database.+1 table.+users'"/>
         </parse>
     </case>
     <case name="IBM DB2 boolean-based brute-force tables enumeration - provided database">
