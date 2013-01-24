@@ -19,7 +19,7 @@ class Syntax(GenericSyntax):
 
         retVal = expression
 
-        if isDBMSVersionAtLeast('2.1'):
+        if isDBMSVersionAtLeast("2.1"):
             retVal = Syntax._escape(expression, quote, escaper)
 
         return retVal
