@@ -1040,12 +1040,12 @@
             <item value="r'Database: Firebird_masterdb.+Table: USERS.+5 entries.+luther.+nameisnull.+'"/>
         </parse>
     </case>
-    <!-- TODO: this test case fails because of a bug whereby partial UNION is no longer detected on Firebird -->
     <case name="Firebird partial UNION query multi-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
+            <dbms value="Firebird"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
