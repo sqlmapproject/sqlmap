@@ -18,6 +18,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="US"/>
+            <verbose value="2"/>
             <cleanup value="True"/>
         </switches>
         <parse>
