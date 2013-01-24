@@ -13,6 +13,7 @@ import re
 import socket
 import string
 import sys
+import sqlite3
 import threading
 import time
 import urllib2
@@ -1793,29 +1794,21 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
-# Logger recorder object, which keeps the log structure
 class LogRecorder(logging.StreamHandler):
-    """
-    Logging handler class which only records CUSTOM_LOGGING.PAYLOAD entries
-    to a global list.
-    """
-    loghist = []
-
     def emit(self, record):
         """
-        Simply record the emitted events.
+        Record emitted events to temporary database for asynchronous I/O
+        communication with the parent process
         """
-        self.loghist.append({'levelname': record.levelname,
-                             'text': record.msg % record.args if record.args else record.msg,
-                             'id': len(self.loghist) + 1})
-
-        if conf.fdLog:
-            # TODO: this is very heavy operation and slows down a lot the
-            # whole execution of the sqlmap engine, find an alternative
-            os.write(conf.fdLog, base64pickle(self.loghist))
+        connection = sqlite3.connect(conf.ipc, isolation_level=None)
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?)",
+                       (time.strftime("%X"), record.levelname, record.msg % record.args if record.args else record.msg))
+        cursor.close()
+        connection.close()
 
 def _setRestAPILog():
-    if hasattr(conf, "fdLog") and conf.fdLog:
+    if hasattr(conf, "ipc"):
         logger.removeHandler(LOGGER_HANDLER)
         LOGGER_RECORDER = LogRecorder()
         logger.addHandler(LOGGER_RECORDER)

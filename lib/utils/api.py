@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 import shutil
+import sqlite3
 import tempfile
 
 from subprocess import PIPE
@@ -39,7 +40,6 @@ RESTAPI_SERVER_PORT = 8775
 
 # Local global variables
 adminid = ""
-pipes = dict()
 procs = dict()
 tasks = AttribDict()
 
@@ -114,6 +114,19 @@ def task_new():
 
     taskid = hexencode(os.urandom(16))
     tasks[taskid] = init_options()
+
+    # Initiate the temporary database for asynchronous I/O with the
+    # sqlmap engine (children processes)
+    _, ipc_filepath = tempfile.mkstemp(prefix="sqlmapipc-", suffix=".db", text=False)
+    connection = sqlite3.connect(ipc_filepath, isolation_level=None)
+    cursor = connection.cursor()
+    cursor.execute("DROP TABLE IF EXISTS logs")
+    cursor.execute("CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, level TEXT, message TEXT)")
+    cursor.close()
+    connection.close()
+
+    # Set the temporary database to use for asynchronous I/O communication
+    tasks[taskid].ipc = ipc_filepath
 
     return jsonize({"taskid": taskid})
 
@@ -242,7 +255,6 @@ def scan_start(taskid):
     """
     global tasks
     global procs
-    global pipes
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
@@ -253,15 +265,10 @@ def scan_start(taskid):
         tasks[taskid][key] = value
 
     # Overwrite output directory (oDir) value to a temporary directory
-    tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmap-")
+    tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmaptask-")
 
     # Launch sqlmap engine in a separate thread
     logger.debug("starting a scan for task ID %s" % taskid)
-
-    pipes[taskid] = os.pipe()
-
-    # Provide sqlmap engine with the writable pipe for logging
-    tasks[taskid]["fdLog"] = pipes[taskid][1]
 
     # Launch sqlmap engine
     procs[taskid] = execute("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
@@ -273,7 +280,6 @@ def scan_output(taskid):
     """
     Read the standard output of sqlmap core execution
     """
-    global pipes
     global tasks
 
     if taskid not in tasks:
@@ -303,46 +309,51 @@ def scan_delete(taskid):
 @get("/scan/<taskid>/log/<start>/<end>")
 def scan_log_limited(taskid, start, end):
     """
-    Retrieve the log messages
+    Retrieve a subset of log messages
     """
-    log = None
+    json_log_messages = {}
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
+    # Temporary "protection" against SQL injection FTW ;)
     if not start.isdigit() or not end.isdigit() or end <= start:
         abort(500, "Invalid start or end value, must be digits")
 
-    start = max(0, int(start) - 1)
+    start = max(1, int(start))
     end = max(1, int(end))
-    pickledLog = os.read(pipes[taskid][0], 100000)
 
-    try:
-        log = base64unpickle(pickledLog)
-        log = log[slice(start, end)]
-    except (KeyError, IndexError, TypeError), e:
-        logger.error("handled exception when trying to unpickle logger dictionary in scan_log_limited(): %s" % str(e))
+    # Read a subset of log messages from the temporary I/O database
+    connection = sqlite3.connect(tasks[taskid].ipc, isolation_level=None)
+    cursor = connection.cursor()
+    cursor.execute("SELECT id, time, level, message FROM logs WHERE id >= %d AND id <= %d" % (start, end))
+    db_log_messages = cursor.fetchall()
 
-    return jsonize({"log": log})
+    for (id_, time_, level, message) in db_log_messages:
+        json_log_messages[id_] = {"time": time_, "level": level, "message": message}
+
+    return jsonize({"log": json_log_messages})
 
 @get("/scan/<taskid>/log")
 def scan_log(taskid):
     """
     Retrieve the log messages
     """
-    log = None
+    json_log_messages = {}
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    pickledLog = os.read(pipes[taskid][0], 100000)
+    # Read all log messages from the temporary I/O database
+    connection = sqlite3.connect(tasks[taskid].ipc, isolation_level=None)
+    cursor = connection.cursor()
+    cursor.execute("SELECT id, time, level, message FROM logs")
+    db_log_messages = cursor.fetchall()
 
-    try:
-        log = base64unpickle(pickledLog)
-    except (KeyError, IndexError, TypeError), e:
-        logger.error("handled exception when trying to unpickle logger dictionary in scan_log(): %s" % str(e))
+    for (id_, time_, level, message) in db_log_messages:
+        json_log_messages[id_] = {"time": time_, "level": level, "message": message}
 
-    return jsonize({"log": log})
+    return jsonize({"log": json_log_messages})
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
