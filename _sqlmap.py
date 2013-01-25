@@ -36,6 +36,7 @@ from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
+from lib.utils.api import StdDbOut
 
 def modulePath():
     """
@@ -53,15 +54,21 @@ def main():
     try:
         paths.SQLMAP_ROOT_PATH = modulePath()
         setPaths()
+
+        # Store original command line options for possible later restoration
+        cmdLineOptions.update(cmdLineParser().__dict__)
+        init(cmdLineOptions)
+
+        if hasattr(conf, "ipc_database"):
+            # Overwrite system standard output and standard error to write
+            # to a temporary I/O database
+            sys.stdout = StdDbOut(type_="stdout")
+            sys.stderr = StdDbOut(type_="stderr")
+
         banner()
 
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
-
-        # Store original command line options for possible later restoration
-        cmdLineOptions.update(cmdLineParser().__dict__)
-
-        init(cmdLineOptions)
 
         if conf.profile:
             profile()
@@ -112,6 +119,13 @@ def main():
         if conf.get("hashDB"):
             try:
                 conf.hashDB.flush(True)
+            except KeyboardInterrupt:
+                pass
+
+        if hasattr(conf, "ipc_database"):
+            try:
+                conf.ipc_database_cursor.close()
+                conf.ipc_database_connection.close()
             except KeyboardInterrupt:
                 pass
 
