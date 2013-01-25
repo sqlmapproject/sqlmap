@@ -454,10 +454,6 @@ def checkSqlInjection(place, parameter, value):
                                     warnMsg += "explicitly set it using option '--dbms'"
                                     singleTimeWarnMessage(warnMsg)
                                 else:
-                                    warnMsg = "heuristic test showed that the back-end DBMS "
-                                    warnMsg += "could be '%s' " % kb.heuristicDbms
-                                    singleTimeWarnMessage(warnMsg)
-
                                     Backend.forceDbms(kb.heuristicDbms)
 
                             if unionExtended:
@@ -613,6 +609,11 @@ def heuristicCheckDbms(injection):
 
         Backend.flushForcedDbms()
         kb.injection = popValue()
+
+    if retVal:
+        infoMsg = "heuristic test showed that the back-end DBMS "
+        infoMsg += "could be '%s' " % retVal
+        logger.info(infoMsg)
 
     return retVal
 
