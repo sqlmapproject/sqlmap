@@ -22,6 +22,7 @@ from lib.core.common import extractTextTagContent
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getLastRequestHTTPError
+from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import intersect
@@ -42,6 +43,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
+from lib.core.dicts import FROM_DUMMY_TABLE
+from lib.core.enums import DBMS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -55,7 +58,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
-from lib.core.settings import UNKNOWN_DBMS_VERSION
+from lib.core.settings import UNKNOWN_DBMS
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
@@ -441,11 +444,17 @@ def checkSqlInjection(place, parameter, value):
                             configUnion(test.request.char, test.request.columns)
 
                             if not Backend.getIdentifiedDbms():
-                                warnMsg = "using unescaped version of the test "
-                                warnMsg += "because of zero knowledge of the "
-                                warnMsg += "back-end DBMS. You can try to "
-                                warnMsg += "explicitly set it using option '--dbms'"
-                                singleTimeWarnMessage(warnMsg)
+                                if not kb.heuristicDbms:
+                                    kb.heuristicDbms = heuristicCheckDbms(injection) or UNKNOWN_DBMS
+
+                                if kb.heuristicDbms == UNKNOWN_DBMS:
+                                    warnMsg = "using unescaped version of the test "
+                                    warnMsg += "because of zero knowledge of the "
+                                    warnMsg += "back-end DBMS. You can try to "
+                                    warnMsg += "explicitly set it using option '--dbms'"
+                                    singleTimeWarnMessage(warnMsg)
+                                else:
+                                    Backend.forceDbms(kb.heuristicDbms)
 
                             if unionExtended:
                                 infoMsg = "automatically extending ranges "
@@ -581,6 +590,32 @@ def checkSqlInjection(place, parameter, value):
         checkSuhosinPatch(injection)
 
     return injection
+
+def heuristicCheckDbms(injection):
+    retVal = None
+
+    if not Backend.getIdentifiedDbms() and len(injection.data) == 1 and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
+        pushValue(kb.injection)
+        kb.injection = injection
+        randStr1, randStr2 = randomStr(), randomStr()
+
+        for dbms in getPublicTypeMembers(DBMS, True):
+            Backend.forceDbms(dbms)
+
+            if checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr1)):
+                if not checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr2)):
+                    retVal = dbms
+                    break
+
+        Backend.flushForcedDbms()
+        kb.injection = popValue()
+
+    if retVal:
+        infoMsg = "heuristic test showed that the back-end DBMS "
+        infoMsg += "could be '%s' " % retVal
+        logger.info(infoMsg)
+
+    return retVal
 
 def checkFalsePositives(injection):
     """
@@ -723,7 +758,7 @@ def heuristicCheckSqlInjection(place, parameter):
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N').upper() != 'N'
 
     elif result:
-        infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS_VERSION)
+        infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS)
         logger.info(infoMsg)
 
     else:

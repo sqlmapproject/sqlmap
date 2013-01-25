@@ -1526,6 +1526,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.fileReadMode = False
     kb.forcedDbms = None
     kb.headersFp = {}
+    kb.heuristicDbms = None
     kb.heuristicTest = None
     kb.hintValue = None
     kb.htmlFp = []

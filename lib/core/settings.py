@@ -36,7 +36,8 @@ UPPER_RATIO_BOUND = 0.98
 # Markers for special cases when parameter values contain html encoded characters
 PARAMETER_AMP_MARKER = "__AMP__"
 PARAMETER_SEMICOLON_MARKER = "__SEMICOLON__"
-PARTIAL_VALUE_MARKER = "__PARTIAL__"
+PARTIAL_VALUE_MARKER = "__PARTIAL_VALUE__"
+PARTIAL_HEX_VALUE_MARKER = "__PARTIAL_HEX_VALUE__"
 URI_QUESTION_MARKER = "__QUESTION_MARK__"
 ASTERISK_MARKER = "__ASTERISK_MARK__"
 
@@ -110,6 +111,9 @@ INFERENCE_EQUALS_CHAR = "="
 
 # Character used for operation "not-equals" in inference
 INFERENCE_NOT_EQUALS_CHAR = "!="
+
+# String used for representation of unknown dbms
+UNKNOWN_DBMS = "Unknown"
 
 # String used for representation of unknown dbms version
 UNKNOWN_DBMS_VERSION = "Unknown"
@@ -459,7 +463,7 @@ VALID_TIME_CHARS_RUN_THRESHOLD = 100
 CHECK_ZERO_COLUMNS_THRESHOLD = 10
 
 # Boldify all logger messages containing these "patterns"
-BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result")
+BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "heuristic test showed")
 
 # Generic www root directory names
 GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")

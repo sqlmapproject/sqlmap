@@ -3354,6 +3354,41 @@
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
+    <case name="Custom GET parameter injection mark">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1*"/>
+            <tech value="B"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+        </parse>
+    </case>
+    <case name="Custom POST data injection mark">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/mysql/post_int.php"/>
+            <data value="id=1*"/>
+            <tech value="E"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+        </parse>
+    </case>
+    <case name="Custom HTTP header (UA) injection mark">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/mysql/header_str.php"/>
+            <headers value="User-Agent: 1*"/>
+            <tech value="U"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+        </parse>
+    </case>
     <case name="Estimated time of arrival">
         <switches>
             <verbose value="2"/>

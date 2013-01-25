@@ -42,6 +42,7 @@ from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
+from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import VALID_TIME_CHARS_RUN_THRESHOLD
 from lib.core.threads import getCurrentThreadData
@@ -65,10 +66,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     retVal = hashDBRetrieve(expression, checkConf=True)
 
     if retVal:
-        if PARTIAL_VALUE_MARKER in retVal:
+        if PARTIAL_HEX_VALUE_MARKER in retVal:
+            retVal = retVal.replace(PARTIAL_HEX_VALUE_MARKER, "")
+
+            if retVal and conf.hexConvert:
+                partialValue = retVal
+                infoMsg = "resuming partial value: %s" % safecharencode(partialValue)
+                logger.info(infoMsg)
+        elif PARTIAL_VALUE_MARKER in retVal:
             retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
 
-            if retVal:
+            if retVal and not conf.hexConvert:
                 partialValue = retVal
                 infoMsg = "resuming partial value: %s" % safecharencode(partialValue)
                 logger.info(infoMsg)
@@ -545,7 +553,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
             hashDBWrite(expression, finalValue)
         elif partialValue:
-            hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER, partialValue))
+            hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 
     if conf.hexConvert and not abortedFlag:
         infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
