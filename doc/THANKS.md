@@ -116,6 +116,9 @@ Carey Evans, <careye@spamcop.net>
 * for his fcrypt module that allows crypt(3) support
     on Windows platforms
 
+Shawn Evans, <shawndevans@gmail.com>
+* for suggesting an idea for one tamper script, greatest.py
+
 Adam Faheem, <faheem.adam@is.co.za>
 * for reporting a few bugs
 
@@ -294,7 +297,7 @@ Michael Majchrowicz, <mmajchrowicz@gmail.com>
 * for suggesting a lot of ideas and features
 
 Ahmad Maulana, <matdhule@gmail.com>
-* for contributing one tamper scripts, halfversionedmorekeywords.py
+* for contributing one tamper script, halfversionedmorekeywords.py
 
 Ferruh Mavituna, <ferruh@mavituna.com>
 * for exchanging ideas on the implementation of a couple of features
