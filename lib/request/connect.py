@@ -687,7 +687,7 @@ class Connect(object):
         else:
             uri = conf.url
 
-        if place == PLACE.CUSTOM_HEADER:
+        if value and place == PLACE.CUSTOM_HEADER:
             if not auxHeaders:
                 auxHeaders = {}
             auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
