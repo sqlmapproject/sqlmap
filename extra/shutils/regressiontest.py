@@ -140,7 +140,7 @@ def main():
         send_email(msg)
 
 if __name__ == "__main__":
-    log_fd = open("/tmp/regressiontest.txt", "ab")
+    log_fd = open("/tmp/sqlmapregressiontest.log", "ab")
     log_fd.write("Regression test started at %s\n" % TIME)
 
     try:
