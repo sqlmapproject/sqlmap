@@ -122,7 +122,7 @@ def init_options():
     return options
 
 @hook("after_request")
-def security_headers():
+def security_headers(json_header=True):
     """
     Set some headers across all HTTP responses
     """
@@ -133,7 +133,8 @@ def security_headers():
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache"
     response.headers["Expires"] = "0"
-    response.content_type = "application/json; charset=UTF-8"
+    if json_header:
+        response.content_type = "application/json; charset=UTF-8"
 
 ##############################
 # HTTP Status Code functions #
@@ -141,18 +142,22 @@ def security_headers():
 
 @error(401)  # Access Denied
 def error401(error=None):
+    security_headers(False)
     return "Access denied"
 
 @error(404)  # Not Found
 def error404(error=None):
+    security_headers(False)
     return "Nothing here"
 
 @error(405)  # Method Not Allowed (e.g. when requesting a POST method via GET)
 def error405(error=None):
+    security_headers(False)
     return "Method not allowed"
 
 @error(500)  # Internal Server Error
 def error500(error=None):
+    security_headers(False)
     return "Internal server error"
 
 #############################
@@ -390,15 +395,14 @@ def scan_log_limited(taskid, start, end):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    # Temporary "protection" against SQL injection FTW ;)
-    if not start.isdigit() or not end.isdigit() or end <= start:
+    if not start.isdigit() or not end.isdigit() or end < start:
         abort(500, "Invalid start or end value, must be digits")
 
     start = max(1, int(start))
     end = max(1, int(end))
 
     # Read a subset of log messages from the temporary I/O database
-    procs[taskid].ipc_database_cursor.execute("SELECT id, time, level, message FROM logs WHERE id >= %d AND id <= %d" % (start, end))
+    procs[taskid].ipc_database_cursor.execute("SELECT id, time, level, message FROM logs WHERE id >= ? AND id <= ?", (start, end))
     db_log_messages = procs[taskid].ipc_database_cursor.fetchall()
 
     for (id_, time_, level, message) in db_log_messages:
