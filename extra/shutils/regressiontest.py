@@ -140,7 +140,7 @@ def main():
         send_email(msg)
 
 if __name__ == "__main__":
-    log_fd = open("/tmp/sqlmapregressiontest.log", "ab")
+    log_fd = open("/tmp/sqlmapregressiontest.log", "wb")
     log_fd.write("Regression test started at %s\n" % TIME)
 
     try:
@@ -148,5 +148,5 @@ if __name__ == "__main__":
     except Exception, e:
         log_fd.write("An exception has occurred:\n%s" % str(traceback.format_exc()))
 
-    log_fd.write("\nRegression test finished at %s\n\n" % TIME)
+    log_fd.write("Regression test finished at %s\n\n" % TIME)
     log_fd.close()
