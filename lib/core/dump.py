@@ -46,7 +46,6 @@ class Dump(object):
     """
     This class defines methods used to parse and output the results
     of SQL injection actions
-
     """
 
     def __init__(self):

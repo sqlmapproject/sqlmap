@@ -200,7 +200,8 @@ class LogRecorder(logging.StreamHandler):
         communication with the parent process
         """
         conf.database_cursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)",
-                                     (conf.taskid, time.strftime("%X"), record.levelname, record.msg % record.args if record.args else record.msg))
+                                     (conf.taskid, time.strftime("%X"), record.levelname,
+                                     record.msg % record.args if record.args else record.msg))
 
 def setRestAPILog():
     if hasattr(conf, "api"):
