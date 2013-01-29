@@ -152,8 +152,12 @@ class Task(object):
         else:
             return None
 
+    def engine_get_returncode(self):
+        self.process.poll()
+        return self.process.returncode
+
     def engine_has_terminated(self):
-        return isinstance(self.process.returncode, int) == True
+        return isinstance(self.engine_get_returncode(), int)
 
 # Wrapper functions for sqlmap engine
 class StdDbOut(object):
@@ -271,7 +275,6 @@ def task_new():
     tasks[taskid] = Task(taskid)
 
     logger.debug("Created new task ID: %s" % taskid)
-
     return jsonize({"taskid": taskid})
 
 @get("/task/<taskid>/delete")
@@ -284,7 +287,6 @@ def task_delete(taskid):
         tasks.pop(taskid)
 
         logger.debug("Deleted task ID: %s" % taskid)
-
         return jsonize({"success": True})
     else:
         abort(500, "Invalid task ID")
@@ -296,10 +298,10 @@ def task_delete(taskid):
 @get("/admin/<taskid>/list")
 def task_list(taskid):
     """
-    List task poll
+    List task pull
     """
     if is_admin(taskid):
-        logger.debug("Listed task poll")
+        logger.debug("Listed task pull")
         return jsonize({"tasks": tasks, "tasks_num": len(tasks)})
     else:
         abort(401)
@@ -316,7 +318,7 @@ def task_flush(taskid):
             tasks[task].clean_filesystem()
 
         tasks = dict()
-        logger.debug("Flushed task poll")
+        logger.debug("Flushed task pull")
         return jsonize({"success": True})
     else:
         abort(401)
@@ -341,6 +343,8 @@ def option_get(taskid):
     """
     Get the value of an option (command line switch) for a certain task ID
     """
+    global tasks
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
@@ -349,7 +353,7 @@ def option_get(taskid):
     if option in tasks[taskid]:
         return jsonize({option: tasks[taskid].get_option(option)})
     else:
-        return jsonize({option: "Not set"})
+        return jsonize({option: "not set"})
 
 @post("/option/<taskid>/set")
 def option_set(taskid):
@@ -384,12 +388,10 @@ def scan_start(taskid):
     # Overwrite output directory value to a temporary directory
     tasks[taskid].set_output_directory()
 
-    # Launch sqlmap engine in a separate thread
-    logger.debug("Starting a scan for task ID %s" % taskid)
-
-    # Launch sqlmap engine
+    # Launch sqlmap engine in a separate process
     tasks[taskid].engine_start()
 
+    logger.debug("Started scan for task ID %s" % taskid)
     return jsonize({"success": True, "engineid": tasks[taskid].engine_get_id()})
 
 @get("/scan/<taskid>/stop")
@@ -402,7 +404,10 @@ def scan_stop(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize({"success": tasks[taskid].engine_stop()})
+    tasks[taskid].engine_stop()
+
+    logger.debug("Stopped scan for task ID %s" % taskid)
+    return jsonize({"success": True})
 
 @get("/scan/<taskid>/kill")
 def scan_kill(taskid):
@@ -414,7 +419,25 @@ def scan_kill(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize({"success": tasks[taskid].engine_kill()})
+    tasks[taskid].engine_kill()
+
+    logger.debug("Killed scan for task ID %s" % taskid)
+    return jsonize({"success": True})
+
+@get("/scan/<taskid>/status")
+def scan_status(taskid):
+    """
+    Returns status of a scan
+    """
+    global tasks
+
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    status = "terminated" if tasks[taskid].engine_has_terminated() is True else "running"
+
+    logger.debug("Requested status of scan for task ID %s" % taskid)
+    return jsonize({"status": status, "returncode": tasks[taskid].engine_get_returncode()})
 
 @get("/scan/<taskid>/data")
 def scan_data(taskid):
@@ -438,6 +461,7 @@ def scan_data(taskid):
     for error in db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
+    logger.debug("Retrieved data and error messages for scan for task ID %s" % taskid)
     return jsonize({"data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
@@ -463,6 +487,7 @@ def scan_log_limited(taskid, start, end):
     for time_, level, message in db.execute("SELECT time, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
+    logger.debug("Retrieved subset of log messages for scan for task ID %s" % taskid)
     return jsonize({"log": json_log_messages})
 
 @get("/scan/<taskid>/log")
@@ -481,6 +506,7 @@ def scan_log(taskid):
     for time_, level, message in db.execute("SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
+    logger.debug("Retrieved log messages for scan for task ID %s" % taskid)
     return jsonize({"log": json_log_messages})
 
 # Function to handle files inside the output directory
@@ -501,7 +527,7 @@ def download(taskid, target, filename):
     if os.path.exists(path):
         return static_file(filename, root=path)
     else:
-        abort(500)
+        abort(500, "File does not exist")
 
 def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
