@@ -12,7 +12,7 @@ from lib.core.common import Format
 from lib.core.common import getCurrentThreadData
 from lib.core.common import randomInt
 from lib.core.common import randomStr
-from lib.core.common import wasLastRequestDBMSError
+from lib.core.common import wasLastResponseDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -95,7 +95,7 @@ class Fingerprint(GenericFingerprint):
         randStr = randomStr()
         inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
 
-        if wasLastRequestDBMSError():
+        if wasLastResponseDBMSError():
             threadData = getCurrentThreadData()
             match = re.search("Could not find file\s+'([^']+?)'", threadData.lastErrorPage[1])
 

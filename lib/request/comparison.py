@@ -11,8 +11,8 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
-from lib.core.common import wasLastRequestDBMSError
-from lib.core.common import wasLastRequestHTTPError
+from lib.core.common import wasLastResponseDBMSError
+from lib.core.common import wasLastResponseHTTPError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -77,7 +77,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
 
     if page:
         # In case of an DBMS error page return None
-        if kb.errorIsNone and (wasLastRequestDBMSError() or wasLastRequestHTTPError()):
+        if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()):
             return None
 
         # Dynamic content lines to be excluded before comparison

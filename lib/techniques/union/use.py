@@ -33,7 +33,7 @@ from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
-from lib.core.common import wasLastRequestDBMSError
+from lib.core.common import wasLastResponseDBMSError
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
@@ -94,7 +94,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             retVal = getUnicode(retVal, kb.pageEncoding)
 
             # Special case when DBMS is Microsoft SQL Server and error message is used as a result of union injection
-            if Backend.isDbms(DBMS.MSSQL) and wasLastRequestDBMSError():
+            if Backend.isDbms(DBMS.MSSQL) and wasLastResponseDBMSError():
                 retVal = htmlunescape(retVal).replace("<br>", "\n")
 
             hashDBWrite("%s%s" % (conf.hexConvert, expression), retVal)

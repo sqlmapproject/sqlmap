@@ -34,7 +34,7 @@ from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
-from lib.core.common import wasLastRequestDelayed
+from lib.core.common import wasLastResponseDelayed
 from lib.core.common import unicodeencode
 from lib.core.common import urlencode
 from lib.core.data import conf
@@ -827,7 +827,7 @@ class Connect(object):
             kb.testQueryCount += 1
 
         if timeBasedCompare:
-            return wasLastRequestDelayed()
+            return wasLastResponseDelayed()
         elif noteResponseTime:
             kb.responseTimes.append(threadData.lastQueryDuration)
 
