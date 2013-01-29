@@ -66,10 +66,10 @@ def main():
     test_counts = []
     attachments = {}
 
-    proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --update", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --update", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.wait()
 
-    proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.wait()
     stdout, stderr = proc.communicate()
 
