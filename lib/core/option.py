@@ -136,7 +136,6 @@ from lib.request.httpshandler import HTTPSHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
-from lib.utils.api import setRestAPILog
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
@@ -2052,21 +2051,22 @@ def _resolveCrossReferences():
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
 
-def init(inputOptions=AttribDict(), overrideOptions=False):
-    """
-    Set attributes into both configuration and knowledge base singletons
-    based upon command line and configuration file options.
-    """
-
+def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     if not inputOptions.disableColoring:
         coloramainit()
 
     _setConfAttributes()
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)
+
+def init():
+    """
+    Set attributes into both configuration and knowledge base singletons
+    based upon command line and configuration file options.
+    """
+
     _useWizardInterface()
     setVerbosity()
-    setRestAPILog()
     _saveCmdline()
     _setRequestFromFile()
     _cleanupOptions()
