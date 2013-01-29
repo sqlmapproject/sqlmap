@@ -36,6 +36,7 @@ from lib.core.common import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import API_CONTENT_TYPE
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPMETHOD
@@ -151,9 +152,11 @@ def _showInjections():
     header = "sqlmap identified the following injection points with "
     header += "a total of %d HTTP(s) requests" % kb.testQueryCount
 
-    data = "".join(set(map(lambda x: _formatInjection(x), kb.injections))).rstrip("\n")
-
-    conf.dumper.string(header, data)
+    if hasattr(conf, "api"):
+        conf.dumper.string("", kb.injections, content_type=API_CONTENT_TYPE.TECHNIQUES)
+    else:
+        data = "".join(set(map(lambda x: _formatInjection(x), kb.injections))).rstrip("\n")
+        conf.dumper.string(header, data)
 
     if conf.tamper:
         warnMsg = "changes made by tampering scripts are not "
