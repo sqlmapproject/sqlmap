@@ -19,7 +19,7 @@
         <concatenate query="CONCAT(%s,%s)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
-        <inference query="ORD(MID((%s),%d,1)) > %d"/>
+        <inference query="ORD(MID((%s),%d,1))>%d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
@@ -87,7 +87,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="ENCODE(CONVERT_TO((%s),'UTF8'),'HEX')"/>
-        <inference query="ASCII(SUBSTR((%s)::text,%d,1)) > %d"/>
+        <inference query="ASCII(SUBSTR((%s)::text,%d,1))>%d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_DATABASE()"/>
@@ -155,7 +155,7 @@
         <concatenate query="%s+%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="master.sys.fn_varbintohexstr(CAST(%s AS VARBINARY(MAX)))"/>
-        <inference query="UNICODE(SUBSTRING((%s),%d,1)) > %d"/>
+        <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
@@ -221,7 +221,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="RAWTOHEX(%s)"/>
-        <inference query="ASCII(SUBSTRC((%s),%d,1)) > %d"/>
+        <inference query="ASCII(SUBSTRC((%s),%d,1))>%d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
         <!--
@@ -310,7 +310,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
-        <inference query="SUBSTR((%s),%d,1) > '%c'"/>
+        <inference query="SUBSTR((%s),%d,1)>'%c'"/>
         <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
         <current_db/>
@@ -359,7 +359,7 @@
         <substring query="MID((%s),%d,%d)"/>
         <concatenate query="%s&amp;%s"/>
         <case query="SELECT (IIF(%s,1,0))"/>
-        <inference query="ASCW(MID((%s),%d,1)) > %d"/>
+        <inference query="ASCW(MID((%s),%d,1))>%d"/>
         <banner/>
         <!--CURRENTUSER() is not available outside the MS Access query tool itself-->
         <current_user/>
@@ -401,7 +401,7 @@
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT IIF(%s,1,0)"/>
-        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1)) > %d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1) > '%c'"/>
+        <inference query="ASCII_VAL(SUBSTRING((%s) FROM %d FOR 1))>%d" dbms_version="&gt;=2.1" query2="SUBSTRING((%s) FROM %d FOR 1)>'%c'"/>
         <banner query="SELECT RDB$GET_CONTEXT('SYSTEM','ENGINE_VERSION') FROM RDB$DATABASE" dbms_version="&gt;=2.1"/>
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
@@ -457,7 +457,7 @@
         <concatenate query="CONCAT(%s,%s)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
-        <inference query="SUBSTR((%s),%d,1) > '%c'"/>
+        <inference query="SUBSTR((%s),%d,1)>'%c'"/>
         <banner query="SELECT ID FROM SYSINFO.VERSION"/>
         <current_user query="SELECT USER() FROM DUAL"/>
         <current_db query="SELECT DATABASE() FROM DUAL"/>
@@ -507,7 +507,7 @@
         <concatenate query="%s+%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="BINTOSTR(CONVERT(VARBINARY,%s))"/>
-        <inference query="ASCII(SUBSTRING((%s),%d,1)) > %d"/>
+        <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SUSER_NAME()"/>
         <current_db query="SELECT DB_NAME()"/>
@@ -576,7 +576,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSIBM.SYSDUMMY1"/>
         <hex query="HEX(%s)"/>
-        <inference query="SUBSTR((%s),%d,1) > '%c'"/>
+        <inference query="SUBSTR((%s),%d,1)>'%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
         <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT,versionnumber FROM sysibm.sysversions) AS foobar WHERE LIMIT=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>

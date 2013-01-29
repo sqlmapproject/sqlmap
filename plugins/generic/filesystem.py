@@ -65,7 +65,7 @@ class Filesystem:
                 if localFileSize == remoteFileSize:
                     sameFile = True
                     infoMsg = "the local file %s and the remote file " % localFile
-                    infoMsg += "%s have the same size" % remoteFile
+                    infoMsg += "%s has the same size" % remoteFile
                 elif remoteFileSize > localFileSize:
                     infoMsg = "the remote file %s is larger than " % remoteFile
                     infoMsg += "the local file %s" % localFile

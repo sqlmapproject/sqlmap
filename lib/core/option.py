@@ -916,7 +916,7 @@ def _setDNSCache():
 
 def _setHTTPProxy():
     """
-    Check and set the HTTP proxy to pass by all HTTP requests.
+    Check and set the HTTP/SOCKS proxy for all HTTP requests.
     """
 
     global proxyHandler
@@ -927,7 +927,7 @@ def _setHTTPProxy():
 
         return
 
-    debugMsg = "setting the HTTP/SOCKS proxy to pass by all HTTP requests"
+    debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
     logger.debug(debugMsg)
 
     proxySplit = urlparse.urlsplit(conf.proxy)
@@ -1376,7 +1376,7 @@ def _cleanupOptions():
         if not any([char in conf.testFilter for char in ('.', ')', '(', ']', '[')]):
             conf.testFilter = conf.testFilter.replace('*', '.*')
 
-    if conf.timeSec not in kb.explicitSettings:
+    if "timeSec" not in kb.explicitSettings:
         if conf.tor:
             conf.timeSec = 2 * conf.timeSec
             kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
