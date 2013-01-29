@@ -104,3 +104,6 @@ def stdoutencode(data):
 
 def jsonize(data):
     return json.dumps(data, sort_keys=False, indent=4)
+
+def dejsonize(data):
+    return json.loads(data)

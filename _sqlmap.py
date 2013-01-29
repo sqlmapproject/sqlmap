@@ -59,11 +59,11 @@ def main():
         cmdLineOptions.update(cmdLineParser().__dict__)
         init(cmdLineOptions)
 
-        if hasattr(conf, "ipc_database"):
+        if hasattr(conf, "api"):
             # Overwrite system standard output and standard error to write
-            # to a temporary I/O database
-            sys.stdout = StdDbOut(type_="stdout")
-            sys.stderr = StdDbOut(type_="stderr")
+            # to an IPC database
+            sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
+            sys.stderr = StdDbOut(conf.taskid, messagetype="stderr")
 
         banner()
 
@@ -122,10 +122,10 @@ def main():
             except KeyboardInterrupt:
                 pass
 
-        if hasattr(conf, "ipc_database"):
+        if hasattr(conf, "api"):
             try:
-                conf.ipc_database_cursor.close()
-                conf.ipc_database_connection.close()
+                conf.database_cursor.close()
+                conf.database_connection.close()
             except KeyboardInterrupt:
                 pass
 

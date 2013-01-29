@@ -742,7 +742,7 @@ def setColor(message, bold=False):
 
     return retVal
 
-def dataToStdout(data, forceOutput=False, bold=False):
+def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=None):
     """
     Writes text to the stdout (console) stream
     """
@@ -754,8 +754,15 @@ def dataToStdout(data, forceOutput=False, bold=False):
             if kb.get("multiThreadMode"):
                 logging._acquireLock()
 
-            message = stdoutencode(data)
-            sys.stdout.write(setColor(message, bold))
+            if isinstance(data, basestring):
+                message = stdoutencode(data)
+            else:
+                message = data
+
+            if content_type is not None and status is not None:
+                sys.stdout.write(message, status=status, content_type=content_type)
+            else:
+                sys.stdout.write(setColor(message, bold))
 
             try:
                 sys.stdout.flush()
