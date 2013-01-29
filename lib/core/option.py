@@ -917,7 +917,7 @@ def _setDNSCache():
 
 def _setHTTPProxy():
     """
-    Check and set the HTTP proxy to pass by all HTTP requests.
+    Check and set the HTTP/SOCKS proxy for all HTTP requests.
     """
 
     global proxyHandler
@@ -928,7 +928,7 @@ def _setHTTPProxy():
 
         return
 
-    debugMsg = "setting the HTTP/SOCKS proxy to pass by all HTTP requests"
+    debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
     logger.debug(debugMsg)
 
     proxySplit = urlparse.urlsplit(conf.proxy)
