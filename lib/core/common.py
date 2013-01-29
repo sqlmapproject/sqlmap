@@ -759,7 +759,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             else:
                 message = data
 
-            if content_type is not None and status is not None:
+            if hasattr(conf, "api"):
                 sys.stdout.write(message, status=status, content_type=content_type)
             else:
                 sys.stdout.write(setColor(message, bold))
