@@ -60,10 +60,10 @@ class Database(object):
 
     def create(self):
         _, self.database = tempfile.mkstemp(prefix="sqlmapipc-", text=False)
-        logger.info("IPC database is %s" % self.database)
+        logger.debug("IPC database: %s" % self.database)
 
     def connect(self):
-        self.connection = sqlite3.connect(self.database, timeout=1, isolation_level=None)
+        self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None)
         self.cursor = self.connection.cursor()
 
     def disconnect(self):
@@ -132,18 +132,32 @@ class Task(object):
         shutil.rmtree(self.output_directory)
 
     def engine_start(self):
-        self.process = Popen("python sqlmap.py --pickled-options %s" % base64pickle(self.options), shell=True, stdin=PIPE)
+        self.process = Popen("python sqlmap.py --pickled-options %s" % base64pickle(self.options), shell=True, stdin=PIPE, close_fds=False)
 
     def engine_stop(self):
         if self.process:
-            self.process.terminate()
+            return self.process.terminate()
+        else:
+            return None
 
     def engine_kill(self):
         if self.process:
-            self.process.kill()
+            return self.process.kill()
+        else:
+            return None
 
-    def engine_get_pid(self):
-        return self.processid.pid
+    def engine_get_id(self):
+        if self.process:
+            return self.process.pid
+        else:
+            return None
+
+    def engine_get_returncode(self):
+        self.process.poll()
+        return self.process.returncode
+
+    def engine_has_terminated(self):
+        return isinstance(self.engine_get_returncode(), int)
 
 # Wrapper functions for sqlmap engine
 class StdDbOut(object):
@@ -162,9 +176,13 @@ class StdDbOut(object):
 
     def write(self, value, status=None, content_type=None):
         if self.messagetype == "stdout":
-            conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
+            #conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
+            #                             (self.taskid, status, content_type, base64pickle(value)))
+            conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
+                                         (self.taskid, status, content_type, jsonize(value)))
         else:
-            conf.database_cursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (self.taskid, value))
+            conf.database_cursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)",
+                                         (self.taskid, str(value) if value else ""))
 
     def flush(self):
         pass
@@ -257,35 +275,42 @@ def task_new():
     taskid = hexencode(os.urandom(8))
     tasks[taskid] = Task(taskid)
 
+    logger.debug("Created new task ID: %s" % taskid)
     return jsonize({"taskid": taskid})
 
-@get("/task/<taskid>/destroy")
-def task_destroy(taskid):
+@get("/task/<taskid>/delete")
+def task_delete(taskid):
     """
-    Destroy own task ID
+    Delete own task ID
     """
     if taskid in tasks:
         tasks[taskid].clean_filesystem()
         tasks.pop(taskid)
+
+        logger.debug("Deleted task ID: %s" % taskid)
         return jsonize({"success": True})
     else:
         abort(500, "Invalid task ID")
 
-# Admin's methods
-@get("/task/<taskid>/list")
+###################
+# Admin functions #
+###################
+
+@get("/admin/<taskid>/list")
 def task_list(taskid):
     """
-    List all active tasks
+    List task pull
     """
     if is_admin(taskid):
-        return jsonize({"tasks": tasks})
+        logger.debug("Listed task pull")
+        return jsonize({"tasks": tasks, "tasks_num": len(tasks)})
     else:
         abort(401)
 
-@get("/task/<taskid>/flush")
+@get("/admin/<taskid>/flush")
 def task_flush(taskid):
     """
-    Flush task spool (destroy all tasks)
+    Flush task spool (delete all tasks)
     """
     global tasks
 
@@ -294,6 +319,7 @@ def task_flush(taskid):
             tasks[task].clean_filesystem()
 
         tasks = dict()
+        logger.debug("Flushed task pull")
         return jsonize({"success": True})
     else:
         abort(401)
@@ -302,20 +328,7 @@ def task_flush(taskid):
 # sqlmap core interact functions #
 ##################################
 
-# Admin's methods
-@get("/status/<taskid>")
-def status(taskid):
-    """
-    Verify the status of the API as well as the core
-    """
-
-    if is_admin(taskid):
-        tasks_num = len(tasks)
-        return jsonize({"tasks": tasks_num})
-    else:
-        abort(401)
-
-# Functions to handle options
+# Handle task's options
 @get("/option/<taskid>/list")
 def option_list(taskid):
     """
@@ -324,13 +337,15 @@ def option_list(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize(tasks[taskid].get_options())
+    return jsonize({"options": tasks[taskid].get_options()})
 
 @post("/option/<taskid>/get")
 def option_get(taskid):
     """
     Get the value of an option (command line switch) for a certain task ID
     """
+    global tasks
+
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
@@ -339,7 +354,7 @@ def option_get(taskid):
     if option in tasks[taskid]:
         return jsonize({option: tasks[taskid].get_option(option)})
     else:
-        return jsonize({option: None})
+        return jsonize({option: "not set"})
 
 @post("/option/<taskid>/set")
 def option_set(taskid):
@@ -356,7 +371,7 @@ def option_set(taskid):
 
     return jsonize({"success": True})
 
-# Function to handle scans
+# Handle scans
 @post("/scan/<taskid>/start")
 def scan_start(taskid):
     """
@@ -374,13 +389,11 @@ def scan_start(taskid):
     # Overwrite output directory value to a temporary directory
     tasks[taskid].set_output_directory()
 
-    # Launch sqlmap engine in a separate thread
-    logger.debug("starting a scan for task ID %s" % taskid)
-
-    # Launch sqlmap engine
+    # Launch sqlmap engine in a separate process
     tasks[taskid].engine_start()
 
-    return jsonize({"success": True})
+    logger.debug("Started scan for task ID %s" % taskid)
+    return jsonize({"success": True, "engineid": tasks[taskid].engine_get_id()})
 
 @get("/scan/<taskid>/stop")
 def scan_stop(taskid):
@@ -392,7 +405,10 @@ def scan_stop(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize({"success": tasks[taskid].engine_stop()})
+    tasks[taskid].engine_stop()
+
+    logger.debug("Stopped scan for task ID %s" % taskid)
+    return jsonize({"success": True})
 
 @get("/scan/<taskid>/kill")
 def scan_kill(taskid):
@@ -404,22 +420,25 @@ def scan_kill(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize({"success": tasks[taskid].engine_kill()})
+    tasks[taskid].engine_kill()
 
-@get("/scan/<taskid>/delete")
-def scan_delete(taskid):
+    logger.debug("Killed scan for task ID %s" % taskid)
+    return jsonize({"success": True})
+
+@get("/scan/<taskid>/status")
+def scan_status(taskid):
     """
-    Delete a scan and corresponding temporary output directory and IPC database
+    Returns status of a scan
     """
     global tasks
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    scan_stop(taskid)
-    tasks[taskid].clean_filesystem()
+    status = "terminated" if tasks[taskid].engine_has_terminated() is True else "running"
 
-    return jsonize({"success": True})
+    logger.debug("Requested status of scan for task ID %s" % taskid)
+    return jsonize({"status": status, "returncode": tasks[taskid].engine_get_returncode()})
 
 @get("/scan/<taskid>/data")
 def scan_data(taskid):
@@ -436,12 +455,14 @@ def scan_data(taskid):
 
     # Read all data from the IPC database for the taskid
     for status, content_type, value in db.execute("SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC", (taskid,)):
-        json_data_message.append([status, content_type, dejsonize(value)])
+        #json_data_message.append({"status": status, "type": content_type, "value": base64unpickle(value)})
+        json_data_message.append({"status": status, "type": content_type, "value": dejsonize(value)})
 
     # Read all error messages from the IPC database
     for error in db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
+    logger.debug("Retrieved data and error messages for scan for task ID %s" % taskid)
     return jsonize({"data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
@@ -467,6 +488,7 @@ def scan_log_limited(taskid, start, end):
     for time_, level, message in db.execute("SELECT time, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
+    logger.debug("Retrieved subset of log messages for scan for task ID %s" % taskid)
     return jsonize({"log": json_log_messages})
 
 @get("/scan/<taskid>/log")
@@ -485,6 +507,7 @@ def scan_log(taskid):
     for time_, level, message in db.execute("SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
+    logger.debug("Retrieved log messages for scan for task ID %s" % taskid)
     return jsonize({"log": json_log_messages})
 
 # Function to handle files inside the output directory
@@ -505,7 +528,7 @@ def download(taskid, target, filename):
     if os.path.exists(path):
         return static_file(filename, root=path)
     else:
-        abort(500)
+        abort(500, "File does not exist")
 
 def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
@@ -515,24 +538,26 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     global db
 
     adminid = hexencode(os.urandom(16))
+
+    logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
+    logger.info("Admin ID: %s" % adminid)
+
+    # Initialize IPC database
     db = Database()
     db.initialize()
 
-    logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
-    logger.info("the admin task ID is: %s" % adminid)
-
     # Run RESTful API
-    run(host=host, port=port, quiet=False, debug=False)
+    run(host=host, port=port, quiet=True, debug=False)
 
 def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API client
     """
     addr = "http://%s:%d" % (host, port)
-    logger.info("starting debug REST-JSON client to '%s'..." % addr)
+    logger.info("Starting REST-JSON API client to '%s'..." % addr)
 
     # TODO: write a simple client with requests, for now use curl from command line
-    logger.error("not yet implemented, use curl from command line instead for now, for example:")
+    logger.error("Not yet implemented, use curl from command line instead for now, for example:")
     print "\n\t$ curl http://%s:%d/task/new" % (host, port)
     print "\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://%s:%d/scan/:taskid/start" % (host, port)
     print "\t$ curl http://%s:%d/scan/:taskid/output" % (host, port)

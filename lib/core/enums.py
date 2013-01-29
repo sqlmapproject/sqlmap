@@ -246,29 +246,30 @@ class WEB_API:
 
 class API_CONTENT_TYPE:
     TECHNIQUES = 0
-    BANNER = 1
-    CURRENT_USER = 2
-    CURRENT_DB = 3
-    HOSTNAME = 4
-    IS_DBA = 5
-    USERS = 6
-    PASSWORDS = 7
-    PRIVILEGES = 8
-    ROLES = 9
-    DBS = 10
-    TABLES = 11
-    COLUMNS = 12
-    SCHEMA = 13
-    COUNT = 14
-    DUMP_TABLE = 15
-    SEARCH = 16
-    SQL_QUERY = 17
-    COMMON_TABLES = 18
-    COMMON_COLUMNS = 19
-    FILE_READ = 20
-    FILE_WRITE = 21
-    OS_CMD = 22
-    REG_READ = 23
+    DBMS_FINGERPRINT = 1
+    BANNER = 2
+    CURRENT_USER = 3
+    CURRENT_DB = 4
+    HOSTNAME = 5
+    IS_DBA = 6
+    USERS = 7
+    PASSWORDS = 8
+    PRIVILEGES = 9
+    ROLES = 10
+    DBS = 11
+    TABLES = 12
+    COLUMNS = 13
+    SCHEMA = 14
+    COUNT = 15
+    DUMP_TABLE = 16
+    SEARCH = 17
+    SQL_QUERY = 18
+    COMMON_TABLES = 19
+    COMMON_COLUMNS = 20
+    FILE_READ = 21
+    FILE_WRITE = 22
+    OS_CMD = 23
+    REG_READ = 24
 
 class API_CONTENT_STATUS:
     IN_PROGRESS = 0

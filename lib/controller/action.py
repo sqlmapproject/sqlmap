@@ -12,6 +12,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import API_CONTENT_TYPE
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
@@ -77,7 +78,7 @@ def action():
     if conf.getPasswordHashes:
         try:
             conf.dumper.userSettings("database management system users password hashes",
-                                    conf.dbmsHandler.getPasswordHashes(), "password hash")
+                                    conf.dbmsHandler.getPasswordHashes(), "password hash", API_CONTENT_TYPE.PASSWORDS)
         except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
@@ -86,7 +87,7 @@ def action():
     if conf.getPrivileges:
         try:
             conf.dumper.userSettings("database management system users privileges",
-                                    conf.dbmsHandler.getPrivileges(), "privilege")
+                                    conf.dbmsHandler.getPrivileges(), "privilege", API_CONTENT_TYPE.PRIVILEGES)
         except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
@@ -95,7 +96,7 @@ def action():
     if conf.getRoles:
         try:
             conf.dumper.userSettings("database management system users roles",
-                                    conf.dbmsHandler.getRoles(), "role")
+                                    conf.dbmsHandler.getRoles(), "role", API_CONTENT_TYPE.ROLES)
         except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
@@ -111,10 +112,10 @@ def action():
         conf.dumper.dbTables(tableExists(paths.COMMON_TABLES))
 
     if conf.getSchema:
-        conf.dumper.dbTableColumns(conf.dbmsHandler.getSchema())
+        conf.dumper.dbTableColumns(conf.dbmsHandler.getSchema(), API_CONTENT_TYPE.SCHEMA)
 
     if conf.getColumns:
-        conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns())
+        conf.dumper.dbTableColumns(conf.dbmsHandler.getColumns(), API_CONTENT_TYPE.COLUMNS)
 
     if conf.getCount:
         conf.dumper.dbTablesCount(conf.dbmsHandler.getCount())

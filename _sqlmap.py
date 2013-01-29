@@ -30,12 +30,14 @@ from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.option import initOptions
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
+from lib.utils.api import setRestAPILog
 from lib.utils.api import StdDbOut
 
 def modulePath():
@@ -57,18 +59,21 @@ def main():
 
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
-        init(cmdLineOptions)
+        initOptions(cmdLineOptions)
 
         if hasattr(conf, "api"):
             # Overwrite system standard output and standard error to write
             # to an IPC database
             sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
             sys.stderr = StdDbOut(conf.taskid, messagetype="stderr")
+            setRestAPILog()
 
         banner()
 
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
+
+        init()
 
         if conf.profile:
             profile()

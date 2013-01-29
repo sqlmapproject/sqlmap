@@ -46,7 +46,6 @@ class Dump(object):
     """
     This class defines methods used to parse and output the results
     of SQL injection actions
-
     """
 
     def __init__(self):
@@ -85,8 +84,8 @@ class Dump(object):
     def getOutputFile(self):
         return self._outputFile
 
-    def singleString(self, data):
-        self._write(data)
+    def singleString(self, data, content_type=None):
+        self._write(data, content_type=content_type)
 
     def string(self, header, data, content_type=None, sort=True):
         kb.stickyLevel = None
@@ -161,15 +160,19 @@ class Dump(object):
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
 
-        if userSettings:
-            self._write("%s:" % header)
-
         if isinstance(userSettings, (tuple, list, set)):
             self._areAdmins = userSettings[1]
             userSettings = userSettings[0]
 
         users = userSettings.keys()
         users.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+
+        if hasattr(conf, "api"):
+            self._write(userSettings, content_type=content_type)
+            return
+
+        if userSettings:
+            self._write("%s:" % header)
 
         for user in users:
             settings = userSettings[user]
@@ -196,8 +199,12 @@ class Dump(object):
     def dbs(self, dbs):
         self.lister("available databases", dbs, content_type=API_CONTENT_TYPE.DBS)
 
-    def dbTables(self, dbTables, content_type=API_CONTENT_TYPE.TABLES):
+    def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
+            if hasattr(conf, "api"):
+                self._write(dbTables, content_type=API_CONTENT_TYPE.TABLES)
+                return
+
             maxlength = 0
 
             for tables in dbTables.values():
@@ -230,12 +237,16 @@ class Dump(object):
 
                 self._write("+%s+\n" % lines)
         elif dbTables is None or len(dbTables) == 0:
-            self.singleString("No tables found")
+            self.singleString("No tables found", content_type=API_CONTENT_TYPE.TABLES)
         else:
-            self.string("tables", dbTables)
+            self.string("tables", dbTables, content_type=API_CONTENT_TYPE.TABLES)
 
-    def dbTableColumns(self, tableColumns, content_type=API_CONTENT_TYPE.COLUMNS):
+    def dbTableColumns(self, tableColumns, content_type=None):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
+            if hasattr(conf, "api"):
+                self._write(tableColumns, content_type=content_type)
+                return
+
             for db, tables in tableColumns.items():
                 if not db:
                     db = "All"
@@ -301,8 +312,12 @@ class Dump(object):
                     else:
                         self._write("+%s+\n" % lines1)
 
-    def dbTablesCount(self, dbTables, content_type=API_CONTENT_TYPE.COUNT):
+    def dbTablesCount(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
+            if hasattr(conf, "api"):
+                self._write(dbTables, content_type=API_CONTENT_TYPE.COUNT)
+                return
+
             maxlength1 = len("Table")
             maxlength2 = len("Entries")
 
@@ -343,7 +358,7 @@ class Dump(object):
         else:
             logger.error("unable to retrieve the number of entries for any table")
 
-    def dbTableValues(self, tableValues, content_type=API_CONTENT_TYPE.DUMP_TABLE):
+    def dbTableValues(self, tableValues):
         replication = None
         rtable = None
         dumpFP = None
@@ -355,6 +370,10 @@ class Dump(object):
         if not db:
             db = "All"
         table = tableValues["__infos__"]["table"]
+
+        if hasattr(conf, "api"):
+            self._write(tableValues, content_type=API_CONTENT_TYPE.DUMP_TABLE)
+            return
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
@@ -549,7 +568,11 @@ class Dump(object):
             dumpFP.close()
             logger.info("table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName))
 
-    def dbColumns(self, dbColumnsDict, colConsider, dbs, content_type=API_CONTENT_TYPE.COLUMNS):
+    def dbColumns(self, dbColumnsDict, colConsider, dbs):
+        if hasattr(conf, "api"):
+            self._write(dbColumnsDict, content_type=API_CONTENT_TYPE.COLUMNS)
+            return
+
         for column in dbColumnsDict.keys():
             if colConsider == "1":
                 colConsiderStr = "s like '" + column + "' were"

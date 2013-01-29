@@ -760,7 +760,8 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
                 message = data
 
             if hasattr(conf, "api"):
-                sys.stdout.write(message, status=status, content_type=content_type)
+                if content_type and status:
+                    sys.stdout.write(message, status, content_type)
             else:
                 sys.stdout.write(setColor(message, bold))
 
@@ -772,7 +773,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             if kb.get("multiThreadMode"):
                 logging._releaseLock()
 
-            kb.prependFlag = len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n'
+            kb.prependFlag = isinstance(data, basestring) and (len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
 
 def dataToTrafficFile(data):
     if not conf.trafficFile:

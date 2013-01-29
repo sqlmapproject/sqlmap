@@ -29,6 +29,7 @@ from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
+from lib.core.option import initOptions
 from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
@@ -243,7 +244,8 @@ def initCase(switches=None):
             if key in cmdLineOptions.__dict__:
                 cmdLineOptions.__dict__[key] = value
 
-    init(cmdLineOptions, True)
+    initOptions(cmdLineOptions, True)
+    init()
 
 def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
