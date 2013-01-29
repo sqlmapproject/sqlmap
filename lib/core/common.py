@@ -100,6 +100,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import MIN_VALID_DELAYED_RESPONSE
 from lib.core.settings import ML
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_AMP_MARKER
@@ -1913,7 +1914,7 @@ def wasLastResponseDelayed():
             logger.warn(warnMsg)
 
         lowerStdLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
-        retVal = (threadData.lastQueryDuration >= lowerStdLimit)
+        retVal = (threadData.lastQueryDuration >= max(MIN_VALID_DELAYED_RESPONSE, lowerStdLimit))
 
         if not kb.testMode and retVal:
             if kb.adjustTimeDelay is None:

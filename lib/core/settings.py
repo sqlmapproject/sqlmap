@@ -64,6 +64,9 @@ CONCAT_VALUE_DELIMITER = '|'
 # Coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 7
 
+# Minimum response time that can be even considered as delayed (not a complete requirement)
+MIN_VALID_DELAYED_RESPONSE = 0.5
+
 # Standard deviation after which a warning message should be displayed about connection lags
 WARN_TIME_STDEV = 0.5
 
