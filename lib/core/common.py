@@ -1352,7 +1352,7 @@ def normalizePath(filepath):
     retVal = filepath
 
     if retVal:
-        retVal = retVal.strip("\r").strip("\n")
+        retVal = retVal.strip("\r\n")
         retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else posixpath.normpath(retVal)
 
     return retVal
