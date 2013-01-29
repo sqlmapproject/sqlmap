@@ -776,7 +776,7 @@ class Connect(object):
 
             elif not kb.testMode:
                 warnMsg = "it is very important not to stress the network adapter's "
-                warnMsg += "bandwidth during usage of time-based queries"
+                warnMsg += "bandwidth during usage of time-based payloads"
                 singleTimeWarnMessage(warnMsg)
 
         if conf.safUrl and conf.saFreq > 0:
