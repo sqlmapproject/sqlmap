@@ -87,7 +87,6 @@ from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
-from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.purge import purge
 from lib.core.settings import ACCESS_ALIASES
@@ -137,6 +136,7 @@ from lib.request.httpshandler import HTTPSHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
+from lib.utils.api import setRestAPILog
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
@@ -1795,25 +1795,6 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
-class LogRecorder(logging.StreamHandler):
-    def emit(self, record):
-        """
-        Record emitted events to temporary database for asynchronous I/O
-        communication with the parent process
-        """
-        connection = sqlite3.connect(conf.ipc, isolation_level=None)
-        cursor = connection.cursor()
-        cursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?)",
-                       (time.strftime("%X"), record.levelname, record.msg % record.args if record.args else record.msg))
-        cursor.close()
-        connection.close()
-
-def _setRestAPILog():
-    if hasattr(conf, "ipc"):
-        logger.removeHandler(LOGGER_HANDLER)
-        LOGGER_RECORDER = LogRecorder()
-        logger.addHandler(LOGGER_RECORDER)
-
 def _setTrafficOutputFP():
     if conf.trafficFile:
         infoMsg = "setting file for logging HTTP traffic"
@@ -2085,7 +2066,7 @@ def init(inputOptions=AttribDict(), overrideOptions=False):
     _mergeOptions(inputOptions, overrideOptions)
     _useWizardInterface()
     setVerbosity()
-    _setRestAPILog()
+    setRestAPILog()
     _saveCmdline()
     _setRequestFromFile()
     _cleanupOptions()

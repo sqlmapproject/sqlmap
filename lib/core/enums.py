@@ -243,3 +243,33 @@ class WEB_API:
     ASP = "asp"
     ASPX = "aspx"
     JSP = "jsp"
+
+class API_CONTENT_TYPE:
+    TECHNIQUES = 0
+    BANNER = 1
+    CURRENT_USER = 2
+    CURRENT_DB = 3
+    HOSTNAME = 4
+    IS_DBA = 5
+    USERS = 6
+    PASSWORDS = 7
+    PRIVILEGES = 8
+    ROLES = 9
+    DBS = 10
+    TABLES = 11
+    COLUMNS = 12
+    SCHEMA = 13
+    COUNT = 14
+    DUMP_TABLE = 15
+    SEARCH = 16
+    SQL_QUERY = 17
+    COMMON_TABLES = 18
+    COMMON_COLUMNS = 19
+    FILE_READ = 20
+    FILE_WRITE = 21
+    OS_CMD = 22
+    REG_READ = 23
+
+class API_CONTENT_STATUS:
+    IN_PROGRESS = 0
+    COMPLETE = 1

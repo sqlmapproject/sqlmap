@@ -4,17 +4,19 @@
 # See the file 'doc/COPYING' for copying permission
 
 import codecs
+import inspect
 import os
 import re
 import smtplib
 import subprocess
 import sys
 import time
+import traceback
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-sys.path.append("../../")
+sys.path.append(os.path.normpath("%s/../../" % os.path.dirname(inspect.getfile(inspect.currentframe()))))
 
 from lib.core.revision import getRevisionNumber
 
@@ -64,7 +66,7 @@ def main():
     test_counts = []
     attachments = {}
 
-    command_line = "cd %s && python sqlmap.py --live-test" % SQLMAP_HOME
+    command_line = "python /opt/sqlmap/sqlmap.py --live-test"
     proc = subprocess.Popen(command_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     proc.wait()
@@ -138,4 +140,13 @@ def main():
         send_email(msg)
 
 if __name__ == "__main__":
-    main()
+    log_fd = open("/tmp/sqlmapregressiontest.log", "wb")
+    log_fd.write("Regression test started at %s\n" % TIME)
+
+    try:
+        main()
+    except Exception, e:
+        log_fd.write("An exception has occurred:\n%s" % str(traceback.format_exc()))
+
+    log_fd.write("Regression test finished at %s\n\n" % TIME)
+    log_fd.close()

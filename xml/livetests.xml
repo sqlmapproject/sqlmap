@@ -3133,7 +3133,7 @@
             <tech value="BU"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
-            <answers value="please provide additional comma separated file paths to=/var/www/test,do you want to overwrite it=Y"/>
+            <answers value="please provide additional comma separated file paths to=/var/www/test,do you want to overwrite it=Y,which connection type do you want to use=2"/>
         </switches>
         <parse>
             <item value="r'Sending stage.+Linux.+uid=.+www-data'" console_output="True"/>
@@ -3167,7 +3167,7 @@
             <tech value="US"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
-            <answers value="do you want to overwrite it=Y"/>
+            <answers value="do you want to overwrite it=Y,which connection type do you want to use=2"/>
         </switches>
         <parse>
             <item value="r'Sending stage.+Linux.+uid=.+postgres'" console_output="True"/>

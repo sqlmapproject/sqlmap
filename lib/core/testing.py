@@ -265,7 +265,7 @@ def runCase(switches=None, parse=None):
     try:
         result = start()
     except KeyboardInterrupt:
-        raise
+        pass
     except SqlmapBaseException, e:
         handled_exception = e
     except Exception, e:

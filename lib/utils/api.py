@@ -5,10 +5,13 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import logging
 import os
 import shutil
 import sqlite3
+import sys
 import tempfile
+import time
 
 from subprocess import PIPE
 
@@ -16,13 +19,16 @@ from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.convert import hexencode
+from lib.core.convert import dejsonize
 from lib.core.convert import jsonize
+from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
+from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
-from lib.core.subprocessng import Popen as execute
+from lib.core.subprocessng import Popen
 from lib.core.subprocessng import send_all
 from lib.core.subprocessng import recv_some
 from thirdparty.bottle.bottle import abort
@@ -40,8 +46,154 @@ RESTAPI_SERVER_PORT = 8775
 
 # Local global variables
 adminid = ""
-procs = dict()
-tasks = AttribDict()
+db = None
+tasks = dict()
+
+# API objects
+class Database(object):
+    LOGS_TABLE = "CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, time TEXT, level TEXT, message TEXT)"
+    DATA_TABLE = "CREATE TABLE data(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, status INTEGER, content_type INTEGER, value TEXT)"
+    ERRORS_TABLE = "CREATE TABLE errors(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, error TEXT)"
+
+    def __init__(self):
+        pass
+
+    def create(self):
+        _, self.database = tempfile.mkstemp(prefix="sqlmapipc-", text=False)
+        logger.info("IPC database is %s" % self.database)
+
+    def connect(self):
+        self.connection = sqlite3.connect(self.database, timeout=1, isolation_level=None)
+        self.cursor = self.connection.cursor()
+
+    def disconnect(self):
+        self.cursor.close()
+        self.connection.close()
+
+    def execute(self, statement, arguments=None):
+        if arguments:
+            self.cursor.execute(statement, arguments)
+        else:
+            self.cursor.execute(statement)
+
+        if statement.lstrip().upper().startswith("SELECT"):
+            return self.cursor.fetchall()
+
+    def initialize(self):
+        self.create()
+        self.connect()
+        self.execute(self.LOGS_TABLE)
+        self.execute(self.DATA_TABLE)
+        self.execute(self.ERRORS_TABLE)
+
+    def get_filepath(self):
+        return self.database
+
+class Task(object):
+    global db
+
+    def __init__(self, taskid):
+        self.process = None
+        self.output_directory = None
+        self.initialize_options(taskid)
+
+    def initialize_options(self, taskid):
+        dataype = {"boolean": False, "string": None, "integer": None, "float": None}
+        self.options = AttribDict()
+
+        for _ in optDict:
+            for name, type_ in optDict[_].items():
+                type_ = unArrayizeValue(type_)
+                self.options[name] = _defaults.get(name, dataype[type_])
+
+        # Let sqlmap engine knows it is getting called by the API, the task ID and the file path of the IPC database
+        self.options.api = True
+        self.options.taskid = taskid
+        self.options.database = db.get_filepath()
+
+        # Enforce batch mode and disable coloring
+        self.options.batch = True
+        self.options.disableColoring = True
+
+    def set_option(self, option, value):
+        self.options[option] = value
+
+    def get_option(self, option):
+        return self.options[option]
+
+    def get_options(self):
+        return self.options
+
+    def set_output_directory(self):
+        self.output_directory = tempfile.mkdtemp(prefix="sqlmapoutput-")
+        self.set_option("oDir", self.output_directory)
+
+    def clean_filesystem(self):
+        shutil.rmtree(self.output_directory)
+
+    def engine_start(self):
+        self.process = Popen("python sqlmap.py --pickled-options %s" % base64pickle(self.options), shell=True, stdin=PIPE)
+
+    def engine_stop(self):
+        if self.process:
+            self.process.terminate()
+
+    def engine_kill(self):
+        if self.process:
+            self.process.kill()
+
+    def engine_get_pid(self):
+        return self.processid.pid
+
+# Wrapper functions for sqlmap engine
+class StdDbOut(object):
+    encoding = "UTF-8"
+
+    def __init__(self, taskid, messagetype="stdout"):
+        # Overwrite system standard output and standard error to write
+        # to an IPC database
+        self.messagetype = messagetype
+        self.taskid = taskid
+
+        if self.messagetype == "stdout":
+            sys.stdout = self
+        else:
+            sys.stderr = self
+
+    def write(self, value, status=None, content_type=None):
+        if self.messagetype == "stdout":
+            conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
+        else:
+            conf.database_cursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (self.taskid, value))
+
+    def flush(self):
+        pass
+
+    def close(self):
+        pass
+
+    def seek(self):
+        pass
+
+class LogRecorder(logging.StreamHandler):
+    def emit(self, record):
+        """
+        Record emitted events to IPC database for asynchronous I/O
+        communication with the parent process
+        """
+        conf.database_cursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)",
+                                     (conf.taskid, time.strftime("%X"), record.levelname,
+                                     record.msg % record.args if record.args else record.msg))
+
+def setRestAPILog():
+    if hasattr(conf, "api"):
+        conf.database_connection = sqlite3.connect(conf.database, timeout=1, isolation_level=None)
+        conf.database_cursor = conf.database_connection.cursor()
+
+        # Set a logging handler that writes log messages to a IPC database
+        logger.removeHandler(LOGGER_HANDLER)
+        LOGGER_RECORDER = LogRecorder()
+        logger.addHandler(LOGGER_RECORDER)
 
 # Generic functions
 def is_admin(taskid):
@@ -51,23 +203,8 @@ def is_admin(taskid):
     else:
         return True
 
-def init_options():
-    dataype = {"boolean": False, "string": None, "integer": None, "float": None}
-    options = AttribDict()
-
-    for _ in optDict:
-        for name, type_ in optDict[_].items():
-            type_ = unArrayizeValue(type_)
-            options[name] = _defaults.get(name, dataype[type_])
-
-    # Enforce batch mode and disable coloring
-    options.batch = True
-    options.disableColoring = True
-
-    return options
-
 @hook("after_request")
-def security_headers():
+def security_headers(json_header=True):
     """
     Set some headers across all HTTP responses
     """
@@ -78,7 +215,8 @@ def security_headers():
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache"
     response.headers["Expires"] = "0"
-    response.content_type = "application/json; charset=UTF-8"
+    if json_header:
+        response.content_type = "application/json; charset=UTF-8"
 
 ##############################
 # HTTP Status Code functions #
@@ -86,18 +224,22 @@ def security_headers():
 
 @error(401)  # Access Denied
 def error401(error=None):
+    security_headers(False)
     return "Access denied"
 
 @error(404)  # Not Found
 def error404(error=None):
+    security_headers(False)
     return "Nothing here"
 
 @error(405)  # Method Not Allowed (e.g. when requesting a POST method via GET)
 def error405(error=None):
+    security_headers(False)
     return "Method not allowed"
 
 @error(500)  # Internal Server Error
 def error500(error=None):
+    security_headers(False)
     return "Internal server error"
 
 #############################
@@ -112,21 +254,8 @@ def task_new():
     """
     global tasks
 
-    taskid = hexencode(os.urandom(16))
-    tasks[taskid] = init_options()
-
-    # Initiate the temporary database for asynchronous I/O with the
-    # sqlmap engine (children processes)
-    _, ipc_filepath = tempfile.mkstemp(prefix="sqlmapipc-", suffix=".db", text=False)
-    connection = sqlite3.connect(ipc_filepath, isolation_level=None)
-    cursor = connection.cursor()
-    cursor.execute("DROP TABLE IF EXISTS logs")
-    cursor.execute("CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, level TEXT, message TEXT)")
-    cursor.close()
-    connection.close()
-
-    # Set the temporary database to use for asynchronous I/O communication
-    tasks[taskid].ipc = ipc_filepath
+    taskid = hexencode(os.urandom(8))
+    tasks[taskid] = Task(taskid)
 
     return jsonize({"taskid": taskid})
 
@@ -135,7 +264,8 @@ def task_destroy(taskid):
     """
     Destroy own task ID
     """
-    if taskid in tasks and not is_admin(taskid):
+    if taskid in tasks:
+        tasks[taskid].clean_filesystem()
         tasks.pop(taskid)
         return jsonize({"success": True})
     else:
@@ -155,16 +285,15 @@ def task_list(taskid):
 @get("/task/<taskid>/flush")
 def task_flush(taskid):
     """
-    Flush task spool (destroy all tasks except admin)
+    Flush task spool (destroy all tasks)
     """
-    global adminid
     global tasks
 
     if is_admin(taskid):
-        admin_task = tasks[adminid]
-        tasks = AttribDict()
-        tasks[adminid] = admin_task
+        for task in tasks:
+            tasks[task].clean_filesystem()
 
+        tasks = dict()
         return jsonize({"success": True})
     else:
         abort(401)
@@ -186,26 +315,6 @@ def status(taskid):
     else:
         abort(401)
 
-@get("/cleanup/<taskid>")
-def cleanup(taskid):
-    """
-    Destroy all sessions except admin ID and all output directories
-    """
-    global tasks
-
-    if is_admin(taskid):
-        for task, options in tasks.items():
-            if "oDir" in options and options.oDir is not None:
-                shutil.rmtree(options.oDir)
-
-        admin_task = tasks[adminid]
-        tasks = AttribDict()
-        tasks[adminid] = admin_task
-
-        return jsonize({"success": True})
-    else:
-        abort(401)
-
 # Functions to handle options
 @get("/option/<taskid>/list")
 def option_list(taskid):
@@ -215,7 +324,7 @@ def option_list(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    return jsonize(tasks[taskid])
+    return jsonize(tasks[taskid].get_options())
 
 @post("/option/<taskid>/get")
 def option_get(taskid):
@@ -228,7 +337,7 @@ def option_get(taskid):
     option = request.json.get("option", "")
 
     if option in tasks[taskid]:
-        return jsonize({option: tasks[taskid][option]})
+        return jsonize({option: tasks[taskid].get_option(option)})
     else:
         return jsonize({option: None})
 
@@ -242,8 +351,8 @@ def option_set(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    for key, value in request.json.items():
-        tasks[taskid][key] = value
+    for option, value in request.json.items():
+        tasks[taskid].set_option(option, value)
 
     return jsonize({"success": True})
 
@@ -254,56 +363,86 @@ def scan_start(taskid):
     Launch a scan
     """
     global tasks
-    global procs
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    # Initialize sqlmap engine's options with user's provided options
-    # within the JSON request
-    for key, value in request.json.items():
-        tasks[taskid][key] = value
+    # Initialize sqlmap engine's options with user's provided options, if any
+    for option, value in request.json.items():
+        tasks[taskid].set_option(option, value)
 
-    # Overwrite output directory (oDir) value to a temporary directory
-    tasks[taskid].oDir = tempfile.mkdtemp(prefix="sqlmaptask-")
+    # Overwrite output directory value to a temporary directory
+    tasks[taskid].set_output_directory()
 
     # Launch sqlmap engine in a separate thread
     logger.debug("starting a scan for task ID %s" % taskid)
 
     # Launch sqlmap engine
-    procs[taskid] = execute("python sqlmap.py --pickled-options %s" % base64pickle(tasks[taskid]), shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
+    tasks[taskid].engine_start()
 
     return jsonize({"success": True})
 
-@get("/scan/<taskid>/output")
-def scan_output(taskid):
+@get("/scan/<taskid>/stop")
+def scan_stop(taskid):
     """
-    Read the standard output of sqlmap core execution
+    Stop a scan
     """
     global tasks
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    stdout = recv_some(procs[taskid], t=1, e=0, stderr=0)
-    stderr = recv_some(procs[taskid], t=1, e=0, stderr=1)
+    return jsonize({"success": tasks[taskid].engine_stop()})
 
-    return jsonize({"stdout": stdout, "stderr": stderr})
+@get("/scan/<taskid>/kill")
+def scan_kill(taskid):
+    """
+    Kill a scan
+    """
+    global tasks
+
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    return jsonize({"success": tasks[taskid].engine_kill()})
 
 @get("/scan/<taskid>/delete")
 def scan_delete(taskid):
     """
-    Delete a scan and corresponding temporary output directory
+    Delete a scan and corresponding temporary output directory and IPC database
     """
     global tasks
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    if "oDir" in tasks[taskid] and tasks[taskid].oDir is not None:
-        shutil.rmtree(tasks[taskid].oDir)
+    scan_stop(taskid)
+    tasks[taskid].clean_filesystem()
 
     return jsonize({"success": True})
+
+@get("/scan/<taskid>/data")
+def scan_data(taskid):
+    """
+    Retrieve the data of a scan
+    """
+    global db
+    global tasks
+    json_data_message = list()
+    json_errors_message = list()
+
+    if taskid not in tasks:
+        abort(500, "Invalid task ID")
+
+    # Read all data from the IPC database for the taskid
+    for status, content_type, value in db.execute("SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+        json_data_message.append([status, content_type, dejsonize(value)])
+
+    # Read all error messages from the IPC database
+    for error in db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+        json_errors_message.append(error)
+
+    return jsonize({"data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
 @get("/scan/<taskid>/log/<start>/<end>")
@@ -311,26 +450,22 @@ def scan_log_limited(taskid, start, end):
     """
     Retrieve a subset of log messages
     """
-    json_log_messages = {}
+    global db
+    global tasks
+    json_log_messages = list()
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    # Temporary "protection" against SQL injection FTW ;)
-    if not start.isdigit() or not end.isdigit() or end <= start:
+    if not start.isdigit() or not end.isdigit() or end < start:
         abort(500, "Invalid start or end value, must be digits")
 
     start = max(1, int(start))
     end = max(1, int(end))
 
-    # Read a subset of log messages from the temporary I/O database
-    connection = sqlite3.connect(tasks[taskid].ipc, isolation_level=None)
-    cursor = connection.cursor()
-    cursor.execute("SELECT id, time, level, message FROM logs WHERE id >= %d AND id <= %d" % (start, end))
-    db_log_messages = cursor.fetchall()
-
-    for (id_, time_, level, message) in db_log_messages:
-        json_log_messages[id_] = {"time": time_, "level": level, "message": message}
+    # Read a subset of log messages from the IPC database
+    for time_, level, message in db.execute("SELECT time, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
+        json_log_messages.append({"time": time_, "level": level, "message": message})
 
     return jsonize({"log": json_log_messages})
 
@@ -339,19 +474,16 @@ def scan_log(taskid):
     """
     Retrieve the log messages
     """
-    json_log_messages = {}
+    global db
+    global tasks
+    json_log_messages = list()
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    # Read all log messages from the temporary I/O database
-    connection = sqlite3.connect(tasks[taskid].ipc, isolation_level=None)
-    cursor = connection.cursor()
-    cursor.execute("SELECT id, time, level, message FROM logs")
-    db_log_messages = cursor.fetchall()
-
-    for (id_, time_, level, message) in db_log_messages:
-        json_log_messages[id_] = {"time": time_, "level": level, "message": message}
+    # Read all log messages from the IPC database
+    for time_, level, message in db.execute("SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+        json_log_messages.append({"time": time_, "level": level, "message": message})
 
     return jsonize({"log": json_log_messages})
 
@@ -369,6 +501,7 @@ def download(taskid, target, filename):
         abort(500)
 
     path = os.path.join(paths.SQLMAP_OUTPUT_PATH, target)
+
     if os.path.exists(path):
         return static_file(filename, root=path)
     else:
@@ -379,10 +512,11 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     REST-JSON API server
     """
     global adminid
-    global tasks
+    global db
 
     adminid = hexencode(os.urandom(16))
-    tasks[adminid] = init_options()
+    db = Database()
+    db.initialize()
 
     logger.info("running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("the admin task ID is: %s" % adminid)
