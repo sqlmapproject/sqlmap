@@ -5,6 +5,7 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import ntpath
 import re
 
 from lib.core.common import Backend
@@ -36,6 +37,11 @@ class Miscellaneous:
         pass
 
     def getRemoteTempPath(self):
+        if not conf.tmpPath and Backend.isDbms(DBMS.MSSQL):
+            _ = unArrayizeValue(inject.getValue("SELECT SERVERPROPERTY('ErrorLogFileName')", safeCharEncode=False))
+            if _:
+                conf.tmpPath = ntpath.dirname(_)
+
         if not conf.tmpPath:
             if Backend.isOs(OS.WINDOWS):
                 if conf.direct:
