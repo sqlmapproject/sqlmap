@@ -244,7 +244,7 @@ class WEB_API:
     ASPX = "aspx"
     JSP = "jsp"
 
-class API_CONTENT_TYPE:
+class CONTENT_TYPE:
     TECHNIQUES = 0
     DBMS_FINGERPRINT = 1
     BANNER = 2

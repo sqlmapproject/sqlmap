@@ -27,7 +27,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import API_CONTENT_STATUS
-from lib.core.enums import API_CONTENT_TYPE
+from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import DUMP_FORMAT
 from lib.core.exception import SqlmapGenericException
@@ -135,27 +135,27 @@ class Dump(object):
             self._write("")
 
     def banner(self, data):
-        self.string("banner", data, content_type=API_CONTENT_TYPE.BANNER)
+        self.string("banner", data, content_type=CONTENT_TYPE.BANNER)
 
     def currentUser(self, data):
-        self.string("current user", data, content_type=API_CONTENT_TYPE.CURRENT_USER)
+        self.string("current user", data, content_type=CONTENT_TYPE.CURRENT_USER)
 
     def currentDb(self, data):
         if Backend.isDbms(DBMS.MAXDB):
-            self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data, content_type=API_CONTENT_TYPE.CURRENT_DB)
+            self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         elif Backend.isDbms(DBMS.ORACLE):
-            self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data, content_type=API_CONTENT_TYPE.CURRENT_DB)
+            self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         else:
-            self.string("current database", data, content_type=API_CONTENT_TYPE.CURRENT_DB)
+            self.string("current database", data, content_type=CONTENT_TYPE.CURRENT_DB)
 
     def hostname(self, data):
-        self.string("hostname", data, content_type=API_CONTENT_TYPE.HOSTNAME)
+        self.string("hostname", data, content_type=CONTENT_TYPE.HOSTNAME)
 
     def dba(self, data):
-        self.string("current user is DBA", data, content_type=API_CONTENT_TYPE.IS_DBA)
+        self.string("current user is DBA", data, content_type=CONTENT_TYPE.IS_DBA)
 
     def users(self, users):
-        self.lister("database management system users", users, content_type=API_CONTENT_TYPE.USERS)
+        self.lister("database management system users", users, content_type=CONTENT_TYPE.USERS)
 
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
@@ -197,12 +197,12 @@ class Dump(object):
             self.singleString("")
 
     def dbs(self, dbs):
-        self.lister("available databases", dbs, content_type=API_CONTENT_TYPE.DBS)
+        self.lister("available databases", dbs, content_type=CONTENT_TYPE.DBS)
 
     def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
             if hasattr(conf, "api"):
-                self._write(dbTables, content_type=API_CONTENT_TYPE.TABLES)
+                self._write(dbTables, content_type=CONTENT_TYPE.TABLES)
                 return
 
             maxlength = 0
@@ -237,9 +237,9 @@ class Dump(object):
 
                 self._write("+%s+\n" % lines)
         elif dbTables is None or len(dbTables) == 0:
-            self.singleString("No tables found", content_type=API_CONTENT_TYPE.TABLES)
+            self.singleString("No tables found", content_type=CONTENT_TYPE.TABLES)
         else:
-            self.string("tables", dbTables, content_type=API_CONTENT_TYPE.TABLES)
+            self.string("tables", dbTables, content_type=CONTENT_TYPE.TABLES)
 
     def dbTableColumns(self, tableColumns, content_type=None):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
@@ -315,7 +315,7 @@ class Dump(object):
     def dbTablesCount(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
             if hasattr(conf, "api"):
-                self._write(dbTables, content_type=API_CONTENT_TYPE.COUNT)
+                self._write(dbTables, content_type=CONTENT_TYPE.COUNT)
                 return
 
             maxlength1 = len("Table")
@@ -372,7 +372,7 @@ class Dump(object):
         table = tableValues["__infos__"]["table"]
 
         if hasattr(conf, "api"):
-            self._write(tableValues, content_type=API_CONTENT_TYPE.DUMP_TABLE)
+            self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
@@ -570,7 +570,7 @@ class Dump(object):
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         if hasattr(conf, "api"):
-            self._write(dbColumnsDict, content_type=API_CONTENT_TYPE.COLUMNS)
+            self._write(dbColumnsDict, content_type=CONTENT_TYPE.COLUMNS)
             return
 
         for column in dbColumnsDict.keys():
@@ -603,13 +603,13 @@ class Dump(object):
             self.dbTableColumns(_)
 
     def query(self, query, queryRes):
-        self.string(query, queryRes, content_type=API_CONTENT_TYPE.SQL_QUERY)
+        self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
 
     def rFile(self, fileData):
-        self.lister("files saved to", fileData, sort=False, content_type=API_CONTENT_TYPE.FILE_READ)
+        self.lister("files saved to", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
 
     def registerValue(self):
-        self.string("Registry key value data", registerData, registerData, content_type=API_CONTENT_TYPE.REG_READ, sort=False)
+        self.string("Registry key value data", registerData, registerData, content_type=CONTENT_TYPE.REG_READ, sort=False)
 
 # object to manage how to print the retrieved queries output to
 # standard output and sessions file
