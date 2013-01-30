@@ -18,7 +18,7 @@ from lib.core.common import pushValue
 from lib.core.common import popValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.common import wasLastRequestDelayed
+from lib.core.common import wasLastResponseDelayed
 from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -94,7 +94,7 @@ class Xp_cmdshell:
         cmd = "ping -n %d 127.0.0.1" % (conf.timeSec * 2)
         self.xpCmdshellExecCmd(cmd)
 
-        return wasLastRequestDelayed()
+        return wasLastResponseDelayed()
 
     def _xpCmdshellTest(self):
         threadData = getCurrentThreadData()

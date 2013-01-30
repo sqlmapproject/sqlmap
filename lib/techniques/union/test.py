@@ -22,7 +22,7 @@ from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
-from lib.core.common import wasLastRequestDBMSError
+from lib.core.common import wasLastResponseDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -223,7 +223,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                         logger.warn(warnMsg)
                         vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
 
-            unionErrorCase = kb.errorIsNone and wasLastRequestDBMSError()
+            unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
 
             if unionErrorCase and count > 1:
                 warnMsg = "combined UNION/error-based SQL injection case found on "

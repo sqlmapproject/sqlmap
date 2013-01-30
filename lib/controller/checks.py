@@ -36,8 +36,8 @@ from lib.core.common import readInput
 from lib.core.common import showStaticWords
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
-from lib.core.common import wasLastRequestDBMSError
-from lib.core.common import wasLastRequestHTTPError
+from lib.core.common import wasLastResponseDBMSError
+from lib.core.common import wasLastResponseHTTPError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -695,7 +695,7 @@ def heuristicCheckSqlInjection(place, parameter):
         logger.debug(debugMsg)
         return None
 
-    if wasLastRequestDBMSError():
+    if wasLastResponseDBMSError():
         debugMsg = "heuristic checking skipped "
         debugMsg += "because original page content "
         debugMsg += "contains DBMS error"
@@ -723,7 +723,7 @@ def heuristicCheckSqlInjection(place, parameter):
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
     parseFilePaths(page)
-    result = wasLastRequestDBMSError()
+    result = wasLastResponseDBMSError()
 
     infoMsg = "heuristic test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
@@ -1083,14 +1083,14 @@ def checkConnection(suppressOutput=False):
 
         kb.errorIsNone = False
 
-        if not kb.originalPage and wasLastRequestHTTPError():
+        if not kb.originalPage and wasLastResponseHTTPError():
             errMsg = "unable to retrieve page content"
             raise SqlmapConnectionException(errMsg)
-        elif wasLastRequestDBMSError():
+        elif wasLastResponseDBMSError():
             warnMsg = "there is a DBMS error found in the HTTP response body "
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
-        elif wasLastRequestHTTPError():
+        elif wasLastResponseHTTPError():
             warnMsg = "the web server responded with an HTTP error code (%d) " % getLastRequestHTTPError()
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
