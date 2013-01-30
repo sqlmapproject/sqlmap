@@ -16,6 +16,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import safeStringFormat
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -157,8 +158,6 @@ class Search:
 
         foundTbls = {}
         tblList = conf.tbl.split(",")
-        import pdb
-        pdb.set_trace()
         rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
@@ -300,13 +299,16 @@ class Search:
                     for index in indexRange:
                         query = rootQuery.blind.query2
 
+                        if query.endswith("'%s')"):
+                            query = query[:-1] + " AND %s)" % tblQuery
+                        else:
+                            query += " AND %s" % tblQuery
+
                         if Backend.isDbms(DBMS.FIREBIRD):
-                            query = query % index
+                            query = safeStringFormat(query, index)
 
                         if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
-                            query = query % unsafeSQLIdentificatorNaming(db)
-
-                        query += " AND %s" % tblQuery
+                            query = safeStringFormat(query, unsafeSQLIdentificatorNaming(db))
 
                         if not Backend.isDbms(DBMS.FIREBIRD):
                             query = agent.limitQuery(index, query)
