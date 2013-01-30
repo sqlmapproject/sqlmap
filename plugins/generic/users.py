@@ -474,7 +474,7 @@ class Users:
                 count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
-                    if Backend.isDbms(DBMS.ORACLE) and not query2:
+                    if not retrievedUsers and Backend.isDbms(DBMS.ORACLE) and not query2:
                         infoMsg = "trying with table USER_SYS_PRIVS"
                         logger.info(infoMsg)
 
