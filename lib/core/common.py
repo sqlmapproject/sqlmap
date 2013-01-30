@@ -1957,6 +1957,9 @@ def getLastRequestHTTPError():
 def extractErrorMessage(page):
     """
     Returns reported error message from page if it founds one
+
+    >>> extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>')
+    u'oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated'
     """
 
     retVal = None
@@ -2023,7 +2026,14 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
     return result
 
 def urlencode(value, safe="%&=", convall=False, limit=False, spaceplus=False):
-    if conf.direct:
+    """
+    URL encodes given value
+
+    >>> urlencode('AND 1>(2+3)#')
+    'AND%201%3E%282%2B3%29%23'
+    """
+
+    if conf.get("direct"):
         return value
 
     count = 0
@@ -2105,6 +2115,9 @@ def getPageTemplate(payload, place):  # Cross-linked function
 def getPublicTypeMembers(type_, onlyValues=False):
     """
     Useful for getting members from types (e.g. in enums)
+
+    >>> [_ for _ in getPublicTypeMembers(OS, True)]
+    ['Linux', 'Windows']
     """
 
     for name, value in inspect.getmembers(type_):
@@ -2117,6 +2130,9 @@ def getPublicTypeMembers(type_, onlyValues=False):
 def enumValueToNameLookup(type_, value_):
     """
     Returns name of a enum member with a given value
+
+    >>> enumValueToNameLookup(SORT_ORDER, 100)
+    'LAST'
     """
 
     retVal = None
@@ -2132,11 +2148,14 @@ def extractRegexResult(regex, content, flags=0):
     """
     Returns 'result' group value from a possible match with regex on a given
     content
+
+    >>> extractRegexResult(r'a(?P<result>[^g]+)g', 'abcdefg')
+    'bcdef'
     """
 
     retVal = None
 
-    if regex and content and '?P<result>' in regex:
+    if regex and content and "?P<result>" in regex:
         match = re.search(regex, content, flags)
 
         if match:
@@ -2147,6 +2166,9 @@ def extractRegexResult(regex, content, flags=0):
 def extractTextTagContent(page):
     """
     Returns list containing content from "textual" tags
+
+    >>> extractTextTagContent(u'<html><head><title>Title</title></head><body><pre>foobar</pre><a href="#link">Link</a></body></html>')
+    [u'Title', u'foobar']
     """
 
     page = re.sub(r"(?si)[^\s>]*%s[^<]*" % REFLECTED_VALUE_MARKER, "", page or "")
@@ -2155,6 +2177,9 @@ def extractTextTagContent(page):
 def trimAlphaNum(value):
     """
     Trims alpha numeric characters from start and ending of a given value
+
+    >>> trimAlphaNum(u'AND 1>(2+3)-- foobar')
+    u' 1>(2+3)-- '
     """
 
     while value and value[-1].isalnum():
@@ -2168,14 +2193,26 @@ def trimAlphaNum(value):
 def isNumPosStrValue(value):
     """
     Returns True if value is a string (or integer) with a positive integer representation
+
+    >>> isNumPosStrValue(1)
+    True
+    >>> isNumPosStrValue('1')
+    True
+    >>> isNumPosStrValue(0)
+    False
+    >>> isNumPosStrValue('-2')
+    False
     """
 
-    return (value and isinstance(value, basestring) and value.isdigit() and value != "0") or (isinstance(value, int) and value != 0)
+    return (value and isinstance(value, basestring) and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
     """
     Returns major DBMS name from a given alias
+
+    >>> aliasToDbmsEnum('mssql')
+    'Microsoft SQL Server'
     """
 
     retVal = None
@@ -2252,22 +2289,28 @@ def removeDynamicContent(page):
 
     return page
 
-def filterStringValue(value, regex, replacement=""):
+def filterStringValue(value, charRegex, replacement=""):
     """
     Returns string value consisting only of chars satisfying supplied
     regular expression (note: it has to be in form [...])
+
+    >>> filterStringValue(u'wzydeadbeef0123#', r'[0-9a-f]')
+    u'deadbeef0123'
     """
 
     retVal = value
 
     if value:
-        retVal = re.sub(regex.replace("[", "[^") if "[^" not in regex else regex.replace("[^", "["), replacement, value)
+        retVal = re.sub(charRegex.replace("[", "[^") if "[^" not in charRegex else charRegex.replace("[^", "["), replacement, value)
 
     return retVal
 
 def filterControlChars(value):
     """
     Returns string value with control chars being supstituted with ' '
+
+    >>> filterControlChars(u'AND 1>(2+3)\\n--')
+    u'AND 1>(2+3) --'
     """
 
     return filterStringValue(value, PRINTABLE_CHAR_REGEX, ' ')
@@ -2398,6 +2441,9 @@ def initTechnique(technique=None):
 def arrayizeValue(value):
     """
     Makes a list out of value if it is not already a list or tuple itself
+
+    >>> arrayizeValue(u'1')
+    [u'1']
     """
 
     if not isListLike(value):
@@ -2408,6 +2454,9 @@ def arrayizeValue(value):
 def unArrayizeValue(value):
     """
     Makes a value out of iterable if it is a list or tuple itself
+
+    >>> unArrayizeValue([u'1'])
+    u'1'
     """
 
     if isListLike(value):
@@ -2418,6 +2467,9 @@ def unArrayizeValue(value):
 def flattenValue(value):
     """
     Returns an iterator representing flat representation of a given value
+
+    >>> [_ for _ in flattenValue([[u'1'], [[u'2'], u'3']])]
+    [u'1', u'2', u'3']
     """
 
     for i in iter(value):
@@ -2430,6 +2482,11 @@ def flattenValue(value):
 def isListLike(value):
     """
     Returns True if the given value is a list-like instance
+
+    >>> isListLike([1, 2, 3])
+    True
+    >>> isListLike(u'2')
+    False
     """
 
     return isinstance(value, (list, tuple, set, BigArray))
@@ -2465,6 +2522,9 @@ def filterListValue(value, regex):
     """
     Returns list with items that have parts satisfying given regular
     expression
+
+    >>> filterListValue(['users', 'admins', 'logs'], r'(users|admins)')
+    ['users', 'admins']
     """
 
     if isinstance(value, list) and regex:
@@ -2503,6 +2563,11 @@ def openFile(filename, mode='r'):
 def decodeIntToUnicode(value):
     """
     Decodes inferenced integer value to an unicode character
+
+    >>> decodeIntToUnicode(35)
+    u'#'
+    >>> decodeIntToUnicode(64)
+    u'@'
     """
     retVal = value
 
@@ -2593,6 +2658,9 @@ def getExceptionFrameLocals():
 def intersect(valueA, valueB, lowerCase=False):
     """
     Returns intersection of the array-ized values
+
+    >>> intersect([1, 2, 3], set([1,3]))
+    [1, 3]
     """
 
     retVal = None
@@ -2742,6 +2810,17 @@ def unsafeSQLIdentificatorNaming(name):
 def isNoneValue(value):
     """
     Returns whether the value is unusable (None or '')
+
+    >>> isNoneValue(None)
+    True
+    >>> isNoneValue('None')
+    True
+    >>> isNoneValue('')
+    True
+    >>> isNoneValue([])
+    True
+    >>> isNoneValue([2])
+    False
     """
 
     if isinstance(value, basestring):
@@ -2756,6 +2835,9 @@ def isNoneValue(value):
 def isNullValue(value):
     """
     Returns whether the value contains explicit 'NULL' value
+
+    >>> isNullValue(u'NULL')
+    True
     """
 
     return isinstance(value, basestring) and value.upper() == NULL
@@ -2847,13 +2929,18 @@ def safeCSValue(value):
     """
     Returns value safe for CSV dumping
     Reference: http://tools.ietf.org/html/rfc4180
+
+    >>> safeCSValue(u'foo, bar')
+    u'"foo, bar"'
+    >>> safeCSValue(u'foobar')
+    u'foobar'
     """
 
     retVal = value
 
     if retVal and isinstance(retVal, basestring):
         if not (retVal[0] == retVal[-1] == '"'):
-            if any(_ in retVal for _ in (conf.csvDel, '"', '\n')):
+            if any(_ in retVal for _ in (conf.get("csvDel", ','), '"', '\n')):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
@@ -2861,6 +2948,9 @@ def safeCSValue(value):
 def filterPairValues(values):
     """
     Returns only list-like values with length 2
+
+    >>> filterPairValues([[1, 2], [3], 1, [4, 5]])
+    [[1, 2], [4, 5]]
     """
 
     retVal = []
