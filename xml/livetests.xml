@@ -3110,7 +3110,7 @@
             <answers value="do you want to overwrite it=Y"/>
         </switches>
         <parse>
-            <item value="the local file /etc/passwd and the remote file /tmp/passwd-${random} have the same size" console_output="True"/>
+            <item value="the local file /etc/passwd and the remote file /tmp/passwd-${random} has the same size" console_output="True"/>
         </parse>
     </case>
     <!-- End of file system access switches -->
@@ -3399,7 +3399,7 @@
         </switches>
         <parse>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="r'100% \[===.+=\] 17/17 ETA 00:00'" console_output="True"/>
+            <item value="r'100\% \[===.+=\] 17\/17'" console_output="True"/>
         </parse>
     </case>
     <case name="Multiple parameters">

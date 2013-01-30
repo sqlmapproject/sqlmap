@@ -135,7 +135,7 @@ def liveTest():
                     vars_[child.tagName] = randomStr(6) if var == "random" else var
 
     for case in livetests.getElementsByTagName("case"):
-        console_output = False
+        parse_from_console_output = False
         count += 1
         name = None
         parse = []
@@ -162,9 +162,9 @@ def liveTest():
                     value = replaceVars(item.getAttribute("value"), vars_)
 
                 if item.hasAttribute("console_output"):
-                    console_output = bool(item.getAttribute("console_output"))
+                    parse_from_console_output = bool(item.getAttribute("console_output"))
 
-                parse.append((value, console_output))
+                parse.append((value, parse_from_console_output))
 
         msg = "running live test case: %s (%d/%d)" % (name, count, length)
         logger.info(msg)
@@ -292,8 +292,8 @@ def runCase(switches=None, parse=None):
         with codecs.open(conf.dumper.getOutputFile(), "rb", UNICODE_ENCODING) as f:
             content = f.read()
 
-        for item, console_output in parse:
-            parse_on = console if console_output else content
+        for item, parse_from_console_output in parse:
+            parse_on = console if parse_from_console_output else content
 
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
