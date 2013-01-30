@@ -157,6 +157,8 @@ class Search:
 
         foundTbls = {}
         tblList = conf.tbl.split(",")
+        import pdb
+        pdb.set_trace()
         rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
