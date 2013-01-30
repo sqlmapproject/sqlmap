@@ -416,6 +416,7 @@ class Agent(object):
 
         prefixRegex = r"(?:\s+(?:FIRST|SKIP)\s+\d+)*"
         fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
+        fieldsSelectRownum = re.search(r"SELECT\s+([^()]+?),\s*ROWNUM AS LIMIT FROM", query, re.I)
         fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
         fieldsSelectCase = re.search(r"\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
         fieldsSelectFrom = re.search(r"\ASELECT%s\s+(.+?)\s+FROM " % prefixRegex, query, re.I)
@@ -433,6 +434,8 @@ class Agent(object):
             fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsSelectTop:
             fieldsToCastStr = fieldsSelectTop.groups()[0]
+        elif fieldsSelectRownum:
+            fieldsToCastStr = fieldsSelectRownum.groups()[0]
         elif fieldsSelectDistinct:
             fieldsToCastStr = fieldsSelectDistinct.groups()[0]
         elif fieldsSelectCase:
