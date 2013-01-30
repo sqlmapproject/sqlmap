@@ -53,6 +53,7 @@ from lib.core.convert import stdoutencode
 from lib.core.convert import unicodeencode
 from lib.core.convert import utf8encode
 from lib.core.decorators import cachedmethod
+from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
@@ -2940,7 +2941,7 @@ def safeCSValue(value):
 
     if retVal and isinstance(retVal, basestring):
         if not (retVal[0] == retVal[-1] == '"'):
-            if any(_ in retVal for _ in (conf.get("csvDel", ','), '"', '\n')):
+            if any(_ in retVal for _ in (conf.get("csvDel", defaults.csvDel), '"', '\n')):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
