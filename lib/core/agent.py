@@ -426,6 +426,10 @@ class Agent(object):
         fieldsMinMaxstr = re.search(r"(?:MIN|MAX)\(([^\(\)]+)\)", query, re.I)
         fieldsNoSelect = query
 
+        _ = zeroDepthSearch(query, " FROM ")
+        if not _:
+            fieldsSelectFrom = None
+
         if fieldsSubstr:
             fieldsToCastStr = query
         elif fieldsMinMaxstr:
@@ -441,7 +445,6 @@ class Agent(object):
         elif fieldsSelectCase:
             fieldsToCastStr = fieldsSelectCase.groups()[0]
         elif fieldsSelectFrom:
-            _ = zeroDepthSearch(query, " FROM ")
             fieldsToCastStr = query[:unArrayizeValue(_)] if _ else query
             fieldsToCastStr = re.sub(r"\ASELECT%s\s+" % prefixRegex, "", fieldsToCastStr)
         elif fieldsSelect:
