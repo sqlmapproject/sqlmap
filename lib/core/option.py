@@ -324,6 +324,10 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     scheme = "https"
                     port = port or "443"
 
+                if not host:
+                    errMsg = "invalid format of a request file"
+                    raise SqlmapSyntaxException, errMsg
+
                 if not url.startswith("http"):
                     url = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
                     scheme = None
