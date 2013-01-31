@@ -1376,6 +1376,8 @@ def safeStringFormat(format_, params):
 
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params)
+    elif not isListLike(params):
+        retVal = retVal.replace("%s", str(params))
     else:
         count, index = 0, 0
         while index != -1:
