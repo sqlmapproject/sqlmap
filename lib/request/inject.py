@@ -25,6 +25,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseUnionPage
 from lib.core.common import popValue
 from lib.core.common import pushValue
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
@@ -76,6 +77,13 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
 
     if not (timeBasedCompare and kb.dnsTest):
         if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not timeBasedCompare:
+
+            if field and re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
+                expression = "SELECT %s FROM (%s)" % (field, expression)
+
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                    expression += " AS %s" % randomStr(lowercase=True)
+
             if field and conf.hexConvert:
                 nulledCastedField = agent.nullAndCastField(field)
                 injExpression = expression.replace(field, nulledCastedField, 1)
