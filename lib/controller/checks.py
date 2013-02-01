@@ -85,6 +85,24 @@ def checkSqlInjection(place, parameter, value):
             if kb.endDetection:
                 break
 
+            if conf.dbms is None:
+                if not injection.dbms and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
+                    if not Backend.getIdentifiedDbms() and not kb.heuristicDbms:
+                        kb.heuristicDbms = heuristicCheckDbms(injection) or UNKNOWN_DBMS
+
+                if not conf.testFilter and (Backend.getErrorParsedDBMSes() or kb.heuristicDbms) not in ([], None, UNKNOWN_DBMS):
+                    if kb.reduceTests is None and Backend.getErrorParsedDBMSes():
+                        msg = "heuristic (parsing) test showed that the "
+                        msg += "back-end DBMS could be '%s'. " % (Format.getErrorParsedDBMSes() if Backend.getErrorParsedDBMSes() else kb.heuristicDbms)
+                        msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
+                        kb.reduceTests = [] if readInput(msg, default='Y').upper() != 'Y' else (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms])
+
+                    if kb.extendTests is None:
+                        _ = (Format.getErrorParsedDBMSes() if Backend.getErrorParsedDBMSes() else kb.heuristicDbms)
+                        msg = "do you want to include all tests for '%s' " % _
+                        msg += "ignoring provided level (%d) and risk (%s)? [Y/n]" % (conf.level, conf.risk)
+                        kb.extendTests = [] if readInput(msg, default='Y').upper() != 'Y' else (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms])
+
             title = test.title
             stype = test.stype
             clause = test.clause
@@ -143,15 +161,24 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
+
+            # Skip DBMS-specific test if it does not match either the
+            # previously identified or the user's provided DBMS (either
+            # from program switch or from parsed error message(s))
+            if "details" in test and "dbms" in test.details:
+                dbms = test.details.dbms
+            else:
+                dbms = None
+
             # Skip tests if title is not included by the given filter
             if conf.testFilter:
-                if not any(re.search(conf.testFilter, str(item), re.I) for item in (test.title, test.vector,\
-                test.details.dbms if "details" in test and "dbms" in test.details else "")):
+                if not any(re.search(conf.testFilter, str(item), re.I) for item in (test.title, test.vector, dbms)):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "its name/vector/dbms is not included by the given filter"
                     logger.debug(debugMsg)
                     continue
-            else:
+
+            if not (kb.extendTests and intersect(dbms, kb.extendTests)):
                 # Skip test if the risk is higher than the provided (or default)
                 # value
                 # Parse test's <risk>
@@ -170,14 +197,6 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-            # Skip DBMS-specific test if it does not match either the
-            # previously identified or the user's provided DBMS (either
-            # from program switch or from parsed error message(s))
-            if "details" in test and "dbms" in test.details:
-                dbms = test.details.dbms
-            else:
-                dbms = None
-
             if dbms is not None:
                 if injection.dbms is not None and not intersect(injection.dbms, dbms):
                     debugMsg = "skipping test '%s' because " % title
@@ -192,17 +211,7 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-                if conf.dbms is None and len(Backend.getErrorParsedDBMSes()) > 0 and not intersect(dbms, Backend.getErrorParsedDBMSes()) and kb.skipOthersDbms is None:
-                    msg = "parsed error message(s) showed that the "
-                    msg += "back-end DBMS could be %s. " % Format.getErrorParsedDBMSes()
-                    msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
-
-                    if readInput(msg, default="Y") in ("y", "Y"):
-                        kb.skipOthersDbms = Backend.getErrorParsedDBMSes()
-                    else:
-                        kb.skipOthersDbms = []
-
-                if kb.skipOthersDbms and not intersect(dbms, kb.skipOthersDbms):
+                if kb.reduceTests and not intersect(dbms, kb.reduceTests):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the parsed error message(s) showed "
                     debugMsg += "that the back-end DBMS could be "
@@ -549,20 +558,12 @@ def checkSqlInjection(place, parameter, value):
             # Reset forced back-end DBMS value
             Backend.flushForcedDbms()
 
-            if len(injection.data) == 1 and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
-                if not Backend.getIdentifiedDbms() and kb.heuristicDbms in (None, UNKNOWN_DBMS):
-                    kb.heuristicDbms = heuristicCheckDbms(injection) or UNKNOWN_DBMS
-
-            if Backend.getIdentifiedDbms() or kb.heuristicDbms not in (None, UNKNOWN_DBMS):
-                #do you want to extend <- one time question!!!!!!!!!! (mirek)
-                pass
-
         except KeyboardInterrupt:
             warnMsg = "user aborted during detection phase"
             logger.warn(warnMsg)
 
-            message = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
-            choice = readInput(message, default="S", checkBatch=False)
+            msg = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
+            choice = readInput(msg, default="S", checkBatch=False)
 
             if choice[0] in ("s", "S"):
                 pass
@@ -615,7 +616,7 @@ def heuristicCheckDbms(injection):
     kb.injection = popValue()
 
     if retVal:
-        infoMsg = "heuristic test showed that the back-end DBMS "
+        infoMsg = "heuristic (extended) test shows that the back-end DBMS "  # not as important as "parsing" counter-part (because of false-positives)
         infoMsg += "could be '%s' " % retVal
         logger.info(infoMsg)
 
@@ -729,7 +730,7 @@ def heuristicCheckSqlInjection(place, parameter):
     parseFilePaths(page)
     result = wasLastResponseDBMSError()
 
-    infoMsg = "heuristic test shows that %s " % place
+    infoMsg = "heuristic (parsing) test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
     def _(page):
@@ -762,7 +763,7 @@ def heuristicCheckSqlInjection(place, parameter):
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N').upper() != 'N'
 
     elif result:
-        infoMsg += "be injectable (possible DBMS: %s)" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS)
+        infoMsg += "be injectable (possible DBMS: '%s')" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS)
         logger.info(infoMsg)
 
     else:
