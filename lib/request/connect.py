@@ -79,7 +79,6 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
-from lib.utils.checkpayload import checkPayload
 from thirdparty.socks.socks import ProxyError
 from thirdparty.multipart import multipartpost
 
@@ -657,9 +656,6 @@ class Connect(object):
 
         if place:
             value = agent.removePayloadDelimiters(value)
-
-        if conf.checkPayload:
-            checkPayload(value)
 
         if PLACE.GET in conf.parameters:
             get = conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value
