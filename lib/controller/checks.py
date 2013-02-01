@@ -444,10 +444,7 @@ def checkSqlInjection(place, parameter, value):
                             configUnion(test.request.char, test.request.columns)
 
                             if not Backend.getIdentifiedDbms():
-                                if not kb.heuristicDbms:
-                                    kb.heuristicDbms = heuristicCheckDbms(injection) or UNKNOWN_DBMS
-
-                                if kb.heuristicDbms == UNKNOWN_DBMS:
+                                if kb.heuristicDbms in (None, UNKNOWN_DBMS):
                                     warnMsg = "using unescaped version of the test "
                                     warnMsg += "because of zero knowledge of the "
                                     warnMsg += "back-end DBMS. You can try to "
@@ -552,6 +549,14 @@ def checkSqlInjection(place, parameter, value):
             # Reset forced back-end DBMS value
             Backend.flushForcedDbms()
 
+            if len(injection.data) == 1 and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
+                if not Backend.getIdentifiedDbms() and kb.heuristicDbms in (None, UNKNOWN_DBMS):
+                    kb.heuristicDbms = heuristicCheckDbms(injection) or UNKNOWN_DBMS
+
+            if Backend.getIdentifiedDbms() or kb.heuristicDbms not in (None, UNKNOWN_DBMS):
+                #do you want to extend <- one time question!!!!!!!!!! (mirek)
+                pass
+
         except KeyboardInterrupt:
             warnMsg = "user aborted during detection phase"
             logger.warn(warnMsg)
@@ -594,21 +599,20 @@ def checkSqlInjection(place, parameter, value):
 def heuristicCheckDbms(injection):
     retVal = None
 
-    if not Backend.getIdentifiedDbms() and len(injection.data) == 1 and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
-        pushValue(kb.injection)
-        kb.injection = injection
-        randStr1, randStr2 = randomStr(), randomStr()
+    pushValue(kb.injection)
+    kb.injection = injection
+    randStr1, randStr2 = randomStr(), randomStr()
 
-        for dbms in getPublicTypeMembers(DBMS, True):
-            Backend.forceDbms(dbms)
+    for dbms in getPublicTypeMembers(DBMS, True):
+        Backend.forceDbms(dbms)
 
-            if checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr1)):
-                if not checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr2)):
-                    retVal = dbms
-                    break
+        if checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr1)):
+            if not checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr2)):
+                retVal = dbms
+                break
 
-        Backend.flushForcedDbms()
-        kb.injection = popValue()
+    Backend.flushForcedDbms()
+    kb.injection = popValue()
 
     if retVal:
         infoMsg = "heuristic test showed that the back-end DBMS "
