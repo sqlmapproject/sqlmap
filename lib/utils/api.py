@@ -48,7 +48,7 @@ RESTAPI_SERVER_PORT = 8775
 # Local global variables
 adminid = ""
 db = None
-db_filepath = tempfile.mkstemp(prefix="sqlmapipc-", text=False)[1]
+db_filepath = None
 tasks = dict()
 
 # API objects
@@ -553,6 +553,7 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     global db_filepath
 
     adminid = hexencode(os.urandom(16))
+    db_filepath = tempfile.mkstemp(prefix="sqlmapipc-", text=False)[1]
 
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("Admin ID: %s" % adminid)
