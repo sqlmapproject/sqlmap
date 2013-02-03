@@ -1771,7 +1771,7 @@ def goGoodSamaritan(prevValue, originalCharset):
     else:
         return None, None, None, originalCharset
 
-def getPartRun():
+def getPartRun(alias=True):
     """
     Goes through call stack and finds constructs matching conf.dbmsHandler.*.
     Returns it or its alias used in txt/common-outputs.txt
@@ -1803,7 +1803,10 @@ def getPartRun():
         pass
 
     # Return the INI tag to consider for common outputs (e.g. 'Databases')
-    return commonPartsDict[retVal][1] if isinstance(commonPartsDict.get(retVal), tuple) else retVal
+    if alias:
+        return commonPartsDict[retVal][1] if isinstance(commonPartsDict.get(retVal), tuple) else retVal
+    else:
+        return retVal
 
 def getUnicode(value, encoding=None, system=False, noneToNull=False):
     """

@@ -89,7 +89,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     try:
         # Set kb.partRun in case "common prediction" feature (a.k.a. "good
         # samaritan") is used or the engine is called from the API
-        kb.partRun = getPartRun() if conf.predictOutput or hasattr(conf, "api") else None
+        if conf.predictOutput:
+            kb.partRun = getPartRun()
+        elif hasattr(conf, "api"):
+            kb.partRun = getPartRun(alias=False)
+        else:
+            kb.partRun = None
 
         if partialValue:
             firstChar = len(partialValue)

@@ -178,18 +178,26 @@ class StdDbOut(object):
             if content_type is None:
                 content_type = 99
 
+            output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND status = ? AND content_type = ? LIMIT 0,1",
+                                                  (self.taskid, status, content_type))
+
             if status == CONTENT_STATUS.IN_PROGRESS:
-                output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND status = ? AND content_type = ? LIMIT 0,1",
-                                                      (self.taskid, status, content_type))
+                # Ignore all non-relevant messages
+                if kb.partRun is None:
+                    return
 
                 if len(output) == 0:
                     conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
                                                  (self.taskid, status, content_type, jsonize(value)))
                 else:
-                    new_value = "%s%s" % (output[0][1], value)
+                    new_value = "%s%s" % (dejsonize(output[0][1]), value)
                     conf.database_cursor.execute("UPDATE data SET value = ? WHERE id = ?",
                                                  (jsonize(new_value), output[0][0]))
             else:
+                if len(output) > 0:
+                    conf.database_cursor.execute("DELETE FROM data WHERE taskid = ? AND status = %s AND content_type = ?" % CONTENT_STATUS.IN_PROGRESS,
+                                                 (self.taskid, content_type))
+
                 conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
                                              (self.taskid, status, content_type, jsonize(value)))
         else:
@@ -217,9 +225,6 @@ class LogRecorder(logging.StreamHandler):
 
 def setRestAPILog():
     if hasattr(conf, "api"):
-        #conf.database_connection = sqlite3.connect(conf.database, timeout=1, isolation_level=None)
-        #conf.database_cursor = conf.database_connection.cursor()
-
         conf.database_cursor = Database(conf.database)
         conf.database_cursor.connect("client")
 
