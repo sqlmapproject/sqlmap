@@ -169,13 +169,15 @@ def liveTest():
         msg = "running live test case: %s (%d/%d)" % (name, count, length)
         logger.info(msg)
 
-        try:
-            result = runCase(switches, parse)
-        except SqlmapNotVulnerableException:
-            vulnerable = False
+        initCase(switches)
 
         test_case_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "test_case"), "wb", UNICODE_ENCODING)
         test_case_fd.write("%s\n" % name)
+
+        try:
+            result = runCase(parse)
+        except SqlmapNotVulnerableException:
+            vulnerable = False
 
         if result is True:
             logger.info("test passed")
@@ -250,12 +252,10 @@ def initCase(switches=None):
 def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
 
-def runCase(switches=None, parse=None):
+def runCase(parse):
     global failedItem
     global failedParseOn
     global failedTraceBack
-
-    initCase(switches)
 
     LOGGER_HANDLER.stream = sys.stdout = tempfile.SpooledTemporaryFile(max_size=0, mode="w+b", prefix="sqlmapstdout-")
     retVal = True
