@@ -60,7 +60,7 @@ def send_email(msg):
         print "Failure to send email: %s" % str(e)
 
 def failure_email(msg):
-    msg = prepare_email()
+    msg = prepare_email(msg)
     send_email(msg)
     sys.exit(1)
 
