@@ -71,7 +71,7 @@ def main():
     test_counts = []
     attachments = {}
 
-    proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --update", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen("cd /opt/sqlmap/ ; python /opt/sqlmap/sqlmap.py --update", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.wait()
     stdout, stderr = proc.communicate()
 
