@@ -19,6 +19,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import flattenValue
 from lib.core.common import getConsoleWidth
+from lib.core.common import getPartRun
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -162,6 +163,9 @@ def unionUse(expression, unpack=True, dump=False):
     start = time.time()
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
+
+    # Set kb.partRun in case the engine is called from the API
+    kb.partRun = getPartRun() if hasattr(conf, "api") else None
 
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
         # Removed ORDER BY clause because UNION does not play well with it

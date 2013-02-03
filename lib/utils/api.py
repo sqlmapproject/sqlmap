@@ -17,15 +17,16 @@ from subprocess import PIPE
 
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
-from lib.core.convert import base64unpickle
 from lib.core.convert import hexencode
 from lib.core.convert import dejsonize
 from lib.core.convert import jsonize
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
+from lib.core.enums import CONTENT_STATUS
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.subprocessng import Popen
@@ -47,24 +48,27 @@ RESTAPI_SERVER_PORT = 8775
 # Local global variables
 adminid = ""
 db = None
+db_filepath = tempfile.mkstemp(prefix="sqlmapipc-", text=False)[1]
 tasks = dict()
 
 # API objects
 class Database(object):
+    global db_filepath
+
     LOGS_TABLE = "CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, time TEXT, level TEXT, message TEXT)"
     DATA_TABLE = "CREATE TABLE data(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, status INTEGER, content_type INTEGER, value TEXT)"
     ERRORS_TABLE = "CREATE TABLE errors(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, error TEXT)"
 
-    def __init__(self):
-        pass
+    def __init__(self, database=None):
+        if database:
+            self.database = database
+        else:
+            self.database = db_filepath
 
-    def create(self):
-        _, self.database = tempfile.mkstemp(prefix="sqlmapipc-", text=False)
-        logger.debug("IPC database: %s" % self.database)
-
-    def connect(self):
+    def connect(self, who="server"):
         self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None)
         self.cursor = self.connection.cursor()
+        logger.debug("REST-JSON API %s connected to IPC database" % who)
 
     def disconnect(self):
         self.cursor.close()
@@ -79,18 +83,13 @@ class Database(object):
         if statement.lstrip().upper().startswith("SELECT"):
             return self.cursor.fetchall()
 
-    def initialize(self):
-        self.create()
-        self.connect()
+    def init(self):
         self.execute(self.LOGS_TABLE)
         self.execute(self.DATA_TABLE)
         self.execute(self.ERRORS_TABLE)
 
-    def get_filepath(self):
-        return self.database
-
 class Task(object):
-    global db
+    global db_filepath
 
     def __init__(self, taskid):
         self.process = None
@@ -109,7 +108,7 @@ class Task(object):
         # Let sqlmap engine knows it is getting called by the API, the task ID and the file path of the IPC database
         self.options.api = True
         self.options.taskid = taskid
-        self.options.database = db.get_filepath()
+        self.options.database = db_filepath
 
         # Enforce batch mode and disable coloring
         self.options.batch = True
@@ -174,12 +173,25 @@ class StdDbOut(object):
         else:
             sys.stderr = self
 
-    def write(self, value, status=None, content_type=None):
+    def write(self, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
         if self.messagetype == "stdout":
-            #conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
-            #                             (self.taskid, status, content_type, base64pickle(value)))
-            conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
-                                         (self.taskid, status, content_type, jsonize(value)))
+            if content_type is None:
+                content_type = 99
+
+            if status == CONTENT_STATUS.IN_PROGRESS:
+                output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND status = ? AND content_type = ? LIMIT 0,1",
+                                                      (self.taskid, status, content_type))
+
+                if len(output) == 0:
+                    conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
+                                                 (self.taskid, status, content_type, jsonize(value)))
+                else:
+                    new_value = "%s%s" % (output[0][1], value)
+                    conf.database_cursor.execute("UPDATE data SET value = ? WHERE id = ?",
+                                                 (jsonize(new_value), output[0][0]))
+            else:
+                conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
+                                             (self.taskid, status, content_type, jsonize(value)))
         else:
             conf.database_cursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)",
                                          (self.taskid, str(value) if value else ""))
@@ -205,8 +217,11 @@ class LogRecorder(logging.StreamHandler):
 
 def setRestAPILog():
     if hasattr(conf, "api"):
-        conf.database_connection = sqlite3.connect(conf.database, timeout=1, isolation_level=None)
-        conf.database_cursor = conf.database_connection.cursor()
+        #conf.database_connection = sqlite3.connect(conf.database, timeout=1, isolation_level=None)
+        #conf.database_cursor = conf.database_connection.cursor()
+
+        conf.database_cursor = Database(conf.database)
+        conf.database_cursor.connect("client")
 
         # Set a logging handler that writes log messages to a IPC database
         logger.removeHandler(LOGGER_HANDLER)
@@ -455,7 +470,6 @@ def scan_data(taskid):
 
     # Read all data from the IPC database for the taskid
     for status, content_type, value in db.execute("SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC", (taskid,)):
-        #json_data_message.append({"status": status, "type": content_type, "value": base64unpickle(value)})
         json_data_message.append({"status": status, "type": content_type, "value": dejsonize(value)})
 
     # Read all error messages from the IPC database
@@ -536,15 +550,18 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     """
     global adminid
     global db
+    global db_filepath
 
     adminid = hexencode(os.urandom(16))
 
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("Admin ID: %s" % adminid)
+    logger.debug("IPC database: %s" % db_filepath)
 
     # Initialize IPC database
     db = Database()
-    db.initialize()
+    db.connect()
+    db.init()
 
     # Run RESTful API
     run(host=host, port=port, quiet=True, debug=False)

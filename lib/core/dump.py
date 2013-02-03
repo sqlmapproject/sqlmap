@@ -26,7 +26,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import DUMP_REPLACEMENTS
-from lib.core.enums import API_CONTENT_STATUS
+from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import DUMP_FORMAT
@@ -55,7 +55,7 @@ class Dump(object):
 
     def _write(self, data, newline=True, console=True, content_type=None):
         if hasattr(conf, "api"):
-            dataToStdout(data, content_type=content_type, status=API_CONTENT_STATUS.COMPLETE)
+            dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
             return
 
         text = "%s%s" % (data, "\n" if newline else " ")

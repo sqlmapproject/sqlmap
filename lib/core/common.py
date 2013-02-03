@@ -58,6 +58,7 @@ from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
+from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -744,7 +745,7 @@ def setColor(message, bold=False):
 
     return retVal
 
-def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=None):
+def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=CONTENT_STATUS.IN_PROGRESS):
     """
     Writes text to the stdout (console) stream
     """
@@ -762,8 +763,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
                 message = data
 
             if hasattr(conf, "api"):
-                if content_type and status:
-                    sys.stdout.write(message, status, content_type)
+                sys.stdout.write(message, status, content_type)
             else:
                 sys.stdout.write(setColor(message, bold))
 

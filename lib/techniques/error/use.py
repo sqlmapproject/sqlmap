@@ -16,6 +16,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
+from lib.core.common import getPartRun
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -242,6 +243,9 @@ def errorUse(expression, dump=False):
     value = None
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
+
+    # Set kb.partRun in case the engine is called from the API
+    kb.partRun = getPartRun() if hasattr(conf, "api") else None
 
     # We have to check if the SQL query might return multiple entries
     # and in such case forge the SQL limiting the query output one

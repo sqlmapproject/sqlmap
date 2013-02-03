@@ -129,8 +129,7 @@ def main():
 
         if hasattr(conf, "api"):
             try:
-                conf.database_cursor.close()
-                conf.database_connection.close()
+                conf.database_cursor.disconnect()
             except KeyboardInterrupt:
                 pass
 

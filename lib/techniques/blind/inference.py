@@ -88,8 +88,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     try:
         # Set kb.partRun in case "common prediction" feature (a.k.a. "good
-        # samaritan") is used
-        kb.partRun = getPartRun() if conf.predictOutput else None
+        # samaritan") is used or the engine is called from the API
+        kb.partRun = getPartRun() if conf.predictOutput or hasattr(conf, "api") else None
 
         if partialValue:
             firstChar = len(partialValue)
@@ -486,7 +486,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         if result:
                             if showEta:
                                 etaProgressUpdate(time.time() - charStart, len(commonValue))
-                            elif conf.verbose in (1, 2):
+                            elif conf.verbose in (1, 2) or hasattr(conf, "api"):
                                 dataToStdout(filterControlChars(commonValue[index - 1:]))
 
                             finalValue = commonValue
@@ -534,7 +534,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                 if showEta:
                     etaProgressUpdate(time.time() - charStart, index)
-                elif conf.verbose in (1, 2):
+                elif conf.verbose in (1, 2) or hasattr(conf, "api"):
                     dataToStdout(filterControlChars(val))
 
                 # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
