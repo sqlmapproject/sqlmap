@@ -59,6 +59,11 @@ def send_email(msg):
     except smtplib.SMTPException, e:
         print "Failure to send email: %s" % str(e)
 
+def failure_email(msg):
+    msg = prepare_email()
+    send_email(msg)
+    sys.exit(1)
+
 def main():
     global SUBJECT
 
@@ -68,15 +73,17 @@ def main():
 
     proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --update", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.wait()
+    stdout, stderr = proc.communicate()
+
+    if stderr:
+        failure_email("Update of sqlmap failed with error:\n\n%s" % stderr)
 
     proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.wait()
     stdout, stderr = proc.communicate()
 
     if stderr:
-        msg = prepare_email("Execution of regression test failed with error:\n\n%s" % stderr)
-        send_email(msg)
-        sys.exit(1)
+        failure_email("Execution of regression test failed with error:\n\n%s" % stderr)
 
     failed_tests = re.findall("running live test case: (.+?) \((\d+)\/\d+\)[\r]*\n.+test failed (at parsing item \"(.+)\" )?\- scan folder: (\/.+) \- traceback: (.*?)( - SQL injection not detected)?[\r]*\n", stdout, re.M)
 
