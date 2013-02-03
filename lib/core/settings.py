@@ -466,7 +466,7 @@ VALID_TIME_CHARS_RUN_THRESHOLD = 100
 CHECK_ZERO_COLUMNS_THRESHOLD = 10
 
 # Boldify all logger messages containing these "patterns"
-BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "heuristic test showed")
+BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "test shows that")
 
 # Generic www root directory names
 GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")

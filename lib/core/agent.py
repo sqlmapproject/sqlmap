@@ -426,6 +426,10 @@ class Agent(object):
         fieldsMinMaxstr = re.search(r"(?:MIN|MAX)\(([^\(\)]+)\)", query, re.I)
         fieldsNoSelect = query
 
+        _ = zeroDepthSearch(query, " FROM ")
+        if not _:
+            fieldsSelectFrom = None
+
         if fieldsSubstr:
             fieldsToCastStr = query
         elif fieldsMinMaxstr:
@@ -441,7 +445,6 @@ class Agent(object):
         elif fieldsSelectCase:
             fieldsToCastStr = fieldsSelectCase.groups()[0]
         elif fieldsSelectFrom:
-            _ = zeroDepthSearch(query, " FROM ")
             fieldsToCastStr = query[:unArrayizeValue(_)] if _ else query
             fieldsToCastStr = re.sub(r"\ASELECT%s\s+" % prefixRegex, "", fieldsToCastStr)
         elif fieldsSelect:
@@ -888,23 +891,17 @@ class Agent(object):
         lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
         select = re.search("\ASELECT\s+", expression, re.I)
         selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
-        selectDistinctExpr = re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I)
         selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
         selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
 
         _, _, _, _, _, _, fieldsStr, _ = self.getFields(expression)
 
-        if any((selectTopExpr, selectDistinctExpr, selectFromExpr, selectExpr)):
+        if any((selectTopExpr, selectFromExpr, selectExpr)):
             query = fieldsStr
         else:
             query = expression
 
-        if selectDistinctExpr:
-            lengthExpr = "SELECT %s FROM (%s)" % (lengthQuery % query, expression)
-
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                lengthExpr += " AS %s" % randomStr(lowercase=True)
-        elif select:
+        if select:
             lengthExpr = expression.replace(query, lengthQuery % query, 1)
         else:
             lengthExpr = lengthQuery % expression

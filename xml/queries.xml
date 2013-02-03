@@ -344,10 +344,10 @@
 
     <!-- Microsoft Access -->
     <dbms value="Microsoft Access">
-        <cast query="CVAR(%s)"/>
-        <length query="LEN(%s)"/>
+        <cast query="RTRIM(CVAR(%s))"/>
+        <length query="LEN(RTRIM(CVAR(%s)))"/>
         <isnull query="IIF(LEN(%s)=0,' ',%s)"/>
-        <delimiter query=","/>
+        <delimiter query="&amp;"/>
         <limit query="TOP %d"/>
         <limitregexp query="\s+TOP\s+([\d]+)"/>
         <limitgroupstart query="1"/>

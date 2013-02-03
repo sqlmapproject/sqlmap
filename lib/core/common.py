@@ -974,7 +974,6 @@ def setPaths():
     paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
     paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
     paths.WORDLIST = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.zip")
-    paths.PHPIDS_RULES_XML = os.path.join(paths.SQLMAP_XML_PATH, "phpids_rules.xml")
     paths.ERRORS_XML = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
     paths.PAYLOADS_XML = os.path.join(paths.SQLMAP_XML_PATH, "payloads.xml")
     paths.INJECTIONS_XML = os.path.join(paths.SQLMAP_XML_PATH, "injections.xml")
@@ -1376,6 +1375,8 @@ def safeStringFormat(format_, params):
 
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params)
+    elif not isListLike(params):
+        retVal = retVal.replace("%s", str(params))
     else:
         count, index = 0, 0
         while index != -1:

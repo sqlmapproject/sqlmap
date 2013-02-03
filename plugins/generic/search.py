@@ -534,8 +534,13 @@ class Search:
 
                         for index in indexRange:
                             query = rootQuery.blind.query2
-                            query = query % db
-                            query += " AND %s" % colQuery
+
+                            if query.endswith("'%s')"):
+                                query = query[:-1] + " AND %s)" % colQuery
+                            else:
+                                query += " AND %s" % colQuery
+
+                            query = safeStringFormat(query, db)
                             query += whereTblsQuery
                             query = agent.limitQuery(index, query)
 

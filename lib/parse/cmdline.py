@@ -612,10 +612,6 @@ def cmdLineParser():
         miscellaneous.add_option("--beep", dest="beep", action="store_true",
                                   help="Make a beep sound when SQL injection is found")
 
-        miscellaneous.add_option("--check-payload", dest="checkPayload",
-                                  action="store_true",
-                                  help="Offline WAF/IPS/IDS payload detection testing")
-
         miscellaneous.add_option("--check-waf", dest="checkWaf",
                                   action="store_true",
                                   help="Check for existence of WAF/IPS/IDS protection")

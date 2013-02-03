@@ -256,8 +256,7 @@ def decodePage(page, contentEncoding, contentType):
 def processResponse(page, responseHeaders):
     kb.processResponseCounter += 1
 
-    if not kb.dumpTable:
-        parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None)
+    parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None)
 
     if conf.parseErrors:
         msg = extractErrorMessage(page)

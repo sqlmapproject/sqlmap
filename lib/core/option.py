@@ -324,6 +324,10 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     scheme = "https"
                     port = port or "443"
 
+                if not host:
+                    errMsg = "invalid format of a request file"
+                    raise SqlmapSyntaxException, errMsg
+
                 if not url.startswith("http"):
                     url = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
                     scheme = None
@@ -1521,6 +1525,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.dynamicParameter = False
     kb.endDetection = False
     kb.explicitSettings = set()
+    kb.extendTests = None
     kb.errorIsNone = True
     kb.fileReadMode = False
     kb.forcedDbms = None
@@ -1548,12 +1553,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.multiThreadMode = False
     kb.negativeLogic = False
     kb.nullConnection = None
-    kb.pageCompress = True
-    kb.pageTemplate = None
-    kb.pageTemplates = dict()
-    kb.postHint = None
-    kb.previousMethod = None
-    kb.processUserMarks = None
     kb.orderByColumns = None
     kb.originalCode = None
     kb.originalPage = None
@@ -1566,12 +1565,19 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.osVersion = None
     kb.osSP = None
 
+    kb.pageCompress = True
+    kb.pageTemplate = None
+    kb.pageTemplates = dict()
     kb.pageEncoding = DEFAULT_PAGE_ENCODING
     kb.pageStable = None
     kb.partRun = None
     kb.permissionFlag = False
+    kb.postHint = None
+    kb.postSpaceToPlus = False
     kb.prependFlag = False
     kb.processResponseCounter = 0
+    kb.previousMethod = None
+    kb.processUserMarks = None
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
     kb.redirectChoice = None
@@ -1584,8 +1590,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.resumeValues = True
     kb.safeCharEncode = False
     kb.singleLogFlags = set()
-    kb.skipOthersDbms = None
-    kb.postSpaceToPlus = False
+    kb.reduceTests = None
     kb.stickyDBMS = False
     kb.stickyLevel = None
     kb.suppressResumeInfo = False

@@ -205,6 +205,7 @@ POST_HINT_CONTENT_TYPES = {
 DEPRECATED_OPTIONS = {
                         "--replicate": "use '--dump-format=SQLITE' instead",
                         "--no-unescape": "use '--no-escape' instead",
+                        "--check-payload": None,
                      }
 
 DUMP_DATA_PREPROCESS = {
