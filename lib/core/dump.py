@@ -608,7 +608,7 @@ class Dump(object):
     def rFile(self, fileData):
         self.lister("files saved to", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
 
-    def registerValue(self):
+    def registerValue(self, registerData):
         self.string("Registry key value data", registerData, registerData, content_type=CONTENT_TYPE.REG_READ, sort=False)
 
 # object to manage how to print the retrieved queries output to
