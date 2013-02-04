@@ -125,7 +125,6 @@ from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import UNKNOWN_DBMS
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT

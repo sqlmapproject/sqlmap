@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import getUnicode
-from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -85,8 +84,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            randInt = randomInt()
-            result = inject.checkBooleanExpression("BINARY_CHECKSUM(%d)=BINARY_CHECKSUM(%d)" % (randInt, randInt))
+            result = inject.checkBooleanExpression("BINARY_CHECKSUM([RANDNUM])=BINARY_CHECKSUM([RANDNUM])")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MSSQL

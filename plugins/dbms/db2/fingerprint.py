@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -90,8 +89,7 @@ class Fingerprint(GenericFingerprint):
         logMsg = "testing %s" % DBMS.DB2
         logger.info(logMsg)
 
-        randInt = randomInt()
-        result = inject.checkBooleanExpression("%d=(SELECT %d FROM SYSIBM.SYSDUMMY1)" % (randInt, randInt))
+        result = inject.checkBooleanExpression("[RANDNUM]=(SELECT [RANDNUM] FROM SYSIBM.SYSDUMMY1)")
 
         if result:
             logMsg = "confirming %s" % DBMS.DB2

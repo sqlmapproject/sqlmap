@@ -7,8 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import getUnicode
-from lib.core.common import randomInt
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -76,14 +74,13 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.PGSQL
         logger.info(infoMsg)
 
-        randInt = getUnicode(randomInt(1))
-        result = inject.checkBooleanExpression("%s::int=%s" % (randInt, randInt))
+        result = inject.checkBooleanExpression("[RANDNUM]::int=[RANDNUM]")
 
         if result:
             infoMsg = "confirming %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("COALESCE(%s, NULL)=%s" % (randInt, randInt))
+            result = inject.checkBooleanExpression("COALESCE([RANDNUM], NULL)=[RANDNUM]")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.PGSQL

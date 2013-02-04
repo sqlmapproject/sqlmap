@@ -10,7 +10,6 @@ import re
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import getCurrentThreadData
-from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.data import conf
@@ -67,8 +66,7 @@ class Fingerprint(GenericFingerprint):
                     negate = True
                     table = table[1:]
 
-                randInt = randomInt()
-                result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE %d=%d)" % (table, randInt, randInt))
+                result = inject.checkBooleanExpression("EXISTS(SELECT * FROM %s WHERE [RANDNUM]=[RANDNUM])" % table)
                 if result is None:
                     result = False
 
@@ -91,9 +89,8 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "searching for database directory"
         logger.info(infoMsg)
 
-        randInt = randomInt()
         randStr = randomStr()
-        inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE %d=%d)" % (randStr, randStr, randInt, randInt))
+        inject.checkBooleanExpression("EXISTS(SELECT * FROM %s.%s WHERE [RANDNUM]=[RANDNUM])" % (randStr, randStr))
 
         if wasLastResponseDBMSError():
             threadData = getCurrentThreadData()

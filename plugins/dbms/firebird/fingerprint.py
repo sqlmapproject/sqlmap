@@ -10,7 +10,6 @@ import re
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import getUnicode
-from lib.core.common import randomInt
 from lib.core.common import randomRange
 from lib.core.data import conf
 from lib.core.data import kb
@@ -122,8 +121,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.FIREBIRD
         logger.info(infoMsg)
 
-        randInt = randomInt()
-        result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM RDB$DATABASE WHERE %d=%d)>0" % (randInt, randInt))
+        result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM RDB$DATABASE WHERE [RANDNUM]=[RANDNUM])>0")
 
         if result:
             infoMsg = "confirming %s" % DBMS.FIREBIRD
