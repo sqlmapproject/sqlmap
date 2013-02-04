@@ -334,12 +334,17 @@ def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
         results = dictionaryAttack(kb.data.cachedUsersPasswords)
 
+        lut = {}
         for (_, hash_, password) in results:
-            for user in kb.data.cachedUsersPasswords.keys():
-                for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                    if kb.data.cachedUsersPasswords[user][i] and hash_.lower() in kb.data.cachedUsersPasswords[user][i].lower()\
-                    and 'clear-text password' not in kb.data.cachedUsersPasswords[user][i].lower():
-                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', password)
+            lut[hash_.lower()] = password
+
+        for user in kb.data.cachedUsersPasswords.keys():
+            for i in xrange(len(kb.data.cachedUsersPasswords[user])):
+                _ = kb.data.cachedUsersPasswords[user][i]
+                if _:
+                    hash_ = _.split()[0].lower()
+                    if hash_ in lut and "clear-text password" not in _:
+                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', lut[hash_])
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
