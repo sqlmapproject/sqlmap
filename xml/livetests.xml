@@ -881,6 +881,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3_nooutput.php?id=1"/>
             <tech value="T"/>
+            <extensiveFp value="True"/>
             <level value="3"/>
             <risk value="2"/>
             <timeSec value="2"/>
@@ -888,6 +889,7 @@
         </switches>
         <parse>
             <item value="Title: SQLite &gt; 2.0 AND time-based blind (heavy query)"/>
+            <item value="r'back-end DBMS: active fingerprint: SQLite 3'"/>
             <item value="banner:    '3.7.3'"/>
         </parse>
     </case>
