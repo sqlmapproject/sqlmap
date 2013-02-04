@@ -142,7 +142,8 @@ def _oneShotErrorUse(expression, field=None):
                     retVal = output
                     break
         except:
-            hashDBWrite(expression, "%s%s" % (retVal, PARTIAL_VALUE_MARKER))
+            if retVal is not None:
+                hashDBWrite(expression, "%s%s" % (retVal, PARTIAL_VALUE_MARKER))
             raise
 
         retVal = decodeHexValue(retVal) if conf.hexConvert else retVal
@@ -152,7 +153,8 @@ def _oneShotErrorUse(expression, field=None):
 
         retVal = _errorReplaceChars(retVal)
 
-        hashDBWrite(expression, retVal)
+        if retVal is not None:
+            hashDBWrite(expression, retVal)
 
     else:
         _ = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
