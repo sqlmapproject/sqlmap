@@ -43,7 +43,7 @@ ASTERISK_MARKER = "__ASTERISK_MARK__"
 
 PAYLOAD_DELIMITER = "\x00"
 CHAR_INFERENCE_MARK = "%c"
-PRINTABLE_CHAR_REGEX = r"[^\x00-\x1f\x7e-\xff]"
+PRINTABLE_CHAR_REGEX = r"[^\x00-\x1f\x7f-\xff]"
 
 # Regular expression used for recognition of generic permission messages
 PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"

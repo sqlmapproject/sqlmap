@@ -444,7 +444,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 abortedFlag = True
 
             finally:
-                value = [partialValue[_] if _ < len(partialValue) else threadData.shared.value[_] for _ in xrange(length)]
+                value = [_ for _ in partialValue]
+                value.extend(_ for _ in threadData.shared.value)
 
             infoMsg = None
 
