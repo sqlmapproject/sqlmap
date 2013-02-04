@@ -13,7 +13,6 @@ import re
 import socket
 import string
 import sys
-import sqlite3
 import threading
 import time
 import urllib2
@@ -53,8 +52,6 @@ from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.common import urldecode
-from lib.core.common import urlencode
-from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
@@ -95,7 +92,6 @@ from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DB2_ALIASES
-from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
@@ -117,7 +113,6 @@ from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import TIME_DELAY_CANDIDATES
-from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNION_CHAR_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX
