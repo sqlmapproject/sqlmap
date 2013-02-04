@@ -340,11 +340,9 @@ def attackCachedUsersPasswords():
 
         for user in kb.data.cachedUsersPasswords.keys():
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                _ = kb.data.cachedUsersPasswords[user][i]
-                if _:
-                    hash_ = _.split()[0].lower()
-                    if hash_ in lut and "clear-text password" not in _:
-                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', lut[hash_])
+                value = kb.data.cachedUsersPasswords[user][i].lower()
+                if value in lut and "clear-text password" not in value:
+                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', lut[value])
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
