@@ -178,7 +178,7 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-            if not (kb.extendTests and intersect(dbms, kb.extendTests)):
+            elif not (kb.extendTests and intersect(dbms, kb.extendTests)):
                 # Skip test if the risk is higher than the provided (or default)
                 # value
                 # Parse test's <risk>
