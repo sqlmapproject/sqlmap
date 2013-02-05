@@ -541,12 +541,11 @@ class Search:
                             query = rootQuery.blind.query2
 
                             if query.endswith("'%s')"):
-                                query = query[:-1] + " AND %s)" % colQuery
+                                query = query[:-1] + " AND %s)" % (colQuery + whereTblsQuery)
                             else:
-                                query += " AND %s" % colQuery
+                                query += " AND %s" % (colQuery + whereTblsQuery)
 
                             query = safeStringFormat(query, db)
-                            query += whereTblsQuery
                             query = agent.limitQuery(index, query)
 
                             tbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
