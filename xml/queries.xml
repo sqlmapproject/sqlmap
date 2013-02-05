@@ -293,7 +293,7 @@
 
     <!-- SQLite -->
     <dbms value="SQLite">
-        <cast query="CAST(%s AS VARCHAR(8000))" dbms_version="&gt;=3.0"/>
+        <cast query="CAST(%s AS TEXT)" dbms_version="&gt;=3.0"/>
         <!-- NOTE: On SQLite version 2 everything is stored as a string (Reference: http://www.mono-project.com/SQLite) -->
         <length query="LENGTH(%s)"/>
         <isnull query="COALESCE(%s,' ')"/>
