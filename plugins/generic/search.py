@@ -314,12 +314,13 @@ class Search:
                             query = agent.limitQuery(index, query)
 
                         foundTbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                        kb.hintValue = foundTbl
-                        foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
-                        foundTbls[db].append(foundTbl)
+                        if not isNoneValue(foundTbls[db]):
+                            kb.hintValue = foundTbl
+                            foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
+                            foundTbls[db].append(foundTbl)
 
         for db in foundTbls.keys():
-            if not foundTbls[db]:
+            if isNoneValue(foundTbls[db]):
                 del foundTbls[db]
 
         if not foundTbls:
