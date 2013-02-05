@@ -496,7 +496,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 dataToStdout(filterControlChars(commonValue[index - 1:]))
 
                             finalValue = commonValue
-
                             break
 
                     # If there is a common pattern starting with partialValue,
@@ -549,7 +548,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     break
 
                 if (lastChar > 0 and index >= lastChar):
-                    finalValue = partialValue
+                    finalValue = "" if length == 0 else partialValue
+                    finalValue = finalValue.rstrip() if len(finalValue) > 1 else finalValue
+                    partialValue = None
                     break
 
     except KeyboardInterrupt:
