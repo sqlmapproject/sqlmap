@@ -156,7 +156,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             warnMsg += "usage of option '--threads' for faster data retrieval"
             singleTimeWarnMessage(warnMsg)
 
-        if conf.verbose in (1, 2) and not showEta:
+        if conf.verbose in (1, 2) and not showEta and not hasattr(conf, "api"):
             if isinstance(length, int) and conf.threads > 1:
                 dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
                 dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
@@ -430,7 +430,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length - 1):
                                     output = output[:-2] + '..'
 
-                                if conf.verbose in (1, 2) and not showEta:
+                                if conf.verbose in (1, 2) and not showEta and not hasattr(conf, "api"):
                                     _ = count - firstChar
                                     output += '_' * (min(length, conf.progressWidth) - len(output))
                                     status = ' %d/%d (%d%%)' % (_, length, round(100.0 * _ / length))
@@ -460,7 +460,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 finalValue = "".join(value)
                 infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
 
-            if conf.verbose in (1, 2) and not showEta and infoMsg:
+            if conf.verbose in (1, 2) and not showEta and infoMsg and not hasattr(conf, "api"):
                 dataToStdout(infoMsg)
 
         # No multi-threading (--threads = 1)
@@ -566,11 +566,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 
-    if conf.hexConvert and not abortedFlag:
+    if conf.hexConvert and not abortedFlag and not hasattr(conf, "api"):
         infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
         dataToStdout(infoMsg)
     else:
-        if conf.verbose in (1, 2) or showEta:
+        if conf.verbose in (1, 2) or showEta and not hasattr(conf, "api"):
             dataToStdout("\n")
 
         if (conf.verbose in (1, 2) and showEta) or conf.verbose >= 3:

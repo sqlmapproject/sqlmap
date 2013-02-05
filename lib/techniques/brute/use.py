@@ -99,7 +99,7 @@ def tableExists(tableFile, regex=None):
                 threadData.shared.value.append(table)
                 threadData.shared.unique.add(table.lower())
 
-                if conf.verbose in (1, 2):
+                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), table)
                     dataToStdout(infoMsg, True)
@@ -195,7 +195,7 @@ def columnExists(columnFile, regex=None):
             if result:
                 threadData.shared.value.append(column)
 
-                if conf.verbose in (1, 2):
+                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), column)
                     dataToStdout(infoMsg, True)
