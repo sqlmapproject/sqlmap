@@ -271,6 +271,34 @@ class CONTENT_TYPE:
     OS_CMD = 23
     REG_READ = 24
 
+PART_RUN_CONTENT_TYPES = {
+    "checkDbms": CONTENT_TYPE.TECHNIQUES,
+    "getFingerprint": CONTENT_TYPE.DBMS_FINGERPRINT,
+    "getBanner": CONTENT_TYPE.BANNER,
+    "getCurrentUser": CONTENT_TYPE.CURRENT_USER,
+    "getCurrentDb": CONTENT_TYPE.CURRENT_DB,
+    "getHostname": CONTENT_TYPE.HOSTNAME,
+    "isDba": CONTENT_TYPE.IS_DBA,
+    "getUsers": CONTENT_TYPE.USERS,
+    "getPasswordHashes": CONTENT_TYPE.PASSWORDS,
+    "getPrivileges": CONTENT_TYPE.PRIVILEGES,
+    "getRoles": CONTENT_TYPE.ROLES,
+    "getDbs": CONTENT_TYPE.DBS,
+    "getTables": CONTENT_TYPE.TABLES,
+    "getColumns": CONTENT_TYPE.COLUMNS,
+    "getSchema": CONTENT_TYPE.SCHEMA,
+    "getCount": CONTENT_TYPE.COUNT,
+    "dumpTable": CONTENT_TYPE.DUMP_TABLE,
+    "search": CONTENT_TYPE.SEARCH,
+    "sqlQuery": CONTENT_TYPE.SQL_QUERY,
+    "tableExists": CONTENT_TYPE.COMMON_TABLES,
+    "columnExists": CONTENT_TYPE.COMMON_COLUMNS,
+    "readFile": CONTENT_TYPE.FILE_READ,
+    "writeFile": CONTENT_TYPE.FILE_WRITE,
+    "osCmd": CONTENT_TYPE.OS_CMD,
+    "regRead": CONTENT_TYPE.REG_READ
+}
+
 class CONTENT_STATUS:
     IN_PROGRESS = 0
     COMPLETE = 1

@@ -27,6 +27,7 @@ from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
 from lib.core.enums import CONTENT_STATUS
+from lib.core.enums import PART_RUN_CONTENT_TYPES
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.subprocessng import Popen
@@ -176,16 +177,16 @@ class StdDbOut(object):
     def write(self, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
         if self.messagetype == "stdout":
             if content_type is None:
-                content_type = 99
+                if kb.partRun is not None:
+                    content_type = PART_RUN_CONTENT_TYPES.get(kb.partRun)
+                else:
+                    # Ignore all non-relevant messages
+                    return
 
             output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND status = ? AND content_type = ? LIMIT 0,1",
                                                   (self.taskid, status, content_type))
 
             if status == CONTENT_STATUS.IN_PROGRESS:
-                # Ignore all non-relevant messages
-                if kb.partRun is None:
-                    return
-
                 if len(output) == 0:
                     conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
                                                  (self.taskid, status, content_type, jsonize(value)))
