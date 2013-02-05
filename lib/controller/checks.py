@@ -763,7 +763,9 @@ def heuristicCheckSqlInjection(place, parameter):
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N').upper() != 'N'
 
     elif result:
-        infoMsg += "be injectable (possible DBMS: '%s')" % (Format.getErrorParsedDBMSes() or UNKNOWN_DBMS)
+        infoMsg += "be injectable"
+        if Backend.getErrorParsedDBMSes():
+            infoMsg += " (possible DBMS: '%s')" % Format.getErrorParsedDBMSes()
         logger.info(infoMsg)
 
     else:
