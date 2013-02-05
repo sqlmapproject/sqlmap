@@ -17,7 +17,7 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         def escaper(value):
-            return "X'%s'" % binascii.hexlify(value)
+            return "CAST(X'%s' AS TEXT)" % binascii.hexlify(value)
 
         retVal = expression
 
