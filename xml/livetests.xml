@@ -3340,7 +3340,7 @@
         </switches>
         <parse>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+река Москва'"/>
+            <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+长江.+река Москва'"/>
         </parse>
     </case>
     <case name="Highly dynamic page">
