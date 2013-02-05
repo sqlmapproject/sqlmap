@@ -512,7 +512,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
         pass
 
     finally:
-        if hasattr(proc_count, 'value'):
+        if hasattr(proc_count, "value"):
             proc_count.value -= 1
 
 def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
@@ -579,7 +579,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
         pass
 
     finally:
-        if hasattr(proc_count, 'value'):
+        if hasattr(proc_count, "value"):
             proc_count.value -= 1
 
 def dictionaryAttack(attack_dict):
@@ -732,10 +732,11 @@ def dictionaryAttack(attack_dict):
                             processes.append(p)
 
                         for p in processes:
+                            p.daemon = True
                             p.start()
 
-                        for p in processes:
-                            p.join()
+                        while count.value > 0:
+                            time.sleep(0.5)
 
                     else:
                         warnMsg = "multiprocessing hash cracking is currently "
@@ -810,10 +811,11 @@ def dictionaryAttack(attack_dict):
                                 processes.append(p)
 
                             for p in processes:
+                                p.daemon = True
                                 p.start()
 
-                            for p in processes:
-                                p.join()
+                            while count.value > 0:
+                                time.sleep(0.5)
 
                             found = found_.value != 0
 
