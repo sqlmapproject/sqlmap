@@ -318,6 +318,10 @@ class Search:
                         foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
                         foundTbls[db].append(foundTbl)
 
+        for db in foundTbls.keys():
+            if not foundTbls[db]:
+                del foundTbls[db]
+
         if not foundTbls:
             warnMsg = "no databases contain any of the provided tables"
             logger.warn(warnMsg)
