@@ -314,7 +314,7 @@ class Search:
                             query = agent.limitQuery(index, query)
 
                         foundTbl = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                        if not isNoneValue(foundTbls[db]):
+                        if not isNoneValue(foundTbl):
                             kb.hintValue = foundTbl
                             foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
                             foundTbls[db].append(foundTbl)
