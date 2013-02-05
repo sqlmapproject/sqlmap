@@ -529,7 +529,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     val = getChar(index, asciiTbl)
 
-                if val is None or (lastChar > 0 and index > lastChar):
+                if val is None:
                     finalValue = partialValue
                     break
 
@@ -546,6 +546,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
                 if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace() and partialValue.strip(' ')[-1:] != '\n':
                     finalValue = partialValue[:-INFERENCE_BLANK_BREAK]
+                    break
+
+                if (lastChar > 0 and index >= lastChar):
+                    finalValue = partialValue
                     break
 
     except KeyboardInterrupt:
