@@ -169,7 +169,7 @@ def liveTest():
         msg = "running live test case: %s (%d/%d)" % (name, count, length)
         logger.info(msg)
 
-        initCase(switches)
+        initCase(switches, count)
 
         test_case_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "test_case"), "wb", UNICODE_ENCODING)
         test_case_fd.write("%s\n" % name)
@@ -224,7 +224,7 @@ def liveTest():
 
     return retVal
 
-def initCase(switches=None):
+def initCase(switches, count):
     global failedItem
     global failedParseOn
     global failedTraceBack
@@ -233,7 +233,7 @@ def initCase(switches=None):
     failedParseOn = None
     failedTraceBack = None
 
-    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-")
+    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-%d-" % count)
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
