@@ -54,6 +54,9 @@ class xrange(object):
     def _len(self):
         return max(0, int((self.stop - self.start) / self.step))
 
+    def __contains__(self, value):
+        return (self.start <= value < self.stop) and (value - self.start) % self.step == 0
+
     def __getitem__(self, index):
         if isinstance(index, slice):
             start, stop, step = index.indices(self._len())
