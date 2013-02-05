@@ -111,6 +111,10 @@ class HashDB(object):
                         except sqlite3.IntegrityError:
                             self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
                     except sqlite3.OperationalError, ex:
+                        if not os.path.exists(self.filepath):
+                            debugMsg = "session file '%s' does not exist" % self.filepath
+                            logger.debug(debugMsg)
+                            break
 
                         if retries == 0:
                             warnMsg = "there has been a problem while writing to "
