@@ -20,10 +20,20 @@ LOGGER_HANDLER = None
 try:
     from thirdparty.ansistrm.ansistrm import ColorizingStreamHandler
 
-    LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
-    LOGGER_HANDLER.level_map[logging.getLevelName("PAYLOAD")] = (None, "cyan", False)
-    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC OUT")] = (None, "magenta", False)
-    LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC IN")] = ("magenta", None, False)
+    disableColoring = False
+
+    for argument in sys.argv:
+        if "disable-col" in argument:
+            disableColoring = True
+            break
+
+    if disableColoring:
+        LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
+    else:
+        LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
+        LOGGER_HANDLER.level_map[logging.getLevelName("PAYLOAD")] = (None, "cyan", False)
+        LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC OUT")] = (None, "magenta", False)
+        LOGGER_HANDLER.level_map[logging.getLevelName("TRAFFIC IN")] = ("magenta", None, False)
 except ImportError:
     LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
 

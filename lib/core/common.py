@@ -729,6 +729,9 @@ def boldifyMessage(message):
     return retVal
 
 def setColor(message, bold=False):
+    if conf.disableColoring:
+        return message
+
     retVal = message
     level = extractRegexResult(r"\[(?P<result>[A-Z ]+)\]", message) or kb.get("stickyLevel")
 
