@@ -492,10 +492,14 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
                 elif (proc_id == 0 or getattr(proc_count, "value", 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0 or hash_regex == HASH.ORACLE_OLD or hash_regex == HASH.CRYPT_GENERIC and IS_WIN:
                     rotator += 1
+
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
+
                     status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
-                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                    if not hasattr(conf, "api"):
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
                 raise
@@ -560,9 +564,12 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
                     status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
+
                     if not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
-                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+                    if not hasattr(conf, "api"):
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
                 raise
