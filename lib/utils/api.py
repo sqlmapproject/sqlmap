@@ -114,9 +114,10 @@ class Task(object):
         self.options.taskid = taskid
         self.options.database = db_filepath
 
-        # Enforce batch mode and disable coloring
+        # Enforce batch mode and disable coloring and ETA
         self.options.batch = True
         self.options.disableColoring = True
+        self.options.eta = False
 
     def set_option(self, option, value):
         self.options[option] = value
@@ -192,6 +193,9 @@ class StdDbOut(object):
             # Delete partial output from IPC database if we have got a complete output
             if status == CONTENT_STATUS.COMPLETE and len(output) > 0:
                 conf.database_cursor.execute("DELETE FROM data WHERE id=?", (output[0][0],))
+
+                if kb.partRun:
+                    kb.partRun = None
 
             if status == CONTENT_STATUS.IN_PROGRESS:
                 if len(output) == 0:
@@ -587,5 +591,5 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
     logger.error("Not yet implemented, use curl from command line instead for now, for example:")
     print "\n\t$ curl http://%s:%d/task/new" % (host, port)
     print "\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://%s:%d/scan/:taskid/start" % (host, port)
-    print "\t$ curl http://%s:%d/scan/:taskid/output" % (host, port)
+    print "\t$ curl http://%s:%d/scan/:taskid/data" % (host, port)
     print "\t$ curl http://%s:%d/scan/:taskid/log\n" % (host, port)
