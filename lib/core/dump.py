@@ -90,22 +90,22 @@ class Dump(object):
     def string(self, header, data, content_type=None, sort=True):
         kb.stickyLevel = None
 
+        if hasattr(conf, "api"):
+            self._write(data, content_type=content_type)
+            return
+
         if isListLike(data):
-            self.lister(header, data, sort)
+            self.lister(header, data, content_type, sort)
         elif data is not None:
             _ = getUnicode(data)
 
             if _ and _[-1] == '\n':
                 _ = _[:-1]
 
-            if hasattr(conf, "api"):
-                self._write(data, content_type=content_type)
-            elif "\n" in _:
+            if "\n" in _:
                 self._write("%s:\n---\n%s\n---" % (header, _))
             else:
                 self._write("%s:    %s" % (header, ("'%s'" % _) if isinstance(data, basestring) else _))
-        elif hasattr(conf, "api"):
-            self._write(data, content_type=content_type)
         else:
             self._write("%s:\tNone" % header)
 
