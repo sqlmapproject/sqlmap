@@ -75,6 +75,9 @@ class Database(object):
         self.cursor.close()
         self.connection.close()
 
+    def commit(self):
+        self.cursor.commit()
+
     def execute(self, statement, arguments=None):
         if arguments:
             self.cursor.execute(statement, arguments)
@@ -186,6 +189,10 @@ class StdDbOut(object):
             output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND status = ? AND content_type = ? LIMIT 0,1",
                                                   (self.taskid, status, content_type))
 
+            # Delete partial output from IPC database if we have got a complete output
+            if status == CONTENT_STATUS.COMPLETE and len(output) > 0:
+                conf.database_cursor.execute("DELETE FROM data WHERE id=?", (output[0][0],))
+
             if status == CONTENT_STATUS.IN_PROGRESS:
                 if len(output) == 0:
                     conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
@@ -195,10 +202,6 @@ class StdDbOut(object):
                     conf.database_cursor.execute("UPDATE data SET value = ? WHERE id = ?",
                                                  (jsonize(new_value), output[0][0]))
             else:
-                if len(output) > 0:
-                    conf.database_cursor.execute("DELETE FROM data WHERE taskid = ? AND status = %s AND content_type = ?" % CONTENT_STATUS.IN_PROGRESS,
-                                                 (self.taskid, content_type))
-
                 conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
                                              (self.taskid, status, content_type, jsonize(value)))
         else:
