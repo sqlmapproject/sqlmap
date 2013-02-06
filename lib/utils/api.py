@@ -187,12 +187,15 @@ class StdDbOut(object):
                     # Ignore all non-relevant messages
                     return
 
-            output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND status = ? AND content_type = ? LIMIT 0,1",
-                                                  (self.taskid, status, content_type))
+            #print >>sys.__stdout__, "value: %s\nstatus: %d\ncontent_type: %d\nkb.partRun: %s\n--------------" % (value, status, content_type, kb.partRun)
+
+            output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND content_type = ?",
+                                                  (self.taskid, content_type))
 
             # Delete partial output from IPC database if we have got a complete output
             if status == CONTENT_STATUS.COMPLETE and len(output) > 0:
-                conf.database_cursor.execute("DELETE FROM data WHERE id=?", (output[0][0],))
+                for index in xrange(0, len(output)-1):
+                    conf.database_cursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
 
                 if kb.partRun:
                     kb.partRun = None
