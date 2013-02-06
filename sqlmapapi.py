@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import logging
 import optparse
 
-from _sqlmap import modulePath
+from sqlmap import modulePath
 from lib.core.common import setPaths
 from lib.core.data import paths
 from lib.core.data import logger
