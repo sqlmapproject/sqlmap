@@ -15,7 +15,8 @@ import warnings
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-from lib.utils import versioncheck
+from lib.utils import versioncheck  # this has to be the first non-standard import
+
 from lib.controller.controller import start
 from lib.core.common import banner
 from lib.core.common import dataToStdout
