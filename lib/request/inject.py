@@ -413,6 +413,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         warnMsg += "a switch '--no-cast' and/or switch '--hex'"
         singleTimeWarnMessage(warnMsg)
 
+    if kb.partRun:
+        kb.partRun = None
+
     return extractExpectedValue(value, expected)
 
 def goStacked(expression, silent=False):
