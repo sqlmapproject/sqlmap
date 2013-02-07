@@ -1476,7 +1476,6 @@
     <!-- End of custom enumeration switches -->
 
     <!-- Brute force switches -->
-    <!-- TODO: these test case stall the whole regression test for over 10 hours
     <case name="MySQL boolean-based brute-force tables enumeration - provided no database">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
@@ -1751,7 +1750,6 @@
             <item value="r'Current database.+1 table.+users'"/>
         </parse>
     </case>
-    -->
     <!-- TODO: add test cases to brute-force columns -->
     <!-- End of brute force switches -->
 
