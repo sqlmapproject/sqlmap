@@ -245,26 +245,36 @@ class Format(object):
         """
 
         infoStr = ""
+        infoApi = {}
 
         if info and "type" in info:
-            infoStr += "%s operating system: %s" % (target, Format.humanize(info["type"]))
+            if hasattr(conf, "api"):
+                infoApi["%s operating system" % target] = info
+            else:
+                infoStr += "%s operating system: %s" % (target, Format.humanize(info["type"]))
 
-            if "distrib" in info:
-                infoStr += " %s" % Format.humanize(info["distrib"])
+                if "distrib" in info:
+                    infoStr += " %s" % Format.humanize(info["distrib"])
 
-            if "release" in info:
-                infoStr += " %s" % Format.humanize(info["release"])
+                if "release" in info:
+                    infoStr += " %s" % Format.humanize(info["release"])
 
-            if "sp" in info:
-                infoStr += " %s" % Format.humanize(info["sp"])
+                if "sp" in info:
+                    infoStr += " %s" % Format.humanize(info["sp"])
 
-            if "codename" in info:
-                infoStr += " (%s)" % Format.humanize(info["codename"])
+                if "codename" in info:
+                    infoStr += " (%s)" % Format.humanize(info["codename"])
 
         if "technology" in info:
-            infoStr += "\nweb application technology: %s" % Format.humanize(info["technology"], ", ")
+            if hasattr(conf, "api"):
+                infoApi["web application technology"] = Format.humanize(info["technology"], ", ")
+            else:
+                infoStr += "\nweb application technology: %s" % Format.humanize(info["technology"], ", ")
 
-        return infoStr.lstrip()
+        if hasattr(conf, "api"):
+            return infoApi
+        else:
+            return infoStr.lstrip()
 
 class Backend:
     # Set methods

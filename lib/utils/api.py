@@ -129,8 +129,9 @@ class Task(object):
         return self.options
 
     def set_output_directory(self):
-        self.output_directory = tempfile.mkdtemp(prefix="sqlmapoutput-")
-        self.set_option("oDir", self.output_directory)
+        if not self.output_directory or not os.path.isdir(self.output_directory):
+            self.output_directory = tempfile.mkdtemp(prefix="sqlmapoutput-")
+            self.set_option("oDir", self.output_directory)
 
     def clean_filesystem(self):
         shutil.rmtree(self.output_directory)
@@ -180,6 +181,8 @@ class StdDbOut(object):
 
     def write(self, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
         if self.messagetype == "stdout":
+            insert = True
+
             if content_type is None:
                 if kb.partRun is not None:
                     content_type = PART_RUN_CONTENT_TYPES.get(kb.partRun)
@@ -189,28 +192,32 @@ class StdDbOut(object):
 
             #print >>sys.__stdout__, "value: %s\nstatus: %d\ncontent_type: %d\nkb.partRun: %s\n--------------" % (value, status, content_type, kb.partRun)
 
-            output = conf.database_cursor.execute("SELECT id, value FROM data WHERE taskid = ? AND content_type = ?",
+            output = conf.database_cursor.execute("SELECT id, status, value FROM data WHERE taskid = ? AND content_type = ?",
                                                   (self.taskid, content_type))
 
             # Delete partial output from IPC database if we have got a complete output
-            if status == CONTENT_STATUS.COMPLETE and len(output) > 0:
-                for index in xrange(0, len(output)-1):
-                    conf.database_cursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
+            if status == CONTENT_STATUS.COMPLETE:
+                if len(output) > 0:
+                    for index in xrange(0, len(output)-1):
+                        if output[index][1] == CONTENT_STATUS.COMPLETE:
+                            insert = False
+                        else:
+                            conf.database_cursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
 
+                if insert:
+                    conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
+                                                 (self.taskid, status, content_type, jsonize(value)))
                 if kb.partRun:
                     kb.partRun = None
 
-            if status == CONTENT_STATUS.IN_PROGRESS:
+            elif status == CONTENT_STATUS.IN_PROGRESS:
                 if len(output) == 0:
                     conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
                                                  (self.taskid, status, content_type, jsonize(value)))
                 else:
-                    new_value = "%s%s" % (dejsonize(output[0][1]), value)
+                    new_value = "%s%s" % (dejsonize(output[0][2]), value)
                     conf.database_cursor.execute("UPDATE data SET value = ? WHERE id = ?",
                                                  (jsonize(new_value), output[0][0]))
-            else:
-                conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
-                                             (self.taskid, status, content_type, jsonize(value)))
         else:
             conf.database_cursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)",
                                          (self.taskid, str(value) if value else ""))

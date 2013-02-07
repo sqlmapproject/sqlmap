@@ -91,13 +91,13 @@ class Fingerprint(GenericFingerprint):
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
-        if wsOsFp:
+        if wsOsFp and not hasattr(conf, "api"):
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
             dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
-            if dbmsOsFp:
+            if dbmsOsFp and not hasattr(conf, "api"):
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
