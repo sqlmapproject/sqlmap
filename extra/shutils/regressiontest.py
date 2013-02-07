@@ -20,7 +20,7 @@ sys.path.append(os.path.normpath("%s/../../" % os.path.dirname(inspect.getfile(i
 
 from lib.core.revision import getRevisionNumber
 
-TIME = time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
+START_TIME = time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
 SQLMAP_HOME = "/opt/sqlmap"
 REVISION = getRevisionNumber()
 
@@ -30,7 +30,7 @@ SMTP_TIMEOUT = 30
 FROM = "regressiontest@sqlmap.org"
 #TO = "dev@sqlmap.org"
 TO = ["bernardo.damele@gmail.com", "miroslav.stampar@gmail.com"]
-SUBJECT = "Regression test on %s using revision %s" % (TIME, REVISION)
+SUBJECT = "Regression test on %s using revision %s" % (START_TIME, REVISION)
 
 def prepare_email(content):
     global FROM
@@ -71,16 +71,14 @@ def main():
     test_counts = []
     attachments = {}
 
-    proc = subprocess.Popen("cd /opt/sqlmap/ ; python /opt/sqlmap/sqlmap.py --update", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    proc.wait()
-    stdout, stderr = proc.communicate()
+    updateproc = subprocess.Popen("cd /opt/sqlmap/ ; python /opt/sqlmap/sqlmap.py --update", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = updateproc.communicate()
 
     if stderr:
         failure_email("Update of sqlmap failed with error:\n\n%s" % stderr)
 
-    proc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    proc.wait()
-    stdout, stderr = proc.communicate()
+    regressionproc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = regressionproc.communicate()
 
     if stderr:
         failure_email("Execution of regression test failed with error:\n\n%s" % stderr)
@@ -149,12 +147,12 @@ def main():
 
 if __name__ == "__main__":
     log_fd = open("/tmp/sqlmapregressiontest.log", "wb")
-    log_fd.write("Regression test started at %s\n" % TIME)
+    log_fd.write("Regression test started at %s\n" % START_TIME)
 
     try:
         main()
     except Exception, e:
         log_fd.write("An exception has occurred:\n%s" % str(traceback.format_exc()))
 
-    log_fd.write("Regression test finished at %s\n\n" % TIME)
+    log_fd.write("Regression test finished at %s\n\n" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
     log_fd.close()
