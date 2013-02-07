@@ -20,14 +20,14 @@ LOGGER_HANDLER = None
 try:
     from thirdparty.ansistrm.ansistrm import ColorizingStreamHandler
 
-    disableColoring = False
+    disableColor = False
 
     for argument in sys.argv:
         if "disable-col" in argument:
-            disableColoring = True
+            disableColor = True
             break
 
-    if disableColoring:
+    if disableColor:
         LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
     else:
         LOGGER_HANDLER = ColorizingStreamHandler(sys.stdout)
