@@ -515,6 +515,7 @@ class Metasploit:
                         if "shell" in self.payloadStr:
                             send_all(proc, "whoami\n" if Backend.isOs(OS.WINDOWS) else "uname -a ; id\n")
                         if conf.liveTest:
+                            time.sleep(2)
                             send_all(proc, "exit\n")
                     elif time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
                         proc.kill()
