@@ -513,6 +513,9 @@ FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
 # Minimum field entry length needed for encoded content (hex, base64,...) check
 MIN_ENCODED_LEN_CHECK = 5
 
+# Timeout in seconds in which Meterpreter session has to be initialized
+METERPRETER_INIT_TIMEOUT = 120
+
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
 table{

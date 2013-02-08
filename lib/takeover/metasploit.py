@@ -30,7 +30,9 @@ from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapFilePathException
+from lib.core.exception import SqlmapGenericException
 from lib.core.settings import IS_WIN
+from lib.core.settings import METERPRETER_INIT_TIMEOUT
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
@@ -443,8 +445,9 @@ class Metasploit:
             send_all(proc, "getuid\n")
 
     def _controlMsfCmd(self, proc, func):
+        initialized = False
+        start_time = time.time()
         stdin_fd = sys.stdin.fileno()
-        initiated_properly = False
 
         while True:
             returncode = proc.poll()
@@ -461,7 +464,7 @@ class Metasploit:
                     timeout = 3
 
                     inp = ""
-                    start_time = time.time()
+                    _ = time.time()
 
                     while True:
                         if msvcrt.kbhit():
@@ -472,7 +475,7 @@ class Metasploit:
                             elif ord(char) >= 32:   # space_char
                                 inp += char
 
-                        if len(inp) == 0 and (time.time() - start_time) > timeout:
+                        if len(inp) == 0 and (time.time() - _) > timeout:
                             break
 
                     if len(inp) > 0:
@@ -494,14 +497,6 @@ class Metasploit:
                 out = recv_some(proc, t=.1, e=0)
                 blockingWriteToFD(sys.stdout.fileno(), out)
 
-                # Dirty hack to allow Metasploit integration to be tested
-                # in --live-test mode
-                if initiated_properly and conf.liveTest:
-                    try:
-                        send_all(proc, "exit\n")
-                    except TypeError:
-                        continue
-
                 # For --os-pwn and --os-bof
                 pwnBofCond = self.connectionStr.startswith("reverse")
                 pwnBofCond &= "Starting the payload handler" in out
@@ -512,19 +507,20 @@ class Metasploit:
                 if pwnBofCond or smbRelayCond:
                     func()
 
-                if "Starting the payload handler" in out and "shell" in self.payloadStr:
-                    if Backend.isOs(OS.WINDOWS):
-                        send_all(proc, "whoami\n")
-                    else:
-                        send_all(proc, "uname -a ; id\n")
-
-                    time.sleep(2)
-                    initiated_properly = True
-
-                metSess = re.search("Meterpreter session ([\d]+) opened", out)
-
-                if metSess:
-                    self._loadMetExtensions(proc, metSess.group(1))
+                if not initialized:
+                    match = re.search("session ([\d]+) opened", out)
+                    if match:
+                        initialized = True
+                        self._loadMetExtensions(proc, match.group(1))
+                        if "shell" in self.payloadStr:
+                            send_all(proc, "whoami\n" if Backend.isOs(OS.WINDOWS) else "uname -a ; id\n")
+                        if conf.liveTest:
+                            send_all(proc, "exit\n")
+                    elif time.time() - start_time > METERPRETER_INIT_TIMEOUT:
+                        proc.kill()
+                        errMsg = "Timeout occurred while attempting "
+                        errMsg += "to open a remote session"
+                        raise SqlmapGenericException(errMsg)
 
             except EOFError:
                 returncode = proc.wait()
