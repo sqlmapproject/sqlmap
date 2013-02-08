@@ -32,7 +32,7 @@ from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.settings import IS_WIN
-from lib.core.settings import METERPRETER_INIT_TIMEOUT
+from lib.core.settings import METASPLOIT_SESSION_TIMEOUT
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
@@ -516,7 +516,7 @@ class Metasploit:
                             send_all(proc, "whoami\n" if Backend.isOs(OS.WINDOWS) else "uname -a ; id\n")
                         if conf.liveTest:
                             send_all(proc, "exit\n")
-                    elif time.time() - start_time > METERPRETER_INIT_TIMEOUT:
+                    elif time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
                         proc.kill()
                         errMsg = "Timeout occurred while attempting "
                         errMsg += "to open a remote session"
