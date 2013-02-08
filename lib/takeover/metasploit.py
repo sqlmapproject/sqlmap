@@ -522,7 +522,7 @@ class Metasploit:
 
                         initialized = True
 
-                    elif time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
+                    if time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
                         proc.kill()
                         errMsg = "timeout occurred while attempting "
                         errMsg += "to open a remote session"
