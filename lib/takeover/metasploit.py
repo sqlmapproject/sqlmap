@@ -517,9 +517,6 @@ class Metasploit:
                             send_all(proc, "whoami\n" if Backend.isOs(OS.WINDOWS) else "uname -a ; id\n")
                             time.sleep(2)
 
-                        if conf.liveTest:
-                            send_all(proc, "exit\n")
-
                         initialized = True
 
                     elif time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
@@ -527,6 +524,9 @@ class Metasploit:
                         errMsg = "timeout occurred while attempting "
                         errMsg += "to open a remote session"
                         raise SqlmapGenericException(errMsg)
+
+                elif conf.liveTest and time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
+                    proc.kill()
 
             except EOFError:
                 returncode = proc.wait()
