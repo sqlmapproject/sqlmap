@@ -380,7 +380,7 @@ class Metasploit:
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self._cliCmd)
-        self._msfCliProc = execute(self._cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self._msfCliProc = execute(self._cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
     def _runMsfCli(self, exitfunc):
         self._forgeMsfCliCmd(exitfunc)
@@ -390,7 +390,7 @@ class Metasploit:
         logger.info(infoMsg)
 
         logger.debug("executing local command: %s" % self._cliCmd)
-        self._msfCliProc = execute(self._cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self._msfCliProc = execute(self._cliCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
     def _runMsfShellcodeRemote(self):
         infoMsg = "running Metasploit Framework shellcode "
@@ -481,7 +481,7 @@ class Metasploit:
                     if len(inp) > 0:
                         try:
                             send_all(proc, inp)
-                        except IOError:
+                        except (EOFError, IOError):
                             # Probably the child has exited
                             pass
                 else:
@@ -490,7 +490,7 @@ class Metasploit:
                     if stdin_fd in ready_fds[0]:
                         try:
                             send_all(proc, blockingReadFromFD(stdin_fd))
-                        except IOError:
+                        except (EOFError, IOError):
                             # Probably the child has exited
                             pass
 
@@ -528,10 +528,8 @@ class Metasploit:
                 elif conf.liveTest and time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
                     proc.kill()
 
-            except EOFError:
-                returncode = proc.wait()
-
-                return returncode
+            except (EOFError, IOError):
+                return proc.returncode
 
     def createMsfShellcode(self, exitfunc, format, extra, encode):
         infoMsg = "creating Metasploit Framework multi-stage shellcode "
@@ -545,7 +543,7 @@ class Metasploit:
         self._forgeMsfPayloadCmd(exitfunc, format, self._shellcodeFilePath, extra)
 
         logger.debug("executing local command: %s" % self._payloadCmd)
-        process = execute(self._payloadCmd, shell=True, stdout=None, stderr=PIPE)
+        process = execute(self._payloadCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
         dataToStdout("\r[%s] [INFO] creation in progress " % time.strftime("%X"))
         pollProcess(process)
