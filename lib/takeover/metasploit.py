@@ -525,8 +525,12 @@ class Metasploit:
                         errMsg += "to open a remote session"
                         raise SqlmapGenericException(errMsg)
 
-                elif conf.liveTest and time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
-                    proc.kill()
+                if conf.liveTest and time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
+                    if initialized:
+                        send_all(proc, "exit\n")
+                        time.sleep(2)
+                    else:
+                        proc.kill()
 
             except (EOFError, IOError):
                 return proc.returncode
