@@ -295,23 +295,23 @@ class Users:
             errMsg += "database users (most probably because the session "
             errMsg += "user has no read privileges over the relevant "
             errMsg += "system database table)"
-            raise SqlmapNoneDataException(errMsg)
+            logger.error(errMsg)
         else:
             for user in kb.data.cachedUsersPasswords:
                 kb.data.cachedUsersPasswords[user] = list(set(kb.data.cachedUsersPasswords[user]))
 
-        storeHashesToFile(kb.data.cachedUsersPasswords)
+            storeHashesToFile(kb.data.cachedUsersPasswords)
 
-        message = "do you want to perform a dictionary-based attack "
-        message += "against retrieved password hashes? [Y/n/q]"
-        test = readInput(message, default="Y")
+            message = "do you want to perform a dictionary-based attack "
+            message += "against retrieved password hashes? [Y/n/q]"
+            test = readInput(message, default="Y")
 
-        if test[0] in ("n", "N"):
-            pass
-        elif test[0] in ("q", "Q"):
-            raise SqlmapUserQuitException
-        else:
-            attackCachedUsersPasswords()
+            if test[0] in ("n", "N"):
+                pass
+            elif test[0] in ("q", "Q"):
+                raise SqlmapUserQuitException
+            else:
+                attackCachedUsersPasswords()
 
         return kb.data.cachedUsersPasswords
 
