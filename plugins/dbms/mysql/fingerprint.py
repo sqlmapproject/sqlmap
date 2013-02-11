@@ -181,7 +181,7 @@ class Fingerprint(GenericFingerprint):
             # Reference: http://bugs.mysql.com/bug.php?id=15855
 
             # Determine if it is MySQL >= 5.0.0
-            if inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,[RANDNUM],[RANDNUM]))"):
+            if inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,[RANDNUM],0))"):
                 kb.data.has_information_schema = True
                 Backend.setVersion(">= 5.0.0")
                 setDbms("%s 5" % DBMS.MYSQL)
