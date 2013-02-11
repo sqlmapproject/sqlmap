@@ -2590,7 +2590,10 @@ def decodeIntToUnicode(value):
         try:
             # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
-                retVal = getUnicode(hexdecode(hex(value)))
+                _ = "%x" % value
+                if len(_) % 2 == 1:
+                    _ = "0%s" % _
+                retVal = getUnicode(hexdecode(_))
             elif value > 255:
                 retVal = unichr(value)
             else:
