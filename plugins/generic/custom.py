@@ -9,7 +9,9 @@ import re
 
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
+from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
+from lib.core.common import getTechniqueData
 from lib.core.common import isTechniqueAvailable
 from lib.core.convert import utf8decode
 from lib.core.data import conf
@@ -39,14 +41,23 @@ class Custom:
                     sqlType = sqlTitle
                     break
 
-        if 'OPENROWSET' not in query.upper() and (not sqlType or 'SELECT' in sqlType):
+        stacked = isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)
+
+        if not stacked:
+            for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
+                _ = getTechniqueData(technique)
+                if _ and "stacked" in _["title"].lower():
+                    stacked = True
+                    break
+
+        if "OPENROWSET" not in query.upper() and (not sqlType or "SELECT" in sqlType):
             infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             logger.info(infoMsg)
 
             output = inject.getValue(query, fromUser=True)
 
             return output
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+        elif not stacked and not conf.direct:
                 warnMsg = "execution of custom SQL queries is only "
                 warnMsg += "available when stacked queries are supported"
                 logger.warn(warnMsg)
