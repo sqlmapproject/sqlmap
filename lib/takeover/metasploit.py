@@ -507,6 +507,8 @@ class Metasploit:
                 if pwnBofCond or smbRelayCond:
                     func()
 
+                timeout = time.time() - start_time > METASPLOIT_SESSION_TIMEOUT
+
                 if not initialized:
                     match = re.search("session ([\d]+) opened", out)
 
@@ -519,13 +521,13 @@ class Metasploit:
 
                         initialized = True
 
-                    elif time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
+                    elif timeout:
                         proc.kill()
                         errMsg = "timeout occurred while attempting "
                         errMsg += "to open a remote session"
                         raise SqlmapGenericException(errMsg)
 
-                if conf.liveTest and time.time() - start_time > METASPLOIT_SESSION_TIMEOUT:
+                if conf.liveTest and timeout:
                     if initialized:
                         send_all(proc, "exit\n")
                         time.sleep(2)
