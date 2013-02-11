@@ -30,7 +30,7 @@ SMTP_TIMEOUT = 30
 FROM = "regressiontest@sqlmap.org"
 #TO = "dev@sqlmap.org"
 TO = ["bernardo.damele@gmail.com", "miroslav.stampar@gmail.com"]
-SUBJECT = "Regression test on %s using revision %s" % (START_TIME, REVISION)
+SUBJECT = "regression test started on %s using revision %s" % (START_TIME, REVISION)
 
 def prepare_email(content):
     global FROM
@@ -132,9 +132,11 @@ def main():
 
         content += "#######################################################################\n\n"
 
+    end_string = "Regression test finished at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
+
     if content:
-        content += "Regression test finished at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
-        SUBJECT += " (%s)" % ", ".join("#%d" % count for count in test_counts)
+        content += end_string
+        SUBJECT = "Failed %s (%s)" % (SUBJECT, ", ".join("#%d" % count for count in test_counts))
 
         msg = prepare_email(content)
 
@@ -143,6 +145,10 @@ def main():
             attachment.add_header("Content-Disposition", "attachment", filename="test_case_%d_console_output.txt" % test_count)
             msg.attach(attachment)
 
+        send_email(msg)
+    else:
+        SUBJECT += "Successful %s" % SUBJECT
+        msg = prepare_email("All test cases were successful\n\n%s" % end_string)
         send_email(msg)
 
 if __name__ == "__main__":
