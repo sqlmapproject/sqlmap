@@ -147,7 +147,7 @@ def main():
 
         send_email(msg)
     else:
-        SUBJECT += "Successful %s" % SUBJECT
+        SUBJECT = "Successful %s" % SUBJECT
         msg = prepare_email("All test cases were successful\n\n%s" % end_string)
         send_email(msg)
 
