@@ -36,6 +36,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastResponseDelayed
 from lib.core.common import unicodeencode
+from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -716,6 +717,7 @@ class Connect(object):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
+                        value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
                         evaluateCode("%s=%s" % (name, repr(value)), variables)
 
             originals.update(variables)

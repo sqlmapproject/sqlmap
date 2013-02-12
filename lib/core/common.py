@@ -2025,7 +2025,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
             pass
         finally:
             if convall:
-                result = urllib.unquote_plus(value)
+                result = urllib.unquote_plus(value) if plusspace else urllib.unquote(value)
             else:
                 def _(match):
                     charset = reduce(lambda x, y: x.replace(y, ""), unsafe, string.printable)
