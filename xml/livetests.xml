@@ -10,6 +10,7 @@
         <flushSession value="True"/>
         <disableColoring value="True"/>
         <verbose value="1"/>
+        <parseErrors value="True"/>
         <cleanup value="True"/>
     </global>
 
