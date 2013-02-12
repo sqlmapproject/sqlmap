@@ -3356,20 +3356,34 @@ def resetCookieJar(cookieJar):
     else:
         try:
             if not cookieJar.filename:
+                infoMsg = "loading cookies from '%s'" % conf.loadCookies
+                logger.info(infoMsg)
+
                 content = readCachedFileContent(conf.loadCookies)
                 lines = filter(None, (line.strip() for line in content.split("\n") if not line.startswith('#')))
                 handle, filename = tempfile.mkstemp()
                 os.close(handle)
+
                 with open(filename, "w+b") as f:
                     f.write("%s\n" % NETSCAPE_FORMAT_HEADER_COOKIES)
                     for line in lines:
                         f.write("\n%s" % "\t".join(line.split()))
+
                 cookieJar.filename = filename
-            cookieJar.load(cookieJar.filename)
+
+            cookieJar.load(cookieJar.filename, ignore_expires=True)
+
+            for cookie in cookieJar:
+                if cookie.expires < time.time():
+                    warnMsg = "cookie '%s' has expired" % cookie
+                    singleTimeWarnMessage(warnMsg)
+
+            cookieJar.clear_expired_cookies()
+
             if not cookieJar._cookies:
-                errMsg = "no valid cookies found. Please "
-                errMsg += "make sure that cookies aren't expired"
+                errMsg = "no valid cookies found"
                 raise SqlmapGenericException(errMsg)
+
         except cookielib.LoadError, msg:
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % msg
