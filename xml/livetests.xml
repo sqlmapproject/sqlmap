@@ -62,7 +62,7 @@
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="current user:    'root@%'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -106,7 +106,7 @@
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="current user:    'root@%'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -150,7 +150,7 @@
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="current user:    'root@%'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -194,7 +194,7 @@
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="current user:    'root@%'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -252,7 +252,7 @@
             <item value="Title: MySQL inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="current user:    'root@%'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -3484,7 +3484,7 @@
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="current user:    'root@%'"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
