@@ -148,12 +148,13 @@ def _setRequestParams():
         elif test[0] in ("q", "Q"):
             raise SqlmapUserQuitException
 
-    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, re.sub(r"\bq=[^;']+", "", str(conf.httpHeaders)))):
-        if CUSTOM_INJECTION_MARK_CHAR in (value or ""):
+    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
+        _ = re.sub(r"\bq=[^;']+", "", value or "")
+        if CUSTOM_INJECTION_MARK_CHAR in _:
             if kb.processUserMarks is None:
-                _ = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer'}
+                lut = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer/--cookie'}
                 message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
-                message += "'%s'. Do you want to process it? [Y/n/q] " % _[place]
+                message += "'%s'. Do you want to process it? [Y/n/q] " % lut[place]
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):
                     raise SqlmapUserQuitException
@@ -187,7 +188,9 @@ def _setRequestParams():
                     for index in xrange(len(conf.httpHeaders)):
                         header, value = conf.httpHeaders[index]
                         if CUSTOM_INJECTION_MARK_CHAR in re.sub(r"\bq=[^;']+", "", value):
-                            conf.paramDict[place][header] = "%s,%s" % (header, value)
+                            parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
+                            for i in xrange(len(parts) - 1):
+                                conf.paramDict[place]["%s #%d%s" % (header, i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "%s,%s" % (header, "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts))))
                             conf.httpHeaders[index] = (header, value.replace(CUSTOM_INJECTION_MARK_CHAR, ""))
                 else:
                     parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
@@ -203,8 +206,9 @@ def _setRequestParams():
                 testableParameters = True
 
     if kb.processUserMarks:
-        conf.url = conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, "")
-        conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, "") if conf.data else conf.data
+        for item in ("url", "data", "agent", "referer", "cookie"):
+            if conf.get(item):
+                conf[item] = conf[item].replace(CUSTOM_INJECTION_MARK_CHAR, "")
 
     # Perform checks on Cookie parameters
     if conf.cookie:
