@@ -16,6 +16,7 @@ from lib.core.common import cleanQuery
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import extractExpectedValue
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getTechniqueData
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import initTechnique
@@ -416,7 +417,15 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     return extractExpectedValue(value, expected)
 
 def goStacked(expression, silent=False):
-    kb.technique = PAYLOAD.TECHNIQUE.STACKED
+    if PAYLOAD.TECHNIQUE.STACKED in kb.injection.data:
+        kb.technique = PAYLOAD.TECHNIQUE.STACKED
+    else:
+        for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
+            _ = getTechniqueData(technique)
+            if _ and "stacked" in _["title"].lower():
+                kb.technique = technique
+                break
+
     expression = cleanQuery(expression)
 
     if conf.direct:
