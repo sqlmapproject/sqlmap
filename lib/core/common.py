@@ -104,6 +104,7 @@ from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MIN_VALID_DELAYED_RESPONSE
 from lib.core.settings import ML
+from lib.core.settings import NETSCAPE_FORMAT_HEADER_COOKIES
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_AMP_MARKER
 from lib.core.settings import PARAMETER_SEMICOLON_MARKER
@@ -3354,8 +3355,15 @@ def resetCookieJar(cookieJar):
         cookieJar.clear()
     else:
         try:
-            cookieJar.load(conf.loadCookies)
-            cookieJar.clear_expired_cookies()
+            content = readCachedFileContent(conf.loadCookies)
+            lines = filter(None, (line.strip() for line in content.split("\n") if not line.startswith('#')))
+            handle, filename = tempfile.mkstemp()
+            os.close(handle)
+            with open(filename, "w+b") as f:
+                f.write("%s\n" % NETSCAPE_FORMAT_HEADER_COOKIES)
+                for line in lines:
+                    f.write("\n%s" % "\t".join(line.split()))
+            cookieJar.load(filename)
         except cookielib.LoadError, msg:
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % msg

@@ -516,6 +516,9 @@ MIN_ENCODED_LEN_CHECK = 5
 # Timeout in seconds in which Metasploit remote session has to be initialized
 METASPLOIT_SESSION_TIMEOUT = 120
 
+# Reference: http://www.cookiecentral.com/faq/#3.5
+NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
+
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
 table{
