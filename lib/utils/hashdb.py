@@ -110,7 +110,7 @@ class HashDB(object):
                             self.cursor.execute("INSERT INTO storage VALUES (?, ?)", (hash_, value,))
                         except sqlite3.IntegrityError:
                             self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
-                    except sqlite3.OperationalError, ex:
+                    except sqlite3.DatabaseError, ex:
                         if not os.path.exists(self.filepath):
                             debugMsg = "session file '%s' does not exist" % self.filepath
                             logger.debug(debugMsg)
