@@ -154,7 +154,7 @@
         <substring query="SUBSTRING((%s),%d,%d)"/>
         <concatenate query="%s+%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <hex query="master.sys.fn_varbintohexstr(CAST(%s AS VARBINARY(MAX)))"/>
+        <hex query="master.sys.fn_varbintohexstr(CAST(%s AS VARBINARY(8000)))"/>
         <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
