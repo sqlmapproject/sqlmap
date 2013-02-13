@@ -40,7 +40,7 @@ class Miscellaneous:
             debugMsg = "identifying Microsoft SQL Server error log directory "
             debugMsg += "that sqlmap will use to store temporary files with "
             debugMsg += "commands' output"
-            logger.debugMsg(debugMsg)
+            logger.debug(debugMsg)
 
             _ = unArrayizeValue(inject.getValue("SELECT SERVERPROPERTY('ErrorLogFileName')", safeCharEncode=False))
 
