@@ -10,6 +10,7 @@ import re
 
 from lib.core.common import Backend
 from lib.core.common import hashDBWrite
+from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -125,7 +126,7 @@ class Miscellaneous:
             self.delRemoteFile(self.webStagerFilePath)
             self.delRemoteFile(self.webBackdoorFilePath)
 
-        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+        if not isStackingAvailable() and not conf.direct:
             return
 
         if Backend.isOs(OS.WINDOWS):

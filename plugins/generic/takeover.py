@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 
 from lib.core.common import Backend
+from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
@@ -41,9 +42,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         Abstraction.__init__(self)
 
     def osCmd(self):
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
+        if isStackingAvailable() or conf.direct:
             web = False
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and Backend.isDbms(DBMS.MYSQL):
+        elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
             infoMsg = "going to use a web backdoor for command execution"
             logger.info(infoMsg)
 
@@ -63,9 +64,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             self.cleanup(web=web)
 
     def osShell(self):
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
+        if isStackingAvailable() or conf.direct:
             web = False
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and Backend.isDbms(DBMS.MYSQL):
+        elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
             infoMsg = "going to use a web backdoor for command prompt"
             logger.info(infoMsg)
 
@@ -153,7 +154,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 self.sysUdfs.pop("sys_bineval")
 
-        if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) or conf.direct:
+        if isStackingAvailable() or conf.direct:
             web = False
 
             self.getRemoteTempPath()
@@ -202,7 +203,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 self.uploadIcmpshSlave(web=web)
                 self.icmpPwn()
 
-        elif not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and Backend.isDbms(DBMS.MYSQL):
+        elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
             web = True
 
             infoMsg = "going to use a web backdoor to establish the tunnel"
@@ -250,7 +251,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             errMsg += "relay attack"
             raise SqlmapUnsupportedDBMSException(errMsg)
 
-        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+        if not isStackingAvailable() and not conf.direct:
             if Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.MSSQL):
                 errMsg = "on this back-end DBMS it is only possible to "
                 errMsg += "perform the SMB relay attack if stacked "
@@ -292,7 +293,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self.smb()
 
     def osBof(self):
-        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+        if not isStackingAvailable() and not conf.direct:
             return
 
         if not Backend.isDbms(DBMS.MSSQL) or not Backend.isVersionWithin(("2000", "2005")):
@@ -328,7 +329,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         raise SqlmapUndefinedMethod(errMsg)
 
     def _regInit(self):
-        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED) and not conf.direct:
+        if not isStackingAvailable() and not conf.direct:
             return
 
         self.checkDbmsOs()

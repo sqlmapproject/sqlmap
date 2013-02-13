@@ -2399,6 +2399,24 @@ def isTechniqueAvailable(technique):
     else:
         return getTechniqueData(technique) is not None
 
+def isStackingAvailable():
+    """
+    Returns True whether techniques using stacking are available
+    """
+
+    retVal = False
+
+    if PAYLOAD.TECHNIQUE.STACKED in kb.injection.data:
+        retVal = True
+    else:
+        for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
+            _ = getTechniqueData(technique)
+            if _ and "stacked" in _["title"].lower():
+                retVal = True
+                break
+
+    return retVal
+
 def isInferenceAvailable():
     """
     Returns True whether techniques using inference technique are available

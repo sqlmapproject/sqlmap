@@ -14,6 +14,7 @@ from lib.core.common import decloakToTemp
 from lib.core.common import decodeHexValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
+from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -189,8 +190,8 @@ class Filesystem:
             fileContent = None
             kb.fileReadMode = True
 
-            if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-                if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+            if conf.direct or isStackingAvailable():
+                if isStackingAvailable():
                     debugMsg = "going to read the file with stacked query SQL "
                     debugMsg += "injection technique"
                     logger.debug(debugMsg)
@@ -260,8 +261,8 @@ class Filesystem:
         if localFile.endswith('_'):
             localFile = decloakToTemp(localFile)
 
-        if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
-            if isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED):
+        if conf.direct or isStackingAvailable():
+            if isStackingAvailable():
                 debugMsg = "going to upload the %s file with " % fileType
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
