@@ -516,7 +516,8 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
     finally:
         if hasattr(proc_count, "value"):
-            proc_count.value -= 1
+            with proc_count.get_lock():
+                proc_count.value -= 1
 
 def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
     count = 0
@@ -586,7 +587,8 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
     finally:
         if hasattr(proc_count, "value"):
-            proc_count.value -= 1
+            with proc_count.get_lock():
+                proc_count.value -= 1
 
 def dictionaryAttack(attack_dict):
     suffix_list = [""]
