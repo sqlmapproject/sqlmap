@@ -37,7 +37,13 @@ class Miscellaneous:
 
     def getRemoteTempPath(self):
         if not conf.tmpPath and Backend.isDbms(DBMS.MSSQL):
+            debugMsg = "identifying Microsoft SQL Server error log directory "
+            debugMsg += "that sqlmap will use to store temporary files with "
+            debugMsg += "commands' output"
+            logger.debugMsg(debugMsg)
+
             _ = unArrayizeValue(inject.getValue("SELECT SERVERPROPERTY('ErrorLogFileName')", safeCharEncode=False))
+
             if _:
                 conf.tmpPath = ntpath.dirname(_)
 
@@ -62,6 +68,9 @@ class Miscellaneous:
 
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
+
+        debugMsg = "going to use %s as temporary files directory" % conf.tmpPath
+        logger.debug(debugMsg)
 
         hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 
