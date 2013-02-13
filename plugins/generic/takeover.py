@@ -9,14 +9,12 @@ import os
 
 from lib.core.common import Backend
 from lib.core.common import isStackingAvailable
-from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges

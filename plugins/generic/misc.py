@@ -11,7 +11,6 @@ import re
 from lib.core.common import Backend
 from lib.core.common import hashDBWrite
 from lib.core.common import isStackingAvailable
-from lib.core.common import isTechniqueAvailable
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import posixToNtSlashes
@@ -24,7 +23,6 @@ from lib.core.data import queries
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject

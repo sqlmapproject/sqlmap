@@ -10,12 +10,10 @@ from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import getSQLSnippet
 from lib.core.common import isStackingAvailable
-from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
-from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
