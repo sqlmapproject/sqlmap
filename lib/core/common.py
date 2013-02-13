@@ -1576,7 +1576,7 @@ def getSQLSnippet(dbms, sfile, **variables):
     for _ in re.findall(r"%RANDINT\d+%", retVal, re.I):
         retVal = retVal.replace(_, randomInt())
 
-    variables = re.findall(r"(?<!\bLIKE\s*')%(\w+)%", retVal, re.I)
+    variables = re.findall(r"(?<!\bLIKE ')%(\w+)%", retVal, re.I)
 
     if variables:
         errMsg = "unresolved variable%s '%s' in SQL file '%s'" % ("s" if len(variables) > 1 else "", ", ".join(variables), sfile)
