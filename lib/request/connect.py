@@ -56,6 +56,7 @@ from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapValueException
+from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -666,6 +667,7 @@ class Connect(object):
 
         if PLACE.CUSTOM_POST in conf.parameters:
             post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR, "") if place != PLACE.CUSTOM_POST or not value else value
+            post = post.replace(ASTERISK_MARKER, '*') if post else post
 
         if PLACE.COOKIE in conf.parameters:
             cookie = conf.parameters[PLACE.COOKIE] if place != PLACE.COOKIE or not value else value

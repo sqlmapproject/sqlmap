@@ -39,6 +39,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import _setDBMS
 from lib.core.option import _setKnowledgeBaseAttributes
 from lib.core.option import _setAuthCred
+from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import JSON_RECOGNITION_REGEX
@@ -85,16 +86,14 @@ def _setRequestParams():
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST
 
-        if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
-            pass
-
-        elif re.search(JSON_RECOGNITION_REGEX, conf.data):
+        if re.search(JSON_RECOGNITION_REGEX, conf.data):
             message = "JSON like data found in POST data. "
             message += "Do you want to process it? [Y/n/q] "
             test = readInput(message, default="Y")
             if test and test[0] in ("q", "Q"):
                 raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
+                conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                 conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 conf.data = re.sub(r'("[^"]+"\s*:\s*)(-?\d[\d\.]*\b)', r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.JSON
@@ -106,6 +105,7 @@ def _setRequestParams():
             if test and test[0] in ("q", "Q"):
                 raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
+                conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                 conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
@@ -116,8 +116,12 @@ def _setRequestParams():
             if test and test[0] in ("q", "Q"):
                 raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
+                conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                 conf.data = re.sub(r"(?si)(Content-Disposition.+?)((\r)?\n--)", r"\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.MULTIPART
+
+        elif CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
+            pass
 
         else:
             place = PLACE.POST
@@ -149,7 +153,7 @@ def _setRequestParams():
             raise SqlmapUserQuitException
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
-        _ = re.sub(r"\bq=[^;']+", "", value or "")
+        _ = re.sub(r"\bq=[^;']+", "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
         if CUSTOM_INJECTION_MARK_CHAR in _:
             if kb.processUserMarks is None:
                 lut = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer/--cookie'}
