@@ -665,7 +665,7 @@ def cmdLineParser():
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--binary", dest="binary",
+        parser.add_option("--binary-fields", dest="binaryFields",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int",
