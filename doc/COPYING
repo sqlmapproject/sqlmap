@@ -350,6 +350,7 @@ This license does not apply to the following components:
 
 * The Ansistrm library located under thirdparty/ansistrm/.
 * The Beautiful Soup library located under thirdparty/beautifulsoup/.
+* The Bottle library located under thirdparty/bottle/.
 * The Chardet library located under thirdparty/chardet/.
 * The ClientForm library located under thirdparty/clientform/.
 * The Colorama library located under thirdparty/colorama/.
