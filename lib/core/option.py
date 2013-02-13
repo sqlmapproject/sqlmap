@@ -309,6 +309,8 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     elif key not in (HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION):
                         conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
 
+            data = data.rstrip("\r\n") if data else data
+
             if getPostReq and (params or cookie):
                 if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
                     port = "443"
