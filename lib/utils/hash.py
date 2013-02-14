@@ -339,7 +339,7 @@ def attackCachedUsersPasswords():
 
         for user in kb.data.cachedUsersPasswords.keys():
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                value = kb.data.cachedUsersPasswords[user][i].lower()
+                value = kb.data.cachedUsersPasswords[user][i].lower().split()[0]
                 if value in lut:
                     kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', lut[value])
 
