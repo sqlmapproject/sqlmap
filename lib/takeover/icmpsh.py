@@ -18,7 +18,6 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.exception import SqlmapFilePathException
 
 class ICMPsh:
     """
