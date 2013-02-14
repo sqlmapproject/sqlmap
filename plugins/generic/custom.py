@@ -38,7 +38,7 @@ class Custom:
                     sqlType = sqlTitle
                     break
 
-        if "OPENROWSET" not in query.upper() and (not sqlType or "SELECT" in sqlType):
+        if not any(_ in query.upper() for _ in ("OPENROWSET", "INTO")) and (not sqlType or "SELECT" in sqlType):
             infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
             logger.info(infoMsg)
 
