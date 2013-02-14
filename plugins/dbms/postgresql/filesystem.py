@@ -28,7 +28,7 @@ class Filesystem(GenericFilesystem):
 
         return self.udfEvalCmd(cmd=rFile, udfName="sys_fileread")
 
-    def unionWriteFile(self, wFile, dFile, fileType):
+    def unionWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         errMsg = "PostgreSQL does not support file upload with UNION "
         errMsg += "query SQL injection technique"
         raise SqlmapUnsupportedFeatureException(errMsg)

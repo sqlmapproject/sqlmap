@@ -158,7 +158,7 @@ class Filesystem(GenericFilesystem):
 
         return result
 
-    def unionWriteFile(self, wFile, dFile, fileType):
+    def unionWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         errMsg = "Microsoft SQL Server does not support file upload with "
         errMsg += "UNION query SQL injection technique"
         raise SqlmapUnsupportedFeatureException(errMsg)
@@ -340,8 +340,7 @@ class Filesystem(GenericFilesystem):
             wFileContent = f.read()
 
         self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
-
-        written = self.askCheckWrittenFile(wFile, dFile)
+        written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         if written is False:
             message = "do you want to try to upload the file with "

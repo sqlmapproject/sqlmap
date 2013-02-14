@@ -171,12 +171,12 @@ class Filesystem:
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod(errMsg)
 
-    def unionWriteFile(self, localFile, remoteFile, fileType):
+    def unionWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
         errMsg = "'unionWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod(errMsg)
 
-    def stackedWriteFile(self, localFile, remoteFile, fileType):
+    def stackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
         errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod(errMsg)

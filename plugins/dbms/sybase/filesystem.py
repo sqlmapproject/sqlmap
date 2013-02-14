@@ -16,6 +16,6 @@ class Filesystem(GenericFilesystem):
         errMsg = "on Sybase it is not possible to read files"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
-    def writeFile(self, wFile, dFile, fileType=None):
+    def writeFile(self, wFile, dFile, fileType=None, forceCheck=False):
         errMsg = "on Sybase it is not possible to write files"
         raise SqlmapUnsupportedFeatureException(errMsg)
