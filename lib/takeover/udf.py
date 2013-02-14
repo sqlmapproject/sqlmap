@@ -164,6 +164,8 @@ class UDF:
                     written = True
                 else:
                     return False
+        else:
+            return True
 
         for udf, inpRet in udfDict.items():
             if udf in self.udfToCreate and udf not in self.createdUdf:
