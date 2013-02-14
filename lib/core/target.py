@@ -279,7 +279,7 @@ def _setRequestParams():
 
     elif not testableParameters:
         errMsg = "all testable parameters you provided are not present "
-        errMsg += "within the GET, POST and Cookie parameters"
+        errMsg += "within the given request data"
         raise SqlmapGenericException(errMsg)
 
 def _setHashDB():
