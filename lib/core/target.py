@@ -88,9 +88,9 @@ def _setRequestParams():
         conf.method = HTTPMETHOD.POST
 
         def process(match, repl):
-            if conf.testParameter and match.group("name") not in conf.testParameter:
-                retVal = match.group(0)
-            else:
+            retVal = match.group(0)
+
+            if not (conf.testParameter and match.group("name") not in conf.testParameter):
                 retVal = repl
                 while True:
                     _ = re.search(r"\\g<([^>]+)>", retVal)
@@ -98,6 +98,7 @@ def _setRequestParams():
                         retVal = retVal.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
                     else:
                         break
+
             return retVal
 
         if re.search(JSON_RECOGNITION_REGEX, conf.data):
