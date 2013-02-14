@@ -88,8 +88,10 @@ class Web:
             else:
                 with open(filepath, "rb") as f:
                     content = f.read()
+
         if content is not None:
             stream = StringIO.StringIO(content)  # string content
+
         return self._webFileStreamUpload(stream, destFileName, directory)
 
     def _webFileStreamUpload(self, stream, destFileName, directory):
@@ -114,12 +116,15 @@ class Web:
             page = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
             if "File uploaded" not in page:
-                warnMsg = "unable to upload the backdoor through "
-                warnMsg += "the file stager on '%s'" % directory
+                warnMsg = "unable to upload the file through the web file "
+                warnMsg += "stager to '%s'" % directory
                 logger.warn(warnMsg)
                 return False
             else:
                 return True
+        else:
+            logger.error("sqlmap has not got a web backdoor nor a web file stager for %s" % self.webApi)
+            return False
 
     def _webFileInject(self, fileContent, fileName, directory):
         outFile = posixpath.normpath("%s/%s" % (directory, fileName))
@@ -151,9 +156,6 @@ class Web:
             return
 
         self.checkDbmsOs()
-
-        infoMsg = "trying to upload the file stager"
-        logger.info(infoMsg)
 
         default = None
         choices = list(getPublicTypeMembers(WEB_API, True))
@@ -199,7 +201,6 @@ class Web:
 
         stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
         stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
-
         success = False
 
         for docRoot in kb.docRoot:
@@ -226,7 +227,6 @@ class Web:
                 else:
                     localPath = directory
                     uriPath = directory[2:] if isWindowsDriveLetterPath(directory) else directory
-                    docRoot = docRoot[2:] if isWindowsDriveLetterPath(docRoot) else docRoot
 
                     if docRoot in uriPath:
                         uriPath = uriPath.replace(docRoot, "/")
@@ -243,6 +243,9 @@ class Web:
                 uriPath = posixpath.normpath(uriPath).rstrip('/')
 
                 # Upload the file stager with the LIMIT 0, 1 INTO OUTFILE technique
+                infoMsg = "trying to upload the file stager on '%s' " % localPath
+                infoMsg += "via LIMIT INTO OUTFILE technique"
+                logger.info(infoMsg)
                 self._webFileInject(stagerContent, stagerName, localPath)
 
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, uriPath)
@@ -259,8 +262,8 @@ class Web:
                     singleTimeWarnMessage(warnMsg)
 
                     if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                        infoMsg = "trying to upload the file stager via "
-                        infoMsg += "UNION technique"
+                        infoMsg = "trying to upload the file stager on '%s' " % localPath
+                        infoMsg += "via UNION technique"
                         logger.info(infoMsg)
 
                         handle, filename = mkstemp()
