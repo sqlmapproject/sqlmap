@@ -874,6 +874,9 @@ class Agent(object):
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
                     limitedQuery += "%s %s ORDER BY %s) ORDER BY %s" % (self.nullAndCastField(uniqueField or field), fromFrom, uniqueField or "1", uniqueField or "1")
                 else:
+                    match = re.search(" ORDER BY (\w+)\Z", query)
+                    field = match.group(1) if match else field
+
                     if " WHERE " in limitedQuery:
                         limitedQuery = "%s AND %s " % (limitedQuery, field)
                     else:
