@@ -619,11 +619,12 @@ def getDocRoot():
             if any("/%s/" % _ in absFilePath for _ in GENERIC_DOC_ROOT_DIRECTORY_NAMES):
                 for _ in GENERIC_DOC_ROOT_DIRECTORY_NAMES:
                     _ = "/%s/" % _
+
                     if _ in absFilePath:
                         docRoot = "%s%s" % (absFilePath.split(_)[0], _)
                         break
 
-            elif pagePath in absFilePath:
+            if pagePath in absFilePath:
                 docRoot = absFilePath.split(pagePath)[0]
                 if windowsDriveLetter:
                     docRoot = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(docRoot))
