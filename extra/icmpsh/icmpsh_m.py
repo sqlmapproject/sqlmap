@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  icmpsh - simple icmp command shell (port of icmpsh-m.pl written in
 #  Perl by Nico Leidecker <nico@leidecker.info>)

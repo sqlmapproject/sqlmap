@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 
 # Runs pylint on all python scripts found in a directory tree
 # Reference: http://rowinggolfer.blogspot.com/2009/08/pylint-recursively.html

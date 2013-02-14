@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Script for getting Google Page Rank of page
 #  Google Toolbar 3.0.x/4.0.x Pagerank Checksum Algorithm
