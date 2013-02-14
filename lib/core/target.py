@@ -45,6 +45,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import JSON_RECOGNITION_REGEX
 from lib.core.settings import MULTIPART_RECOGNITION_REGEX
+from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_RECOGNITION_REGEX
@@ -168,7 +169,7 @@ def _setRequestParams():
             raise SqlmapUserQuitException
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
-        _ = re.sub(r"\bq=[^;']+", "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
+        _ = re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
         if CUSTOM_INJECTION_MARK_CHAR in _:
             if kb.processUserMarks is None:
                 lut = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer/--cookie'}
@@ -206,7 +207,7 @@ def _setRequestParams():
                 if place == PLACE.CUSTOM_HEADER:
                     for index in xrange(len(conf.httpHeaders)):
                         header, value = conf.httpHeaders[index]
-                        if CUSTOM_INJECTION_MARK_CHAR in re.sub(r"\bq=[^;']+", "", value):
+                        if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value):
                             parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
                             for i in xrange(len(parts) - 1):
                                 conf.paramDict[place]["%s #%d%s" % (header, i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "%s,%s" % (header, "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts))))
