@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """
 Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
@@ -178,8 +178,7 @@ class Xp_cmdshell:
         return agent.runAsDBMSUser(self._forgedCmd)
 
     def xpCmdshellExecCmd(self, cmd, silent=False):
-        cmd = self.xpCmdshellForgeCmd(cmd)
-        return inject.goStacked(cmd, silent)
+        return inject.goStacked(self.xpCmdshellForgeCmd(cmd), silent)
 
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
         if conf.direct:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #Copyright (c) 2010, Chris Hall <chris.hall@mod10.net>
 #All rights reserved.
