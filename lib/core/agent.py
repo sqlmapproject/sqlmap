@@ -94,7 +94,12 @@ class Agent(object):
         elif place == PLACE.CUSTOM_POST:
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
-            origValue = extractRegexResult(r"(?s)(?P<result>(\W+\Z|\w+\Z))", origValue)
+            if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
+                origValue = origValue.split('>')[-1]
+            elif kb.postHint == POST_HINT.JSON:
+                origValue = extractRegexResult(r"(?s)(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)(?P<result>[^"]+\Z)', origValue)
+            else:
+                origValue = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"]+\Z)", origValue)
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
