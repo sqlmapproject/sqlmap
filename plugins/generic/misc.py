@@ -15,6 +15,7 @@ from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import posixToNtSlashes
 from lib.core.common import readInput
+from lib.core.common import singleTimeDebugMessage
 from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
@@ -69,8 +70,7 @@ class Miscellaneous:
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
 
-        debugMsg = "going to use %s as temporary files directory" % conf.tmpPath
-        logger.debug(debugMsg)
+        singleTimeDebugMessage("going to use %s as temporary files directory" % conf.tmpPath)
 
         hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 
