@@ -119,7 +119,11 @@ class Miscellaneous:
 
     def createSupportTbl(self, tblName, tblField, tblType):
         inject.goStacked("DROP TABLE %s" % tblName, silent=True)
-        inject.goStacked("CREATE TABLE %s(id INT PRIMARY KEY IDENTITY, %s %s)" % (tblName, tblField, tblType))
+
+        if Backend.isDbms(DBMS.MSSQL) and tblName == self.cmdTblName:
+            inject.goStacked("CREATE TABLE %s(id INT PRIMARY KEY IDENTITY, %s %s)" % (tblName, tblField, tblType))
+        else:
+            inject.goStacked("CREATE TABLE %s(%s %s)" % (tblName, tblField, tblType))
 
     def cleanup(self, onlyFileTbl=False, udfDict=None, web=False):
         """
