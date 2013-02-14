@@ -568,16 +568,16 @@ def paramToDict(place, parameters=None):
             parameter = conf.testParameter[0]
 
             if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
-                warnMsg = "provided parameter '%s' " % paramStr
-                warnMsg += "is not inside the %s" % place
-                logger.warn(warnMsg)
+                debugMsg = "provided parameter '%s' " % paramStr
+                debugMsg += "is not inside the %s" % place
+                logger.debug(debugMsg)
 
     elif len(conf.testParameter) != len(testableParameters.keys()):
         for parameter in conf.testParameter:
             if parameter not in testableParameters:
-                warnMsg = "provided parameter '%s' " % parameter
-                warnMsg += "is not inside the %s" % place
-                logger.warn(warnMsg)
+                debugMsg = "provided parameter '%s' " % parameter
+                debugMsg += "is not inside the %s" % place
+                logger.debug(debugMsg)
 
     if testableParameters:
         for parameter, value in testableParameters.items():
