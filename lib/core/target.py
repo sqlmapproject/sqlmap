@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-import functools
 import os
 import re
 import tempfile
@@ -87,19 +86,6 @@ def _setRequestParams():
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST
 
-        def process(match, repl):
-            if conf.testParameter and match.group("name") not in conf.testParameter:
-                retVal = match.group(0)
-            else:
-                retVal = repl
-                while True:
-                    _ = re.search(r"\\g<([^>]+)>", retVal)
-                    if _:
-                        retVal = retVal.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
-                    else:
-                        break
-            return retVal
-
         if re.search(JSON_RECOGNITION_REGEX, conf.data):
             message = "JSON like data found in POST data. "
             message += "Do you want to process it? [Y/n/q] "
@@ -108,8 +94,8 @@ def _setRequestParams():
                 raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
                 conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
-                conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*"[^"]+)"', functools.partial(process, repl=r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
-                conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*\b)', functools.partial(process, repl=r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
+                conf.data = re.sub(r'("[^"]+"\s*:\s*"[^"]+)"', r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
+                conf.data = re.sub(r'("[^"]+"\s*:\s*)(-?\d[\d\.]*\b)', r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.JSON
 
         elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
@@ -120,7 +106,7 @@ def _setRequestParams():
                 raise SqlmapUserQuitException
             elif test[0] not in ("n", "N"):
                 conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
-                conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
+                conf.data = re.sub(r"(<([^>]+)( [^<]*)?>)([^<]+)(</\2)", r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
         elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
