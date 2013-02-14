@@ -171,10 +171,10 @@ class Abstraction(Web, UDF, Xp_cmdshell):
         #    expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
         #    inject.goStacked(expression)
 
-    def initEnv(self, mandatory=True, detailed=False, web=False):
+    def initEnv(self, mandatory=True, detailed=False, web=False, forceInit=False):
         self._initRunAs()
 
-        if self.envInitialized:
+        if self.envInitialized and not forceInit:
             return
 
         if web:
