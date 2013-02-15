@@ -829,6 +829,10 @@ def readInput(message, default=None, checkBatch=True):
     elif message[-1] == ']':
         message += " "
 
+    if kb.prependFlag:
+        message = "\n%s" % message
+        kb.prependFlag = False
+
     if conf.answers:
         for item in conf.answers.split(','):
             question = item.split('=')[0].strip()
