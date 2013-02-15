@@ -3442,7 +3442,7 @@
             <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
-    <case name="Predict output enumeration">
+    <case name="Boolean-based predict output enumeration">
         <switches>
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
@@ -3453,6 +3453,19 @@
         <parse>
             <item value="banner:    '5.1.66-0+squeeze1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
+        </parse>
+    </case>
+    <case name="Time-based predict output enumeration">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
+            <predictOutput value="True"/>
+            <tech value="T"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+            <item value="r'performed 126 queries'" console_output="True"/>
         </parse>
     </case>
     <case name="Hex conversion data retrival">
