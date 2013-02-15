@@ -396,7 +396,7 @@ class Entries:
 
             conf.db = db
             dumpFromTbls = []
-            message = "which table(s) of database '%s'?\n" % db
+            message = "which table(s) of database '%s'?\n" % unsafeSQLIdentificatorNaming(db)
             message += "[a]ll (default)\n"
 
             for tbl in tblData:
