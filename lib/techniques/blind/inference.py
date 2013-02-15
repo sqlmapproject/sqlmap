@@ -483,7 +483,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if commonValue is not None:
                         # One-shot query containing equals commonValue
                         testValue = unescaper.escape("'%s'" % commonValue) if "'" not in commonValue else unescaper.escape("%s" % commonValue, quote=False)
-                        query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (expressionUnescaped, testValue)))
+
+                        if timeBasedCompare:
+                            query = kb.injection.data[kb.technique].vector.replace("[RANDNUM]", testValue)
+                            query = agent.prefixQuery(query.replace("[INFERENCE]", "(%s)=%s" % (expressionUnescaped, testValue)))
+                        else:
+                            query = agent.prefixQuery(safeStringFormat("AND (%s)=%s", (expressionUnescaped, testValue)))
+
                         query = agent.suffixQuery(query)
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
                         incrementCounter(kb.technique)
@@ -504,7 +510,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # Substring-query containing equals commonPattern
                         subquery = queries[Backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
                         testValue = unescaper.escape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.escape("%s" % commonPattern, quote=False)
-                        query = agent.prefixQuery(safeStringFormat("AND (%s) = %s", (subquery, testValue)))
+
+                        if timeBasedCompare:
+                            query = kb.injection.data[kb.technique].vector.replace("[RANDNUM]", testValue)
+                            query = agent.prefixQuery(query.replace("[INFERENCE]", "(%s)=%s" % (subquery, testValue)))
+                        else:
+                            query = agent.prefixQuery(safeStringFormat("AND (%s)=%s", (subquery, testValue)))
+
                         query = agent.suffixQuery(query)
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
                         incrementCounter(kb.technique)
