@@ -189,7 +189,7 @@ class Search:
             logger.info(infoMsg)
 
             tblQuery = "%s%s" % (tblCond, tblCondParam)
-            tblQuery = tblQuery % tbl
+            tblQuery = tblQuery % unsafeSQLIdentificatorNaming(tbl)
 
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 query = rootQuery.inband.query
@@ -505,7 +505,7 @@ class Search:
 
                 for column, dbData in foundCols.items():
                     colQuery = "%s%s" % (colCond, colCondParam)
-                    colQuery = colQuery % column
+                    colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
                     for db in dbData:
                         db = safeSQLIdentificatorNaming(db)
