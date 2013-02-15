@@ -774,6 +774,10 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             else:
                 message = data
 
+            if kb.prependFlag:
+                message = "\n%s" % message
+                kb.prependFlag = False
+
             if hasattr(conf, "api"):
                 sys.stdout.write(message, status, content_type)
             else:
