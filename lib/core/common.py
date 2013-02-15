@@ -2818,8 +2818,6 @@ def safeSQLIdentificatorNaming(name, isTable=False):
         if retVal.upper() in kb.keywords or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ("." if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
                 retVal = "`%s`" % retVal.strip("`")
-            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,) and not isTable:
-                retVal = "\"%s\"" % retVal.strip("\"")
             elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2):
                 retVal = "\"%s\"" % retVal.strip("\"")
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
