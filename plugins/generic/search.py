@@ -263,7 +263,7 @@ class Search:
                     else:
                         for db in conf.db.split(","):
                             if db not in foundTbls:
-                                foundTbls[db] = []
+                                foundTbls[safeSQLIdentificatorNaming(db)] = []
                 else:
                     dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
                     foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
@@ -289,7 +289,7 @@ class Search:
                         if tblConsider == "1":
                             warnMsg += "s like"
                         warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "in database '%s'" % db
+                        warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                         logger.warn(warnMsg)
 
                         continue
