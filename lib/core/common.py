@@ -853,8 +853,7 @@ def readInput(message, default=None, checkBatch=True):
             else:
                 options = unicode()
 
-            infoMsg = "%s%s" % (getUnicode(message), options)
-            logger.info(infoMsg)
+            dataToStdout("\r%s%s" % (getUnicode(message), options), forceOutput=True, bold=True)
 
             debugMsg = "used the default behaviour, running in batch mode"
             logger.debug(debugMsg)
@@ -864,6 +863,7 @@ def readInput(message, default=None, checkBatch=True):
             logging._acquireLock()
             dataToStdout("\r%s" % message, forceOutput=True, bold=True)
             kb.prependFlag = False
+
             try:
                 retVal = raw_input() or default
                 retVal = getUnicode(retVal, system=True) if retVal else retVal
@@ -871,6 +871,7 @@ def readInput(message, default=None, checkBatch=True):
                 time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
                 kb.prependFlag = True
                 raise SqlmapUserQuitException
+
             finally:
                 logging._releaseLock()
 
