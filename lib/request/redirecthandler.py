@@ -90,13 +90,13 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         redirectMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
         if headers:
-            logHeaders = "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in headers.items())
+            logHeaders = "\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in headers.items())
         else:
             logHeaders = ""
 
         redirectMsg += logHeaders
         if content:
-            redirectMsg += "\n\n%s" % content[:MAX_CONNECTION_CHUNK_SIZE]
+            redirectMsg += "\n\n%s" % getUnicode(content[:MAX_CONNECTION_CHUNK_SIZE])
 
         logHTTPTraffic(threadData.lastRequestMsg, redirectMsg)
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
