@@ -212,7 +212,7 @@ class Dump(object):
                     if table and isListLike(table):
                         table = table[0]
 
-                    maxlength = max(maxlength, len(normalizeUnicode(table) or str(table)))
+                    maxlength = max(maxlength, len(unsafeSQLIdentificatorNaming(normalizeUnicode(table) or str(table))))
 
             lines = "-" * (int(maxlength) + 2)
 
@@ -232,6 +232,7 @@ class Dump(object):
                     if table and isListLike(table):
                         table = table[0]
 
+                    table = unsafeSQLIdentificatorNaming(table)
                     blank = " " * (maxlength - len(normalizeUnicode(table) or str(table)))
                     self._write("| %s%s |" % (table, blank))
 
@@ -263,6 +264,7 @@ class Dump(object):
                     for column in colList:
                         colType = columns[column]
 
+                        column = unsafeSQLIdentificatorNaming(column)
                         maxlength1 = max(maxlength1, len(column or ""))
                         maxlength2 = max(maxlength2, len(colType or ""))
 
@@ -299,6 +301,8 @@ class Dump(object):
 
                     for column in colList:
                         colType = columns[column]
+
+                        column = unsafeSQLIdentificatorNaming(column)
                         blank1 = " " * (maxlength1 - len(column))
 
                         if colType is not None:

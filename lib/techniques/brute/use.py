@@ -18,6 +18,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -101,7 +102,7 @@ def tableExists(tableFile, regex=None):
 
                 if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), table)
+                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
@@ -197,7 +198,7 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), column)
+                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
