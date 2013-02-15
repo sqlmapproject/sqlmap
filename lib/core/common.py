@@ -3380,7 +3380,7 @@ def resetCookieJar(cookieJar):
 
                 content = readCachedFileContent(conf.loadCookies)
                 lines = filter(None, (line.strip() for line in content.split("\n") if not line.startswith('#')))
-                handle, filename = tempfile.mkstemp()
+                handle, filename = tempfile.mkstemp(prefix="sqlmapcj-")
                 os.close(handle)
 
                 with open(filename, "w+b") as f:

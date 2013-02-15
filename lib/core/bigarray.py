@@ -58,7 +58,7 @@ class BigArray(list):
         return ValueError, "%s is not in list" % value
 
     def _dump(self, value):
-        handle, filename = tempfile.mkstemp()
+        handle, filename = tempfile.mkstemp(prefix="sqlmapba-")
         self.filenames.add(filename)
         os.close(handle)
         with open(filename, "w+b") as fp:
