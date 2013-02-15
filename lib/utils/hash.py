@@ -305,12 +305,12 @@ def storeHashesToFile(attack_dict):
     if not attack_dict:
         return
 
-    handle, filename = tempfile.mkstemp(suffix=".txt")
+    handle, filename = tempfile.mkstemp(prefix="sqlmaphashes-", suffix=".txt")
     os.close(handle)
 
-    warnMsg = "writing hashes to file '%s' " % filename
-    warnMsg += "for eventual further processing with other tools"
-    logger.warn(warnMsg)
+    infoMsg = "writing hashes to file '%s' " % filename
+    infoMsg += "for eventual further processing with other tools"
+    logger.info(infoMsg)
 
     items = set()
 
