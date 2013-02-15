@@ -274,7 +274,7 @@ class Search:
                     infoMsg = "fetching number of table"
                     if tblConsider == "1":
                         infoMsg += "s like"
-                    infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), db)
+                    infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
@@ -393,15 +393,15 @@ class Search:
             if conf.tbl:
                 _ = conf.tbl.split(",")
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
-                infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
+                infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in _))
 
             if conf.db and conf.db != CURRENT_DB:
                 _ = conf.db.split(",")
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
-                infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
             elif conf.excludeSysDbs:
                 whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                 logger.info(infoMsg2)
             else:
                 infoMsgDb = " across all databases"
@@ -464,7 +464,7 @@ class Search:
                     infoMsg = "fetching number of databases with tables containing column"
                     if colConsider == "1":
                         infoMsg += "s like"
-                    infoMsg += " '%s'" % column
+                    infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
                     logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
                     query = rootQuery.blind.count
@@ -475,7 +475,7 @@ class Search:
                         warnMsg = "no databases have tables containing column"
                         if colConsider == "1":
                             warnMsg += "s like"
-                        warnMsg += " '%s'" % column
+                        warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
                         logger.warn("%s%s" % (warnMsg, infoMsgTbl))
 
                         continue
@@ -515,7 +515,7 @@ class Search:
                         infoMsg = "fetching number of tables containing column"
                         if colConsider == "1":
                             infoMsg += "s like"
-                        infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(column), db)
+                        infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(column), unsafeSQLIdentificatorNaming(db))
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count2
@@ -529,8 +529,8 @@ class Search:
                             warnMsg = "no tables contain column"
                             if colConsider == "1":
                                 warnMsg += "s like"
-                            warnMsg += " '%s' " % column
-                            warnMsg += "in database '%s'" % db
+                            warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(column)
+                            warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                             logger.warn(warnMsg)
 
                             continue
