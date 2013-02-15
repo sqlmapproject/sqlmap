@@ -166,8 +166,6 @@ class Task(object):
 
 # Wrapper functions for sqlmap engine
 class StdDbOut(object):
-    encoding = "UTF-8"
-
     def __init__(self, taskid, messagetype="stdout"):
         # Overwrite system standard output and standard error to write
         # to an IPC database
