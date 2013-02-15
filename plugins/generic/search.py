@@ -519,7 +519,7 @@ class Search:
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count2
-                        query = query % db
+                        query = query % unsafeSQLIdentificatorNaming(db)
                         query += " AND %s" % colQuery
                         query += whereTblsQuery
 
