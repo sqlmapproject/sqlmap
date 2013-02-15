@@ -579,9 +579,9 @@ class Dump(object):
 
         for column in dbColumnsDict.keys():
             if colConsider == "1":
-                colConsiderStr = "s like '" + column + "' were"
+                colConsiderStr = "s like '%s' were" % unsafeSQLIdentificatorNaming(column)
             else:
-                colConsiderStr = " '%s' was" % column
+                colConsiderStr = " '%s' was" % unsafeSQLIdentificatorNaming(column)
 
             msg = "Column%s found in the " % colConsiderStr
             msg += "following databases:"

@@ -508,7 +508,6 @@ class Search:
                     colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
                     for db in dbData:
-                        db = safeSQLIdentificatorNaming(db)
                         conf.db = origDb
                         conf.tbl = origTbl
 
@@ -519,7 +518,7 @@ class Search:
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count2
-                        query = query % db
+                        query = query % unsafeSQLIdentificatorNaming(db)
                         query += " AND %s" % colQuery
                         query += whereTblsQuery
 
@@ -545,7 +544,7 @@ class Search:
                             else:
                                 query += " AND %s" % (colQuery + whereTblsQuery)
 
-                            query = safeStringFormat(query, db)
+                            query = safeStringFormat(query, unsafeSQLIdentificatorNaming(db))
                             query = agent.limitQuery(index, query)
 
                             tbl = unArrayizeValue(inject.getValue(query, union=False, error=False))

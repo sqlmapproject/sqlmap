@@ -363,7 +363,7 @@ class Entries:
 
                         self.dumpTable()
                     except SqlmapNoneDataException:
-                        infoMsg = "skipping table '%s'" % table
+                        infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(table)
                         logger.info(infoMsg)
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
@@ -378,7 +378,7 @@ class Entries:
 
         for db, tblData in dbs.items():
             if tblData:
-                message += "[%s]\n" % db
+                message += "[%s]\n" % unsafeSQLIdentificatorNaming(db)
 
         message += "[q]uit"
         test = readInput(message, default="a")
@@ -396,7 +396,7 @@ class Entries:
 
             conf.db = db
             dumpFromTbls = []
-            message = "which table(s) of database '%s'?\n" % db
+            message = "which table(s) of database '%s'?\n" % unsafeSQLIdentificatorNaming(db)
             message += "[a]ll (default)\n"
 
             for tbl in tblData:
@@ -441,7 +441,7 @@ class Entries:
 
         for db, tablesList in tables.items():
             if tablesList:
-                message += "[%s]\n" % db
+                message += "[%s]\n" % unsafeSQLIdentificatorNaming(db)
 
         message += "[q]uit"
         test = readInput(message, default="a")
@@ -459,11 +459,11 @@ class Entries:
 
             conf.db = db
             dumpFromTbls = []
-            message = "which table(s) of database '%s'?\n" % db
+            message = "which table(s) of database '%s'?\n" % unsafeSQLIdentificatorNaming(db)
             message += "[a]ll (default)\n"
 
             for tbl in tablesList:
-                message += "[%s]\n" % tbl
+                message += "[%s]\n" % unsafeSQLIdentificatorNaming(tbl)
 
             message += "[s]kip\n"
             message += "[q]uit"

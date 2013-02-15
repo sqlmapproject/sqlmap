@@ -247,7 +247,7 @@ class Databases:
                 return tableExists(paths.COMMON_TABLES)
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: '%s'" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
+        infoMsg += "%s: '%s'" % ("s" if len(dbs) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(unArrayizeValue(db)) for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
@@ -261,7 +261,7 @@ class Databases:
                     query += " WHERE %s" % condition
 
                     if conf.excludeSysDbs:
-                        infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                        infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                         logger.info(infoMsg)
                         query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
                     else:
@@ -290,7 +290,7 @@ class Databases:
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    infoMsg = "skipping system database '%s'" % db
+                    infoMsg = "skipping system database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
 
                     continue
@@ -569,7 +569,7 @@ class Databases:
                    and conf.db in kb.data.cachedColumns and tbl in \
                    kb.data.cachedColumns[conf.db]:
                     infoMsg = "fetched tables' columns on "
-                    infoMsg += "database '%s'" % conf.db
+                    infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     return {conf.db: kb.data.cachedColumns[conf.db]}
@@ -692,7 +692,7 @@ class Databases:
 
         if not kb.data.cachedColumns:
             warnMsg = "unable to retrieve column names for "
-            warnMsg += ("table '%s' " % tblList[0]) if len(tblList) == 1 else "any table "
+            warnMsg += ("table '%s' " % unsafeSQLIdentificatorNaming(unArrayizeValue(tblList))) if len(tblList) == 1 else "any table "
             warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.warn(warnMsg)
 
