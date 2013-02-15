@@ -57,7 +57,7 @@ class Takeover(GenericTakeover):
 
                 break
 
-        if addrs is None:
+        if not addrs:
             errMsg = "sqlmap can not exploit the stored procedure buffer "
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
