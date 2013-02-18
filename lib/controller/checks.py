@@ -1051,7 +1051,7 @@ def checkNullConnection():
     try:
         page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD)
 
-        if not page and HTTPHEADER.CONTENT_LENGTH in headers:
+        if not page and HTTPHEADER.CONTENT_LENGTH in (headers or {}):
             kb.nullConnection = NULLCONNECTION.HEAD
 
             infoMsg = "NULL connection is supported with HEAD header"
@@ -1059,7 +1059,7 @@ def checkNullConnection():
         else:
             page, headers, _ = Request.getPage(auxHeaders={HTTPHEADER.RANGE: "bytes=-1"})
 
-            if page and len(page) == 1 and HTTPHEADER.CONTENT_RANGE in headers:
+            if page and len(page) == 1 and HTTPHEADER.CONTENT_RANGE in (headers or {}):
                 kb.nullConnection = NULLCONNECTION.RANGE
 
                 infoMsg = "NULL connection is supported with GET header "
