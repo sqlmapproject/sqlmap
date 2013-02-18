@@ -2820,6 +2820,8 @@ def safeSQLIdentificatorNaming(name, isTable=False):
                 retVal = "`%s`" % retVal.strip("`")
             elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2):
                 retVal = "\"%s\"" % retVal.strip("\"")
+            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
+                retVal = "\"%s\"" % retVal.strip("\"").upper()
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
                 retVal = "[%s]" % retVal.strip("[]")
 
@@ -2838,8 +2840,10 @@ def unsafeSQLIdentificatorNaming(name):
     if isinstance(name, basestring):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.DB2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2):
             retVal = name.replace("\"", "")
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
+            retVal = name.replace("\"", "").upper()
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
             retVal = name.replace("[", "").replace("]", "")
 
