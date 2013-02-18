@@ -262,8 +262,9 @@ class Search:
                             continue
                     else:
                         for db in conf.db.split(","):
+                            db = safeSQLIdentificatorNaming(db)
                             if db not in foundTbls:
-                                foundTbls[safeSQLIdentificatorNaming(db)] = []
+                                foundTbls[db] = []
                 else:
                     dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
                     foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
@@ -425,7 +426,7 @@ class Search:
 
                     for db in conf.db.split(","):
                         for tbl in conf.tbl.split(","):
-                            values.append([db, tbl])
+                            values.append([safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(tbl, True)])
 
                 for db, tbl in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
@@ -497,6 +498,7 @@ class Search:
                             foundCols[column][db] = []
                 else:
                     for db in conf.db.split(","):
+                        db = safeSQLIdentificatorNaming(db)
                         if db not in foundCols[column]:
                             foundCols[column][db] = []
 
