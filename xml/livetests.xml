@@ -1554,7 +1554,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+3 tables.+users'"/>
+            <item value="r'Current database.+2 tables.+users'"/>
         </parse>
     </case>
     <case name="PostgreSQL boolean-based brute-force tables enumeration - provided database">
@@ -1577,7 +1577,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+3 tables.+users'"/>
+            <item value="r'Current database.+2 tables.+users'"/>
         </parse>
     </case>
     <case name="PostgreSQL error-based brute-force tables enumeration - provided database">
@@ -1600,7 +1600,7 @@
             <commonTables value="True"/>
         </switches>
         <parse>
-            <item value="r'Current database.+3 tables.+users'"/>
+            <item value="r'Current database.+2 tables.+users'"/>
         </parse>
     </case>
     <case name="PostgreSQL UNION query brute-force tables enumeration - provided database">
