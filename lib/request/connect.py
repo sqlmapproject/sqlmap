@@ -476,7 +476,7 @@ class Connect(object):
                     raise SqlmapConnectionException(errMsg)
                 else:
                     debugMsg = "page not found (%d)" % code
-                    logger.debug(debugMsg)
+                    singleTimeWarnMessage(debugMsg)
                     processResponse(page, responseHeaders)
             elif e.code == httplib.GATEWAY_TIMEOUT:
                 if ignoreTimeout:
