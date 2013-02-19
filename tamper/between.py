@@ -43,5 +43,7 @@ def tamper(payload, **kwargs):
         if match:
             _ = "%s %s NOT BETWEEN 0 AND %s" % (match.group(2), match.group(4), match.group(5))
             retVal = retVal.replace(match.group(0), _)
+        else:
+            retVal = re.sub(r"\s*>\s*(\d+|'[^']+')", " NOT BETWEEN 0 AND \g<1>", payload)
 
     return retVal
