@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import httplib
 import json
+import logging
 import re
 import socket
 import string
@@ -32,6 +33,7 @@ from lib.core.common import logHTTPTraffic
 from lib.core.common import randomizeParameterValue
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastResponseDelayed
@@ -476,7 +478,7 @@ class Connect(object):
                     raise SqlmapConnectionException(errMsg)
                 else:
                     debugMsg = "page not found (%d)" % code
-                    singleTimeWarnMessage(debugMsg)
+                    singleTimeLogMessage(debugMsg, logging.DEBUG)
                     processResponse(page, responseHeaders)
             elif e.code == httplib.GATEWAY_TIMEOUT:
                 if ignoreTimeout:
