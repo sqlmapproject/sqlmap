@@ -3548,17 +3548,6 @@
             <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
-    <case name="Custom SQL statement">
-        <switches>
-            <verbose value="2"/>
-            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
-            <tech value="E"/>
-            <query value="SELECT VERSION()"/>
-        </switches>
-        <parse>
-            <item value="SELECT VERSION():    '5.1.66-0+squeeze1'"/>
-        </parse>
-    </case>
     <case name="Estimated time of arrival">
         <switches>
             <verbose value="2"/>
