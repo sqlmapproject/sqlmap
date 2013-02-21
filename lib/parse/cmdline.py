@@ -614,7 +614,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--check-waf", dest="checkWaf",
                                   action="store_true",
-                                  help="Check for existence of WAF/IPS/IDS protection")
+                                  help="Heuristically check for WAF/IPS/IDS protection")
 
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true",
@@ -635,6 +635,10 @@ def cmdLineParser():
         miscellaneous.add_option("--hpp", dest="hpp",
                                   action="store_true",
                                   help="Use HTTP parameter pollution")
+
+        miscellaneous.add_option("--identify-waf", dest="identifyWaf",
+                                  action="store_true",
+                                  help="Make a through testing for a WAF/IPS/IDS protection")
 
         miscellaneous.add_option("--mobile", dest="mobile",
                                   action="store_true",
@@ -672,9 +676,6 @@ def cmdLineParser():
                           help=SUPPRESS_HELP)
 
         parser.add_option("--force-dns", dest="forceDns", action="store_true",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--identify-waf", dest="identifyWaf", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",

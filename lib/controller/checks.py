@@ -993,7 +993,7 @@ def checkWaf():
     if not conf.checkWaf:
         return False
 
-    infoMsg = "testing if the target is protected by "
+    infoMsg = "heuristic checking if the target is protected by "
     infoMsg += "some kind of WAF/IPS/IDS"
     logger.info(infoMsg)
 
