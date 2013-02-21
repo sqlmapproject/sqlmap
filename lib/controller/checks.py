@@ -1037,6 +1037,37 @@ def checkWaf():
 
     return retVal
 
+def identifyWaf():
+    if not conf.identifyWaf:
+        return None
+
+    infoMsg = "using WAF scripts to detect "
+    infoMsg += "backend WAF/IPS/IDS protection"
+    logger.info(infoMsg)
+
+    retVal = False
+    page, headers, code = Request.getPage()
+
+    for function, product, request in kb.wafFunctions:
+        found = False
+        if not request:
+            found = function(page or "", headers or {}, code)
+        else:
+            pass
+        if found:
+            retVal = product
+            break
+
+    if retVal:
+        warnMsg = "WAF/IDS/IPS identified ('%s'). Please " % retVal
+        warnMsg += "consider usage of tamper scripts (option '--tamper')"
+        logger.critical(warnMsg)
+    else:
+        warnMsg = "no WAF/IDS/IPS were identified"
+        logger.warn(warnMsg)
+
+    return retVal
+
 def checkNullConnection():
     """
     Reference: http://www.wisec.it/sectou.php?id=472f952d79293

@@ -214,6 +214,7 @@ optDict = {
                                "profile":           "boolean",
                                "cpuThrottle":       "integer",
                                "forceDns":          "boolean",
+                               "identifyWaf":       "boolean",
                                "smokeTest":         "boolean",
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",

@@ -152,6 +152,11 @@ class HTTPHEADER:
     REFERER = "Referer"
     USER_AGENT = "User-Agent"
 
+class WAF_REQUEST:
+    GET = 1
+    POST = 2
+    HEADERS = 3
+
 class EXPECTED:
     BOOL = "bool"
     INT = "int"

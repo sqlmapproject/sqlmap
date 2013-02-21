@@ -18,6 +18,7 @@ from lib.controller.checks import checkConnection
 from lib.controller.checks import checkNullConnection
 from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
+from lib.controller.checks import identifyWaf
 from lib.core.agent import agent
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
@@ -359,6 +360,9 @@ def start():
 
             if conf.checkWaf:
                 checkWaf()
+
+            if conf.identifyWaf:
+                identifyWaf()
 
             if conf.nullConnection:
                 checkNullConnection()

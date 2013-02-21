@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import cookielib
+import glob
 import inspect
 import logging
 import os
@@ -894,6 +895,35 @@ def _setTamperingFunctions():
             for _, function in priorities:
                 kb.tamperFunctions.append(function)
 
+def _setWafFunctions():
+    """
+    Loads WAF/IDS/IPS detecting functions from script(s)
+    """
+
+    if conf.identifyWaf:
+        for found in glob.glob(os.path.join(paths.SQLMAP_WAF_PATH, "*.py")):
+            dirname, filename = os.path.split(found)
+            dirname = os.path.abspath(dirname)
+
+            debugMsg = "loading WAF script '%s'" % filename[:-3]
+            logger.debug(debugMsg)
+
+            if dirname not in sys.path:
+                sys.path.insert(0, dirname)
+
+            try:
+                module = __import__(filename[:-3])
+            except ImportError, msg:
+                raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], msg))
+
+            _ = dict(inspect.getmembers(module))
+            if "detect" not in _:
+                errMsg = "missing function 'detect(page, headers, code)' "
+                errMsg += "in WAF script '%s'" % found
+                raise SqlmapGenericException(errMsg)
+            else:
+                kb.wafFunctions.append((_["detect"], _.get("__product__", filename[:-3]), _.get("__request__")))
+
 def _setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
         conf.threads = 1
@@ -1611,6 +1641,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.userAgents = None
         kb.vainRun = True
         kb.vulnHosts = set()
+        kb.wafFunctions = []
         kb.wordlists = None
 
 def _useWizardInterface():
@@ -2080,6 +2111,7 @@ def init():
     _adjustLoggingFormatter()
     _setMultipleTargets()
     _setTamperingFunctions()
+    _setWafFunctions()
     _setTrafficOutputFP()
     _resolveCrossReferences()
 
