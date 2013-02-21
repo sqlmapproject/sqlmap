@@ -112,6 +112,9 @@ Stefano Di Paola, <stefano.dipaola@wisec.it>
 Mosk Dmitri, <ya@darkbyte.ru>
 * for reporting a minor bug
 
+Meng Dong, <whenov@gmail.com>
+* for contributing a code for Waffit integration
+
 Carey Evans, <careye@spamcop.net>
 * for his fcrypt module that allows crypt(3) support
     on Windows platforms
