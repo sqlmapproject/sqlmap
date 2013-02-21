@@ -13,7 +13,7 @@ def cachedmethod(f, cache={}):
     """
 
     def _(*args, **kwargs):
-        key = (f, tuple(args), frozenset(kwargs.items()))
+        key = (f, tuple(args), str(kwargs))
         if key not in cache:
             cache[key] = f(*args, **kwargs)
         return cache[key]

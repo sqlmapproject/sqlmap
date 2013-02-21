@@ -152,6 +152,7 @@ class HTTPHEADER:
     REFERER = "Referer"
     SERVER = "Server"
     USER_AGENT = "User-Agent"
+    TRANSFER_ENCODING = "Transfer-Encoding"
 
 class EXPECTED:
     BOOL = "bool"
