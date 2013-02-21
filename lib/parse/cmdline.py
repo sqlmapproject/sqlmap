@@ -616,6 +616,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Heuristically check for WAF/IPS/IDS protection")
 
+        miscellaneous.add_option("--identify-waf", dest="identifyWaf",
+                                  action="store_true",
+                                  help="Identify the vendor of WAF")
+
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true",
                                   help="Clean up the DBMS by sqlmap specific "

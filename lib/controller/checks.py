@@ -65,6 +65,7 @@ from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.threads import getCurrentThreadData
+from lib.core.wafs import wafs
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
@@ -1026,6 +1027,19 @@ def checkWaf():
 
         if not falseResult:
             retVal = True
+
+    if retVal:
+        if conf.identifyWaf:
+            infoMsg = "detecting the vendor of the waf"
+            logger.info(infoMsg)
+            for waf in wafs:
+                if waf.identify():
+                    kb.waf = waf.vendor
+                    infoMsg = "the vendor of the waf seems to be " + kb.waf
+                    logger.info(infoMsg)
+                    break
+            infoMsg = "the vendor of the waf is not detected"
+            logger.info(infoMsg)
 
     conf.parameters = dict(backup)
 

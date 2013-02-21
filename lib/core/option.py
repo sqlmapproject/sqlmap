@@ -1632,6 +1632,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.timeValidCharsRun = 0
     kb.uChar = NULL
     kb.unionDuplicates = False
+    kb.waf = None
     kb.xpCmdshellAvailable = False
 
     if flushAll:
