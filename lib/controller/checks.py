@@ -1059,22 +1059,24 @@ def identifyWaf():
 
     retVal = False
 
-    for function, product, request in kb.wafFunctions:
-        found = False
-
-        if not request:
+    for function, product in kb.wafFunctions:
+        try:
             found = function(_)
-        else:
-            pass
+        except Exception, ex:
+            errMsg = "exception occured while running "
+            errMsg += "WAF script for '%s' ('%s')" % (product, ex)
+            logger.critical(errMsg)
+
+            found = False
 
         if found:
             retVal = product
             break
 
     if retVal:
-        warnMsg = "WAF/IDS/IPS identified ('%s'). Please " % retVal
-        warnMsg += "consider usage of tamper scripts (option '--tamper')"
-        logger.critical(warnMsg)
+        errMsg = "WAF/IDS/IPS identified ('%s'). Please " % retVal
+        errMsg += "consider usage of tamper scripts (option '--tamper')"
+        logger.critical(errMsg)
     else:
         warnMsg = "WAF/IDS/IPS product not identified"
         logger.warn(warnMsg)

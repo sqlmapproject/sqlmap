@@ -925,7 +925,7 @@ def _setWafFunctions():
                 errMsg += "in WAF script '%s'" % found
                 raise SqlmapGenericException(errMsg)
             else:
-                kb.wafFunctions.append((_["detect"], _.get("__product__", filename[:-3]), _.get("__request__")))
+                kb.wafFunctions.append((_["detect"], _.get("__product__", filename[:-3])))
 
 def _setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
