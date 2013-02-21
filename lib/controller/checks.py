@@ -36,6 +36,7 @@ from lib.core.common import readInput
 from lib.core.common import showStaticWords
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.data import conf
@@ -43,6 +44,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
+from lib.core.decorators import cachedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import HEURISTIC_TEST
@@ -1045,15 +1047,26 @@ def identifyWaf():
     infoMsg += "backend WAF/IPS/IDS protection"
     logger.info(infoMsg)
 
+    @cachedmethod
+    def _(*args, **kwargs):
+        try:
+            if kwargs.get("get"):
+                kwargs["get"] = urlencode(kwargs["get"])
+            kwargs["raise404"] = False
+            return Request.getPage(*args, **kwargs)
+        except Exception, ex:
+            return None, None, None
+
     retVal = False
-    page, headers, code = Request.getPage()
 
     for function, product, request in kb.wafFunctions:
         found = False
+
         if not request:
-            found = function(page or "", headers or {}, code)
+            found = function(_)
         else:
             pass
+
         if found:
             retVal = product
             break
@@ -1063,7 +1076,7 @@ def identifyWaf():
         warnMsg += "consider usage of tamper scripts (option '--tamper')"
         logger.critical(warnMsg)
     else:
-        warnMsg = "no WAF/IDS/IPS were identified"
+        warnMsg = "WAF/IDS/IPS product not identified"
         logger.warn(warnMsg)
 
     return retVal

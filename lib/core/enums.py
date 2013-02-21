@@ -150,12 +150,8 @@ class HTTPHEADER:
     PROXY_CONNECTION = "Proxy-Connection"
     RANGE = "Range"
     REFERER = "Referer"
+    SERVER = "Server"
     USER_AGENT = "User-Agent"
-
-class WAF_REQUEST:
-    GET = 1
-    POST = 2
-    HEADERS = 3
 
 class EXPECTED:
     BOOL = "bool"

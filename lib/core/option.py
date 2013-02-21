@@ -905,6 +905,9 @@ def _setWafFunctions():
             dirname, filename = os.path.split(found)
             dirname = os.path.abspath(dirname)
 
+            if filename == "__init__.py":
+                continue
+
             debugMsg = "loading WAF script '%s'" % filename[:-3]
             logger.debug(debugMsg)
 
