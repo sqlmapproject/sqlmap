@@ -1061,6 +1061,7 @@ def identifyWaf():
 
     for function, product in kb.wafFunctions:
         try:
+            logger.debug("checking for WAF/IDS/IPS product '%s'" % product)
             found = function(_)
         except Exception, ex:
             errMsg = "exception occured while running "
