@@ -857,7 +857,7 @@ def readInput(message, default=None, checkBatch=True):
             else:
                 options = unicode()
 
-            dataToStdout("\r%s%s" % (getUnicode(message), options), forceOutput=True, bold=True)
+            dataToStdout("\r%s%s\n" % (getUnicode(message), options), forceOutput=True, bold=True)
 
             debugMsg = "used the default behaviour, running in batch mode"
             logger.debug(debugMsg)
