@@ -70,7 +70,7 @@ def _linux_wav_play(filename):
         raise Exception("Could not create pulse audio stream: %s" % pa.strerror(ctypes.byref(error)))
 
     while True:
-        latency = pa.pa_simple_get_latency(pa_stream, error)
+        latency = pa.pa_simple_get_latency(pa_stream, ctypes.byref(error))
         if latency == -1:
             raise Exception("Getting latency failed")
 
@@ -78,12 +78,12 @@ def _linux_wav_play(filename):
         if not buf:
             break
 
-        if pa.pa_simple_write(pa_stream, buf, len(buf), error):
+        if pa.pa_simple_write(pa_stream, buf, len(buf), ctypes.byref(error)):
             raise Exception("Could not play file")
 
     wave_file.close()
 
-    if pa.pa_simple_drain(pa_stream, error):
+    if pa.pa_simple_drain(pa_stream, ctypes.byref(error)):
         raise Exception("Could not simple drain")
 
     pa.pa_simple_free(pa_stream)
