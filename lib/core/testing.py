@@ -30,6 +30,7 @@ from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.option import initOptions
+from lib.core.option import setVerbosity
 from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
@@ -166,6 +167,9 @@ def liveTest():
 
                 parse.append((value, parse_from_console_output))
 
+        conf.verbose = global_.get("verbose", 1)
+        setVerbosity()
+
         msg = "running live test case: %s (%d/%d)" % (name, count, length)
         logger.info(msg)
 
@@ -178,6 +182,9 @@ def liveTest():
             result = runCase(parse)
         except SqlmapNotVulnerableException:
             vulnerable = False
+        finally:
+            conf.verbose = global_.get("verbose", 1)
+            setVerbosity()
 
         if result is True:
             logger.info("test passed")
@@ -239,6 +246,8 @@ def initCase(switches, count):
 
     logger.debug("using output directory '%s' for this test case" % paths.SQLMAP_OUTPUT_PATH)
 
+    LOGGER_HANDLER.stream = sys.stdout = tempfile.SpooledTemporaryFile(max_size=0, mode="w+b", prefix="sqlmapstdout-")
+
     cmdLineOptions = cmdLineParser()
 
     if switches:
@@ -257,7 +266,6 @@ def runCase(parse):
     global failedParseOn
     global failedTraceBack
 
-    LOGGER_HANDLER.stream = sys.stdout = tempfile.SpooledTemporaryFile(max_size=0, mode="w+b", prefix="sqlmapstdout-")
     retVal = True
     handled_exception = None
     unhandled_exception = None
