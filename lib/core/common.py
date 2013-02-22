@@ -1510,6 +1510,7 @@ def isHexEncodedString(subject):
 
     return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
 
+@cachedmethod
 def getConsoleWidth(default=80):
     """
     Returns console width
@@ -1520,11 +1521,15 @@ def getConsoleWidth(default=80):
     if os.getenv("COLUMNS", "").isdigit():
         width = int(os.getenv("COLUMNS"))
     else:
-        output = execute("stty size", shell=True, stdout=PIPE, stderr=PIPE).stdout.read()
-        items = output.split()
+        try:
+            process = execute("stty size", shell=True, stdout=PIPE, stderr=PIPE)
+            stdout, _ = process.communicate()
+            items = stdout.split()
 
-        if len(items) == 2 and items[1].isdigit():
-            width = int(items[1])
+            if len(items) == 2 and items[1].isdigit():
+                width = int(items[1])
+        except OSError:
+            pass
 
     if width is None:
         try:
