@@ -1086,8 +1086,8 @@ def identifyWaf():
         errMsg += "consider usage of tamper scripts (option '--tamper')"
         logger.critical(errMsg)
     else:
-        warnMsg = "no WAF/IDS/IPS product has been identified"
-        logger.warn(warnMsg)
+        infoMsg = "no WAF/IDS/IPS product has been identified"
+        logger.info(infoMsg)
 
     return retVal
 
