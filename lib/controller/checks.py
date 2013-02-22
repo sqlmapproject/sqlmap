@@ -671,6 +671,13 @@ def checkFalsePositives(injection):
             warnMsg = "false positive or unexploitable injection point detected"
             logger.warn(warnMsg)
 
+            if PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
+                if all(_.__name__ != "between" for _ in kb.tamperFunctions):
+                    warnMsg = "there is a possibility that the character '>' is "
+                    warnMsg += "filtered by the back-end server. You can try "
+                    warnMsg += "to rerun with '--tamper=between'"
+                    logger.warn(warnMsg)
+
         kb.injection = popValue()
 
     return retVal
