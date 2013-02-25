@@ -18,6 +18,7 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         def escaper(value):
+            # Reference: http://stackoverflow.com/questions/3444335/how-do-i-quote-a-utf-8-string-literal-in-sqlite3
             return "CAST(X'%s' AS TEXT)" % binascii.hexlify(value.encode(UNICODE_ENCODING) if isinstance(value, unicode) else value)
 
         retVal = expression
