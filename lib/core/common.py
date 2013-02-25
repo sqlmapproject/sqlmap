@@ -55,6 +55,7 @@ from lib.core.convert import utf8encode
 from lib.core.decorators import cachedmethod
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
+from lib.core.dicts import DEFAULT_DOC_ROOTS
 from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
@@ -599,7 +600,7 @@ def getDocRoot():
     docRoot = None
     pagePath = directoryPath(conf.path)
 
-    defaultDocRoot = ("C:/xampp/htdocs/", "C:/Inetpub/wwwroot/") if Backend.isOs(OS.WINDOWS) else ("/var/www/",)
+    defaultDocRoot = DEFAULT_DOC_ROOTS.get(Backend.getOs(), DEFAULT_DOC_ROOTS[OS.LINUX])
 
     if kb.absFilePaths:
         for absFilePath in kb.absFilePaths:

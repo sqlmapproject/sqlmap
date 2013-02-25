@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.enums import POST_HINT
 from lib.core.settings import BLANK
 from lib.core.settings import NULL
@@ -213,3 +214,8 @@ DUMP_DATA_PREPROCESS = {
                             DBMS.ORACLE: {"XMLTYPE": "(%s).getStringVal()"},  # Reference: https://www.tibcommunity.com/docs/DOC-3643
                             DBMS.MSSQL: {"IMAGE": "CONVERT(VARBINARY(MAX),%s)"},
                        }
+
+DEFAULT_DOC_ROOTS = {
+                        OS.WINDOWS: ("C:/xampp/htdocs/", "C:/Inetpub/wwwroot/"),
+                        OS.LINUX: ("/var/www/",)
+                    }
