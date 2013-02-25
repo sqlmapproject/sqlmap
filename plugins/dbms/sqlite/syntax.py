@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import binascii
 
 from lib.core.common import isDBMSVersionAtLeast
+from lib.core.settings import UNICODE_ENCODING
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -17,7 +18,7 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         def escaper(value):
-            return "CAST(X'%s' AS TEXT)" % binascii.hexlify(value)
+            return "CAST(X'%s' AS TEXT)" % binascii.hexlify(value.encode(UNICODE_ENCODING) if isinstance(value, unicode) else value)
 
         retVal = expression
 
