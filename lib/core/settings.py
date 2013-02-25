@@ -53,7 +53,7 @@ PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"
 MAX_CONNECTIONS_REGEX = r"max.+connections"
 
 # Regular expression used for extracting results from google search
-GOOGLE_REGEX = r"url\?\w+=(http[^>]+)&(sa=U|rct=j)"
+GOOGLE_REGEX = r"url\?\w+=((?![^>]+webcache\.googleusercontent\.com)http[^>]+)&(sa=U|rct=j)"
 
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
