@@ -19,9 +19,9 @@ class Syntax(GenericSyntax):
         def escaper(value):
             retVal = None
             try:
-                retVal = "0x%s" % binascii.hexlify(value.strip("'"))
+                retVal = "0x%s" % binascii.hexlify(value)
             except UnicodeEncodeError:
-                retVal = "CONVERT(0x%s USING utf8)" % "".join("%.2x" % ord(_) for _ in utf8encode(value.strip("'")))
+                retVal = "CONVERT(0x%s USING utf8)" % "".join("%.2x" % ord(_) for _ in utf8encode(value))
             return retVal
 
         return Syntax._escape(expression, quote, escaper)
