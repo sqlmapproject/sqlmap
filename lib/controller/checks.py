@@ -1050,6 +1050,8 @@ def identifyWaf():
     if not conf.identifyWaf:
         return None
 
+    kb.testMode = True
+
     infoMsg = "using WAF scripts to detect "
     infoMsg += "backend WAF/IPS/IDS protection"
     logger.info(infoMsg)
@@ -1088,6 +1090,8 @@ def identifyWaf():
     else:
         infoMsg = "no WAF/IDS/IPS product has been identified"
         logger.info(infoMsg)
+
+    kb.testMode = False
 
     return retVal
 
