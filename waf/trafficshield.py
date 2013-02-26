@@ -13,4 +13,4 @@ __product__ = "TrafficShield (F5 Networks)"
 
 def detect(get_page):
     page, headers, code = get_page()
-    return (re.search(r"\AASINFO=", headers.get(HTTPHEADER.COOKIE, ""), re.I) or re.search(r"F5-TrafficShield", headers.get(HTTPHEADER.SERVER, ""), re.I)) is not None
+    return (re.search(r"\AASINFO=", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) or re.search(r"F5-TrafficShield", headers.get(HTTPHEADER.SERVER, ""), re.I)) is not None
