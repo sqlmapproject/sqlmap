@@ -108,6 +108,7 @@ from lib.core.settings import NULL
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import SITE
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SUPPORTED_DBMS
@@ -309,6 +310,9 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     # Avoid proxy and connection type related headers
                     elif key not in (HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION):
                         conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
+
+                    if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
+                        params = True
 
             data = data.rstrip("\r\n") if data else data
 
