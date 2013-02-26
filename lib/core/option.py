@@ -350,6 +350,11 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
     _parseBurpLog(content)
     _parseWebScarabLog(content)
 
+    if not addedTargetUrls:
+        errMsg = "unable to find usable request(s) "
+        errMsg += "in provided file ('%s')" % reqFile
+        raise SqlmapGenericException(errMsg)
+
 def _loadQueries():
     """
     Loads queries from 'xml/queries.xml' file.
