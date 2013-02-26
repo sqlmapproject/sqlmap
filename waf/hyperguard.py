@@ -8,9 +8,17 @@ See the file 'doc/COPYING' for copying permission
 import re
 
 from lib.core.enums import HTTPHEADER
+from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "Hyperguard Web Application Firewall (art of defence Inc.)"
 
 def detect(get_page):
-    page, headers, code = get_page()
-    return re.search(r"\AODSESSION=", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
+    retval = False
+
+    for vector in WAF_ATTACK_VECTORS:
+        page, headers, code = get_page(get=vector)
+        retval = re.search(r"\AODSESSION=", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
+        if retval:
+            break
+
+    return retval

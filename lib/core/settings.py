@@ -384,6 +384,7 @@ IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM informat
 
 # Vectors used for provoking specific WAF/IDS/IPS behavior(s)
 WAF_ATTACK_VECTORS = (
+                        "",  # NIL
                         "search=<script>alert(1)</script>",
                         "file=../../../../etc/passwd",
                         "q=<invalid>foobar",
