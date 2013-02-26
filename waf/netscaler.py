@@ -15,6 +15,7 @@ __product__ = "NetScaler (Citrix Systems)"
 def detect(get_page):
     page, headers, code = get_page()
     retval = re.search(r"\A(ns_af=|citrix_ns_id|NSC_)", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
+    retval |= re.search(r"\ANS-CACHE", headers.get(HTTPHEADER.VIA, ""), re.I) is not None
 
     if not retval:
         for vector in WAF_ATTACK_VECTORS:

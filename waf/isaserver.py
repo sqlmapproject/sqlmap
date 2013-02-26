@@ -11,4 +11,6 @@ __product__ = "ISA Server (Microsoft)"
 
 def detect(get_page):
     page, headers, code = get_page(host=randomInt(6))
-    return "The server denied the specified Uniform Resource Locator (URL). Contact the server administrator" in page
+    retval = "The server denied the specified Uniform Resource Locator (URL). Contact the server administrator." in (page or "")
+    retval |= "The ISA Server denied the specified Uniform Resource Locator (URL)" in (page or "")
+    return retval

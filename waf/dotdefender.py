@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retVal = headers.get("X-dotDefender-denied", "") == 1
+        retVal = headers.get("X-dotDefender-denied", "") == "1"
         if retVal:
             break
 

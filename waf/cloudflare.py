@@ -10,16 +10,16 @@ import re
 from lib.core.enums import HTTPHEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "WebKnight Application Firewall (AQTRONIX)"
+__product__ = "CloudFlare Web Application Firewall (CloudFlare)"
 
 def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retVal = code == 999
-        retval |= re.search(r"WebKnight", headers.get(HTTPHEADER.SERVER, ""), re.I) is not None
-        if retVal:
+        retval = re.search(r"cloudflare-nginx", headers.get(HTTPHEADER.SERVER, ""), re.I) is not None
+        retval |= re.search(r"\A__cfduid=", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
+        if retval:
             break
 
     return retval

@@ -153,6 +153,7 @@ class HTTPHEADER:
     SERVER = "Server"
     USER_AGENT = "User-Agent"
     TRANSFER_ENCODING = "Transfer-Encoding"
+    VIA = "Via"
 
 class EXPECTED:
     BOOL = "bool"
