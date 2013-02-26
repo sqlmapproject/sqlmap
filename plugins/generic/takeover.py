@@ -197,9 +197,6 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 if not goUdf:
                     setupSuccess = self.uploadShellcodeexec(web=web)
 
-                    print "forcing setupSuccess to False"
-                    setupSuccess = False
-
                     if setupSuccess is not True:
                         if Backend.isDbms(DBMS.MYSQL):
                             fallbackToWeb = True
