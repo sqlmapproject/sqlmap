@@ -9,8 +9,8 @@ import re
 
 from lib.core.enums import HTTPHEADER
 
-__product__ = "ISV Teros Web Application Firewall (Teros/Citrix Systems)"
+__product__ = "Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)"
 
 def detect(get_page):
     page, headers, code = get_page()
-    return re.search(r"\Ast8id=", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
+    return re.search(r"\Ast8(id|_wat|_wlf)", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
