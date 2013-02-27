@@ -18,6 +18,7 @@ def detect(get_page):
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
         retval = re.search(r"incap_ses|visid_incap", headers.get(HTTPHEADER.SET_COOKIE, ""), re.I) is not None
+        retval |= re.search(r"Incapsula", headers.get("X-CDN", ""), re.I) is not None
         if retval:
             break
 
