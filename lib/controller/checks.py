@@ -1138,7 +1138,7 @@ def checkConnection(suppressOutput=False):
             errMsg = "host '%s' does not exist" % conf.hostname
             raise SqlmapConnectionException(errMsg)
 
-    if not suppressOutput:
+    if not suppressOutput and not conf.dummy:
         infoMsg = "testing connection to the target url"
         logger.info(infoMsg)
 
