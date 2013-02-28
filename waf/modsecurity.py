@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = code == 501
+        retval = code == 501 and re.search(r"Reference #[0-9A-Fa-f.]+", page, re.I) is None
         retval |= re.search(r"Mod_Security|NOYB", headers.get(HTTPHEADER.SERVER, ""), re.I) is not None
         if retval:
             break
