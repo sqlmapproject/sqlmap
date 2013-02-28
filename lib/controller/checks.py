@@ -1131,7 +1131,7 @@ def checkNullConnection():
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
-    if not any([conf.proxy, conf.tor]):
+    if not any((conf.proxy, conf.tor, conf.dummy)):
         try:
             socket.getaddrinfo(conf.hostname, None)
         except socket.gaierror:

@@ -210,6 +210,7 @@ optDict = {
                                "verbose":           "integer",
                              },
             "Hidden": {
+                               "dummy":             "boolean",
                                "binaryFields":      "boolean",
                                "profile":           "boolean",
                                "cpuThrottle":       "integer",

@@ -131,6 +131,9 @@ DUMMY_USER_PREFIX = "__dummy__"
 # Reference: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
 DEFAULT_PAGE_ENCODING = "iso-8859-1"
 
+# URL used in dummy runs
+DUMMY_URL = "http://foo/bar?id=1"
+
 # System variables
 IS_WIN = subprocess.mswindows
 

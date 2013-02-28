@@ -31,6 +31,8 @@ from lib.core.common import getRequestHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import randomizeParameterValue
+from lib.core.common import randomInt
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeLogMessage
@@ -180,6 +182,9 @@ class Connect(object):
             time.sleep(conf.delay)
         elif conf.cpuThrottle:
             cpuThrottle(conf.cpuThrottle)
+
+        if conf.dummy:
+            return randomStr(int(randomInt())), {}, int(randomInt())
 
         threadData = getCurrentThreadData()
         with kb.locks.request:

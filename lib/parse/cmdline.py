@@ -18,6 +18,7 @@ from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.defaults import defaults
 from lib.core.settings import BASIC_HELP_ITEMS
+from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
 
@@ -664,6 +665,9 @@ def cmdLineParser():
                                   help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
+        parser.add_option("--dummy", dest="dummy", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--pickled-options", dest="pickledOptions", help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
@@ -759,6 +763,9 @@ def cmdLineParser():
         for i in xrange(len(sys.argv) - 1):
             if sys.argv[i] == '-z':
                 expandMnemonics(sys.argv[i + 1], parser, args)
+
+        if args.dummy:
+            args.url = args.url or DUMMY_URL
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
