@@ -82,12 +82,6 @@ def forgeHeaders(items=None):
         if kb.testMode:
             resetCookieJar(conf.cj)
 
-    if kb.redirectSetCookie and not conf.dropSetCookie:
-        if HTTPHEADER.COOKIE in headers:
-            headers[HTTPHEADER.COOKIE] += "%s %s" % (DEFAULT_COOKIE_DELIMITER, kb.redirectSetCookie)
-        else:
-            headers[HTTPHEADER.COOKIE] = kb.redirectSetCookie
-
     return headers
 
 def parseResponse(page, headers):
