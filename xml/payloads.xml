@@ -1310,7 +1310,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE or HAVING clause (utl_inaddr.get_host_address)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>0</risk>
@@ -1330,7 +1330,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle AND error-based - WHERE or HAVING clause (ctxsys.drithsx.sn)</title>
+        <title>Oracle AND error-based - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>0</risk>
@@ -1548,7 +1548,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE or HAVING clause (utl_inaddr.get_host_address)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)</title>
         <stype>2</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1568,7 +1568,7 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle OR error-based - WHERE or HAVING clause (ctxsys.drithsx.sn)</title>
+        <title>Oracle OR error-based - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>2</risk>
