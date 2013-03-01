@@ -657,7 +657,12 @@ def checkFalsePositives(injection):
             if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
                 retVal = None
                 break
-            elif checkBooleanExpression("%d>(%d+%d)" % (min(randInt1, randInt2), randInt3, max(randInt1, randInt2))):
+
+            # Just in case if DBMS hasn't properly recovered from previous delayed request
+            if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
+                checkBooleanExpression("%d=%d", randInt1, randInt2)
+
+            if checkBooleanExpression("%d>(%d+%d)" % (min(randInt1, randInt2), randInt3, max(randInt1, randInt2))):
                 retVal = None
                 break
             elif checkBooleanExpression("(%d+%d)>%d" % (randInt3, min(randInt1, randInt2), randInt1 + randInt2 + randInt3)):
