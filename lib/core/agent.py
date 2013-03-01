@@ -112,7 +112,8 @@ class Agent(object):
                 if conf.invalidLogical:
                     match = re.search(r'\A[^ ]+', newValue)
                     newValue = newValue[len(match.group() if match else ""):]
-                    value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", randomInt(2), randomInt(2))
+                    _ = randomInt(2)
+                    value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", _, _ + 1)
                 elif conf.invalidBignum:
                     value = "%d.%d" % (randomInt(6), randomInt(1))
                 else:
