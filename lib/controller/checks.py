@@ -328,7 +328,8 @@ def checkSqlInjection(place, parameter, value):
                         # one as we are changing parameters value, which
                         # will likely result in a different content
                         if conf.invalidLogical:
-                            origValue = "%s AND %s=%s" % (value, randomInt(), randomInt())
+                            _ = randomInt(2)
+                            origValue = "%s AND %s=%s" % (value, _, _ + 1)
                         elif conf.invalidBignum:
                             origValue = "%d.%d" % (randomInt(6), randomInt(1))
                         else:
