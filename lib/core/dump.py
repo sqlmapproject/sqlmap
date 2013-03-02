@@ -379,11 +379,11 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
+        dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
+
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
-            dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
-
             if not os.path.isdir(dumpDbPath):
                 os.makedirs(dumpDbPath, 0755)
 
@@ -522,6 +522,9 @@ class Dump(object):
                     if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
                         mimetype = magic.from_buffer(value, mime=True)
                         if any(mimetype.startswith(_) for _ in ("application", "image")):
+                            if not os.path.isdir(dumpDbPath):
+                                os.makedirs(dumpDbPath, 0755)
+
                             filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (column, randomInt(8)))
                             warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
                             logger.warn(warnMsg)
