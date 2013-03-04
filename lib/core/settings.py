@@ -490,6 +490,9 @@ GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")
 # Maximum length of a help part containing switch/option name(s)
 MAX_HELP_OPTION_LENGTH = 18
 
+# Maximum number of connection retries (to prevent problems with recursion)
+MAX_CONNECT_RETRIES = 100
+
 # Strings for detecting formatting errors
 FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
 

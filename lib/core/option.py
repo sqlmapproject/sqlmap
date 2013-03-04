@@ -101,6 +101,7 @@ from lib.core.settings import INJECT_HERE_MARK
 from lib.core.settings import IS_WIN
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import MAX_CONNECT_RETRIES
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
@@ -1430,6 +1431,9 @@ def _cleanupOptions():
             logger.warn(warnMsg)
     else:
         kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
+
+    if conf.retries:
+        conf.retries = min(conf.retries, MAX_CONNECT_RETRIES)
 
     if conf.code:
         conf.code = int(conf.code)
