@@ -28,6 +28,9 @@ import time
 
 from hashlib import md5
 from hashlib import sha1
+from hashlib import sha224
+from hashlib import sha384
+from hashlib import sha512
 from Queue import Queue
 
 from lib.core.common import Backend
@@ -216,6 +219,35 @@ def sha1_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
+def sha224_generic_passwd(password, uppercase=False):
+    """
+    >>> sha224_generic_passwd(password='testpass', uppercase=False)
+    '648db6019764b598f75ab6b7616d2e82563a00eb1531680e19ac4c6f'
+    """
+
+    retVal = sha224(password).hexdigest()
+
+    return retVal.upper() if uppercase else retVal.lower()
+
+def sha384_generic_passwd(password, uppercase=False):
+    """
+    >>> sha384_generic_passwd(password='testpass', uppercase=False)
+    '6823546e56adf46849343be991d4b1be9b432e42ed1b4bb90635a0e4b930e49b9ca007bc3e04bf0a4e0df6f1f82769bf'
+    """
+
+    retVal = sha384(password).hexdigest()
+
+    return retVal.upper() if uppercase else retVal.lower()
+
+def sha512_generic_passwd(password, uppercase=False):
+    """
+    >>> sha512_generic_passwd(password='testpass', uppercase=False)
+    '78ddc8555bb1677ff5af75ba5fc02cb30bb592b0610277ae15055e189b77fe3fda496e5027a3d99ec85d54941adee1cc174b50438fdc21d82d0a79f85b58cf44'
+    """
+
+    retVal = sha512(password).hexdigest()
+
+    return retVal.upper() if uppercase else retVal.lower()
 
 def crypt_generic_passwd(password, salt, uppercase=False):
     """
@@ -297,6 +329,9 @@ __functions__ = {
                     HASH.ORACLE_OLD: oracle_old_passwd,
                     HASH.MD5_GENERIC: md5_generic_passwd,
                     HASH.SHA1_GENERIC: sha1_generic_passwd,
+                    HASH.SHA224_GENERIC: sha224_generic_passwd,
+                    HASH.SHA384_GENERIC: sha384_generic_passwd,
+                    HASH.SHA512_GENERIC: sha512_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
                     HASH.WORDPRESS: wordpress_passwd,
                 }
