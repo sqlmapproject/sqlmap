@@ -3455,6 +3455,20 @@
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
+    <case name="Boolean-based ORDER BY predict output enumeration">
+        <switches>
+            <verbose value="2"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_orderby.php?id=1"/>
+            <predictOutput value="True"/>
+            <tech value="B"/>
+            <testFilter value="boolean-based blind - GROUP BY and ORDER BY clauses"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+            <item value="r'performed 112 queries'" console_output="True"/>
+        </parse>
+    </case>
     <case name="Time-based predict output enumeration">
         <switches>
             <verbose value="2"/>
