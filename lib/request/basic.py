@@ -227,23 +227,27 @@ def decodePage(page, contentEncoding, contentType):
         kb.pageEncoding = conf.charset
 
     # can't do for all responses because we need to support binary files too
-    if contentType and not isinstance(page, unicode) and any(map(lambda _: _ in contentType.lower(), ("text/txt", "text/raw", "text/html", "text/xml"))):
+    if contentType and not isinstance(page, unicode) and "text/" in contentType.lower():
         # e.g. &#195;&#235;&#224;&#226;&#224;
         if "&#" in page:
-            page = re.sub('&#(\d{1,3});', lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
+            page = re.sub(r"&#(\d{1,3});", lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
+
+        # e.g. %20%28%29
+        if "%" in page:
+            page = re.sub(r"%([0-9a-fA-F]{2})", lambda _: _.group(1).decode("hex"), page)
 
         # e.g. &amp;
-        page = re.sub('&([^;]+);', lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
+        page = re.sub(r"&([^;]+);", lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
 
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
         page = getUnicode(page, kb.pageEncoding)
 
         # e.g. &#8217;&#8230;&#8482;
         if "&#" in page:
-            page = re.sub('&#(\d+);', lambda _: unichr(int(_.group(1))), page)
+            page = re.sub(r"&#(\d+);", lambda _: unichr(int(_.group(1))), page)
 
         # e.g. &zeta;
-        page = re.sub('&([^;]+);', lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
+        page = re.sub(r"&([^;]+);", lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
     return page
 
