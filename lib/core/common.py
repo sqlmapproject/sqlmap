@@ -3458,6 +3458,8 @@ def getRequestHeader(request, name):
     retVal = None
     if request and name:
         retVal = max(request.get_header(_) if name.upper() == _.upper() else None for _ in request.headers.keys())
+        if not retVal and request.unredirected_hdrs:
+            retVal = max(request.unredirected_hdrs.get(_) if name.upper() == _.upper() else None for _ in request.unredirected_hdrs.keys())
     return retVal
 
 def isNumber(value):
