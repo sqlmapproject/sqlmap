@@ -184,7 +184,7 @@ class Connect(object):
             cpuThrottle(conf.cpuThrottle)
 
         if conf.dummy:
-            return randomStr(int(randomInt())), {}, int(randomInt())
+            return randomStr(int(randomInt()), alphabet=[chr(_) for _ in xrange(256)]), {}, int(randomInt())
 
         threadData = getCurrentThreadData()
         with kb.locks.request:
