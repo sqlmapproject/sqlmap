@@ -16,6 +16,11 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def escape(expression, quote=True):
+        """
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
+        'SELECT 0x6162636465666768 FROM foobar'
+        """
+
         def escaper(value):
             retVal = None
             try:

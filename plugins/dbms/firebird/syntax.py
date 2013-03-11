@@ -5,6 +5,7 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+from lib.core.common import Backend
 from lib.core.common import isDBMSVersionAtLeast
 from plugins.generic.syntax import Syntax as GenericSyntax
 
@@ -14,6 +15,17 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def escape(expression, quote=True):
+        """
+        >>> Backend.setVersion('2.0')
+        ['2.0']
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
+        "SELECT 'abcdefgh' FROM foobar"
+        >>> Backend.setVersion('2.1')
+        ['2.1']
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
+        'SELECT ASCII_CHAR(97)||ASCII_CHAR(98)||ASCII_CHAR(99)||ASCII_CHAR(100)||ASCII_CHAR(101)||ASCII_CHAR(102)||ASCII_CHAR(103)||ASCII_CHAR(104) FROM foobar'
+        """
+
         def escaper(value):
             return "||".join("ASCII_CHAR(%d)" % ord(_) for _ in value)
 

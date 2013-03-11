@@ -1480,7 +1480,7 @@ def isWindowsDriveLetterPath(filepath):
 def posixToNtSlashes(filepath):
     """
     Replaces all occurances of Posix slashes (/) in provided
-    filepath with NT ones (/)
+    filepath with NT ones (\)
 
     >>> posixToNtSlashes('C:/Windows')
     'C:\\\\Windows'
