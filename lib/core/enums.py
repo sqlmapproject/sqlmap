@@ -308,3 +308,8 @@ PART_RUN_CONTENT_TYPES = {
 class CONTENT_STATUS:
     IN_PROGRESS = 0
     COMPLETE = 1
+
+class AUTH_TYPE:
+    BASIC = "basic"
+    DIGEST = "digest"
+    NTLM = "ntlm"

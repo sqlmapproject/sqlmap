@@ -47,6 +47,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import ADJUST_TIME_DELAY
+from lib.core.enums import AUTH_TYPE
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTPHEADER
 from lib.core.enums import HTTPMETHOD
@@ -364,7 +365,7 @@ class Connect(object):
 
             conn = urllib2.urlopen(req)
 
-            if not kb.authHeader and getRequestHeader(req, HTTPHEADER.AUTHORIZATION):
+            if not kb.authHeader and getRequestHeader(req, HTTPHEADER.AUTHORIZATION) and conf.aType == AUTH_TYPE.BASIC:
                 kb.authHeader = getRequestHeader(req, HTTPHEADER.AUTHORIZATION)
 
             if not kb.proxyAuthHeader and getRequestHeader(req, HTTPHEADER.PROXY_AUTHORIZATION):

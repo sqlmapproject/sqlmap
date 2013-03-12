@@ -64,6 +64,7 @@ from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DUMP_REPLACEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
+from lib.core.enums import AUTH_TYPE
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DUMP_FORMAT
 from lib.core.enums import HTTPHEADER
@@ -1098,15 +1099,15 @@ def _setHTTPAuthentication():
 
         aTypeLower = conf.aType.lower()
 
-        if aTypeLower not in ("basic", "digest", "ntlm"):
+        if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM):
             errMsg = "HTTP authentication type value must be "
             errMsg += "Basic, Digest or NTLM"
             raise SqlmapSyntaxException(errMsg)
-        elif aTypeLower in ("basic", "digest"):
+        elif aTypeLower in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST):
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % aTypeLower
             errMsg += "value must be in format username:password"
-        elif aTypeLower == "ntlm":
+        elif aTypeLower == AUTH_TYPE.NTLM:
             regExp = "^(.*\\\\.*):(.*?)$"
             errMsg = "HTTP NTLM authentication credentials value must "
             errMsg += "be in format DOMAIN\username:password"
@@ -1123,13 +1124,13 @@ def _setHTTPAuthentication():
 
         _setAuthCred()
 
-        if aTypeLower == "basic":
+        if aTypeLower == AUTH_TYPE.BASIC:
             authHandler = SmartHTTPBasicAuthHandler(kb.passwordMgr)
 
-        elif aTypeLower == "digest":
+        elif aTypeLower == AUTH_TYPE.DIGEST:
             authHandler = urllib2.HTTPDigestAuthHandler(kb.passwordMgr)
 
-        elif aTypeLower == "ntlm":
+        elif aTypeLower == AUTH_TYPE.NTLM:
             try:
                 from ntlm import HTTPNtlmAuthHandler
             except ImportError:
