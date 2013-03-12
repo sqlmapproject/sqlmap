@@ -713,7 +713,14 @@ def getDirs():
 
     return list(directories)
 
-def filePathToString(filePath):
+def filePathToSafeString(filePath):
+    """
+    Returns string representation of a given filepath safe for a single filename usage
+
+    >>> filePathToSafeString('C:/Windows/system32')
+    'C__Windows_system32'
+    """
+
     retVal = filePath.replace("/", "_").replace("\\", "_")
     retVal = retVal.replace(" ", "_").replace(":", "_")
 
@@ -885,6 +892,10 @@ def readInput(message, default=None, checkBatch=True):
 def randomRange(start=0, stop=1000):
     """
     Returns random integer value in given range
+
+    >>> random.seed(0)
+    >>> randomRange(1, 500)
+    423
     """
 
     return int(random.randint(start, stop))
@@ -892,6 +903,10 @@ def randomRange(start=0, stop=1000):
 def randomInt(length=4):
     """
     Returns random integer value with provided number of digits
+
+    >>> random.seed(0)
+    >>> randomInt(6)
+    874254
     """
 
     return int("".join(random.choice(string.digits if _ != 0 else string.digits.replace('0', '')) for _ in xrange(0, length)))
@@ -899,6 +914,10 @@ def randomInt(length=4):
 def randomStr(length=4, lowercase=False, alphabet=None):
     """
     Returns random string value with provided number of characters
+
+    >>> random.seed(0)
+    >>> randomStr(6)
+    'RNvnAv'
     """
 
     if alphabet:
@@ -913,6 +932,9 @@ def randomStr(length=4, lowercase=False, alphabet=None):
 def sanitizeStr(value):
     """
     Sanitizes string value in respect to newline and line-feed characters
+
+    >>> sanitizeStr('foo\\n\\rbar')
+    u'foo bar'
     """
 
     return getUnicode(value).replace("\n", " ").replace("\r", "")
@@ -1214,6 +1236,9 @@ def expandAsteriskForColumns(expression):
 def getLimitRange(count, dump=False, plusOne=False):
     """
     Returns range of values used in limit/offset constructs
+
+    >>> [_ for _ in getLimitRange(10)]
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
 
     retVal = None
@@ -1321,6 +1346,14 @@ def getFileType(filePath):
     return "text" if "ASCII" in _ or "text" in _ else "binary"
 
 def getCharset(charsetType=None):
+    """
+    Returns list with integers representing characters of a given
+    charset type appropriate for inference techniques
+
+    >>> getCharset(CHARSET_TYPE.BINARY)
+    [0, 1, 47, 48, 49]
+    """
+
     asciiTbl = []
 
     if charsetType is None:
@@ -1363,6 +1396,9 @@ def getCharset(charsetType=None):
 def directoryPath(filepath):
     """
     Returns directory path for a given filepath
+
+    >>> directoryPath('/var/log/apache.log')
+    '/var/log'
     """
 
     retVal = filepath
@@ -1375,6 +1411,9 @@ def directoryPath(filepath):
 def normalizePath(filepath):
     """
     Returns normalized string representation of a given filepath
+
+    >>> normalizePath('//var///log/apache.log')
+    '//var/log/apache.log'
     """
 
     retVal = filepath
@@ -1388,6 +1427,9 @@ def normalizePath(filepath):
 def safeStringFormat(format_, params):
     """
     Avoids problems with inappropriate string format strings
+
+    >>> safeStringFormat('foobar%d%s', ('1', 2))
+    u'foobar12'
     """
 
     retVal = format_.replace("%d", "%s")
@@ -1413,6 +1455,9 @@ def getFilteredPageContent(page, onlyText=True):
     """
     Returns filtered page content without script, style and/or comments
     or all HTML tags
+
+    >>> getFilteredPageContent(u'<html><title>foobar</title><body>test</body></html>')
+    u'foobar test'
     """
 
     retVal = page
@@ -1422,13 +1467,16 @@ def getFilteredPageContent(page, onlyText=True):
         retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
         while retVal.find("  ") != -1:
             retVal = retVal.replace("  ", " ")
-        retVal = htmlunescape(retVal)
+        retVal = htmlunescape(retVal.strip())
 
     return retVal
 
 def getPageWordSet(page):
     """
     Returns word set used in page content
+
+    >>> sorted(getPageWordSet(u'<html><title>foobar</title><body>test</body></html>'))
+    [u'foobar', u'test']
     """
 
     retVal = set()
@@ -1473,6 +1521,11 @@ def showStaticWords(firstPage, secondPage):
 def isWindowsDriveLetterPath(filepath):
     """
     Returns True if given filepath starts with a Windows drive letter
+
+    >>> isWindowsDriveLetterPath('C:\\boot.ini')
+    True
+    >>> isWindowsDriveLetterPath('/var/log/apache.log')
+    False
     """
 
     return re.search("\A[\w]\:", filepath) is not None
@@ -1634,6 +1687,9 @@ def stdev(values):
     """
     Computes standard deviation of a list of numbers.
     Reference: http://www.goldb.org/corestats.html
+
+    >>> stdev([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
+    0.06324555320336757
     """
 
     if not values or len(values) < 2:
@@ -1654,6 +1710,9 @@ def stdev(values):
 def average(values):
     """
     Computes the arithmetic mean of a list of numbers.
+
+    >>> average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
+    0.9
     """
 
     return (sum(values) / len(values)) if values else None
@@ -1872,6 +1931,9 @@ def longestCommonPrefix(*sequences):
     """
     Returns longest common prefix occuring in given sequences
     Reference: http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
+
+    >>> longestCommonPrefix('foobar', 'fobar')
+    'fo'
     """
 
     if len(sequences) == 1:
@@ -1904,6 +1966,10 @@ def pushValue(value):
 def popValue():
     """
     Pop value from the stack (thread dependent)
+
+    >>> pushValue('foobar')
+    >>> popValue()
+    'foobar'
     """
 
     return getCurrentThreadData().valueStack.pop()
@@ -2028,6 +2094,13 @@ def findMultipartPostBoundary(post):
     return retVal
 
 def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, plusspace=True):
+    """
+    URL decodes given value
+
+    >>> urldecode('AND%201%3E%282%2B3%29%23', convall=True)
+    u'AND 1>(2+3)#'
+    """
+
     result = value
 
     if value:
@@ -2044,10 +2117,10 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                     charset = reduce(lambda x, y: x.replace(y, ""), unsafe, string.printable)
                     char = chr(ord(match.group(1).decode("hex")))
                     return char if char in charset else match.group(0)
-                result = re.sub("%([0-9a-fA-F]{2})", _, value)
-
+                result = value
                 if plusspace:
                     result = result.replace("+", " ")  # plus sign has a special meaning in url encoded data (hence the usage of urllib.unquote_plus in convall case)
+                result = re.sub("%([0-9a-fA-F]{2})", _, result)
 
     if isinstance(result, str):
         result = unicode(result, encoding or UNICODE_ENCODING, "replace")
