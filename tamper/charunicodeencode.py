@@ -21,10 +21,6 @@ def tamper(payload, **kwargs):
     Unicode-url-encodes non-encoded characters in a given payload (not
     processing already encoded)
 
-    Example:
-        * Input: SELECT FIELD%20FROM TABLE
-        * Output: %u0053%u0045%u004c%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004c%u0044%u0020%u0046%u0052%u004f%u004d%u0020%u0054%u0041%u0042%u004c%u0045'
-
     Requirement:
         * ASP
         * ASP.NET
@@ -39,6 +35,9 @@ def tamper(payload, **kwargs):
         * Useful to bypass weak web application firewalls that do not
           unicode url-decode the request before processing it through their
           ruleset
+
+    >>> tamper('SELECT FIELD%20FROM TABLE')
+    '%u0053%u0045%u004C%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004C%u0044%u0020%u0046%u0052%u004F%u004D%u0020%u0054%u0041%u0042%u004C%u0045'
     """
 
     retVal = payload

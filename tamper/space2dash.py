@@ -17,20 +17,18 @@ def tamper(payload, **kwargs):
     Replaces space character (' ') with a dash comment ('--') followed by
     a random string and a new line ('\n')
 
-    Example:
-        * Input: 1 AND 9227=9227
-        * Output: 1--PTTmJopxdWJ%0AAND--cWfcVRPV%0A9227=9227
-
     Requirement:
         * MSSQL
         * SQLite
-
-    Tested against:
 
     Notes:
         * Useful to bypass several web application firewalls
         * Used during the ZeroNights SQL injection challenge,
           https://proton.onsec.ru/contest/
+
+    >>> random.seed(0)
+    >>> tamper('1 AND 9227=9227')
+    '1--nVNaVoPYeva%0AAND--ngNvzqu%0A9227=9227'
     """
 
     retVal = ""

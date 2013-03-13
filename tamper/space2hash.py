@@ -23,10 +23,6 @@ def tamper(payload, **kwargs):
     Replaces space character (' ') with a pound character ('#') followed by
     a random string and a new line ('\n')
 
-    Example:
-        * Input: 1 AND 9227=9227
-        * Output: 1%23PTTmJopxdWJ%0AAND%23cWfcVRPV%0A9227=9227
-
     Requirement:
         * MySQL
 
@@ -37,6 +33,10 @@ def tamper(payload, **kwargs):
         * Useful to bypass several web application firewalls
         * Used during the ModSecurity SQL injection challenge,
           http://modsecurity.org/demo/challenge.html
+
+    >>> random.seed(0)
+    >>> tamper('1 AND 9227=9227')
+    '1%23nVNaVoPYeva%0AAND%23ngNvzqu%0A9227=9227'
     """
 
     retVal = ""

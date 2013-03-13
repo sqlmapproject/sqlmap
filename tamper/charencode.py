@@ -19,10 +19,6 @@ def tamper(payload, **kwargs):
     Url-encodes all characters in a given payload (not processing already
     encoded)
 
-    Example:
-        * Input: SELECT FIELD FROM%20TABLE
-        * Output: %53%45%4c%45%43%54%20%46%49%45%4c%44%20%46%52%4f%4d%20%54%41%42%4c%45
-
     Tested against:
         * Microsoft SQL Server 2005
         * MySQL 4, 5.0 and 5.5
@@ -34,6 +30,9 @@ def tamper(payload, **kwargs):
           url-decode the request before processing it through their ruleset
         * The web server will anyway pass the url-decoded version behind,
           hence it should work against any DBMS
+
+    >>> tamper('SELECT FIELD FROM%20TABLE')
+    '%53%45%4C%45%43%54%20%46%49%45%4C%44%20%46%52%4F%4D%20%54%41%42%4C%45'
     """
 
     retVal = payload

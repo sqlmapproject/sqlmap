@@ -41,8 +41,9 @@ failedTraceBack = None
 
 def smokeTest():
     """
-    This will run the basic smoke testing of a program
+    Runs the basic smoke testing of a program
     """
+
     retVal = True
     count, length = 0, 0
 
@@ -106,8 +107,9 @@ def adjustValueType(tagName, value):
 
 def liveTest():
     """
-    This will run the test of a program against the live testing environment
+    Runs the test of a program against the live testing environment
     """
+
     global failedItem
     global failedParseOn
     global failedTraceBack

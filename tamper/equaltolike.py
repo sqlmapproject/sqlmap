@@ -21,10 +21,6 @@ def tamper(payload, **kwargs):
     """
     Replaces all occurances of operator equal ('=') with operator 'LIKE'
 
-    Example:
-        * Input: SELECT * FROM users WHERE id=1
-        * Output: SELECT * FROM users WHERE id LIKE 1
-
     Tested against:
         * Microsoft SQL Server 2005
         * MySQL 4, 5.0 and 5.5
@@ -34,6 +30,9 @@ def tamper(payload, **kwargs):
           filter the equal character ('=')
         * The LIKE operator is SQL standard. Hence, this tamper script
           should work against all (?) databases
+
+    >>> tamper('SELECT * FROM users WHERE id=1')
+    'SELECT * FROM users WHERE id LIKE 1'
     """
 
     def process(match):

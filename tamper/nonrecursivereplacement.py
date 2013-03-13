@@ -18,12 +18,12 @@ def tamper(payload, **kwargs):
     Replaces predefined SQL keywords with representations
     suitable for replacement (e.g. .replace("SELECT", "")) filters
 
-    Example:
-        * Input: 1 UNION SELECT 2--
-        * Output: 1 UNUNIONION SELSELECTECT 2--
-
     Notes:
         * Useful to bypass very weak custom filters
+
+    >>> random.seed(0)
+    >>> tamper('1 UNION SELECT 2--')
+    '1 UNIOUNIONN SELESELECTCT 2--'
     """
 
     keywords = ("UNION", "SELECT", "INSERT", "UPDATE", "FROM", "WHERE")

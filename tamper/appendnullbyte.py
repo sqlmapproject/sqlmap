@@ -16,10 +16,6 @@ def tamper(payload, **kwargs):
     """
     Appends encoded NULL byte character at the end of payload
 
-    Example:
-        * Input: AND 1=1
-        * Output: AND 1=1%00
-
     Requirement:
         * Microsoft Access
 
@@ -29,6 +25,9 @@ def tamper(payload, **kwargs):
           also possible
 
     Reference: http://projects.webappsec.org/w/page/13246949/Null-Byte-Injection
+
+    >>> tamper('1 AND 1=1')
+    '1 AND 1=1%00'
     """
 
     return "%s%%00" % payload if payload else payload

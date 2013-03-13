@@ -20,10 +20,6 @@ def tamper(payload, **kwargs):
     """
     Adds a percentage sign ('%') infront of each character
 
-    Example:
-        * Input: SELECT FIELD FROM TABLE
-        * Output: %S%E%L%E%C%T %F%I%E%L%D %F%R%O%M %T%A%B%L%E
-
     Requirement:
         * ASP
 
@@ -34,6 +30,9 @@ def tamper(payload, **kwargs):
 
     Notes:
         * Useful to bypass weak and bespoke web application firewalls
+
+    >>> tamper('SELECT FIELD FROM TABLE')
+    '%S%E%L%E%C%T %F%I%E%L%D %F%R%O%M %T%A%B%L%E'
     """
 
     if payload:

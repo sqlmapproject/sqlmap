@@ -22,10 +22,6 @@ def tamper(payload, **kwargs):
     Replaces space character (' ') with a random blank character from a
     valid set of alternate characters
 
-    Example:
-        * Input: SELECT id FROM users
-        * Output: SELECT%0Bid%0BFROM%A0users
-
     Requirement:
         * MySQL
 
@@ -34,6 +30,10 @@ def tamper(payload, **kwargs):
 
     Notes:
         * Useful to bypass several web application firewalls
+
+    >>> random.seed(0)
+    >>> tamper('SELECT id FROM users')
+    'SELECT%A0id%0BFROM%0Cusers'
     """
 
     # ASCII table:

@@ -736,7 +736,7 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
     if flag is None:
         flag = hash(message)
 
-    if flag not in kb.singleLogFlags:
+    if not conf.smokeTest and flag not in kb.singleLogFlags:
         kb.singleLogFlags.add(flag)
         logger.log(level, message)
 

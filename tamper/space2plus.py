@@ -16,14 +16,13 @@ def tamper(payload, **kwargs):
     """
     Replaces space character (' ') with plus ('+')
 
-    Example:
-        * Input: SELECT id FROM users
-        * Output: SELECT+id+FROM+users
-
     Notes:
         * Is this any useful? The plus get's url-encoded by sqlmap engine
           invalidating the query afterwards
         * This tamper script works against all databases
+
+    >>> tamper('SELECT id FROM users')
+    'SELECT+id+FROM+users'
     """
 
     retVal = payload

@@ -18,10 +18,6 @@ def tamper(payload, **kwargs):
     """
     Replaces greater than operator ('>') with 'NOT BETWEEN 0 AND #'
 
-    Example:
-        * Input: 'A > B'
-        * Output: 'A NOT BETWEEN 0 AND B'
-
     Tested against:
         * Microsoft SQL Server 2005
         * MySQL 4, 5.0 and 5.5
@@ -33,6 +29,9 @@ def tamper(payload, **kwargs):
           filter the greater than character
         * The BETWEEN clause is SQL standard. Hence, this tamper script
           should work against all (?) databases
+
+    >>> tamper('1 AND A > B--')
+    '1 AND A NOT BETWEEN 0 AND B--'
     """
 
     retVal = payload

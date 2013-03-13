@@ -16,7 +16,11 @@ __priority__ = PRIORITY.LOW
 def tamper(payload, **kwargs):
     """
     Add random comments to SQL keywords
-    Example: 'INSERT' becomes 'IN/**/S/**/ERT'
+
+    >>> import random
+    >>> random.seed(0)
+    >>> tamper('INSERT')
+    'I/**/N/**/SERT'
     """
 
     retVal = payload

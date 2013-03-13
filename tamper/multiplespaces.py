@@ -20,15 +20,15 @@ def tamper(payload, **kwargs):
     """
     Adds multiple spaces around SQL keywords
 
-    Example:
-        * Input: UNION SELECT
-        * Output:  UNION   SELECT
-
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
           that has poorly written permissive regular expressions
 
     Reference: https://www.owasp.org/images/7/74/Advanced_SQL_Injection.ppt
+
+    >>> random.seed(0)
+    >>> tamper('1 UNION SELECT foobar')
+    '1    UNION     SELECT   foobar'
     """
 
     retVal = payload

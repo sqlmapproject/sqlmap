@@ -18,9 +18,8 @@ def tamper(payload, **kwargs):
     """
     Base64 all characters in a given payload
 
-    Example:
-        * Input: 1' AND SLEEP(5)#
-        * Output: MScgQU5EIFNMRUVQKDUpIw==
+    >>> tamper("1' AND SLEEP(5)#")
+    'MScgQU5EIFNMRUVQKDUpIw=='
     """
 
     return base64.b64encode(payload) if payload else payload

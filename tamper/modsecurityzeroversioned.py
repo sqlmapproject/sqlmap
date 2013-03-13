@@ -16,10 +16,6 @@ def tamper(payload, **kwargs):
     """
     Embraces complete query with zero-versioned comment
 
-    Example:
-        * Input: 1 AND 2>1--
-        * Output: 1 /*!00000AND 2>1*/--
-
     Requirement:
         * MySQL
 
@@ -28,6 +24,9 @@ def tamper(payload, **kwargs):
 
     Notes:
         * Useful to bypass ModSecurity WAF/IDS
+
+    >>> tamper('1 AND 2>1--')
+    '1 /*!00000AND 2>1*/--'
     """
 
     retVal = payload

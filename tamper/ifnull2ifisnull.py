@@ -16,10 +16,6 @@ def tamper(payload, **kwargs):
     """
     Replaces instances like 'IFNULL(A, B)' with 'IF(ISNULL(A), B, A)'
 
-    Example:
-        * Input: IFNULL(1, 2)
-        * Output: IF(ISNULL(1), 2, 1)
-
     Requirement:
         * MySQL
         * SQLite (possibly)
@@ -31,6 +27,9 @@ def tamper(payload, **kwargs):
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
           that filter the IFNULL() function
+
+    >>> tamper('IFNULL(1, 2)')
+    'IF(ISNULL(1),2,1)'
     """
 
     if payload and payload.find("IFNULL") > -1:
@@ -55,7 +54,7 @@ def tamper(payload, **kwargs):
 
             if comma and end:
                 _ = payload[index + len("IFNULL("):comma]
-                __ = payload[comma + 1:end]
+                __ = payload[comma + 1:end].lstrip()
                 newVal = "IF(ISNULL(%s),%s,%s)" % (_, __, _)
                 payload = payload[:index] + newVal + payload[end + 1:]
             else:

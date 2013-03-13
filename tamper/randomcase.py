@@ -20,10 +20,6 @@ def tamper(payload, **kwargs):
     """
     Replaces each keyword character with random case value
 
-    Example:
-        * Input: INSERT
-        * Output: InsERt
-
     Tested against:
         * Microsoft SQL Server 2005
         * MySQL 4, 5.0 and 5.5
@@ -34,6 +30,11 @@ def tamper(payload, **kwargs):
         * Useful to bypass very weak and bespoke web application firewalls
           that has poorly written permissive regular expressions
         * This tamper script should work against all (?) databases
+
+    >>> import random
+    >>> random.seed(0)
+    >>> tamper('INSERT')
+    'INseRt'
     """
 
     retVal = payload

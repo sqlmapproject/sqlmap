@@ -21,10 +21,6 @@ def tamper(payload, **kwargs):
     Replaces space character (' ') with a dash comment ('--') followed by
     a new line ('\n')
 
-    Example:
-        * Input: 1 AND 9227=9227
-        * Output: 1--%0AAND--%0A9227=9227
-
     Requirement:
         * MySQL
         * MSSQL
@@ -33,6 +29,9 @@ def tamper(payload, **kwargs):
 
     Notes:
         * Useful to bypass several web application firewalls.
+
+    >>> tamper('1 AND 9227=9227')
+    '1--%0AAND--%0A9227=9227'
     """
 
     retVal = ""

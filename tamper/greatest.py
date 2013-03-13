@@ -18,10 +18,6 @@ def tamper(payload, **kwargs):
     """
     Replaces greater than operator ('>') with 'GREATEST' counterpart
 
-    Example:
-        * Input: 'A > B'
-        * Output: 'GREATEST(A, B + 1) = A'
-
     Tested against:
         * MySQL 4, 5.0 and 5.5
         * Oracle 10g
@@ -32,6 +28,9 @@ def tamper(payload, **kwargs):
           filter the greater than character
         * The GREATEST clause is a widespread SQL command. Hence, this
           tamper script should work against majority of databases
+
+    >>> tamper('1 AND A > B')
+    '1 AND GREATEST(A,B+1)=A'
     """
 
     retVal = payload

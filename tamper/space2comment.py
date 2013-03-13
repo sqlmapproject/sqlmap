@@ -16,10 +16,6 @@ def tamper(payload, **kwargs):
     """
     Replaces space character (' ') with comments '/**/'
 
-    Example:
-        * Input: SELECT id FROM users
-        * Output: SELECT/**/id/**/FROM/**/users
-
     Tested against:
         * Microsoft SQL Server 2005
         * MySQL 4, 5.0 and 5.5
@@ -28,6 +24,9 @@ def tamper(payload, **kwargs):
 
     Notes:
         * Useful to bypass weak and bespoke web application firewalls
+
+    >>> tamper('SELECT id FROM users')
+    'SELECT/**/id/**/FROM/**/users'
     """
 
     retVal = payload

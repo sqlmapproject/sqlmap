@@ -16,9 +16,8 @@ def tamper(payload, **kwargs):
     """
     Replaces apostrophe character with its illegal double unicode counterpart
 
-    Example:
-        * Input: AND '1'='1'
-        * Output: AND %00%271%00%27=%00%271%00%27
+    >>> tamper("1 AND '1'='1")
+    '1 AND %00%271%00%27=%00%271'
     """
 
     return payload.replace('\'', "%00%27") if payload else payload
