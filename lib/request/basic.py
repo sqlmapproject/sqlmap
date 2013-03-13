@@ -99,13 +99,23 @@ def parseResponse(page, headers):
         htmlParser(page)
 
 def checkCharEncoding(encoding, warn=True):
+    """
+    Checks encoding name, repairs common misspellings and adjusts to
+    proper namings used in codecs module
+
+    >>> checkCharEncoding('iso-8858', False)
+    'iso8859-1'
+    >>> checkCharEncoding('en_us', False)
+    'utf8'
+    """
+
     if encoding:
         encoding = encoding.lower()
     else:
         return encoding
 
     # Reference: http://www.destructor.de/charsets/index.htm
-    translate = {"windows-874": "iso-8859-11", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8",  "utc8": "utf8", "ebcdic": "ebcdic-cp-be"}
+    translate = {"windows-874": "iso-8859-11", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8",  "utc8": "utf8", "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1"}
 
     for delimiter in (';', ',', '('):
         if delimiter in encoding:

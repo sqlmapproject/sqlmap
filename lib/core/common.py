@@ -1697,13 +1697,14 @@ def stdev(values):
 
     key = (values[0], values[-1], len(values))
 
-    if key in kb.cache.stdev:
+    if kb.get("cache") and key in kb.cache.stdev:
         retVal = kb.cache.stdev[key]
     else:
         avg = average(values)
         _ = reduce(lambda x, y: x + pow((y or 0) - avg, 2), values, 0.0)
         retVal = sqrt(_ / (len(values) - 1))
-        kb.cache.stdev[key] = retVal
+        if kb.get("cache"):
+            kb.cache.stdev[key] = retVal
 
     return retVal
 
@@ -2876,6 +2877,9 @@ def normalizeUnicode(value):
     """
     Does an ASCII normalization of unicode strings
     Reference: http://www.peterbe.com/plog/unicode-to-ascii
+
+    >>> normalizeUnicode(u'\u0161u\u0107uraj')
+    'sucuraj'
     """
 
     return unicodedata.normalize('NFKD', value).encode('ascii', 'ignore') if isinstance(value, unicode) else value
@@ -2965,6 +2969,8 @@ def isNullValue(value):
 
     >>> isNullValue(u'NULL')
     True
+    >>> isNullValue(u'foobar')
+    False
     """
 
     return isinstance(value, basestring) and value.upper() == NULL
@@ -3090,6 +3096,12 @@ def filterPairValues(values):
 def randomizeParameterValue(value):
     """
     Randomize a parameter value based on occurances of alphanumeric characters
+
+    >>> random.seed(0)
+    >>> randomizeParameterValue('foobar')
+    'rnvnav'
+    >>> randomizeParameterValue('17')
+    '83'
     """
 
     retVal = value
@@ -3119,6 +3131,9 @@ def asciifyUrl(url, forceQuote=False):
     See also RFC 3987.
 
     Reference: http://blog.elsdoerfer.name/2008/12/12/opening-iris-in-python/
+
+    >>> asciifyUrl(u'http://www.\u0161u\u0107uraj.com')
+    u'http://www.xn--uuraj-gxa24d.com'
     """
 
     parts = urlparse.urlsplit(url)
@@ -3290,6 +3305,9 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 def getHostHeader(url):
     """
     Returns proper Host header value for a given target URL
+
+    >>> getHostHeader('http://www.target.com/vuln.php?id=1')
+    'www.target.com'
     """
 
     retVal = url
@@ -3339,6 +3357,9 @@ def serializeObject(object_):
 def unserializeObject(value):
     """
     Unserializes object from given serialized form
+
+    >>> unserializeObject(serializeObject([1, 2, 3])) == [1, 2, 3]
+    True
     """
 
     return base64unpickle(value) if value else None
@@ -3367,6 +3388,9 @@ def getCounter(technique):
 def applyFunctionRecursively(value, function):
     """
     Applies function recursively through list-like structures
+
+    >>> applyFunctionRecursively([1, 2, [3, 4, [19]], -9], lambda _: _ > 0)
+    [True, True, [True, True, [True]], False]
     """
 
     if isListLike(value):
@@ -3379,6 +3403,9 @@ def applyFunctionRecursively(value, function):
 def decodeHexValue(value):
     """
     Returns value decoded from DBMS specific hexadecimal representation
+
+    >>> decodeHexValue('3132332031')
+    u'123 1'
     """
 
     retVal = value
@@ -3409,6 +3436,11 @@ def decodeHexValue(value):
 def extractExpectedValue(value, expected):
     """
     Extracts and returns expected value by a given type
+
+    >>> extractExpectedValue(['1'], EXPECTED.BOOL)
+    True
+    >>> extractExpectedValue('1', EXPECTED.INT)
+    1
     """
 
     if expected:
@@ -3516,6 +3548,9 @@ def prioritySortColumns(columns):
     """
     Sorts given column names by length in ascending order while those containing
     string 'id' go first
+
+    >>> prioritySortColumns(['password', 'userid', 'name'])
+    ['userid', 'name', 'password']
     """
 
     _ = lambda x: x and "id" in x.lower()
@@ -3536,6 +3571,13 @@ def getRequestHeader(request, name):
 def isNumber(value):
     """
     Returns True if the given value is a number-like object
+
+    >>> isNumber(1)
+    True
+    >>> isNumber('0')
+    True
+    >>> isNumber('foobar')
+    False
     """
 
     try:
@@ -3566,7 +3608,10 @@ def zeroDepthSearch(expression, value):
 
 def splitFields(fields, delimiter=','):
     """
-    Returns list of fields splitted by delimiter
+    Returns list of (0-depth) fields splitted by delimiter
+
+    >>> splitFields('foo, bar, max(foo, bar)')
+    ['foo', 'bar', 'max(foo,bar)']
     """
 
     fields = fields.replace("%s " % delimiter, delimiter)
