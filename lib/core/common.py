@@ -817,7 +817,7 @@ def dataToOutFile(filename, data):
     retVal = None
 
     if data:
-        retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToString(filename))
+        retVal = "%s%s%s" % (conf.filePath, os.sep, filePathToSafeString(filename))
 
         with codecs.open(retVal, "wb", UNICODE_ENCODING) as f:
             f.write(data)
