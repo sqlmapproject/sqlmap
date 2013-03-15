@@ -260,6 +260,19 @@ Option: `-l`
 Rather than providing a single target URL, it is possible to test and inject against HTTP requests proxied through [Burp proxy](http://portswigger.net/suite/) or 
 [WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This option requires an argument which is the proxy's HTTP requests log file.
 
+### Scan multiple targets enlisted in a given textual file
+
+Option: `-m`
+
+Providing list of target URLs enlisted in a given bulk file, sqlmap will scan 
+each of those one by one.
+
+Sample content of a bulk file provided as an argument to this option:
+
+    www.target1.com/vuln1.php?q=foobar
+    www.target2.com/vuln2.php?id=1
+    www.target3.com/vuln3/id/1*
+
 ### Load HTTP request from a file
 
 Option: `-r`
