@@ -9,19 +9,19 @@
 
       Target:
         At least one of these options has to be specified to set the source to
-        get target urls from
+        get target URLs from
 
         -d DIRECT           Direct connection to the database
-        -u URL, --url=URL   Target url
+        -u URL, --url=URL   Target URL
         -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
         -m BULKFILE         Scan multiple targets enlisted in a given textual file
         -r REQUESTFILE      Load HTTP request from a file
         -s SESSIONFILE      Load session from a stored (.sqlite) file
-        -g GOOGLEDORK       Process Google dork results as target urls
+        -g GOOGLEDORK       Process Google dork results as target URLs
         -c CONFIGFILE       Load options from a configuration INI file
 
       Request:
-        These options can be used to specify how to connect to the target url
+        These options can be used to specify how to connect to the target URL
 
         --data=DATA         Data string to be sent through POST
         --param-del=PDEL    Character used for splitting parameter values
@@ -38,15 +38,15 @@
         --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
         --auth-cred=ACRED   HTTP authentication credentials (name:password)
         --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
-        --proxy=PROXY       Use a HTTP proxy to connect to the target url
+        --proxy=PROXY       Use a HTTP proxy to connect to the target URL
         --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
         --ignore-proxy      Ignore system default HTTP proxy
         --delay=DELAY       Delay in seconds between each HTTP request
         --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
         --retries=RETRIES   Retries when the connection timeouts (default 3)
         --scope=SCOPE       Regexp to filter targets from provided proxy log
-        --safe-url=SAFURL   Url address to visit frequently during testing
-        --safe-freq=SAFREQ  Test requests between two visits to a given safe url
+        --safe-url=SAFURL   URL address to visit frequently during testing
+        --safe-freq=SAFREQ  Test requests between two visits to a given safe URL
         --skip-urlencode    Skip URL encoding of payload data
         --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
                             "import hashlib;id2=hashlib.md5(id).hexdigest()")
@@ -98,7 +98,7 @@
         --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
         --union-char=UCHAR  Character to use for bruteforcing number of columns
         --dns-domain=DNS..  Domain name used for DNS exfiltration attack
-        --second-order=S..  Resulting page url searched for second-order response
+        --second-order=S..  Resulting page URL searched for second-order response
 
       Fingerprint:
         -f, --fingerprint   Perform an extensive DBMS version fingerprint
@@ -191,13 +191,13 @@
         --batch             Never ask for user input, use the default behaviour
         --charset=CHARSET   Force character encoding used for data retrieval
         --check-tor         Check to see if Tor is used properly
-        --crawl=CRAWLDEPTH  Crawl the website starting from the target url
+        --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
         --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
         --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
         --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
         --eta               Display for each output the estimated time of arrival
         --flush-session     Flush session files for current target
-        --forms             Parse and test forms on target url
+        --forms             Parse and test forms on target URL
         --fresh-queries     Ignores query results stored in session file
         --hex               Uses DBMS hex function(s) for data retrieval
         --output-dir=ODIR   Custom output directory path
