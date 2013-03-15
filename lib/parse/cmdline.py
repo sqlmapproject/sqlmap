@@ -271,7 +271,7 @@ def cmdLineParser():
                                  "injection techniques")
 
         techniques.add_option("--technique", dest="tech",
-                              help="SQL injection techniques to test for "
+                              help="SQL injection techniques to use "
                                    "(default \"%s\")" % defaults.tech)
 
         techniques.add_option("--time-sec", dest="timeSec",
