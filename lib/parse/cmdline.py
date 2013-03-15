@@ -43,12 +43,12 @@ def cmdLineParser():
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
                              "options has to be specified to set the source "
-                             "to get target urls from")
+                             "to get target URLs from")
 
         target.add_option("-d", dest="direct", help="Direct "
                           "connection to the database")
 
-        target.add_option("-u", "--url", dest="url", help="Target url")
+        target.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"www.target.com/vuln.php?id=1\")")
 
         target.add_option("-l", dest="logFile", help="Parse targets from Burp "
                           "or WebScarab proxy logs")
@@ -63,14 +63,14 @@ def cmdLineParser():
                           help="Load session from a stored (.sqlite) file")
 
         target.add_option("-g", dest="googleDork",
-                          help="Process Google dork results as target urls")
+                          help="Process Google dork results as target URLs")
 
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
 
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
-                              "to specify how to connect to the target url")
+                              "to specify how to connect to the target URL")
 
         request.add_option("--data", dest="data",
                            help="Data string to be sent through POST")
@@ -124,7 +124,7 @@ def cmdLineParser():
                                 "key_file,cert_file)")
 
         request.add_option("--proxy", dest="proxy",
-                           help="Use a HTTP proxy to connect to the target url")
+                           help="Use a HTTP proxy to connect to the target URL")
 
         request.add_option("--proxy-cred", dest="pCred",
                            help="HTTP proxy authentication credentials "
@@ -148,10 +148,10 @@ def cmdLineParser():
                            help="Regexp to filter targets from provided proxy log")
 
         request.add_option("--safe-url", dest="safUrl",
-                           help="Url address to visit frequently during testing")
+                           help="URL address to visit frequently during testing")
 
         request.add_option("--safe-freq", dest="saFreq", type="int",
-                           help="Test requests between two visits to a given safe url")
+                           help="Test requests between two visits to a given safe URL")
 
         request.add_option("--skip-urlencode", dest="skipUrlEncode",
                            action="store_true",
@@ -289,7 +289,7 @@ def cmdLineParser():
                               help="Domain name used for DNS exfiltration attack")
 
         techniques.add_option("--second-order", dest="secondOrder",
-                             help="Resulting page url searched for second-order "
+                             help="Resulting page URL searched for second-order "
                                   "response")
 
         # Fingerprint options
@@ -539,7 +539,7 @@ def cmdLineParser():
                                   help="Check to see if Tor is used properly")
 
         general.add_option("--crawl", dest="crawlDepth", type="int",
-                                  help="Crawl the website starting from the target url")
+                                  help="Crawl the website starting from the target URL")
 
         general.add_option("--csv-del", dest="csvDel",
                                   help="Delimiting character used in CSV output "
@@ -562,7 +562,7 @@ def cmdLineParser():
 
         general.add_option("--forms", dest="forms",
                                   action="store_true",
-                                  help="Parse and test forms on target url")
+                                  help="Parse and test forms on target URL")
 
         general.add_option("--fresh-queries", dest="freshQueries",
                             action="store_true",
