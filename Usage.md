@@ -251,13 +251,14 @@ At least one of these options has to be provided.
 
 Option: `-d`
 
-Run sqlmap against a single database instance. This option requires a connection string in form `http(s)://targeturl[:port]/[...]`.
+Run sqlmap against a single database instance. This option requires a connection string in form `DBMS://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME` (for DBMSes like MySQL, Oracle, Microsoft SQL Server, PostgreSQL, etc.) or `DBMS://DATABASE_FILEPATH` (for DBMSes like SQLite, Microsoft Access, Firebird, etc.)
 
 ### Target URL
 
 Option: `-u` or `--url`
 
-Run sqlmap against a single target URL. This option requires a target URL in form `DBMS://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME` (for e.g. MySQL) or `DBMS://DATABASE_FILEPATH` (for e.g. Microsoft Access).
+Run sqlmap against a single target URL. This option requires a target URL in form 
+`http(s)://targeturl[:port]/[...]`.
 
 ### Parse targets from Burp or WebScarab proxy logs
 
