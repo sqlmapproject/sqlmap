@@ -247,11 +247,17 @@ A reasonable level of verbosity to further understand what sqlmap does under the
 
 At least one of these options has to be provided.
 
+### Direct connection to the database
+
+Option: `-d`
+
+Run sqlmap against a single database instance. This option requires a connection string in form `http(s)://targeturl[:port]/[...]`.
+
 ### Target URL
 
 Option: `-u` or `--url`
 
-Run sqlmap against a single target URL. This switch requires an argument which is the target URL in the form `http(s)://targeturl[:port]/[...]`.
+Run sqlmap against a single target URL. This option requires a target URL in form `DBMS://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME` (for e.g. MySQL) or `DBMS://DATABASE_FILEPATH` (for e.g. Microsoft Access).
 
 ### Parse targets from Burp or WebScarab proxy logs
 
@@ -270,7 +276,7 @@ each of those one by one.
 Sample content of a bulk file provided as an argument to this option:
 
     www.target1.com/vuln1.php?q=foobar
-    www.target2.com/vuln2.php?id=1
+    www.target2.com/vuln2.asp?id=1
     www.target3.com/vuln3/id/1*
 
 ### Load HTTP request from a file
