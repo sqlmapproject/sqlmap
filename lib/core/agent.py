@@ -899,6 +899,7 @@ class Agent(object):
     def forgeQueryOutputLength(self, expression):
         lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
         select = re.search("\ASELECT\s+", expression, re.I)
+        selectTopNotIntExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM.+NOT IN", expression, re.I)
         selectTopExpr = re.search("\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
         selectFromExpr = re.search("\ASELECT\s+(.+?)\s+FROM", expression, re.I)
         selectExpr = re.search("\ASELECT\s+(.+)$", expression, re.I)
@@ -910,7 +911,9 @@ class Agent(object):
         else:
             query = expression
 
-        if select:
+        if selectTopNotIntExpr:
+            lengthExpr = lengthQuery % ("(%s)" % expression)
+        elif select:
             lengthExpr = expression.replace(query, lengthQuery % query, 1)
         else:
             lengthExpr = lengthQuery % expression
