@@ -16,7 +16,6 @@
         -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
         -m BULKFILE         Scan multiple targets enlisted in a given textual file
         -r REQUESTFILE      Load HTTP request from a file
-        -s SESSIONFILE      Load session from a stored (.sqlite) file
         -g GOOGLEDORK       Process Google dork results as target URLs
         -c CONFIGFILE       Load options from a configuration INI file
 
@@ -187,6 +186,7 @@
       General:
         These options can be used to set some general working parameters
 
+        -s SESSIONFILE      Load session from a stored (.sqlite) file
         -t TRAFFICFILE      Log all HTTP traffic into a textual file
         --batch             Never ask for user input, use the default behaviour
         --charset=CHARSET   Force character encoding used for data retrieval
