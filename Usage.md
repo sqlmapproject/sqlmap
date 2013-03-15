@@ -251,14 +251,27 @@ At least one of these options has to be provided.
 
 Option: `-d`
 
-Run sqlmap against a single database instance. This option requires a connection string in form `DBMS://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME` (for DBMSes like MySQL, Oracle, Microsoft SQL Server, PostgreSQL, etc.) or `DBMS://DATABASE_FILEPATH` (for DBMSes like SQLite, Microsoft Access, Firebird, etc.)
+Run sqlmap against a single database instance. This option accepts a connection string in one of following forms: 
+
+* `DBMS://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME` (MySQL, Oracle, Microsoft SQL Server, PostgreSQL, etc.)
+* `DBMS://DATABASE_FILEPATH` (SQLite, Microsoft Access, Firebird, etc.)
+
+For example:
+
+    python sqlmap.py -d "mysql://admin:admin@192.168.21.17:3306/testdb" -f --banner --dbs --users
+
 
 ### Target URL
 
 Option: `-u` or `--url`
 
-Run sqlmap against a single target URL. This option requires a target URL in form 
-`http(s)://targeturl[:port]/[...]`.
+Run sqlmap against a single target URL. This option requires a target URL in following form: 
+
+`http(s)://targeturl[:port]/[...]`
+
+For example:
+
+    python sqlmap.py -u "http://www.target.com/vuln.php?id=1" -f --banner --dbs --users
 
 ### Parse targets from Burp or WebScarab proxy logs
 
@@ -288,8 +301,8 @@ One of the possibilities of sqlmap is loading of complete HTTP request from a te
 
 Sample content of a HTTP request file provided as an argument to this option:
 
-    POST /sqlmap/mysql/post_int.php HTTP/1.1
-    Host: 192.168.136.131
+    POST /vuln.php HTTP/1.1
+    Host: www.target.com
     User-Agent: Mozilla/4.0
     
     id=1
@@ -301,6 +314,10 @@ Option: `-g`
 It is also possible to test and inject on `GET` parameters on the results of your Google dork.
 
 This option makes sqlmap negotiate with the search engine its session cookie to be able to perform a search, then sqlmap will retrieve Google first 100 results for the Google dork expression with `GET` parameters asking you if you want to test and inject on each possible affected URL.
+
+For example:
+
+    python sqlmap.py -g "inurl:\".php?id=1\""
 
 ### Load options from a configuration INI file
 
@@ -319,6 +336,20 @@ These options can be used to specify how to connect to the target url.
 Option: `--data`
 
 By default the HTTP method used to perform HTTP requests is `GET`, but you can implicitly change it to `POST` by providing the data to be sent in the `POST` requests. Such data, being those parameters, are tested for SQL injection as well as any provided `GET` parameters.
+
+For example:
+
+    python sqlmap.py -u "http://www.target.com/vuln.php" --data="id=1" -f --banner --dbs --users
+
+### Parameter splitting character
+
+Option: `--param-del`
+
+There are cases when default parameter delimiter (e.g. `&` in GET and POST data) needs to be overwritten for sqlmap to be able to properly split and process each parameter separately.
+
+For example:
+
+    python sqlmap.py -u "http://www.target.com/vuln.php" --data="query=foobar;id=1" --param-del=";" -f --banner --dbs --users
 
 ### HTTP `Cookie` header
 
