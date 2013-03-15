@@ -1,6 +1,6 @@
 # Usage
 
-    Usage: python sqlmap.py [options]
+    Usage: sqlmap.py [options]
 
     Options:
       -h, --help            Show basic help message and exit
@@ -16,6 +16,7 @@
         -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
         -m BULKFILE         Scan multiple targets enlisted in a given textual file
         -r REQUESTFILE      Load HTTP request from a file
+        -s SESSIONFILE      Load session from a stored (.sqlite) file
         -g GOOGLEDORK       Process Google dork results as target urls
         -c CONFIGFILE       Load options from a configuration INI file
 
@@ -69,7 +70,7 @@
         --invalid-bignum    Use big numbers for invalidating values
         --invalid-logical   Use logical operations for invalidating values
         --no-cast           Turn off payload casting mechanism
-        --no-unescape       Turn off string unescaping mechanism
+        --no-escape         Turn off string escaping mechanism
         --prefix=PREFIX     Injection payload prefix string
         --suffix=SUFFIX     Injection payload suffix string
         --skip=SKIP         Skip testing for given parameter(s)
@@ -92,7 +93,7 @@
         These options can be used to tweak testing of specific SQL injection
         techniques
 
-        --technique=TECH    SQL injection techniques to test for (default "BEUST")
+        --technique=TECH    SQL injection techniques to use (default "BEUSTQ")
         --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
         --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
         --union-char=UCHAR  Character to use for bruteforcing number of columns
@@ -193,6 +194,7 @@
         --crawl=CRAWLDEPTH  Crawl the website starting from the target url
         --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
         --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
+        --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
         --eta               Display for each output the estimated time of arrival
         --flush-session     Flush session files for current target
         --forms             Parse and test forms on target url
@@ -200,21 +202,24 @@
         --hex               Uses DBMS hex function(s) for data retrieval
         --output-dir=ODIR   Custom output directory path
         --parse-errors      Parse and display DBMS error messages from responses
-        --replicate         Replicate dumped data into a sqlite3 database
         --save              Save options to a configuration INI file
         --tor               Use Tor anonymity network
         --tor-port=TORPORT  Set Tor proxy port other than default
-        --tor-type=TORTYPE  Set Tor proxy type (HTTP - default, SOCKS4 or SOCKS5)
+        --tor-type=TORTYPE  Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)
         --update            Update sqlmap
 
       Miscellaneous:
         -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
-        --check-payload     Offline WAF/IPS/IDS payload detection testing
-        --check-waf         Check for existence of WAF/IPS/IDS protection
+        --alert=ALERT       Run shell command(s) when SQL injection is found
+        --answers=ANSWERS   Set question answers (e.g. "quit=N,follow=N")
+        --beep              Make a beep sound when SQL injection is found
+        --check-waf         Heuristically check for WAF/IPS/IDS protection
         --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
-        --dependencies      Check for missing sqlmap dependencies
+        --dependencies      Check for missing (non-core) sqlmap dependencies
         --disable-coloring  Disable console output coloring
         --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+        --hpp               Use HTTP parameter pollution
+        --identify-waf      Make a through testing for a WAF/IPS/IDS protection
         --mobile            Imitate smartphone through HTTP User-Agent header
         --page-rank         Display page rank (PR) for Google dork results
         --purge-output      Safely remove all content from output directory
