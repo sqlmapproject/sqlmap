@@ -59,9 +59,6 @@ def cmdLineParser():
         target.add_option("-r", dest="requestFile",
                           help="Load HTTP request from a file")
 
-        target.add_option("-s", dest="sessionFile",
-                          help="Load session from a stored (.sqlite) file")
-
         target.add_option("-g", dest="googleDork",
                           help="Process Google dork results as target URLs")
 
@@ -522,6 +519,9 @@ def cmdLineParser():
 
         #general.add_option("-x", dest="xmlFile",
         #                    help="Dump the data into an XML file")
+
+        general.add_option("-s", dest="sessionFile",
+                            help="Load session from a stored (.sqlite) file")
 
         general.add_option("-t", dest="trafficFile",
                             help="Log all HTTP traffic into a "
