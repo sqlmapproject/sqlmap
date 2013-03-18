@@ -100,7 +100,7 @@ class Google(object):
 
         if not retVal and "detected unusual traffic" in page:
             warnMsg = "Google has detected 'unusual' traffic from "
-            warnMsg += "this computer disabling further searches"
+            warnMsg += "used IP address disabling further searches"
             raise SqlmapGenericException(warnMsg)
 
         return retVal
