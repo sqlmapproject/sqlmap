@@ -490,6 +490,23 @@ To bypass this limitation set by the target, you can provide two options:
 
 This way, sqlmap will visit every a predefined number of requests a certain _safe_ URL without performing any kind of injection against it.
 
+### Turn off URL encoding of parameter values
+
+Switch: `--skip-urlencode`
+
+Depending on parameter placement (e.g. GET) its value could be URL encoded by default. In some cases, backend web servers do not follow RFC standards and require values to be send in their raw non-encoded form. Use `--skip-urlencode` in those kind of cases.
+
+### Evaluate custom python code during each request
+
+Option: `--eval`
+
+In case that user wants to change (or add new) parameter values, most probably because of some known dependency, he can provide to sqlmap a custom python code with option `--eval` that will be evaluated just before each request.
+
+For example:
+    python sqlmap.py -u "http://www.target.com/vuln.php?id=1&hash=c4ca4238a0b923820dcc509a6f75849b" --eval="import hashlib;hash=hashlib.md5(id).hexdigest()"
+
+Each request of such run will re-evaluate value of GET parameter `hash` to contain a fresh MD5 hash digest for current value of parameter `id`.
+
 ## Optimization
 
 These switches can be used to optimize the performance of sqlmap.
