@@ -21,6 +21,7 @@ except (ImportError, OSError):
 else:
     _multiprocessing = multiprocessing
 
+import gc
 import os
 import re
 import tempfile
@@ -767,6 +768,8 @@ def dictionaryAttack(attack_dict):
                             infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                             singleTimeLogMessage(infoMsg)
 
+                        gc.disable()
+
                         retVal = _multiprocessing.Queue()
                         count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
@@ -803,6 +806,9 @@ def dictionaryAttack(attack_dict):
                             pass
 
                 finally:
+                    if _multiprocessing:
+                        gc.enable()
+
                     if retVal:
                         conf.hashDB.beginTransaction()
 
@@ -844,6 +850,8 @@ def dictionaryAttack(attack_dict):
                             if _multiprocessing.cpu_count() > 1:
                                 infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
                                 singleTimeLogMessage(infoMsg)
+
+                            gc.disable()
 
                             retVal = _multiprocessing.Queue()
                             found_ = _multiprocessing.Value('i', False)
@@ -892,6 +900,9 @@ def dictionaryAttack(attack_dict):
                                 pass
 
                     finally:
+                        if _multiprocessing:
+                            gc.enable()
+
                         if retVal:
                             conf.hashDB.beginTransaction()
 
