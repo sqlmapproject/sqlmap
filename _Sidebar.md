@@ -1,20 +1,20 @@
 ### sqlmap wiki pages
 ----
 #### User's manual
-* [[Scenario]] - Use cases for sqlmap.
-* [[Techniques]] - SQLi techniques detected and exploited by sqlmap.
-* [[Features]] - Breakdown of the features implemented.
+* [[Introduction]] - Introduction to sqlmap.
+* [[Techniques]] - SQLi techniques supported by sqlmap.
+* [[Features]] - Brief list of supported features.
 * [[Download and update]] - Keep your copy up-to-date.
-* [[Dependencies]] - Third-party libraries and tools required.
-* [[History]] - Kickin' databases since 2006.
-* [[Usage]] - Exhaustive breakdown of all switches with examples.
-* [[License]] - The boring stuff.
+* [[Dependencies]] - Information about used third-party libraries and tools.
+* [[History]] - History from 2006 to 2013.
+* [[Usage]] - Exhaustive breakdown of all options and switches together with examples.
+* [[License]] - Copyright information.
 
 <br>
 
 ----
 #### Miscellaneous
 * [[FAQ]] - Frequently Asked Questions.
-* [[Presentations]] - Material around sqlmap presented at conferences.
-* [[Screenshots]] - Collection of screen-shots demonstrating some features.
+* [[Presentations]] - Materials from sqlmap team presented at conferences.
+* [[Screenshots]] - Collection of screenshots demonstrating some of features.
 * [[Third party libraries]] - Details of third-party libraries and tools used by sqlmap.

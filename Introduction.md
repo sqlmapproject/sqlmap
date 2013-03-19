@@ -1,4 +1,4 @@
-# Scenario
+# Introduction
 
 ## Detect and exploit a SQL injection
 
