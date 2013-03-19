@@ -350,8 +350,6 @@ class Agent(object):
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
             if conf.hexConvert or conf.binaryFields and field in conf.binaryFields.split(','):
-                import pdb
-                pdb.set_trace()
                 nulledCastedField = self.hexConvertField(nulledCastedField)
 
         return nulledCastedField
