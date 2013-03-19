@@ -411,7 +411,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     if not kb.testMode and value is None and Backend.getDbms() and conf.dbmsHandler:
         warnMsg = "in case of continuous data retrieval problems you are advised to try "
-        warnMsg += "a switch '--no-cast' and/or switch '--hex'"
+        warnMsg += "a switch '--no-cast' or switch '--hex'"
         singleTimeWarnMessage(warnMsg)
 
     return extractExpectedValue(value, expected)
