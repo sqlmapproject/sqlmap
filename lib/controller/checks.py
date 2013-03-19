@@ -1064,13 +1064,15 @@ def identifyWaf():
 
     @cachedmethod
     def _(*args, **kwargs):
+        page, headers, code = None, None, None
         try:
             if kwargs.get("get"):
                 kwargs["get"] = urlencode(kwargs["get"])
             kwargs["raise404"] = False
-            return Request.getPage(*args, **kwargs)
-        except Exception, ex:
-            return None, None, None
+            page, headers, code = Request.getPage(*args, **kwargs)
+        except Exception:
+            pass
+        return page or "", headers or {}, code
 
     retVal = False
 
