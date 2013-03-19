@@ -86,8 +86,8 @@ HTTP_ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.
 # Default value for HTTP Accept-Encoding header
 HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip,deflate"
 
-# HTTP timeout in silent mode
-HTTP_SILENT_TIMEOUT = 3
+# Default timeout for running commands over backdoor
+BACKDOOR_RUN_CMD_TIMEOUT = 5
 
 # Maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2

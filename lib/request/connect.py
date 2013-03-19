@@ -67,7 +67,6 @@ from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
-from lib.core.settings import HTTP_SILENT_TIMEOUT
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -204,6 +203,7 @@ class Connect(object):
         multipart = kwargs.get("multipart",         False)
         silent = kwargs.get("silent",               False)
         raise404 = kwargs.get("raise404",           True)
+        timeout = kwargs.get("timeout",             conf.timeout)
         auxHeaders = kwargs.get("auxHeaders",       None)
         response = kwargs.get("response",           False)
         ignoreTimeout = kwargs.get("ignoreTimeout", kb.ignoreTimeout)
@@ -248,10 +248,7 @@ class Connect(object):
         url = unicodeencode(url)
 
         try:
-            if silent:
-                socket.setdefaulttimeout(HTTP_SILENT_TIMEOUT)
-            else:
-                socket.setdefaulttimeout(conf.timeout)
+            socket.setdefaulttimeout(timeout)
 
             if direct_:
                 if "?" in url:
@@ -529,14 +526,16 @@ class Connect(object):
             if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
 
-            if "forcibly closed" in tbMsg:
+            if silent:
+                return None, None, None
+            elif "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
                 return None, None, None
-            elif silent or (ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead"))):
+            elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead")):
                 return None, None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
                 warnMsg += ". sqlmap is going to retry the request"
-                logger.log(logging.CRITICAL if not conf.identifyWaf else logging.DEBUG, warnMsg)
+                logger.critical(warnMsg)
                 return Connect._retryProxy(**kwargs)
             elif kb.testMode:
                 logger.critical(warnMsg)

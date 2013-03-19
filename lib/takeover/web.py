@@ -41,6 +41,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import WEB_API
+from lib.core.settings import BACKDOOR_RUN_CMD_TIMEOUT
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
@@ -71,7 +72,7 @@ class Web:
             cmd = conf.osCmd
 
         cmdUrl = "%s?cmd=%s" % (self.webBackdoorUrl, cmd)
-        page, _, _ = Request.getPage(url=cmdUrl, direct=True, silent=True)
+        page, _, _ = Request.getPage(url=cmdUrl, direct=True, silent=True, timeout=BACKDOOR_RUN_CMD_TIMEOUT)
 
         if page is not None:
             output = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
