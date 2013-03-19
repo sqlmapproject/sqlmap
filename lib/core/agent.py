@@ -339,8 +339,7 @@ class Agent(object):
         if field:
             rootQuery = queries[Backend.getIdentifiedDbms()]
 
-            if field.startswith("(CASE") or field.startswith("(IIF") or\
-            conf.noCast:
+            if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast:
                 nulledCastedField = field
             else:
                 if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
