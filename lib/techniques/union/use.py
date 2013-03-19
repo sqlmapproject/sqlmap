@@ -319,7 +319,8 @@ def unionUse(expression, unpack=True, dump=False):
                 kb.suppressResumeInfo = False
 
     if not value and not abortedFlag:
-        value = _oneShotUnionUse(expression, unpack)
+        output = _oneShotUnionUse(expression, unpack)
+        value = parseUnionPage(output)
 
     duration = calculateDeltaSeconds(start)
 
