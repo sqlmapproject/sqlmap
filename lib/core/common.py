@@ -64,7 +64,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import OS
 from lib.core.enums import PLACE
@@ -1188,14 +1188,14 @@ def parseTargetUrl():
     if not conf.referer and intersect(REFERER_ALIASES, conf.testParameter, True):
         debugMsg = "setting the HTTP Referer header to the target url"
         logger.debug(debugMsg)
-        conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.REFERER, conf.httpHeaders)
-        conf.httpHeaders.append((HTTPHEADER.REFERER, conf.url))
+        conf.httpHeaders = filter(lambda (key, value): key != HTTP_HEADER.REFERER, conf.httpHeaders)
+        conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url))
 
     if not conf.host and intersect(HOST_ALIASES, conf.testParameter, True):
         debugMsg = "setting the HTTP Host header to the target url"
         logger.debug(debugMsg)
-        conf.httpHeaders = filter(lambda (key, value): key != HTTPHEADER.HOST, conf.httpHeaders)
-        conf.httpHeaders.append((HTTPHEADER.HOST, getHostHeader(conf.url)))
+        conf.httpHeaders = filter(lambda (key, value): key != HTTP_HEADER.HOST, conf.httpHeaders)
+        conf.httpHeaders.append((HTTP_HEADER.HOST, getHostHeader(conf.url)))
 
     if conf.url != originalUrl:
         kb.originalUrls[conf.url] = originalUrl

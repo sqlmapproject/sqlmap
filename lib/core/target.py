@@ -28,7 +28,7 @@ from lib.core.data import paths
 from lib.core.dicts import DBMS_DICT
 from lib.core.dump import dumper
 from lib.core.enums import HASHDB_KEYS
-from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
@@ -247,7 +247,7 @@ def _setRequestParams():
 
             httpHeader = httpHeader.title()
 
-            if httpHeader == HTTPHEADER.USER_AGENT:
+            if httpHeader == HTTP_HEADER.USER_AGENT:
                 conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
@@ -256,7 +256,7 @@ def _setRequestParams():
                     conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
                     testableParameters = True
 
-            elif httpHeader == HTTPHEADER.REFERER:
+            elif httpHeader == HTTP_HEADER.REFERER:
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
@@ -265,7 +265,7 @@ def _setRequestParams():
                     conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
                     testableParameters = True
 
-            elif httpHeader == HTTPHEADER.HOST:
+            elif httpHeader == HTTP_HEADER.HOST:
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))

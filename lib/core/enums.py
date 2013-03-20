@@ -133,7 +133,7 @@ class DUMP_FORMAT:
     HTML = "HTML"
     SQLITE = "SQLITE"
 
-class HTTPHEADER:
+class HTTP_HEADER:
     ACCEPT = "Accept"
     ACCEPT_CHARSET = "Accept-Charset"
     ACCEPT_ENCODING = "Accept-Encoding"

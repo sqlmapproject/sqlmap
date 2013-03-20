@@ -15,7 +15,7 @@ from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
 from lib.core.enums import CUSTOM_LOGGING
-from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
@@ -82,7 +82,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 except:
                     pass
 
-        content = decodePage(content, headers.get(HTTPHEADER.CONTENT_ENCODING), headers.get(HTTPHEADER.CONTENT_TYPE))
+        content = decodePage(content, headers.get(HTTP_HEADER.CONTENT_ENCODING), headers.get(HTTP_HEADER.CONTENT_TYPE))
 
         threadData = getCurrentThreadData()
         threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
@@ -110,9 +110,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             self._ask_redirect_choice(code, redurl, req.get_method())
 
         if redurl and kb.redirectChoice == REDIRECTION.YES:
-            req.headers[HTTPHEADER.HOST] = getHostHeader(redurl)
-            if headers and HTTPHEADER.SET_COOKIE in headers:
-                req.headers[HTTPHEADER.COOKIE] = headers[HTTPHEADER.SET_COOKIE].split(DEFAULT_COOKIE_DELIMITER)[0]
+            req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)
+            if headers and HTTP_HEADER.SET_COOKIE in headers:
+                req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(DEFAULT_COOKIE_DELIMITER)[0]
             result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         else:
             result = fp

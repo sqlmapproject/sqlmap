@@ -67,7 +67,7 @@ from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import AUTH_TYPE
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DUMP_FORMAT
-from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
 from lib.core.enums import PAYLOAD
@@ -292,9 +292,9 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     key, value = line.split(": ", 1)
 
                     # Cookie and Host headers
-                    if key.upper() == HTTPHEADER.COOKIE.upper():
+                    if key.upper() == HTTP_HEADER.COOKIE.upper():
                         cookie = value
-                    elif key.upper() == HTTPHEADER.HOST.upper():
+                    elif key.upper() == HTTP_HEADER.HOST.upper():
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
                         splitValue = value.split(":")
@@ -306,11 +306,11 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     # Avoid to add a static content length header to
                     # conf.httpHeaders and consider the following lines as
                     # POSTed data
-                    if key.upper() == HTTPHEADER.CONTENT_LENGTH.upper():
+                    if key.upper() == HTTP_HEADER.CONTENT_LENGTH.upper():
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in (HTTPHEADER.PROXY_CONNECTION, HTTPHEADER.CONNECTION):
+                    elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
                         conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
 
                     if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
@@ -1190,16 +1190,16 @@ def _setHTTPExtraHeaders():
                 raise SqlmapSyntaxException(errMsg)
 
     elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
-        conf.httpHeaders.append((HTTPHEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
+        conf.httpHeaders.append((HTTP_HEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
         if not conf.charset:
-            conf.httpHeaders.append((HTTPHEADER.ACCEPT_CHARSET, "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
+            conf.httpHeaders.append((HTTP_HEADER.ACCEPT_CHARSET, "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
         else:
-            conf.httpHeaders.append((HTTPHEADER.ACCEPT_CHARSET, "%s;q=0.7,*;q=0.1" % conf.charset))
+            conf.httpHeaders.append((HTTP_HEADER.ACCEPT_CHARSET, "%s;q=0.7,*;q=0.1" % conf.charset))
 
         # Invalidating any caching mechanism in between
         # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-        conf.httpHeaders.append((HTTPHEADER.CACHE_CONTROL, "no-cache,no-store"))
-        conf.httpHeaders.append((HTTPHEADER.PRAGMA, "no-cache"))
+        conf.httpHeaders.append((HTTP_HEADER.CACHE_CONTROL, "no-cache,no-store"))
+        conf.httpHeaders.append((HTTP_HEADER.PRAGMA, "no-cache"))
 
 def _defaultHTTPUserAgent():
     """
@@ -1243,24 +1243,24 @@ def _setHTTPUserAgent():
         except:
             item = MOBILES.IPHONE
 
-        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, item[1]))
+        conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, item[1]))
 
     elif conf.agent:
         debugMsg = "setting the HTTP User-Agent header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, conf.agent))
+        conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, conf.agent))
 
     elif not conf.randomAgent:
         _ = True
 
         for header, _ in conf.httpHeaders:
-            if header == HTTPHEADER.USER_AGENT:
+            if header == HTTP_HEADER.USER_AGENT:
                 _ = False
                 break
 
         if _:
-            conf.httpHeaders.append((HTTPHEADER.USER_AGENT, _defaultHTTPUserAgent()))
+            conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, _defaultHTTPUserAgent()))
 
     else:
         if not kb.userAgents:
@@ -1275,7 +1275,7 @@ def _setHTTPUserAgent():
                 warnMsg += "file '%s'" % paths.USER_AGENTS
                 logger.warn(warnMsg)
 
-                conf.httpHeaders.append((HTTPHEADER.USER_AGENT, _defaultHTTPUserAgent()))
+                conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, _defaultHTTPUserAgent()))
                 return
 
         count = len(kb.userAgents)
@@ -1286,7 +1286,7 @@ def _setHTTPUserAgent():
             userAgent = kb.userAgents[randomRange(stop=count - 1)]
 
         userAgent = sanitizeStr(userAgent)
-        conf.httpHeaders.append((HTTPHEADER.USER_AGENT, userAgent))
+        conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, userAgent))
 
         infoMsg = "fetched random HTTP User-Agent header from "
         infoMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
@@ -1301,7 +1301,7 @@ def _setHTTPReferer():
         debugMsg = "setting the HTTP Referer header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append((HTTPHEADER.REFERER, conf.referer))
+        conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.referer))
 
 def _setHTTPCookies():
     """
@@ -1312,7 +1312,7 @@ def _setHTTPCookies():
         debugMsg = "setting the HTTP Cookie header"
         logger.debug(debugMsg)
 
-        conf.httpHeaders.append((HTTPHEADER.COOKIE, conf.cookie))
+        conf.httpHeaders.append((HTTP_HEADER.COOKIE, conf.cookie))
 
 def _setHTTPTimeout():
     """

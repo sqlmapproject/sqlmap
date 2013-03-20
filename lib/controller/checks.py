@@ -48,7 +48,7 @@ from lib.core.decorators import cachedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
@@ -1118,15 +1118,15 @@ def checkNullConnection():
     try:
         page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD)
 
-        if not page and HTTPHEADER.CONTENT_LENGTH in (headers or {}):
+        if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
             kb.nullConnection = NULLCONNECTION.HEAD
 
             infoMsg = "NULL connection is supported with HEAD header"
             logger.info(infoMsg)
         else:
-            page, headers, _ = Request.getPage(auxHeaders={HTTPHEADER.RANGE: "bytes=-1"})
+            page, headers, _ = Request.getPage(auxHeaders={HTTP_HEADER.RANGE: "bytes=-1"})
 
-            if page and len(page) == 1 and HTTPHEADER.CONTENT_RANGE in (headers or {}):
+            if page and len(page) == 1 and HTTP_HEADER.CONTENT_RANGE in (headers or {}):
                 kb.nullConnection = NULLCONNECTION.RANGE
 
                 infoMsg = "NULL connection is supported with GET header "

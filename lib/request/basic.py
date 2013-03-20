@@ -23,7 +23,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
-from lib.core.enums import HTTPHEADER
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapCompressionException
 from lib.core.htmlentities import htmlEntities
@@ -56,28 +56,28 @@ def forgeHeaders(items=None):
     headers = dict(("-".join(_.capitalize() for _ in key.split('-')), value) for (key, value) in headers.items())
 
     if conf.cj:
-        if HTTPHEADER.COOKIE in headers:
+        if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
-                if ("%s=" % cookie.name) in headers[HTTPHEADER.COOKIE]:
+                if ("%s=" % cookie.name) in headers[HTTP_HEADER.COOKIE]:
                     if kb.mergeCookies is None:
-                        message = "you provided a HTTP %s header value. " % HTTPHEADER.COOKIE
+                        message = "you provided a HTTP %s header value. " % HTTP_HEADER.COOKIE
                         message += "The target url provided its own cookies within "
-                        message += "the HTTP %s header which intersect with yours. " % HTTPHEADER.SET_COOKIE
+                        message += "the HTTP %s header which intersect with yours. " % HTTP_HEADER.SET_COOKIE
                         message += "Do you want to merge them in futher requests? [Y/n] "
                         _ = readInput(message, default="Y")
                         kb.mergeCookies = not _ or _[0] in ("y", "Y")
 
                     if kb.mergeCookies:
                         _ = lambda x: re.sub("(?i)%s=[^%s]+" % (cookie.name, DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, cookie.value), x)
-                        headers[HTTPHEADER.COOKIE] = _(headers[HTTPHEADER.COOKIE])
+                        headers[HTTP_HEADER.COOKIE] = _(headers[HTTP_HEADER.COOKIE])
 
                         if PLACE.COOKIE in conf.parameters:
                             conf.parameters[PLACE.COOKIE] = _(conf.parameters[PLACE.COOKIE])
 
-                        conf.httpHeaders = [(item[0], item[1] if item[0] != HTTPHEADER.COOKIE else _(item[1])) for item in conf.httpHeaders]
+                        conf.httpHeaders = [(item[0], item[1] if item[0] != HTTP_HEADER.COOKIE else _(item[1])) for item in conf.httpHeaders]
 
                 elif not kb.testMode:
-                    headers[HTTPHEADER.COOKIE] += "%s %s=%s" % (DEFAULT_COOKIE_DELIMITER, cookie.name, cookie.value)
+                    headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (DEFAULT_COOKIE_DELIMITER, cookie.name, cookie.value)
 
         if kb.testMode:
             resetCookieJar(conf.cj)
