@@ -21,6 +21,7 @@ from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
+from lib.core.settings import VERSION_STRING
 
 def cmdLineParser():
     """
@@ -36,6 +37,10 @@ def cmdLineParser():
         parser.add_option("--hh", dest="advancedHelp",
                           action="store_true",
                           help="Show advanced help message and exit")
+
+        parser.add_option("--version", dest="showVersion",
+                          action="store_true",
+                          help="Show version string and exit")
 
         parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
@@ -740,6 +745,9 @@ def cmdLineParser():
         for i in xrange(len(sys.argv)):
             if sys.argv[i] == '-hh':
                 sys.argv[i] = '-h'
+            elif sys.argv[i] == '--version':
+                print VERSION_STRING
+                raise SystemExit
             elif sys.argv[i] == '-h':
                 advancedHelp = False
                 for group in parser.option_groups[:]:
