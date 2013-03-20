@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.enums import HTTPHEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "KS-WAF (Knownsec)"

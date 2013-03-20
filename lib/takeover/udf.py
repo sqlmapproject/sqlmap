@@ -11,7 +11,6 @@ from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import isStackingAvailable
-from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
@@ -20,7 +19,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
 from lib.core.common import unArrayizeValue
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
