@@ -81,6 +81,9 @@ Y P Chien, <ypchien@cox.net>
 Pierre Chifflier, <pollux@debian.org> and Mark Hymers, <ftpmaster@debian.org>
 * for uploading and accepting the sqlmap Debian package to the official Debian project repository
 
+Hysia Chow <hysia@icloud.com>
+* for contributing a couple of WAF scripts
+
 Chris Clements, <cclements@flatearth.net>
 * for reporting a couple of bugs
 
