@@ -3562,6 +3562,19 @@
             <item value="banner:    '5.1.66-0+squeeze1'"/>
         </parse>
     </case>
+    <case name="Custom FROM table in UNION query">
+        <switches>
+            <verbose value="3"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <tech value="U"/>
+            <uFrom value="INFORMATION_SCHEMA.COLLATIONS"/>
+            <getBanner value="True"/>
+        </switches>
+        <parse>
+            <item value="r'VERSION\(\).+FROM INFORMATION_SCHEMA\.COLLATIONS'" console_output="True"/>
+            <item value="banner:    '5.1.66-0+squeeze1'"/>
+        </parse>
+    </case>
     <case name="Estimated time of arrival">
         <switches>
             <verbose value="2"/>
