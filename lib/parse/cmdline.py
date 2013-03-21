@@ -287,6 +287,9 @@ def cmdLineParser():
         techniques.add_option("--union-char", dest="uChar",
                               help="Character to use for bruteforcing number of columns")
 
+        techniques.add_option("--union-from", dest="uFrom",
+                              help="Table to use in FROM part of UNION query SQL injection")
+
         techniques.add_option("--dns-domain", dest="dnsName",
                               help="Domain name used for DNS exfiltration attack")
 

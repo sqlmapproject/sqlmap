@@ -647,7 +647,10 @@ class Agent(object):
         @rtype: C{str}
         """
 
-        fromTable = fromTable or FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
+        if conf.uFrom:
+            fromTable = " FROM %s" % conf.uFrom
+        else:
+            fromTable = fromTable or FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
 
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]

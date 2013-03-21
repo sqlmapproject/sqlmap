@@ -88,6 +88,7 @@ optDict = {
                                "timeSec":           "integer",
                                "uCols":             "string",
                                "uChar":             "string",
+                               "uFrom":             "string",
                                "dnsName":           "string",
                                "secondOrder":       "string",
                              },
