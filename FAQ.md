@@ -91,9 +91,9 @@ We already support the major and some minor databases. We do have plans to exten
 
 **No**.
 
-## My site was attacked with sqlmap. Stop developing it you *dumb f.cks*!
+## My site was attacked with sqlmap. Stop developing it you *dumb f.cks*!?
 
-We get occasional rage bursts from unknown people. It should be emphasized here that with each sqlmap run end users are obligated with the following prelude message:
+We get occasional rage bursts from unknown people. It should be emphasized here that **with each sqlmap run end users are obligated** with the following prelude message:
 
     [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent
     is illegal. It is the end user's responsibility to obey all applicable local, state and
