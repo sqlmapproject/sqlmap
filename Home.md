@@ -1,0 +1,1 @@
+You can find detailed information about sqlmap at wiki pages enlisted at the right side panel.
