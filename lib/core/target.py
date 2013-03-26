@@ -136,10 +136,6 @@ def _setRequestParams():
                 conf.data = re.sub(r"(?si)(Content-Disposition.+?)((\r)?\n--)", r"\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.MULTIPART
 
-        if kb.postHint:
-            if CUSTOM_INJECTION_MARK_CHAR not in conf.data:  # in case that no usable parameter values has been found
-                kb.postHint = None
-
         if not kb.postHint:
             if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
                 pass
@@ -152,8 +148,11 @@ def _setRequestParams():
                 if paramDict:
                     conf.paramDict[place] = paramDict
                     testableParameters = True
+        else:
+            if CUSTOM_INJECTION_MARK_CHAR not in conf.data:  # in case that no usable parameter values has been found
+                conf.parameters[PLACE.POST] = conf.data
 
-    kb.processUserMarks = True if kb.postHint else kb.processUserMarks
+    kb.processUserMarks = True if (kb.postHint and CUSTOM_INJECTION_MARK_CHAR in conf.data) else kb.processUserMarks
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint:
         warnMsg = "you've provided target url without any GET "
