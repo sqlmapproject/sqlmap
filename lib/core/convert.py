@@ -53,7 +53,7 @@ def base64pickle(value):
 
 def base64unpickle(value):
     """
-    Decodes value from Base64 to plain format and deserializes (with pickle) it's content
+    Decodes value from Base64 to plain format and deserializes (with pickle) its content
 
     >>> base64unpickle('gAJVBmZvb2JhcnEALg==')
     'foobar'

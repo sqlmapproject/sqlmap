@@ -437,7 +437,7 @@ class XMLDump(object):
     def query(self, query, queryRes):
         '''
         Adds details of an executed query to the xml.
-        The query details are the query itself and it's results.
+        The query details are the query itself and its results.
         '''
         queryElem = self.__doc.createElement(QUERY_ELEM_NAME)
         queryElem.setAttributeNode(self._createAttribute(VALUE_ATTR, query))

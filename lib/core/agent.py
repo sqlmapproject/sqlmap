@@ -471,7 +471,7 @@ class Agent(object):
 
     def preprocessField(self, table, field):
         """
-        Does a field preprocessing (if needed) based on it's type (e.g. image to text)
+        Does a field preprocessing (if needed) based on its type (e.g. image to text)
         Note: used primarily in dumping of custom tables
         """
 

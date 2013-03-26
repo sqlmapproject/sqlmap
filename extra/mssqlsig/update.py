@@ -21,7 +21,7 @@ MSSQL_VERSIONS_URL = "http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/t
 
 def updateMSSQLXML():
     if not os.path.exists(MSSQL_XML):
-        errMsg = "[ERROR] file '%s' does not exist. please run the script from it's parent directory." % MSSQL_XML
+        errMsg = "[ERROR] file '%s' does not exist. Please run the script from its parent directory" % MSSQL_XML
         print errMsg
         return
 
