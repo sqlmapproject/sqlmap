@@ -749,7 +749,7 @@ class Connect(object):
             get = urlencode(get, limit=True)
 
         if post is not None:
-            if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
+            if place not in (PLACE.POST, PLACE.CUSTOM_POST) and '%' in getattr(post, UNENCODED_ORIGINAL_VALUE, ""):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
             elif not skipUrlEncode and kb.postHint not in POST_HINT_CONTENT_TYPES.keys():
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
