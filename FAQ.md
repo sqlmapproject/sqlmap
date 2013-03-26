@@ -93,11 +93,11 @@ We already support the major and some minor databases. We do have plans to exten
 
 ## My site was attacked with sqlmap. Stop developing it you *dumb f.cks*!
 
-We get occasional rage flames from unknown people. With each sqlmap run end users are obligated with the following prelude message:
+We get occasional rage bursts from unknown people. It should be emphasized here that with each sqlmap run end users are obligated with the following prelude message:
 
-```
-[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
-```
+    [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is 
+    the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no 
+    liability and are not responsible for any misuse or damage caused by this program
 
 ## When sqlmap will switch to Python 3?
 
