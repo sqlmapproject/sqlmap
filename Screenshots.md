@@ -28,6 +28,14 @@ DNS exfiltration technique (option `--dns-domain`):
 
 ![DNS exfiltration technique](images/sqlmap_dns_exfiltration.png)
 
+Identify WAF/IDS/IPS protection (option `--identify-waf`):
+
+![Identify WAF/IDS/IPS protection](images/sqlmap_identify_waf.png)
+
+HTTP parameter pollution (option `--hpp`):
+
+![HTTP parameter pollution](images/sqlmap_hpp.png)
+
 Replicating table to a local SQLite3 database (switch `--replicate`):
 
 ![Replicated table](images/sqlmap_replicate_result.png)
