@@ -1917,9 +1917,8 @@ def _setTorHttpProxySettings():
 
     if not conf.checkTor:
         warnMsg = "use switch '--check-tor' at "
-        warnMsg += "your own convenience when using "
-        warnMsg += "HTTP proxy type (option '--tor-type') "
-        warnMsg += "for accessing Tor anonymizing network because of "
+        warnMsg += "your own convenience when accessing "
+        warnMsg += "Tor anonymizing network because of "
         warnMsg += "known issues with default settings of various 'bundles' "
         warnMsg += "(e.g. Vidalia)"
         logger.warn(warnMsg)
