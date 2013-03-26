@@ -91,6 +91,14 @@ We already support the major and some minor databases. We do have plans to exten
 
 **No**.
 
+## My site was attacked with sqlmap. Stop developing it you *dumb f.cks*!
+
+We get occasional rage flames from unknown people. With each sqlmap run end users are obligated with the following prelude message:
+
+```
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+```
+
 ## When sqlmap will switch to Python 3?
 
 Currently there is no pressure on Python projects to switch to the new version of Python interpreter, as the process of switching, especially on larger projects can be cumbersome (due to the few backward incompatibilities). The switch will take place eventually, but currently it is a very [low priority task](https://github.com/sqlmapproject/sqlmap/issues/93).
