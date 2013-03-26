@@ -4,7 +4,7 @@ Verbose output (option `-v` set to `3`):
 
 ![Verbose output set to 3](images/sqlmap_verbose_3.png)
 
-Concatenation of three tamper scripts to obfuscate the injected SQL payloads (switch `--tamper`):
+Concatenation of three tamper scripts to obfuscate the injected SQL payloads (option `--tamper` set to `between,randomcase,space2comment`):
 
 ![Tamper scripts in action](images/sqlmap_tamper_in_action.png)
 
@@ -28,19 +28,19 @@ DNS exfiltration technique (option `--dns-domain`):
 
 ![DNS exfiltration technique](images/sqlmap_dns_exfiltration.png)
 
-Identify WAF/IDS/IPS protection (option `--identify-waf`):
+Identify WAF/IDS/IPS protection (switch `--identify-waf`):
 
 ![Identify WAF/IDS/IPS protection](images/sqlmap_identify_waf.png)
 
-HTTP parameter pollution (option `--hpp`):
+HTTP parameter pollution (switch `--hpp`):
 
 ![HTTP parameter pollution](images/sqlmap_hpp.png)
 
-Replicating table to a local SQLite3 database (option `--dump-format=SQLITE`):
+Replicating table to a local SQLite3 database (option `--dump-format` set to `SQLITE`):
 
 ![Replicated table](images/sqlmap_replicate_result.png)
 
-Dumping table to HTML format (option `--dump-format=HTML`):
+Dumping table to HTML format (option `--dump-format` set to `HTML`):
 
 ![Dumped table to HTML](images/sqlmap_dump_html.png)
 
