@@ -880,7 +880,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the url is stable, wait a few seconds"
+    infoMsg = "testing if the url is stable. This can take a couple of seconds"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
