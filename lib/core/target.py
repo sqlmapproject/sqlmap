@@ -136,18 +136,18 @@ def _setRequestParams():
                 conf.data = re.sub(r"(?si)(Content-Disposition.+?)((\r)?\n--)", r"\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                 kb.postHint = POST_HINT.MULTIPART
 
-        elif CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
-            pass
+        if not kb.postHint:
+            if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
+                pass
+            else:
+                place = PLACE.POST
 
-        else:
-            place = PLACE.POST
+                conf.parameters[place] = conf.data
+                paramDict = paramToDict(place, conf.data)
 
-            conf.parameters[place] = conf.data
-            paramDict = paramToDict(place, conf.data)
-
-            if paramDict:
-                conf.paramDict[place] = paramDict
-                testableParameters = True
+                if paramDict:
+                    conf.paramDict[place] = paramDict
+                    testableParameters = True
 
     kb.processUserMarks = True if kb.postHint else kb.processUserMarks
 
