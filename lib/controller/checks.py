@@ -745,7 +745,7 @@ def heuristicCheckSqlInjection(place, parameter):
     parseFilePaths(page)
     result = wasLastResponseDBMSError()
 
-    infoMsg = "heuristic (parsing) test shows that %s " % place
+    infoMsg = "heuristic (basic) test shows that %s " % place
     infoMsg += "parameter '%s' might " % parameter
 
     def _(page):
