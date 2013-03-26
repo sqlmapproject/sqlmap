@@ -36,9 +36,13 @@ HTTP parameter pollution (option `--hpp`):
 
 ![HTTP parameter pollution](images/sqlmap_hpp.png)
 
-Replicating table to a local SQLite3 database (switch `--replicate`):
+Replicating table to a local SQLite3 database (option `--dump-format=SQLITE`):
 
 ![Replicated table](images/sqlmap_replicate_result.png)
+
+Dumping table to HTML format (option `--dump-format=HTML`):
+
+![Dumped table to HTML](images/sqlmap_dump_html.png)
 
 OS pwn mode (Meterpreter) (switch `--os-pwn`):
 
