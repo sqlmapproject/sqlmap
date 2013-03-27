@@ -518,7 +518,10 @@ JSON_RECOGNITION_REGEX = r'(?s)\A\s*\{.*"[^"]+"\s*:\s*("[^"]+"|\d+).*\}\s*\Z'
 MULTIPART_RECOGNITION_REGEX = r"(?i)Content-Disposition:[^;]+;\s*name="
 
 # Default POST data content-type
-DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded"
+DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=utf-8"
+
+# Raw text POST data content-type
+PLAIN_TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
 
 # Length used while checking for existence of Suhosin-patch (like) protection mechanism
 SUHOSIN_MAX_VALUE_LENGTH = 512

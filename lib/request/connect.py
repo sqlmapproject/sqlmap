@@ -76,6 +76,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PERMISSION_DENIED_REGEX
+from lib.core.settings import PLAIN_TEXT_CONTENT_TYPE
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
@@ -586,7 +587,7 @@ class Connect(object):
         pageLength = None
         uri = None
         code = None
-        skipUrlEncode = conf.skipUrlEncode
+        urlEncodePost = None
 
         if not place:
             place = kb.injection.place or PLACE.GET
@@ -597,11 +598,16 @@ class Connect(object):
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
 
-        if skipUrlEncode is None and conf.httpHeaders:
+        if conf.httpHeaders:
             headers = dict(conf.httpHeaders)
-            _ = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
-            if _ and "urlencoded" not in _:
-                skipUrlEncode = True
+            contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
+            urlEncodePost = contentType and "urlencoded" in contentType
+
+            if conf.skipUrlEncode and urlEncodePost:
+                urlEncodePost = False
+                conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
+                contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
+                conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
 
         if payload:
             if kb.tamperFunctions:
@@ -628,8 +634,8 @@ class Connect(object):
                         payload = json.dumps(payload)[1:-1]
                 value = agent.replacePayload(value, payload)
             else:
-                if not skipUrlEncode and place in (PLACE.GET, PLACE.POST, PLACE.COOKIE, PLACE.URI):
-                    # GET, POST, URI and Cookie payload needs to be throughly URL encoded
+                # GET, POST, URI and Cookie payload needs to be throughly URL encoded
+                if place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST,) and urlEncodePost:
                     payload = urlencode(payload, '%', False, place != PLACE.URI)
                     value = agent.replacePayload(value, payload)
 
@@ -745,13 +751,13 @@ class Connect(object):
                         else:
                             get += "%s%s=%s" % (delimiter, name, value)
 
-        if not skipUrlEncode:
+        if not conf.skipUrlEncode:
             get = urlencode(get, limit=True)
 
         if post is not None:
-            if place not in (PLACE.POST, PLACE.CUSTOM_POST) and '%' in getattr(post, UNENCODED_ORIGINAL_VALUE, ""):
+            if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
-            elif not skipUrlEncode and kb.postHint not in POST_HINT_CONTENT_TYPES.keys():
+            elif urlEncodePost:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
         if timeBasedCompare:
