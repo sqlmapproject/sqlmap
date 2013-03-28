@@ -212,7 +212,7 @@ class Dump(object):
                     if table and isListLike(table):
                         table = table[0]
 
-                    maxlength = max(maxlength, len(unsafeSQLIdentificatorNaming(normalizeUnicode(table) or str(table))))
+                    maxlength = max(maxlength, len(unsafeSQLIdentificatorNaming(normalizeUnicode(table) or unicode(table))))
 
             lines = "-" * (int(maxlength) + 2)
 
@@ -233,7 +233,7 @@ class Dump(object):
                         table = table[0]
 
                     table = unsafeSQLIdentificatorNaming(table)
-                    blank = " " * (maxlength - len(normalizeUnicode(table) or str(table)))
+                    blank = " " * (maxlength - len(normalizeUnicode(table) or unicode(table)))
                     self._write("| %s%s |" % (table, blank))
 
                 self._write("+%s+\n" % lines)
@@ -328,7 +328,7 @@ class Dump(object):
             for ctables in dbTables.values():
                 for tables in ctables.values():
                     for table in tables:
-                        maxlength1 = max(maxlength1, len(normalizeUnicode(table) or str(table)))
+                        maxlength1 = max(maxlength1, len(normalizeUnicode(table) or unicode(table)))
 
             for db, counts in dbTables.items():
                 self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db else "Current database")
@@ -354,7 +354,7 @@ class Dump(object):
                     tables.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
 
                     for table in tables:
-                        blank1 = " " * (maxlength1 - len(normalizeUnicode(table) or str(table)))
+                        blank1 = " " * (maxlength1 - len(normalizeUnicode(table) or unicode(table)))
                         blank2 = " " * (maxlength2 - len(str(count)))
                         self._write("| %s%s | %d%s |" % (table, blank1, count, blank2))
 
