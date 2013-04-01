@@ -476,7 +476,7 @@ class Agent(object):
         """
 
         retVal = field
-        if conf.db in table:
+        if conf.db and table and conf.db in table:
             table = table.split(conf.db)[-1].strip('.')
         try:
             columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(table, True)]
