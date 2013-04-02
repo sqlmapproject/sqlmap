@@ -29,8 +29,6 @@
         --drop-set-cookie   Ignore Set-Cookie header from response
         --user-agent=AGENT  HTTP User-Agent header
         --random-agent      Use randomly selected HTTP User-Agent header
-        --randomize=RPARAM  Randomly change value for given parameter(s)
-        --force-ssl         Force usage of SSL/HTTPS requests
         --host=HOST         HTTP Host header
         --referer=REFERER   HTTP Referer header
         --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
@@ -43,6 +41,7 @@
         --delay=DELAY       Delay in seconds between each HTTP request
         --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
         --retries=RETRIES   Retries when the connection timeouts (default 3)
+        --randomize=RPARAM  Randomly change value for given parameter(s)
         --scope=SCOPE       Regexp to filter targets from provided proxy log
         --safe-url=SAFURL   URL address to visit frequently during testing
         --safe-freq=SAFREQ  Test requests between two visits to a given safe URL
@@ -197,6 +196,7 @@
         --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
         --eta               Display for each output the estimated time of arrival
         --flush-session     Flush session files for current target
+        --force-ssl         Force usage of SSL/HTTPS requests
         --forms             Parse and test forms on target URL
         --fresh-queries     Ignores query results stored in session file
         --hex               Uses DBMS hex function(s) for data retrieval
@@ -329,7 +329,7 @@ Note that if you also provide other options from command line, those are evaluat
 
 ## Request
 
-These options can be used to specify how to connect to the target url.
+These options can be used to specify how to connect to the target URL.
 
 ### HTTP data
 
@@ -391,11 +391,19 @@ Moreover, by providing the `--random-agent` switch, sqlmap will randomly select 
 
 Some sites perform a server-side check on the HTTP `User-Agent` header value and fail the HTTP response if a valid `User-Agent` is not provided, its value is not expected or is blacklisted by a web application firewall or similar intrusion prevention system. In this case sqlmap will show you a message as follows:
 
-    [hh:mm:20] [ERROR] the target url responded with an unknown HTTP status code, try to 
+    [hh:mm:20] [ERROR] the target URL responded with an unknown HTTP status code, try to 
     force the HTTP User-Agent header with option --user-agent or --random-agent
 
 Note that also the HTTP `User-Agent` header is tested against SQL injection if the `--level` is set to **3** or above.
 Read below for details.
+
+### HTTP `Host` header
+
+Option: `--host`
+
+You can manually set HTTP `Host` header value. By default HTTP `Host` header is parsed from a provided target URL.
+
+Note that also the HTTP `Host` header is tested against SQL injection if the `--level` is set to **5**. Read below for details.
 
 ### HTTP `Referer` header
 
@@ -467,6 +475,12 @@ Option: `--retries`
 
 It is possible to specify the maximum number of retries when the HTTP(S) connection timeouts. By default it retries up to **three times**.
 
+### Randomly change value for given parameter(s)
+
+Option: `--randomize`
+
+It is possible to specify parameter names whose values you want to be randomly changed during each request. Length and type are being kept according to provided original values.
+
 ### Filtering targets from provided proxy log using regular expression
 
 Option: `--scope`
@@ -485,8 +499,8 @@ Sometimes web applications or inspection technology in between destroys the sess
 
 To bypass this limitation set by the target, you can provide two options:
 
-* `--safe-url`: Url address to visit frequently during testing.
-* `--safe-freq`: Test requests between two visits to a given safe url.
+* `--safe-url`: URL address to visit frequently during testing.
+* `--safe-freq`: Test requests between two visits to a given safe URL.
 
 This way, sqlmap will visit every a predefined number of requests a certain _safe_ URL without performing any kind of injection against it.
 
@@ -620,6 +634,18 @@ By default sqlmap automatically detects the web application's back-end database 
 It is possible to force the operating system name if you already know it so that sqlmap will avoid doing it itself.
 
 Note that this option is **not** mandatory and it is strongly recommended to use it **only if you are absolutely sure** about the back-end database management system underlying operating system. If you do not know it, let sqlmap automatically identify it for you. 
+
+### Force usage of big numbers for invalidating values
+
+Switch: `--invalid-bignum`
+
+In cases when sqlmap needs to invalidate original parameter value (e.g. `id=13`) it uses classical negation (e.g. `id=-13`). With this switch it is possible to force the usage of large integer values to fulfill the same goal (`id=99999999`).
+
+### Force usage of logical operations for invalidating values
+
+Switch: `--invalid-logical`
+
+In cases when sqlmap needs to invalidate original parameter value (e.g. `id=13`) it uses classical negation (e.g. `id=-13`). With this switch it is possible to force the usage of boolean operations to fulfill the same goal (`id=13 AND 18=19`).
 
 ### Custom injection payload
 
@@ -1500,7 +1526,7 @@ Say that you want to test against SQL injections a huge _search form_ or you wan
 
 Both of the above mentioned instances, and many others, appear as ` <form>` and ` <input>` tags in HTML response bodies and this is where this switch comes into play.
 
-Provide sqlmap with `--forms` as well as the page where the form can be found as the target url (`-u`) and sqlmap will request the target url for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target url provided. 
+Provide sqlmap with `--forms` as well as the page where the form can be found as the target URL (`-u`) and sqlmap will request the target URL for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target URL provided. 
 
 ### Use Google dork results from specified page number
 
