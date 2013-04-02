@@ -97,9 +97,6 @@ def cmdLineParser():
                            action="store_true",
                            help="Use randomly selected HTTP User-Agent header")
 
-        request.add_option("--randomize", dest="rParam",
-                           help="Randomly change value for given parameter(s)")
-
         request.add_option("--host", dest="host",
                            help="HTTP Host header")
 
@@ -141,6 +138,9 @@ def cmdLineParser():
         request.add_option("--retries", dest="retries", type="int",
                            help="Retries when the connection timeouts "
                                 "(default %d)" % defaults.retries)
+
+        request.add_option("--randomize", dest="rParam",
+                           help="Randomly change value for given parameter(s)")
 
         request.add_option("--scope", dest="scope",
                            help="Regexp to filter targets from provided proxy log")
