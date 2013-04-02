@@ -100,10 +100,6 @@ def cmdLineParser():
         request.add_option("--randomize", dest="rParam",
                            help="Randomly change value for given parameter(s)")
 
-        request.add_option("--force-ssl", dest="forceSSL",
-                           action="store_true",
-                           help="Force usage of SSL/HTTPS requests")
-
         request.add_option("--host", dest="host",
                            help="HTTP Host header")
 
@@ -567,6 +563,10 @@ def cmdLineParser():
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true",
                             help="Flush session files for current target")
+
+        general.add_option("--force-ssl", dest="forceSSL",
+                           action="store_true",
+                           help="Force usage of SSL/HTTPS requests")
 
         general.add_option("--forms", dest="forms",
                                   action="store_true",
