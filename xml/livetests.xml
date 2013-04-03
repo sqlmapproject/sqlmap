@@ -983,6 +983,7 @@
             <extensiveFp value="True"/>
             <level value="3"/>
             <risk value="2"/>
+            <timeSec value="2"/>
             <getBanner value="True"/>
         </switches>
         <parse>
