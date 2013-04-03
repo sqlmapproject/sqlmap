@@ -603,7 +603,7 @@ class Connect(object):
             contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
             urlEncodePost = contentType and "urlencoded" in contentType or contentType is None
 
-            if conf.skipUrlEncode and urlEncodePost:
+            if (kb.postHint or conf.skipUrlEncode) and urlEncodePost:
                 urlEncodePost = False
                 conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
                 contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
