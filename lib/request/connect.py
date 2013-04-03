@@ -601,7 +601,7 @@ class Connect(object):
         if conf.httpHeaders:
             headers = dict(conf.httpHeaders)
             contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
-            urlEncodePost = contentType and "urlencoded" in contentType
+            urlEncodePost = contentType and "urlencoded" in contentType or contentType is None
 
             if conf.skipUrlEncode and urlEncodePost:
                 urlEncodePost = False
