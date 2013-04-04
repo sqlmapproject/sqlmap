@@ -311,7 +311,7 @@ Sample content of a HTTP request file provided as an argument to this option:
 
 Option: `-g`
 
-It is also possible to test and inject on `GET` parameters on the results of your Google dork.
+It is also possible to test and inject on `GET` parameters based on results of your Google dork.
 
 This option makes sqlmap negotiate with the search engine its session cookie to be able to perform a search, then sqlmap will retrieve Google first 100 results for the Google dork expression with `GET` parameters asking you if you want to test and inject on each possible affected URL.
 
@@ -389,7 +389,7 @@ However, it is possible to fake it with the `--user-agent` switch by providing c
 
 Moreover, by providing the `--random-agent` switch, sqlmap will randomly select a `User-Agent` from the `./txt/user-agents.txt` textual file and use it for all HTTP requests within the session.
 
-Some sites perform a server-side check on the HTTP `User-Agent` header value and fail the HTTP response if a valid `User-Agent` is not provided, its value is not expected or is blacklisted by a web application firewall or similar intrusion prevention system. In this case sqlmap will show you a message as follows:
+Some sites perform a server-side check of HTTP `User-Agent` header value and fail the HTTP response if a valid `User-Agent` is not provided, its value is not expected or is blacklisted by a web application firewall or similar intrusion prevention system. In this case sqlmap will show you a message as follows:
 
     [hh:mm:20] [ERROR] the target URL responded with an unknown HTTP status code, try to 
     force the HTTP User-Agent header with option --user-agent or --random-agent
@@ -423,7 +423,7 @@ It is possible to provide extra HTTP headers by setting the `--headers` switch. 
 
 Options: `--auth-type` and `--auth-cred`
 
-These options can be used to specify which HTTP protocol authentication the web server implements and the valid credentials to be used to perform all HTTP requests to the target application.
+These options can be used to specify which HTTP protocol authentication back-end web server implements and the valid credentials to be used to perform all HTTP requests to the target application.
 
 The three supported HTTP protocol authentication mechanisms are:
 
@@ -453,7 +453,7 @@ It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) reques
 If the HTTP(S) proxy requires authentication, you can provide the credentials in the format `username:password` to the
 `--proxy-cred` switch.
 
-If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained on the Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply providing the tool with the option `--tor` instead of `--proxy`.
+If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply providing the tool with the option `--tor` instead of `--proxy`.
 
 Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
 
@@ -508,7 +508,7 @@ This way, sqlmap will visit every a predefined number of requests a certain _saf
 
 Switch: `--skip-urlencode`
 
-Depending on parameter placement (e.g. GET) its value could be URL encoded by default. In some cases, backend web servers do not follow RFC standards and require values to be send in their raw non-encoded form. Use `--skip-urlencode` in those kind of cases.
+Depending on parameter placement (e.g. GET) its value could be URL encoded by default. In some cases, back-end web servers do not follow RFC standards and require values to be send in their raw non-encoded form. Use `--skip-urlencode` in those kind of cases.
 
 ### Evaluate custom python code during each request
 
@@ -570,7 +570,7 @@ Note that this switch is incompatible with switch `--text-only`.
 Switch: `--threads`
 
 It is possible to specify the maximum number of concurrent HTTP(S) requests that sqlmap is allowed to do.
-This feature relies on the [multi-threading](http://en.wikipedia.org/wiki/Multithreading) concept and inherits both its pro and its cons.
+This feature relies on [multi-threading](http://en.wikipedia.org/wiki/Multithreading) concept and inherits both its pro and its cons.
 
 This features applies to the brute-force switches and when the data fetching is done through any of the blind SQL injection techniques. For the latter case, sqlmap first calculates the length of the query output in a single thread, then starts the multi-threading. Each thread is assigned to retrieve one character of the query output. The thread ends when that character is retrieved - it takes up to 7 HTTP(S) requests with the bisection algorithm implemented in sqlmap.
 
@@ -586,9 +586,15 @@ These options can be used to specify which parameters to test for, provide custo
 
 Option: `-p`
 
-By default sqlmap tests all `GET` parameters and `POST` parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on the value of `--level` too. 
+By default sqlmap tests all `GET` parameters and `POST` parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on value of `--level` too. 
 
-For instance, to test for GET parameter `id` and for HTTP `User-Agent` only, provide `-p id,user-agent`.
+For instance, to test for GET parameter `id` and for HTTP `User-Agent` only, provide `-p "id,user-agent"`.
+
+Option: `--skip`
+
+In case that user wants to exclude certain parameters from testing, he can use this option. This is especially useful in cases when you want to use higher value for `--level` and test all available parameters excluding some of HTTP headers normally being tested.
+
+For instance, to skip testing for HTTP `User-Agent` and HTTP `Referer` at `--level=5`, provide `--skip "user-agent,referer"`.
 
 ### URI injection point
 
@@ -657,7 +663,7 @@ When retrieving results, sqlmap uses a mechanism where all entries are being cas
 
 Switch: `--no-escape`
 
-In cases when sqlmap needs to use (single-quote delimited) string values inside payloads (e.g. `SELECT 'foobar'`), those values are automatically being escaped (e.g. `SELECT CHAR(102)+CHAR(111)+CHAR(111)+CHAR(98)+CHAR(97)+CHAR(114)`). That is being done because of two things: obfuscation of payload content and preventing potential problems with query escaping mechanisms (e.g. `magic_quotes` and/or `mysql_real_escape_string`) at the backend server. User can use this switch to turn it off (e.g. to reduce payload size).
+In cases when sqlmap needs to use (single-quote delimited) string values inside payloads (e.g. `SELECT 'foobar'`), those values are automatically being escaped (e.g. `SELECT CHAR(102)+CHAR(111)+CHAR(111)+CHAR(98)+CHAR(97)+CHAR(114)`). That is being done because of two things: obfuscation of payload content and preventing potential problems with query escaping mechanisms (e.g. `magic_quotes` and/or `mysql_real_escape_string`) at the back-end server. User can use this switch to turn it off (e.g. to reduce payload size).
 
 ### Custom injection payload
 
@@ -771,12 +777,22 @@ In some instances, like a SQL injection in an `UPDATE` statement, injecting an `
 
 ### Page comparison
 
-Options and switch: `--string`, `--regexp` and `--text-only`
+Options: `--string`, `--not-string` and `--regexp`
 
-By default the distinction of a `True` query by a `False` one (rough concept behind boolean-based blind SQL injection vulnerabilities) is done by comparing the injected requests page content with the original not injected page content.
-Not always this concept works because sometimes the page content changes at each refresh even not injecting anything, for instance when the page has a counter, a dynamic advertisement banner or any other part of the HTML which is rendered dynamically and might change in time not only consequently to user's input. To bypass this limit, sqlmap tries hard to identify these snippets of the response bodies and deal accordingly. Sometimes it may fail, that is why the user can provide a string (`--string` switch) which is **always** present on the not injected page **and** on all True injected query pages, but that it is **not** on the False ones. As an alternative to a static string, the user can provide a regular expression (`--regexp` switch).
+By default the distinction of a `True` query from a `False` one (rough concept behind boolean-based blind SQL injection vulnerabilities) is done by comparing the injected requests page content with the original not injected page content.
+Not always this concept works because sometimes the page content changes at each refresh even not injecting anything, for instance when the page has a counter, a dynamic advertisement banner or any other part of the HTML which is rendered dynamically and might change in time not only consequently to user's input. To bypass this limit, sqlmap tries hard to identify these snippets of the response bodies and deal accordingly. Sometimes it may fail, that is why the user can provide a string (`--string` switch) which is **always** present on original page **and** on all True injected query pages, but that it is **not** on the False ones. Instead of static string, the user can provide a regular expression (`--regexp` switch). Alternatively, user can provide a string (`--not-string` switch) which is **not** present on original page **and** not on all True injected query pages, but appears **always** on False ones.
 
-Such data is easy for an user to retrieve, simply try to inject on the affected parameter an invalid value and compare manually the original (not injected) page content with the injected wrong page content. This way the distinction will be based upon string presence or regular expression match. 
+Such data is easy for an user to retrieve, simply try to inject into the affected parameter an invalid value and compare manually the original (not injected) page content with the injected wrong page content. This way the distinction will be based upon string presence or regular expression match. 
+
+Option: `--code`
+
+In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTTP code (e.g. `200` for `True` and `401` for `False`), he can provide that information to sqlmap using this option (e.g. `--code=200`).
+
+Switch: `--title`
+
+In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can provide that information to sqlmap using this option (e.g. `--title="Welcome"`).
+
+Switch: `--text-only`
 
 In cases with lot of active content (e.g. scripts, embeds, etc.) in the HTTP responses' body, you can filter pages (`--text-only` switch) just for their textual content. This way, in a good number of cases, you can automatically tune the detection engine.
 
@@ -832,7 +848,7 @@ You can manually tell sqlmap to test for this type of SQL injection with a speci
 
 Switches: `-f` or `--fingerprint`
 
-By default the web application's back-end database management system fingerprint is handled automatically by sqlmap. Just after the detection phase finishes and the user is eventually prompted with a choice of which vulnerable parameter to use further on, sqlmap fingerprints the back-end database management system and carries on the injection by knowing which SQL syntax, dialect and queries to use to proceed with the attack within the limits of the database architecture. 
+By default the web application's back-end database management system fingerprint is handled automatically by sqlmap. Just after the detection phase finishes and the user is eventually prompted with a choice of which vulnerable parameter to use further on, sqlmap fingerprints the back-end database management system and continues on with the injection by knowing which SQL syntax, dialect and queries to use to proceed with the attack within the limits of the database architecture. 
 
 If for any instance you want to perform an extensive database management system fingerprint based on various techniques like specific SQL dialects and inband error messages, you can provide the `--fingerprint` switch. sqlmap will perform a lot more requests and fingerprint the exact DBMS version and, where possible, operating system, architecture and patch level. 
 
@@ -852,7 +868,7 @@ Most of the modern database management systems have a function and/or  an enviro
 
 Switch: `--current-user`
 
-On the majority of modern DBMSes is possible to retrieve the database management system's user which is effectively performing the query against the back-end DBMS from the web application. 
+On majority of modern DBMSes is possible to retrieve the database management system's user which is effectively performing the query against the back-end DBMS from the web application. 
 
 ### Current database
 
@@ -955,7 +971,7 @@ Switch and options: `--columns`, `-C`, `-T` and `-D`
 
 When the session user has read access to the system table containing information about database's tables, it is possible to enumerate the list of columns for a specific database table. sqlmap also enumerates the data-type for each column. 
 
-This feature depends on the option `-T` to specify the table name and optionally on `-D` to specify the database name. When the database name is not specified, the current database name is used. You can also provide the `-C` option to specify the table columns name like the one you provided to be enumerated.
+This feature depends on option `-T` to specify the table name and optionally on `-D` to specify the database name. When the database name is not specified, the current database name is used. You can also provide the `-C` option to specify the table columns name like the one you provided to be enumerated.
 
 Example against a SQLite target:
 
