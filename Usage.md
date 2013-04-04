@@ -584,13 +584,11 @@ These options can be used to specify which parameters to test for, provide custo
 
 ### Testable parameter(s)
 
-Option: `-p`
+Options: `-p` and `--skip`
 
 By default sqlmap tests all `GET` parameters and `POST` parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on value of `--level` too. 
 
 For instance, to test for GET parameter `id` and for HTTP `User-Agent` only, provide `-p "id,user-agent"`.
-
-Option: `--skip`
 
 In case that user wants to exclude certain parameters from testing, he can use this option. This is especially useful in cases when you want to use higher value for `--level` and test all available parameters excluding some of HTTP headers normally being tested.
 
@@ -777,22 +775,18 @@ In some instances, like a SQL injection in an `UPDATE` statement, injecting an `
 
 ### Page comparison
 
-Options: `--string`, `--not-string` and `--regexp`
+Options: `--string`, `--not-string`, `--regexp` and `--code`
 
 By default the distinction of a `True` query from a `False` one (rough concept behind boolean-based blind SQL injection vulnerabilities) is done by comparing the injected requests page content with the original not injected page content.
 Not always this concept works because sometimes the page content changes at each refresh even not injecting anything, for instance when the page has a counter, a dynamic advertisement banner or any other part of the HTML which is rendered dynamically and might change in time not only consequently to user's input. To bypass this limit, sqlmap tries hard to identify these snippets of the response bodies and deal accordingly. Sometimes it may fail, that is why the user can provide a string (`--string` switch) which is **always** present on original page **and** on all True injected query pages, but that it is **not** on the False ones. Instead of static string, the user can provide a regular expression (`--regexp` switch). Alternatively, user can provide a string (`--not-string` switch) which is **not** present on original page **and** not on all True injected query pages, but appears **always** on False ones.
 
 Such data is easy for an user to retrieve, simply try to inject into the affected parameter an invalid value and compare manually the original (not injected) page content with the injected wrong page content. This way the distinction will be based upon string presence or regular expression match. 
 
-Option: `--code`
-
 In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTTP code (e.g. `200` for `True` and `401` for `False`), he can provide that information to sqlmap using this option (e.g. `--code=200`).
 
-Switch: `--title`
+Switches: `--titles` and `--text-only`
 
-In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can provide that information to sqlmap using this option (e.g. `--title="Welcome"`).
-
-Switch: `--text-only`
+In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can turn turn on title-based comparison using this switch.
 
 In cases with lot of active content (e.g. scripts, embeds, etc.) in the HTTP responses' body, you can filter pages (`--text-only` switch) just for their textual content. This way, in a good number of cases, you can automatically tune the detection engine.
 
