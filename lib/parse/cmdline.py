@@ -189,6 +189,9 @@ def cmdLineParser():
         injection.add_option("-p", dest="testParameter",
                              help="Testable parameter(s)")
 
+        injection.add_option("--skip", dest="skip",
+                             help="Skip testing for given parameter(s)")
+
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
 
@@ -217,9 +220,6 @@ def cmdLineParser():
 
         injection.add_option("--suffix", dest="suffix",
                              help="Injection payload suffix string")
-
-        injection.add_option("--skip", dest="skip",
-                             help="Skip testing for given parameter(s)")
 
         injection.add_option("--tamper", dest="tamper",
                              help="Use given script(s) for tampering injection data")

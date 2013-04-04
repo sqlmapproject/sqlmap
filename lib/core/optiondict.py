@@ -59,6 +59,7 @@ optDict = {
 
             "Injection":     {
                                "testParameter":     "string",
+                               "skip":              "string",
                                "dbms":              "string",
                                "os":                "string",
                                "invalidBignum":     "boolean",
@@ -67,7 +68,6 @@ optDict = {
                                "noEscape":          "boolean",
                                "prefix":            "string",
                                "suffix":            "string",
-                               "skip":              "string",
                                "tamper":            "string",
                              },
 
