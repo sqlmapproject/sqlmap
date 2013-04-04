@@ -11,15 +11,15 @@ Preferably, you can download sqlmap by cloning the Git repository:
 
     git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap should work out of the box with [Python](http://www.python.org/download/) version 2.6.x or 2.7.x.
+sqlmap should work out of the box with [Python](http://www.python.org/download/) version 2.6.x or 2.7.x on any platform.
 
 Usage
 ---
-To get a list of basic options use:
+To get a list of basic options and switches use:
 
     python sqlmap.py -h
 
-To get a list of all options use:
+To get a list of all options and switches use:
 
     python sqlmap.py -hh
 
