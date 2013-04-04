@@ -590,7 +590,7 @@ By default sqlmap tests all `GET` parameters and `POST` parameters. When the val
 
 For instance, to test for GET parameter `id` and for HTTP `User-Agent` only, provide `-p "id,user-agent"`.
 
-In case that user wants to exclude certain parameters from testing, he can use this option. This is especially useful in cases when you want to use higher value for `--level` and test all available parameters excluding some of HTTP headers normally being tested.
+In case that user wants to exclude certain parameters from testing, he can use option `--skip`. That is especially useful in cases when you want to use higher value for `--level` and test all available parameters excluding some of HTTP headers normally being tested.
 
 For instance, to skip testing for HTTP header `User-Agent` and HTTP header `Referer` at `--level=5`, provide `--skip="user-agent,referer"`.
 
@@ -782,11 +782,11 @@ Not always this concept works because sometimes the page content changes at each
 
 Such data is easy for an user to retrieve, simply try to inject into the affected parameter an invalid value and compare manually the original (not injected) page content with the injected wrong page content. This way the distinction will be based upon string presence or regular expression match. 
 
-In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTTP code (e.g. `200` for `True` and `401` for `False`), he can provide that information to sqlmap using this option (e.g. `--code=200`).
+In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTTP code (e.g. `200` for `True` and `401` for `False`), he can provide that information to sqlmap (e.g. `--code=200`).
 
 Switches: `--titles` and `--text-only`
 
-In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can turn turn on title-based comparison using this switch.
+In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can turn turn on title-based comparison using switch `--titles`.
 
 In cases with lot of active content (e.g. scripts, embeds, etc.) in the HTTP responses' body, you can filter pages (`--text-only` switch) just for their textual content. This way, in a good number of cases, you can automatically tune the detection engine.
 
