@@ -647,6 +647,18 @@ Switch: `--invalid-logical`
 
 In cases when sqlmap needs to invalidate original parameter value (e.g. `id=13`) it uses classical negation (e.g. `id=-13`). With this switch it is possible to force the usage of boolean operations to fulfill the same goal (e.g. `id=13 AND 18=19`).
 
+### Turn off payload casting mechanism
+
+Switch: `--no-cast`
+
+When retrieving results, sqlmap uses a mechanism where all entries are being casted to string type and replaced with a whitespace character in case of `NULL` values. That is being made to prevent any erroneous states (e.g. concatenation of `NULL` values with string values) and to easy the data retrieval process itself. Nevertheless, there are reported cases (e.g. older versions of MySQL DBMS) where this mechanism needed to be turned-off (using this switch) because of constant retrival of `None` values.
+
+### Turn off string escaping mechanism
+
+Switch: `--no-escape`
+
+In cases when sqlmap needs to use (single-quote delimited) string values inside payloads (e.g. `foobar`), those values are automatically being escaped (e.g. `CHAR(102)+CHAR(111)+CHAR(111)+CHAR(98)+CHAR(97)+CHAR(114)`). That is being done because of two things: obfuscation of payload content and preventing potential problems with query escaping mechanisms (e.g. `magic_quotes` and/or `mysql_real_escape_string`) at the backend server. User can use this switch to turn it off (e.g. to reduce payload size).
+
 ### Custom injection payload
 
 Options: `--prefix` and `--suffix`
