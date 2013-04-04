@@ -594,7 +594,7 @@ Option: `--skip`
 
 In case that user wants to exclude certain parameters from testing, he can use this option. This is especially useful in cases when you want to use higher value for `--level` and test all available parameters excluding some of HTTP headers normally being tested.
 
-For instance, to skip testing for HTTP `User-Agent` and HTTP `Referer` at `--level=5`, provide `--skip="user-agent,referer"`.
+For instance, to skip testing for HTTP header `User-Agent` and HTTP header `Referer` at `--level=5`, provide `--skip="user-agent,referer"`.
 
 ### URI injection point
 
