@@ -777,7 +777,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             if kb.get("multiThreadMode"):
                 logging._acquireLock()
 
-            if isinstance(data, basestring):
+            if isinstance(data, unicode):
                 message = stdoutencode(data)
             else:
                 message = data
