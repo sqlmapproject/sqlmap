@@ -134,6 +134,8 @@ def checkCharEncoding(encoding, warn=True):
         encoding = encoding.replace("2313", "2312")  # gb2313 -> gb2312
     elif "x-euc" in encoding:
         encoding = encoding.replace("x-euc", "euc")  # x-euc-kr -> euc-kr
+    elif "windows-cp" in encoding:
+        encoding = encoding.replace("windows-cp", "windows")  # windows-cp-1254 -> windows-1254
 
     # name adjustment for compatibility
     if encoding.startswith("8859"):
