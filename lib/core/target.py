@@ -516,9 +516,20 @@ def _restoreCmdLineOptions():
     Restore command line options that could be possibly
     changed during the testing of previous target.
     """
+
+    conf.col = cmdLineOptions.col
+    conf.db = cmdLineOptions.db
+    conf.dnsName = cmdLineOptions.dnsName
+    conf.privEsc = cmdLineOptions.privEsc
+    conf.tbl = cmdLineOptions.tbl
     conf.regexp = cmdLineOptions.regexp
     conf.string = cmdLineOptions.string
     conf.textOnly = cmdLineOptions.textOnly
+    conf.threads = cmdLineOptions.threads
+    conf.timeSec = cmdLineOptions.timeSec
+    conf.tmpPath = cmdLineOptions.tmpPath
+    conf.uChar = cmdLineOptions.uChar
+    conf.user = cmdLineOptions.user
 
 def initTargetEnv():
     """
