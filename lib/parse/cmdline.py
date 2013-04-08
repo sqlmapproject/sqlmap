@@ -40,7 +40,7 @@ def cmdLineParser():
 
         parser.add_option("--version", dest="showVersion",
                           action="store_true",
-                          help="Show version string and exit")
+                          help="Show program's version number and exit")
 
         parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
