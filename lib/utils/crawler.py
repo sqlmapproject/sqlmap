@@ -102,17 +102,25 @@ def crawl(target):
         threadData.shared.deeper = set()
         threadData.shared.unprocessed = set([target])
 
-        logger.info("starting crawler")
+        infoMsg = "starting crawler"
+        if conf.bulkFile:
+            infoMsg += " for target URL '%s'" % target
+        logger.info(infoMsg)
 
         for i in xrange(conf.crawlDepth):
             if i > 0 and conf.threads == 1:
                 singleTimeWarnMessage("running in a single-thread mode. This could take a while")
+
             threadData.shared.count = 0
             threadData.shared.length = len(threadData.shared.unprocessed)
             numThreads = min(conf.threads, len(threadData.shared.unprocessed))
-            logger.info("searching for links with depth %d" % (i + 1))
+
+            if not conf.bulkFile:
+                logger.info("searching for links with depth %d" % (i + 1))
+
             runThreads(numThreads, crawlThread)
             clearConsoleLine(True)
+
             if threadData.shared.deeper:
                 threadData.shared.unprocessed = set(threadData.shared.deeper)
             else:

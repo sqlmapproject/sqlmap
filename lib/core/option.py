@@ -479,7 +479,21 @@ def _setCrawler():
     if not conf.crawlDepth:
         return
 
-    crawl(conf.url)
+    if not conf.bulkFile:
+        crawl(conf.url)
+    else:
+        targets = getFileItems(conf.bulkFile)
+        for i in xrange(len(targets)):
+            try:
+                target = targets[i]
+                crawl(target)
+
+                if conf.verbose in (1, 2):
+                    status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+            except Exception, ex:
+                errMsg = "problem occured while crawling at '%s' ('%s')" % (target, ex)
+                logger.error(errMsg)
 
 def _setGoogleDorking():
     """
