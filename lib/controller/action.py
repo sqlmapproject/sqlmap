@@ -22,7 +22,7 @@ from lib.techniques.brute.use import tableExists
 def action():
     """
     This function exploit the SQL injection on the affected
-    url parameter and extract requested data from the
+    URL parameter and extract requested data from the
     back-end database management system or operating system
     if possible
     """

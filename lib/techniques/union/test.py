@@ -90,7 +90,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         found = kb.orderByColumns or _orderByTechnique()
         if found:
             kb.orderByColumns = found
-            infoMsg = "target url appears to have %d column%s in query" % (found, 's' if found > 1 else "")
+            infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
             singleTimeLogMessage(infoMsg)
             return found
 
@@ -150,7 +150,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
     kb.errorIsNone = popValue()
 
     if retVal:
-        infoMsg = "target url appears to be UNION injectable with %d columns" % retVal
+        infoMsg = "target URL appears to be UNION injectable with %d columns" % retVal
         singleTimeLogMessage(infoMsg)
 
     return retVal
@@ -165,7 +165,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
     random.shuffle(positions)
 
     # For each column of the table (# of NULL) perform a request using
-    # the UNION ALL SELECT statement to test it the target url is
+    # the UNION ALL SELECT statement to test it the target URL is
     # affected by an exploitable union SQL injection vulnerability
     for position in positions:
         # Prepare expression with delimiters
@@ -252,7 +252,7 @@ def _unionConfirm(comment, place, parameter, prefix, suffix, count):
 
 def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
     """
-    This method tests if the target url is affected by an union
+    This method tests if the target URL is affected by an union
     SQL injection vulnerability. The test is done up to 50 columns
     on the target database table
     """
@@ -297,7 +297,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
 def unionTest(comment, place, parameter, value, prefix, suffix):
     """
-    This method tests if the target url is affected by an union
+    This method tests if the target URL is affected by an union
     SQL injection vulnerability. The test is done up to 3*50 times
     """
 

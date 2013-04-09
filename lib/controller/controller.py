@@ -253,7 +253,7 @@ def start():
 
     if conf.configFile and not kb.targets:
         errMsg = "you did not edit the configuration file properly, set "
-        errMsg += "the target url, list of targets or google dork"
+        errMsg += "the target URL, list of targets or google dork"
         logger.error(errMsg)
         return False
 
@@ -301,7 +301,7 @@ def start():
                 if conf.forms:
                     message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
                 else:
-                    message = "url %d:\n%s %s%s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl, " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
+                    message = "URL %d:\n%s %s%s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl, " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
@@ -340,7 +340,7 @@ def start():
                         break
 
                 else:
-                    message += "\ndo you want to test this url? [Y/n/q]"
+                    message += "\ndo you want to test this URL? [Y/n/q]"
                     test = readInput(message, default="Y")
 
                     if not test or test[0] in ("y", "Y"):
@@ -350,7 +350,7 @@ def start():
                     elif test[0] in ("q", "Q"):
                         break
 
-                    infoMsg = "testing url '%s'" % targetUrl
+                    infoMsg = "testing URL '%s'" % targetUrl
                     logger.info(infoMsg)
 
             setupTargetEnv()
@@ -602,7 +602,7 @@ def start():
             e = getUnicode(e)
 
             if conf.multipleTargets:
-                e += ", skipping to the next %s" % ("form" if conf.forms else "url")
+                e += ", skipping to the next %s" % ("form" if conf.forms else "URL")
                 logger.error(e)
             else:
                 logger.critical(e)

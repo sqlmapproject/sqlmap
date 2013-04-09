@@ -126,7 +126,7 @@ class Connect(object):
                     warnMsg += "(e.g. 'https://help.ubuntu.com/community/Tor')"
             else:
                 warnMsg = "if the problem persists please check that the provided "
-                warnMsg += "target url is valid. In case that it is, you can try to rerun "
+                warnMsg += "target URL is valid. In case that it is, you can try to rerun "
                 warnMsg += "with the switch '--random-agent' turned on "
                 warnMsg += "and/or proxy switches ('--ignore-proxy', '--proxy',...)"
             singleTimeWarnMessage(warnMsg)
@@ -175,8 +175,8 @@ class Connect(object):
     @staticmethod
     def getPage(**kwargs):
         """
-        This method connects to the target url or proxy and returns
-        the target url page content
+        This method connects to the target URL or proxy and returns
+        the target URL page content
         """
 
         if conf.delay is not None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
@@ -488,7 +488,7 @@ class Connect(object):
                 if ignoreTimeout:
                     return None, None, None
                 else:
-                    warnMsg = "unable to connect to the target url (%d - %s)" % (e.code, httplib.responses[e.code])
+                    warnMsg = "unable to connect to the target URL (%d - %s)" % (e.code, httplib.responses[e.code])
                     if threadData.retriesCount < conf.retries and not kb.threadException:
                         warnMsg += ". sqlmap is going to retry the request"
                         logger.critical(warnMsg)
@@ -506,23 +506,23 @@ class Connect(object):
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
-                warnMsg = "invalid url address used (%s)" % repr(url)
+                warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
             elif "forcibly closed" in tbMsg:
-                warnMsg = "connection was forcibly closed by the target url"
+                warnMsg = "connection was forcibly closed by the target URL"
             elif "timed out" in tbMsg:
-                warnMsg = "connection timed out to the target url"
+                warnMsg = "connection timed out to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
-                warnMsg = "unable to connect to the target url"
+                warnMsg = "unable to connect to the target URL"
             elif "BadStatusLine" in tbMsg:
                 warnMsg = "connection dropped or unknown HTTP "
                 warnMsg += "status code received. Try to force the HTTP User-Agent "
                 warnMsg += "header with option '--user-agent' or switch '--random-agent'"
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
-                warnMsg += "from the target url"
+                warnMsg += "from the target URL"
             else:
-                warnMsg = "unable to connect to the target url"
+                warnMsg = "unable to connect to the target URL"
 
             if "BadStatusLine" not in tbMsg:
                 warnMsg += " or proxy"
@@ -569,7 +569,7 @@ class Connect(object):
     @staticmethod
     def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True):
         """
-        This method calls a function to get the target url page content
+        This method calls a function to get the target URL page content
         and returns its page MD5 hash or a boolean value in case of
         string match check ('--string' command line parameter)
         """

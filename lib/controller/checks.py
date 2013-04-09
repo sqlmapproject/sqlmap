@@ -791,7 +791,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
 def checkDynParam(place, parameter, value):
     """
-    This function checks if the url parameter is dynamic. If it is
+    This function checks if the URL parameter is dynamic. If it is
     dynamic, the content of the page differs, otherwise the
     dynamicity might depend on another parameter.
     """
@@ -855,14 +855,14 @@ def checkDynamicContent(firstPage, secondPage):
             count += 1
 
             if count > conf.retries:
-                warnMsg = "target url is too dynamic. "
+                warnMsg = "target URL is too dynamic. "
                 warnMsg += "Switching to '--text-only' "
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
                 return
 
-            warnMsg = "target url is heavily dynamic"
+            warnMsg = "target URL is heavily dynamic"
             warnMsg += ". sqlmap is going to retry the request"
             logger.critical(warnMsg)
 
@@ -880,7 +880,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the url is stable. This can take a couple of seconds"
+    infoMsg = "testing if the target URL is stable. This can take a couple of seconds"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
@@ -894,7 +894,7 @@ def checkStability():
 
     if kb.pageStable:
         if firstPage:
-            infoMsg = "url is stable"
+            infoMsg = "target URL is stable"
             logger.info(infoMsg)
         else:
             errMsg = "there was an error checking the stability of page "
@@ -904,7 +904,7 @@ def checkStability():
             logger.error(errMsg)
 
     else:
-        warnMsg = "url is not stable, sqlmap will base the page "
+        warnMsg = "target URL is not stable. sqlmap will base the page "
         warnMsg += "comparison on a sequence matcher. If no dynamic nor "
         warnMsg += "injectable parameters are detected, or in case of "
         warnMsg += "junk results, refer to user's manual paragraph "
@@ -1112,7 +1112,7 @@ def checkNullConnection():
     if conf.data:
         return False
 
-    infoMsg = "testing NULL connection to the target url"
+    infoMsg = "testing NULL connection to the target URL"
     logger.info(infoMsg)
 
     try:
@@ -1148,7 +1148,7 @@ def checkConnection(suppressOutput=False):
             raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput and not conf.dummy:
-        infoMsg = "testing connection to the target url"
+        infoMsg = "testing connection to the target URL"
         logger.info(infoMsg)
 
     try:

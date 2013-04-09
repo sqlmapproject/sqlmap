@@ -1127,7 +1127,7 @@ def parseTargetDirect():
 
 def parseTargetUrl():
     """
-    Parse target url and set some attributes into the configuration singleton.
+    Parse target URL and set some attributes into the configuration singleton.
     """
 
     if not conf.url:
@@ -1165,14 +1165,14 @@ def parseTargetUrl():
         _ = None
 
     if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'))):
-        errMsg = "invalid target url"
+        errMsg = "invalid target URL"
         raise SqlmapSyntaxException(errMsg)
 
     if len(hostnamePort) == 2:
         try:
             conf.port = int(hostnamePort[1])
         except:
-            errMsg = "invalid target url"
+            errMsg = "invalid target URL"
             raise SqlmapSyntaxException(errMsg)
     elif conf.scheme == "https":
         conf.port = 443
@@ -1186,13 +1186,13 @@ def parseTargetUrl():
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
     if not conf.referer and intersect(REFERER_ALIASES, conf.testParameter, True):
-        debugMsg = "setting the HTTP Referer header to the target url"
+        debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = filter(lambda (key, value): key != HTTP_HEADER.REFERER, conf.httpHeaders)
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url))
 
     if not conf.host and intersect(HOST_ALIASES, conf.testParameter, True):
-        debugMsg = "setting the HTTP Host header to the target url"
+        debugMsg = "setting the HTTP Host header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = filter(lambda (key, value): key != HTTP_HEADER.HOST, conf.httpHeaders)
         conf.httpHeaders.append((HTTP_HEADER.HOST, getHostHeader(conf.url)))
@@ -2120,7 +2120,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                     return char if char in charset else match.group(0)
                 result = value
                 if plusspace:
-                    result = result.replace("+", " ")  # plus sign has a special meaning in url encoded data (hence the usage of urllib.unquote_plus in convall case)
+                    result = result.replace("+", " ")  # plus sign has a special meaning in URL encoded data (hence the usage of urllib.unquote_plus in convall case)
                 result = re.sub("%([0-9a-fA-F]{2})", _, result)
 
     if isinstance(result, str):
@@ -2147,7 +2147,7 @@ def urlencode(value, safe="%&=", convall=False, limit=False, spaceplus=False):
             safe = ""
 
         # corner case when character % really needs to be
-        # encoded (when not representing url encoded char)
+        # encoded (when not representing URL encoded char)
         # except in cases when tampering scripts are used
         if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
             value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
@@ -3119,7 +3119,7 @@ def randomizeParameterValue(value):
 
 def asciifyUrl(url, forceQuote=False):
     """
-    Attempts to make a unicode url usuable with ``urllib/urllib2``.
+    Attempts to make a unicode URL usuable with ``urllib/urllib2``.
 
     More specifically, it attempts to convert the unicode object ``url``,
     which is meant to represent a IRI, to an unicode object that,
@@ -3232,7 +3232,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
-        warnMsg = "badly formed HTML at the given url ('%s'). Going to filter it" % url
+        warnMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
         logger.warning(warnMsg)
         response.seek(0)
         filtered = _("".join(re.findall(FORM_SEARCH_REGEX, response.read())), response.geturl())
@@ -3279,7 +3279,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 target = (url, method, data, conf.cookie)
                 retVal.add(target)
     else:
-        errMsg = "there were no forms found at the given target url"
+        errMsg = "there were no forms found at the given target URL"
         if raise_:
             raise SqlmapGenericException(errMsg)
         else:

@@ -450,7 +450,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             infoMsg = None
 
             # If we have got one single character not correctly fetched it
-            # can mean that the connection to the target url was lost
+            # can mean that the connection to the target URL was lost
             if None in value:
                 partialValue = "".join(value[:value.index(None)])
 

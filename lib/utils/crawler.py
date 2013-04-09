@@ -46,11 +46,11 @@ def crawl(target):
                         content = Request.getPage(url=current, crawling=True, raise404=False)[0]
                 except SqlmapConnectionException, e:
                     errMsg = "connection exception detected (%s). skipping " % e
-                    errMsg += "url '%s'" % current
+                    errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
                 except httplib.InvalidURL, e:
-                    errMsg = "invalid url detected (%s). skipping " % e
-                    errMsg += "url '%s'" % current
+                    errMsg = "invalid URL detected (%s). skipping " % e
+                    errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
 
                 if not kb.threadContinue:

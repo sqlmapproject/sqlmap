@@ -307,7 +307,7 @@ REFLECTED_MAX_REGEX_PARTS = 10
 # Chars which can be used as a failsafe values in case of too long URL encoding value
 URLENCODE_FAILSAFE_CHARS = "()|,"
 
-# Maximum length of urlencoded value after which failsafe procedure takes away
+# Maximum length of URL encoded value after which failsafe procedure takes away
 URLENCODE_CHAR_LIMIT = 2000
 
 # Default schema for Microsoft SQL Server DBMS

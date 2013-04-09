@@ -155,14 +155,14 @@ def _setRequestParams():
     kb.processUserMarks = True if (kb.postHint and CUSTOM_INJECTION_MARK_CHAR in conf.data) else kb.processUserMarks
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint:
-        warnMsg = "you've provided target url without any GET "
+        warnMsg = "you've provided target URL without any GET "
         warnMsg += "parameters (e.g. www.site.com/article.php?id=1) "
         warnMsg += "and without providing any POST parameters "
         warnMsg += "through --data option"
         logger.warn(warnMsg)
 
         message = "do you want to try URI injections "
-        message += "in the target url itself? [Y/n/q] "
+        message += "in the target URL itself? [Y/n/q] "
         test = readInput(message, default="Y")
 
         if not test or test[0] not in ("n", "N"):
@@ -423,7 +423,7 @@ def _setResultsFile():
     if not conf.resultsFP:
         conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, time.strftime(RESULTS_FILE_FORMAT).lower())
         conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
-        conf.resultsFP.writelines("Target url,Place,Parameter,Techniques%s" % os.linesep)
+        conf.resultsFP.writelines("Target URL,Place,Parameter,Techniques%s" % os.linesep)
 
         logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
 

@@ -146,8 +146,8 @@ def configUnion(char=None, columns=None):
 def unionUse(expression, unpack=True, dump=False):
     """
     This function tests for an union SQL injection on the target
-    url then call its subsidiary function to effectively perform an
-    union SQL injection on the affected url
+    URL then call its subsidiary function to effectively perform an
+    union SQL injection on the affected URL
     """
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)

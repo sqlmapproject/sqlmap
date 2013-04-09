@@ -189,7 +189,7 @@ def _urllib2Opener():
 
 def _feedTargetsDict(reqFile, addedTargetUrls):
     """
-    Parses web scarab and burp logs and adds results to the target url list
+    Parses web scarab and burp logs and adds results to the target URL list
     """
 
     def _parseWebScarabLog(content):
@@ -1045,7 +1045,7 @@ def _setSafeUrl():
             conf.safUrl = "http://" + conf.safUrl
 
     if conf.saFreq <= 0:
-        errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe url feature"
+        errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe URL feature"
         raise SqlmapSyntaxException(errMsg)
 
 def _setPrefixSuffix():
