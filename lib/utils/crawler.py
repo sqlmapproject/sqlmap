@@ -106,7 +106,7 @@ def crawl(target):
 
         for i in xrange(conf.crawlDepth):
             if i > 0 and conf.threads == 1:
-                singleTimeWarnMessage("running in a single-thread mode. This could take a while.")
+                singleTimeWarnMessage("running in a single-thread mode. This could take a while")
             threadData.shared.count = 0
             threadData.shared.length = len(threadData.shared.unprocessed)
             numThreads = min(conf.threads, len(threadData.shared.unprocessed))
