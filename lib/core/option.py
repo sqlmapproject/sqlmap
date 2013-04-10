@@ -57,6 +57,7 @@ from lib.core.convert import base64unpickle
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import mergedOptions
 from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
@@ -1853,6 +1854,8 @@ def _mergeOptions(inputOptions, overrideOptions):
     for key, value in defaults.items():
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
+
+    mergedOptions.update(conf)
 
 def _setTrafficOutputFP():
     if conf.trafficFile:

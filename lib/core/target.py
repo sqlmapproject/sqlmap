@@ -20,10 +20,10 @@ from lib.core.common import paramToDict
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import urldecode
-from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import mergedOptions
 from lib.core.data import paths
 from lib.core.dicts import DBMS_DICT
 from lib.core.dump import dumper
@@ -47,6 +47,7 @@ from lib.core.settings import JSON_RECOGNITION_REGEX
 from lib.core.settings import MULTIPART_RECOGNITION_REGEX
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import REFERER_ALIASES
+from lib.core.settings import RESTORE_MERGED_OPTIONS
 from lib.core.settings import RESULTS_FILE_FORMAT
 from lib.core.settings import SOAP_RECOGNITION_REGEX
 from lib.core.settings import SUPPORTED_DBMS
@@ -511,25 +512,14 @@ def _createTargetDirs():
     _createFilesDir()
     _configureDumper()
 
-def _restoreCmdLineOptions():
+def _restoreMergedOptions():
     """
-    Restore command line options that could be possibly
-    changed during the testing of previous target.
+    Restore merged options (command line, configuration file and default values)
+    that could be possibly changed during the testing of previous target.
     """
 
-    conf.col = cmdLineOptions.col
-    conf.db = cmdLineOptions.db
-    conf.dnsName = cmdLineOptions.dnsName
-    conf.privEsc = cmdLineOptions.privEsc
-    conf.tbl = cmdLineOptions.tbl
-    conf.regexp = cmdLineOptions.regexp
-    conf.string = cmdLineOptions.string
-    conf.textOnly = cmdLineOptions.textOnly
-    conf.threads = cmdLineOptions.threads
-    conf.timeSec = cmdLineOptions.timeSec
-    conf.tmpPath = cmdLineOptions.tmpPath
-    conf.uChar = cmdLineOptions.uChar
-    conf.user = cmdLineOptions.user
+    for option in RESTORE_MERGED_OPTIONS:
+        conf[option] = mergedOptions[option]
 
 def initTargetEnv():
     """
@@ -548,7 +538,7 @@ def initTargetEnv():
         conf.hashDBFile = None
 
         _setKnowledgeBaseAttributes(False)
-        _restoreCmdLineOptions()
+        _restoreMergedOptions()
         _setDBMS()
 
     if conf.data:

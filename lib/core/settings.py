@@ -319,6 +319,9 @@ HASH_MOD_ITEM_DISPLAY = 11
 # Maximum integer value
 MAX_INT = sys.maxint
 
+# Options that need to be restored in multiple targets run mode
+RESTORE_MERGED_OPTIONS = ("col", "db", "dnsName", "privEsc", "tbl", "regexp", "string", "textOnly", "threads", "timeSec", "tmpPath", "uChar", "user")
+
 # Parameters to be ignored in detection phase (upper case)
 IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
 
