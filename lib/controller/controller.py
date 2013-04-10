@@ -276,7 +276,7 @@ def start():
             testSqlInj = False
 
             if PLACE.GET in conf.parameters and not any([conf.data, conf.testParameter]):
-                for parameter in re.findall(r"([^=]+)=([^%s]+%s?|\Z)" % (conf.pDel or ";", conf.pDel or ";"), conf.parameters[PLACE.GET]):
+                for parameter in re.findall(r"([^=]+)=([^%s]+%s?|\Z)" % (conf.pDel or DEFAULT_GET_POST_DELIMITER, conf.pDel or DEFAULT_GET_POST_DELIMITER), conf.parameters[PLACE.GET]):
                     paramKey = (conf.hostname, conf.path, PLACE.GET, parameter[0])
 
                     if paramKey not in kb.testedParams:
@@ -287,7 +287,6 @@ def start():
                 if paramKey not in kb.testedParams:
                     testSqlInj = True
 
-            testSqlInj &= (conf.hostname, conf.path, None, None) not in kb.testedParams
             testSqlInj &= conf.hostname not in kb.vulnHosts
 
             if not testSqlInj:
