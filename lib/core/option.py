@@ -241,10 +241,10 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             else:
                 scheme, port = None, None
 
-            if not re.search(r"^[\n]*(GET|POST).*?\sHTTP\/", request, re.I | re.M):
+            if not re.search(r"^[\n]*(%s).*?\sHTTP\/" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), request, re.I | re.M):
                 continue
 
-            if re.search(r"^[\n]*(GET|POST).*?\.(%s)\sHTTP\/" % "|".join(CRAWL_EXCLUDE_EXTENSIONS), request, re.I | re.M):
+            if re.search(r"^[\n]*(%s|%s).*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, HTTPMETHOD.POST, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
                 continue
 
             getPostReq = False
@@ -260,19 +260,16 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             for line in lines:
                 newline = "\r\n" if line.endswith('\r') else '\n'
                 line = line.strip('\r')
+                match = re.search(r"\A(%s) (.+) HTTP/[\d.]+\Z" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), line) if not method else None
+
                 if len(line) == 0:
-                    if method == HTTPMETHOD.POST and data is None:
+                    if method in (HTTPMETHOD.POST, HTTPMETHOD.PUT) and data is None:
                         data = ""
                         params = True
 
-                elif (line.startswith("GET ") or line.startswith("POST ")) and " HTTP/" in line:
-                    if line.startswith("GET "):
-                        index = 4
-                    else:
-                        index = 5
-
-                    url = line[index:line.index(" HTTP/")]
-                    method = line[:index - 1]
+                elif match:
+                    method = match.group(1)
+                    url = match.group(2)
 
                     if "?" in line and "=" in line:
                         params = True

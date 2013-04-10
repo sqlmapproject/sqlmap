@@ -76,6 +76,12 @@ class HTTPMETHOD:
     GET = "GET"
     POST = "POST"
     HEAD = "HEAD"
+    PUT = "PUT"
+    DELETE = "DETELE"
+    TRACE = "TRACE"
+    OPTIONS = "OPTIONS"
+    CONNECT = "CONNECT"
+    PATCH = "PATCH"
 
 class NULLCONNECTION:
     HEAD = "HEAD"
