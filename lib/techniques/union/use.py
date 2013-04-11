@@ -61,12 +61,11 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         # Prepare expression with delimiters
         injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
 
-        where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else None
-
         # Forge the union SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
         query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
+        where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
         payload = agent.payload(newValue=query, where=where)
 
         # Perform the request
