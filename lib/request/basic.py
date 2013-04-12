@@ -58,8 +58,13 @@ def forgeHeaders(items=None):
     if conf.cj:
         if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
+                if cookie.domain_specified and not conf.hostname.endswith(cookie.domain):
+                    continue
+
                 if ("%s=" % cookie.name) in headers[HTTP_HEADER.COOKIE]:
-                    if kb.mergeCookies is None:
+                    if conf.loadCookies:
+                        conf.httpHeaders = filter(None, ((item if item[0] != HTTP_HEADER.COOKIE else None) for item in conf.httpHeaders))
+                    elif kb.mergeCookies is None:
                         message = "you provided a HTTP %s header value. " % HTTP_HEADER.COOKIE
                         message += "The target URL provided its own cookies within "
                         message += "the HTTP %s header which intersect with yours. " % HTTP_HEADER.SET_COOKIE
