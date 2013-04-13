@@ -3504,10 +3504,15 @@ def resetCookieJar(cookieJar):
                 handle, filename = tempfile.mkstemp(prefix="sqlmapcj-")
                 os.close(handle)
 
+                # Reference: http://www.hashbangcode.com/blog/netscape-http-cooke-file-parser-php-584.html
                 with open(filename, "w+b") as f:
                     f.write("%s\n" % NETSCAPE_FORMAT_HEADER_COOKIES)
                     for line in lines:
-                        f.write("\n%s" % "\t".join(line.split()))
+                        _ = line.split()
+                        if len(_) == 7:
+                            _[1]= "TRUE"  # MozillaCookieJar expects TRUE here
+                            _[4] = "9999999999"  # The UNIX time that the variable will expire on
+                            f.write("\n%s" % "\t".join(_))
 
                 cookieJar.filename = filename
 
