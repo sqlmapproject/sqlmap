@@ -25,7 +25,6 @@ from plugins.generic.connector import Connector as GenericConnector
 class SQLAlchemy(GenericConnector):
     def __init__(self, dialect=None):
         GenericConnector.__init__(self)
-
         self.dialect = dialect
 
     def connect(self):
