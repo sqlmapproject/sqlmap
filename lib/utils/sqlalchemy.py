@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import imp
+import os
 import sys
 
 _sqlalchemy = None
@@ -18,6 +19,7 @@ except ImportError:
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapFilePathException
 from plugins.generic.connector import Connector as GenericConnector
 
 class SQLAlchemy(GenericConnector):
@@ -32,12 +34,19 @@ class SQLAlchemy(GenericConnector):
 
             try:
                 if not self.port and self.db:
-                    if "///" not in conf.direct:
-                        conf.direct = conf.direct.replace("//", "///", 1)
+                    if not os.path.exists(self.db):
+                        raise SqlmapFilePathException, "missing database file '%s'" % self.db
+
+                    _ = conf.direct.split("//", 1)
+                    conf.direct = "%s////%s" % (_[0], os.path.abspath(self.db))
+
                 if self.dialect:
                     conf.direct = conf.direct.replace(conf.dbms, self.dialect)
+
                 engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False} if self.dialect == "sqlite" else {})
                 self.connection = engine.connect()
+            except SqlmapFilePathException:
+                raise
             except Exception, msg:
                 raise SqlmapConnectionException(msg[0])
 
