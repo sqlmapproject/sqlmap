@@ -8,11 +8,13 @@ See the file 'doc/COPYING' for copying permission
 import imp
 import os
 import sys
+import warnings
 
 _sqlalchemy = None
 try:
     f, pathname, desc = imp.find_module("sqlalchemy", sys.path[1:])
     _sqlalchemy = imp.load_module("sqlalchemy", f, pathname, desc)
+    warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
 except ImportError:
     pass
 
