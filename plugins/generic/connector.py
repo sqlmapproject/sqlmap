@@ -29,7 +29,7 @@ class Connector:
         self.port = conf.port
         self.db = conf.dbmsDb
 
-    def connected(self):
+    def printConnected(self):
         infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
         infoMsg += ":%d established" % self.port
         logger.info(infoMsg)

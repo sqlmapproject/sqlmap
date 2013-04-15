@@ -39,7 +39,7 @@ class Connector(GenericConnector):
 
 
         self.initCursor()
-        self.connected()
+        self.printConnected()
 
     def fetchall(self):
         try:

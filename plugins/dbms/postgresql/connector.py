@@ -42,7 +42,7 @@ class Connector(GenericConnector):
         self.connector.set_client_encoding('UNICODE')
 
         self.initCursor()
-        self.connected()
+        self.printConnected()
 
     def fetchall(self):
         try:

@@ -41,7 +41,7 @@ class SQLAlchemy(GenericConnector):
             except Exception, msg:
                 raise SqlmapConnectionException(msg[0])
 
-            self.connected()
+            self.printConnected()
 
     def fetchall(self):
         try:

@@ -43,8 +43,9 @@ class Connector(GenericConnector):
                 user=self.user.encode(UNICODE_ENCODING), password=self.password.encode(UNICODE_ENCODING), charset="UTF8")  # Reference: http://www.daniweb.com/forums/thread248499.html
         except kinterbasdb.OperationalError, msg:
             raise SqlmapConnectionException(msg[1])
+
         self.initCursor()
-        self.connected()
+        self.printConnected()
 
     def fetchall(self):
         try:
