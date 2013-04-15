@@ -92,6 +92,7 @@ from lib.core.settings import DUMMY_SQL_INJECTION_CHARS
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
+from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
 from lib.core.settings import HASHDB_MILESTONE_VALUE
@@ -3510,7 +3511,7 @@ def resetCookieJar(cookieJar):
                     for line in lines:
                         _ = line.split()
                         if len(_) == 7:
-                            _[4] = "9999999999"  # The UNIX time that the variable will expire on
+                            _[4] = FORCE_COOKIE_EXPIRATION_TIME
                             f.write("\n%s" % "\t".join(_))
 
                 cookieJar.filename = filename
