@@ -116,7 +116,7 @@ def _goInferenceFields(expression, expressionFields, expressionFieldsList, paylo
 
         if isinstance(num, int):
             origExpr = expression
-            expression = agent.limitQuery(num, expression, field)
+            expression = agent.limitQuery(num, expression, field, expressionFieldsList[0])
 
         if "ROWNUM" in expressionFieldsList:
             expressionReplaced = expression
