@@ -43,7 +43,7 @@ class SQLAlchemy(GenericConnector):
                     conf.direct = conf.direct.replace(conf.dbms, self.dialect)
 
                 engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False} if self.dialect == "sqlite" else {})
-                self.connection = engine.connect()
+                self.connector = engine.connect()
             except SqlmapFilePathException:
                 raise
             except Exception, msg:
@@ -63,7 +63,7 @@ class SQLAlchemy(GenericConnector):
 
     def execute(self, query):
         try:
-            self.cursor = self.connection.execute(query)
+            self.cursor = self.connector.execute(query)
         except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
         except _sqlalchemy.exc.InternalError, msg:

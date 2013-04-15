@@ -89,7 +89,7 @@ def setHandler():
             except SqlmapConnectionException, msg:
                 logger.critical(msg)
 
-            if sqlalchemy.connection:
+            if sqlalchemy.connector:
                 conf.dbmsConnector = sqlalchemy
             else:
                 conf.dbmsConnector.connect()
