@@ -18,6 +18,7 @@ class Connector:
     """
 
     def __init__(self):
+        self.connection = None
         self.connector = None
         self.cursor = None
 

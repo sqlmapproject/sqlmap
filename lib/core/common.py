@@ -137,6 +137,7 @@ from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 from lib.core.threads import getCurrentThreadData
+from lib.utils.sqlalchemy import _sqlalchemy
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
 from thirdparty.magic import magic
@@ -1121,10 +1122,15 @@ def parseTargetDirect():
                 elif dbmsName == DBMS.FIREBIRD:
                     import kinterbasdb
             except ImportError:
-                errMsg = "sqlmap requires '%s' third-party library " % data[1]
-                errMsg += "in order to directly connect to the database "
-                errMsg += "%s. Download from '%s'" % (dbmsName, data[2])
-                raise SqlmapMissingDependence(errMsg)
+                if _sqlalchemy and data[3] in _sqlalchemy.dialects.__all__:
+                    pass
+                else:
+                    errMsg = "sqlmap requires '%s' third-party library " % data[1]
+                    errMsg += "in order to directly connect to the database "
+                    errMsg += "%s. You can download it from '%s'" % (dbmsName, data[2])
+                    errMsg += ". Alternative is to use a package 'python-sqlalchemy' "
+                    errMsg += "with support for dialect '%s' installed" % data[3]
+                    raise SqlmapMissingDependence(errMsg)
 
 def parseTargetUrl():
     """

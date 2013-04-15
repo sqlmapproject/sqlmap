@@ -8,6 +8,8 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.common import Backend
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.dicts import DBMS_DICT
+from lib.core.enums import DBMS
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
@@ -48,16 +50,16 @@ def setHandler():
     """
 
     items = [
-                  ("MySQL", MYSQL_ALIASES, MySQLMap, MySQLConn),
-                  ("Oracle", ORACLE_ALIASES, OracleMap, OracleConn),
-                  ("PostgreSQL", PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
-                  ("Microsoft SQL Server", MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn),
-                  ("SQLite", SQLITE_ALIASES, SQLiteMap, SQLiteConn),
-                  ("Microsoft Access", ACCESS_ALIASES, AccessMap, AccessConn),
-                  ("Firebird", FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
-                  ("SAP MaxDB", MAXDB_ALIASES, MaxDBMap, MaxDBConn),
-                  ("Sybase", SYBASE_ALIASES, SybaseMap, SybaseConn),
-                  ("IBM DB2", DB2_ALIASES, DB2Map, DB2Conn),
+                  (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, MySQLConn),
+                  (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, OracleConn),
+                  (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
+                  (DBMS.MSSQL, MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn),
+                  (DBMS.SQLITE, SQLITE_ALIASES, SQLiteMap, SQLiteConn),
+                  (DBMS.ACCESS, ACCESS_ALIASES, AccessMap, AccessConn),
+                  (DBMS.FIREBIRD, FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
+                  (DBMS.MAXDB, MAXDB_ALIASES, MaxDBMap, MaxDBConn),
+                  (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
+                  (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
             ]
 
     _ = max(_ if (Backend.getIdentifiedDbms() or "").lower() in _[1] else None for _ in items)
@@ -77,7 +79,15 @@ def setHandler():
         if conf.direct:
             logger.debug("forcing timeout to 10 seconds")
             conf.timeout = 10
-            conf.dbmsConnector.connect()
+
+            dialect = DBMS_DICT[name][3]
+            sqlalchemy = SQLAlchemy(dialect=dialect)
+            sqlalchemy.connect()
+
+            if sqlalchemy.connection:
+                conf.dbmsConnector = sqlalchemy
+            else:
+                conf.dbmsConnector.connect()
 
         if handler.checkDbms():
             conf.dbmsHandler = handler

@@ -21,22 +21,27 @@ from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
 class SQLAlchemy(GenericConnector):
-    def __init__(self):
+    def __init__(self, dialect=None):
         GenericConnector.__init__(self)
 
-    def connect(self):
-        self.initConnection()
-        try:
-            #_sqlalchemy.dialects.__all__
-            if not self.port and self.db:
-                if "///" not in conf.direct:
-                    conf.direct = conf.direct.replace("//", "///")
-            engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False})
-            self.connection = engine.connect()
-        except _sqlalchemy.exc.OperationalError, msg:
-            raise SqlmapConnectionException(msg[0])
+        self.dialect = dialect
 
-        self.connected()
+    def connect(self):
+        if _sqlalchemy:
+            self.initConnection()
+
+            try:
+                if not self.port and self.db:
+                    if "///" not in conf.direct:
+                        conf.direct = conf.direct.replace("//", "///", 1)
+                if self.dialect:
+                    conf.direct = conf.direct.replace(conf.dbms, self.dialect)
+                engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False} if self.dialect == "sqlite" else {})
+                self.connection = engine.connect()
+            except Exception, msg:
+                raise SqlmapConnectionException(msg[0])
+
+            self.connected()
 
     def fetchall(self):
         try:
