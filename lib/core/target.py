@@ -356,7 +356,7 @@ def _resumeDBMS():
 
     if conf.dbms:
         check = True
-        for aliases, _, _ in DBMS_DICT.values():
+        for aliases, _, _, _ in DBMS_DICT.values():
             if conf.dbms.lower() in aliases and dbms not in aliases:
                 check = False
                 break

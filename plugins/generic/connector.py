@@ -46,8 +46,10 @@ class Connector:
 
     def close(self):
         try:
-            self.cursor.close()
-            self.connector.close()
+            if self.cursor:
+                self.cursor.close()
+            if self.connector:
+                self.connector.close()
         except Exception, msg:
             logger.debug(msg)
         finally:

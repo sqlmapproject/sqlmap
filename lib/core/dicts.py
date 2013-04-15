@@ -127,16 +127,16 @@ DB2_PRIVS = {
 DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
 
 DBMS_DICT = {
-                DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
-                DBMS.MYSQL: (MYSQL_ALIASES, "python pymysql", "https://github.com/petehunt/PyMySQL/"),
-                DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/"),
-                DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/"),
-                DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "http://packages.ubuntu.com/quantal/python-sqlite"),
-                DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/"),
-                DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/"),
-                DBMS.MAXDB: (MAXDB_ALIASES, None, None),
-                DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/"),
-                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/"),
+                DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "mssql"),
+                DBMS.MYSQL: (MYSQL_ALIASES, "python pymysql", "https://github.com/petehunt/PyMySQL/", "mysql"),
+                DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
+                DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/", "oracle"),
+                DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "http://packages.ubuntu.com/quantal/python-sqlite", "sqlite"),
+                DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/", "access"),
+                DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/", "firebird"),
+                DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
+                DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "sybase"),
+                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/", "ibm_db_sa"),
             }
 
 FROM_DUMMY_TABLE = {
