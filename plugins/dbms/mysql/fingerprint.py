@@ -224,7 +224,6 @@ class Fingerprint(GenericFingerprint):
                 else:
                     Backend.setVersionList([">= 5.0.0", "< 5.0.3"])
 
-            # For cases when information_schema is missing
             elif inject.checkBooleanExpression("DATABASE() LIKE SCHEMA()"):
                 Backend.setVersion(">= 5.0.2")
                 setDbms("%s 5" % DBMS.MYSQL)

@@ -45,7 +45,10 @@ class SQLAlchemy(GenericConnector):
 
     def fetchall(self):
         try:
-            return self.cursor.fetchall()
+            retVal = []
+            for row in self.cursor.fetchall():
+                retVal.append(tuple(row))
+            return retVal
         except _sqlalchemy.exc.ProgrammingError, msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
             return None
