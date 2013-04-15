@@ -3510,7 +3510,6 @@ def resetCookieJar(cookieJar):
                     for line in lines:
                         _ = line.split()
                         if len(_) == 7:
-                            _[1]= "TRUE"  # MozillaCookieJar expects TRUE here
                             _[4] = "9999999999"  # The UNIX time that the variable will expire on
                             f.write("\n%s" % "\t".join(_))
 
