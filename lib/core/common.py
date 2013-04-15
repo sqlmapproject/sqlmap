@@ -3531,7 +3531,7 @@ def resetCookieJar(cookieJar):
 
         except cookielib.LoadError, msg:
             errMsg = "there was a problem loading "
-            errMsg += "cookies file ('%s')" % msg
+            errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", "\g<1>", str(msg))
             raise SqlmapGenericException(errMsg)
 
 def decloakToTemp(filename):
