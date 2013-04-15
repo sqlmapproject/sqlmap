@@ -83,11 +83,7 @@ def setHandler():
 
             dialect = DBMS_DICT[name][3]
             sqlalchemy = SQLAlchemy(dialect=dialect)
-
-            try:
-                sqlalchemy.connect()
-            except SqlmapConnectionException, msg:
-                logger.critical(msg)
+            sqlalchemy.connect()
 
             if sqlalchemy.connector:
                 conf.dbmsConnector = sqlalchemy
