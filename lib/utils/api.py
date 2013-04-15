@@ -134,7 +134,8 @@ class Task(object):
             self.set_option("oDir", self.output_directory)
 
     def clean_filesystem(self):
-        shutil.rmtree(self.output_directory)
+        if self.output_directory:
+            shutil.rmtree(self.output_directory)
 
     def engine_start(self):
         self.process = Popen("python sqlmap.py --pickled-options %s" % base64pickle(self.options), shell=True, stdin=PIPE, close_fds=False)
