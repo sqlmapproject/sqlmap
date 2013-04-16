@@ -1995,6 +1995,10 @@ def _basicOptionValidation():
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.direct and conf.url:
+        errMsg = "option '-d' is incompatible with option '-u' ('--url')"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.titles and conf.nullConnection:
         errMsg = "switch '--titles' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
@@ -2036,11 +2040,11 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.forms and not any((conf.url, conf.bulkFile)):
-        errMsg = "switch '--forms' requires usage of option '-u' (--url) or '-m'"
+        errMsg = "switch '--forms' requires usage of option '-u' ('--url') or '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url:
-        errMsg = "option '-r' is incompatible with option '-u' (--url)"
+        errMsg = "option '-r' is incompatible with option '-u' ('--url')"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.tor and conf.ignoreProxy:
@@ -2080,7 +2084,7 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.forms and any([conf.logFile, conf.direct, conf.requestFile, conf.googleDork]):
-        errMsg = "switch '--forms' is compatible only with options '-u' (--url) and '-m'"
+        errMsg = "switch '--forms' is compatible only with options '-u' ('--url') and '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.timeSec < 1:
