@@ -844,6 +844,14 @@ DNS exfiltration SQL injection attack is described in paper [Data Retrieval over
 
 If user is controlling a machine registered as a DNS domain server (e.g. domain `attacker.com`) he can turn on this attack by using this option (e.g. `--dns-domain attacker.com`). Prerequisites for it to work is to run a sqlmap with `Administrator` privileges (usage of privileged port `53`) and that one normal (blind) technique is available for exploitation. That's solely the purpose of this attack is to speed up the process of data retrieval in case that at least one technique has been identified (in best case time-based blind). In case that error-based blind or UNION query techniques are available it will be skipped as those are preferred ones by default. 
 
+### Second-order attack
+
+Option: `--second-order`
+
+Second-order SQL injection attack is an attack where result(s) of an injected payload in one vulnerable page is shown (reflected) at the other. Usually that's happening because of database storage of user provided input at the original vulnerable page.
+
+You can manually tell sqlmap to test for this type of SQL injection by using option `--second-order` with the URL address of the web page where results are being shown.
+
 ## Fingerprint
 
 ### Extensive database management system fingerprint
