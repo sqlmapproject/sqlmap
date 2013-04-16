@@ -778,7 +778,7 @@ In some instances, like a SQL injection in an `UPDATE` statement, injecting an `
 Options: `--string`, `--not-string`, `--regexp` and `--code`
 
 By default the distinction of a `True` query from a `False` one (rough concept behind boolean-based blind SQL injection vulnerabilities) is done by comparing the injected requests page content with the original not injected page content.
-Not always this concept works because sometimes the page content changes at each refresh even not injecting anything, for instance when the page has a counter, a dynamic advertisement banner or any other part of the HTML which is rendered dynamically and might change in time not only consequently to user's input. To bypass this limit, sqlmap tries hard to identify these snippets of the response bodies and deal accordingly. Sometimes it may fail, that is why the user can provide a string (`--string` switch) which is **always** present on original page **and** on all True injected query pages, but that it is **not** on the False ones. Instead of static string, the user can provide a regular expression (`--regexp` switch). Alternatively, user can provide a string (`--not-string` switch) which is **not** present on original page **and** not on all True injected query pages, but appears **always** on False ones.
+Not always this concept works because sometimes the page content changes at each refresh even not injecting anything, for instance when the page has a counter, a dynamic advertisement banner or any other part of the HTML which is rendered dynamically and might change in time not only consequently to user's input. To bypass this limit, sqlmap tries hard to identify these snippets of the response bodies and deal accordingly. Sometimes it may fail, that is why the user can provide a string (`--string` option) which is **always** present on original page **and** on all True injected query pages, but that it is **not** on the False ones. Instead of static string, the user can provide a regular expression (`--regexp` option). Alternatively, user can provide a string (`--not-string` option) which is **not** present on original page **and** not on all True injected query pages, but appears **always** on False ones.
 
 Such data is easy for an user to retrieve, simply try to inject into the affected parameter an invalid value and compare manually the original (not injected) page content with the injected wrong page content. This way the distinction will be based upon string presence or regular expression match. 
 
@@ -835,6 +835,14 @@ Option: `--union-char`
 By default sqlmap tests for UNION query SQL injection technique using `NULL` character. However, by providing an higher `--level` value sqlmap will performs tests also with a random number because there are some corner cases where UNION query tests with `NULL` fail whereas with a random integer they succeed.
 
 You can manually tell sqlmap to test for this type of SQL injection with a specific character by providing the tool with the option `--union-char` followed by a string.
+
+### DNS exfiltration attack
+
+Option: `--dns-domain`
+
+DNS exfiltration SQL injection attack is described in paper [Data Retrieval over DNS in SQL Injection Attacks](arxiv.org/pdf/1303.3047), while presentation of it's implementation inside sqlmap can be found in slides [DNS exfiltration using sqlmap](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281).
+
+If user is controlling a machine registered as a DNS domain server (e.g. domain `attacker.com`) he can turn on this attack by using this option (e.g. `--dns-domain attacker.com`). Prerequisites for it to work is to run a sqlmap with `Administrator` privileges (usage of privileged port `53`) and that one normal (blind) technique is available for exploitation. That's solely the purpose of this attack is to speed up the process of data retrieval in case that at least one technique has been identified (in best case time-based blind). In case that error-based blind or UNION query techniques are available it will be skipped as those are preferred ones by default. 
 
 ## Fingerprint
 
