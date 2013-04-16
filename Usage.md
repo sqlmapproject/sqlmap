@@ -453,7 +453,7 @@ It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) reques
 If the HTTP(S) proxy requires authentication, you can provide the credentials in the format `username:password` to the
 `--proxy-cred` switch.
 
-If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply providing the tool with the option `--tor` instead of `--proxy`.
+If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply using switch `--tor` instead of `--proxy`.
 
 Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
 
@@ -832,9 +832,9 @@ You can manually tell sqlmap to test for this type of SQL injection with a speci
 
 Option: `--union-char`
 
-By default sqlmap tests for UNION query SQL injection technique using `NULL` character. However, by providing an higher `--level` value sqlmap will performs tests also with a random number because there are some corner cases where UNION query tests with `NULL` fail whereas with a random integer they succeed.
+By default sqlmap tests for UNION query SQL injection technique using `NULL` character. However, by providing a higher `--level` value sqlmap will performs tests also with a random number because there are some corner cases where UNION query tests with `NULL` fail, whereas with a random integer they succeed.
 
-You can manually tell sqlmap to test for this type of SQL injection with a specific character by providing the tool with the option `--union-char` followed by a string.
+You can manually tell sqlmap to test for this type of SQL injection with a specific character by using option `--union-char` with desired character value (e.g. `--union-char 123`).
 
 ### DNS exfiltration attack
 
