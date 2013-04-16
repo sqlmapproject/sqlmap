@@ -2047,6 +2047,14 @@ def _basicOptionValidation():
         errMsg = "option '-r' is incompatible with option '-u' ('--url')"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.direct and conf.proxy:
+        errMsg = "option '-d' is incompatible with option '--proxy'"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.direct and conf.tor:
+        errMsg = "option '-d' is incompatible with switch '--tor'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.tor and conf.ignoreProxy:
         errMsg = "switch '--tor' is incompatible with switch '--ignore-proxy'"
         raise SqlmapSyntaxException(errMsg)
