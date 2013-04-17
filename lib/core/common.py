@@ -1058,8 +1058,11 @@ def parseTargetDirect():
                 conf.dbmsUser = details.group('user')
                 conf.dbmsPass = details.group('pass')
             else:
-                conf.dbmsUser = unicode()
-                conf.dbmsPass = unicode()
+                if conf.dbmsCred:
+                    conf.dbmsUser, conf.dbmsPass = conf.dbmsCred.split(':')
+                else:
+                    conf.dbmsUser = unicode()
+                    conf.dbmsPass = unicode()
 
             if not conf.dbmsPass:
                 conf.dbmsPass = None

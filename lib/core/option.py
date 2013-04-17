@@ -2109,6 +2109,11 @@ def _basicOptionValidation():
             errMsg += "(e.g. 1-10) or integer value (e.g. 5)"
             raise SqlmapSyntaxException(errMsg)
 
+    if conf.dbmsCred and ':' not in conf.dbmsCred:
+        errMsg = "value for option '--dbms-cred' must be in "
+        errMsg += "format <username>:<password> (e.g. \"root:pass\")"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.charset:
         _ = checkCharEncoding(conf.charset, False)
         if _ is None:
