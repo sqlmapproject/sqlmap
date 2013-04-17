@@ -245,7 +245,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             if not re.search(r"^[\n]*(%s).*?\sHTTP\/" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), request, re.I | re.M):
                 continue
 
-            if re.search(r"^[\n]*(%s|%s).*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, HTTPMETHOD.POST, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
+            if re.search(r"^[\n]*%s.*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
                 continue
 
             getPostReq = False
