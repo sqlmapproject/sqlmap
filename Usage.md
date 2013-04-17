@@ -446,16 +446,24 @@ This switch should be used in cases when the web server requires proper client-s
 
 ### HTTP(S) proxy
 
-Options and switch: `--proxy`, `--proxy-cred`, `--tor` and `--ignore-proxy`
+Options and switches: `--proxy`, `--proxy-cred` and `--ignore-proxy`
 
 It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) requests to the target URL. The syntax of HTTP(S) proxy value is `http://url:port`.
 
 If the HTTP(S) proxy requires authentication, you can provide the credentials in the format `username:password` to the
 `--proxy-cred` switch.
 
+Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
+
+### Tor anonymity network
+
+Options and switches: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
+
 If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in Tor client guide and use the Privoxy daemon, by default listening on `127.0.0.1:8118`, as the sqlmap proxy by simply using switch `--tor` instead of `--proxy`.
 
-Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
+In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
+
+You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
 
 ### Delay between each HTTP request
 
