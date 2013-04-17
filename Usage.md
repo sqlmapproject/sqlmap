@@ -63,6 +63,7 @@
         provide custom injection payloads and optional tampering scripts
 
         -p TESTPARAMETER    Testable parameter(s)
+        --skip=SKIP         Skip testing for given parameter(s)
         --dbms=DBMS         Force back-end DBMS to this value
         --os=OS             Force back-end DBMS operating system to this value
         --invalid-bignum    Use big numbers for invalidating values
@@ -71,7 +72,6 @@
         --no-escape         Turn off string escaping mechanism
         --prefix=PREFIX     Injection payload prefix string
         --suffix=SUFFIX     Injection payload suffix string
-        --skip=SKIP         Skip testing for given parameter(s)
         --tamper=TAMPER     Use given script(s) for tampering injection data
 
       Detection:
