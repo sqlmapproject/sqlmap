@@ -1642,11 +1642,11 @@ Example against a Microsoft SQL Server target:
 
 Switch: `--wizard`
 
-For beginner users there is a wizard interface which uses a simple workflow with as little questions as possible. If user just uses default answers (e.g. just presses `Enter`) he should have a properly set sqlmap run environment by the end of the workflow.
+For beginner users there is a wizard interface which uses a simple workflow with as little questions as possible. If user just enters target URL and uses default answers (e.g. by pressing `Enter`) he should have a properly set sqlmap run environment by the end of the workflow.
 
     Example against a Microsoft SQL Server target:
 
-        $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --wizard
+        $ python sqlmap.py --wizard
 
             sqlmap/1.0-dev-2defc30 - automatic SQL injection and database takeover tool
             http://sqlmap.org
@@ -1655,6 +1655,7 @@ For beginner users there is a wizard interface which uses a simple workflow with
 
         [*] starting at 11:25:26
 
+        Please enter full target URL (-u): http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1
         POST data (--data) [Enter for None]: 
         Injection difficulty (--level/--risk). Please choose:
         [1] Normal (default)
