@@ -1642,7 +1642,7 @@ Example against a Microsoft SQL Server target:
 
 Switch: `--wizard`
 
-For beginner users there is a wizard interface which uses a simple workflow with as little questions as possible. If users just uses default answers he should have a properly set sqlmap run environment by the end of the workflow.
+For beginner users there is a wizard interface which uses a simple workflow with as little questions as possible. If user just uses default answers (e.g. just presses `Enter`) he should have a properly set sqlmap run environment by the end of the workflow.
 
     Example against a Microsoft SQL Server target:
 
