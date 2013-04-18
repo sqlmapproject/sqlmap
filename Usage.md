@@ -1644,7 +1644,7 @@ Switch: `--wizard`
 
 For beginner users there is a wizard interface which uses a simple workflow with as little questions as possible. If user just enters target URL and uses default answers (e.g. by pressing `Enter`) he should have a properly set sqlmap run environment by the end of the workflow.
 
-    Example against a Microsoft SQL Server target:
+Example against a Microsoft SQL Server target:
 
         $ python sqlmap.py --wizard
 
