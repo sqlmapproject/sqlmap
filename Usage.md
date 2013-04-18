@@ -1590,7 +1590,7 @@ Default sqlmap behavior with option `-g` is to do a Google search and use the fi
 
 Switch: `--mobile`
 
-Sometimes web servers expose different interfaces toward mobile phones than desktop computers. In such cases you can enforce usage of one of predetermined smartphone HTTP User-Agent header values. By using this switch, sqlmap will ask you to pick one of popular smartphones which it will imitate in current run.
+Sometimes web servers expose different interfaces toward mobile phones than to desktop computers. In such cases you can enforce usage of one of predetermined smartphone HTTP User-Agent header values. By using this switch, sqlmap will ask you to pick one of popular smartphones which it will imitate in current run.
 
 Example run:
 
