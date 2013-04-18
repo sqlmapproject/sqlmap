@@ -114,6 +114,7 @@ optDict = {
                                "getCount":          "boolean",
                                "dumpTable":         "boolean",
                                "dumpAll":           "boolean",
+                               "pivotColumn":       "string",
                                "search":            "boolean",
                                "db":                "string",
                                "tbl":               "string",

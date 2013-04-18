@@ -365,6 +365,9 @@ def cmdLineParser():
         enumeration.add_option("--dump-all", dest="dumpAll", action="store_true",
                                help="Dump all DBMS databases tables entries")
 
+        enumeration.add_option("--pivot-column", dest="pivotColumn",
+                               help="Pivot column name")
+
         enumeration.add_option("--search", dest="search", action="store_true",
                                help="Search column(s), table(s) and/or database name(s)")
 
