@@ -758,7 +758,7 @@ def setColor(message, bold=False):
         if bold:
             retVal = colored(message, color=None, on_color=None, attrs=("bold",))
         elif level:
-            _ = LOGGER_HANDLER.level_map.get(logging.getLevelName(level))
+            _ = LOGGER_HANDLER.level_map.get(level)
             if _:
                 background, foreground, bold = _
                 retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
