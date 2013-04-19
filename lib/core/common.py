@@ -627,7 +627,7 @@ def getDocRoot():
                         docRoot = "%s%s" % (absFilePath.split(_)[0], _)
                         break
 
-            if pagePath in absFilePath:
+            if pagePath and pagePath in absFilePath:
                 docRoot = absFilePath.split(pagePath)[0]
                 if windowsDriveLetter:
                     docRoot = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(docRoot))
