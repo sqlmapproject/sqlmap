@@ -2055,6 +2055,10 @@ def _basicOptionValidation():
         errMsg = "option '-d' is incompatible with switch '--tor'"
         raise SqlmapSyntaxException(errMsg)
 
+    if not conf.tech:
+        errMsg = "option '--technique' can't be empty"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.tor and conf.ignoreProxy:
         errMsg = "switch '--tor' is incompatible with switch '--ignore-proxy'"
         raise SqlmapSyntaxException(errMsg)
