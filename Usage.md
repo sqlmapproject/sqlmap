@@ -1564,6 +1564,27 @@ If you want sqlmap to run as a batch tool, without any user's interaction  when 
 
 ## Miscellaneous
 
+### Set answers for questions
+
+Option: `--answers`
+
+In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be splitted with delimiter character `;`.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--technique=E --answers="extending=N" --batch
+    [...]
+    [21:58:56] [INFO] testing for SQL injection on GET parameter 'id'
+    heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+    [21:58:56] [INFO] do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] N
+    [...]
+
+### Make a beep sound when SQL injection is found
+
+Switch: `--beep`
+
+In case that user uses switch `--beep` he'll be warned with a beep sound immediately when SQL injection is found. This is especially useful when there is a large bulk list (option `-m`) of target URLs to be tested.
+
 ### Cleanup the DBMS from sqlmap specific UDF(s) and table(s)
 
 Switch: `--cleanup`
