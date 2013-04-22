@@ -23,7 +23,7 @@ def purge(directory):
         logger.warn(warnMsg)
         return
 
-    infoMsg = "purging content of directory ('%s'). Please wait as this could take a while" % directory
+    infoMsg = "purging content of directory '%s'..." % directory
     logger.info(infoMsg)
 
     filepaths = []
@@ -33,14 +33,14 @@ def purge(directory):
         dirpaths.extend([os.path.abspath(os.path.join(rootpath, _)) for _ in directories])
         filepaths.extend([os.path.abspath(os.path.join(rootpath, _)) for _ in filenames])
 
-    logger.debug("changing file attributes...")
+    logger.debug("changing file attributes")
     for filepath in filepaths:
         try:
             os.chmod(filepath, stat.S_IREAD | stat.S_IWRITE)
         except:
             pass
 
-    logger.debug("writing random data to files...")
+    logger.debug("writing random data to files")
     for filepath in filepaths:
         try:
             filesize = os.path.getsize(filepath)
@@ -49,7 +49,7 @@ def purge(directory):
         except:
             pass
 
-    logger.debug("truncating files...")
+    logger.debug("truncating files")
     for filepath in filepaths:
         try:
             with open(filepath, 'w') as f:
@@ -57,7 +57,7 @@ def purge(directory):
         except:
             pass
 
-    logger.debug("renaming filenames to random values...")
+    logger.debug("renaming filenames to random values")
     for filepath in filepaths:
         try:
             os.rename(filepath, os.path.join(os.path.dirname(filepath), "".join(random.sample(string.letters, random.randint(4, 8)))))
@@ -66,13 +66,13 @@ def purge(directory):
 
     dirpaths.sort(cmp=lambda x, y: y.count(os.path.sep) - x.count(os.path.sep))
 
-    logger.debug("renaming directory names to random values...")
+    logger.debug("renaming directory names to random values")
     for dirpath in dirpaths:
         try:
             os.rename(dirpath, os.path.join(os.path.dirname(dirpath), "".join(random.sample(string.letters, random.randint(4, 8)))))
         except:
             pass
 
-    logger.debug("deleting the whole directory tree...")
+    logger.debug("deleting the whole directory tree")
     os.chdir(os.path.join(directory, ".."))
     shutil.rmtree(directory)
