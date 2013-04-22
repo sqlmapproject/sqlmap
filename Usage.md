@@ -1506,6 +1506,16 @@ Option: `--flush-session`
 
 As you are already familiar with the concept of a session file from the description above, it is good to know that you can flush the content of that file using option `--flush-session`. This way you can avoid the caching mechanisms implemented by default in sqlmap. Other possible way is to manually remove the session file(s). 
 
+### Parse and test forms' input fields
+
+Switch: `--forms`
+
+Say that you want to test against SQL injections a huge _search form_ or you want to test a login bypass (typically only two input fields named like _username_ and _password_), you can either pass to sqlmap the request in a request file (`-r`), set the POSTed data accordingly (`--data`) or let sqlmap do it for you! 
+
+Both of the above mentioned instances, and many others, appear as ` <form>` and ` <input>` tags in HTML response bodies and this is where this switch comes into play.
+
+Provide sqlmap with `--forms` as well as the page where the form can be found as the target URL (`-u`) and sqlmap will request the target URL for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target URL provided. 
+
 ### Ignores query results stored in session file
 
 Switch: `--fresh-queries`
@@ -1591,15 +1601,11 @@ Switch: `--cleanup`
 
 It is recommended to clean up the back-end database management system from sqlmap temporary table(s) and created user-defined function(s) when you are done taking over the underlying operating system or file system. Switch `--cleanup` will attempt to clean up the DBMS and the file system wherever possible. 
 
-### Parse and test forms' input fields
+### Disable console output coloring
 
-Switch: `--forms`
+Switch: `--disable-coloring`
 
-Say that you want to test against SQL injections a huge _search form_ or you want to test a login bypass (typically only two input fields named like _username_ and _password_), you can either pass to sqlmap the request in a request file (`-r`), set the POSTed data accordingly (`--data`) or let sqlmap do it for you! 
-
-Both of the above mentioned instances, and many others, appear as ` <form>` and ` <input>` tags in HTML response bodies and this is where this switch comes into play.
-
-Provide sqlmap with `--forms` as well as the page where the form can be found as the target URL (`-u`) and sqlmap will request the target URL for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target URL provided. 
+sqlmap by default uses coloring while writting to console. In case of undesired effects (e.g. console appearance of uninterpreted ANSI coloring codes like `\x01\x1b[0;32m\x02[INFO] testing connection to the target URL`) you can disable console output coloring by using this switch.
 
 ### Use Google dork results from specified page number
 
@@ -1657,6 +1663,25 @@ Example against a Microsoft SQL Server target:
     [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
     [11:12:17] [INFO] target URL appears to have 3 columns in query
+    [...]
+
+### Safely remove all content from output directory
+
+Switch `--purge-output`
+
+In case that user decides to safely remove all content from `output` directory, containing all target details from previous sqlmap runs, he can use switch `--purge-output`. While purging, all files from (sub)directories in folder `output` will be overwritten with random data, truncated, renamed to random names, (sub)directories will be renamed to random names too, and finally the whole directory tree will be deleted.
+
+Example run:
+
+    $ python sqlmap.py --purge-output -v 3
+    [...]
+    [11:38:55] [INFO] purging content of directory '/home/user/sqlmap/output'...
+    [11:38:55] [DEBUG] changing file attributes
+    [11:38:55] [DEBUG] writing random data to files
+    [11:38:55] [DEBUG] truncating files
+    [11:38:55] [DEBUG] renaming filenames to random values
+    [11:38:55] [DEBUG] renaming directory names to random values
+    [11:38:55] [DEBUG] deleting the whole directory tree
     [...]
 
 ### Conduct through tests only if positive heuristic(s)
