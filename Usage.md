@@ -1605,7 +1605,7 @@ It is recommended to clean up the back-end database management system from sqlma
 
 Switch: `--disable-coloring`
 
-sqlmap by default uses coloring while writting to console. In case of undesired effects (e.g. console appearance of uninterpreted ANSI coloring codes like `\x01\x1b[0;32m\x02[INFO] testing connection to the target URL`) you can disable console output coloring by using this switch.
+sqlmap by default uses coloring while writting to console. In case of undesired effects (e.g. console appearance of uninterpreted ANSI coloring codes like `\x01\x1b[0;32m\x02[INFO]`) you can disable console output coloring by using this switch.
 
 ### Use Google dork results from specified page number
 
