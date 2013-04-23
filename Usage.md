@@ -1595,6 +1595,12 @@ Switch: `--beep`
 
 In case that user uses switch `--beep` he'll be warned with a beep sound immediately when SQL injection is found. This is especially useful when there is a large bulk list (option `-m`) of target URLs to be tested.
 
+# Heuristically check for WAF/IPS/IDS protection
+
+Switch: `--check-waf`
+
+WAF/IPS/IDS protection mechanisms can deal a lot of trouble to sqlmap. In case that user suspects that one such mechanism is protecting the target he can use this switch to make a dummy heuristic check. sqlmap will send inside the original request a dummy parameter value containing a "suspicious" SQL injection payload (e.g. `...&foobar=AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1`). In case that target responds differently there is a high possibility that it's under such protection.
+
 ### Cleanup the DBMS from sqlmap specific UDF(s) and table(s)
 
 Switch: `--cleanup`
@@ -1612,6 +1618,12 @@ sqlmap by default uses coloring while writting to console. In case of undesired 
 Option: `--gpage`
 
 Default sqlmap behavior with option `-g` is to do a Google search and use the first 100 resulting URLs for further SQL injection testing. However, in combination with this option you can specify with this switch, `--gpage`, some page other than the first one to retrieve target URLs from. 
+
+### Use HTTP parameter pollution
+
+Switch: `--hpp`
+
+HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS/IDS protection mechanisms (explained [here](http://www.imperva.com/resources/glossary/http_parameter_pollution_hpp.html)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
 
 ### Imitate smartphone
 
