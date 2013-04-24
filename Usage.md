@@ -1500,27 +1500,11 @@ This switch requires an argument that specified the textual file to write all HT
 
 This is useful primarily for debug purposes.
 
-### Flush session files
+### Format of dumped data
 
-Option: `--flush-session`
+Option: `--dump-format`
 
-As you are already familiar with the concept of a session file from the description above, it is good to know that you can flush the content of that file using option `--flush-session`. This way you can avoid the caching mechanisms implemented by default in sqlmap. Other possible way is to manually remove the session file(s). 
-
-### Parse and test forms' input fields
-
-Switch: `--forms`
-
-Say that you want to test against SQL injections a huge _search form_ or you want to test a login bypass (typically only two input fields named like _username_ and _password_), you can either pass to sqlmap the request in a request file (`-r`), set the POSTed data accordingly (`--data`) or let sqlmap do it for you! 
-
-Both of the above mentioned instances, and many others, appear as ` <form>` and ` <input>` tags in HTML response bodies and this is where this switch comes into play.
-
-Provide sqlmap with `--forms` as well as the page where the form can be found as the target URL (`-u`) and sqlmap will request the target URL for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target URL provided. 
-
-### Ignore query results stored in session file
-
-Switch: `--fresh-queries`
-
-As you are already familiar with the concept of a session file from the description above, it is good to know that you can ignore the content of that file using option `--fresh-queries`. This way you can keep the session file untouched and for a selected run, avoid the resuming/restoring of queries output. 
+sqlmap supports three different types of formatting when storing dumped table data into the output directory: `CSV`, `HTML` and `SQLITE`. Default one is `CSV` where each table row is stored into a textual file line by line, and where each entry is separated with a comma character ','. In case of `HTML` output is being stored into a HTML file where each row is represented with a row inside a formatted table. In case of `SQLITE` output is being stored into a SQLITE database where original table content is replicated into the corresponding table having a same name.
 
 ### Estimated time of arrival
 
@@ -1549,6 +1533,34 @@ Then:
     banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'
 
 As you can see, sqlmap first calculates the length of the query output, then estimates the time of arrival, shows the progress in percentage and counts the number of retrieved output characters. 
+
+### Flush session files
+
+Option: `--flush-session`
+
+As you are already familiar with the concept of a session file from the description above, it is good to know that you can flush the content of that file using option `--flush-session`. This way you can avoid the caching mechanisms implemented by default in sqlmap. Other possible way is to manually remove the session file(s). 
+
+### Force usage of SSL/HTTPS requests
+
+Switch: `--force-ssl`
+
+In case that user wants to force usage of SSL/HTTPS requests toward the target, he can use this switch. This can be useful in cases when urls are being collected by using switch `--crawl` or when Burp log is being provided with option `-l`.
+
+### Parse and test forms' input fields
+
+Switch: `--forms`
+
+Say that you want to test against SQL injections a huge _search form_ or you want to test a login bypass (typically only two input fields named like _username_ and _password_), you can either pass to sqlmap the request in a request file (`-r`), set the POSTed data accordingly (`--data`) or let sqlmap do it for you! 
+
+Both of the above mentioned instances, and many others, appear as ` <form>` and ` <input>` tags in HTML response bodies and this is where this switch comes into play.
+
+Provide sqlmap with `--forms` as well as the page where the form can be found as the target URL (`-u`) and sqlmap will request the target URL for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target URL provided. 
+
+### Ignore query results stored in session file
+
+Switch: `--fresh-queries`
+
+As you are already familiar with the concept of a session file from the description above, it is good to know that you can ignore the content of that file using option `--fresh-queries`. This way you can keep the session file untouched and for a selected run, avoid the resuming/restoring of queries output. 
 
 ### Update sqlmap
 
