@@ -198,7 +198,7 @@
         --flush-session     Flush session files for current target
         --force-ssl         Force usage of SSL/HTTPS requests
         --forms             Parse and test forms on target URL
-        --fresh-queries     Ignores query results stored in session file
+        --fresh-queries     Ignore query results stored in session file
         --hex               Uses DBMS hex function(s) for data retrieval
         --output-dir=ODIR   Custom output directory path
         --parse-errors      Parse and display DBMS error messages from responses
@@ -1516,7 +1516,7 @@ Both of the above mentioned instances, and many others, appear as ` <form>` and 
 
 Provide sqlmap with `--forms` as well as the page where the form can be found as the target URL (`-u`) and sqlmap will request the target URL for you, parse the forms it has and guide you through to test for SQL injection on those form input fields (parameters) rather than the target URL provided. 
 
-### Ignores query results stored in session file
+### Ignore query results stored in session file
 
 Switch: `--fresh-queries`
 
