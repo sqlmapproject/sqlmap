@@ -366,6 +366,7 @@ class Dump(object):
         replication = None
         rtable = None
         dumpFP = None
+        appendToFile = False
 
         if tableValues is None:
             return
@@ -388,7 +389,8 @@ class Dump(object):
                 os.makedirs(dumpDbPath, 0755)
 
             dumpFileName = "%s%s%s.%s" % (dumpDbPath, os.sep, unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())
-            dumpFP = openFile(dumpFileName, "wb")
+            appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
+            dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
 
         count = int(tableValues["__infos__"]["count"])
         separator = str()
@@ -466,22 +468,23 @@ class Dump(object):
 
                 self._write("| %s%s" % (column, blank), newline=False)
 
-                if conf.dumpFormat == DUMP_FORMAT.CSV:
-                    if field == fields:
-                        dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
-                    else:
-                        dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
-                elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                    entryNode = documentNode.createElement("td")
-                    rowNode.appendChild(entryNode)
-                    entryNode.appendChild(documentNode.createTextNode(column))
+                if not appendToFile:
+                    if conf.dumpFormat == DUMP_FORMAT.CSV:
+                        if field == fields:
+                            dataToDumpFile(dumpFP, "%s" % safeCSValue(column))
+                        else:
+                            dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
+                    elif conf.dumpFormat == DUMP_FORMAT.HTML:
+                        entryNode = documentNode.createElement("td")
+                        rowNode.appendChild(entryNode)
+                        entryNode.appendChild(documentNode.createTextNode(column))
 
                 field += 1
 
         self._write("|\n%s" % separator)
 
         if conf.dumpFormat == DUMP_FORMAT.CSV:
-            dataToDumpFile(dumpFP, "\n")
+            dataToDumpFile(dumpFP, "\n" if not appendToFile else "")
 
         elif conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.beginTransaction()
