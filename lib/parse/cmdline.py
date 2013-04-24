@@ -574,7 +574,7 @@ def cmdLineParser():
 
         general.add_option("--fresh-queries", dest="freshQueries",
                             action="store_true",
-                            help="Ignores query results stored in session file")
+                            help="Ignore query results stored in session file")
 
         general.add_option("--hex", dest="hexConvert",
                             action="store_true",
