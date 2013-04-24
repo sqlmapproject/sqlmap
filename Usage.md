@@ -1504,7 +1504,7 @@ This is useful primarily for debug purposes.
 
 Option: `--dump-format`
 
-sqlmap supports three different types of formatting when storing dumped table data into the output directory: `CSV`, `HTML` and `SQLITE`. Default one is `CSV` where each table row is stored into a textual file line by line, and where each entry is separated with a comma character ','. In case of `HTML` output is being stored into a HTML file where each row is represented with a row inside a formatted table. In case of `SQLITE` output is being stored into a SQLITE database where original table content is replicated into the corresponding table having a same name.
+sqlmap supports three different types of formatting when storing dumped table data into the corresponding file inside an output directory: `CSV`, `HTML` and `SQLITE`. Default one is `CSV` where each table row is stored into a textual file line by line, and where each entry is separated with a comma character `,`. In case of `HTML`, output is being stored into a HTML file where each row is represented with a row inside a formatted table. In case of `SQLITE` output is being stored into a SQLITE database where original table content is replicated into the corresponding table having a same name.
 
 ### Estimated time of arrival
 
