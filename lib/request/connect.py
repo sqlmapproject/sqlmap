@@ -276,6 +276,10 @@ class Connect(object):
                 pass
 
             elif target:
+                if conf.forceSSL and urlparse.urlparse(url).scheme != "https":
+                    url = re.sub("\Ahttp:", "https:", url, re.I)
+                    url = re.sub(":80/", ":443/", url, re.I)
+
                 if PLACE.GET in conf.parameters and not get:
                     get = conf.parameters[PLACE.GET]
 
