@@ -578,7 +578,7 @@ def cmdLineParser():
 
         general.add_option("--hex", dest="hexConvert",
                             action="store_true",
-                            help="Uses DBMS hex function(s) for data retrieval")
+                            help="Use DBMS hex function(s) for data retrieval")
 
         general.add_option("--output-dir", dest="oDir",
                             action="store",
