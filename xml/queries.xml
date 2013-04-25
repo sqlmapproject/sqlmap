@@ -83,11 +83,11 @@
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
         <comment query="--" query2="/*"/>
-        <substring query="SUBSTR((%s)::text,%d,%d)"/>
+        <substring query="SUBSTRING((%s)::text FROM %d FOR %d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="ENCODE(CONVERT_TO((%s),'UTF8'),'HEX')"/>
-        <inference query="ASCII(SUBSTR((%s)::text,%d,1))>%d"/>
+        <inference query="ASCII(SUBSTRING((%s)::text FROM %d FOR 1))>%d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_DATABASE()"/>
