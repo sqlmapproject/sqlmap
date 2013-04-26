@@ -62,3 +62,11 @@ class HTTPSConnection(httplib.HTTPSConnection):
 class HTTPSHandler(urllib2.HTTPSHandler):
     def https_open(self, req):
         return self.do_open(HTTPSConnection if ssl else httplib.HTTPSConnection, req)
+
+# Bug fix (http://bugs.python.org/issue17849)
+
+def _(self, *args):
+    return self._readline()
+
+httplib.LineAndFileWrapper._readline = httplib.LineAndFileWrapper.readline
+httplib.LineAndFileWrapper.readline = _
