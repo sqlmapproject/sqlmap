@@ -1565,13 +1565,15 @@ If you want sqlmap to run as a batch tool, without any user's interaction  when 
 
 Option: `--charset`
 
-For proper decoding of character data sqlmap uses either web server provided information (e.g. HTTP header `Content-Type`) or a heuristic result coming from a 3rd party library [chardet](https://pypi.python.org/pypi/chardet). Nevertheless, there are cases when this value has to be overwritten, especially in cases of international non-ASCII letters (e.g. `--charset=GBK`). It has to be noted that there is a possibility that character information is going to be irreversibly lost due to implicit incompatibility between stored database content and used database connector at the target side.
+For proper decoding of character data sqlmap uses either web server provided information (e.g. HTTP header `Content-Type`) or a heuristic result coming from a 3rd party library [chardet](https://pypi.python.org/pypi/chardet).
+
+Nevertheless, there are cases when this value has to be overwritten, especially when retrieving data containing international non-ASCII letters (e.g. `--charset=GBK`). It has to be noted that there is a possibility that character information is going to be irreversibly lost due to implicit incompatibility between stored database content and used database connector at the target side.
 
 ### Crawl the website starting from the target URL
 
 Option: `--crawl`
 
-sqlmap can collect potentially vulnerable links by collecting them (crawling) from the target location. Using this option user can set a depth (distance from a starting location) below which sqlmap won't go in collecting phase, as the process is being done recursively as long as there are new links to be visited.
+sqlmap can collect potentially vulnerable links by collecting them (crawling) starting from the target location. Using this option user can set a depth (distance from a starting location) below which sqlmap won't go in collecting phase, as the process is being done recursively as long as there are new links to be visited.
 
 Example run against a MySQL target:
 
@@ -1584,6 +1586,12 @@ Example run against a MySQL target:
     [11:54:54] [INFO] heuristics detected web page charset 'ascii'
     [11:55:00] [INFO] 42/56 links visited (75%)
     [...]
+
+### Delimiting character used in CSV output
+
+Option: `--csv-del`
+
+When data being dumped is stored into the CSV format (`--dump-format=CSV`), entries have to be separated with a "separation value" (default is `,`). In case that user wants to override its default value he can use this option (e.g. `--csv-del=";"`).
 
 ### Format of dumped data
 
@@ -1669,7 +1677,7 @@ Example against a PostgreSQL target:
 
 Option: `--output-dir`
 
-sqlmap by default stores session and result files inside a subdirectory `output`. In case that user wants to use a different location for it he can use this option.
+sqlmap by default stores session and result files inside a subdirectory `output`. In case that user wants to use a different location for it he can use this option (e.g. `--output-dir=/tmp`).
 
 ### Update sqlmap
 
