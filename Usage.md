@@ -1555,6 +1555,36 @@ This switch requires an argument that specified the textual file to write all HT
 
 This is useful primarily for debug purposes.
 
+### Act in non-interactive mode
+
+Switch: `--batch`
+
+If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using `--batch` switch. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
+
+### Force character encoding used for data retrieval
+
+Option: `--charset`
+
+For proper decoding of character data sqlmap uses either web server provided information (e.g. HTTP header `Content-Type`) or a heuristic result coming from a 3rd party library [chardet](https://pypi.python.org/pypi/chardet). Nevertheless, there are cases when this value has to be overwritten, especially in cases of international non-ASCII letters (e.g. `--charset=GBK`). It has to be noted that there is a possibility that character information is going to be irreversibly lost due to implicit incompatibility between stored database content and used database connector at the target side.
+
+### Crawl the website starting from the target URL
+
+Option: `--crawl`
+
+sqlmap can collect potentially vulnerable links by collecting them (crawling) from the target location. Using this option user can set a depth (distance from a starting location) below which sqlmap won't go in collecting phase, as the process is being done recursively as long as there are new links to be visited.
+
+Example run against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/" --batch --crawl=3
+    [...]
+    [11:54:53] [INFO] starting crawler
+    [11:54:53] [INFO] searching for links with depth 1
+    [11:54:53] [WARNING] running in a single-thread mode. This could take a while                                                                                                                                                               
+    [11:54:53] [INFO] searching for links with depth 2
+    [11:54:54] [INFO] heuristics detected web page charset 'ascii'
+    [11:55:00] [INFO] 42/56 links visited (75%)
+    [...]
+
 ### Format of dumped data
 
 Option: `--dump-format`
@@ -1635,11 +1665,17 @@ Example against a PostgreSQL target:
     GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2
     [...]
 
+### Custom output directory path
+
+Option: `--output-dir`
+
+sqlmap by default stores session and result files inside a subdirectory `output`. In case that user wants to use a different location for it he can use this option.
+
 ### Update sqlmap
 
 Switch: `--update`
 
-Using this option you can update the tool to the latest development version directly from the subversion repository. You obviously need Internet access. 
+Using this option you can update the tool to the latest development version directly from the [Git repository](https://github.com/sqlmapproject/sqlmap.git). You obviously need Internet access. 
 
 If, for any reason, this operation fails, run `git pull` from your sqlmap working copy. It will perform the exact same operation of switch `--update`. If you are running sqlmap on Windows, you can use the [SmartGit](http://www.syntevo.com/smartgit/index.html) client. 
 
@@ -1650,12 +1686,6 @@ This is strongly recommended **before** reporting any bug to the [mailing lists]
 Switch: `--save`
 
 It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
-
-### Act in non-interactive mode
-
-Switch: `--batch`
-
-If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using `--batch` switch. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
 
 ## Miscellaneous
 
