@@ -817,8 +817,9 @@ This switch requires an argument. Such argument is a string composed by any comb
 * `U`: Union query-based
 * `S`: Stacked queries
 * `T`: Time-based blind
+* `Q`: Inline query
 
-For instance, you can provide `ES` if you want to test for and exploit error-based and stacked queries SQL injection types only. The default value is `BEUST`. 
+For instance, you can provide `ES` if you want to test for and exploit error-based and stacked queries SQL injection types only. The default value is `BEUSTQ`. 
 
 Note that the string must include stacked queries technique letter, `S`, when you want to access the file system, takeover the operating system or access Windows registry hives. 
 
