@@ -491,7 +491,7 @@ CHECK_ZERO_COLUMNS_THRESHOLD = 10
 BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "test shows that")
 
 # Generic www root directory names
-GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "wwwroot", "www")
+GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "httpdocs", "public", "wwwroot", "www")
 
 # Maximum length of a help part containing switch/option name(s)
 MAX_HELP_OPTION_LENGTH = 18
