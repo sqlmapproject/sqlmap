@@ -1593,6 +1593,12 @@ Option: `--csv-del`
 
 When data being dumped is stored into the CSV format (`--dump-format=CSV`), entries have to be separated with a "separation value" (default is `,`). In case that user wants to override its default value he can use this option (e.g. `--csv-del=";"`).
 
+### DBMS authentication credentials
+
+Option: --dbms-cred
+
+In some cases user will be warned that some operations failed because of lack of current DBMS user privileges and that he could try to use this option. In those cases, if he provides `admin` user credentials to sqlmap by using this option, sqlmap will try to rerun the problematic part with specialized "run as" mechanisms (e.g. `OPENROWSET`) using those credentials.
+
 ### Format of dumped data
 
 Option: `--dump-format`
@@ -1747,6 +1753,43 @@ Default sqlmap behavior with option `-g` is to do a Google search and use the fi
 Switch: `--hpp`
 
 HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS/IDS protection mechanisms (explained [here](http://www.imperva.com/resources/glossary/http_parameter_pollution_hpp.html)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
+
+### Make a through testing for a WAF/IPS/IDS protection
+
+Switch: `--identify-waf`
+
+sqlmap can try to identify backend WAF/IPS/IDS protection (if any) so user could do appropriate steps (e.g. use tamper scripts with `--tamper`). Currently around 30 different products are supported (Airlock, Barracuda WAF, etc.) and their respective WAF scripts can be found inside `waf` directory.
+
+Example against a MySQL target protected by the ModSecurity WAF:
+
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --identify-waf -v 3
+    [...]
+    [11:35:23] [INFO] testing connection to the target URL
+    [11:35:23] [INFO] heuristics detected web page charset 'ascii'
+    [11:35:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United Security Providers)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firewall (BinarySEC)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Firewall (NetContinuum/Barracuda Networks)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Firewall (art of defence Inc.)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Systems)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai Technologies)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firewall (Incapsula/Imperva)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Firewall (CloudFlare)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firewall (Barracuda Networks)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Security (IBM)'
+    [11:35:23] [DEBUG] declared web page charset 'iso-8859-1'
+    [11:35:23] [DEBUG] page not found (404)
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewall (Jiasule)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall (AQTRONIX)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
+    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Application Firewall (Trustwave)'
+    [11:35:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Application Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper')
+    [...]
 
 ### Imitate smartphone
 
