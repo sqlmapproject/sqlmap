@@ -810,14 +810,14 @@ This switch can be used to specify which SQL injection type to test for. By defa
 
 In certain situations you may want to test only for one or few specific types of SQL injection thought and this is where this switch comes into play. 
 
-This switch requires an argument. Such argument is a string composed by any combination of `B`, `E`, `U`, `S` and `T` characters where each letter stands for a different technique: 
+This switch requires an argument. Such argument is a string composed by any combination of `B`, `E`, `U`, `S`, `T` and `Q` characters where each letter stands for a different technique: 
 
 * `B`: Boolean-based blind
 * `E`: Error-based
 * `U`: Union query-based
 * `S`: Stacked queries
 * `T`: Time-based blind
-* `Q`: Inline query
+* `Q`: Inline queries
 
 For instance, you can provide `ES` if you want to test for and exploit error-based and stacked queries SQL injection types only. The default value is `BEUSTQ`. 
 
