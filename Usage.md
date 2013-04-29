@@ -1595,9 +1595,9 @@ When data being dumped is stored into the CSV format (`--dump-format=CSV`), entr
 
 ### DBMS authentication credentials
 
-Option: --dbms-cred
+Option: `--dbms-cred`
 
-In some cases user will be warned that some operations failed because of lack of current DBMS user privileges and that he could try to use this option. In those cases, if he provides `admin` user credentials to sqlmap by using this option, sqlmap will try to rerun the problematic part with specialized "run as" mechanisms (e.g. `OPENROWSET`) using those credentials.
+In some cases user will be warned that some operations failed because of lack of current DBMS user privileges and that he could try to use this option. In those cases, if he provides `admin` user credentials to sqlmap by using this option, sqlmap will try to rerun the problematic part with specialized "run as" mechanisms (e.g. `OPENROWSET` on Microsoft SQL Server) using those credentials.
 
 ### Format of dumped data
 
