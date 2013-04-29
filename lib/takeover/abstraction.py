@@ -158,7 +158,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
             msg = "on Microsoft SQL Server 2005 and 2008, OPENROWSET function "
             msg += "is disabled by default. This function is needed to execute "
             msg += "statements as another DBMS user since you provided the "
-            msg += "--dbms-creds switch. If you are DBA, you can enable it. "
+            msg += "option '--dbms-creds'. If you are DBA, you can enable it. "
             msg += "Do you want to enable it? [Y/n] "
             choice = readInput(msg, default="Y")
 
