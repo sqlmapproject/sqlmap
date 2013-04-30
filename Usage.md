@@ -39,6 +39,10 @@
         --proxy=PROXY       Use a HTTP proxy to connect to the target URL
         --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
         --ignore-proxy      Ignore system default HTTP proxy
+        --tor               Use Tor anonymity network
+        --tor-port=TORPORT  Set Tor proxy port other than default
+        --tor-type=TORTYPE  Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)
+        --check-tor         Check to see if Tor is used properly
         --delay=DELAY       Delay in seconds between each HTTP request
         --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
         --retries=RETRIES   Retries when the connection timeouts (default 3)
@@ -192,7 +196,6 @@
         -t TRAFFICFILE      Log all HTTP traffic into a textual file
         --batch             Never ask for user input, use the default behaviour
         --charset=CHARSET   Force character encoding used for data retrieval
-        --check-tor         Check to see if Tor is used properly
         --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
         --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
         --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
@@ -206,9 +209,6 @@
         --parse-errors      Parse and display DBMS error messages from responses
         --pivot-column=P..  Pivot column name
         --save              Save options to a configuration INI file
-        --tor               Use Tor anonymity network
-        --tor-port=TORPORT  Set Tor proxy port other than default
-        --tor-type=TORTYPE  Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)
         --update            Update sqlmap
 
       Miscellaneous:
@@ -472,6 +472,16 @@ If the HTTP(S) proxy requires authentication, you can provide the credentials in
 option `--proxy-cred`.
 
 Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
+
+### Tor anonymity network
+
+Switches and options: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
+
+If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in [Tor installation guides](https://www.torproject.org/docs/installguide.html.en). Then you can use a switch `--tor` and sqlmap will try to automatically set Tor proxy connection settings.
+
+In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
+
+You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
 
 ### Delay between each HTTP request
 
@@ -1800,16 +1810,6 @@ Example against a Microsoft SQL Server target:
 Switch: `--save`
 
 It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above.
-
-### Tor anonymity network
-
-Switches and options: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
-
-If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in [Tor installation guides](https://www.torproject.org/docs/installguide.html.en). Then you can use a switch `--tor` and sqlmap will try to automatically set Tor proxy connection settings.
-
-In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
-
-You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
 
 ### Update sqlmap
 
