@@ -155,9 +155,6 @@ def cmdLineParser():
         request.add_option("--randomize", dest="rParam",
                            help="Randomly change value for given parameter(s)")
 
-        request.add_option("--scope", dest="scope",
-                           help="Regexp to filter targets from provided proxy log")
-
         request.add_option("--safe-url", dest="safUrl",
                            help="URL address to visit frequently during testing")
 
@@ -171,6 +168,10 @@ def cmdLineParser():
         request.add_option("--force-ssl", dest="forceSSL",
                            action="store_true",
                            help="Force usage of SSL/HTTPS")
+
+        request.add_option("--hpp", dest="hpp",
+                                  action="store_true",
+                                  help="Use HTTP parameter pollution")
 
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
@@ -601,6 +602,12 @@ def cmdLineParser():
                             action="store_true",
                             help="Save options to a configuration INI file")
 
+        general.add_option("--scope", dest="scope",
+                           help="Regexp to filter targets from provided proxy log")
+
+        general.add_option("--test-filter", dest="testFilter",
+                           help="Select tests by payloads and/or titles (e.g. ROW)")
+
         general.add_option("--update", dest="updateAll",
                             action="store_true",
                             help="Update sqlmap")
@@ -640,10 +647,6 @@ def cmdLineParser():
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                   help="Use Google dork results from specified page number")
 
-        miscellaneous.add_option("--hpp", dest="hpp",
-                                  action="store_true",
-                                  help="Use HTTP parameter pollution")
-
         miscellaneous.add_option("--identify-waf", dest="identifyWaf",
                                   action="store_true",
                                   help="Make a through testing for a WAF/IPS/IDS protection")
@@ -663,9 +666,6 @@ def cmdLineParser():
         miscellaneous.add_option("--smart", dest="smart",
                                   action="store_true",
                                   help="Conduct through tests only if positive heuristic(s)")
-
-        miscellaneous.add_option("--test-filter", dest="testFilter",
-                                  help="Select tests by payloads and/or titles (e.g. ROW)")
 
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
