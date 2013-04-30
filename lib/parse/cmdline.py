@@ -178,7 +178,7 @@ def cmdLineParser():
 
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
-                               "switches can be used to optimize the "
+                               "options can be used to optimize the "
                                "performance of sqlmap")
 
         optimization.add_option("-o", dest="optimize",
@@ -427,7 +427,7 @@ def cmdLineParser():
 
         # User-defined function options
         brute = OptionGroup(parser, "Brute force", "These "
-                          "switches can be used to run brute force "
+                          "options can be used to run brute force "
                           "checks")
 
         brute.add_option("--common-tables", dest="commonTables", action="store_true",
