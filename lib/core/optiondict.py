@@ -47,6 +47,7 @@ optDict = {
                                "saFreq":            "integer",
                                "skipUrlEncode":     "boolean",
                                "evalCode":          "string",
+                               "forceSSL":          "boolean",
                              },
 
             "Optimization":  {
@@ -178,7 +179,6 @@ optDict = {
                                "dumpFormat":        "string",
                                "eta":               "boolean",
                                "flushSession":      "boolean",
-                               "forceSSL":          "boolean",
                                "forms":             "boolean",
                                "freshQueries":      "boolean",
                                "hexConvert":        "boolean",

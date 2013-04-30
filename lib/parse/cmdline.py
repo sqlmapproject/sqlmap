@@ -157,6 +157,10 @@ def cmdLineParser():
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 
+        request.add_option("--force-ssl", dest="forceSSL",
+                           action="store_true",
+                           help="Force usage of SSL/HTTPS")
+
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
                                "switches can be used to optimize the "
@@ -559,10 +563,6 @@ def cmdLineParser():
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true",
                             help="Flush session files for current target")
-
-        general.add_option("--force-ssl", dest="forceSSL",
-                           action="store_true",
-                           help="Force usage of SSL/HTTPS requests")
 
         general.add_option("--forms", dest="forms",
                                   action="store_true",
