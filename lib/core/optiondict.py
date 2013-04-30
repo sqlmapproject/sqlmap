@@ -46,8 +46,8 @@ optDict = {
                                "safUrl":            "string",
                                "saFreq":            "integer",
                                "skipUrlEncode":     "boolean",
-                               "evalCode":          "string",
                                "forceSSL":          "boolean",
+                               "evalCode":          "string",
                              },
 
             "Optimization":  {

@@ -154,12 +154,12 @@ def cmdLineParser():
                            action="store_true",
                            help="Skip URL encoding of payload data")
 
-        request.add_option("--eval", dest="evalCode",
-                           help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
-
         request.add_option("--force-ssl", dest="forceSSL",
                            action="store_true",
                            help="Force usage of SSL/HTTPS")
+
+        request.add_option("--eval", dest="evalCode",
+                           help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
