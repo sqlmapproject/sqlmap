@@ -47,6 +47,7 @@
         --safe-url=SAFURL   URL address to visit frequently during testing
         --safe-freq=SAFREQ  Test requests between two visits to a given safe URL
         --skip-urlencode    Skip URL encoding of payload data
+        --force-ssl         Force usage of SSL/HTTPS
         --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
                             "import hashlib;id2=hashlib.md5(id).hexdigest()")
 
@@ -198,7 +199,6 @@
         --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
         --eta               Display for each output the estimated time of arrival
         --flush-session     Flush session files for current target
-        --force-ssl         Force usage of SSL/HTTPS requests
         --forms             Parse and test forms on target URL
         --fresh-queries     Ignore query results stored in session file
         --hex               Use DBMS hex function(s) for data retrieval
@@ -525,6 +525,12 @@ This way, sqlmap will visit every a predefined number of requests a certain _saf
 Switch: `--skip-urlencode`
 
 Depending on parameter placement (e.g. GET) its value could be URL encoded by default. In some cases, back-end web servers do not follow RFC standards and require values to be send in their raw non-encoded form. Use `--skip-urlencode` in those kind of cases.
+
+### Force usage of SSL/HTTPS
+
+Switch: `--force-ssl`
+
+In case that user wants to force usage of SSL/HTTPS requests toward the target, he can use this switch. This can be useful in cases when urls are being collected by using option `--crawl` or when Burp log is being provided with option `-l`.
 
 ### Evaluate custom python code during each request
 
@@ -1686,12 +1692,6 @@ As you can see, sqlmap first calculates the length of the query output, then est
 Option: `--flush-session`
 
 As you are already familiar with the concept of a session file from the description above, it is good to know that you can flush the content of that file using option `--flush-session`. This way you can avoid the caching mechanisms implemented by default in sqlmap. Other possible way is to manually remove the session file(s). 
-
-### Force usage of SSL/HTTPS requests
-
-Switch: `--force-ssl`
-
-In case that user wants to force usage of SSL/HTTPS requests toward the target, he can use this switch. This can be useful in cases when urls are being collected by using option `--crawl` or when Burp log is being provided with option `-l`.
 
 ### Parse and test forms' input fields
 
