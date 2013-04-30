@@ -72,7 +72,7 @@ def crawl(target):
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
 
                             if href:
-                                url = urlparse.urljoin(target, href)
+                                url = urlparse.urljoin(current, href)
 
                                 # flag to know if we are dealing with the same target host
                                 _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (url, target)))
