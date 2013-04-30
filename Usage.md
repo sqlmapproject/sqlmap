@@ -1201,7 +1201,7 @@ Switch: `--common-tables`
 
 There are cases where `--tables` switch can not be used to retrieve the databases' table names. These cases usually fit into one of the following categories: 
 
-* The database management system is MySQL ** < 5.0** where `information_schema` is not available.
+* The database management system is MySQL **< 5.0** where `information_schema` is not available.
 * The database management system is Microsoft Access and system table `MSysObjects` is not readable - default setting.
 * The session user does not have read privileges against the system table storing the scheme of the databases.
 
@@ -1243,7 +1243,7 @@ Switch: `--common-columns`
 
 As per tables, there are cases where `--columns` switch can not be used to retrieve the databases' tables' column names. These cases usually fit into one of the following categories: 
 
-* The database management system is MySQL ** < 5.0** where `information_schema` is not available.
+* The database management system is MySQL **< 5.0** where `information_schema` is not available.
 * The database management system is Microsoft Access where this kind of information is not available inside system tables.
 * The session user does not have read privileges against the system table storing the scheme of the databases.
 
