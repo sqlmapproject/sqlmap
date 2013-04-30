@@ -1,10 +1,11 @@
 # Usage
 
-    Usage: sqlmap.py [options]
+    Usage: python sqlmap.py [options]
 
     Options:
       -h, --help            Show basic help message and exit
       -hh                   Show advanced help message and exit
+      --version             Show program's version number and exit
       -v VERBOSE            Verbosity level: 0-6 (default 1)
 
       Target:
@@ -12,7 +13,7 @@
         get target URLs from
 
         -d DIRECT           Direct connection to the database
-        -u URL, --url=URL   Target URL
+        -u URL, --url=URL   Target URL (e.g. "www.target.com/vuln.php?id=1")
         -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
         -m BULKFILE         Scan multiple targets enlisted in a given textual file
         -r REQUESTFILE      Load HTTP request from a file
@@ -95,6 +96,7 @@
         --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
         --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
         --union-char=UCHAR  Character to use for bruteforcing number of columns
+        --union-from=UFROM  Table to use in FROM part of UNION query SQL injection
         --dns-domain=DNS..  Domain name used for DNS exfiltration attack
         --second-order=S..  Resulting page URL searched for second-order response
 
@@ -202,6 +204,7 @@
         --hex               Use DBMS hex function(s) for data retrieval
         --output-dir=ODIR   Custom output directory path
         --parse-errors      Parse and display DBMS error messages from responses
+        --pivot-column=P..  Pivot column name
         --save              Save options to a configuration INI file
         --tor               Use Tor anonymity network
         --tor-port=TORPORT  Set Tor proxy port other than default
@@ -231,7 +234,7 @@
 
 Option: `-v`
 
-This option can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error and critical messages and Python tracebacks (if any occur) will be displayed.
+This option can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error, critical messages and Python tracebacks (if any occur) are displayed.
 
 * **0**: Show only Python tracebacks, error and critical messages.
 * **1**: Show also information and warning messages.
@@ -241,11 +244,12 @@ This option can be used to set the verbosity level of output messages. There exi
 * **5**: Show also HTTP responses' headers.
 * **6**: Show also HTTP responses' page content.
 
-A reasonable level of verbosity to further understand what sqlmap does under the hood is level **2**, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level **3** is your best choice. In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level **4** or above. This level is recommended to be used when you feed the developers with a bug report too.
+A reasonable level of verbosity to further understand what sqlmap does under the hood is level **2**, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level **3** is your best choice. This level is also recommended to be used when you feed the developers with a potential bug report, make sure you send along with the standard output the traffic log file generated with option `-t`.
+In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level **4** or above.
 
 ## Target
 
-At least one of these options has to be provided.
+At least one of these options has be provided to set the target(s).
 
 ### Direct connection to the database
 
@@ -297,7 +301,7 @@ Sample content of a bulk file provided as an argument to this option:
 
 Option: `-r`
 
-One of the possibilities of sqlmap is loading of complete HTTP request from a textual file. That way you can skip usage of bunch of other options (e.g. setting of cookies, POSTed data, etc).
+One of the possibilities of sqlmap is loading of raw HTTP request from a textual file. That way you can skip usage of a number of other options (e.g. setting of cookies, POSTed data, etc).
 
 Sample content of a HTTP request file provided as an argument to this option:
 
@@ -306,6 +310,8 @@ Sample content of a HTTP request file provided as an argument to this option:
     User-Agent: Mozilla/4.0
     
     id=1
+
+Note that if the request is over HTTPS, you can use this in conjunction with switch `--force-ssl` to force SSL connection to 443/tcp. Alternatively, you can append `:443` to the end of the `Host` header value.
 
 ### Process Google dork results as target addresses
 
@@ -325,7 +331,7 @@ Option: `-c`
 
 It is possible to pass user's options from a configuration INI file, an example is `sqlmap.conf`.
 
-Note that if you also provide other options from command line, those are evaluated when running sqlmap and overwrite those provided in the configuration file.
+Note that if you provide other options from command line, those are evaluated when running sqlmap and overwrite those provided in the configuration file.
 
 ## Request
 
@@ -353,9 +359,11 @@ For example:
 
 ### HTTP `Cookie` header
 
-Switches: `--cookie` and `--drop-set-cookie`
+**TODO**: needs updating.
 
-This feature can be useful in two ways:
+Switches: `--cookie`, `--load-cookies` and `--drop-set-cookie`
+
+These switches can be useful in two ways:
 
 * The web application requires authentication based upon cookies and you have such data.
 * You want to detect and exploit SQL injection on such header values.
@@ -365,7 +373,6 @@ Either reason brings you to need to send cookies with sqlmap requests, the steps
 * Login to the application with your favourite browser.
 * Get the HTTP Cookie from the browser's preferences or from the HTTP proxy screen and copy to the clipboard.
 * Go back to your shell and run sqlmap by pasting your clipboard as the argument of the `--cookie` switch.
-
 
 Note that the HTTP `Cookie` header values are usually separated by a `;` character, **not** by an `&`. sqlmap can recognize these as separate sets of `parameter=value` too, as well as GET and POST parameters.
 
@@ -377,7 +384,6 @@ Vice versa, if you provide a HTTP `Cookie` header with `--cookie` switch and the
 Note that also the HTTP `Cookie` header is tested against SQL injection if the `--level` is set to **2** or above. Read below for details.
 
 ### HTTP `User-Agent` header
-
 
 Option and switch: `--user-agent` and `--random-agent`
 
@@ -446,9 +452,9 @@ This switch should be used in cases when the web server requires proper client-s
 
 ### HTTP(S) proxy
 
-Options and switches: `--proxy`, `--proxy-cred` and `--ignore-proxy`
+Options and switch: `--proxy`, `--proxy-cred` and `--ignore-proxy`
 
-It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) requests to the target URL. The syntax of HTTP(S) proxy value is `http://url:port`.
+It is possible to provide an HTTP(S) proxy address to pass by the HTTP(S) requests to the target URL with option `--proxy`. The syntax of HTTP(S) proxy value is `http://url:port`.
 
 If the HTTP(S) proxy requires authentication, you can provide the credentials in the format `username:password` to the
 `--proxy-cred` switch.
@@ -602,7 +608,7 @@ In case that user wants to exclude certain parameters from testing, he can use o
 
 For instance, to skip testing for HTTP header `User-Agent` and HTTP header `Referer` at `--level=5`, provide `--skip="user-agent,referer"`.
 
-### URI injection point
+#### URI injection point
 
 There are special cases when injection point is within the URI itself. sqlmap does not perform any automatic test against URI paths, unless manually pointed to. You have to specify these injection points in the command line by appending an asterisk (`*`) after each URI point that you want sqlmap to test for and exploit a SQL injection. 
 
@@ -616,7 +622,7 @@ An example of valid command line would be:
 
 Option: `--dbms`
 
-By default sqlmap automatically detects the web application's back-end database management system. As of version **0.9**, sqlmap fully supports the following database management systems: 
+By default sqlmap automatically detects the web application's back-end database management system. sqlmap fully supports the following database management systems: 
 
 * MySQL
 * Oracle
@@ -627,6 +633,7 @@ By default sqlmap automatically detects the web application's back-end database 
 * Firebird
 * Sybase
 * SAP MaxDB
+* DB2
 
 If for any reason sqlmap fails to detect the back-end DBMS once a SQL injection has been identified or if you want to avoid an active fingeprint, you can provide the name of the back-end DBMS yourself (e.g. `postgresql`). For MySQL and Microsoft SQL Server provide them respectively in the form `MySQL  <version>` and `Microsoft SQL Server  <version> `, where ` <version>` is a valid version for the DBMS; for instance `5.0` for MySQL and `2005` for Microsoft SQL Server.
 
@@ -758,8 +765,7 @@ Example against a MySQL target assuming that `>` character, spaces and capital `
 
 ## Detection
 
-These options can be used to specify how to parse and compare page
-content from HTTP responses when using blind SQL injection technique.
+These options can be used to customize the detection phase.
 
 ### Level
 
@@ -792,7 +798,7 @@ Such data is easy for an user to retrieve, simply try to inject into the affecte
 
 In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTTP code (e.g. `200` for `True` and `401` for `False`), he can provide that information to sqlmap (e.g. `--code=200`).
 
-Switches: `--titles` and `--text-only`
+Switches: `--text-only` and `--titles`
 
 In cases when user knows that the distinction of a `True` query from a `False` one can be done using HTML title (e.g. `Welcome` for `True` and `Forbidden` for `False`), he can turn turn on title-based comparison using switch `--titles`.
 
@@ -845,11 +851,17 @@ By default sqlmap tests for UNION query SQL injection technique using `NULL` cha
 
 You can manually tell sqlmap to test for this type of SQL injection with a specific character by using option `--union-char` with desired character value (e.g. `--union-char 123`).
 
+### Table to use in FROM part of UNION query SQL injection
+
+Option: `--union-from`
+
+**TODO**: needs updating.
+
 ### DNS exfiltration attack
 
 Option: `--dns-domain`
 
-DNS exfiltration SQL injection attack is described in paper [Data Retrieval over DNS in SQL Injection Attacks](arxiv.org/pdf/1303.3047), while presentation of it's implementation inside sqlmap can be found in slides [DNS exfiltration using sqlmap](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281).
+DNS exfiltration SQL injection attack is described in paper [Data Retrieval over DNS in SQL Injection Attacks](http://arxiv.org/pdf/1303.3047.pdf), while presentation of it's implementation inside sqlmap can be found in slides [DNS exfiltration using sqlmap](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281).
 
 If user is controlling a machine registered as a DNS domain server (e.g. domain `attacker.com`) he can turn on this attack by using this option (e.g. `--dns-domain attacker.com`). Prerequisites for it to work is to run a sqlmap with `Administrator` privileges (usage of privileged port `53`) and that one normal (blind) technique is available for exploitation. That's solely the purpose of this attack is to speed up the process of data retrieval in case that at least one technique has been identified (in best case time-based blind). In case that error-based blind or UNION query techniques are available it will be skipped as those are preferred ones by default. 
 
@@ -877,6 +889,12 @@ If you want the fingerprint to be even more accurate result, you can also provid
 
 These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements. 
 
+### Retrieve all
+
+Switch: `--all`
+
+**TODO**: needs updating.
+
 ### Banner
 
 Switch: `-b` or `--banner`
@@ -894,6 +912,12 @@ On majority of modern DBMSes is possible to retrieve the database management sys
 Switch: `--current-db`
 
 It is possible to retrieve the database management system's database name that the web application is connected to.
+
+### Server hostname
+
+Switch: `--hostname`
+
+**TODO**: needs updating.
 
 ### Detect whether or not the session user is a database administrator
 
@@ -1013,7 +1037,7 @@ Note that on PostgreSQL you have to provide `public` or the name of a system dat
 
 ### Enumerate database management system schema
 
-Switch: `--schema`
+Switche: `--schema` and `--exclude-sysdbs`
 
 User can retrieve a DBMS schema by using this switch. Schema listing will contain all databases, tables and columns, together with their respective types. In combination with `--exclude-sysdbs` only part of the schema containing non-system databases will be retrieved and shown.
 
@@ -1193,7 +1217,7 @@ The SQL shell option allows you to run your own SQL statement interactively, lik
 
 ## Brute force
 
-These options can be used to run brute force checks.
+These switches can be used to run brute force checks.
 
 ### Brute force tables names
 
@@ -1258,7 +1282,7 @@ These options can be used to create custom user-defined functions.
 
 ### Inject custom user-defined functions (UDF)
 
-Options: `--udf-inject` and `--shared-lib`
+Switch and option: `--udf-inject` and `--shared-lib`
 
 You can inject your own user-defined functions (UDFs) by compiling a MySQL or PostgreSQL shared library, DLL for Windows and shared object for Linux/Unix, then provide sqlmap with the path where the shared library is stored locally on your machine. sqlmap will then ask you some questions, upload the shared library on the database server file system, create the user-defined function(s) from it and, depending on your options, execute them. When you are finished using the injected UDFs, sqlmap can also remove them from the database for you. 
 
@@ -1515,6 +1539,7 @@ It is possible to provide sqlmap with the `--priv-esc` switch to perform a **dat
 ## Windows registry access
 
 It is possible to access Windows registry when the back-end database management system is either MySQL, PostgreSQL or Microsoft SQL Server, and when the web application supports stacked queries. Also, session user has to have the needed privileges to access it. 
+
 ### Read a Windows registry key value
 
 Option: `--reg-read`
@@ -1548,13 +1573,21 @@ A sample command line for adding a registry key hive follows:
 
 ## General
 
-### Log HTTP(s) traffic to a textual file
+These options can be used to set some general working parameters.
+
+### Load session
+
+Option: `-s`
+
+**TODO**: needs updating.
+
+### Log HTTP(S) traffic to a textual file
 
 Option: `-t`
 
-This switch requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap - HTTP(s) requests and HTTP(s) responses. 
+This switch requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap: HTTP(S) requests and HTTP(S) responses.
 
-This is useful primarily for debug purposes.
+This is useful primarily for debug purposes - when you provide the developers with a potential bug report, send this file too.
 
 ### Act in non-interactive mode
 
@@ -1582,7 +1615,7 @@ Example run against a MySQL target:
     [...]
     [11:54:53] [INFO] starting crawler
     [11:54:53] [INFO] searching for links with depth 1
-    [11:54:53] [WARNING] running in a single-thread mode. This could take a while                                                                                                                                                               
+    [11:54:53] [WARNING] running in a single-thread mode. This could take a while
     [11:54:53] [INFO] searching for links with depth 2
     [11:54:54] [INFO] heuristics detected web page charset 'ascii'
     [11:55:00] [INFO] 42/56 links visited (75%)
@@ -1670,7 +1703,7 @@ In lost of cases retrieval of non-ASCII data requires special needs. One solutio
 
 Example against a PostgreSQL target:
 
-    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" -z "flu,bat,tec=E" --banner --hex -v 3 --parse-errors
+    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" --banner --hex -v 3 --parse-errors
 
     [...]
     [20:01:14] [INFO] fetching banner
@@ -1684,7 +1717,44 @@ Example against a PostgreSQL target:
 
 Option: `--output-dir`
 
-sqlmap by default stores session and result files inside a subdirectory `output`. In case that user wants to use a different location for it he can use this option (e.g. `--output-dir=/tmp`).
+sqlmap by default stores session and result files inside a subdirectory `output`. In case you want to use a different location, you can use this option (e.g. `--output-dir=/tmp`).
+
+### Parse DBMS error messages from response pages
+
+Switch: `--parse-errors`
+
+If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
+
+This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
+
+Example against a Microsoft SQL Server target:
+
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --parse-errors
+    [...]
+    [11:12:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [11:12:17] [INFO] target URL appears to have 3 columns in query
+    [...]
+
+### Pivot column
+
+Option: `--pivot-column`
+
+**TODO**: needs updating.
+
+### Save options in a configuration INI file
+
+Switch: `--save`
+
+It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
 
 ### Update sqlmap
 
@@ -1696,13 +1766,19 @@ If, for any reason, this operation fails, run `git pull` from your sqlmap workin
 
 This is strongly recommended **before** reporting any bug to the [mailing lists](http://www.sqlmap.org/#ml).
 
-### Save options in a configuration INI file
-
-Switch: `--save`
-
-It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
-
 ## Miscellaneous
+
+### Short mnemonics
+
+Option: `-z`
+
+**TODO**: needs updating.
+
+### Alerting on successful SQL injection detection
+
+Option: `--alert`
+
+**TODO**: needs updating.
 
 ### Set answers for questions
 
@@ -1725,7 +1801,7 @@ Switch: `--beep`
 
 In case that user uses switch `--beep` he'll be warned with a beep sound immediately when SQL injection is found. This is especially useful when there is a large bulk list (option `-m`) of target URLs to be tested.
 
-# Heuristically check for WAF/IPS/IDS protection
+### Heuristically check for WAF/IPS/IDS protection
 
 Switch: `--check-waf`
 
@@ -1736,6 +1812,12 @@ WAF/IPS/IDS protection mechanisms can deal a lot of trouble to sqlmap. In case t
 Switch: `--cleanup`
 
 It is recommended to clean up the back-end database management system from sqlmap temporary table(s) and created user-defined function(s) when you are done taking over the underlying operating system or file system. Switch `--cleanup` will attempt to clean up the DBMS and the file system wherever possible. 
+
+### Check for dependencies
+
+Switch: `--dependencies`
+
+**TODO**: needs updating.
 
 ### Disable console output coloring
 
@@ -1818,31 +1900,6 @@ Example run:
 Switch: `--page-rank`
 
 Performs further requests to Google when `-g` is provided and display page rank (PR) for Google dork results.
-
-### Parse DBMS error messages from response pages
-
-Switch: `--parse-errors`
-
-If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
-
-This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
-
-Example against a Microsoft SQL Server target:
-
-    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" -z "ign,flu,tec=U" --parse-errors
-    [...]
-    [11:12:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] target URL appears to have 3 columns in query
-    [...]
 
 ### Safely remove all content from output directory
 
@@ -1966,7 +2023,7 @@ Example against a Microsoft SQL Server target:
 
     heuristic (parsing) test showed that the back-end DBMS could be 'Microsoft SQL Server'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
     do you want to include all tests for 'Microsoft SQL Server' extending provided level (1) and risk (1)? [Y/n] Y
-    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N                                                                                                                                                  
+    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
     sqlmap identified the following injection points with a total of 25 HTTP(s) requests:
     ---
     Place: GET
@@ -2011,3 +2068,4 @@ Example against a Microsoft SQL Server target:
     current user is DBA:    True
 
     [*] shutting down at 11:25:52
+
