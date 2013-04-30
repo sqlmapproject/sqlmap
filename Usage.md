@@ -1791,7 +1791,7 @@ Switch: `--beep`
 
 In case that user uses switch `--beep` he'll be warned with a beep sound immediately when SQL injection is found. This is especially useful when there is a large bulk list (option `-m`) of target URLs to be tested.
 
-# Heuristically check for WAF/IPS/IDS protection
+### Heuristically check for WAF/IPS/IDS protection
 
 Switch: `--check-waf`
 
