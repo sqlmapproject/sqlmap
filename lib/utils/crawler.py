@@ -72,6 +72,8 @@ def crawl(target):
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
 
                             if href:
+                                if threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
+                                    current = threadData.lastRedirectURL[1]
                                 url = urlparse.urljoin(current, href)
 
                                 # flag to know if we are dealing with the same target host
