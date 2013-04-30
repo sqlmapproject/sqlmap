@@ -198,6 +198,9 @@ def cmdLineParser():
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
 
+        injection.add_option("--dbms-cred", dest="dbmsCred",
+                            help="DBMS authentication credentials (user:password)")
+
         injection.add_option("--os", dest="os",
                              help="Force back-end DBMS operating system "
                                   "to this value")
@@ -548,9 +551,6 @@ def cmdLineParser():
         general.add_option("--csv-del", dest="csvDel",
                                   help="Delimiting character used in CSV output "
                                   "(default \"%s\")" % defaults.csvDel)
-
-        general.add_option("--dbms-cred", dest="dbmsCred",
-                            help="DBMS authentication credentials (user:password)")
 
         general.add_option("--dump-format", dest="dumpFormat",
                                   help="Format of dumped data (CSV (default), HTML or SQLITE)")
