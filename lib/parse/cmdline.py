@@ -47,8 +47,7 @@ def cmdLineParser():
 
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
-                             "options has to be specified to set the source "
-                             "to get target URLs from")
+                             "options has to be provided to set the target(s)")
 
         target.add_option("-d", dest="direct", help="Direct "
                           "connection to the database")
@@ -160,7 +159,7 @@ def cmdLineParser():
 
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
-                               "options can be used to optimize the "
+                               "switches can be used to optimize the "
                                "performance of sqlmap")
 
         optimization.add_option("-o", dest="optimize",
@@ -226,10 +225,7 @@ def cmdLineParser():
 
         # Detection options
         detection = OptionGroup(parser, "Detection", "These options can be "
-                                "used to specify how to parse "
-                                "and compare page content from "
-                                "HTTP responses when using blind SQL "
-                                "injection technique")
+                                "used to customize the detection phase")
 
         detection.add_option("--level", dest="level", type="int",
                              help="Level of tests to perform (1-5, "
@@ -409,7 +405,7 @@ def cmdLineParser():
 
         # User-defined function options
         brute = OptionGroup(parser, "Brute force", "These "
-                          "options can be used to run brute force "
+                          "switches can be used to run brute force "
                           "checks")
 
         brute.add_option("--common-tables", dest="commonTables", action="store_true",
