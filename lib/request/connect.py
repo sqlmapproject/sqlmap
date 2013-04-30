@@ -226,6 +226,7 @@ class Connect(object):
         # url splitted with space char while urlencoding it in the later phase
         url = url.replace(" ", "%20")
 
+        conn = None
         code = None
         page = None
 
@@ -554,7 +555,12 @@ class Connect(object):
 
         processResponse(page, responseHeaders)
 
-        responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
+        if conn and hasattr(conn, "redcode"):
+            responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, conn.code, status)
+            requestMsg = requestMsg.replace("%s HTTP/" % url, "%s HTTP/" % conn.redurl, 1)
+        else:
+            responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
+
         if responseHeaders:
             logHeaders = "\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items())
 
