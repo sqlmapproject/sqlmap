@@ -27,6 +27,7 @@ from thirdparty.oset.pyoset import oset
 
 def crawl(target):
     try:
+        visited = set()
         threadData = getCurrentThreadData()
         threadData.shared.value = oset()
 
@@ -37,6 +38,10 @@ def crawl(target):
                 with kb.locks.limit:
                     if threadData.shared.unprocessed:
                         current = threadData.shared.unprocessed.pop()
+                        if current in visited:
+                            continue
+                        else:
+                            visited.add(current)
                     else:
                         break
 
