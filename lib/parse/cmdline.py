@@ -127,6 +127,20 @@ def cmdLineParser():
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            help="Ignore system default HTTP proxy")
 
+        request.add_option("--tor", dest="tor",
+                                  action="store_true",
+                                  help="Use Tor anonymity network")
+
+        request.add_option("--tor-port", dest="torPort",
+                                  help="Set Tor proxy port other than default")
+
+        request.add_option("--tor-type", dest="torType",
+                                  help="Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)")
+
+        request.add_option("--check-tor", dest="checkTor",
+                                  action="store_true",
+                                  help="Check to see if Tor is used properly")
+
         request.add_option("--delay", dest="delay", type="float",
                            help="Delay in seconds between each HTTP request")
 
@@ -541,10 +555,6 @@ def cmdLineParser():
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
-        general.add_option("--check-tor", dest="checkTor",
-                                  action="store_true",
-                                  help="Check to see if Tor is used properly")
-
         general.add_option("--crawl", dest="crawlDepth", type="int",
                                   help="Crawl the website starting from the target URL")
 
@@ -590,16 +600,6 @@ def cmdLineParser():
         general.add_option("--save", dest="saveCmdline",
                             action="store_true",
                             help="Save options to a configuration INI file")
-
-        general.add_option("--tor", dest="tor",
-                                  action="store_true",
-                                  help="Use Tor anonymity network")
-
-        general.add_option("--tor-port", dest="torPort",
-                                  help="Set Tor proxy port other than default")
-
-        general.add_option("--tor-type", dest="torType",
-                                  help="Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)")
 
         general.add_option("--update", dest="updateAll",
                             action="store_true",

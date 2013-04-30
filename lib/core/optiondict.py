@@ -38,6 +38,10 @@ optDict = {
                                "proxy":             "string",
                                "pCred":             "string",
                                "ignoreProxy":       "boolean",
+                               "tor":               "boolean",
+                               "torPort":           "integer",
+                               "torType":           "string",
+                               "checkTor":          "boolean",
                                "delay":             "float",
                                "timeout":           "float",
                                "retries":           "integer",
@@ -173,7 +177,6 @@ optDict = {
                                "trafficFile":       "string",
                                "batch":             "boolean",
                                "charset":           "string",
-                               "checkTor":          "boolean",
                                "crawlDepth":        "integer",
                                "csvDel":            "string",
                                "dumpFormat":        "string",
@@ -187,9 +190,6 @@ optDict = {
                                "pivotColumn":       "string",
                                "saveCmdline":       "boolean",
                                "updateAll":         "boolean",
-                               "tor":               "boolean",
-                               "torPort":           "integer",
-                               "torType":           "string",
                              },
 
             "Miscellaneous": {
