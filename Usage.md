@@ -71,6 +71,7 @@
         -p TESTPARAMETER    Testable parameter(s)
         --skip=SKIP         Skip testing for given parameter(s)
         --dbms=DBMS         Force back-end DBMS to this value
+        --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
         --os=OS             Force back-end DBMS operating system to this value
         --invalid-bignum    Use big numbers for invalidating values
         --invalid-logical   Use logical operations for invalidating values
@@ -198,7 +199,6 @@
         --charset=CHARSET   Force character encoding used for data retrieval
         --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
         --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
-        --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
         --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
         --eta               Display for each output the estimated time of arrival
         --flush-session     Flush session files for current target
