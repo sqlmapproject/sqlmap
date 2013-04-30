@@ -8,9 +8,8 @@
       --version             Show program's version number and exit
       -v VERBOSE            Verbosity level: 0-6 (default 1)
 
-      Target:
-        At least one of these options has to be specified to set the source to
-        get target URLs from
+    Target:
+        At least one of these options has to be provided to set the target(s)
 
         -d DIRECT           Direct connection to the database
         -u URL, --url=URL   Target URL (e.g. "www.target.com/vuln.php?id=1")
@@ -20,7 +19,7 @@
         -g GOOGLEDORK       Process Google dork results as target URLs
         -c CONFIGFILE       Load options from a configuration INI file
 
-      Request:
+    Request:
         These options can be used to specify how to connect to the target URL
 
         --data=DATA         Data string to be sent through POST
@@ -47,15 +46,14 @@
         --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
         --retries=RETRIES   Retries when the connection timeouts (default 3)
         --randomize=RPARAM  Randomly change value for given parameter(s)
-        --scope=SCOPE       Regexp to filter targets from provided proxy log
         --safe-url=SAFURL   URL address to visit frequently during testing
         --safe-freq=SAFREQ  Test requests between two visits to a given safe URL
         --skip-urlencode    Skip URL encoding of payload data
         --force-ssl         Force usage of SSL/HTTPS
-        --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
-                            "import hashlib;id2=hashlib.md5(id).hexdigest()")
+        --hpp               Use HTTP parameter pollution
+        --eval=EVALCODE     Evaluate provided Python code before the request (e.g. "import hashlib;id2=hashlib.md5(id).hexdigest()")
 
-      Optimization:
+    Optimization:
         These options can be used to optimize the performance of sqlmap
 
         -o                  Turn on all optimization switches
@@ -64,9 +62,8 @@
         --null-connection   Retrieve page length without actual HTTP response body
         --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
 
-      Injection:
-        These options can be used to specify which parameters to test for,
-        provide custom injection payloads and optional tampering scripts
+    Injection:
+        These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts
 
         -p TESTPARAMETER    Testable parameter(s)
         --skip=SKIP         Skip testing for given parameter(s)
@@ -81,9 +78,8 @@
         --suffix=SUFFIX     Injection payload suffix string
         --tamper=TAMPER     Use given script(s) for tampering injection data
 
-      Detection:
-        These options can be used to specify how to parse and compare page
-        content from HTTP responses when using blind SQL injection technique
+    Detection:
+        These options can be used to customize the detection phase
 
         --level=LEVEL       Level of tests to perform (1-5, default 1)
         --risk=RISK         Risk of tests to perform (0-3, default 1)
@@ -94,9 +90,8 @@
         --text-only         Compare pages based only on the textual content
         --titles            Compare pages based only on their titles
 
-      Techniques:
-        These options can be used to tweak testing of specific SQL injection
-        techniques
+    Techniques:
+        These options can be used to tweak testing of specific SQL injection techniques
 
         --technique=TECH    SQL injection techniques to use (default "BEUSTQ")
         --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
@@ -106,13 +101,11 @@
         --dns-domain=DNS..  Domain name used for DNS exfiltration attack
         --second-order=S..  Resulting page URL searched for second-order response
 
-      Fingerprint:
+    Fingerprint:
         -f, --fingerprint   Perform an extensive DBMS version fingerprint
 
-      Enumeration:
-        These options can be used to enumerate the back-end database
-        management system information, structure and data contained in the
-        tables. Moreover you can run your own SQL statements
+    Enumeration:
+        These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements
 
         -a, --all           Retrieve everything
         -b, --banner        Retrieve DBMS banner
@@ -145,29 +138,27 @@
         --sql-shell         Prompt for an interactive SQL shell
         --sql-file=SQLFILE  Execute SQL statements from given file(s)
 
-      Brute force:
+    Brute force:
         These options can be used to run brute force checks
 
         --common-tables     Check existence of common tables
         --common-columns    Check existence of common columns
 
-      User-defined function injection:
+    User-defined function injection:
         These options can be used to create custom user-defined functions
 
         --udf-inject        Inject custom user-defined functions
         --shared-lib=SHLIB  Local path of the shared library
 
-      File system access:
-        These options can be used to access the back-end database management
-        system underlying file system
+    File system access:
+        These options can be used to access the back-end database management system underlying file system
 
         --file-read=RFILE   Read a file from the back-end DBMS file system
         --file-write=WFILE  Write a local file on the back-end DBMS file system
         --file-dest=DFILE   Back-end DBMS absolute filepath to write to
 
-      Operating system access:
-        These options can be used to access the back-end database management
-        system underlying operating system
+    Operating system access:
+        These options can be used to access the back-end database management system underlying operating system
 
         --os-cmd=OSCMD      Execute an operating system command
         --os-shell          Prompt for an interactive operating system shell
@@ -178,9 +169,8 @@
         --msf-path=MSFPATH  Local path where Metasploit Framework is installed
         --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
-      Windows registry access:
-        These options can be used to access the back-end database management
-        system Windows registry
+    Windows registry access:
+        These options can be used to access the back-end database management system Windows registry
 
         --reg-read          Read a Windows registry key value
         --reg-add           Write a Windows registry key value data
@@ -190,7 +180,7 @@
         --reg-data=REGDATA  Windows registry key value data
         --reg-type=REGTYPE  Windows registry key value type
 
-      General:
+    General:
         These options can be used to set some general working parameters
 
         -s SESSIONFILE      Load session from a stored (.sqlite) file
@@ -209,9 +199,11 @@
         --parse-errors      Parse and display DBMS error messages from responses
         --pivot-column=P..  Pivot column name
         --save              Save options to a configuration INI file
+        --scope=SCOPE       Regexp to filter targets from provided proxy log
+        --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
         --update            Update sqlmap
 
-      Miscellaneous:
+    Miscellaneous:
         -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
         --alert=ALERT       Run shell command(s) when SQL injection is found
         --answers=ANSWERS   Set question answers (e.g. "quit=N,follow=N")
@@ -221,13 +213,11 @@
         --dependencies      Check for missing (non-core) sqlmap dependencies
         --disable-coloring  Disable console output coloring
         --gpage=GOOGLEPAGE  Use Google dork results from specified page number
-        --hpp               Use HTTP parameter pollution
         --identify-waf      Make a through testing for a WAF/IPS/IDS protection
         --mobile            Imitate smartphone through HTTP User-Agent header
         --page-rank         Display page rank (PR) for Google dork results
         --purge-output      Safely remove all content from output directory
         --smart             Conduct through tests only if positive heuristic(s)
-        --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
         --wizard            Simple wizard interface for beginner users
 
 ## Output verbosity
