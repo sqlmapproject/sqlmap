@@ -1055,7 +1055,7 @@ Note that on PostgreSQL you have to provide `public` or the name of a system dat
 
 ### Enumerate database management system schema
 
-Switche: `--schema` and `--exclude-sysdbs`
+Switches: `--schema` and `--exclude-sysdbs`
 
 User can retrieve a DBMS schema by using this switch. Schema listing will contain all databases, tables and columns, together with their respective types. In combination with `--exclude-sysdbs` only part of the schema containing non-system databases will be retrieved and shown.
 
