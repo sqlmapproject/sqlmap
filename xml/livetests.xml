@@ -295,7 +295,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -338,7 +338,7 @@
         <parse>
             <item value="Title: PostgreSQL AND error-based - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -381,7 +381,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -424,7 +424,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
@@ -449,7 +449,7 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 AND time-based blind"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -463,7 +463,7 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 stacked queries"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -495,7 +495,7 @@
         <parse>
             <item value="Title: PostgreSQL inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.4.0 and &lt; 9.0.0'"/>
-            <item value="banner:    'PostgreSQL 8.4.13 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
+            <item value="banner:    'PostgreSQL 8.4.17 on i486-pc-linux-gnu, compiled by GCC gcc-4.4.real (Debian 4.4.5-8) 4.4.5, 32-bit'"/>
             <item value="current user:    'postgres'"/>
             <item value="current database:    'testdb'"/>
             <item value="current user is DBA:    True"/>
