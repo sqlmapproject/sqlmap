@@ -102,19 +102,19 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             firstChar = 0
         elif dump and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
-        elif firstChar is None:
-            firstChar = 0
-        elif (isinstance(firstChar, basestring) and firstChar.isdigit()) or isinstance(firstChar, int):
+        elif isinstance(firstChar, basestring) and firstChar.isdigit() or isinstance(firstChar, int):
             firstChar = int(firstChar) - 1
+        else:
+            firstChar = 0
 
         if "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
             lastChar = 0
         elif dump and conf.lastChar is not None and (isinstance(conf.lastChar, int) or (isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
-        elif lastChar in (None, "0"):
-            lastChar = 0
-        elif (isinstance(lastChar, basestring) and lastChar.isdigit()) or isinstance(lastChar, int):
+        elif isinstance(lastChar, basestring) and lastChar.isdigit() or isinstance(lastChar, int):
             lastChar = int(lastChar)
+        else:
+            lastChar = 0
 
         if Backend.getDbms():
             _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
@@ -124,8 +124,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             expressionUnescaped = unescaper.escape(expression)
 
-        if length and isinstance(length, basestring) and length.isdigit():
+        if isinstance(length, basestring) and length.isdigit() or isinstance(length, int):
             length = int(length)
+        else:
+            length = None
 
         if length == 0:
             return 0, ""
