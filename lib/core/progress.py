@@ -75,7 +75,7 @@ class ProgressBar(object):
         """
 
         if len(self._times) <= ((self._max * 3) / 100) or newAmount > self._max:
-            eta = 0
+            eta = None
         else:
             midTime = sum(self._times) / len(self._times)
             midTimeWithLatest = (midTime + deltaTime) / 2
@@ -85,22 +85,17 @@ class ProgressBar(object):
         self.update(newAmount)
         self.draw(eta)
 
-    def draw(self, eta=0):
+    def draw(self, eta=None):
         """
         This method draws the progress bar if it has changed
         """
 
         if self._progBar != self._oldProgBar:
             self._oldProgBar = self._progBar
-
-            if eta and self._amount < self._max:
-                dataToStdout("\r%s %d/%d  ETA %s" % (self._progBar, self._amount, self._max, self._convertSeconds(int(eta))))
-            else:
-                dataToStdout("\r%s\r" % (" " * (self._width - 1)))
-                if self._amount < self._max:
-                    dataToStdout("%s %d/%d" % (self._progBar, self._amount, self._max))
-                else:
-                    kb.prependFlag = False
+            dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, ("  ETA %s" % self._convertSeconds(int(eta))) if eta is not None else ""))
+            if self._amount >= self._max:
+                dataToStdout("\r%s\r" % (" " * self._width))
+                kb.prependFlag = False
 
     def __str__(self):
         """
