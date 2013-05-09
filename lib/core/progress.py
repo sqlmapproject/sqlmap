@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.common import getUnicode
 from lib.core.common import dataToStdout
 from lib.core.data import conf
+from lib.core.data import kb
 
 class ProgressBar(object):
     """
@@ -22,6 +23,7 @@ class ProgressBar(object):
         self._span = self._max - self._min
         self._width = totalWidth if totalWidth else conf.progressWidth
         self._amount = 0
+        self._times = []
         self.update()
 
     def _convertSeconds(self, value):
@@ -50,7 +52,7 @@ class ProgressBar(object):
         percentDone = int(percentDone)
 
         # Figure out how many hash bars the percentage should be
-        allFull = self._width - 2
+        allFull = self._width - len("100%% [] %s/%s  ETA 00:00" % (self._max, self._max))
         numHashes = (percentDone / 100.0) * allFull
         numHashes = int(round(numHashes))
 
@@ -67,6 +69,22 @@ class ProgressBar(object):
         percentString = getUnicode(percentDone) + "%"
         self._progBar = "%s %s" % (percentString, self._progBar)
 
+    def progress(self, deltaTime, newAmount, threads=1):
+        """
+        This method saves item delta time and shows updated progress bar with calculated eta
+        """
+
+        if len(self._times) <= ((self._max * 3) / 100) or newAmount == self._max:
+            eta = 0
+        else:
+            midTime = sum(self._times) / len(self._times)
+            midTimeWithLatest = (midTime + deltaTime) / 2
+            eta = midTimeWithLatest * (self._max - newAmount) / threads
+
+        self._times.append(deltaTime)
+        self.update(newAmount)
+        self.draw(eta)
+
     def draw(self, eta=0):
         """
         This method draws the progress bar if it has changed
@@ -78,8 +96,11 @@ class ProgressBar(object):
             if eta and self._amount < self._max:
                 dataToStdout("\r%s %d/%d  ETA %s" % (self._progBar, self._amount, self._max, self._convertSeconds(int(eta))))
             else:
-                blank = " " * (80 - len("\r%s %d/%d" % (self._progBar, self._amount, self._max)))
-                dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, blank))
+                dataToStdout("\r%s\r" % (" " * (self._width - 1)))
+                if self._amount < self._max:
+                    dataToStdout("%s %d/%d" % (self._progBar, self._amount, self._max))
+                else:
+                    kb.prependFlag = False
 
     def __str__(self):
         """

@@ -140,7 +140,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if showEta:
             progress = ProgressBar(maxValue=length)
-            progressTime = []
 
         if timeBasedCompare and conf.threads > 1:
             warnMsg = "multi-threading is considered unsafe in time-based data retrieval. Going to switch it off automatically"
@@ -354,18 +353,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         return None
 
-        def etaProgressUpdate(charTime, index):
-            if len(progressTime) <= ((length * 3) / 100):
-                eta = 0
-            else:
-                midTime = sum(progressTime) / len(progressTime)
-                midTimeWithLatest = (midTime + charTime) / 2
-                eta = midTimeWithLatest * (length - index) / conf.threads
-
-            progressTime.append(charTime)
-            progress.update(index)
-            progress.draw(eta)
-
         # Go multi-threading (--threads > 1)
         if conf.threads > 1 and isinstance(length, int) and length > 1:
             threadData = getCurrentThreadData()
@@ -404,7 +391,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         if kb.threadContinue:
                             if showEta:
-                                etaProgressUpdate(time.time() - charStart, threadData.shared.index[0])
+                                progress.progress(time.time() - charStart, threadData.shared.index[0], numThreads)
                             elif conf.verbose >= 1:
                                 startCharIndex = 0
                                 endCharIndex = 0
@@ -496,7 +483,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # Did we have luck?
                         if result:
                             if showEta:
-                                etaProgressUpdate(time.time() - charStart, len(commonValue))
+                                progress.progress(time.time() - charStart, len(commonValue))
                             elif conf.verbose in (1, 2) or hasattr(conf, "api"):
                                 dataToStdout(filterControlChars(commonValue[index - 1:]))
 
@@ -546,7 +533,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 partialValue += val
 
                 if showEta:
-                    etaProgressUpdate(time.time() - charStart, index)
+                    progress.progress(time.time() - charStart, index)
                 elif conf.verbose in (1, 2) or hasattr(conf, "api"):
                     dataToStdout(filterControlChars(val))
 
@@ -578,7 +565,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
         dataToStdout(infoMsg)
     else:
-        if conf.verbose in (1, 2) or showEta and not hasattr(conf, "api"):
+        if conf.verbose in (1, 2) and not showEta and not hasattr(conf, "api"):
             dataToStdout("\n")
 
         if (conf.verbose in (1, 2) and showEta) or conf.verbose >= 3:
