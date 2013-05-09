@@ -44,6 +44,7 @@ from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.progress import ProgressBar
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -230,7 +231,12 @@ def unionUse(expression, unpack=True, dump=False):
             numThreads = min(conf.threads, (stopLimit - startLimit))
             threadData.shared.value = BigArray()
             threadData.shared.buffered = []
+            threadData.shared.counter = 0
             threadData.shared.lastFlushed = startLimit - 1
+            threadData.shared.showEta = conf.eta and (stopLimit - startLimit) > 1
+
+            if threadData.shared.showEta:
+                threadData.shared.progress = ProgressBar(maxValue=(stopLimit - startLimit))
 
             if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                 kb.suppressResumeInfo = True
@@ -245,6 +251,8 @@ def unionUse(expression, unpack=True, dump=False):
                     while kb.threadContinue:
                         with kb.locks.limit:
                             try:
+                                valueStart = time.time()
+                                threadData.shared.counter += 1
                                 num = threadData.shared.limits.next()
                             except StopIteration:
                                 break
@@ -267,6 +275,8 @@ def unionUse(expression, unpack=True, dump=False):
                                 items = parseUnionPage(output)
 
                                 with kb.locks.value:
+                                    if threadData.shared.showEta:
+                                        threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
                                     # in case that we requested N columns and we get M!=N then we have to filter a bit
                                     if isListLike(items) and len(items) > 1 and len(expressionFieldsList) > 1:
                                         items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
@@ -284,13 +294,15 @@ def unionUse(expression, unpack=True, dump=False):
                             else:
                                 with kb.locks.value:
                                     index = None
+                                    if threadData.shared.showEta:
+                                        threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
                                     for index in xrange(len(threadData.shared.buffered)):
                                         if threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, None))
                                 items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
-                            if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo):
+                            if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
                                 status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items)))))
 
                                 if len(status) > width:
