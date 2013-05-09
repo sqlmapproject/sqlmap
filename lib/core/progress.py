@@ -69,17 +69,17 @@ class ProgressBar(object):
         percentString = getUnicode(percentDone) + "%"
         self._progBar = "%s %s" % (percentString, self._progBar)
 
-    def progress(self, deltaTime, newAmount, threads=1):
+    def progress(self, deltaTime, newAmount):
         """
         This method saves item delta time and shows updated progress bar with calculated eta
         """
 
-        if len(self._times) <= ((self._max * 3) / 100) or newAmount == self._max:
+        if len(self._times) <= ((self._max * 3) / 100) or newAmount > self._max:
             eta = 0
         else:
             midTime = sum(self._times) / len(self._times)
             midTimeWithLatest = (midTime + deltaTime) / 2
-            eta = midTimeWithLatest * (self._max - newAmount) / threads
+            eta = midTimeWithLatest * (self._max - newAmount)
 
         self._times.append(deltaTime)
         self.update(newAmount)

@@ -391,7 +391,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         if kb.threadContinue:
                             if showEta:
-                                progress.progress(time.time() - charStart, threadData.shared.index[0], numThreads)
+                                progress.progress(time.time() - charStart, threadData.shared.index[0])
                             elif conf.verbose >= 1:
                                 startCharIndex = 0
                                 endCharIndex = 0
