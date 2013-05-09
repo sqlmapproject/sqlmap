@@ -82,6 +82,9 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BOLD_PATTERNS
+from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
+from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
+from lib.core.settings import BRUTE_DOC_ROOT_TARGET_MARK
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
@@ -99,6 +102,7 @@ from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
+from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
@@ -644,38 +648,48 @@ def getDocRoot():
 
         docRoot = []
 
-        message = "do you want to provide a text file with a list of "
-        message += "directories to try? [y/N] "
-        answer = readInput(message, default="N")
+        message = "what do you want to use for web server document root?\n"
+        message += "[1] common location(s) '%s' (default)\n" % ", ".join(root for root in defaultDocRoot)
+        message += "[2] custom location\n"
+        message += "[3] custom directory list file\n"
+        message += "[4] brute force search\n"
+        choice = readInput(message, default="1").strip()
 
-        if answer and answer.lower() == "y":
-            message = "please provide the directories list file to try: "
-            dirFilePath = readInput(message)
+        if choice == "2":
+            message = "please provide the web server document root: "
+            docRoot = readInput(message).split(',')
+        elif choice == "3":
+            message = "what's the list file location?\n"
+            listPath = readInput(message)
+            checkFile(listPath)
+            docRoot = getFileItems(listPath)
+        elif choice == "4":
+            targets = set([conf.hostname])
+            _ = conf.hostname.split('.')
 
-            if dirFilePath:
-                if os.path.isfile(dirFilePath):
-                    fd = codecs.open(dirFilePath, "rb", UNICODE_ENCODING)
-
-                    for filepath in fd.readlines():
-                        docRoot.append(normalizePath(filepath))
-
-                else:
-                    errMsg = "provided directory list file %s " % dirFilePath
-                    errMsg += "is not a valid file"
-                    logger.error(errMsg)
-
-        if len(docRoot) == 0:
-            message = "please provide the web server document root "
-            message += "[%s]: " % ", ".join(root for root in defaultDocRoot)
-            inputDocRoot = readInput(message, default=defaultDocRoot)
-
-            if inputDocRoot:
-                if isinstance(inputDocRoot, basestring):
-                    docRoot = inputDocRoot.split(',')
-                else:
-                    docRoot = inputDocRoot
+            if _[0] == "www":
+                targets.add('.'.join(_[1:]))
+                targets.add('.'.join(_[1:-1]))
             else:
-                docRoot = defaultDocRoot
+                targets.add('.'.join(_[:-1]))
+
+            targets = filter(None, targets)
+
+            for prefix in BRUTE_DOC_ROOT_PREFIXES.get(Backend.getOs(), DEFAULT_DOC_ROOTS[OS.LINUX]):
+                if BRUTE_DOC_ROOT_TARGET_MARK in prefix and re.match(IP_ADDRESS_REGEX, conf.hostname):
+                    continue
+
+                for suffix in BRUTE_DOC_ROOT_SUFFIXES:
+                    for target in targets:
+                        item = "%s/%s" % (prefix, suffix)
+                        item = item.replace(BRUTE_DOC_ROOT_TARGET_MARK, target).replace("//", "/")
+                        docRoot.append(item)
+
+                        if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
+                            break
+
+        else:
+            docRoot = defaultDocRoot
 
     return docRoot
 
@@ -699,19 +713,6 @@ def getDirs():
     webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/.", conf.url)
     if webDir:
         directories.add(webDir)
-
-    message = "please provide additional comma separated file paths to "
-    message += "try to upload the agent inside the possible document: "
-    message += "root%s [Enter for None]: " % "s" if len(kb.docRoot) > 1 else ""
-    inputDirs = readInput(message)
-
-    if inputDirs:
-        inputDirs = inputDirs.replace(", ", ",")
-        inputDirs = inputDirs.split(",")
-
-        for inputDir in inputDirs:
-            if inputDir:
-                directories.add(inputDir)
 
     return list(directories)
 
