@@ -3216,6 +3216,7 @@
     <!-- End of file system access switches -->
 
     <!-- Operating system access switches -->
+    <!--
     <case name="MySQL web shell - command execution">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
@@ -3239,6 +3240,7 @@
             <item value="r'Sending stage.+Linux.+uid=.+www-data'" console_output="True"/>
         </parse>
     </case>
+    -->
     <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (UNION)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
