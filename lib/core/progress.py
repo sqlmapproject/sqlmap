@@ -94,8 +94,11 @@ class ProgressBar(object):
             self._oldProgBar = self._progBar
             dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, ("  ETA %s" % self._convertSeconds(int(eta))) if eta is not None else ""))
             if self._amount >= self._max:
-                dataToStdout("\r%s\r" % (" " * self._width))
-                kb.prependFlag = False
+                if not conf.liveTest:
+                    dataToStdout("\r%s\r" % (" " * self._width))
+                    kb.prependFlag = False
+                else:
+                    dataToStdout("\n")
 
     def __str__(self):
         """
