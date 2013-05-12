@@ -406,6 +406,7 @@ def start():
                     skip &= not (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.HOST and intersect(HOST_ALIASES, conf.testParameter, True))
+                    skip &= not (place == PLACE.COOKIE and intersect((PLACE.COOKIE,), conf.testParameter, True))
 
                     if skip:
                         continue
