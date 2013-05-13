@@ -2799,7 +2799,7 @@ def intersect(valueA, valueB, lowerCase=False):
     [1, 3]
     """
 
-    retVal = None
+    retVal = []
 
     if valueA and valueB:
         valueA = arrayizeValue(valueA)
