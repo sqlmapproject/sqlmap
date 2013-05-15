@@ -699,8 +699,7 @@ def checkSuhosinPatch(injection):
         kb.injection = injection
         randInt = randomInt()
 
-        _ = " " * (SUHOSIN_MAX_VALUE_LENGTH / 2)
-        if not checkBooleanExpression("%d%s=%s%d" % (randInt, _, _, randInt)):
+        if not checkBooleanExpression("%d=%s%d" % (randInt, ' ' * SUHOSIN_MAX_VALUE_LENGTH, randInt)):
             warnMsg = "parameter length constraint "
             warnMsg += "mechanism detected (e.g. Suhosin patch). "
             warnMsg += "Potential problems in enumeration phase can be expected"
