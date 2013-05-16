@@ -225,7 +225,10 @@ def columnExists(columnFile, regex=None):
         columns = {}
 
         for column in threadData.shared.value:
-            result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ABS(%s)>0)", (column, table, column)))
+            else:
+                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
             if result:
                 columns[column] = 'numeric'
