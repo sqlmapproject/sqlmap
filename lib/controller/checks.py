@@ -1114,6 +1114,9 @@ def checkNullConnection():
     infoMsg = "testing NULL connection to the target URL"
     logger.info(infoMsg)
 
+    pushValue(kb.pageCompress)
+    kb.pageCompress = False
+
     try:
         page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD)
 
@@ -1143,6 +1146,8 @@ def checkNullConnection():
     except SqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
         raise SqlmapConnectionException(errMsg)
+
+    kb.pageCompress = popValue()
 
     return kb.nullConnection is not None
 

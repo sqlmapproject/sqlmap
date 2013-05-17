@@ -30,6 +30,8 @@ from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
+from lib.core.common import pushValue
+from lib.core.common import popValue
 from lib.core.common import randomizeParameterValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -311,7 +313,7 @@ class Connect(object):
                 headers[HTTP_HEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
-            headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if method != HTTPMETHOD.HEAD and kb.pageCompress else "identity"
+            headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
             headers[HTTP_HEADER.HOST] = host or getHostHeader(url)
 
             if post is not None and HTTP_HEADER.CONTENT_TYPE not in headers:
@@ -813,6 +815,9 @@ class Connect(object):
         if kb.nullConnection and not content and not response and not timeBasedCompare:
             noteResponseTime = False
 
+            pushValue(kb.pageCompress)
+            kb.pageCompress = False
+
             if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
             elif kb.nullConnection == NULLCONNECTION.RANGE:
@@ -828,6 +833,8 @@ class Connect(object):
                     pageLength = int(headers[HTTP_HEADER.CONTENT_LENGTH])
                 elif kb.nullConnection == NULLCONNECTION.RANGE and HTTP_HEADER.CONTENT_RANGE in headers:
                     pageLength = int(headers[HTTP_HEADER.CONTENT_RANGE][headers[HTTP_HEADER.CONTENT_RANGE].find('/') + 1:])
+
+            kb.pageCompress = popValue()
 
         if not pageLength:
             try:
