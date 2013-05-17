@@ -86,6 +86,7 @@ class HTTPMETHOD:
 class NULLCONNECTION:
     HEAD = "HEAD"
     RANGE = "Range"
+    SKIP_READ = "skip-read"
 
 class REFLECTIVE_COUNTER:
     MISS = "MISS"

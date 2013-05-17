@@ -211,6 +211,7 @@ class Connect(object):
         refreshing = kwargs.get("refreshing",       False)
         retrying = kwargs.get("retrying",           False)
         crawling = kwargs.get("crawling",           False)
+        skipRead = kwargs.get("skipRead",           False)
 
         if not urlparse.urlsplit(url).netloc:
             url = urlparse.urljoin(conf.url, url)
@@ -266,7 +267,7 @@ class Connect(object):
 
                 multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
                 conn = multipartOpener.open(unicodeencode(url), multipart)
-                page = Connect._connReadProxy(conn)
+                page = Connect._connReadProxy(conn) if not skipRead else None
                 responseHeaders = conn.info()
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
@@ -380,12 +381,12 @@ class Connect(object):
 
             # Get HTTP response
             if hasattr(conn, 'redurl'):
-                page = threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
-                  else Connect._connReadProxy(conn)
+                page = (threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
+                  else Connect._connReadProxy(conn)) if not skipRead else None
                 skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
                 code = conn.redcode
             else:
-                page = Connect._connReadProxy(conn)
+                page = Connect._connReadProxy(conn) if not skipRead else None
 
             code = code or conn.code
             responseHeaders = conn.info()
@@ -439,7 +440,7 @@ class Connect(object):
             responseHeaders = None
 
             try:
-                page = e.read()
+                page = e.read() if not skipRead else None
                 responseHeaders = e.info()
                 responseHeaders[URI_HTTP_HEADER] = e.geturl()
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
@@ -820,10 +821,10 @@ class Connect(object):
 
                 auxHeaders[HTTP_HEADER.RANGE] = "bytes=-1"
 
-            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404)
+            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404, skipRead=(kb.nullConnection == NULLCONNECTION.SKIP_READ))
 
             if headers:
-                if kb.nullConnection == NULLCONNECTION.HEAD and HTTP_HEADER.CONTENT_LENGTH in headers:
+                if kb.nullConnection in (NULLCONNECTION.HEAD, NULLCONNECTION.SKIP_READ) and HTTP_HEADER.CONTENT_LENGTH in headers:
                     pageLength = int(headers[HTTP_HEADER.CONTENT_LENGTH])
                 elif kb.nullConnection == NULLCONNECTION.RANGE and HTTP_HEADER.CONTENT_RANGE in headers:
                     pageLength = int(headers[HTTP_HEADER.CONTENT_RANGE][headers[HTTP_HEADER.CONTENT_RANGE].find('/') + 1:])

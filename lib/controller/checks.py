@@ -1131,6 +1131,14 @@ def checkNullConnection():
                 infoMsg = "NULL connection is supported with GET header "
                 infoMsg += "'%s'" % kb.nullConnection
                 logger.info(infoMsg)
+            else:
+                _, headers, _ = Request.getPage(skipRead = True)
+
+                if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
+                    kb.nullConnection = NULLCONNECTION.SKIP_READ
+
+                    infoMsg = "NULL connection is supported with 'skip-read' method"
+                    logger.info(infoMsg)
 
     except SqlmapConnectionException, errMsg:
         errMsg = getUnicode(errMsg)
