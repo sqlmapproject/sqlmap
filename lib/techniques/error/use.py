@@ -95,7 +95,7 @@ def _oneShotErrorUse(expression, field=None):
                 payload = agent.payload(newValue=injExpression)
 
                 # Perform the request
-                page, headers = Request.queryPage(payload, content=True)
+                page, headers = Request.queryPage(payload, content=True, raise404=False)
 
                 incrementCounter(kb.technique)
 
