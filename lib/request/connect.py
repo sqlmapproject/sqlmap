@@ -789,6 +789,14 @@ class Connect(object):
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     Connect.queryPage(content=True)
 
+            elif not kb.testMode:
+                warnMsg = "it is very important not to stress the network adapter's "
+                warnMsg += "bandwidth during usage of time-based payloads"
+                singleTimeWarnMessage(warnMsg)
+
+            if not kb.laggingChecked:
+                kb.laggingChecked = True
+
                 deviation = stdev(kb.responseTimes)
 
                 if deviation > WARN_TIME_STDEV:
@@ -797,13 +805,9 @@ class Connect(object):
                     warnMsg = "there is considerable lagging "
                     warnMsg += "in connection response(s). Please use as high "
                     warnMsg += "value for option '--time-sec' as possible (e.g. "
-                    warnMsg += "%d or more)" % (conf.timeSec * 2)
+                    warnMsg += "10 or more)"
                     logger.critical(warnMsg)
 
-            elif not kb.testMode:
-                warnMsg = "it is very important not to stress the network adapter's "
-                warnMsg += "bandwidth during usage of time-based payloads"
-                singleTimeWarnMessage(warnMsg)
 
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
