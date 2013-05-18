@@ -760,6 +760,7 @@ def setColor(message, bold=False):
         if bold:
             retVal = colored(message, color=None, on_color=None, attrs=("bold",))
         elif level:
+            level = getattr(logging, level, None) if isinstance(level, basestring) else level
             _ = LOGGER_HANDLER.level_map.get(level)
             if _:
                 background, foreground, bold = _
