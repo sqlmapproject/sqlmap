@@ -1096,7 +1096,8 @@ def identifyWaf():
         errMsg += "consider usage of tamper scripts (option '--tamper')"
         logger.critical(errMsg)
 
-        message = "are you sure that you want to continue with target testing? [y/N] "
+        message = "are you sure that you want to "
+        message += "continue with further target testing? [y/N] "
         output = readInput(message, default="N")
 
         if output and output[0] not in ("Y", "y"):
