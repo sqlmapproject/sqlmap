@@ -438,7 +438,7 @@ class Dump(object):
                                 colType = None
                                 break
 
-                    cols.append((column, colType if colType else Replication.TEXT))
+                    cols.append((unsafeSQLIdentificatorNaming(column), colType if colType else Replication.TEXT))
 
             rtable = replication.createTable(table, cols)
         elif conf.dumpFormat == DUMP_FORMAT.HTML:
@@ -463,6 +463,8 @@ class Dump(object):
         for column in columns:
             if column != "__infos__":
                 info = tableValues[column]
+
+                column = unsafeSQLIdentificatorNaming(column)
                 maxlength = int(info["length"])
                 blank = " " * (maxlength - len(column))
 
@@ -528,7 +530,7 @@ class Dump(object):
                             if not os.path.isdir(dumpDbPath):
                                 os.makedirs(dumpDbPath, 0755)
 
-                            filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (column, randomInt(8)))
+                            filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (unsafeSQLIdentificatorNaming(column), randomInt(8)))
                             warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
                             logger.warn(warnMsg)
 
