@@ -565,7 +565,7 @@ def checkSqlInjection(place, parameter, value):
             warnMsg = "user aborted during detection phase"
             logger.warn(warnMsg)
 
-            msg = "How do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
+            msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
             choice = readInput(msg, default="S", checkBatch=False)
 
             if choice[0] in ("s", "S"):
@@ -1095,6 +1095,12 @@ def identifyWaf():
         errMsg = "WAF/IDS/IPS identified '%s'. Please " % retVal
         errMsg += "consider usage of tamper scripts (option '--tamper')"
         logger.critical(errMsg)
+
+        message = "are you sure that you want to continue with target testing? [y/N] "
+        output = readInput(message, default="N")
+
+        if output and output[0] not in ("Y", "y"):
+            raise SqlmapUserQuitException
     else:
         infoMsg = "no WAF/IDS/IPS product has been identified"
         logger.info(infoMsg)
