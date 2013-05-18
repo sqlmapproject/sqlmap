@@ -768,7 +768,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if casting:
         errMsg = "possible %s casting " % ("integer" if origValue.isdigit() else "type")
-        errMsg += "detected (e.g. %s=(int)$_REQUEST('%s')) " % (parameter, parameter)
+        errMsg += "detected (e.g. %s=intval($_REQUEST('%s'))) " % (parameter, parameter)
         errMsg += "at the back-end web application"
         logger.error(errMsg)
 
