@@ -633,7 +633,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true",
-                                  help="Clean up the DBMS by sqlmap specific "
+                                  help="Clean up the DBMS from sqlmap specific "
                                   "UDF and tables")
 
         miscellaneous.add_option("--dependencies", dest="dependencies",
