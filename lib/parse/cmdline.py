@@ -107,7 +107,7 @@ def cmdLineParser():
 
         request.add_option("--auth-type", dest="aType",
                            help="HTTP authentication type "
-                                "(Basic, Digest or NTLM)")
+                                "(Basic, Digest, NTLM or Cert)")
 
         request.add_option("--auth-cred", dest="aCred",
                            help="HTTP authentication credentials "

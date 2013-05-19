@@ -1095,7 +1095,7 @@ def _setHTTPAuthentication():
     if not conf.aType and not conf.aCred and not conf.aCert:
         return
 
-    elif conf.aType and not conf.aCred:
+    elif conf.aType and not conf.aCred and not conf.aCert:
         errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise SqlmapSyntaxException(errMsg)
@@ -1111,18 +1111,22 @@ def _setHTTPAuthentication():
 
         aTypeLower = conf.aType.lower()
 
-        if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM):
+        if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.CERT):
             errMsg = "HTTP authentication type value must be "
-            errMsg += "Basic, Digest or NTLM"
+            errMsg += "Basic, Digest, NTLM or Cert"
             raise SqlmapSyntaxException(errMsg)
         elif aTypeLower in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST):
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % aTypeLower
-            errMsg += "value must be in format username:password"
+            errMsg += "value must be in format 'username:password'"
         elif aTypeLower == AUTH_TYPE.NTLM:
             regExp = "^(.*\\\\.*):(.*?)$"
             errMsg = "HTTP NTLM authentication credentials value must "
-            errMsg += "be in format DOMAIN\username:password"
+            errMsg += "be in format 'DOMAIN\username:password'"
+        elif aTypeLower == AUTH_TYPE.CERT:
+            errMsg = "HTTP Cert authentication require "
+            errMsg += "usage of option `--auth-cert`"
+            raise SqlmapSyntaxException(errMsg)
 
         aCredRegExp = re.search(regExp, conf.aCred)
 
@@ -1160,7 +1164,7 @@ def _setHTTPAuthentication():
 
         if not aCertRegExp:
             errMsg = "HTTP authentication certificate option "
-            errMsg += "must be in format key_file,cert_file"
+            errMsg += "must be in format 'key_file,cert_file'"
             raise SqlmapSyntaxException(errMsg)
 
         # os.path.expanduser for support of paths with ~
@@ -1169,7 +1173,7 @@ def _setHTTPAuthentication():
 
         for ifile in (key_file, cert_file):
             if not os.path.exists(ifile):
-                errMsg = "File '%s' does not exist" % ifile
+                errMsg = "file '%s' does not exist" % ifile
                 raise SqlmapSyntaxException(errMsg)
 
         authHandler = HTTPSCertAuthHandler(key_file, cert_file)

@@ -320,3 +320,4 @@ class AUTH_TYPE:
     BASIC = "basic"
     DIGEST = "digest"
     NTLM = "ntlm"
+    CERT = "cert"
