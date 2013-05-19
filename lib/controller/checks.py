@@ -1197,7 +1197,7 @@ def checkConnection(suppressOutput=False):
         if conf.ipv6:
             warnMsg = "check connection to a provided "
             warnMsg += "IPv6 address with a tool like ping6 "
-            warnMsg += "(e.g. 'ping6 %s') " % conf.hostname
+            warnMsg += "(e.g. 'ping6 -I eth0 %s') " % conf.hostname
             warnMsg += "prior to running sqlmap to avoid "
             warnMsg += "any addressing issues"
             singleTimeWarnMessage(warnMsg)
