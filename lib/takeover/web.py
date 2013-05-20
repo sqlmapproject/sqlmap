@@ -124,7 +124,7 @@ class Web:
             else:
                 return True
         else:
-            logger.error("sqlmap has not got a web backdoor nor a web file stager for %s" % self.webApi)
+            logger.error("sqlmap hasn't got a web backdoor nor a web file stager for %s" % self.webApi)
             return False
 
     def _webFileInject(self, fileContent, fileName, directory):

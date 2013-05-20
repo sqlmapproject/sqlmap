@@ -480,7 +480,7 @@ def cmdLineParser():
 
         takeover.add_option("--os-pwn", dest="osPwn",
                             action="store_true",
-                            help="Prompt for an out-of-band shell, "
+                            help="Prompt for an OOB shell, "
                                  "meterpreter or VNC")
 
         takeover.add_option("--os-smbrelay", dest="osSmb",
@@ -495,7 +495,7 @@ def cmdLineParser():
 
         takeover.add_option("--priv-esc", dest="privEsc",
                             action="store_true",
-                            help="Database process' user privilege escalation")
+                            help="Database process user privilege escalation")
 
         takeover.add_option("--msf-path", dest="msfPath",
                             help="Local path where Metasploit Framework "
