@@ -1729,11 +1729,11 @@ def _useWizardInterface():
 
         while choice is None or choice not in ("", "1", "2", "3"):
             message = "Enumeration (--banner/--current-user/etc). Please choose:\n"
-            message += "[1] Basic (default)\n[2] Smart\n[3] All"
+            message += "[1] Basic (default)\n[2] Intermediate\n[3] All"
             choice = readInput(message, default='1')
 
             if choice == '2':
-                map(lambda x: conf.__setitem__(x, True), WIZARD.SMART)
+                map(lambda x: conf.__setitem__(x, True), WIZARD.INTERMEDIATE)
             elif choice == '3':
                 map(lambda x: conf.__setitem__(x, True), WIZARD.ALL)
             else:

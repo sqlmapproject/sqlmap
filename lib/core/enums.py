@@ -243,7 +243,7 @@ class PAYLOAD:
 
 class WIZARD:
     BASIC = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba")
-    SMART = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema", "excludeSysDbs")
+    INTERMEDIATE = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema", "excludeSysDbs")
     ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes", "getPrivileges", "getRoles", "dumpAll")
 
 class ADJUST_TIME_DELAY:
