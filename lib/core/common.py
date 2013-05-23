@@ -711,7 +711,7 @@ def getDirs():
         warnMsg = "unable to retrieve automatically any web server path"
         logger.warn(warnMsg)
 
-    webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/.", conf.url)
+    webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/", conf.url)
     if webDir:
         directories.add(webDir)
 
