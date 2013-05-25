@@ -258,15 +258,19 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             newline = None
             lines = request.split('\n')
 
-            for line in lines:
+            for index in xrange(len(lines)):
+                line = lines[index]
+
+                if not line.strip() and index == len(lines) - 1:
+                    break
+
                 newline = "\r\n" if line.endswith('\r') else '\n'
                 line = line.strip('\r')
                 match = re.search(r"\A(%s) (.+) HTTP/[\d.]+\Z" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), line) if not method else None
 
-                if len(line) == 0:
-                    if method in (HTTPMETHOD.POST, HTTPMETHOD.PUT) and data is None:
-                        data = ""
-                        params = True
+                if len(line) == 0 and method in (HTTPMETHOD.POST, HTTPMETHOD.PUT) and data is None:
+                    data = ""
+                    params = True
 
                 elif match:
                     method = match.group(1)
