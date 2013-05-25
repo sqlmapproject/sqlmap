@@ -592,7 +592,7 @@ def _setBulkMultipleTargets():
         raise SqlmapFilePathException(errMsg)
 
     for line in getFileItems(conf.bulkFile):
-        if re.search(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
+        if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
             kb.targets.add((line.strip(), None, None, None))
 
 def _findPageForms():
