@@ -1,5 +1,9 @@
 # History
 
+## 2013
+
+* **May 23**, Miroslav [presents] **sqlmap - Under the Hood** ([slides](http://www.slideshare.net/stamparm/ph-days-2013miroslavstamparsqlmapunderthehood)) at PHDays 2013 in Moscow, Russia.
+
 ## 2012
 
 * **June 26**, sqlmap development is [relocated](http://article.gmane.org/gmane.comp.security.sqlmap/2247) on [GitHub](https://github.com/sqlmapproject/sqlmap). A new [homepage](http://sqlmap.org) is deployed. The issue tracker goes [public](https://github.com/sqlmapproject/sqlmap/issues). The Subversion repository is dismissed as is the project hosting on SourceForge.
