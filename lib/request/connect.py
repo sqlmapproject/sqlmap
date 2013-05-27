@@ -256,8 +256,8 @@ class Connect(object):
             socket.setdefaulttimeout(timeout)
 
             if direct_:
-                if "?" in url:
-                    url, params = url.split("?")
+                if '?' in url:
+                    url, params = url.split('?', 1)
                     params = urlencode(params)
                     url = "%s?%s" % (url, params)
                     requestMsg += "?%s" % params
