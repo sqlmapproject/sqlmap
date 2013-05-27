@@ -2,7 +2,7 @@
 
 ## 2013
 
-* **May 23**, Miroslav [presents] **sqlmap - Under the Hood** ([slides](http://www.slideshare.net/stamparm/ph-days-2013miroslavstamparsqlmapunderthehood)) at PHDays 2013 in Moscow, Russia.
+* **May 23**, Miroslav [presents](http://phdays.com/program/workshops/) **sqlmap - Under the Hood** ([slides](http://www.slideshare.net/stamparm/ph-days-2013miroslavstamparsqlmapunderthehood)) at PHDays 2013 in Moscow, Russia.
 
 ## 2012
 
