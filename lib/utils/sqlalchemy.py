@@ -18,6 +18,12 @@ try:
 except ImportError:
     pass
 
+try:
+    import MySQLdb  # used by SQLAlchemy in case of MySQL
+    warnings.filterwarnings("error", category=MySQLdb.Warning)
+except ImportError:
+    pass
+
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
