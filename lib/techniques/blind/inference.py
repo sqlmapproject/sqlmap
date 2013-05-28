@@ -593,7 +593,7 @@ def queryOutputLength(expression, payload):
     start = time.time()
     count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
 
-    debugMsg = "performed %d queries in %d seconds" % (count, calculateDeltaSeconds(start))
+    debugMsg = "performed %d queries in %.2f seconds" % (count, calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
     if length == " ":

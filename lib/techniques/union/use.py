@@ -336,7 +336,7 @@ def unionUse(expression, unpack=True, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d queries in %d seconds" % (kb.counters[PAYLOAD.TECHNIQUE.UNION], duration)
+        debugMsg = "performed %d queries in %.2f seconds" % (kb.counters[PAYLOAD.TECHNIQUE.UNION], duration)
         logger.debug(debugMsg)
 
     return value
