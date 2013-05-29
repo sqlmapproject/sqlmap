@@ -103,7 +103,7 @@ def _setRequestParams():
 
             return retVal
 
-        if kb.processUserMarks is None:
+        if kb.processUserMarks is None and CUSTOM_INJECTION_MARK_CHAR in conf.data:
             message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
             message += "'--data'. Do you want to process it? [Y/n/q] "
             test = readInput(message, default="Y")
