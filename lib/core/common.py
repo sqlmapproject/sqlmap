@@ -2738,7 +2738,7 @@ def unhandledExceptionMessage():
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
     errMsg += "Command line: %s\n" % " ".join(sys.argv)
-    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else None)
+    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else ("DIRECT" if conf.direct else None))
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
 
     return maskSensitiveData(errMsg)
