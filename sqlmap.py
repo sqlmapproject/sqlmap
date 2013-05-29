@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import bdb
+import inspect
 import logging
 import os
 import sys
@@ -50,7 +51,12 @@ def modulePath():
     using py2exe
     """
 
-    return os.path.dirname(os.path.realpath(getUnicode(sys.executable if weAreFrozen() else __file__, sys.getfilesystemencoding())))
+    try:
+        _ = sys.executable if weAreFrozen() else __file__
+    except NameError:
+        _ = inspect.getsourcefile(modulePath)
+
+    return os.path.dirname(os.path.realpath(getUnicode(_, sys.getfilesystemencoding())))
 
 def main():
     """
