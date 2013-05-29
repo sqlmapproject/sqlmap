@@ -59,7 +59,7 @@ class Metasploit:
         self.encoderStr = None
         self.payloadConnStr = None
         self.localIP = getLocalIP()
-        self.remoteIP = getRemoteIP()
+        self.remoteIP = getRemoteIP() or conf.hostname
         self._msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli"))
         self._msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode"))
         self._msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))

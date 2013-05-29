@@ -28,7 +28,7 @@ class ICMPsh:
         self.lhostStr = None
         self.rhostStr = None
         self.localIP = getLocalIP()
-        self.remoteIP = getRemoteIP()
+        self.remoteIP = getRemoteIP() or conf.hostname
         self._icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe_"))
 
     def _selectRhost(self):
