@@ -10,7 +10,6 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
-from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES

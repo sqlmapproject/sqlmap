@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import imp
+import logging
 import os
 import sys
 import warnings
