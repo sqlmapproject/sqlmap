@@ -1349,12 +1349,14 @@ def getLocalIP():
 
 def getRemoteIP():
     retVal = None
+
     try:
         retVal = socket.gethostbyname(conf.hostname)
     except socket.gaierror:
         errMsg = "address resolution problem "
         errMsg += "occurred for hostname '%s'" % conf.hostname
         singleTimeLogMessage(errMsg, logging.ERROR)
+
     return retVal
 
 def getFileType(filePath):
