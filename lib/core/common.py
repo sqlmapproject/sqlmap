@@ -1072,7 +1072,7 @@ def parseTargetDirect():
 
             if details.group('remote'):
                 remote = True
-                conf.hostname = details.group('hostname')
+                conf.hostname = details.group('hostname').strip()
                 conf.port = int(details.group('port'))
             else:
                 conf.hostname = "localhost"
@@ -1348,7 +1348,14 @@ def getLocalIP():
     return retVal
 
 def getRemoteIP():
-    return socket.gethostbyname(conf.hostname)
+    retVal = None
+    try:
+        retVal = socket.gethostbyname(conf.hostname)
+    except socket.gaierror:
+        errMsg = "address resolution problem "
+        errMsg += "occurred for hostname '%s'" % conf.hostname
+        singleTimeLogMessage(errMsg, logging.ERROR)
+    return retVal
 
 def getFileType(filePath):
     try:
