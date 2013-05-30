@@ -543,6 +543,9 @@ def paramToDict(place, parameters=None):
         if len(parts) >= 2:
             parameter = parts[0].replace(" ", "")
 
+            if conf.pDel and conf.pDel == '\n':
+                parts[-1] = parts[-1].rstrip()
+
             condition = not conf.testParameter
             condition |= parameter in conf.testParameter
             condition |= place == PLACE.COOKIE and len(intersect((PLACE.COOKIE,), conf.testParameter, True)) > 0

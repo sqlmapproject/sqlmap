@@ -1395,6 +1395,9 @@ def _cleanupOptions():
     else:
         conf.rParam = []
 
+    if conf.pDel:
+        conf.pDel = conf.pDel.decode("string_escape")
+
     if conf.skip:
         conf.skip = conf.skip.replace(" ", "")
         conf.skip = re.split(PARAMETER_SPLITTING_REGEX, conf.skip)
