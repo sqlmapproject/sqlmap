@@ -1395,7 +1395,7 @@ def _cleanupOptions():
     else:
         conf.rParam = []
 
-    if conf.pDel:
+    if conf.pDel and '\\' in conf.pDel:
         conf.pDel = conf.pDel.decode("string_escape")
 
     if conf.skip:
