@@ -240,6 +240,8 @@ class Users:
                 retrievedUsers = set()
 
                 for user in users:
+                    user = unArrayizeValue(user)
+
                     if user in retrievedUsers:
                         continue
 
