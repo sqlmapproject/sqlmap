@@ -44,7 +44,7 @@ def tamper(payload, **kwargs):
 
     def process(match):
         word = match.group('word')
-        randomStr = ''.join(random.choice(string.ascii_uppercase + string.lowercase) for _ in xrange(random.randint(6, 12)))
+        randomStr = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in xrange(random.randint(6, 12)))
 
         if word.upper() in kb.keywords and word.upper() not in IGNORE_SPACE_AFFECTED_KEYWORDS:
             return match.group().replace(word, "%s%%23%s%%0A" % (word, randomStr))
@@ -58,7 +58,7 @@ def tamper(payload, **kwargs):
 
         for i in xrange(len(payload)):
             if payload[i].isspace():
-                randomStr = ''.join(random.choice(string.ascii_uppercase + string.lowercase) for _ in xrange(random.randint(6, 12)))
+                randomStr = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in xrange(random.randint(6, 12)))
                 retVal += "%%23%s%%0A" % randomStr
             elif payload[i] == '#' or payload[i:i + 3] == '-- ':
                 retVal += payload[i:]

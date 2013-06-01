@@ -60,7 +60,7 @@ def purge(directory):
     logger.debug("renaming filenames to random values")
     for filepath in filepaths:
         try:
-            os.rename(filepath, os.path.join(os.path.dirname(filepath), "".join(random.sample(string.letters, random.randint(4, 8)))))
+            os.rename(filepath, os.path.join(os.path.dirname(filepath), "".join(random.sample(string.ascii_letters, random.randint(4, 8)))))
         except:
             pass
 
@@ -69,7 +69,7 @@ def purge(directory):
     logger.debug("renaming directory names to random values")
     for dirpath in dirpaths:
         try:
-            os.rename(dirpath, os.path.join(os.path.dirname(dirpath), "".join(random.sample(string.letters, random.randint(4, 8)))))
+            os.rename(dirpath, os.path.join(os.path.dirname(dirpath), "".join(random.sample(string.ascii_letters, random.randint(4, 8)))))
         except:
             pass
 

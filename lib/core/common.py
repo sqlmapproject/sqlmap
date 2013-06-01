@@ -931,9 +931,9 @@ def randomStr(length=4, lowercase=False, alphabet=None):
     if alphabet:
         retVal = "".join(random.choice(alphabet) for _ in xrange(0, length))
     elif lowercase:
-        retVal = "".join(random.choice(string.lowercase) for _ in xrange(0, length))
+        retVal = "".join(random.choice(string.ascii_lowercase) for _ in xrange(0, length))
     else:
-        retVal = "".join(random.choice(string.letters) for _ in xrange(0, length))
+        retVal = "".join(random.choice(string.ascii_letters) for _ in xrange(0, length))
 
     return retVal
 
