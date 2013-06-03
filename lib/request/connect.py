@@ -287,6 +287,9 @@ class Connect(object):
                 if PLACE.GET in conf.parameters and not get:
                     get = conf.parameters[PLACE.GET]
 
+                    if not conf.skipUrlEncode:
+                        get = urlencode(get, limit=True)
+
                 if get:
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
