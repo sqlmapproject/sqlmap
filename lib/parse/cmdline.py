@@ -675,7 +675,8 @@ def cmdLineParser():
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--pickled-options", dest="pickledOptions", help=SUPPRESS_HELP)
+        parser.add_option("--pickled-options", dest="pickledOptions",
+                          help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
