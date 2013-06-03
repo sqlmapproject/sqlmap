@@ -291,11 +291,8 @@ class Connect(object):
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
-                if conf.method == HTTPMETHOD.POST and not post:
-                    for place in (PLACE.POST,):
-                        if place in conf.parameters:
-                            post = conf.parameters[place]
-                            break
+                if PLACE.POST in conf.parameters and not post and method in (None, HTTPMETHOD.POST):
+                    post = conf.parameters[PLACE.POST]
 
             elif get:
                 url = "%s?%s" % (url, get)
