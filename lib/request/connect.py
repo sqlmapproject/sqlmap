@@ -559,8 +559,10 @@ class Connect(object):
         processResponse(page, responseHeaders)
 
         if conn and hasattr(conn, "redcode"):
+            _ = urlparse.urlsplit(conn.redurl)
+            _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
+            requestMsg = re.sub("(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % getUnicode(_), requestMsg, 1)
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, conn.code, status)
-            requestMsg = requestMsg.replace("%s HTTP/" % url, "%s HTTP/" % conn.redurl, 1)
         else:
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
 
