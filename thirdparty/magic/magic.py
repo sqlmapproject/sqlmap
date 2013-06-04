@@ -16,10 +16,6 @@ Usage:
 
 import sys
 import os.path
-import ctypes
-import ctypes.util
-
-from ctypes import c_char_p, c_int, c_size_t, c_void_p
 
 class MagicException(Exception):
     pass
@@ -104,6 +100,12 @@ def from_buffer(buffer, mime=False):
 
 try:
     libmagic = None
+
+    import ctypes
+    import ctypes.util
+
+    from ctypes import c_char_p, c_int, c_size_t, c_void_p
+
     # Let's try to find magic or magic1
     dll = ctypes.util.find_library('magic') or ctypes.util.find_library('magic1')
 

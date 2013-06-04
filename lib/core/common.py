@@ -9,7 +9,6 @@ import codecs
 import contextlib
 import cookielib
 import copy
-import ctypes
 import httplib
 import inspect
 import logging
@@ -2209,6 +2208,8 @@ def runningAsAdmin():
 
         isAdmin = isinstance(_, (int, float, long)) and _ == 0
     elif IS_WIN:
+        import ctypes
+
         _ = ctypes.windll.shell32.IsUserAnAdmin()
 
         isAdmin = isinstance(_, (int, float, long)) and _ == 1

@@ -1,7 +1,6 @@
 #
 # Copyright (C) 2010-2012 Vinay Sajip. All rights reserved. Licensed under the new BSD license.
 #
-import ctypes
 import logging
 import os
 import re
@@ -84,6 +83,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
         }
 
         def output_colorized(self, message):
+            import ctypes
+
             parts = self.ansi_esc.split(message)
             write = self.stream.write
             h = None
