@@ -839,6 +839,8 @@ def readInput(message, default=None, checkBatch=True):
     retVal = None
     kb.stickyLevel = None
 
+    message = getUnicode(message)
+
     if "\n" in message:
         message += "%s> " % ("\n" if message.count("\n") > 1 else "")
     elif message[-1] == ']':
@@ -855,7 +857,7 @@ def readInput(message, default=None, checkBatch=True):
             if answer and question.lower() in message.lower():
                 retVal = getUnicode(answer, UNICODE_ENCODING)
 
-                infoMsg = "%s%s" % (getUnicode(message), retVal)
+                infoMsg = "%s%s" % (message, retVal)
                 logger.info(infoMsg)
 
                 debugMsg = "used the given answer"
@@ -872,7 +874,7 @@ def readInput(message, default=None, checkBatch=True):
             else:
                 options = unicode()
 
-            dataToStdout("\r%s%s\n" % (getUnicode(message), options), forceOutput=True, bold=True)
+            dataToStdout("\r%s%s\n" % (message, options), forceOutput=True, bold=True)
 
             debugMsg = "used the default behaviour, running in batch mode"
             logger.debug(debugMsg)
