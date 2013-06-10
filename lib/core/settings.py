@@ -563,6 +563,9 @@ BRUTE_DOC_ROOT_SUFFIXES = ("", "html", "htdocs", "httpdocs", "php", "public", "s
 # String used for marking target name inside used brute force web server document root
 BRUTE_DOC_ROOT_TARGET_MARK = "%TARGET%"
 
+# Character used as a boundary in kb.chars (preferably less frequent letter)
+KB_CHARS_BOUNDARY_CHAR = 'q'
+
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
 table{
