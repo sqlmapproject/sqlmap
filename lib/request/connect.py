@@ -879,7 +879,5 @@ class Connect(object):
 
         if getRatioValue:
             return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page, headers, code, getRatioValue=True, pageLength=pageLength)
-        elif pageLength or page:
-            return comparison(page, headers, code, getRatioValue, pageLength)
         else:
-            return False
+            return comparison(page, headers, code, getRatioValue, pageLength)
