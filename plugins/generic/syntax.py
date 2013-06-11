@@ -23,7 +23,9 @@ class Syntax:
 
         if quote:
             for item in re.findall(r"'[^']*'+", expression, re.S):
-                retVal = retVal.replace(item, escaper(item[1:-1]))
+                _ = item[1:-1]
+                if _:
+                    retVal = retVal.replace(item, escaper(_))
         else:
             retVal = escaper(expression)
 
