@@ -158,6 +158,22 @@ def mssql_old_passwd(password, salt, uppercase=True):  # prior to version '2005'
 
     return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
 
+def mssql_new_passwd(password, salt, uppercase=False):
+    """
+    Reference(s):
+        http://hashcat.net/forum/thread-1474.html
+
+    >>> mssql_new_passwd(password='testpass', salt='4086ceb6', uppercase=False)
+    '0x02004086ceb6eb051cdbc5bdae68ffc66c918d4977e592f6bdfc2b444a7214f71fa31c35902c5b7ae773ed5f4c50676d329120ace32ee6bc81c24f70711eb0fc6400e85ebf25'
+    """
+
+    binsalt = hexdecode(salt)
+    unistr = "".join(map(lambda c: ("%s\0" if ord(c) < 256 else "%s") % utf8encode(c), password))
+
+    retVal = "0200%s%s" % (salt, sha512(unistr + binsalt).hexdigest())
+
+    return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
+
 def oracle_passwd(password, salt, uppercase=True):
     """
     Reference(s):
@@ -326,6 +342,7 @@ __functions__ = {
                     HASH.POSTGRES: postgres_passwd,
                     HASH.MSSQL: mssql_passwd,
                     HASH.MSSQL_OLD: mssql_old_passwd,
+                    HASH.MSSQL_NEW: mssql_new_passwd,
                     HASH.ORACLE: oracle_passwd,
                     HASH.ORACLE_OLD: oracle_old_passwd,
                     HASH.MD5_GENERIC: md5_generic_passwd,
@@ -671,7 +688,7 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {'username': user}]
                     elif hash_regex in (HASH.ORACLE):
                         item = [(user, hash_), {'salt': hash_[-20:]}]
-                    elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD):
+                    elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD, HASH.MSSQL_NEW):
                         item = [(user, hash_), {'salt': hash_[6:14]}]
                     elif hash_regex in (HASH.CRYPT_GENERIC):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
