@@ -106,7 +106,7 @@ class Xp_cmdshell:
 
         if output == "1":
             logger.info("xp_cmdshell extended procedure is usable")
-        elif isNoneValue(output):
+        elif isNoneValue(output) and conf.dbmsCred:
             errMsg = "it seems that the temporary directory ('%s') used for " % self.getRemoteTempPath()
             errMsg += "storing console output within the back-end file system "
             errMsg += "does not have writing permissions for the DBMS process. "
@@ -114,6 +114,8 @@ class Xp_cmdshell:
             errMsg += "--tmp-path switch or you will not be able to retrieve "
             errMsg += "the commands output"
             logger.error(errMsg)
+	elif isNoneValue(output):
+	    logger.error("unable to retrieve xp_cmdshell output")
         else:
             logger.info("xp_cmdshell extended procedure is usable")
 
