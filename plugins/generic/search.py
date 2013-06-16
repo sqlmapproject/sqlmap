@@ -430,7 +430,7 @@ class Search:
 
                 for db, tbl in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
-                    tbls = tbl.split(",")
+                    tbls = tbl.split(",") if not isNoneValue(tbl) else []
 
                     for tbl in tbls:
                         tbl = safeSQLIdentificatorNaming(tbl, True)
