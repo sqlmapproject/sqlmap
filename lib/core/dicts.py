@@ -127,7 +127,7 @@ DB2_PRIVS = {
 DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
 
 DBMS_DICT = {
-                DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "mssql"),
+                DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "mssql+pymssql"),
                 DBMS.MYSQL: (MYSQL_ALIASES, "python pymysql", "https://github.com/petehunt/PyMySQL/", "mysql"),
                 DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
                 DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/", "oracle"),
