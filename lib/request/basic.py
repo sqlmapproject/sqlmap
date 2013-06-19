@@ -26,7 +26,6 @@ from lib.core.data import logger
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapCompressionException
-from lib.core.htmlentities import htmlEntities
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -36,6 +35,7 @@ from lib.core.settings import PARSE_HEADERS_LIMIT
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
+from lib.utils.htmlentities import htmlEntities
 from thirdparty.chardet import detect
 
 def forgeHeaders(items=None):
