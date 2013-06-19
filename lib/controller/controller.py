@@ -144,7 +144,7 @@ def _formatInjection(inj):
             vector = "%s%s" % (vector, comment)
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
-        data += "    Payload: %s\n" % urldecode(payload, unsafe="&")
+        data += "    Payload: %s\n" % urldecode(payload, unsafe="&", plusspace=(inj.place == PLACE.POST and kb.postSpaceToPlus))
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
