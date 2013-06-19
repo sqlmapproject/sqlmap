@@ -183,6 +183,8 @@ class Xp_cmdshell:
         return inject.goStacked(self.xpCmdshellForgeCmd(cmd), silent)
 
     def xpCmdshellEvalCmd(self, cmd, first=None, last=None):
+        output = None
+
         if conf.direct:
             output = self.xpCmdshellExecCmd(cmd)
 
@@ -208,7 +210,6 @@ class Xp_cmdshell:
                 self.delRemoteFile(self.tmpFile)
 
             query = "SELECT %s FROM %s ORDER BY id" % (self.tblField, self.cmdTblName)
-            output = None
 
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 output = inject.getValue(query, resumeValue=False, blind=False, time=False)
