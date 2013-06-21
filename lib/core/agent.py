@@ -218,7 +218,7 @@ class Agent(object):
             comment = kb.injection.data[kb.technique].comment if comment is None else comment
 
         if Backend.getIdentifiedDbms() == DBMS.ACCESS and comment == GENERIC_SQL_COMMENT:
-            comment = "%00"
+            comment = queries[DBMS.ACCESS].comment.query
 
         if comment is not None:
             expression += comment

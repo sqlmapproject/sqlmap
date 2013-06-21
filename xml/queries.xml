@@ -355,7 +355,7 @@
         <limitstring query=" TOP "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
-        <comment query="%00"/>
+        <comment query="%16" query2="%00"/>
         <substring query="MID((%s),%d,%d)"/>
         <concatenate query="%s&amp;%s"/>
         <case query="SELECT (IIF(%s,1,0))"/>
