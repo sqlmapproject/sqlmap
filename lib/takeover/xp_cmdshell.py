@@ -44,7 +44,7 @@ class Xp_cmdshell:
     def _xpCmdshellCreate(self):
         cmd = ""
 
-        if Backend.isVersionWithin(("2005", "2008")):
+        if Backend.isVersionWithin(("2005", "2008", "2012")):
             logger.debug("activating sp_OACreate")
 
             cmd = getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")

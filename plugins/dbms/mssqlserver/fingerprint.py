@@ -92,7 +92,8 @@ class Fingerprint(GenericFingerprint):
 
             for version, check in (("2000", "HOST_NAME()=HOST_NAME()"), \
                                     ("2005", "XACT_STATE()=XACT_STATE()"), \
-                                    ("2008", "SYSDATETIME()=SYSDATETIME()")):
+                                    ("2008", "SYSDATETIME()=SYSDATETIME()"), \
+                                    ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)")):
                 result = inject.checkBooleanExpression(check)
 
                 if result:
