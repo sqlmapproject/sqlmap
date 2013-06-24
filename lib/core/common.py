@@ -660,10 +660,10 @@ def getDocRoot():
 
         if choice == "2":
             message = "please provide the web server document root: "
-            docRoot = readInput(message).split(',')
+            docRoot = readInput(message, default="").split(',')
         elif choice == "3":
             message = "what's the list file location?\n"
-            listPath = readInput(message)
+            listPath = readInput(message, default="")
             checkFile(listPath)
             docRoot = getFileItems(listPath)
         elif choice == "4":
