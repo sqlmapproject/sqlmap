@@ -522,7 +522,7 @@ class Databases:
                     query += condQuery.replace("[DB]", conf.db)
                 elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     query = rootQuery.inband.query % tbl
-                    
+
                 values = inject.getValue(query, blind=False, time=False)
 
                 if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
