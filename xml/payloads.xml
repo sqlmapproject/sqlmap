@@ -1125,6 +1125,7 @@ Formats:
             <dbms>PostgreSQL</dbms>
         </details>
     </test>
+    <!-- End of stacked conditional-error blind queries tests -->
 
     <!-- Error-based tests - WHERE or HAVING clause -->
     <test>
@@ -1991,7 +1992,6 @@ Formats:
             <dbms>Firebird</dbms>
         </details>
     </test>
-
     <!-- End of inline queries tests -->
 
     <!-- Stacked queries tests -->
@@ -3678,7 +3678,7 @@ Formats:
     <!-- End of time-based blind tests - GROUP BY and ORDER BY clause -->
 
 
-    <!-- UNION query tests -->		
+    <!-- UNION query tests -->
     <test>
         <title>MySQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>3</stype>
