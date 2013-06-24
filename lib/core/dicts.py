@@ -147,7 +147,7 @@ FROM_DUMMY_TABLE = {
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
                         DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
-                        DBMS.HSQL: " FROM INFORMATION_SYSTEM.SYSTEM_USERS"
+                        DBMS.HSQL: " FROM INFORMATION_SCHEMA.SYSTEM_USERS"
                    }
 
 SQL_STATEMENTS = {
