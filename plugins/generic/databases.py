@@ -510,7 +510,7 @@ class Databases:
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQL):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -522,7 +522,7 @@ class Databases:
                     query += condQuery.replace("[DB]", conf.db)
                 elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     query = rootQuery.inband.query % tbl
-
+                    
                 values = inject.getValue(query, blind=False, time=False)
 
                 if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
