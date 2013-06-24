@@ -16,18 +16,6 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def escape(expression, quote=True):
-        """
-        TODO: Unsure of a method to escape. Perhaps RAWTOHEX/HEXTORAW functions?
-        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
-        'SELECT 'abcdefgh' FROM foobar'
-        """
-
         def escaper(value):
-            retVal = None
-            try:
-                retVal = "'%s'" % value
-            except UnicodeEncodeError:
-                retVal = "CONVERT(0x%s USING utf8)" % "".join("%.2x" % ord(_) for _ in utf8encode(value))
+            retVal = "||".join("CHAR(%d)" % ord(value[i]) for i in xrange(len(value)))
             return retVal
-
-        return Syntax._escape(expression, quote, escaper)
