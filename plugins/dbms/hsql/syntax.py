@@ -16,6 +16,11 @@ class Syntax(GenericSyntax):
 
     @staticmethod
     def escape(expression, quote=True):
+        """
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
+        'SELECT CHAR(97)||CHAR(98)||CHAR(99)||CHAR(100)||CHAR(101)||CHAR(102)||CHAR(103)||CHAR(104) FROM foobar'
+        """
         def escaper(value):
-            retVal = "||".join("CHAR(%d)" % ord(value[i]) for i in xrange(len(value)))
-            return retVal
+            return "||".join("CHAR(%d)" % ord(value[i]) for i in xrange(len(value)))
+
+        return Syntax._escape(expression, quote, escaper)
