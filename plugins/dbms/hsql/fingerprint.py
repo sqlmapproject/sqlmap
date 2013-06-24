@@ -130,7 +130,7 @@ class Fingerprint(GenericFingerprint):
                     Backend.setVersion("= %s" % banner)
                 else:
                     if inject.checkBooleanExpression("(SELECT [RANDNUM] FROM (VALUES(0)))=[RANDNUM]"):
-                        Backend.setVersionList([">= 2.0.0", "< 3.0"])
+                        Backend.setVersionList([">= 2.0.0", "< 2.3.0"])
                     else:
                         banner = unArrayizeValue(inject.getValue("\"org.hsqldb.Library.getDatabaseFullProductVersion\"()", safeCharEncode=True))
                         if banner:
