@@ -101,35 +101,35 @@ class Fingerprint(GenericFingerprint):
 
             if inject.checkBooleanExpression("REVERSE('sqlmap')='pamlqs'"):
                 Backend.setVersion(">= 9.1.0")
-            elif inject.checkBooleanExpression("LENGTH(TO_CHAR(1, 'EEEE'))>0"):
+            elif inject.checkBooleanExpression("LENGTH(TO_CHAR(1,'EEEE'))>0"):
                 Backend.setVersionList([">= 9.0.0", "< 9.1.0"])
-            elif inject.checkBooleanExpression("2=(SELECT DIV(6, 3))"):
+            elif inject.checkBooleanExpression("2=(SELECT DIV(6,3))"):
                 Backend.setVersionList([">= 8.4.0", "< 9.0.0"])
             elif inject.checkBooleanExpression("EXTRACT(ISODOW FROM CURRENT_TIMESTAMP)<8"):
                 Backend.setVersionList([">= 8.3.0", "< 8.4.0"])
             elif inject.checkBooleanExpression("ISFINITE(TRANSACTION_TIMESTAMP())"):
                 Backend.setVersionList([">= 8.2.0", "< 8.3.0"])
-            elif inject.checkBooleanExpression("9=(SELECT GREATEST(5, 9, 1))"):
+            elif inject.checkBooleanExpression("9=(SELECT GREATEST(5,9,1))"):
                 Backend.setVersionList([">= 8.1.0", "< 8.2.0"])
-            elif inject.checkBooleanExpression("3=(SELECT WIDTH_BUCKET(5.35, 0.024, 10.06, 5))"):
+            elif inject.checkBooleanExpression("3=(SELECT WIDTH_BUCKET(5.35,0.024,10.06,5))"):
                 Backend.setVersionList([">= 8.0.0", "< 8.1.0"])
-            elif inject.checkBooleanExpression("'d'=(SELECT SUBSTR(MD5('sqlmap'), 1, 1))"):
+            elif inject.checkBooleanExpression("'d'=(SELECT SUBSTR(MD5('sqlmap'),1,1))"):
                 Backend.setVersionList([">= 7.4.0", "< 8.0.0"])
-            elif inject.checkBooleanExpression("'p'=(SELECT SUBSTR(CURRENT_SCHEMA(), 1, 1))"):
+            elif inject.checkBooleanExpression("'p'=(SELECT SUBSTR(CURRENT_SCHEMA(),1,1))"):
                 Backend.setVersionList([">= 7.3.0", "< 7.4.0"])
             elif inject.checkBooleanExpression("8=(SELECT BIT_LENGTH(1))"):
                 Backend.setVersionList([">= 7.2.0", "< 7.3.0"])
-            elif inject.checkBooleanExpression("'a'=(SELECT SUBSTR(QUOTE_LITERAL('a'), 2, 1))"):
+            elif inject.checkBooleanExpression("'a'=(SELECT SUBSTR(QUOTE_LITERAL('a'),2,1))"):
                 Backend.setVersionList([">= 7.1.0", "< 7.2.0"])
-            elif inject.checkBooleanExpression("8=(SELECT POW(2, 3))"):
+            elif inject.checkBooleanExpression("8=(SELECT POW(2,3))"):
                 Backend.setVersionList([">= 7.0.0", "< 7.1.0"])
             elif inject.checkBooleanExpression("'a'=(SELECT MAX('a'))"):
                 Backend.setVersionList([">= 6.5.0", "< 6.5.3"])
             elif inject.checkBooleanExpression("VERSION()=VERSION()"):
                 Backend.setVersionList([">= 6.4.0", "< 6.5.0"])
-            elif inject.checkBooleanExpression("2=(SELECT SUBSTR(CURRENT_DATE, 1, 1))"):
+            elif inject.checkBooleanExpression("2=(SELECT SUBSTR(CURRENT_DATE,1,1))"):
                 Backend.setVersionList([">= 6.3.0", "< 6.4.0"])
-            elif inject.checkBooleanExpression("'s'=(SELECT SUBSTRING('sqlmap', 1, 1))"):
+            elif inject.checkBooleanExpression("'s'=(SELECT SUBSTRING('sqlmap',1,1))"):
                 Backend.setVersionList([">= 6.2.0", "< 6.3.0"])
             else:
                 Backend.setVersion("< 6.2.0")
