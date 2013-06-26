@@ -651,11 +651,16 @@ def checkFalsePositives(injection):
         for i in xrange(1 + conf.level / 2):
             randInt1, randInt2, randInt3 = (_() for j in xrange(3))
 
-            # Just in case (also, they have to be different than 0 because of the last test)
-            while randInt1 == randInt2:
+            randInt1 = min(randInt1, randInt2, randInt3)
+            randInt3 = max(randInt1, randInt2, randInt3)
+
+            while randInt1 >= randInt2:
                 randInt2 = _()
 
-            if not checkBooleanExpression("(%d+%d)=%d" % (randInt1, randInt2, randInt1 + randInt2)):
+            while randInt2 >= randInt3:
+                randInt3 = _()
+
+            if not checkBooleanExpression("%d=%d" % (randInt1, randInt1)):
                 retVal = None
                 break
 
@@ -663,13 +668,15 @@ def checkFalsePositives(injection):
             if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
                 checkBooleanExpression("%d=%d" % (randInt1, randInt2))
 
-            if checkBooleanExpression("%d>(%d+%d)" % (min(randInt1, randInt2), randInt3, max(randInt1, randInt2))):
+            if checkBooleanExpression("%d>%d" % (randInt1, randInt2)):
                 retVal = None
                 break
-            elif checkBooleanExpression("(%d+%d)>%d" % (randInt3, min(randInt1, randInt2), randInt1 + randInt2 + randInt3)):
+
+            elif checkBooleanExpression("%d>%d" % (randInt2, randInt3)):
                 retVal = None
                 break
-            elif not checkBooleanExpression("%d=(%d+%d)" % (randInt1 + randInt2, randInt1, randInt2)):
+
+            elif not checkBooleanExpression("%d>%d" % (randInt3, randInt1)):
                 retVal = None
                 break
 
