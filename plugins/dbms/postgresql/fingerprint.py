@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import Format
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -179,4 +180,4 @@ class Fingerprint(GenericFingerprint):
             warnMsg += "only on the current schema and/or system databases. "
             warnMsg += "sqlmap is going to use 'public' schema as a "
             warnMsg += "database name"
-            logger.warn(warnMsg)
+            singleTimeWarnMessage(warnMsg)
