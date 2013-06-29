@@ -370,7 +370,7 @@ def storeHashesToFile(attack_dict):
     with open(filename, "w+") as f:
         for user, hashes in attack_dict.items():
             for hash_ in hashes:
-                hash_ = hash_.split()[0] if hash_ else hash_
+                hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
                 if hash_ and hash_ != NULL and hashRecognition(hash_):
                     item = None
                     if user and not user.startswith(DUMMY_USER_PREFIX):
