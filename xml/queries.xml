@@ -626,7 +626,7 @@
         </search_column>
     </dbms>
 
-    <dbms value="HyperSQL">
+    <dbms value="HSQLDB">
         <cast query="CAST(%s AS LONGVARCHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
         <isnull query="IFNULL(%s,' ')"/>
