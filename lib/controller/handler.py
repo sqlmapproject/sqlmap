@@ -20,6 +20,7 @@ from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
+from lib.core.settings import HSQL_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
@@ -42,6 +43,8 @@ from plugins.dbms.sybase import SybaseMap
 from plugins.dbms.sybase.connector import Connector as SybaseConn
 from plugins.dbms.db2 import DB2Map
 from plugins.dbms.db2.connector import Connector as DB2Conn
+from plugins.dbms.hsql import HSQLMap
+from plugins.dbms.hsql.connector import Connector as HSQLConn
 
 def setHandler():
     """
@@ -60,6 +63,7 @@ def setHandler():
                   (DBMS.MAXDB, MAXDB_ALIASES, MaxDBMap, MaxDBConn),
                   (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
                   (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
+                  (DBMS.HSQL, HSQL_ALIASES, HSQLMap, HSQLConn),
             ]
 
     _ = max(_ if (Backend.getIdentifiedDbms() or "").lower() in _[1] else None for _ in items)
