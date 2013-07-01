@@ -41,6 +41,9 @@ def checkDependencies():
                 import kinterbasdb
             elif dbmsName == DBMS.DB2:
                 import ibm_db_dbi
+            elif dbmsName == DBMS.HSQLDB:
+                import jaydebeapi
+                import jpype
         except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the database "
