@@ -20,7 +20,7 @@ from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
-from lib.core.settings import HSQL_ALIASES
+from lib.core.settings import HSQLDB_ALIASES
 
 FIREBIRD_TYPES = {
                     "261": "BLOB",
@@ -138,7 +138,7 @@ DBMS_DICT = {
                 DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
                 DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "sybase"),
                 DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/", "ibm_db_sa"),
-                DBMS.HSQL: (HSQL_ALIASES, "python jaydebeapi", "https://pypi.python.org/pypi/JayDeBeApi/", "hsql"),
+                DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi", "https://pypi.python.org/pypi/JayDeBeApi/", "hsqldb"),
             }
 
 FROM_DUMMY_TABLE = {
@@ -147,7 +147,7 @@ FROM_DUMMY_TABLE = {
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
                         DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
-                        DBMS.HSQL: " FROM INFORMATION_SCHEMA.SYSTEM_USERS"
+                        DBMS.HSQLDB: " FROM INFORMATION_SCHEMA.SYSTEM_USERS"
                    }
 
 SQL_STATEMENTS = {

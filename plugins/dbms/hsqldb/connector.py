@@ -33,7 +33,7 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
         try:
-            jar = './thirdparty/hsql/hsqldb.jar'
+            jar = './thirdparty/hsqldb/hsqldb.jar'
             args='-Djava.class.path=%s' % jar
             jvm_path = jpype.getDefaultJVMPath()
             jpype.startJVM(jvm_path, args)

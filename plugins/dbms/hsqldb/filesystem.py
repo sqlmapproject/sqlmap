@@ -13,9 +13,9 @@ class Filesystem(GenericFilesystem):
         GenericFilesystem.__init__(self)
 
     def readFile(self, rFile):
-        errMsg = "Not implemented in HSQL"
+        errMsg = "Not implemented in HSQLDB"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, wFile, dFile, fileType=None, forceCheck=False):
-        errMsg = "Not implemented in HSQL"
+        errMsg = "Not implemented in HSQLDB"
         raise SqlmapUnsupportedFeatureException(errMsg)

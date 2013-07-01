@@ -3448,7 +3448,7 @@ def decodeHexValue(value):
                     retVal = retVal.decode("utf-16-le")
                 except UnicodeDecodeError:
                     pass
-            elif Backend.isDbms(DBMS.HSQL):
+            elif Backend.isDbms(DBMS.HSQLDB):
                 try:
                     retVal = retVal.decode("utf-16-be")
                 except UnicodeDecodeError:

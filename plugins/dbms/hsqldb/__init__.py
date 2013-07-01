@@ -6,22 +6,22 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.enums import DBMS
-from lib.core.settings import HSQL_SYSTEM_DBS
+from lib.core.settings import HSQLDB_SYSTEM_DBS
 from lib.core.unescaper import unescaper
-from plugins.dbms.hsql.enumeration import Enumeration
-from plugins.dbms.hsql.filesystem import Filesystem
-from plugins.dbms.hsql.fingerprint import Fingerprint
-from plugins.dbms.hsql.syntax import Syntax
-from plugins.dbms.hsql.takeover import Takeover
+from plugins.dbms.hsqldb.enumeration import Enumeration
+from plugins.dbms.hsqldb.filesystem import Filesystem
+from plugins.dbms.hsqldb.fingerprint import Fingerprint
+from plugins.dbms.hsqldb.syntax import Syntax
+from plugins.dbms.hsqldb.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
-class HSQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
+class HSQLDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines MySQL methods
     """
 
     def __init__(self):
-        self.excludeDbsList = HSQL_SYSTEM_DBS
+        self.excludeDbsList = HSQLDB_SYSTEM_DBS
         self.sysUdfs = {
                          # UDF name:    UDF return data-type
                          "sys_exec":    { "return": "int" },
@@ -36,4 +36,4 @@ class HSQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeo
         Miscellaneous.__init__(self)
         Takeover.__init__(self)
 
-    unescaper[DBMS.HSQL] = Syntax.escape
+    unescaper[DBMS.HSQLDB] = Syntax.escape

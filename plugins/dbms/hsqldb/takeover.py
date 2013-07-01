@@ -13,17 +13,17 @@ class Takeover(GenericTakeover):
         GenericTakeover.__init__(self)
 
     def osCmd(self):
-        errMsg = "Not implemented in HSQL"
+        errMsg = "Not implemented in HSQLDB"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osShell(self):
-        errMsg = "Not implemented in HSQL"
+        errMsg = "Not implemented in HSQLDB"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osPwn(self):
-        errMsg = "Not implemented in HSQL"
+        errMsg = "Not implemented in HSQLDB"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osSmb(self):
-        errMsg = "Not implemented in HSQL"
+        errMsg = "Not implemented in HSQLDB"
         raise SqlmapUnsupportedFeatureException(errMsg)

@@ -17,14 +17,14 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.session import setDbms
-from lib.core.settings import HSQL_ALIASES
+from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
     def __init__(self):
-        GenericFingerprint.__init__(self, DBMS.HSQL)
+        GenericFingerprint.__init__(self, DBMS.HSQLDB)
 
     def getFingerprint(self):
         value = ""
@@ -76,14 +76,14 @@ class Fingerprint(GenericFingerprint):
         version 2.1.0 added MEDIAN aggregate function
         version < 2.0.1 added support for datetime ROUND and TRUNC functions
         version 2.0.0 added VALUES support
-        version 1.8.0.4 Added org.hsqldb.Library function, getDatabaseFullProductVersion to return the
+        version 1.8.0.4 Added org.hsqldbdb.Library function, getDatabaseFullProductVersion to return the
                         full version string, including the 4th digit (e.g 1.8.0.4).
         version 1.7.2 CASE statements added and INFORMATION_SCHEMA
          
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(HSQL_ALIASES) \
-           or conf.dbms in HSQL_ALIASES) and Backend.getVersion() and \
+        if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \
+           or conf.dbms in HSQLDB_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
             v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")
@@ -91,7 +91,7 @@ class Fingerprint(GenericFingerprint):
 
             Backend.setVersion(v)
 
-            setDbms("%s %s" % (DBMS.HSQL, Backend.getVersion()))
+            setDbms("%s %s" % (DBMS.HSQLDB, Backend.getVersion()))
 
             if Backend.isVersionGreaterOrEqualThan("1.7.2"):
                 kb.data.has_information_schema = True
@@ -100,27 +100,27 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.HSQL
+        infoMsg = "testing %s" % DBMS.HSQLDB
         logger.info(infoMsg)
 
         # TODO This gets mangled in UNION queries because of the dummy table
         result = inject.checkBooleanExpression("\"java.lang.Math.sqrt\"(1)=1")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.HSQL
+            infoMsg = "confirming %s" % DBMS.HSQLDB
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("ROUNDMAGIC(PI())>=3")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.HSQL
+                warnMsg = "the back-end DBMS is not %s" % DBMS.HSQLDB
                 logger.warn(warnMsg)
 
                 return False
             else:
                 kb.data.has_information_schema = True
                 Backend.setVersion(">= 1.7.2")
-                setDbms("%s 1.7.2" % DBMS.HSQL)
+                setDbms("%s 1.7.2" % DBMS.HSQLDB)
 
                 if not conf.extensiveFp:
                     return True
@@ -132,7 +132,7 @@ class Fingerprint(GenericFingerprint):
                     if inject.checkBooleanExpression("(SELECT [RANDNUM] FROM (VALUES(0)))=[RANDNUM]"):
                         Backend.setVersionList([">= 2.0.0", "< 2.3.0"])
                     else:
-                        banner = unArrayizeValue(inject.getValue("\"org.hsqldb.Library.getDatabaseFullProductVersion\"()", safeCharEncode=True))
+                        banner = unArrayizeValue(inject.getValue("\"org.hsqldbdb.Library.getDatabaseFullProductVersion\"()", safeCharEncode=True))
                         if banner:
                             Backend.setVersion("= %s" % banner)
                         else:
@@ -140,7 +140,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s or is < 1.7.2" % DBMS.HSQL
+            warnMsg = "the back-end DBMS is not %s or is < 1.7.2" % DBMS.HSQLDB
             logger.warn(warnMsg)
 
             return False

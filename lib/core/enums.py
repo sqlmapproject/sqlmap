@@ -33,7 +33,7 @@ class DBMS:
     PGSQL = "PostgreSQL"
     SQLITE = "SQLite"
     SYBASE = "Sybase"
-    HSQL = "HyperSQL"
+    HSQLDB = "HyperSQL"
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
@@ -46,7 +46,7 @@ class DBMS_DIRECTORY_NAME:
     PGSQL = "postgresql"
     SQLITE = "sqlite"
     SYBASE = "sybase"
-    HSQL = "hsql"
+    HSQLDB = "hsqldb"
 
 class CUSTOM_LOGGING:
     PAYLOAD = 9

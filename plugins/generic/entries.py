@@ -159,7 +159,7 @@ class Entries:
                                 entries = zip(*[entries[colName] for colName in colList])
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQL):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB):
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
