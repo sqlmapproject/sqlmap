@@ -95,4 +95,10 @@
     <dbms value="Frontbase">
         <error regexp="Exception (condition )?\d+. Transaction rollback."/>
     </dbms>
+
+    <!-- HSQLDB -->
+    <dbms value="HSQLDB">
+        <error regexp="org\.hsqldb\.jdbc"/>
+    </dbms>
+
 </root>
