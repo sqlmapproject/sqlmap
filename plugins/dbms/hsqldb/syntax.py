@@ -5,9 +5,6 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import binascii
-
-from lib.core.convert import utf8encode
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -20,6 +17,7 @@ class Syntax(GenericSyntax):
         >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
         'SELECT CHAR(97)||CHAR(98)||CHAR(99)||CHAR(100)||CHAR(101)||CHAR(102)||CHAR(103)||CHAR(104) FROM foobar'
         """
+
         def escaper(value):
             return "||".join("CHAR(%d)" % ord(value[i]) for i in xrange(len(value)))
 

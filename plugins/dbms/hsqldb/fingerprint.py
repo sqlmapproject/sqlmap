@@ -146,5 +146,5 @@ class Fingerprint(GenericFingerprint):
             return False
 
     def getHostname(self):
-        warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
+        warnMsg = "on HyperSQL it is not possible to enumerate the hostname"
         logger.warn(warnMsg)

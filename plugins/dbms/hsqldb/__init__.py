@@ -17,17 +17,11 @@ from plugins.generic.misc import Miscellaneous
 
 class HSQLDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
-    This class defines MySQL methods
+    This class defines HyperSQL methods
     """
 
     def __init__(self):
         self.excludeDbsList = HSQLDB_SYSTEM_DBS
-        self.sysUdfs = {
-                         # UDF name:    UDF return data-type
-                         "sys_exec":    { "return": "int" },
-                         "sys_eval":    { "return": "string" },
-                         "sys_bineval": { "return": "int" }
-                       }
 
         Syntax.__init__(self)
         Fingerprint.__init__(self)
