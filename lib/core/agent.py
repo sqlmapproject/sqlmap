@@ -525,7 +525,7 @@ class Agent(object):
         else:
             return query
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.HSQLDB):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += ",'%s')" % kb.chars.stop
@@ -541,7 +541,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop

@@ -641,7 +641,7 @@
         <comment query="--" query2="/*" query3="//"/>
         <substring query="SUBSTR((%s),%d,%d)"/>
         <concatenate query="CONCAT(%s,%s)"/>
-        <case query="(CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="RAWTOHEX(%s)"/>
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
         <banner query="DATABASE_VERSION()"/>

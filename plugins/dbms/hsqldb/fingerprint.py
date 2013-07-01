@@ -103,7 +103,6 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.HSQLDB
         logger.info(infoMsg)
 
-        # TODO This gets mangled in UNION queries because of the dummy table
         result = inject.checkBooleanExpression("CASEWHEN(1=1,1,0)=1")
 
         if result:
