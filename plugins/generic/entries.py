@@ -64,7 +64,7 @@ class Entries:
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if Backend.isDbms(DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.db = conf.db.upper()
 
             if  ',' in conf.db:
