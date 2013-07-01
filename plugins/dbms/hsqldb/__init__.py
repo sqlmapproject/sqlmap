@@ -17,7 +17,7 @@ from plugins.generic.misc import Miscellaneous
 
 class HSQLDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
-    This class defines HyperSQL methods
+    This class defines HSQLDB methods
     """
 
     def __init__(self):

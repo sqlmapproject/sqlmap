@@ -33,7 +33,7 @@ class DBMS:
     PGSQL = "PostgreSQL"
     SQLITE = "SQLite"
     SYBASE = "Sybase"
-    HSQLDB = "HyperSQL"
+    HSQLDB = "HSQLDB"
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
