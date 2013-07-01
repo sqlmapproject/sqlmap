@@ -122,9 +122,6 @@ class Fingerprint(GenericFingerprint):
                 Backend.setVersion(">= 1.7.2")
                 setDbms("%s 1.7.2" % DBMS.HSQLDB)
 
-                if not conf.extensiveFp:
-                    return True
-
                 banner = self.getBanner()
                 if banner:
                     Backend.setVersion("= %s" % banner)
