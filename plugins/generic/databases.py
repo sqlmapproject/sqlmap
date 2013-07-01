@@ -205,7 +205,7 @@ class Databases:
         if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
-        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
             conf.db = conf.db.upper()
 
         if conf.db:
@@ -379,7 +379,7 @@ class Databases:
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.db = conf.db.upper()
 
             if  ',' in conf.db:

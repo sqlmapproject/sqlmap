@@ -64,7 +64,7 @@ class Entries:
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if Backend.isDbms(DBMS.ORACLE):
+            if Backend.isDbms(DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.db = conf.db.upper()
 
             if  ',' in conf.db:
@@ -75,7 +75,7 @@ class Entries:
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.tbl:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(",")
