@@ -85,11 +85,15 @@ def setHandler():
             conf.timeout = 10
 
             dialect = DBMS_DICT[name][3]
-            sqlalchemy = SQLAlchemy(dialect=dialect)
-            sqlalchemy.connect()
 
-            if sqlalchemy.connector:
-                conf.dbmsConnector = sqlalchemy
+            if dialect:
+                sqlalchemy = SQLAlchemy(dialect=dialect)
+                sqlalchemy.connect()
+
+                if sqlalchemy.connector:
+                    conf.dbmsConnector = sqlalchemy
+                else:
+                    conf.dbmsConnector.connect()
             else:
                 conf.dbmsConnector.connect()
 
