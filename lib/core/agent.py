@@ -525,7 +525,7 @@ class Agent(object):
         else:
             return query
 
-        if Backend.isDbms(DBMS.MYSQL):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.HSQL):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += ",'%s')" % kb.chars.stop

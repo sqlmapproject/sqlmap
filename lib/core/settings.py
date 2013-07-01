@@ -163,6 +163,7 @@ MAXDB_SYSTEM_DBS = ("SYSINFO", "DOMAIN")
 SYBASE_SYSTEM_DBS = ("master", "model", "sybsystemdb", "sybsystemprocs")
 DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS",\
                    "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS")
+HSQL_SYSTEM_DBS = ("INFORMATION_SCHEMA", "SYSTEM_LOB")
 
 MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
 MYSQL_ALIASES = ("mysql", "my")
@@ -174,10 +175,11 @@ FIREBIRD_ALIASES = ("firebird", "mozilla firebird", "interbase", "ibase", "fb")
 MAXDB_ALIASES = ("maxdb", "sap maxdb", "sap db")
 SYBASE_ALIASES = ("sybase", "sybase sql server")
 DB2_ALIASES = ("db2", "ibm db2", "ibmdb2")
+HSQL_ALIASES = ("hsql", "hsqldb", "hs", "hypersql")
 
 DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 
-SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES
+SUPPORTED_DBMS = MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES + HSQL_ALIASES
 SUPPORTED_OS = ("linux", "windows")
 
 USER_AGENT_ALIASES = ("ua", "useragent", "user-agent")
