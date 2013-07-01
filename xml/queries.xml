@@ -626,7 +626,6 @@
         </search_column>
     </dbms>
 
-   <!-- HSQL (Based on MYSQL)-->
     <dbms value="HyperSQL">
         <cast query="CAST(%s AS LONGVARCHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
@@ -648,16 +647,16 @@
         <banner query="DATABASE_VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="DATABASE()"/>
-        <hostname query=""/>
+        <hostname/>
         <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER=CURRENT_USER"/>
         <check_udf/>
         <users>
             <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
-			<!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
+            <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
             <blind query="SELECT LIMIT %d 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS" count="SELECT COUNT(DISTINCT(user)) FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
         </users>
         <passwords>
-			<!-- Passwords only shown in later versions &gt;=2.0  -->
+            <!-- Passwords only shown in later versions &gt;=2.0  -->
             <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS" condition="user_name"/>
             <blind query="SELECT LIMIT %d 1 DISTINCT(password_digest) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'" count="SELECT COUNT(DISTINCT(password_digest)) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'"/>
         </passwords>

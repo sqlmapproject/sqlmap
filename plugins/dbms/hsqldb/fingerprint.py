@@ -104,7 +104,7 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         # TODO This gets mangled in UNION queries because of the dummy table
-        result = inject.checkBooleanExpression("\"java.lang.Math.sqrt\"(1)=1")
+        result = inject.checkBooleanExpression("CASEWHEN(1=1,1,0)=1")
 
         if result:
             infoMsg = "confirming %s" % DBMS.HSQLDB
@@ -144,3 +144,7 @@ class Fingerprint(GenericFingerprint):
             logger.warn(warnMsg)
 
             return False
+
+    def getHostname(self):
+        warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
+        logger.warn(warnMsg)
