@@ -378,6 +378,11 @@ class Databases:
 
             conf.db = self.getCurrentDb()
 
+            if not conf.db:
+                errMsg = "unable to retrieve the current "
+                errMsg += "database name"
+                raise SqlmapNoneDataException(errMsg)
+
         elif conf.db is not None:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.db = conf.db.upper()
@@ -425,8 +430,7 @@ class Databases:
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
 
-        for tbl in tblList:
-            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
+        tblList = filter(None, (safeSQLIdentificatorNaming(_, True) for _ in tblList))
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
