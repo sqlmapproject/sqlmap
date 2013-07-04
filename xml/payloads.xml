@@ -2246,7 +2246,7 @@ Formats:
     <test>
         <title>HSQLDB &gt;= 1.7.2 Server stacked queries</title>
         <stype>4</stype>
-        <level>1</level>
+        <level>3</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
@@ -2267,7 +2267,7 @@ Formats:
     <test>
         <title>HSQLDB &gt;= 2.0 Server stacked queries</title>
         <stype>4</stype>
-        <level>1</level>
+        <level>4</level>
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
@@ -2755,7 +2755,7 @@ Formats:
     <test>
         <title>HSQLDB &gt;= 1.7.2 AND time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -2796,7 +2796,7 @@ Formats:
     <test>
         <title>HSQLDB &gt; 2.0 AND time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -3056,7 +3056,7 @@ Formats:
     <test>
         <title>HSQLDB &gt;= 1.7.2 OR time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -3097,7 +3097,7 @@ Formats:
     <test>
         <title>HSQLDB &gt; 2.0 OR time-based blind (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -3436,7 +3436,7 @@ Formats:
     <test>
         <title>HSQLDB &gt;= 1.7.2 time-based blind - Parameter replace (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
@@ -3456,7 +3456,7 @@ Formats:
     <test>
         <title>HSQLDB &gt; 2.0 time-based blind - Parameter replace (heavy query)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>5</level>
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
