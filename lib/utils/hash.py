@@ -358,11 +358,19 @@ def storeHashesToFile(attack_dict):
     if not attack_dict:
         return
 
+    if kb.storeHashesChoice is None:
+        message = "do you want to store hashes to a temporary file "
+        message += "for eventual further processing with other tools [y/N] "
+        test = readInput(message, default="N")
+        kb.storeHashesChoice = test[0] in ("y", "Y")
+
+    if not kb.storeHashesChoice:
+        return
+
     handle, filename = tempfile.mkstemp(prefix="sqlmaphashes-", suffix=".txt")
     os.close(handle)
 
-    infoMsg = "writing hashes to file '%s' " % filename
-    infoMsg += "for eventual further processing with other tools"
+    infoMsg = "writing hashes to a temporary file '%s' " % filename
     logger.info(infoMsg)
 
     items = set()
