@@ -716,13 +716,13 @@ def checkSuhosinPatch(injection):
 
 def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:
-        debugMsg = "heuristic checking skipped "
+        debugMsg = "heuristic check skipped "
         debugMsg += "because NULL connection used"
         logger.debug(debugMsg)
         return None
 
     if wasLastResponseDBMSError():
-        debugMsg = "heuristic checking skipped "
+        debugMsg = "heuristic check skipped "
         debugMsg += "because original page content "
         debugMsg += "contains DBMS error"
         logger.debug(debugMsg)
@@ -1016,7 +1016,7 @@ def checkWaf():
     if not conf.checkWaf:
         return False
 
-    infoMsg = "heuristic checking if the target is protected by "
+    infoMsg = "heuristically checking if the target is protected by "
     infoMsg += "some kind of WAF/IPS/IDS"
     logger.info(infoMsg)
 
