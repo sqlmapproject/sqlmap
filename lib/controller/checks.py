@@ -46,6 +46,7 @@ from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.decorators import cachedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
@@ -1024,9 +1025,15 @@ def checkWaf():
 
     backup = dict(conf.parameters)
 
+    payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
+
     conf.parameters = dict(backup)
     conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
-    conf.parameters[PLACE.GET] += "%s=%d %s" % (randomStr(), randomInt(), IDS_WAF_CHECK_PAYLOAD)
+    conf.parameters[PLACE.GET] += "%s=%s" % (randomStr(), payload)
+    import pdb
+    pdb.set_trace()
+
+    logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
 
     kb.matchRatio = None
     Request.queryPage()
