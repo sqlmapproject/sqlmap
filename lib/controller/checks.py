@@ -744,9 +744,13 @@ def heuristicCheckSqlInjection(place, parameter):
     while '\'' not in randStr:
         randStr = randomStr(length=10, alphabet=HEURISTIC_CHECK_ALPHABET)
 
+    kb.heuristicMode = True
+
     payload = "%s%s%s" % (prefix, randStr, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+
+    kb.heuristicMode = False
 
     parseFilePaths(page)
     result = wasLastResponseDBMSError()
