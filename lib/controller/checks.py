@@ -1030,8 +1030,6 @@ def checkWaf():
     conf.parameters = dict(backup)
     conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
     conf.parameters[PLACE.GET] += "%s=%s" % (randomStr(), payload)
-    import pdb
-    pdb.set_trace()
 
     logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
 
