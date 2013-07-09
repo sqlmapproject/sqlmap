@@ -40,6 +40,7 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
+from lib.core.settings import MAX_BISECTION_LENGTH
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
@@ -134,6 +135,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if length and (lastChar > 0 or firstChar > 0):
             length = min(length, lastChar or length) - firstChar
+
+        if length and length > MAX_BISECTION_LENGTH:
+            length = None
 
         showEta = conf.eta and isinstance(length, int)
         numThreads = min(conf.threads, length)

@@ -481,6 +481,9 @@ MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 # Maximum response total page size (trimmed if larger)
 MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
 
+# Maximum (multi-threaded) length of entry in bisection algorithm
+MAX_BISECTION_LENGTH = 50 * 1024 * 1024
+
 # Mark used for trimming unnecessary content in large chunks
 LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
 
