@@ -142,8 +142,7 @@ class Agent(object):
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
-            retVal = paramString.replace("%s=%s" % (parameter, origValue),
-                                         "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
+            retVal = re.sub(r"(\A|\b)%s=%s" % (parameter, origValue), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)), paramString)
 
         return retVal
 
