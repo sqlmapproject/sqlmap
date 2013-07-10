@@ -42,3 +42,5 @@ if __name__ == "__main__":
         server(args.host, args.port)
     elif args.client is True:
         client(args.host, args.port)
+    else:
+        apiparser.print_help()

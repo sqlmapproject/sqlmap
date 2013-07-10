@@ -98,16 +98,18 @@ class Task(object):
     def __init__(self, taskid):
         self.process = None
         self.output_directory = None
+        self.options = None
+        self._original_options = None
         self.initialize_options(taskid)
 
     def initialize_options(self, taskid):
-        dataype = {"boolean": False, "string": None, "integer": None, "float": None}
+        datatype = {"boolean": False, "string": None, "integer": None, "float": None}
         self.options = AttribDict()
 
         for _ in optDict:
             for name, type_ in optDict[_].items():
                 type_ = unArrayizeValue(type_)
-                self.options[name] = _defaults.get(name, dataype[type_])
+                self.options[name] = _defaults.get(name, datatype[type_])
 
         # Let sqlmap engine knows it is getting called by the API, the task ID and the file path of the IPC database
         self.options.api = True
@@ -119,6 +121,8 @@ class Task(object):
         self.options.disableColoring = True
         self.options.eta = False
 
+        self._original_options = AttribDict(self.options)
+
     def set_option(self, option, value):
         self.options[option] = value
 
@@ -127,6 +131,9 @@ class Task(object):
 
     def get_options(self):
         return self.options
+
+    def reset_options(self):
+        self.options = AttribDict(self._original_options)
 
     def set_output_directory(self):
         if not self.output_directory or not os.path.isdir(self.output_directory):
@@ -418,6 +425,8 @@ def scan_start(taskid):
 
     if taskid not in tasks:
         abort(500, "Invalid task ID")
+
+    tasks[taskid].reset_options()
 
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
