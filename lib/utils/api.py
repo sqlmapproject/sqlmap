@@ -187,8 +187,6 @@ class StdDbOut(object):
 
     def write(self, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
         if self.messagetype == "stdout":
-            insert = True
-
             if content_type is None:
                 if kb.partRun is not None:
                     content_type = PART_RUN_CONTENT_TYPES.get(kb.partRun)
@@ -205,14 +203,9 @@ class StdDbOut(object):
             if status == CONTENT_STATUS.COMPLETE:
                 if len(output) > 0:
                     for index in xrange(0, len(output)):
-                        if output[index][1] == CONTENT_STATUS.COMPLETE:
-                            insert = False
-                        else:
-                            conf.database_cursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
+                        conf.database_cursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
 
-                if insert:
-                    conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
-                                                 (self.taskid, status, content_type, jsonize(value)))
+                conf.database_cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
                 if kb.partRun:
                     kb.partRun = None
 
