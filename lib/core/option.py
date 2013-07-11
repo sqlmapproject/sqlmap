@@ -1466,7 +1466,7 @@ def _cleanupOptions():
     if conf.csvDel:
         conf.csvDel = conf.csvDel.decode("string_escape")  # e.g. '\\t' -> '\t'
 
-    if conf.torPort and conf.torPort.isdigit():
+    if conf.torPort and isinstance(conf.torPort, basestring) and conf.torPort.isdigit():
         conf.torPort = int(conf.torPort)
 
     if conf.torType:
