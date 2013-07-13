@@ -6,12 +6,24 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
-import gzip
 import logging
 import re
 import StringIO
 import struct
-import zlib
+
+try:
+    import gzip
+    import zlib
+except ImportError:
+    import lib.core.settings
+    from lib.core.data import logger
+
+    lib.core.settings.HTTP_ACCEPT_ENCODING_HEADER_VALUE = "identity"
+
+    errMsg = "turning off support for HTTP compressed encodings "
+    errMsg += "because of lack of python compression "
+    errMsg += "modules ('gzip, zlib')"
+    logger.critical(errMsg)
 
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
