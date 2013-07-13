@@ -6,24 +6,12 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
+import gzip
 import logging
 import re
 import StringIO
 import struct
-
-try:
-    import bz2
-    import gzip
-    import sqlite3
-    import zlib
-except ImportError, ex:
-    from lib.core.data import logger
-
-    errMsg = "missing one of core extensions (bz2, gzip, sqlite3, zlib) "
-    errMsg += "probably because current version of Python has been "
-    errMsg += "built without appropriate dev packages (e.g. libsqlite3-dev)"
-    logger.critical(errMsg)
-    raise SystemExit
+import zlib
 
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
