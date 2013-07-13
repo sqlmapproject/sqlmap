@@ -101,7 +101,7 @@ def main():
     except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
 
-    except SqlmapBaseException as e:
+    except SqlmapBaseException, e:
         e = getUnicode(e)
         logger.critical(e)
         sys.exit(1)
