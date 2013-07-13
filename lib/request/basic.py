@@ -19,9 +19,9 @@ try:
 except ImportError, ex:
     from lib.core.data import logger
 
-    errMsg = "missing core libraries (bz2, gzip, sqlite3, zlib) "
+    errMsg = "missing one of core extensions (bz2, gzip, sqlite3, zlib) "
     errMsg += "probably because current version of Python has been "
-    errMsg += "built without appropriate dev packages"
+    errMsg += "built without appropriate dev packages (e.g. libsqlite3-dev)"
     logger.critical(errMsg)
     raise SystemExit
 
