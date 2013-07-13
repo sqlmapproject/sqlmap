@@ -7,7 +7,6 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import bz2
 import os
 import sys
 
@@ -25,6 +24,8 @@ def hideAscii(data):
     return retVal
 
 def cloak(inputFile):
+    import bz2
+
     f = open(inputFile, 'rb')
     data = bz2.compress(f.read())
     f.close()
@@ -32,6 +33,8 @@ def cloak(inputFile):
     return hideAscii(data)
 
 def decloak(inputFile):
+    import bz2
+
     f = open(inputFile, 'rb')
     try:
         data = bz2.decompress(hideAscii(f.read()))
