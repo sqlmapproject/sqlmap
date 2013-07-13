@@ -12,18 +12,18 @@ import StringIO
 import struct
 
 try:
+    import bz2
     import gzip
+    import sqlite3
     import zlib
-except ImportError:
-    import lib.core.settings
+except ImportError, ex:
     from lib.core.data import logger
 
-    lib.core.settings.HTTP_ACCEPT_ENCODING_HEADER_VALUE = "identity"
-
-    errMsg = "turning off support for HTTP compressed encodings "
-    errMsg += "because of lack of python compression "
-    errMsg += "modules ('gzip, zlib')"
+    errMsg = "missing core libraries (bz2, gzip, sqlite3, zlib) "
+    errMsg += "probably because current version of Python has been "
+    errMsg += "built without appropriate dev packages"
     logger.critical(errMsg)
+    raise SystemExit
 
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
