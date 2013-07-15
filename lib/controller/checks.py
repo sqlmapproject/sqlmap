@@ -328,13 +328,14 @@ def checkSqlInjection(place, parameter, value):
                         # Use different page template than the original
                         # one as we are changing parameters value, which
                         # will likely result in a different content
+                        kb.data.setdefault("randomInt", str(randomInt(10)))
                         if conf.invalidLogical:
-                            _ = randomInt(2)
+                            _ = int(kb.data.randomInt[:2])
                             origValue = "%s AND %s=%s" % (value, _, _ + 1)
                         elif conf.invalidBignum:
-                            origValue = "%d.%d" % (randomInt(6), randomInt(1))
+                            origValue = "%s.%s" % (kb.data.randomInt[:6], kb.data.randomInt[0])
                         else:
-                            origValue = "-%s" % randomInt()
+                            origValue = "-%s" % kb.data.randomInt[:4]
                         templatePayload = agent.payload(place, parameter, value="", newValue=origValue, where=where)
                     elif where == PAYLOAD.WHERE.REPLACE:
                         origValue = ""
