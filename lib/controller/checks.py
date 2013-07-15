@@ -335,7 +335,7 @@ def checkSqlInjection(place, parameter, value):
                             origValue = "%d.%d" % (randomInt(6), randomInt(1))
                         else:
                             origValue = "-%s" % randomInt()
-                        templatePayload = agent.payload(place, parameter, newValue=origValue, where=where)
+                        templatePayload = agent.payload(place, parameter, value="", newValue=origValue, where=where)
                     elif where == PAYLOAD.WHERE.REPLACE:
                         origValue = ""
 
