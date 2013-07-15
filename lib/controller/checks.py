@@ -332,7 +332,7 @@ def checkSqlInjection(place, parameter, value):
                             _ = randomInt(2)
                             origValue = "%s AND %s=%s" % (value, _, _ + 1)
                         elif conf.invalidBignum:
-                            origValue = "%d.%d" % (randomInt(6), randomInt(1))
+                            origValue = randomInt(6)
                         else:
                             origValue = "-%s" % randomInt()
                         templatePayload = agent.payload(place, parameter, newValue=origValue, where=where)
