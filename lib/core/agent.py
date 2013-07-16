@@ -250,7 +250,7 @@ class Agent(object):
             payload = payload.replace(_, randomStr())
 
         if origValue is not None:
-            payload = payload.replace("[ORIGVALUE]", origValue if origValue.isdigit() else "'%s'" % origValue)
+            payload = payload.replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
 
         if "[INFERENCE]" in payload:
             if Backend.getIdentifiedDbms() is not None:
