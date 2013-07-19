@@ -20,6 +20,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -62,6 +63,12 @@ class Databases:
         if not kb.data.currentDb:
             kb.data.currentDb = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
 
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL):
+            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
+            warnMsg += "schema names for enumeration as the counterpart to database "
+            warnMsg += "names on other DBMSes"
+            singleTimeWarnMessage(warnMsg)
+
         return kb.data.currentDb
 
     def getDbs(self):
@@ -76,20 +83,14 @@ class Databases:
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        elif Backend.isDbms(DBMS.ORACLE):
-            warnMsg = "schema names are going to be used on Oracle "
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL):
+            warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             logger.warn(warnMsg)
 
             infoMsg = "fetching database (schema) names"
-        elif Backend.isDbms(DBMS.DB2):
-            warnMsg = "schema names are going to be used on IBM DB2 "
-            warnMsg += "for enumeration as the counterpart to database "
-            warnMsg += "names on other DBMSes"
-            logger.warn(warnMsg)
 
-            infoMsg = "fetching database (schema) names"
         else:
             infoMsg = "fetching database names"
 

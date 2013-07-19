@@ -143,7 +143,7 @@ class Dump(object):
     def currentDb(self, data):
         if Backend.isDbms(DBMS.MAXDB):
             self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
-        elif Backend.isDbms(DBMS.ORACLE):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL):
             self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         else:
             self.string("current database", data, content_type=CONTENT_TYPE.CURRENT_DB)

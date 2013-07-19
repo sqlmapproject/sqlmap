@@ -90,7 +90,7 @@
         <inference query="ASCII(SUBSTRING((%s)::text FROM %d FOR 1))>%d"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
-        <current_db query="CURRENT_DATABASE()"/>
+        <current_db query="CURRENT_SCHEMA()"/>
         <hostname/>
         <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
@@ -108,8 +108,8 @@
         </privileges>
         <roles/>
         <dbs>
-            <inband query="SELECT datname FROM pg_database"/>
-            <blind query="SELECT DISTINCT(datname) FROM pg_database OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database"/>
+            <inband query="SELECT schemaname FROM pg_tables"/>
+            <blind query="SELECT DISTINCT(schemaname) FROM pg_tables OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
         </dbs>
         <tables>
             <inband query="SELECT schemaname,tablename FROM pg_tables" condition="schemaname"/>

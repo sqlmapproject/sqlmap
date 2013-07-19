@@ -171,13 +171,3 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)
-
-    def forceDbmsEnum(self):
-        if conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
-            conf.db = "public"
-
-            warnMsg = "on %s it is possible to enumerate " % DBMS.PGSQL
-            warnMsg += "only on the current schema and/or system databases. "
-            warnMsg += "sqlmap is going to use 'public' schema as a "
-            warnMsg += "database name"
-            singleTimeWarnMessage(warnMsg)
