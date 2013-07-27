@@ -24,6 +24,8 @@
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
         <hostname query="@@HOSTNAME"/>
+        <table_comment query="SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' AND table_name='%s'"/>
+        <column_comment query="SELECT column_comment FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s' AND table_name='%s' AND column_name='%s'"/>
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0,1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0,1)='%s'"/>
         <users>
@@ -92,6 +94,9 @@
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_SCHEMA()"/>
         <hostname/>
+        <!--<table_comment query="SELECT pg_catalog.obj_description(c.oid) FROM pg_catalog.pg_class c WHERE c.relname='%s'"/>-->
+        <table_comment query="SELECT description FROM pg_description JOIN pg_class ON pg_description.objoid=pg_class.oid JOIN pg_namespace ON pg_class.relnamespace=pg_namespace.oid WHERE nspname='%s' AND relname='%s'"/>
+        <column_comment query="SELECT col_description(pg_class.oid,pg_attribute.attnum) FROM pg_class JOIN pg_namespace ON pg_class.relnamespace=pg_namespace.oid JOIN pg_attribute ON pg_class.oid=pg_attribute.attrelid WHERE nspname='%s' AND relname='%s' AND attname='%s'"/>
         <is_dba query="(SELECT usesuper=true FROM pg_user WHERE usename=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
         <users>
@@ -160,6 +165,8 @@
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
         <hostname query="@@SERVERNAME"/>
+        <table_comment query="SELECT value FROM fn_listextendedproperty(NULL,'schema','%s','table','%s',NULL,NULL)"/>
+        <column_comment query="SELECT value FROM fn_listextendedproperty(NULL,'schema','%s','table','%s','column','%s')"/>
         <is_dba query="IS_SRVROLEMEMBER('sysadmin')=1" query2="IS_SRVROLEMEMBER('sysadmin','%s')=1"/>
         <users>
             <inband query="SELECT name FROM master..syslogins" query2="SELECT name FROM sys.sql_logins"/>
@@ -234,6 +241,8 @@
              SELECT USERENV('ISDBA') FROM DUAL
         -->
         <hostname query="SELECT UTL_INADDR.get_host_name FROM DUAL"/>
+        <table_comment query="SELECT comments FROM user_tab_comments WHERE table_name='%s'"/>
+        <column_comment query="SELECT comments FROM user_col_comments WHERE table_name='%s' AND column_name='%s'"/>
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
