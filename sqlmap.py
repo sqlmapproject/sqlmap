@@ -101,9 +101,9 @@ def main():
     except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
 
-    except SqlmapBaseException, e:
-        e = getUnicode(e)
-        logger.critical(e)
+    except SqlmapBaseException, ex:
+        errMsg = getUnicode(ex.message)
+        logger.critical(errMsg)
         sys.exit(1)
 
     except KeyboardInterrupt:

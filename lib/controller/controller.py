@@ -598,14 +598,14 @@ def start():
         except SqlmapSilentQuitException:
             raise
 
-        except SqlmapBaseException, e:
-            e = getUnicode(e)
+        except SqlmapBaseException, ex:
+            errMsg = getUnicode(ex.message)
 
             if conf.multipleTargets:
-                e += ", skipping to the next %s" % ("form" if conf.forms else "URL")
-                logger.error(e)
+                errMsg += ", skipping to the next %s" % ("form" if conf.forms else "URL")
+                logger.error(errMsg)
             else:
-                logger.critical(e)
+                logger.critical(errMsg)
                 return False
 
         finally:
