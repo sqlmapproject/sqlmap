@@ -931,7 +931,7 @@ Switch: `--hostname`
 
 Switch: `--is-dba`
 
-It is possible to detect if the current database management system session user is a database administrator, also known as DBA. sqlmap will return `True` if it is, viceversa `False`. 
+It is possible to detect if the current database management system session user is a database administrator, also known as DBA. sqlmap will return `True` if it is, vice versa `False`. 
 
 ### List database management system users
 
@@ -1845,7 +1845,7 @@ Option: `--alert`
 
 Option: `--answers`
 
-In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be splitted with delimiter character `,`.
+In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be split with delimiter character `,`.
 
 Example against a MySQL target:
 
