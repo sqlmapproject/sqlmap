@@ -240,9 +240,9 @@
              NOTE: in Oracle to check if the session user is DBA you can use:
              SELECT USERENV('ISDBA') FROM DUAL
         -->
-        <hostname query="SELECT UTL_INADDR.get_host_name FROM DUAL"/>
-        <table_comment query="SELECT comments FROM user_tab_comments WHERE table_name='%s'"/>
-        <column_comment query="SELECT comments FROM user_col_comments WHERE table_name='%s' AND column_name='%s'"/>
+        <hostname query="SELECT UTL_INADDR.GET_HOST_NAME FROM DUAL"/>
+        <table_comment query="SELECT COMMENTS FROM ALL_TAB_COMMENTS WHERE OWNER='%s' AND TABLE_NAME='%s'"/>
+        <column_comment query="SELECT COMMENTS FROM ALL_COL_COMMENTS WHERE OWNER='%s' AND TABLE_NAME='%s' AND COLUMN_NAME='%s'"/>
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
@@ -324,6 +324,8 @@
         <current_user/>
         <current_db/>
         <hostname/>
+        <table_comment/>
+        <column_comment/>
         <is_dba/>
         <check_udf/>
         <users/>
@@ -374,6 +376,8 @@
         <current_user/>
         <current_db/>
         <hostname/>
+        <table_comment/>
+        <column_comment/>
         <is_dba/>
         <dbs/>
         <!--MSysObjects have no read permission by default-->
@@ -415,6 +419,8 @@
         <current_user query="SELECT CURRENT_USER FROM RDB$DATABASE"/>
         <current_db query="SELECT RDB$GET_CONTEXT('SYSTEM','DB_NAME') FROM RDB$DATABASE"/>
         <hostname/>
+        <table_comment/>
+        <column_comment/>
         <is_dba query="CURRENT_USER='SYSDBA'"/>
         <users>
             <inband query="SELECT RDB$USER FROM RDB$USER_PRIVILEGES"/>
@@ -471,6 +477,8 @@
         <current_user query="SELECT USER() FROM DUAL"/>
         <current_db query="SELECT DATABASE() FROM DUAL"/>
         <hostname/>
+        <table_comment/>
+        <column_comment/>
         <is_dba/>
         <users>
             <inband query="SELECT username FROM domain.users"/>
@@ -521,6 +529,8 @@
         <current_user query="SELECT SUSER_NAME()"/>
         <current_db query="SELECT DB_NAME()"/>
         <hostname/>
+        <table_comment/>
+        <column_comment/>
         <is_dba query="PATINDEX('%sa_role%',SHOW_ROLE())>0" query2="EXISTS(SELECT * FROM master..syslogins,master..sysloginroles WHERE srid=0 and name='%s')"/>
         <users>
             <inband query="SELECT name FROM master..syslogins"/>
@@ -592,6 +602,8 @@
         <!-- NOTE: On DB2 we use the current user as default schema (database) -->
         <current_db query="SELECT current server FROM SYSIBM.SYSDUMMY1"/>
         <hostname query="SELECT host_name FROM TABLE(sysproc.env_get_sys_info())"/>
+        <table_comment/>
+        <column_comment/>
         <is_dba query="(SELECT dbadmauth FROM syscat.dbauth WHERE grantee=current user)='Y'"/>
         <users>
             <inband query="SELECT grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
@@ -657,6 +669,8 @@
         <current_user query="CURRENT_USER"/>
         <current_db query="DATABASE()"/>
         <hostname/>
+        <table_comment/>
+        <column_comment/>
         <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER=CURRENT_USER"/>
         <check_udf/>
         <users>

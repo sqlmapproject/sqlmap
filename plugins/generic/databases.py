@@ -554,6 +554,19 @@ class Databases:
                             name = safeSQLIdentificatorNaming(columnData[0])
 
                             if name:
+                                if conf.getComments:
+                                    _ = queries[Backend.getIdentifiedDbms()].column_comment
+                                    if hasattr(_, "query"):
+                                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                            query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(name.upper()))
+                                        else:
+                                            query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(name))
+                                        comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+                                    else:
+                                        warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
+                                        warnMsg += "possible to get column comments"
+                                        singleTimeWarnMessage(warnMsg)
+
                                 if len(columnData) == 1:
                                     columns[name] = None
                                 else:
@@ -666,6 +679,19 @@ class Databases:
                     column = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                     if not isNoneValue(column):
+                        if conf.getComments:
+                            _ = queries[Backend.getIdentifiedDbms()].column_comment
+                            if hasattr(_, "query"):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                    query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(column.upper()))
+                                else:
+                                    query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(column))
+                                comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                            else:
+                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
+                                warnMsg += "possible to get column comments"
+                                singleTimeWarnMessage(warnMsg)
+
                         if not onlyColNames:
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))

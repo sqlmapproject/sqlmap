@@ -386,6 +386,9 @@ def cmdLineParser():
         enumeration.add_option("--search", dest="search", action="store_true",
                                help="Search column(s), table(s) and/or database name(s)")
 
+        enumeration.add_option("--comments", dest="getComments", action="store_true",
+                               help="Retrieve DBMS comments")
+
         enumeration.add_option("-D", dest="db",
                                help="DBMS database to enumerate")
 
