@@ -1380,6 +1380,10 @@ def _cleanupOptions():
     else:
         conf.progressWidth = width - 46
 
+    for key, value in conf.items():
+        if value and any(key.endswith(_) for _ in ("Path", "File")):
+            conf[key] = os.path.expanduser(value)
+
     if conf.testParameter:
         conf.testParameter = urldecode(conf.testParameter)
         conf.testParameter = conf.testParameter.replace(" ", "")
