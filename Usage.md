@@ -1845,7 +1845,7 @@ Option: `--alert`
 
 Option: `--answers`
 
-In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be splitted with delimiter character `;`.
+In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be splitted with delimiter character `,`.
 
 Example against a MySQL target:
 
