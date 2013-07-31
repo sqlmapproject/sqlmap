@@ -25,6 +25,7 @@
         --data=DATA         Data string to be sent through POST
         --param-del=PDEL    Character used for splitting parameter values
         --cookie=COOKIE     HTTP Cookie header
+        --cookie-del=CDEL   Character used for splitting cookie values
         --load-cookies=L..  File containing cookies in Netscape/wget format
         --drop-set-cookie   Ignore Set-Cookie header from response
         --user-agent=AGENT  HTTP User-Agent header
@@ -350,9 +351,9 @@ For example:
 
 **TODO**: needs updating.
 
-Options and switch: `--cookie`, `--load-cookies` and `--drop-set-cookie`
+Options and switch: `--cookie`, `--cookie-del`, `--load-cookies` and `--drop-set-cookie`
 
-These switches can be useful in two ways:
+These options and switches can be used in two situations:
 
 * The web application requires authentication based upon cookies and you have such data.
 * You want to detect and exploit SQL injection on such header values.
@@ -363,7 +364,7 @@ Either reason brings you to need to send cookies with sqlmap requests, the steps
 * Get the HTTP Cookie from the browser's preferences or from the HTTP proxy screen and copy to the clipboard.
 * Go back to your shell and run sqlmap by pasting your clipboard as value of the option `--cookie`.
 
-Note that the HTTP `Cookie` header values are usually separated by a `;` character, **not** by an `&`. sqlmap can recognize these as separate sets of `parameter=value` too, as well as GET and POST parameters.
+Note that the HTTP `Cookie` header values are usually separated by a `;` character, **not** by an `&`. sqlmap can recognize these as separate sets of `parameter=value` too, as well as GET and POST parameters. In case that the separation character is other than `;` it can be specified by using option `--cookie-del`.
 
 If at any time during the communication, the web application responds with `Set-Cookie` headers, sqlmap will automatically use its value in all further HTTP requests as the `Cookie` header. sqlmap will also automatically test those values for SQL injection. This can be avoided by providing the switch `--drop-set-cookie` - sqlmap will ignore any coming `Set-Cookie` header.
 
