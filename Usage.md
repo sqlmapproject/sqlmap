@@ -361,7 +361,7 @@ Either reason brings you to need to send cookies with sqlmap requests, the steps
 
 * Login to the application with your favourite browser.
 * Get the HTTP Cookie from the browser's preferences or from the HTTP proxy screen and copy to the clipboard.
-* Go back to your shell and run sqlmap by pasting your clipboard as the argument of the option `--cookie`.
+* Go back to your shell and run sqlmap by pasting your clipboard as value of the option `--cookie`.
 
 Note that the HTTP `Cookie` header values are usually separated by a `;` character, **not** by an `&`. sqlmap can recognize these as separate sets of `parameter=value` too, as well as GET and POST parameters.
 
@@ -720,7 +720,7 @@ sqlmap itself does no obfuscation of the payload sent, except for strings betwee
 
 This option can be very useful and powerful in situations where there is a weak input validation mechanism between you and the back-end database management system. This mechanism usually is a self-developed input validation routine called by the application source code, an expensive enterprise-grade IPS appliance or a web application firewall (WAF). All buzzwords to define the same concept, implemented in a different way and costing lots of money, usually. 
 
-To take advantage of this option, provide sqlmap with a comma-separated list of tamper scripts and this will process the payload and return it transformed. You can define your own tamper scripts, use sqlmap ones from the `tamper/` folder or edit them as long as you concatenate them comma-separated as the argument of option `--tamper`. 
+To take advantage of this option, provide sqlmap with a comma-separated list of tamper scripts and this will process the payload and return it transformed. You can define your own tamper scripts, use sqlmap ones from the `tamper/` folder or edit them as long as you concatenate them comma-separated as value of the option `--tamper` (e.g. `--tamper="between,randomcase"`). 
 
 The format of a valid tamper script is as follows:
 
