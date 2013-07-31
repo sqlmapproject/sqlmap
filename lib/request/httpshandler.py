@@ -54,7 +54,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
                 else:
                     sock.close()
             except ssl.SSLError, errMsg:
-                logger.debug("SSL connection error occured ('%s')" % errMsg)
+                logger.debug("SSL connection error occurred ('%s')" % errMsg)
 
         if not success:
             raise SqlmapConnectionException("can't establish SSL connection")

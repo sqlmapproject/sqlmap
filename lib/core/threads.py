@@ -140,7 +140,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             try:
                 thread.start()
             except threadError, errMsg:
-                errMsg = "error occured while starting new thread ('%s')" % errMsg
+                errMsg = "error occurred while starting new thread ('%s')" % errMsg
                 logger.critical(errMsg)
                 break
 

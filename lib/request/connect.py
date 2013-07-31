@@ -434,7 +434,7 @@ class Connect(object):
                         conn.fp._sock.close()
                     conn.close()
                 except Exception, msg:
-                    warnMsg = "problem occured during connection closing ('%s')" % msg
+                    warnMsg = "problem occurred during connection closing ('%s')" % msg
                     logger.warn(warnMsg)
 
         except urllib2.HTTPError, e:

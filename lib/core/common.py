@@ -2739,7 +2739,7 @@ def decodeIntToUnicode(value):
 
 def unhandledExceptionMessage():
     """
-    Returns detailed message about occured unhandled exception
+    Returns detailed message about occurred unhandled exception
     """
 
     errMsg = "unhandled exception in %s, retry your " % VERSION_STRING
@@ -3372,7 +3372,7 @@ def evaluateCode(code, variables=None):
     except KeyboardInterrupt:
         raise
     except Exception, ex:
-        errMsg = "an error occured while evaluating provided code ('%s'). " % ex
+        errMsg = "an error occurred while evaluating provided code ('%s'). " % ex
         raise SqlmapGenericException(errMsg)
 
 def serializeObject(object_):

@@ -90,7 +90,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
 
     if kb.nullConnection and pageLength:
         if not seqMatcher.a:
-            errMsg = "problem occured while retrieving original page content "
+            errMsg = "problem occurred while retrieving original page content "
             errMsg += "which prevents sqlmap from continuation. Please rerun, "
             errMsg += "and if the problem persists turn off any optimization switches"
             raise SqlmapNoneDataException(errMsg)

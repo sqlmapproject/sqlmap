@@ -495,7 +495,7 @@ def _setCrawler():
                     status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except Exception, ex:
-                errMsg = "problem occured while crawling at '%s' ('%s')" % (target, ex)
+                errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, ex)
                 logger.error(errMsg)
 
 def _setGoogleDorking():
@@ -625,7 +625,7 @@ def _findPageForms():
                     status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except Exception, ex:
-                errMsg = "problem occured while searching for forms at '%s' ('%s')" % (target, ex)
+                errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, ex)
                 logger.error(errMsg)
 
 def _setDBMSAuthentication():
