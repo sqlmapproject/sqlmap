@@ -752,7 +752,7 @@ class Connect(object):
                         evaluateCode("%s=%s" % (name, repr(value)), variables)
 
             if cookie:
-                for part in cookie.split(conf.pDel or DEFAULT_COOKIE_DELIMITER):
+                for part in cookie.split(conf.cDel or DEFAULT_COOKIE_DELIMITER):
                     if '=' in part:
                         name, value = part.split('=', 1)
                         value = urldecode(value, convall=True)
@@ -770,7 +770,7 @@ class Connect(object):
                         elif re.search(r"\b%s=" % name, (post or "")):
                             post = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, post)
                         elif re.search(r"\b%s=" % name, (cookie or "")):
-                            cookie = re.sub("((\A|\W)%s=)([^%s]+)" % (name, conf.pDel or DEFAULT_COOKIE_DELIMITER), "\g<1>%s" % value, cookie)
+                            cookie = re.sub("((\A|\W)%s=)([^%s]+)" % (name, conf.cDel or DEFAULT_COOKIE_DELIMITER), "\g<1>%s" % value, cookie)
                         elif post is not None:
                             post += "%s%s=%s" % (delimiter, name, value)
                         else:

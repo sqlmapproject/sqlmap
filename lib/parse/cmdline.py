@@ -82,6 +82,9 @@ def cmdLineParser():
         request.add_option("--cookie", dest="cookie",
                            help="HTTP Cookie header")
 
+        request.add_option("--cookie-del", dest="cDel",
+                           help="Character used for splitting cookie values")
+
         request.add_option("--load-cookies", dest="loadCookies",
                            help="File containing cookies in Netscape/wget format")
 

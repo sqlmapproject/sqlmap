@@ -533,7 +533,10 @@ def paramToDict(place, parameters=None):
 
     parameters = parameters.replace(", ", ",")
     parameters = re.sub(r"&(\w{1,4});", r"%s\g<1>%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), parameters)
-    splitParams = parameters.split(conf.pDel or (DEFAULT_COOKIE_DELIMITER if place == PLACE.COOKIE else DEFAULT_GET_POST_DELIMITER))
+    if place == PLACE.COOKIE:
+        splitParams = parameters.split(conf.cDel or DEFAULT_COOKIE_DELIMITER)
+    else:
+        splitParams = parameters.split(conf.pDel or DEFAULT_GET_POST_DELIMITER)
 
     for element in splitParams:
         element = re.sub(r"%s(.+?)%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), r"&\g<1>;", element)
