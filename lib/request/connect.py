@@ -66,6 +66,7 @@ from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
+from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
@@ -750,6 +751,13 @@ class Connect(object):
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
                         evaluateCode("%s=%s" % (name, repr(value)), variables)
 
+            if cookie:
+                for part in cookie.split(conf.pDel or DEFAULT_COOKIE_DELIMITER):
+                    if '=' in part:
+                        name, value = part.split('=', 1)
+                        value = urldecode(value, convall=True)
+                        evaluateCode("%s=%s" % (name, repr(value)), variables)
+
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
 
@@ -757,10 +765,12 @@ class Connect(object):
                 if name != "__builtins__" and originals.get(name, "") != value:
                     if isinstance(value, (basestring, int)):
                         value = unicode(value)
-                        if '%s=' % name in (get or ""):
+                        if re.search(r"\b%s=" % name, (get or "")):
                             get = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, get)
-                        elif '%s=' % name in (post or ""):
+                        elif re.search(r"\b%s=" % name, (post or "")):
                             post = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, post)
+                        elif re.search(r"\b%s=" % name, (cookie or "")):
+                            cookie = re.sub("((\A|\W)%s=)([^%s]+)" % (name, conf.pDel or DEFAULT_COOKIE_DELIMITER), "\g<1>%s" % value, cookie)
                         elif post is not None:
                             post += "%s%s=%s" % (delimiter, name, value)
                         else:
