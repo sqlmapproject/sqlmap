@@ -426,7 +426,7 @@ def checkSqlInjection(place, parameter, value):
                                         injectable = True
 
                             except SqlmapConnectionException, msg:
-                                debugMsg = "problem occured most likely because the "
+                                debugMsg = "problem occurred most likely because the "
                                 debugMsg += "server hasn't recovered as expected from the "
                                 debugMsg += "error-based payload used ('%s')" % msg
                                 logger.debug(debugMsg)
@@ -1098,7 +1098,7 @@ def identifyWaf():
             logger.debug("checking for WAF/IDS/IPS product '%s'" % product)
             found = function(_)
         except Exception, ex:
-            errMsg = "exception occured while running "
+            errMsg = "exception occurred while running "
             errMsg += "WAF script for '%s' ('%s')" % (product, ex)
             logger.critical(errMsg)
 
@@ -1181,6 +1181,10 @@ def checkConnection(suppressOutput=False):
             socket.getaddrinfo(conf.hostname, None)
         except socket.gaierror:
             errMsg = "host '%s' does not exist" % conf.hostname
+            raise SqlmapConnectionException(errMsg)
+        except socket.error, ex:
+            errMsg = "problem occurred while "
+            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, str(ex))
             raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput and not conf.dummy:
