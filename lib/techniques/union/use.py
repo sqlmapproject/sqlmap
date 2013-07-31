@@ -184,7 +184,8 @@ def unionUse(expression, unpack=True, dump=False):
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
        not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE \
        and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
-       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+       and not re.search(SQL_SCALAR_REGEX, expression, re.I)\
+       or kb.forcePartialUnion:
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:

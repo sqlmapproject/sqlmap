@@ -1601,6 +1601,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.errorIsNone = True
     kb.fileReadMode = False
     kb.forcedDbms = None
+    kb.forcePartialUnion = False
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicMode = False
