@@ -380,7 +380,7 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = ("gif", "jpg", "jar", "tif", "bmp", "war", "ear", "mpg", "wmv", "mpeg", "scm", "iso", "dmp", "dll", "cab", "so", "avi", "bin", "exe", "iso", "tar", "png", "pdf", "ps", "mp3", "zip", "rar", "gz")
+CRAWL_EXCLUDE_EXTENSIONS = ("gif", "jpg", "jpeg", "image", "jar", "tif", "bmp", "war", "ear", "mpg", "mpeg", "wmv", "mpeg", "scm", "iso", "dmp", "dll", "cab", "so", "avi", "mkv", "bin", "exe", "iso", "tar", "png", "pdf", "ps", "wav", "mp3", "mp4", "au", "aiff", "aac", "zip", "rar", "7z", "gz", "flv", "mov")
 
 # Patterns often seen in HTTP headers containing custom injection marking character
 PROBLEMATIC_CUSTOM_INJECTION_PATTERNS = r"(\bq=[^;']+)|(\*/\*)"
