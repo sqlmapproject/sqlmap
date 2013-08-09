@@ -121,14 +121,14 @@ def cmdLineParser():
                                 "key_file,cert_file)")
 
         request.add_option("--proxy", dest="proxy",
-                           help="Use a HTTP proxy to connect to the target URL")
+                           help="Use a proxy to connect to the target URL")
 
         request.add_option("--proxy-cred", dest="pCred",
-                           help="HTTP proxy authentication credentials "
+                           help="Proxy authentication credentials "
                                 "(name:password)")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
-                           help="Ignore system default HTTP proxy")
+                           help="Ignore system default proxy settings")
 
         request.add_option("--tor", dest="tor",
                                   action="store_true",
