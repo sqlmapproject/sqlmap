@@ -180,7 +180,7 @@ def _urllib2Opener():
         if conf.proxy:
             warnMsg += "with HTTP(s) proxy"
             logger.warn(warnMsg)
-        elif conf.aType:
+        elif conf.authType:
             warnMsg += "with authentication methods"
             logger.warn(warnMsg)
         else:
@@ -1011,8 +1011,8 @@ def _setHTTPProxy():
         errMsg = "proxy value must be in format '(%s)://url:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.pCred:
-        _ = re.search("^(.*?):(.*?)$", conf.pCred)
+    if conf.proxyCred:
+        _ = re.search("^(.*?):(.*?)$", conf.proxyCred)
         if not _:
             errMsg = "Proxy authentication credentials "
             errMsg += "value must be in format username:password"
@@ -1025,9 +1025,9 @@ def _setHTTPProxy():
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
         socks.wrapmodule(urllib2)
     else:
-        if conf.pCred:
+        if conf.proxyCred:
             # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
-            proxyString = "%s@" % conf.pCred
+            proxyString = "%s@" % conf.proxyCred
         else:
             proxyString = ""
 
@@ -1097,24 +1097,24 @@ def _setHTTPAuthentication():
 
     global authHandler
 
-    if not conf.aType and not conf.aCred and not conf.aCert:
+    if not conf.authType and not conf.authCred and not conf.authCert:
         return
 
-    elif conf.aType and not conf.aCred and not conf.aCert:
+    elif conf.authType and not conf.authCred and not conf.authCert:
         errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise SqlmapSyntaxException(errMsg)
 
-    elif not conf.aType and conf.aCred:
+    elif not conf.authType and conf.authCred:
         errMsg = "you specified the HTTP authentication credentials, "
         errMsg += "but did not provide the type"
         raise SqlmapSyntaxException(errMsg)
 
-    if not conf.aCert:
+    if not conf.authCert:
         debugMsg = "setting the HTTP authentication type and credentials"
         logger.debug(debugMsg)
 
-        aTypeLower = conf.aType.lower()
+        aTypeLower = conf.authType.lower()
 
         if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.CERT):
             errMsg = "HTTP authentication type value must be "
@@ -1133,7 +1133,7 @@ def _setHTTPAuthentication():
             errMsg += "usage of option `--auth-cert`"
             raise SqlmapSyntaxException(errMsg)
 
-        aCredRegExp = re.search(regExp, conf.aCred)
+        aCredRegExp = re.search(regExp, conf.authCred)
 
         if not aCredRegExp:
             raise SqlmapSyntaxException(errMsg)
@@ -1165,7 +1165,7 @@ def _setHTTPAuthentication():
         debugMsg = "setting the HTTP(s) authentication certificate"
         logger.debug(debugMsg)
 
-        aCertRegExp = re.search("^(.+?),\s*(.+?)$", conf.aCert)
+        aCertRegExp = re.search("^(.+?),\s*(.+?)$", conf.authCert)
 
         if not aCertRegExp:
             errMsg = "HTTP authentication certificate option "

@@ -3423,8 +3423,8 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/basic/get_int.php?id=1"/>
             <tech value="E"/>
-            <aType value="Basic"/>
-            <aCred value="testuser:testpass"/>
+            <authType value="Basic"/>
+            <authCred value="testuser:testpass"/>
             <getBanner value="True"/>
         </switches>
         <parse>
@@ -3435,8 +3435,8 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/digest/get_int.php?id=1"/>
             <tech value="E"/>
-            <aType value="Digest"/>
-            <aCred value="testuser:testpass"/>
+            <authType value="Digest"/>
+            <authCred value="testuser:testpass"/>
             <getBanner value="True"/>
         </switches>
         <parse>

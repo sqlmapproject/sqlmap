@@ -108,24 +108,27 @@ def cmdLineParser():
         request.add_option("--headers", dest="headers",
                            help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
 
-        request.add_option("--auth-type", dest="aType",
+        request.add_option("--auth-type", dest="authType",
                            help="HTTP authentication type "
                                 "(Basic, Digest, NTLM or Cert)")
 
-        request.add_option("--auth-cred", dest="aCred",
+        request.add_option("--auth-cred", dest="authCred",
                            help="HTTP authentication credentials "
                                 "(name:password)")
 
-        request.add_option("--auth-cert", dest="aCert",
+        request.add_option("--auth-cert", dest="authCert",
                            help="HTTP authentication certificate ("
                                 "key_file,cert_file)")
 
         request.add_option("--proxy", dest="proxy",
                            help="Use a proxy to connect to the target URL")
 
-        request.add_option("--proxy-cred", dest="pCred",
+        request.add_option("--proxy-cred", dest="proxyCred",
                            help="Proxy authentication credentials "
                                 "(name:password)")
+
+        request.add_option("--proxy-file", dest="proxyFile",
+                           help="Load proxy list from a file")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            help="Ignore system default proxy settings")
