@@ -42,10 +42,10 @@ class Connector(GenericConnector):
         try:
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
-        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError):
+        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError):
             try:
                 self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password)
-            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError), msg:
+            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError), msg:
                 raise SqlmapConnectionException(msg)
 
         self.initCursor()

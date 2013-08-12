@@ -2244,7 +2244,10 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
         dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
 def getPageTemplate(payload, place):  # Cross-linked function
-    pass
+    raise NotImplementedError
+
+def setHTTPProxy():  # Cross-linked function
+    raise NotImplementedError
 
 def getPublicTypeMembers(type_, onlyValues=False):
     """

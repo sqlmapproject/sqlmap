@@ -149,7 +149,7 @@ from xml.etree.ElementTree import ElementTree
 authHandler = urllib2.BaseHandler()
 httpsHandler = HTTPSHandler()
 keepAliveHandler = keepalive.HTTPHandler()
-proxyHandler = urllib2.BaseHandler()
+proxyHandler = urllib2.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
 
@@ -981,21 +981,23 @@ def _setHTTPProxy():
     Check and set the HTTP/SOCKS proxy for all HTTP requests.
     """
 
-    global proxyHandler
-
     if not conf.proxy:
-        if conf.hostname in ('localhost', '127.0.0.1') or conf.ignoreProxy:
-            proxyHandler = urllib2.ProxyHandler({})
+        if conf.proxyList:
+            conf.proxy = conf.proxyList[0]
+            conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
+        else:
+            if conf.hostname in ('localhost', '127.0.0.1') or conf.ignoreProxy:
+                proxyHandler.proxies = {}
 
-        return
+            return
 
     debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
     logger.debug(debugMsg)
 
-    proxySplit = urlparse.urlsplit(conf.proxy)
-    hostnamePort = proxySplit.netloc.split(":")
+    _ = urlparse.urlsplit(conf.proxy)
+    hostnamePort = _.netloc.split(":")
 
-    scheme = proxySplit.scheme.upper()
+    scheme = _.scheme.upper()
     hostname = hostnamePort[0]
     port = None
     username = None
@@ -1022,9 +1024,13 @@ def _setHTTPProxy():
             password = _.group(2)
 
     if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
+        proxyHandler.proxies = {}
+
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
         socks.wrapmodule(urllib2)
     else:
+        socks.unwrapmodule(urllib2)
+
         if conf.proxyCred:
             # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
             proxyString = "%s@" % conf.proxyCred
@@ -1032,7 +1038,9 @@ def _setHTTPProxy():
             proxyString = ""
 
         proxyString += "%s:%d" % (hostname, port)
-        proxyHandler = urllib2.ProxyHandler({"http": proxyString, "https": proxyString})
+        proxyHandler.proxies = {"http": proxyString, "https": proxyString}
+
+    proxyHandler.__init__(proxyHandler.proxies)
 
 def _setSafeUrl():
     """
@@ -1540,6 +1548,7 @@ def _setConfAttributes():
     conf.parameters = {}
     conf.path = None
     conf.port = None
+    conf.proxyList = []
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
@@ -1908,6 +1917,12 @@ def _setDNSServer():
         errMsg += "for incoming address resolution attempts"
         raise SqlmapMissingPrivileges(errMsg)
 
+def _setProxyList():
+    if not conf.proxyFile:
+        return
+
+    conf.proxyList = getFileItems(conf.proxyFile)
+
 def _setTorProxySettings():
     if not conf.tor:
         return
@@ -2154,8 +2169,11 @@ def _basicOptionValidation():
             raise SqlmapFilePathException(errMsg)
 
 def _resolveCrossReferences():
+    import pdb
+    pdb.set_trace()
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
+    lib.core.common.setHTTPProxy = _setHTTPProxy
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
@@ -2180,6 +2198,7 @@ def init():
     _purgeOutput()
     _checkDependencies()
     _basicOptionValidation()
+    _setProxyList()
     _setTorProxySettings()
     _setDNSServer()
     _adjustLoggingFormatter()

@@ -37,6 +37,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
+from lib.core.common import setHTTPProxy
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
@@ -106,6 +107,14 @@ class Connect(object):
     def _retryProxy(**kwargs):
         threadData = getCurrentThreadData()
         threadData.retriesCount += 1
+
+        if threadData.retriesCount >= conf.retries:
+            warnMsg = "changing proxy"
+            logger.warn(warnMsg)
+
+            conf.proxy = conf.proxyList[0]
+            conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
+            setHTTPProxy()
 
         if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
             # timed based payloads can cause web server unresponsiveness

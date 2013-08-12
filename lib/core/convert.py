@@ -133,7 +133,7 @@ def htmlunescape(value):
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function
-    pass
+    raise NotImplementedError
 
 def stdoutencode(data):
     retVal = None
