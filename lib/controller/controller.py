@@ -289,7 +289,7 @@ def start():
 
             if testSqlInj and conf.hostname in kb.vulnHosts:
                 if kb.skipVulnHost is None:
-                    message = "vulnerability has already been detected "
+                    message = "SQL injection vulnerability has already been detected "
                     message += "against '%s'. Do you want to skip " % conf.hostname
                     message += "further tests involving it? [Y/n]"
                     kb.skipVulnHost = readInput(message, default="Y").upper() != 'N'
