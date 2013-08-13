@@ -44,7 +44,7 @@ def cmdLineParser():
 
         parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
-
+        
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
                              "options has to be provided to set the target(s)")
@@ -286,6 +286,11 @@ def cmdLineParser():
         detection.add_option("--titles", dest="titles",
                              action="store_true",
                              help="Compare pages based only on their titles")
+
+
+        detection.add_option("--detect-all", dest="detectAll",
+                             action="store_true",
+                             help="Test all targets and all parameters even if a SQL injection was discovered")
 
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can be "

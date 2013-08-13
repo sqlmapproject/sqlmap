@@ -124,7 +124,15 @@ def _selectInjection():
         kb.injection = kb.injections[index]
 
 def _formatInjection(inj):
-    data = "Place: %s\n" % inj.place
+    if conf.detectAll:
+        data = 'Url: ' + inj.target + '\n'
+    else:
+        data = ""
+    if conf.detectAll:
+        data += "    "
+    data += "Place: %s\n" % inj.place
+    if conf.detectAll:
+        data += "    "
     data += "Parameter: %s\n" % inj.parameter
 
     for stype, sdata in inj.data.items():
@@ -142,9 +150,17 @@ def _formatInjection(inj):
                 title = title.replace("columns", "column")
         elif comment:
             vector = "%s%s" % (vector, comment)
+        if conf.detectAll:
+            data += "    "
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
+        if conf.detectAll:
+            data += "    "
         data += "    Title: %s\n" % title
+        if conf.detectAll:
+            data += "    "
         data += "    Payload: %s\n" % urldecode(payload, unsafe="&", plusspace=(inj.place == PLACE.POST and kb.postSpaceToPlus))
+        if conf.detectAll:
+            data += "   "
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
@@ -289,7 +305,7 @@ def start():
 
             testSqlInj &= conf.hostname not in kb.vulnHosts
 
-            if not testSqlInj:
+            if not conf.detectAll and not testSqlInj:
                 infoMsg = "skipping '%s'" % targetUrl
                 logger.info(infoMsg)
                 continue
@@ -424,7 +440,7 @@ def start():
                         testSqlInj = True
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
-                        if paramKey in kb.testedParams:
+                        if paramKey in kb.testedParams and not conf.detectAll:
                             testSqlInj = False
 
                             infoMsg = "skipping previously processed %s parameter '%s'" % (place, parameter)
@@ -478,7 +494,7 @@ def start():
                             infoMsg += "parameter '%s'" % parameter
                             logger.info(infoMsg)
 
-                            injection = checkSqlInjection(place, parameter, value)
+                            injection = checkSqlInjection(place, parameter, value, targetUrl)
                             proceed = not kb.endDetection
 
                             if injection is not None and injection.place is not None:

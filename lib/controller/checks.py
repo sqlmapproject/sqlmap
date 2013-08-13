@@ -72,11 +72,12 @@ from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
 
-def checkSqlInjection(place, parameter, value):
+def checkSqlInjection(place, parameter, value, targetUrl):
     # Store here the details about boundaries and payload used to
     # successfully inject
     injection = InjectionDict()
 
+    injection.target = targetUrl
     # Localized thread data needed for some methods
     threadData = getCurrentThreadData()
 
