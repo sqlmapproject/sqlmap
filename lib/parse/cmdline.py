@@ -287,6 +287,11 @@ def cmdLineParser():
                              action="store_true",
                              help="Compare pages based only on their titles")
 
+
+        detection.add_option("--detect-all", dest="detectAll",
+                             action="store_true",
+                             help="Test all targets and all parameters even if a SQL injection was discovered")
+
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can be "
                                  "used to tweak testing of specific SQL "
