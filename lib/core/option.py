@@ -1673,6 +1673,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.resumeValues = True
     kb.safeCharEncode = False
     kb.singleLogFlags = set()
+    kb.skipVulnHost = None
     kb.reduceTests = None
     kb.stickyDBMS = False
     kb.stickyLevel = None

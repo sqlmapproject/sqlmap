@@ -287,7 +287,13 @@ def start():
                 if paramKey not in kb.testedParams:
                     testSqlInj = True
 
-            testSqlInj &= conf.hostname not in kb.vulnHosts
+            if testSqlInj and conf.hostname in kb.vulnHosts:
+                if kb.skipVulnHost is None:
+                    message = "vulnerability has already been detected "
+                    message += "against '%s'. Do you want to skip " % conf.hostname
+                    message += "further tests involving it? [Y/n]"
+                    kb.skipVulnHost = readInput(message, default="Y").upper() != 'N'
+                testSqlInj = not kb.skipVulnHost
 
             if not testSqlInj:
                 infoMsg = "skipping '%s'" % targetUrl
