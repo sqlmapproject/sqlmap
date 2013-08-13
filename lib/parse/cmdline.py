@@ -44,7 +44,7 @@ def cmdLineParser():
 
         parser.add_option("-v", dest="verbose", type="int",
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
-        
+
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
                              "options has to be provided to set the target(s)")
