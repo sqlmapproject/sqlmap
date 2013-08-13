@@ -2169,8 +2169,6 @@ def _basicOptionValidation():
             raise SqlmapFilePathException(errMsg)
 
 def _resolveCrossReferences():
-    import pdb
-    pdb.set_trace()
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.common.setHTTPProxy = _setHTTPProxy
