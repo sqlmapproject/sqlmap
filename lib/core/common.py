@@ -1227,14 +1227,14 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    asterisk = re.search("^SELECT\s+\*\s+FROM\s+([\w\.\_]+)\s*", expression, re.I)
+    asterisk = re.search("^SELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+([\w\.\_]+)\s*", expression, re.I)
 
     if asterisk:
         infoMsg = "you did not provide the fields in your query. "
         infoMsg += "sqlmap will retrieve the column names itself"
         logger.info(infoMsg)
 
-        _ = asterisk.group(1).replace("..", ".")
+        _ = asterisk.group(2).replace("..", ".")
         conf.db, conf.tbl = _.split(".", 1) if '.' in _ else (None, _)
         conf.db = safeSQLIdentificatorNaming(conf.db)
         conf.tbl = safeSQLIdentificatorNaming(conf.tbl, True)
@@ -1247,7 +1247,7 @@ def expandAsteriskForColumns(expression):
             columnsStr = ", ".join(column for column in columns)
             expression = expression.replace("*", columnsStr, 1)
 
-            infoMsg = "the query with column names is: "
+            infoMsg = "the query with expanded column name(s) is: "
             infoMsg += "%s" % expression
             logger.info(infoMsg)
 
