@@ -108,7 +108,7 @@ class Connect(object):
         threadData = getCurrentThreadData()
         threadData.retriesCount += 1
 
-        if threadData.retriesCount >= conf.retries:
+        if conf.proxyList and threadData.retriesCount >= conf.retries:
             warnMsg = "changing proxy"
             logger.warn(warnMsg)
 
