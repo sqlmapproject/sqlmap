@@ -116,9 +116,9 @@ class Fingerprint(GenericFingerprint):
             value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
 
         if kb.bannerFp:
-            banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
+            banVer = kb.bannerFp["dbmsVersion"] if "dbmsVersion" in kb.bannerFp else None
 
-            if re.search("-log$", kb.data.banner):
+            if banVer and re.search("-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
             banVer = Format.getDbms([banVer] if banVer else None)
