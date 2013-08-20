@@ -53,6 +53,7 @@ PROXY_TYPE_HTTP = 3
 
 _defaultproxy = None
 _orgsocket = socket.socket
+_orgcreateconnection = socket.create_connection
 
 class ProxyError(Exception): pass
 class GeneralProxyError(ProxyError): pass
@@ -113,8 +114,8 @@ def wrapmodule(module):
         raise GeneralProxyError((4, "no proxy specified"))
 
 def unwrapmodule(module):
-    module.socket.socket = socket.socket
-    module.socket.create_connection = socket.create_connection
+    module.socket.socket = _orgsocket
+    module.socket.create_connection = _orgcreateconnection
 
 class socksocket(socket.socket):
     """socksocket([family[, type[, proto]]]) -> socket object
