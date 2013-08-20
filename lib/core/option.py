@@ -22,6 +22,7 @@ import urlparse
 import lib.core.common
 import lib.core.threads
 import lib.core.convert
+import lib.request.connect
 
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -985,6 +986,9 @@ def _setHTTPProxy():
         if conf.proxyList:
             conf.proxy = conf.proxyList[0]
             conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
+
+            infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
+            logger.info(infoMsg)
         else:
             if conf.hostname in ('localhost', '127.0.0.1') or conf.ignoreProxy:
                 proxyHandler.proxies = {}
@@ -2172,8 +2176,8 @@ def _basicOptionValidation():
 def _resolveCrossReferences():
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
-    lib.core.common.setHTTPProxy = _setHTTPProxy
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
+    lib.request.connect.setHTTPProxy = _setHTTPProxy
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     if not inputOptions.disableColoring:

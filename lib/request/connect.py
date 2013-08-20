@@ -37,7 +37,6 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
-from lib.core.common import setHTTPProxy
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
@@ -112,8 +111,7 @@ class Connect(object):
             warnMsg = "changing proxy"
             logger.warn(warnMsg)
 
-            conf.proxy = conf.proxyList[0]
-            conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
+            conf.proxy = None
             setHTTPProxy()
 
         if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
@@ -900,3 +898,6 @@ class Connect(object):
             return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page, headers, code, getRatioValue=True, pageLength=pageLength)
         else:
             return comparison(page, headers, code, getRatioValue, pageLength)
+
+def setHTTPProxy():  # Cross-linked function
+    raise NotImplementedError

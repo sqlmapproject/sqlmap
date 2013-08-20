@@ -2246,9 +2246,6 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 def getPageTemplate(payload, place):  # Cross-linked function
     raise NotImplementedError
 
-def setHTTPProxy():  # Cross-linked function
-    raise NotImplementedError
-
 def getPublicTypeMembers(type_, onlyValues=False):
     """
     Useful for getting members from types (e.g. in enums)
