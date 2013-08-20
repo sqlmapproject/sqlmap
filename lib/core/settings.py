@@ -145,7 +145,7 @@ IS_WIN = subprocess.mswindows
 PLATFORM = os.name
 PYVERSION = sys.version.split()[0]
 
-# Database management system specific variables
+# DBMS system databases
 MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb")
 MYSQL_SYSTEM_DBS = ("information_schema", "mysql")                   # Before MySQL 5.0 only "mysql"
 PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast")
