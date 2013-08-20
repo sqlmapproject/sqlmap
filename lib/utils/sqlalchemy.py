@@ -14,8 +14,10 @@ import warnings
 _sqlalchemy = None
 try:
     f, pathname, desc = imp.find_module("sqlalchemy", sys.path[1:])
-    _sqlalchemy = imp.load_module("sqlalchemy", f, pathname, desc)
-    warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
+    _ = imp.load_module("sqlalchemy", f, pathname, desc)
+    if hasattr(_, "dialects"):
+        _sqlalchemy = _
+        warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
 except ImportError:
     pass
 
