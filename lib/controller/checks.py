@@ -470,8 +470,8 @@ def checkSqlInjection(place, parameter, value):
                             if unionExtended:
                                 infoMsg = "automatically extending ranges "
                                 infoMsg += "for UNION query injection technique tests as "
-                                infoMsg += "there is at least one other potential "
-                                infoMsg += "injection technique found"
+                                infoMsg += "there is at least one other (potential) "
+                                infoMsg += "technique found"
                                 singleTimeLogMessage(infoMsg)
 
                             # Test for UNION query SQL injection
