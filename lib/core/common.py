@@ -562,7 +562,7 @@ def paramToDict(place, parameters=None):
                         warnMsg += "('%s') with most probably leftover " % element
                         warnMsg += "chars/statements from manual SQL injection test(s). "
                         warnMsg += "Please, always use only valid parameter values "
-                        warnMsg += "so sqlmap could be able to properly run "
+                        warnMsg += "so sqlmap could be able to run properly"
                         logger.warn(warnMsg)
 
                         message = "Are you sure you want to continue? [y/N] "
