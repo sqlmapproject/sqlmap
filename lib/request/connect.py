@@ -183,6 +183,13 @@ class Connect(object):
         return retVal
 
     @staticmethod
+    def _decode(page, headers = None, code = None):
+        if kb.decodeFunctions:
+            for function in kb.decodeFunctions:
+                page, headers, code= function(page, headers, code)
+        return page, headers, code
+
+    @staticmethod
     def getPage(**kwargs):
         """
         This method connects to the target URL or proxy and returns
@@ -282,7 +289,7 @@ class Connect(object):
                 responseHeaders[URI_HTTP_HEADER] = conn.geturl()
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
 
-                return page
+                return Connect._decode(page) # FIXME other return statements return triplet, this did not?!
 
             elif any((refreshing, crawling)):
                 pass
@@ -390,7 +397,7 @@ class Connect(object):
 
             # Return response object
             if response:
-                return conn, None, None
+                return conn, None, None # FIXME dead code?
 
             # Get HTTP response
             if hasattr(conn, 'redurl'):
@@ -590,7 +597,7 @@ class Connect(object):
 
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
-        return page, responseHeaders, code
+        return Connect._decode(page, responseHeaders, code)
 
     @staticmethod
     def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True):

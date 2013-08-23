@@ -249,7 +249,7 @@ def cmdLineParser():
                              help="Injection payload suffix string")
 
         injection.add_option("--tamper", dest="tamper",
-                             help="Use given script(s) for tampering injection data")
+                             help="Use given script(s) for tampering injection data and/or responses")
 
         # Detection options
         detection = OptionGroup(parser, "Detection", "These options can be "
