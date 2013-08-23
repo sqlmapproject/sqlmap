@@ -338,6 +338,9 @@ class Connect(object):
 
             if auxHeaders:
                 for key, item in auxHeaders.items():
+                    for _ in headers.keys():
+                        if _.upper() == key.upper():
+                            del headers[_]
                     headers[key] = item
 
             for key, item in headers.items():
