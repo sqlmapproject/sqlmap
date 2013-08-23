@@ -197,4 +197,6 @@ def send_all(p, data):
 
     while len(data):
         sent = p.send(data)
+        if not isinstance(sent, int):
+            break
         data = buffer(data, sent)
