@@ -18,7 +18,6 @@ def decode(page, headers, code, **kwargs):
     """
     Base64 decode a response
     """
-    print page
 
     try:
         retval = base64.b64decode(page)
