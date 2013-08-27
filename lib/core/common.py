@@ -3365,6 +3365,27 @@ def checkDeprecatedOptions(args):
                 errMsg += " (hint: %s)" % DEPRECATED_OPTIONS[_]
             raise SqlmapSyntaxException(errMsg)
 
+def checkSystemEncoding():
+    """
+    Checks for problematic encodings
+    """
+
+    if sys.getdefaultencoding() == "cp720":
+        try:
+            codecs.lookup("cp720")
+        except LookupError:
+            errMsg = "there is a known Python issue (#1616979) related "
+            errMsg += "to support for charset 'cp720'. Please visit "
+            errMsg += "'http://blog.oneortheother.info/tip/python-fix-cp720-encoding/index.html' "
+            errMsg += "and follow the instructions to be able to fix it"
+            logger.critical(errMsg)
+
+            warnMsg = "temporary switching to charset 'cp1256'"
+            logger.warn(warnMsg)
+
+            reload(sys)
+            sys.setdefaultencoding("cp1256")
+
 def evaluateCode(code, variables=None):
     """
     Executes given python code given in a string form

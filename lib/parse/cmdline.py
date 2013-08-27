@@ -5,6 +5,7 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import codecs
 import sys
 
 from optparse import OptionError
@@ -13,6 +14,7 @@ from optparse import OptionParser
 from optparse import SUPPRESS_HELP
 
 from lib.core.common import checkDeprecatedOptions
+from lib.core.common import checkSystemEncoding
 from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import logger
@@ -27,6 +29,8 @@ def cmdLineParser():
     """
     This function parses the command line parameters and arguments
     """
+
+    checkSystemEncoding()
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % sys.argv[0] if " " in sys.argv[0] else sys.argv[0])
