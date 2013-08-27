@@ -842,7 +842,8 @@ def _setTamperingFunctions():
         last_priority = PRIORITY.HIGHEST
         check_priority = True
         resolve_priorities = False
-        priorities = []
+        tamper_priorities = []
+        decode_priorities = []
 
         for tfile in re.split(PARAMETER_SPLITTING_REGEX, conf.tamper):
             found = False
@@ -885,9 +886,17 @@ def _setTamperingFunctions():
             priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper":
+                if name == "tamper" or name == "decode":
                     found = True
-                    kb.tamperFunctions.append(function)
+
+                    if name == "tamper":
+                        function_list = kb.tamperFunctions
+                        priorities = tamper_priorities
+                    elif name == "decode":
+                        function_list = kb.decodeFunctions
+                        priorities = decode_priorities
+
+                    function_list.append(function)
                     function.func_name = module.__name__
 
                     if check_priority and priority > last_priority:
@@ -913,16 +922,23 @@ def _setTamperingFunctions():
                     function()
 
             if not found:
-                errMsg = "missing function 'tamper(payload, headers)' "
+                errMsg = "missing function 'tamper(payload, headers)' or 'decode(page, headers, code)'"
                 errMsg += "in tamper script '%s'" % tfile
                 raise SqlmapGenericException(errMsg)
 
-        if resolve_priorities and priorities:
-            priorities.sort(reverse=True)
+        if resolve_priorities:
+            tamper_priorities.sort(reverse=True)
             kb.tamperFunctions = []
 
-            for _, function in priorities:
+            for _, function in tamper_priorities:
                 kb.tamperFunctions.append(function)
+
+            decode_priorities.sort(reverse=True)
+            kb.decodeFunctions = []
+
+            for _, function in decode_priorities:
+                kb.decodeFunctions.append(function)
+
 
 def _setWafFunctions():
     """
@@ -1698,6 +1714,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.passwordMgr = None
         kb.tamperFunctions = []
+        kb.decodeFunctions = []
         kb.targets = oset()
         kb.testedParams = set()
         kb.userAgents = None
