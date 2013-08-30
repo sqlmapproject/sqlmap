@@ -774,17 +774,30 @@ class Connect(object):
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:
                     if isinstance(value, (basestring, int)):
+                        found = False
                         value = unicode(value)
-                        if re.search(r"\b%s=" % name, (get or "")):
-                            get = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, get)
-                        elif re.search(r"\b%s=" % name, (post or "")):
-                            post = re.sub("((\A|\W)%s=)([^%s]+)" % (name, delimiter), "\g<1>%s" % value, post)
-                        elif re.search(r"\b%s=" % name, (cookie or "")):
-                            cookie = re.sub("((\A|\W)%s=)([^%s]+)" % (name, conf.cDel or DEFAULT_COOKIE_DELIMITER), "\g<1>%s" % value, cookie)
-                        elif post is not None:
-                            post += "%s%s=%s" % (delimiter, name, value)
-                        elif get is not None:
-                            get += "%s%s=%s" % (delimiter, name, value)
+
+                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), name, re.escape(delimiter))
+                        if re.search(regex, (get or "")):
+                            found = True
+                            get = re.sub(regex, "\g<1>%s\g<3>" % value, get)
+
+                        if re.search(regex, (post or "")):
+                            found = True
+                            post = re.sub(regex, "\g<1>%s\g<3>" % value, post)
+
+                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(conf.cDel or DEFAULT_COOKIE_DELIMITER), name, re.escape(conf.cDel or DEFAULT_COOKIE_DELIMITER))
+                        if re.search(regex, (cookie or "")):
+                            found = True
+                            cookie = re.sub(regex, "\g<1>%s\g<3>" % value, cookie)
+
+                        if not found:
+                            if post is not None:
+                                post += "%s%s=%s" % (delimiter, name, value)
+                            elif get is not None:
+                                get += "%s%s=%s" % (delimiter, name, value)
+                            elif cookie is not None:
+                                cookie += "%s%s=%s" % (conf.cDel or DEFAULT_COOKIE_DELIMITER, name, value)
 
         if not conf.skipUrlEncode:
             get = urlencode(get, limit=True)
