@@ -783,7 +783,7 @@ class Connect(object):
                             cookie = re.sub("((\A|\W)%s=)([^%s]+)" % (name, conf.cDel or DEFAULT_COOKIE_DELIMITER), "\g<1>%s" % value, cookie)
                         elif post is not None:
                             post += "%s%s=%s" % (delimiter, name, value)
-                        else:
+                        elif get is not None:
                             get += "%s%s=%s" % (delimiter, name, value)
 
         if not conf.skipUrlEncode:
