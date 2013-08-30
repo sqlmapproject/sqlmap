@@ -688,11 +688,21 @@ def getDocRoot():
                 for suffix in BRUTE_DOC_ROOT_SUFFIXES:
                     for target in targets:
                         item = "%s/%s" % (prefix, suffix)
-                        item = item.replace(BRUTE_DOC_ROOT_TARGET_MARK, target).replace("//", "/")
+                        item = item.replace(BRUTE_DOC_ROOT_TARGET_MARK, target).replace("//", '/').rstrip('/')
                         docRoot.append(item)
 
                         if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
                             break
+
+            infoMsg = "using common document root locations: %s" % ','.join(docRoot)
+            logger.info(infoMsg)
+
+            msg = "use additional custom "
+            msg += "document root locations [Enter for None]: "
+            answer = readInput(msg)
+
+            if answer:
+                docRoot.extend(answer.split(','))
 
         else:
             docRoot = defaultDocRoot
