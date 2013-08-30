@@ -913,7 +913,7 @@ def _setTamperingFunctions():
                     function()
 
             if not found:
-                errMsg = "missing function 'tamper(payload, headers)' "
+                errMsg = "missing function 'tamper(payload, **kwargs)' "
                 errMsg += "in tamper script '%s'" % tfile
                 raise SqlmapGenericException(errMsg)
 
