@@ -759,14 +759,14 @@ class Connect(object):
                     if '=' in part:
                         name, value = part.split('=', 1)
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
-                        evaluateCode("%s=%s" % (name, repr(value)), variables)
+                        evaluateCode("%s=%s" % (name.strip(), repr(value)), variables)
 
             if cookie:
                 for part in cookie.split(conf.cDel or DEFAULT_COOKIE_DELIMITER):
                     if '=' in part:
                         name, value = part.split('=', 1)
                         value = urldecode(value, convall=True)
-                        evaluateCode("%s=%s" % (name, repr(value)), variables)
+                        evaluateCode("%s=%s" % (name.strip(), repr(value)), variables)
 
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
