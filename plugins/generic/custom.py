@@ -15,6 +15,7 @@ from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.dicts import SQL_STATEMENTS
+from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.shell import autoCompletion
 from lib.request import inject
@@ -63,7 +64,7 @@ class Custom:
             debugMsg = "done"
             logger.debug(debugMsg)
 
-            output = False
+            output = NULL
 
         return output
 
