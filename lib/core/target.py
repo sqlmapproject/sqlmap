@@ -144,7 +144,7 @@ def _setRequestParams():
                     raise SqlmapUserQuitException
                 elif test[0] not in ("n", "N"):
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
-                    conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name=\"(?P<name>[^\n]+)\").+?)((\r)?\n)+--", functools.partial(process, repl=r"\g<1>%s\g<4>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
+                    conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*\"(?P<name>[^\n]+)\").+?)((\r)?\n)+--", functools.partial(process, repl=r"\g<1>%s\g<4>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     kb.postHint = POST_HINT.MULTIPART
 
         if not kb.postHint:
