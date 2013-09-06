@@ -7,6 +7,7 @@
         <error regexp="Warning.*mysql_.*"/>
         <error regexp="valid MySQL result"/>
         <error regexp="MySqlClient\."/>
+        <error regexp="com\.mysql\.jdbc\.exceptions"/>
     </dbms>
 
     <!-- PostgreSQL -->
@@ -15,6 +16,7 @@
         <error regexp="Warning.*\Wpg_.*"/>
         <error regexp="valid PostgreSQL result"/>
         <error regexp="Npgsql\."/>
+        <error regexp="org\.postgresql\.util\.PSQLException"/>
     </dbms>
 
     <!-- Microsoft SQL Server -->
@@ -30,7 +32,7 @@
 
     <!-- Microsoft Access -->
     <dbms value="Microsoft Access">
-        <error regexp="Microsoft Access Driver"/>
+        <error regexp="Microsoft Access (\d+ )?Driver"/>
         <error regexp="JET Database Engine"/>
         <error regexp="Access Database Engine"/>
     </dbms>
@@ -69,6 +71,7 @@
         <error regexp="System.Data.SQLite.SQLiteException"/>
         <error regexp="Warning.*sqlite_.*"/>
         <error regexp="Warning.*SQLite3::"/>
+        <error regexp="\[SQLITE_ERROR\]"/>
     </dbms>
 
     <!-- SAP MaxDB -->
