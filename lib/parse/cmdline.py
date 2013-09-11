@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
+import os
 import sys
 
 from optparse import OptionError
@@ -32,8 +33,10 @@ def cmdLineParser():
 
     checkSystemEncoding()
 
+    _ = os.path.normpath(sys.argv[0])
+
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
-            "\"%s\"" % sys.argv[0] if " " in sys.argv[0] else sys.argv[0])
+            "\"%s\"" % _ if " " in _ else _)
 
     parser = OptionParser(usage=usage)
 
