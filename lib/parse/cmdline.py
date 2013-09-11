@@ -635,7 +635,7 @@ def cmdLineParser():
                                help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
 
         miscellaneous.add_option("--alert", dest="alert",
-                                  help="Run shell command(s) when SQL injection is found")
+                                  help="Run host OS command(s) when SQL injection is found")
 
         miscellaneous.add_option("--answers", dest="answers",
                                   help="Set question answers (e.g. \"quit=N,follow=N\")")
