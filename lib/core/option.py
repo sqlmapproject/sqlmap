@@ -1123,17 +1123,18 @@ def _setHTTPAuthentication():
         errMsg += "but did not provide the type"
         raise SqlmapSyntaxException(errMsg)
 
+    elif conf.authType.lower() not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
+        errMsg = "HTTP authentication type value must be "
+        errMsg += "Basic, Digest, NTLM or PKI"
+        raise SqlmapSyntaxException(errMsg)
+
     if not conf.authPrivate:
         debugMsg = "setting the HTTP authentication type and credentials"
         logger.debug(debugMsg)
 
         aTypeLower = conf.authType.lower()
 
-        if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
-            errMsg = "HTTP authentication type value must be "
-            errMsg += "Basic, Digest, NTLM or PKI"
-            raise SqlmapSyntaxException(errMsg)
-        elif aTypeLower in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST):
+        if aTypeLower in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST):
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % aTypeLower
             errMsg += "value must be in format 'username:password'"
