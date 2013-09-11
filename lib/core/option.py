@@ -27,6 +27,7 @@ import lib.request.connect
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import boldifyMessage
+from lib.core.common import checkFile
 from lib.core.common import dataToStdout
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import extractRegexResult
@@ -133,8 +134,8 @@ from lib.request.basic import checkCharEncoding
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
-from lib.request.certhandler import HTTPSCertAuthHandler
 from lib.request.httpshandler import HTTPSHandler
+from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
@@ -1102,17 +1103,17 @@ def _setAuthCred():
 
 def _setHTTPAuthentication():
     """
-    Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or Certificate),
-    username and password for first three methods, or key file and certification file for
-    certificate authentication
+    Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or PKI),
+    username and password for first three methods, or PEM private key file for
+    PKI authentication
     """
 
     global authHandler
 
-    if not conf.authType and not conf.authCred and not conf.authCert:
+    if not conf.authType and not conf.authCred and not conf.authPrivate:
         return
 
-    elif conf.authType and not conf.authCred and not conf.authCert:
+    elif conf.authType and not conf.authCred and not conf.authPrivate:
         errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise SqlmapSyntaxException(errMsg)
@@ -1122,15 +1123,15 @@ def _setHTTPAuthentication():
         errMsg += "but did not provide the type"
         raise SqlmapSyntaxException(errMsg)
 
-    if not conf.authCert:
+    if not conf.authPrivate:
         debugMsg = "setting the HTTP authentication type and credentials"
         logger.debug(debugMsg)
 
         aTypeLower = conf.authType.lower()
 
-        if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.CERT):
+        if aTypeLower not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
             errMsg = "HTTP authentication type value must be "
-            errMsg += "Basic, Digest, NTLM or Cert"
+            errMsg += "Basic, Digest, NTLM or PKI"
             raise SqlmapSyntaxException(errMsg)
         elif aTypeLower in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST):
             regExp = "^(.*?):(.*?)$"
@@ -1140,9 +1141,9 @@ def _setHTTPAuthentication():
             regExp = "^(.*\\\\.*):(.*?)$"
             errMsg = "HTTP NTLM authentication credentials value must "
             errMsg += "be in format 'DOMAIN\username:password'"
-        elif aTypeLower == AUTH_TYPE.CERT:
-            errMsg = "HTTP Cert authentication require "
-            errMsg += "usage of option `--auth-cert`"
+        elif aTypeLower == AUTH_TYPE.PKI:
+            errMsg = "HTTP PKI authentication require "
+            errMsg += "usage of option `--auth-pki`"
             raise SqlmapSyntaxException(errMsg)
 
         aCredRegExp = re.search(regExp, conf.authCred)
@@ -1174,26 +1175,12 @@ def _setHTTPAuthentication():
 
             authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
     else:
-        debugMsg = "setting the HTTP(s) authentication certificate"
+        debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
 
-        aCertRegExp = re.search("^(.+?),\s*(.+?)$", conf.authCert)
-
-        if not aCertRegExp:
-            errMsg = "HTTP authentication certificate option "
-            errMsg += "must be in format 'key_file,cert_file'"
-            raise SqlmapSyntaxException(errMsg)
-
-        # os.path.expanduser for support of paths with ~
-        key_file = os.path.expanduser(aCertRegExp.group(1))
-        cert_file = os.path.expanduser(aCertRegExp.group(2))
-
-        for ifile in (key_file, cert_file):
-            if not os.path.exists(ifile):
-                errMsg = "file '%s' does not exist" % ifile
-                raise SqlmapSyntaxException(errMsg)
-
-        authHandler = HTTPSCertAuthHandler(key_file, cert_file)
+        key_file = os.path.expanduser(conf.authPrivate)
+        checkFile(key_file)
+        authHandler = HTTPSPKIAuthHandler(key_file)
 
 def _setHTTPMethod():
     """

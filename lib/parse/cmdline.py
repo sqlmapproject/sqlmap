@@ -117,15 +117,14 @@ def cmdLineParser():
 
         request.add_option("--auth-type", dest="authType",
                            help="HTTP authentication type "
-                                "(Basic, Digest, NTLM or Cert)")
+                                "(Basic, Digest, NTLM or PKI)")
 
         request.add_option("--auth-cred", dest="authCred",
                            help="HTTP authentication credentials "
                                 "(name:password)")
 
-        request.add_option("--auth-cert", dest="authCert",
-                           help="HTTP authentication certificate ("
-                                "key_file,cert_file)")
+        request.add_option("--auth-private", dest="authPrivate",
+                           help="HTTP authentication PEM private key file")
 
         request.add_option("--proxy", dest="proxy",
                            help="Use a proxy to connect to the target URL")

@@ -35,7 +35,7 @@ optDict = {
                                "headers":           "string",
                                "authType":          "string",
                                "authCred":          "string",
-                               "authCert":          "string",
+                               "authPrivate":       "string",
                                "proxy":             "string",
                                "proxyCred":         "string",
                                "proxyFile":         "string",
