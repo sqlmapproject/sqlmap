@@ -198,7 +198,7 @@
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
-            <blind query="SELECT name FROM master..sysdatabases WHERE %s" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE " condition="name"/>
+            <blind query="SELECT name FROM master..sysdatabases WHERE %s" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases WHERE %s" condition="name"/>
         </search_db>
         <search_table>
             <inband query="SELECT name FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v') AND " condition="name" condition2="name"/>
