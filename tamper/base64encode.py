@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import base64
 
 from lib.core.enums import PRIORITY
+from lib.core.settings import UNICODE_ENCODING
 
 __priority__ = PRIORITY.LOWEST
 
@@ -22,4 +23,4 @@ def tamper(payload, **kwargs):
     'MScgQU5EIFNMRUVQKDUpIw=='
     """
 
-    return base64.b64encode(payload) if payload else payload
+    return base64.b64encode(payload.encode(UNICODE_ENCODING)) if payload else payload
