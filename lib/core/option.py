@@ -100,6 +100,7 @@ from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
+from lib.core.settings import DUMMY_URL
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import INJECT_HERE_MARK
 from lib.core.settings import IS_WIN
@@ -2071,7 +2072,7 @@ def _basicOptionValidation():
         errMsg = "switch '--forms' requires usage of option '-u' ('--url') or '-m'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.requestFile and conf.url:
+    if conf.requestFile and conf.url and conf.url != DUMMY_URL:
         errMsg = "option '-r' is incompatible with option '-u' ('--url')"
         raise SqlmapSyntaxException(errMsg)
 
