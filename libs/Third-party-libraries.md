@@ -43,11 +43,12 @@ These listed are libraries and tools not entirely developed by sqlmap developers
 | [Metasploit Framework](http://www.metasploit.com) | BSD | Used for OS takeover features | --os-pwn, --os-bof, --os-smbshell |
 | [PyReadline](http://ipython.scipy.org/moin/PyReadline/Intro) | BSD | Used for TAB autocomplete and history | --os-shell and --sql-shell |
 | [python cx_Oracle](http://cx-oracle.sourceforge.net/) | BSD | Connector for Oracle | -d |
+| [python ibm-db](https://code.google.com/p/ibm-db/) | Apache | Connector for DB2 | -d |
 | [python-impacket](http://code.google.com/p/impacket/) | BSD | Used for OS takeover feature via icmpsh | --os-pwn |
 | [python-kinterbasdb](http://kinterbasdb.sourceforge.net/) | BSD | Connector for Firebird | -d |
 | [python-ntlm](http://code.google.com/p/python-ntlm/) | LGPL | Used when the site requires NTLM authentication | --auth-type |
 | [python-psycopg2](http://initd.org/psycopg/) | LGPL | Connector for PostgreSQL | -d |
-| [python-pyodbc](http://pyodbc.googlecode.com/) | MIT | Connector for Microsoft Access | -d |
-| [python-pymssql](http://pymssql.sourceforge.net/) | LGPL | Connector for MS SQL Server | -d |
+| [python-pyodbc](https://code.google.com/p/pyodbc/) | MIT | Connector for Microsoft Access | -d |
+| [python-pymssql](http://pymssql.sourceforge.net/) | LGPL | Connector for Microsoft SQL Server | -d |
 | [python pymysql](http://code.google.com/p/pymysql/) | MIT | Connector for MySQL | -d |
-| [python-pysqlite2](http://pysqlite.googlecode.com/) | MIT | Connector for SQLite 2 | -d |
+| [python-pysqlite2](https://code.google.com/p/pysqlite/) | MIT | Connector for SQLite 2 | -d |
