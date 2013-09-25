@@ -479,7 +479,7 @@
         <hostname/>
         <table_comment/>
         <column_comment/>
-        <is_dba/>
+        <is_dba query="EXISTS(SELECT USER_ID FROM domain.users WHERE username=USER() AND usermode='SYSDBA')"/>
         <users>
             <inband query="SELECT username FROM domain.users"/>
             <blind query="SELECT MIN(username) FROM domain.users WHERE username>'%s'" count="SELECT CHR(COUNT(*)) FROM domain.users"/>
