@@ -525,18 +525,21 @@ class Dump(object):
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
                     if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
-                        mimetype = magic.from_buffer(value, mime=True)
-                        if any(mimetype.startswith(_) for _ in ("application", "image")):
-                            if not os.path.isdir(dumpDbPath):
-                                os.makedirs(dumpDbPath, 0755)
+                        try:
+                            mimetype = magic.from_buffer(value, mime=True)
+                            if any(mimetype.startswith(_) for _ in ("application", "image")):
+                                if not os.path.isdir(dumpDbPath):
+                                    os.makedirs(dumpDbPath, 0755)
 
-                            filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (unsafeSQLIdentificatorNaming(column), randomInt(8)))
-                            warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
-                            logger.warn(warnMsg)
+                                filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (unsafeSQLIdentificatorNaming(column), randomInt(8)))
+                                warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
+                                logger.warn(warnMsg)
 
-                            with open(filepath, "wb") as f:
-                                _ = safechardecode(value, True)
-                                f.write(_)
+                                with open(filepath, "wb") as f:
+                                    _ = safechardecode(value, True)
+                                    f.write(_)
+                        except magic.MagicException, err:
+                            logger.debug(str(err))
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:
