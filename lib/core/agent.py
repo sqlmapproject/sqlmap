@@ -123,6 +123,7 @@ class Agent(object):
                         value = ""
                     else:
                         value = "-%s" % randomInt()
+                value = "%s " % value if value and not value.startswith(' ') else value
             elif where == PAYLOAD.WHERE.REPLACE:
                 value = ""
             else:
