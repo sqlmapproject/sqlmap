@@ -9,6 +9,7 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 import sys
+import zlib
 
 from optparse import OptionError
 from optparse import OptionParser
@@ -24,20 +25,16 @@ def hideAscii(data):
     return retVal
 
 def cloak(inputFile):
-    import bz2
-
     f = open(inputFile, 'rb')
-    data = bz2.compress(f.read())
+    data = zlib.compress(f.read())
     f.close()
 
     return hideAscii(data)
 
 def decloak(inputFile):
-    import bz2
-
     f = open(inputFile, 'rb')
     try:
-        data = bz2.decompress(hideAscii(f.read()))
+        data = zlib.decompress(hideAscii(f.read()))
     except:
         print 'ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile
         sys.exit(1)
