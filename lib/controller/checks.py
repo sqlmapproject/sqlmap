@@ -208,7 +208,7 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-                if conf.dbms is not None and not intersect(conf.dbms.lower(), [value.lower() for value in arrayizeValue(dbms)]):
+                if conf.dbms is not None and not intersect(conf.dbms.lower(), [_.lower() for _ in arrayizeValue(dbms)]):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "the provided DBMS is %s" % conf.dbms
                     logger.debug(debugMsg)
