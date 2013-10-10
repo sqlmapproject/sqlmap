@@ -340,7 +340,8 @@ def task_list(taskid):
     """
     if is_admin(taskid):
         logger.debug("Listed task pull")
-        return jsonize({"tasks": tasks, "tasks_num": len(tasks)})
+        task_list = list(tasks)
+        return jsonize({"tasks": task_list, "tasks_num": len(tasks)})
     else:
         abort(401)
 
