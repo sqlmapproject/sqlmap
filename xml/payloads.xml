@@ -719,7 +719,7 @@ Formats:
     <test>
         <title>MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)</title>
         <stype>1</stype>
-        <level>5</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>1</where>
