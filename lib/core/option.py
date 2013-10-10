@@ -280,7 +280,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     method = match.group(1)
                     url = match.group(2)
 
-                    if "?" in line and "=" in line:
+                    if any(_ in line for _ in ('?', '=', CUSTOM_INJECTION_MARK_CHAR)):
                         params = True
 
                     getPostReq = True
