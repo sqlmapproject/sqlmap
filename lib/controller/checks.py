@@ -489,6 +489,9 @@ def checkSqlInjection(place, parameter, value):
 
                         kb.previousMethod = method
 
+                        if conf.dummy:
+                            injectable = False
+
                     # If the injection test was successful feed the injection
                     # object with the test's details
                     if injectable is True:

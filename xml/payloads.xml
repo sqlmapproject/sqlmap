@@ -250,7 +250,7 @@ Formats:
 
     <boundary>
         <level>3</level>
-        <clause>1</clause>
+        <clause>1,2,3</clause>
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>'</prefix>
