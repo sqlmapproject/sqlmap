@@ -721,7 +721,7 @@ Formats:
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1</clause>
+        <clause>1,2,3</clause>
         <where>1</where>
         <vector>RLIKE IF([INFERENCE],[ORIGVALUE],0x28)</vector>
         <request>
@@ -735,7 +735,6 @@ Formats:
         </details>
     </test>
     <!-- End of boolean-based blind tests - WHERE or HAVING clause -->
-
 
     <!-- Boolean-based blind tests - Parameter replace -->
     <test>
