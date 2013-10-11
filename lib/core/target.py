@@ -462,7 +462,16 @@ def _createDumpDir():
     conf.dumpPath = paths.SQLMAP_DUMP_PATH % conf.hostname
 
     if not os.path.isdir(conf.dumpPath):
-        os.makedirs(conf.dumpPath, 0755)
+        try:
+            os.makedirs(conf.dumpPath, 0755)
+        except OSError, ex:
+            tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
+            warnMsg = "unable to create dump directory "
+            warnMsg += "'%s' (%s). " % (conf.dumpPath, ex)
+            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            logger.warn(warnMsg)
+
+            conf.dumpPath = tempDir
 
 def _configureDumper():
     if hasattr(conf, 'xmlFile') and conf.xmlFile:
@@ -484,7 +493,7 @@ def _createTargetDirs():
             tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
             warnMsg = "unable to create default root output directory "
             warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, ex)
-            warnMsg += "using temporary directory '%s' instead" % tempDir
+            warnMsg += "Using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
             paths.SQLMAP_OUTPUT_PATH = tempDir
@@ -498,7 +507,7 @@ def _createTargetDirs():
             tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
             warnMsg = "unable to create output directory "
             warnMsg += "'%s' (%s). " % (conf.outputPath, ex)
-            warnMsg += "using temporary directory '%s' instead" % tempDir
+            warnMsg += "Using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
             conf.outputPath = tempDir
