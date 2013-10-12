@@ -754,7 +754,7 @@ class Connect(object):
             variables = {}
             originals = {}
 
-            for item in filter(None, (get, post)):
+            for item in filter(None, (get, post if not kb.postHint else None)):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
