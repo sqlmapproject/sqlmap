@@ -551,12 +551,12 @@ def start():
                     elif conf.string:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--string' as perhaps the string you "
-                        errMsg += "have choosen does not match "
+                        errMsg += "have chosen does not match "
                         errMsg += "exclusively True responses"
                     elif conf.regexp:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--regexp' as perhaps the regular "
-                        errMsg += "expression that you have choosen "
+                        errMsg += "expression that you have chosen "
                         errMsg += "does not match exclusively True responses"
 
                     raise SqlmapNotVulnerableException(errMsg)
