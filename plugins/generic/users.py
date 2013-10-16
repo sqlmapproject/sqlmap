@@ -389,6 +389,9 @@ class Users:
                         else:
                             privilege = value[count]
 
+                            if privilege is None:
+                                continue
+
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
                             if Backend.isDbms(DBMS.PGSQL) and getUnicode(privilege).isdigit():
@@ -506,7 +509,11 @@ class Users:
                         query = rootQuery.blind.query % (index, user)
                     else:
                         query = rootQuery.blind.query % (user, index)
+
                     privilege = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                    if privilege is None:
+                        continue
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise
