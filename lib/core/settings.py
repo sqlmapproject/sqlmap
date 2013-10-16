@@ -527,7 +527,7 @@ INVALID_UNICODE_CHAR_FORMAT = r"\?%02x"
 SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2.*>\s*\Z"
 
 # Regular expression used for detecting JSON-like POST data
-JSON_RECOGNITION_REGEX = r'(?s)\A(\s*\[)*\s*\{.*"[^"]+"\s*:\s*("[^"]+"|\d+).*\}\s*(\]\s*)*\s*\Z'
+JSON_RECOGNITION_REGEX = r'(?s)\A(\s*\[)*\s*\{.*"[^"]+"\s*:\s*("[^"]+"|\d+).*\}\s*(\]\s*)*\Z'
 
 # Regular expression used for detecting multipart POST data
 MULTIPART_RECOGNITION_REGEX = r"(?i)Content-Disposition:[^;]+;\s*name="
