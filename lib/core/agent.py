@@ -961,14 +961,16 @@ class Agent(object):
         Extracts payload from inside of the input string
         """
 
-        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr)
+        _ = re.escape(PAYLOAD_DELIMITER)
+        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (_, _), inpStr)
 
     def replacePayload(self, inpStr, payload):
         """
         Replaces payload inside the input string with a given payload
         """
 
-        return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), inpStr) if inpStr else inpStr
+        _ = re.escape(PAYLOAD_DELIMITER)
+        return re.sub("(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), inpStr) if inpStr else inpStr
 
     def runAsDBMSUser(self, query):
         if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:
