@@ -74,7 +74,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("tempdb_id()=tempdb_id()")
+            result = inject.checkBooleanExpression("@@transtate=@@transtate")
 
         if result:
             infoMsg = "confirming %s" % DBMS.SYBASE
