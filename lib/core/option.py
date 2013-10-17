@@ -19,6 +19,7 @@ import time
 import urllib2
 import urlparse
 
+import lib.controller.checks
 import lib.core.common
 import lib.core.threads
 import lib.core.convert
@@ -2167,6 +2168,7 @@ def _resolveCrossReferences():
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
     lib.request.connect.setHTTPProxy = _setHTTPProxy
+    lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     if not inputOptions.disableColoring:

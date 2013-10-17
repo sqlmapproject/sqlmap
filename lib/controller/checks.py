@@ -570,11 +570,20 @@ def checkSqlInjection(place, parameter, value):
             warnMsg = "user aborted during detection phase"
             logger.warn(warnMsg)
 
-            msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(q)uit]"
+            msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
             choice = readInput(msg, default="S", checkBatch=False)
 
             if choice[0] in ("s", "S"):
                 pass
+            elif choice[0] in ("c", "C"):
+                choice = None
+                while not ((choice or "").isdigit() and 0 <= int(choice) <= 6):
+                    if choice:
+                        logger.warn("invalid value")
+                    msg = "enter new verbosity level: [0-6] "
+                    choice = readInput(msg, default=str(conf.verbose), checkBatch=False).strip()
+                conf.verbose = int(choice)
+                setVerbosity()
             elif choice[0] in ("n", "N"):
                 return None
             elif choice[0] in ("e", "E"):
@@ -1239,3 +1248,6 @@ def checkConnection(suppressOutput=False):
             raise
 
     return True
+
+def setVerbosity():  # Cross-linked function
+    raise NotImplementedError
