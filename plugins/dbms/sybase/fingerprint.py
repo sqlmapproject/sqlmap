@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import Format
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -98,12 +99,17 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.SYBASE
             logger.info(infoMsg)
 
-            for version in xrange(6, 17):
-                result = inject.checkBooleanExpression("PATINDEX('%%/%d[./]%%',@@VERSION)>0" % version)
+            result = unArrayizeValue(inject.getValue("SUBSTRING(@@VERSION,1,1)"))
 
-                if result:
-                    Backend.setVersion(str(version))
-                    break
+            if result and result.isdigit():
+                Backend.setVersion(str(result))
+            else:
+                for version in xrange(12, 16):
+                    result = inject.checkBooleanExpression("PATINDEX('%%/%d[./]%%',@@VERSION)>0" % version)
+
+                    if result:
+                        Backend.setVersion(str(version))
+                        break
 
             return True
         else:
