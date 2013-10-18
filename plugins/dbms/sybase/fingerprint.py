@@ -99,7 +99,7 @@ class Fingerprint(GenericFingerprint):
             logger.info(infoMsg)
 
             for version in xrange(12, 16):
-                result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version)
+                result = inject.checkBooleanExpression("PATINDEX('%%/%d[./]%%',@@VERSION)>0" % version)
 
                 if result:
                     Backend.setVersion(str(version))
