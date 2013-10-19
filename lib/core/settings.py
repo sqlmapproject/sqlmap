@@ -591,4 +591,7 @@ tr:nth-child(even) {
 td{
     font-size:10px;
 }
+th{
+    font-size:10px;
+}
 </style>"""

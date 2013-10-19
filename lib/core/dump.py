@@ -5,11 +5,10 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import cgi
 import codecs
 import os
 import threading
-
-from xml.dom.minidom import getDOMImplementation
 
 from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
@@ -442,8 +441,11 @@ class Dump(object):
 
             rtable = replication.createTable(table, cols)
         elif conf.dumpFormat == DUMP_FORMAT.HTML:
-            documentNode = getDOMImplementation().createDocument(None, "table", None)
-            tableNode = documentNode.documentElement
+            dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n")
+            dataToDumpFile(dumpFP, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=%s\">\n" % UNICODE_ENCODING)
+            dataToDumpFile(dumpFP, "<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
+            dataToDumpFile(dumpFP, HTML_DUMP_CSS_STYLE)
+            dataToDumpFile(dumpFP, "\n</head>\n<body>\n<table>\n<thead>\n<tr>\n")
 
         if count == 1:
             self._write("[1 entry]")
@@ -451,14 +453,6 @@ class Dump(object):
             self._write("[%d entries]" % count)
 
         self._write(separator)
-
-        if conf.dumpFormat == DUMP_FORMAT.HTML:
-            headNode = documentNode.createElement("thead")
-            rowNode = documentNode.createElement("tr")
-            tableNode.appendChild(headNode)
-            headNode.appendChild(rowNode)
-            bodyNode = documentNode.createElement("tbody")
-            tableNode.appendChild(bodyNode)
 
         for column in columns:
             if column != "__infos__":
@@ -477,11 +471,12 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        entryNode = documentNode.createElement("td")
-                        rowNode.appendChild(entryNode)
-                        entryNode.appendChild(documentNode.createTextNode(column))
+                        dataToDumpFile(dumpFP, "<th>%s</th>" % cgi.escape(column).encode("ascii", "xmlcharrefreplace"))
 
                 field += 1
+
+        if conf.dumpFormat == DUMP_FORMAT.HTML:
+            dataToDumpFile(dumpFP, "\n</tr>\n</thead>\n<tbody>\n")
 
         self._write("|\n%s" % separator)
 
@@ -503,8 +498,7 @@ class Dump(object):
             values = []
 
             if conf.dumpFormat == DUMP_FORMAT.HTML:
-                rowNode = documentNode.createElement("tr")
-                bodyNode.appendChild(rowNode)
+                dataToDumpFile(dumpFP, "<tr>")
 
             for column in columns:
                 if column != "__infos__":
@@ -547,9 +541,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        entryNode = documentNode.createElement("td")
-                        rowNode.appendChild(entryNode)
-                        entryNode.appendChild(documentNode.createTextNode(value))
+                        dataToDumpFile(dumpFP, "<td>%s</td>" % cgi.escape(value).encode("ascii", "xmlcharrefreplace"))
 
                     field += 1
 
@@ -560,6 +552,8 @@ class Dump(object):
                     pass
             elif conf.dumpFormat == DUMP_FORMAT.CSV:
                 dataToDumpFile(dumpFP, "\n")
+            elif conf.dumpFormat == DUMP_FORMAT.HTML:
+                dataToDumpFile(dumpFP, "</tr>\n")
 
             self._write("|", console=console)
 
@@ -571,13 +565,7 @@ class Dump(object):
 
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
-                dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n")
-                dataToDumpFile(dumpFP, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=%s\">\n" % UNICODE_ENCODING)
-                dataToDumpFile(dumpFP, "<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
-                dataToDumpFile(dumpFP, HTML_DUMP_CSS_STYLE)
-                dataToDumpFile(dumpFP, "\n</head>\n")
-                dataToDumpFile(dumpFP, tableNode.toxml())
-                dataToDumpFile(dumpFP, "\n</html>")
+                dataToDumpFile(dumpFP, "</tbody>\n</table>\n</body>\n</html>")
             else:
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
