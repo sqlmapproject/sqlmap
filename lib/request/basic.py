@@ -137,8 +137,8 @@ def checkCharEncoding(encoding, warn=True):
         encoding = encoding.replace("5589", "8859")  # iso-5589 -> iso-8859
     elif "2313" in encoding:
         encoding = encoding.replace("2313", "2312")  # gb2313 -> gb2312
-    elif "x-euc" in encoding:
-        encoding = encoding.replace("x-euc", "euc")  # x-euc-kr -> euc-kr
+    elif encoding.startswith("x-"):
+        encoding = encoding[len("x-"):]              # x-euc-kr -> euc-kr  /  x-mac-turkish -> mac-turkish
     elif "windows-cp" in encoding:
         encoding = encoding.replace("windows-cp", "windows")  # windows-cp-1254 -> windows-1254
 
