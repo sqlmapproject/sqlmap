@@ -5,8 +5,12 @@ Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+try:
+   import cPickle as pickle
+except:
+   import pickle
+
 import os
-import pickle
 import tempfile
 
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
@@ -62,7 +66,7 @@ class BigArray(list):
         self.filenames.add(filename)
         os.close(handle)
         with open(filename, "w+b") as fp:
-            pickle.dump(value, fp)
+            pickle.dump(value, fp, pickle.HIGHEST_PROTOCOL)
         return filename
 
     def _checkcache(self, index):
