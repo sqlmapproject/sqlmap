@@ -1072,11 +1072,11 @@ def parseTargetDirect():
         details = re.search("^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>.+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_\-\/\\\\]+?)$" % dbms, conf.direct, re.I)
 
         if details:
-            conf.dbms = details.group('dbms')
+            conf.dbms = details.group("dbms")
 
             if details.group('credentials'):
-                conf.dbmsUser = details.group('user')
-                conf.dbmsPass = details.group('pass')
+                conf.dbmsUser = details.group("user")
+                conf.dbmsPass = details.group("pass")
             else:
                 if conf.dbmsCred:
                     conf.dbmsUser, conf.dbmsPass = conf.dbmsCred.split(':')
@@ -1087,16 +1087,15 @@ def parseTargetDirect():
             if not conf.dbmsPass:
                 conf.dbmsPass = None
 
-            if details.group('remote'):
+            if details.group("remote"):
                 remote = True
-                conf.hostname = details.group('hostname').strip()
-                conf.port = int(details.group('port'))
+                conf.hostname = details.group("hostname").strip()
+                conf.port = int(details.group("port"))
             else:
                 conf.hostname = "localhost"
                 conf.port = 0
 
-            conf.dbmsDb = details.group('db')
-
+            conf.dbmsDb = details.group("db")
             conf.parameters[None] = "direct connection"
 
             break
