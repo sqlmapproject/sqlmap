@@ -1797,7 +1797,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
 
     checkFile(filename)
 
-    with codecs.open(filename, 'r', UNICODE_ENCODING) if unicode_ else open(filename, 'r') as f:
+    with codecs.open(filename, 'r', UNICODE_ENCODING, errors="ignore") if unicode_ else open(filename, 'r') as f:
         for line in (f.readlines() if unicode_ else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
             if commentPrefix:
                 if line.find(commentPrefix) != -1:
