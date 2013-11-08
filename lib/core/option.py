@@ -94,6 +94,7 @@ from lib.core.optiondict import optDict
 from lib.core.purge import purge
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import BURP_REQUEST_REGEX
+from lib.core.settings import BURP_XML_HISTORY_REGEX
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
@@ -232,7 +233,10 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
         """
 
         if not re.search(BURP_REQUEST_REGEX, content, re.I | re.S):
-            reqResList = [content]
+            if re.search(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
+                reqResList = [_.decode("base64") for _ in re.findall(BURP_XML_HISTORY_REGEX, content, re.I | re.S)]
+            else:
+                reqResList = [content]
         else:
             reqResList = re.finditer(BURP_REQUEST_REGEX, content, re.I | re.S)
 
@@ -437,7 +441,8 @@ def _setMultipleTargets():
 
     if updatedTargetsCount > initialTargetsCount:
         infoMsg = "sqlmap parsed %d " % (updatedTargetsCount - initialTargetsCount)
-        infoMsg += "testable requests from the targets list"
+        infoMsg += "(parameter unique) requests from the "
+        infoMsg += "targets list ready to be tested"
         logger.info(infoMsg)
 
 def _adjustLoggingFormatter():
