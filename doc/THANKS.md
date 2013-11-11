@@ -6,6 +6,9 @@ Andres Tarasco Acuna, <atarasco@gmail.com>
 Santiago Accurso, <saccurso@skygear.com.ar>
 * for reporting a bug
 
+Syed Afzal, <syed@syedafzal.in>
+* for contributing a WAF script varnish.py
+
 Zaki Akhmad, <zakiakhmad@gmail.com>
 * for suggesting a couple of features
 
@@ -303,7 +306,7 @@ Michael Majchrowicz, <mmajchrowicz@gmail.com>
 * for suggesting a lot of ideas and features
 
 Ahmad Maulana, <matdhule@gmail.com>
-* for contributing one tamper script, halfversionedmorekeywords.py
+* for contributing a tamper script halfversionedmorekeywords.py
 
 Ferruh Mavituna, <ferruh@mavituna.com>
 * for exchanging ideas on the implementation of a couple of features
