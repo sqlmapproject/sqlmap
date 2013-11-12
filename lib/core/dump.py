@@ -74,7 +74,7 @@ class Dump(object):
         kb.dataOutputFlag = True
 
     def setOutputFile(self):
-        self._outputFile = "%s%slog" % (conf.outputPath, os.sep)
+        self._outputFile = os.path.join(conf.outputPath, "log")
         try:
             self._outputFP = codecs.open(self._outputFile, "ab" if not conf.flushSession else "wb", UNICODE_ENCODING)
         except IOError, ex:
@@ -380,15 +380,15 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
-        dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
+        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
-            replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
+            replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if not os.path.isdir(dumpDbPath):
                 os.makedirs(dumpDbPath, 0755)
 
-            dumpFileName = "%s%s%s.%s" % (dumpDbPath, os.sep, unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())
+            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower()))
             appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
 

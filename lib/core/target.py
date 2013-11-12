@@ -304,7 +304,7 @@ def _setHashDB():
     """
 
     if not conf.hashDBFile:
-        conf.hashDBFile = conf.sessionFile or "%s%ssession.sqlite" % (conf.outputPath, os.sep)
+        conf.hashDBFile = conf.sessionFile or os.path.join(conf.outputPath, "session.sqlite")
 
     if os.path.exists(conf.hashDBFile):
         if conf.flushSession:
@@ -432,7 +432,7 @@ def _setResultsFile():
         return
 
     if not conf.resultsFP:
-        conf.resultsFilename = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, time.strftime(RESULTS_FILE_FORMAT).lower())
+        conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
         conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
         conf.resultsFP.writelines("Target URL,Place,Parameter,Techniques%s" % os.linesep)
 
@@ -498,7 +498,7 @@ def _createTargetDirs():
 
             paths.SQLMAP_OUTPUT_PATH = tempDir
 
-    conf.outputPath = "%s%s%s" % (paths.SQLMAP_OUTPUT_PATH, os.sep, conf.hostname)
+    conf.outputPath = os.path.join(paths.SQLMAP_OUTPUT_PATH, conf.hostname)
 
     if not os.path.isdir(conf.outputPath):
         try:
