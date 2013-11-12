@@ -9,13 +9,11 @@ import re
 
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import getUnicode
 from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
-from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION

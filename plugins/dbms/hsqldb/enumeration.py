@@ -13,7 +13,6 @@ from lib.core.data import queries
 from lib.core.common import Backend
 from lib.core.common import unArrayizeValue
 from lib.request import inject
-from lib.parse.banner import bannerParser
 
 class Enumeration(GenericEnumeration):
     def __init__(self):
