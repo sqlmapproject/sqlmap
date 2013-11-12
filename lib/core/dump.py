@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import cgi
 import codecs
 import os
+import re
 import threading
 
 from lib.core.common import Backend
@@ -379,7 +380,7 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
-        dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db))
+        dumpDbPath = "%s%s%s" % (conf.dumpPath, os.sep, re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication("%s%s%s.sqlite3" % (conf.dumpPath, os.sep, unsafeSQLIdentificatorNaming(db)))
