@@ -989,6 +989,7 @@ def _setHTTPProxy():
     """
     Check and set the HTTP/SOCKS proxy for all HTTP requests.
     """
+    global proxyHandler
 
     if not conf.proxy:
         if conf.proxyList:
