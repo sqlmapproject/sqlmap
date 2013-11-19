@@ -198,7 +198,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                     if isNumPosStrValue(count):
                         count = int(count)
 
-                        if batch:
+                        if batch or count == 1:
                             stopLimit = count
                         else:
                             message = "the SQL query provided can return "
