@@ -75,4 +75,8 @@ def purge(directory):
 
     logger.debug("deleting the whole directory tree")
     os.chdir(os.path.join(directory, ".."))
-    shutil.rmtree(directory)
+
+    try:
+        shutil.rmtree(directory)
+    except OSError, ex:
+        logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, ex))
