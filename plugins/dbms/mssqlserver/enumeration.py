@@ -311,7 +311,7 @@ class Enumeration(GenericEnumeration):
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
-            for db in dbs.keys():
+            for db in filter(None, dbs.keys()):
                 db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
