@@ -7,8 +7,24 @@
         <info type="Windows"/>
     </regexp>
 
-    <regexp value="Service Pack (\d)">
+    <regexp value="Service Pack 0">
+        <info sp="0"/>
+    </regexp>
+
+    <regexp value="Service Pack 1">
         <info sp="1"/>
+    </regexp>
+
+    <regexp value="Service Pack 2">
+        <info sp="2"/>
+    </regexp>
+
+    <regexp value="Service Pack 3">
+        <info sp="3"/>
+    </regexp>
+
+    <regexp value="Service Pack 4">
+        <info sp="4"/>
     </regexp>
 
     <regexp value="Windows.*7\.5">
