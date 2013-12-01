@@ -2243,7 +2243,7 @@ Formats:
     </test>
     
     <test>
-        <title>HSQLDB &gt;= 1.7.2 Server stacked queries</title>
+        <title>HSQLDB &gt;= 1.7.2 stacked queries</title>
         <stype>4</stype>
         <level>3</level>
         <risk>0</risk>
@@ -2264,7 +2264,7 @@ Formats:
     </test>
     
     <test>
-        <title>HSQLDB &gt;= 2.0 Server stacked queries</title>
+        <title>HSQLDB &gt;= 2.0 stacked queries</title>
         <stype>4</stype>
         <level>4</level>
         <risk>0</risk>
