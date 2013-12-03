@@ -101,7 +101,8 @@ class Agent(object):
             elif kb.postHint == POST_HINT.JSON:
                 origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)(?P<result>[^"]+\Z)', origValue)
             else:
-                origValue = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"]+\Z)", origValue) or ""
+                _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"]+\Z)", origValue) or ""
+                origValue = _.split('=', 1)[1] if '=' in _ else ""
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
