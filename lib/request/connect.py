@@ -648,7 +648,7 @@ class Connect(object):
 
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
 
-            if place == PLACE.CUSTOM_POST:
+            if place == PLACE.CUSTOM_POST and kb.postHint:
                 if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                     # payloads in SOAP/XML should have chars > and < replaced
                     # with their HTML encoded counterparts
@@ -661,7 +661,7 @@ class Connect(object):
                 value = agent.replacePayload(value, payload)
             else:
                 # GET, POST, URI and Cookie payload needs to be throughly URL encoded
-                if place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST,) and urlEncodePost:
+                if place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST, PLACE.CUSTOM_POST) and urlEncodePost:
                     payload = urlencode(payload, '%', False, place != PLACE.URI)
                     value = agent.replacePayload(value, payload)
 
