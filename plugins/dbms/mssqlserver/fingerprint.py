@@ -84,7 +84,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("BINARY_CHECKSUM([RANDNUM])=BINARY_CHECKSUM([RANDNUM])")
+            result = inject.checkBooleanExpression("SQUARE([RANDNUM])=SQUARE([RANDNUM])")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MSSQL
