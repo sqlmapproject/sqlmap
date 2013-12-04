@@ -97,6 +97,7 @@ from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
+from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
@@ -556,8 +557,9 @@ def paramToDict(place, parameters=None):
                 testableParameters[parameter] = "=".join(parts[1:])
                 if not conf.multipleTargets:
                     _ = urldecode(testableParameters[parameter], convall=True)
-                    if _.strip(DUMMY_SQL_INJECTION_CHARS) != _\
-                        or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _):
+                    if (_.strip(DUMMY_SQL_INJECTION_CHARS) != _\
+                      or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _))\
+                      and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most probably leftover " % element
                         warnMsg += "chars/statements from manual SQL injection test(s). "

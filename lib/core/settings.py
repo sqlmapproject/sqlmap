@@ -340,6 +340,9 @@ IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "
 # Regular expression used for recognition of ASP.NET control parameters
 ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
 
+# Prefix for Google analytics cookie names
+GOOGLE_ANALYTICS_COOKIE_PREFIX = "__UTM"
+
 # Turn off resume console info to avoid potential slowdowns
 TURN_OFF_RESUME_INFO_LIMIT = 20
 
