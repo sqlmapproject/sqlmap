@@ -389,7 +389,7 @@ def option_get(taskid):
 
     option = request.json.get("option", "")
 
-    if option in tasks[taskid]:
+    if option in tasks[taskid].options:
         return jsonize({option: tasks[taskid].get_option(option)})
     else:
         return jsonize({option: "not set"})
