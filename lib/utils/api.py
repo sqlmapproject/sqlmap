@@ -336,7 +336,7 @@ def task_new():
     tasks[taskid] = Task(taskid)
 
     logger.debug("Created new task ID: %s" % taskid)
-    return jsonize({"taskid": taskid})
+    return jsonize({"success": True, "taskid": taskid})
 
 
 @get("/task/<taskid>/delete")
@@ -351,7 +351,7 @@ def task_delete(taskid):
         logger.debug("Deleted task ID: %s" % taskid)
         return jsonize({"success": True})
     else:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
 ###################
 # Admin functions #
@@ -365,9 +365,9 @@ def task_list(taskid):
     if is_admin(taskid):
         logger.debug("Listed task pull")
         task_list = list(tasks)
-        return jsonize({"tasks": task_list, "tasks_num": len(tasks)})
+        return jsonize({"success": True, "tasks": task_list, "tasks_num": len(tasks)})
     else:
-        abort(401)
+        return jsonize({"success": False, "message": "Unauthorized"})
 
 
 @get("/admin/<taskid>/flush")
@@ -385,7 +385,7 @@ def task_flush(taskid):
         logger.debug("Flushed task pull")
         return jsonize({"success": True})
     else:
-        abort(401)
+        return jsonize({"success": False, "message": "Unauthorized"})
 
 ##################################
 # sqlmap core interact functions #
@@ -398,9 +398,9 @@ def option_list(taskid):
     List options for a certain task ID
     """
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
-    return jsonize({"options": tasks[taskid].get_options()})
+    return jsonize({"success": True, "options": tasks[taskid].get_options()})
 
 
 @post("/option/<taskid>/get")
@@ -411,14 +411,14 @@ def option_get(taskid):
     global tasks
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     option = request.json.get("option", "")
 
     if option in tasks[taskid].options:
-        return jsonize({option: tasks[taskid].get_option(option)})
+        return jsonize({"success": True, option: tasks[taskid].get_option(option)})
     else:
-        return jsonize({option: "not set"})
+        return jsonize({"success": False, "message": "Unknown option", option: "not set"})
 
 
 @post("/option/<taskid>/set")
@@ -429,7 +429,7 @@ def option_set(taskid):
     global tasks
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     for option, value in request.json.items():
         tasks[taskid].set_option(option, value)
@@ -445,7 +445,7 @@ def scan_start(taskid):
     global tasks
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
@@ -469,7 +469,7 @@ def scan_stop(taskid):
     global tasks
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     tasks[taskid].engine_stop()
 
@@ -485,7 +485,7 @@ def scan_kill(taskid):
     global tasks
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     tasks[taskid].engine_kill()
 
@@ -501,12 +501,16 @@ def scan_status(taskid):
     global tasks
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     status = "terminated" if tasks[taskid].engine_has_terminated() is True else "running"
 
     logger.debug("Requested status of scan for task ID %s" % taskid)
-    return jsonize({"status": status, "returncode": tasks[taskid].engine_get_returncode()})
+    return jsonize({
+        "success": True,
+        "status": status,
+        "returncode": tasks[taskid].engine_get_returncode()
+    })
 
 
 @get("/scan/<taskid>/data")
@@ -520,7 +524,7 @@ def scan_data(taskid):
     json_errors_message = list()
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all data from the IPC database for the taskid
     for status, content_type, value in db.execute(
@@ -535,7 +539,7 @@ def scan_data(taskid):
         json_errors_message.append(error)
 
     logger.debug("Retrieved data and error messages for scan for task ID %s" % taskid)
-    return jsonize({"data": json_data_message, "error": json_errors_message})
+    return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
 @get("/scan/<taskid>/log/<start>/<end>")
@@ -548,10 +552,10 @@ def scan_log_limited(taskid, start, end):
     json_log_messages = list()
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     if not start.isdigit() or not end.isdigit() or end < start:
-        abort(500, "Invalid start or end value, must be digits")
+        return jsonize({"success": False, "message": "Invalid start or end value, must be digits"})
 
     start = max(1, int(start))
     end = max(1, int(end))
@@ -564,7 +568,7 @@ def scan_log_limited(taskid, start, end):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
     logger.debug("Retrieved subset of log messages for scan for task ID %s" % taskid)
-    return jsonize({"log": json_log_messages})
+    return jsonize({"success": True, "log": json_log_messages})
 
 
 @get("/scan/<taskid>/log")
@@ -577,7 +581,7 @@ def scan_log(taskid):
     json_log_messages = list()
 
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all log messages from the IPC database
     for time_, level, message in db.execute(
@@ -585,7 +589,7 @@ def scan_log(taskid):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
     logger.debug("Retrieved log messages for scan for task ID %s" % taskid)
-    return jsonize({"log": json_log_messages})
+    return jsonize({"success": True, "log": json_log_messages})
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
