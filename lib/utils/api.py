@@ -598,18 +598,20 @@ def download(taskid, target, filename):
     Download a certain file from the file system
     """
     if taskid not in tasks:
-        abort(500, "Invalid task ID")
+        return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Prevent file path traversal - the lame way
-    if target.startswith("."):
-        abort(500)
+    if ".." in target:
+        return jsonize({"success": False, "message": "Forbidden path"})
 
     path = os.path.join(paths.SQLMAP_OUTPUT_PATH, target)
 
     if os.path.exists(path):
-        return static_file(filename, root=path)
+        with open(path, 'rb') as inf:
+            file_content = inf.read()
+        return jsonize({"success": True, "file": file_content.encode("base64")})
     else:
-        abort(500, "File does not exist")
+        return jsonize({"success": False, "message": "File does not exist"})
 
 
 def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
