@@ -87,7 +87,7 @@ class Database(object):
         self.connection.close()
 
     def commit(self):
-        self.cursor.commit()
+        self.connection.commit()
 
     def execute(self, statement, arguments=None):
         if arguments:
