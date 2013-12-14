@@ -32,7 +32,6 @@ from lib.core.enums import PART_RUN_CONTENT_TYPES
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.subprocessng import Popen
-from thirdparty.bottle.bottle import abort
 from thirdparty.bottle.bottle import error
 from thirdparty.bottle.bottle import get
 from thirdparty.bottle.bottle import hook
@@ -40,7 +39,6 @@ from thirdparty.bottle.bottle import post
 from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
-from thirdparty.bottle.bottle import static_file
 
 RESTAPI_SERVER_HOST = "127.0.0.1"
 RESTAPI_SERVER_PORT = 8775
