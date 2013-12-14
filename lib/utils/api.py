@@ -32,8 +32,6 @@ from lib.core.enums import PART_RUN_CONTENT_TYPES
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.subprocessng import Popen
-from lib.core.subprocessng import send_all
-from lib.core.subprocessng import recv_some
 from thirdparty.bottle.bottle import abort
 from thirdparty.bottle.bottle import error
 from thirdparty.bottle.bottle import get
