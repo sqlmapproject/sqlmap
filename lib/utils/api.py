@@ -447,8 +447,6 @@ def scan_start(taskid):
     if taskid not in tasks:
         abort(500, "Invalid task ID")
 
-    tasks[taskid].reset_options()
-
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
         tasks[taskid].set_option(option, value)
