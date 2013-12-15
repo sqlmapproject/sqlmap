@@ -32,7 +32,7 @@ from lib.core.enums import PART_RUN_CONTENT_TYPES
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.subprocessng import Popen
-from thirdparty.bottle.bottle import error
+from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
 from thirdparty.bottle.bottle import hook
 from thirdparty.bottle.bottle import post
@@ -182,6 +182,7 @@ class Task(object):
     def engine_has_terminated(self):
         return isinstance(self.engine_get_returncode(), int)
 
+
 # Wrapper functions for sqlmap engine
 class StdDbOut(object):
     def __init__(self, taskid, messagetype="stdout"):
@@ -289,25 +290,26 @@ def security_headers(json_header=True):
 # HTTP Status Code functions #
 ##############################
 
-@error(401)  # Access Denied
+
+@return_error(401)  # Access Denied
 def error401(error=None):
     security_headers(False)
     return "Access denied"
 
 
-@error(404)  # Not Found
+@return_error(404)  # Not Found
 def error404(error=None):
     security_headers(False)
     return "Nothing here"
 
 
-@error(405)  # Method Not Allowed (e.g. when requesting a POST method via GET)
+@return_error(405)  # Method Not Allowed (e.g. when requesting a POST method via GET)
 def error405(error=None):
     security_headers(False)
     return "Method not allowed"
 
 
-@error(500)  # Internal Server Error
+@return_error(500)  # Internal Server Error
 def error500(error=None):
     security_headers(False)
     return "Internal server error"
@@ -315,6 +317,7 @@ def error500(error=None):
 #############################
 # Task management functions #
 #############################
+
 
 # Users' methods
 @get("/task/new")
@@ -347,6 +350,7 @@ def task_delete(taskid):
 # Admin functions #
 ###################
 
+
 @get("/admin/<taskid>/list")
 def task_list(taskid):
     """
@@ -354,8 +358,8 @@ def task_list(taskid):
     """
     if is_admin(taskid):
         logger.debug("Listed task pull")
-        task_list = list(DataStore.tasks)
-        return jsonize({"success": True, "tasks": task_list, "tasks_num": len(task_list)})
+        tasks = list(DataStore.tasks)
+        return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
     else:
         return jsonize({"success": False, "message": "Unauthorized"})
 
@@ -378,6 +382,7 @@ def task_flush(taskid):
 ##################################
 # sqlmap core interact functions #
 ##################################
+
 
 # Handle task's options
 @get("/option/<taskid>/list")
@@ -419,6 +424,7 @@ def option_set(taskid):
         DataStore.tasks[taskid].set_option(option, value)
 
     return jsonize({"success": True})
+
 
 # Handle scans
 @post("/scan/<taskid>/start")
@@ -516,6 +522,7 @@ def scan_data(taskid):
     logger.debug("Retrieved data and error messages for scan for task ID %s" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
+
 # Functions to handle scans' logs
 @get("/scan/<taskid>/log/<start>/<end>")
 def scan_log_limited(taskid, start, end):
@@ -561,6 +568,7 @@ def scan_log(taskid):
 
     logger.debug("Retrieved log messages for scan for task ID %s" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
+
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
