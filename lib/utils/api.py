@@ -71,6 +71,8 @@ class Database(object):
 
     def __init__(self, database=None):
         self.database = self.filepath if database is None else database
+        self.connection = None
+        self.cursor = None
 
     def connect(self, who="server"):
         self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None)
