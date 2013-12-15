@@ -212,7 +212,7 @@ class StdDbOut(object):
             # Delete partial output from IPC database if we have got a complete output
             if status == CONTENT_STATUS.COMPLETE:
                 if len(output) > 0:
-                    for index in xrange(0, len(output)):
+                    for index in xrange(len(output)):
                         conf.database_cursor.execute("DELETE FROM data WHERE id = ?",
                                                      (output[index][0],))
 
@@ -328,7 +328,7 @@ def task_new():
     taskid = hexencode(os.urandom(8))
     DataStore.tasks[taskid] = Task(taskid)
 
-    logger.debug("Created new task ID: %s" % taskid)
+    logger.debug(" [%s] Created new task" % taskid)
     return jsonize({"success": True, "taskid": taskid})
 
 
@@ -341,9 +341,10 @@ def task_delete(taskid):
         DataStore.tasks[taskid].clean_filesystem()
         DataStore.tasks.pop(taskid)
 
-        logger.debug("Deleted task ID: %s" % taskid)
+        logger.debug("[%s] Deleted task" % taskid)
         return jsonize({"success": True})
     else:
+        logger.warning("[%s] Invalid task ID provided to task_delete()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
 ###################
@@ -357,10 +358,11 @@ def task_list(taskid):
     List task pull
     """
     if is_admin(taskid):
-        logger.debug("Listed task pull")
+        logger.debug("[%s] Listed task pool" % taskid)
         tasks = list(DataStore.tasks)
         return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
     else:
+        logger.warning("[%s] Unauthorized call to task_list()" % taskid)
         return jsonize({"success": False, "message": "Unauthorized"})
 
 
@@ -374,9 +376,10 @@ def task_flush(taskid):
             DataStore.tasks[task].clean_filesystem()
 
         DataStore.tasks = dict()
-        logger.debug("Flushed task pull")
+        logger.debug("[%s] Flushed task pool" % taskid)
         return jsonize({"success": True})
     else:
+        logger.warning("[%s] Unauthorized call to task_flush()" % taskid)
         return jsonize({"success": False, "message": "Unauthorized"})
 
 ##################################
@@ -391,8 +394,10 @@ def option_list(taskid):
     List options for a certain task ID
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to option_list()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
+    logger.debug("[%s] Listed task options" % taskid)
     return jsonize({"success": True, "options": DataStore.tasks[taskid].get_options()})
 
 
@@ -402,13 +407,16 @@ def option_get(taskid):
     Get the value of an option (command line switch) for a certain task ID
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to option_get()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     option = request.json.get("option", "")
 
     if option in DataStore.tasks[taskid].options:
+        logger.debug("[%s] Retrieved value for option %s" % (taskid, option))
         return jsonize({"success": True, option: DataStore.tasks[taskid].get_option(option)})
     else:
+        logger.debug("[%s] Requested value for unknown option %s" % (taskid, option))
         return jsonize({"success": False, "message": "Unknown option", option: "not set"})
 
 
@@ -418,11 +426,13 @@ def option_set(taskid):
     Set an option (command line switch) for a certain task ID
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to option_set()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
+    logger.debug("[%s] Requested to set options" % taskid)
     return jsonize({"success": True})
 
 
@@ -433,6 +443,7 @@ def scan_start(taskid):
     Launch a scan
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_start()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Initialize sqlmap engine's options with user's provided options, if any
@@ -445,7 +456,7 @@ def scan_start(taskid):
     # Launch sqlmap engine in a separate process
     DataStore.tasks[taskid].engine_start()
 
-    logger.debug("Started scan for task ID %s" % taskid)
+    logger.debug("[%s] Started scan" % taskid)
     return jsonize({"success": True, "engineid": DataStore.tasks[taskid].engine_get_id()})
 
 
@@ -455,11 +466,12 @@ def scan_stop(taskid):
     Stop a scan
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_stop()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     DataStore.tasks[taskid].engine_stop()
 
-    logger.debug("Stopped scan for task ID %s" % taskid)
+    logger.debug("[%s] Stopped scan" % taskid)
     return jsonize({"success": True})
 
 
@@ -469,11 +481,12 @@ def scan_kill(taskid):
     Kill a scan
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_kill()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     DataStore.tasks[taskid].engine_kill()
 
-    logger.debug("Killed scan for task ID %s" % taskid)
+    logger.debug("[%s] Killed scan" % taskid)
     return jsonize({"success": True})
 
 
@@ -483,11 +496,12 @@ def scan_status(taskid):
     Returns status of a scan
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_status()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     status = "terminated" if DataStore.tasks[taskid].engine_has_terminated() is True else "running"
 
-    logger.debug("Requested status of scan for task ID %s" % taskid)
+    logger.debug("[%s] Retrieved scan status" % taskid)
     return jsonize({
         "success": True,
         "status": status,
@@ -504,6 +518,7 @@ def scan_data(taskid):
     json_errors_message = list()
 
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_data()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all data from the IPC database for the taskid
@@ -519,7 +534,7 @@ def scan_data(taskid):
             (taskid,)):
         json_errors_message.append(error)
 
-    logger.debug("Retrieved data and error messages for scan for task ID %s" % taskid)
+    logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
 
@@ -532,9 +547,11 @@ def scan_log_limited(taskid, start, end):
     json_log_messages = list()
 
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_log_limited()")
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     if not start.isdigit() or not end.isdigit() or end < start:
+        logger.warning("[%s] Invalid start or end value provided to scan_log_limited()" % taskid)
         return jsonize({"success": False, "message": "Invalid start or end value, must be digits"})
 
     start = max(1, int(start))
@@ -547,7 +564,7 @@ def scan_log_limited(taskid, start, end):
             (taskid, start, end)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
-    logger.debug("Retrieved subset of log messages for scan for task ID %s" % taskid)
+    logger.debug("[%s] Retrieved scan log messages subset" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 
@@ -559,6 +576,7 @@ def scan_log(taskid):
     json_log_messages = list()
 
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_log()")
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all log messages from the IPC database
@@ -566,7 +584,7 @@ def scan_log(taskid):
             "SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
-    logger.debug("Retrieved log messages for scan for task ID %s" % taskid)
+    logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 
@@ -577,19 +595,23 @@ def download(taskid, target, filename):
     Download a certain file from the file system
     """
     if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to download()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Prevent file path traversal - the lame way
     if ".." in target:
+        logger.warning("[%s] Forbidden path (%s)" % (taskid, target))
         return jsonize({"success": False, "message": "Forbidden path"})
 
     path = os.path.join(paths.SQLMAP_OUTPUT_PATH, target)
 
     if os.path.exists(path):
+        logger.debug("[%s] Retrieved content of file %s" % (taskid, target))
         with open(path, 'rb') as inf:
             file_content = inf.read()
         return jsonize({"success": True, "file": file_content.encode("base64")})
     else:
+        logger.warning("[%s] File does not exist %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
 
 
