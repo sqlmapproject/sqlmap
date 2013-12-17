@@ -23,8 +23,10 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import DUCKDUCKGO_REGEX
+from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
+from lib.request.httpshandler import HTTPSHandler
 
 class Google(object):
     """
@@ -36,6 +38,7 @@ class Google(object):
         self._cj = cookielib.CookieJar()
 
         handlers.append(urllib2.HTTPCookieProcessor(self._cj))
+        handlers.append(HTTPSHandler())
 
         self.opener = urllib2.build_opener(*handlers)
         self.opener.addheaders = conf.httpHeaders
@@ -116,8 +119,11 @@ class Google(object):
                 url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
 
                 if not conf.randomAgent:
-                    conf.opener.addheaders = [_ for _ in conf.opener.addheaders if _[0].lower() != HTTP_HEADER.USER_AGENT.lower()]
-                    conf.opener.addheaders.append((HTTP_HEADER.USER_AGENT, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"))
+                    self.opener.addheaders = [_ for _ in self.opener.addheaders if _[0].lower() != HTTP_HEADER.USER_AGENT.lower()]
+                    self.opener.addheaders.append((HTTP_HEADER.USER_AGENT, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"))
+
+                self.opener.addheaders = [_ for _ in self.opener.addheaders if _[0].lower() != HTTP_HEADER.ACCEPT_ENCODING.lower()]
+                self.opener.addheaders.append((HTTP_HEADER.ACCEPT_ENCODING, HTTP_ACCEPT_ENCODING_HEADER_VALUE))
 
                 try:
                     conn = self.opener.open(url)
