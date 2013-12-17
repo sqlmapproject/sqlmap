@@ -2168,7 +2168,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
 
     return result
 
-def urlencode(value, safe="%&=", convall=False, limit=False, spaceplus=False):
+def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
     """
     URL encodes given value
 
