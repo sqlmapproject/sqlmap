@@ -70,7 +70,7 @@ def dnsUse(payload, expression):
 
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
                     query = agent.prefixQuery("; %s" % expressionUnescaped)
-                    query = agent.suffixQuery(query)
+                    query = "%s%s" % (query, queries[Backend.getIdentifiedDbms()].comment.query)
                     forgedPayload = agent.payload(newValue=query)
                 else:
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, randomInt(1), randomInt(3)))
