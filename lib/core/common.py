@@ -3478,18 +3478,19 @@ def decodeHexValue(value):
         if value and isinstance(value, basestring) and len(value) % 2 == 0:
             retVal = hexdecode(retVal)
 
-            if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
-                try:
-                    retVal = retVal.decode("utf-16-le")
-                except UnicodeDecodeError:
-                    pass
-            elif Backend.isDbms(DBMS.HSQLDB):
-                try:
-                    retVal = retVal.decode("utf-16-be")
-                except UnicodeDecodeError:
-                    pass
-            if not isinstance(retVal, unicode):
-                retVal = getUnicode(retVal, "utf8")
+            if not kb.binaryField:
+                if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
+                    try:
+                        retVal = retVal.decode("utf-16-le")
+                    except UnicodeDecodeError:
+                        pass
+                elif Backend.isDbms(DBMS.HSQLDB):
+                    try:
+                        retVal = retVal.decode("utf-16-be")
+                    except UnicodeDecodeError:
+                        pass
+                if not isinstance(retVal, unicode):
+                    retVal = getUnicode(retVal, "utf8")
 
         return retVal
 

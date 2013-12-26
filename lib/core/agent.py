@@ -351,7 +351,8 @@ class Agent(object):
                 else:
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
-            if conf.hexConvert or conf.binaryFields and field in conf.binaryFields.split(','):
+            kb.binaryField = conf.binaryFields and field in conf.binaryFields.split(',')
+            if conf.hexConvert or kb.binaryField:
                 nulledCastedField = self.hexConvertField(nulledCastedField)
 
         return nulledCastedField
