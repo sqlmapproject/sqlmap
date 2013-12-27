@@ -229,7 +229,10 @@ class Agent(object):
             pass
 
         elif suffix and not comment:
-            expression += " %s" % suffix
+            if suffix.startswith(GENERIC_SQL_COMMENT):
+                expression += "%s" % suffix
+            else:
+                expression += " %s" % suffix
 
         return re.sub(r"(?s);\W*;", ";", expression)
 
