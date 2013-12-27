@@ -44,6 +44,7 @@ from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.settings import MAX_BUFFERED_PARTIAL_UNION_LENGTH
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -272,10 +273,10 @@ def unionUse(expression, unpack=True, dump=False):
                             break
 
                         if output:
-                            if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
-                                items = parseUnionPage(output)
+                            with kb.locks.value:
+                                if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
+                                    items = parseUnionPage(output)
 
-                                with kb.locks.value:
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
                                     # in case that we requested N columns and we get M!=N then we have to filter a bit
@@ -286,14 +287,7 @@ def unionUse(expression, unpack=True, dump=False):
                                         if threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, items))
-                                    while threadData.shared.buffered and threadData.shared.lastFlushed + 1 == threadData.shared.buffered[0][0]:
-                                        threadData.shared.lastFlushed += 1
-                                        _ = threadData.shared.buffered[0][1]
-                                        if not isNoneValue(_):
-                                            threadData.shared.value.extend(arrayizeValue(_))
-                                        del threadData.shared.buffered[0]
-                            else:
-                                with kb.locks.value:
+                                else:
                                     index = None
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
@@ -301,7 +295,14 @@ def unionUse(expression, unpack=True, dump=False):
                                         if threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, None))
-                                items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
+
+                                    items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
+
+                                while threadData.shared.buffered and (threadData.shared.lastFlushed + 1 >= threadData.shared.buffered[0][0] or len(threadData.shared.buffered) > MAX_BUFFERED_PARTIAL_UNION_LENGTH):
+                                    threadData.shared.lastFlushed, _ = threadData.shared.buffered[0]
+                                    if not isNoneValue(_):
+                                        threadData.shared.value.extend(arrayizeValue(_))
+                                    del threadData.shared.buffered[0]
 
                             if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
                                 status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items)))))

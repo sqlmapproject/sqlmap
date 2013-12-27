@@ -99,6 +99,9 @@ BACKDOOR_RUN_CMD_TIMEOUT = 5
 # Maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
 
+# In case of missing piece of partial union dump, buffered array must be flushed after certain size
+MAX_BUFFERED_PARTIAL_UNION_LENGTH = 1024
+
 # Suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX = "_masterdb"
 
