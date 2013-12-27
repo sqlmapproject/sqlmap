@@ -108,6 +108,9 @@ class Agent(object):
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             origValue = origValue[origValue.index(',') + 1:]
 
+        if conf.prefix:
+            value = origValue
+
         if value is None:
             if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue

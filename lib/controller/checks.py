@@ -322,7 +322,7 @@ def checkSqlInjection(place, parameter, value):
 
                     # Threat the parameter original value according to the
                     # test's <where> tag
-                    if where == PAYLOAD.WHERE.ORIGINAL:
+                    if where == PAYLOAD.WHERE.ORIGINAL or conf.prefix:
                         origValue = value
                     elif where == PAYLOAD.WHERE.NEGATIVE:
                         # Use different page template than the original
