@@ -229,6 +229,279 @@ Formats:
 -->
 
 <root>
+    <!-- Generic boundaries -->
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1,2,3</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'</prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"</prefix>
+        <suffix></suffix>
+    </boundary>
+    <!-- End of generic boundaries -->
+
+    <!-- WHERE/HAVING clause boundaries -->
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)</prefix>
+        <suffix>AND ([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>))</prefix>
+        <suffix>AND (([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)))</prefix>
+        <suffix>AND ((([RANDNUM]=[RANDNUM]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>0</clause>
+        <where>1,2,3</where>
+        <ptype>1</ptype>
+        <prefix></prefix>
+        <suffix></suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')</prefix>
+        <suffix>AND ('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'))</prefix>
+        <suffix>AND (('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')))</prefix>
+        <suffix>AND ((('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>'</prefix>
+        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>')</prefix>
+        <suffix>AND ('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>'))</prefix>
+        <suffix>AND (('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>')))</prefix>
+        <suffix>AND ((('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
+        <prefix>'</prefix>
+        <suffix>AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>")</prefix>
+        <suffix>AND ("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"))</prefix>
+        <suffix>AND (("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>")))</prefix>
+        <suffix>AND ((("[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>"</prefix>
+        <suffix>AND "[RANDSTR]"="[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>")</prefix>
+        <suffix>AND ("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"))</prefix>
+        <suffix>AND (("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>")))</prefix>
+        <suffix>AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>5</ptype>
+        <prefix>"</prefix>
+        <suffix>AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%')</prefix>
+        <suffix>AND ('%'='</suffix>
+    </boundary>
+
+    <boundary>
+        <level>3</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%'))</prefix>
+        <suffix>AND (('%'='</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%')))</prefix>
+        <suffix>AND ((('%'='</suffix>
+    </boundary>
+
+    <boundary>
+        <level>1</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%'</prefix>
+        <suffix>AND '%'='</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%00')</prefix>
+        <suffix>AND ('[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>%00'</prefix>
+        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+    </boundary>
+
     <boundary>
         <level>1</level>
         <clause>1</clause>
