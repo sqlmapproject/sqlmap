@@ -120,7 +120,7 @@ class Popen(subprocess.Popen):
                     nAvail = maxsize
                 if nAvail > 0:
                     (errCode, read) = ReadFile(x, nAvail, None)
-            except ValueError:
+            except (ValueError, NameError):
                 return self._close(which)
             except (subprocess.pywintypes.error, Exception), why:
                 if why[0] in (109, errno.ESHUTDOWN):
