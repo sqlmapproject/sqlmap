@@ -669,6 +669,15 @@ def _setMetasploit():
     msfEnvPathExists = False
 
     if IS_WIN:
+        try:
+            import win32file
+        except ImportError:
+            errMsg = "sqlmap requires third-party module 'pywin32' "
+            errMsg += "in order to use Metasploit functionalities on "
+            errMsg += "Windows. You can download it from "
+            errMsg += "'http://sourceforge.net/projects/pywin32/files/pywin32/'"
+            raise SqlmapMissingDependence(errMsg)
+
         if not conf.msfPath:
             def _(key, value):
                 retVal = None
