@@ -173,6 +173,9 @@ class Task(object):
         else:
             return None
 
+    def engine_process(self):
+        return self.process
+
     def engine_kill(self):
         if self.process:
             return self.process.kill()
@@ -512,7 +515,7 @@ def scan_status(taskid):
         logger.warning("[%s] Invalid task ID provided to scan_status()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    if DataStore.tasks[taskid].engine_get_returncode() is None:
+    if DataStore.tasks[taskid].engine_process() is None:
         status = "not running"
     else:
         status = "terminated" if DataStore.tasks[taskid].engine_has_terminated() is True else "running"
