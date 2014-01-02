@@ -104,6 +104,7 @@ class Database(object):
 class Task(object):
     def __init__(self, taskid):
         self.process = None
+        self.temporary_directory = False
         self.output_directory = None
         self.options = None
         self._original_options = None
@@ -144,12 +145,23 @@ class Task(object):
         self.options = AttribDict(self._original_options)
 
     def set_output_directory(self):
+        if self.get_option("oDir"):
+            if os.path.isdir(self.get_option("oDir")):
+                self.output_directory = self.get_option("oDir")
+            else:
+                try:
+                    os.makedirs(self.get_option("oDir"))
+                    self.output_directory = self.get_option("oDir")
+                except OSError:
+                    pass
+
         if not self.output_directory or not os.path.isdir(self.output_directory):
             self.output_directory = tempfile.mkdtemp(prefix="sqlmapoutput-")
+            self.temporary_directory = True
             self.set_option("oDir", self.output_directory)
 
     def clean_filesystem(self):
-        if self.output_directory:
+        if self.output_directory and self.temporary_directory:
             shutil.rmtree(self.output_directory)
 
     def engine_start(self):
