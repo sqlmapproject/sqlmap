@@ -102,7 +102,6 @@ class Database(object):
 
 
 class Task(object):
-
     def __init__(self, taskid):
         self.process = None
         self.output_directory = None
