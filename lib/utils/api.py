@@ -54,20 +54,6 @@ class DataStore(object):
 # API objects
 class Database(object):
     filepath = None
-    LOGS_TABLE = ("CREATE TABLE logs("
-                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                  "taskid INTEGER, time TEXT, "
-                  "level TEXT, message TEXT"
-                  ")")
-    DATA_TABLE = ("CREATE TABLE data("
-                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                  "taskid INTEGER, status INTEGER, "
-                  "content_type INTEGER, value TEXT"
-                  ")")
-    ERRORS_TABLE = ("CREATE TABLE errors("
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    "taskid INTEGER, error TEXT"
-                    ")")
 
     def __init__(self, database=None):
         self.database = self.filepath if database is None else database
@@ -96,9 +82,22 @@ class Database(object):
             return self.cursor.fetchall()
 
     def init(self):
-        self.execute(self.LOGS_TABLE)
-        self.execute(self.DATA_TABLE)
-        self.execute(self.ERRORS_TABLE)
+        self.execute("CREATE TABLE logs("
+                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                  "taskid INTEGER, time TEXT, "
+                  "level TEXT, message TEXT"
+                  ")")
+
+        self.execute("CREATE TABLE data("
+                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                  "taskid INTEGER, status INTEGER, "
+                  "content_type INTEGER, value TEXT"
+                  ")")
+
+        self.execute("CREATE TABLE errors("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    "taskid INTEGER, error TEXT"
+                    ")")
 
 
 class Task(object):
