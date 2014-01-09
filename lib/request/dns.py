@@ -65,6 +65,7 @@ class DNSServer(object):
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._socket.bind(("", 53))
         self._running = False
+        self._initialized = False
 
     def pop(self, prefix=None, suffix=None):
         """
@@ -91,6 +92,7 @@ class DNSServer(object):
         def _():
             try:
                 self._running = True
+                self._initialized = True
 
                 while True:
                     data, addr = self._socket.recvfrom(1024)
@@ -115,6 +117,9 @@ if __name__ == "__main__":
     try:
         server = DNSServer()
         server.run()
+
+        while not server._initialized:
+            time.sleep(0.1)
 
         while server._running:
             while True:
