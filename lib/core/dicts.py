@@ -138,7 +138,7 @@ DBMS_DICT = {
                 DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
                 DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "sybase"),
                 DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/", "ibm_db_sa"),
-                DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
+                DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
             }
 
 FROM_DUMMY_TABLE = {
