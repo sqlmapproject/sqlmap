@@ -298,12 +298,10 @@ def runCase(parse):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
                     retVal = None
                     Failures.failedItems.append(item)
-                    #break
 
             elif item not in parse_on:
                 retVal = None
                 Failures.failedItems.append(item)
-                #break
 
         if Failures.failedItems:
             Failures.failedParseOn = console
