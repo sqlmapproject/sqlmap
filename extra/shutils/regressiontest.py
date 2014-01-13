@@ -78,7 +78,7 @@ def main():
     if stderr:
         failure_email("Update of sqlmap failed with error:\n\n%s" % stderr)
 
-    regressionproc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test --run-case 'MySQL UNION query multi-threaded enumeration'", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
+    regressionproc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
     stdout, stderr = regressionproc.communicate()
 
     if stderr:
