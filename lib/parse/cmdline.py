@@ -404,10 +404,13 @@ def cmdLineParser():
                                help="DBMS database to enumerate")
 
         enumeration.add_option("-T", dest="tbl",
-                               help="DBMS database table to enumerate")
+                               help="DBMS database table(s) to enumerate")
 
         enumeration.add_option("-C", dest="col",
-                               help="DBMS database table column to enumerate")
+                               help="DBMS database table column(s) to enumerate")
+
+        enumeration.add_option("-X", dest="excludeCol",
+                               help="DBMS database table column(s) to not enumerate")
 
         enumeration.add_option("-U", dest="user",
                                help="DBMS user to enumerate")

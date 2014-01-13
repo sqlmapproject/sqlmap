@@ -349,7 +349,7 @@ class Search:
             elif test[0] in ("q", "Q"):
                 raise SqlmapUserQuitException
             else:
-                regex = "|".join(conf.col.split(","))
+                regex = '|'.join(conf.col.split(','))
                 conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS, regex))
 
                 message = "do you want to dump entries? [Y/n] "
@@ -368,6 +368,10 @@ class Search:
         infoMsgTbl = ""
         infoMsgDb = ""
         colList = conf.col.split(",")
+
+        if conf.excludeCol:
+            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
         origTbl = conf.tbl
         origDb = conf.db
         colCond = rootQuery.inband.condition

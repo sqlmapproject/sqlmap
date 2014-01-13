@@ -399,9 +399,12 @@ class Databases:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.col = conf.col.upper()
 
-            colList = conf.col.split(",")
+            colList = conf.col.split(',')
         else:
             colList = []
+
+        if conf.excludeCol:
+            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
 
         for col in colList:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)

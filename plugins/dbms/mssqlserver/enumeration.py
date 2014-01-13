@@ -263,6 +263,10 @@ class Enumeration(GenericEnumeration):
         infoMsgTbl = ""
         infoMsgDb = ""
         colList = conf.col.split(",")
+
+        if conf.excludeCol:
+            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
         origTbl = conf.tbl
         origDb = conf.db
         colCond = rootQuery.inband.condition

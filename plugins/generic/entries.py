@@ -122,6 +122,17 @@ class Entries:
 
                 columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]
                 colList = sorted(filter(None, columns.keys()))
+
+                if conf.excludeCol:
+                    colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
+                if not colList:
+                    warnMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg += " (no usable column names)"
+                    logger.warn(warnMsg)
+                    continue
+
                 colNames = colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
@@ -420,7 +431,12 @@ class Entries:
                     continue
 
                 conf.tbl = table
-                conf.col = ",".join(column for column in filter(None, sorted(columns)))
+                colList = filter(None, sorted(columns))
+
+                if conf.excludeCol:
+                    colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
+                conf.col = ",".join(colList)
                 kb.data.cachedColumns = {}
                 kb.data.dumpedTable = {}
 
