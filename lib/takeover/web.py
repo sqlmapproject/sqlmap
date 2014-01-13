@@ -274,9 +274,6 @@ class Web:
 
                         if "sqlmap file uploader" in uplPage:
                             uploaded = True
-                else:
-                    continue
-
             if not uploaded:
                 self.webBaseUrl = "%s://%s:%d/" % (conf.scheme, conf.hostname, conf.port)
                 self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
