@@ -192,8 +192,7 @@ def liveTest():
             errMsg = "test failed"
 
             if Failures.failedItems:
-                errMsg += " at parsing items:\n"
-                errMsg += "\n".join("\t%s" % i for i in Failures.failedItems)
+                errMsg += " at parsing items: %s" % ", ".join(i for i in Failures.failedItems)
 
             errMsg += " - scan folder: %s" % paths.SQLMAP_OUTPUT_PATH
             errMsg += " - traceback: %s" % bool(Failures.failedTraceBack)
