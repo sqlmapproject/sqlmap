@@ -31,6 +31,7 @@ FROM = "regressiontest@sqlmap.org"
 #TO = "dev@sqlmap.org"
 TO = ["bernardo.damele@gmail.com", "miroslav.stampar@gmail.com"]
 SUBJECT = "regression test started on %s using revision %s" % (START_TIME, REVISION)
+TARGET = "debian"
 
 def prepare_email(content):
     global FROM
@@ -96,7 +97,7 @@ def main():
         test_counts.append(test_count)
 
         console_output_file = os.path.join(output_folder, "console_output")
-        log_file = os.path.join(output_folder, "debiandev", "log")
+        log_file = os.path.join(output_folder, TARGET, "log")
         traceback_file = os.path.join(output_folder, "traceback")
 
         if os.path.exists(console_output_file):
