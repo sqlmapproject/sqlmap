@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -35,9 +35,10 @@ from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
 
-failedItem = None
-failedParseOn = None
-failedTraceBack = None
+class Failures(object):
+    failedItems = None
+    failedParseOn = None
+    failedTraceBack = None
 
 def smokeTest():
     """
@@ -109,10 +110,6 @@ def liveTest():
     """
     Runs the test of a program against the live testing environment
     """
-
-    global failedItem
-    global failedParseOn
-    global failedTraceBack
 
     retVal = True
     count = 0
@@ -192,13 +189,14 @@ def liveTest():
             logger.info("test passed")
             cleanCase()
         else:
-            errMsg = "test failed "
+            errMsg = "test failed"
 
-            if failedItem:
-                errMsg += "at parsing item \"%s\" " % failedItem
+            if Failures.failedItems:
+                errMsg += " at parsing items:\n"
+                errMsg += "\n".join("\t%s" % i for i in Failures.failedItems)
 
-            errMsg += "- scan folder: %s " % paths.SQLMAP_OUTPUT_PATH
-            errMsg += "- traceback: %s" % bool(failedTraceBack)
+            errMsg += " - scan folder: %s" % paths.SQLMAP_OUTPUT_PATH
+            errMsg += " - traceback: %s" % bool(Failures.failedTraceBack)
 
             if not vulnerable:
                 errMsg += " - SQL injection not detected"
@@ -206,14 +204,14 @@ def liveTest():
             logger.error(errMsg)
             test_case_fd.write("%s\n" % errMsg)
 
-            if failedParseOn:
+            if Failures.failedParseOn:
                 console_output_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "console_output"), "wb", UNICODE_ENCODING)
-                console_output_fd.write(failedParseOn)
+                console_output_fd.write(Failures.failedParseOn)
                 console_output_fd.close()
 
-            if failedTraceBack:
+            if Failures.failedTraceBack:
                 traceback_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "traceback"), "wb", UNICODE_ENCODING)
-                traceback_fd.write(failedTraceBack)
+                traceback_fd.write(Failures.failedTraceBack)
                 traceback_fd.close()
 
             beep()
@@ -234,13 +232,9 @@ def liveTest():
     return retVal
 
 def initCase(switches, count):
-    global failedItem
-    global failedParseOn
-    global failedTraceBack
-
-    failedItem = None
-    failedParseOn = None
-    failedTraceBack = None
+    Failures.failedItems = []
+    Failures.failedParseOn = None
+    Failures.failedTraceBack = None
 
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-%d-" % count)
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
@@ -264,10 +258,6 @@ def cleanCase():
     shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
 
 def runCase(parse):
-    global failedItem
-    global failedParseOn
-    global failedTraceBack
-
     retVal = True
     handled_exception = None
     unhandled_exception = None
@@ -288,10 +278,10 @@ def runCase(parse):
         LOGGER_HANDLER.stream = sys.stdout = sys.__stdout__
 
     if unhandled_exception:
-        failedTraceBack = "unhandled exception: %s" % str(traceback.format_exc())
+        Failures.failedTraceBack = "unhandled exception: %s" % str(traceback.format_exc())
         retVal = None
     elif handled_exception:
-        failedTraceBack = "handled exception: %s" % str(traceback.format_exc())
+        Failures.failedTraceBack = "handled exception: %s" % str(traceback.format_exc())
         retVal = None
     elif result is False:  # this means no SQL injection has been detected - if None, ignore
         retVal = False
@@ -308,19 +298,19 @@ def runCase(parse):
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
                     retVal = None
-                    failedItem = item
-                    break
+                    Failures.failedItems.append(item)
+                    #break
 
             elif item not in parse_on:
                 retVal = None
-                failedItem = item
-                break
+                Failures.failedItems.append(item)
+                #break
 
-        if failedItem is not None:
-            failedParseOn = console
+        if Failures.failedItems:
+            Failures.failedParseOn = console
 
     elif retVal is False:
-        failedParseOn = console
+        Failures.failedParseOn = console
 
     return retVal
 

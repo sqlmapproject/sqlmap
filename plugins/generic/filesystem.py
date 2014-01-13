@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -66,7 +66,7 @@ class Filesystem:
                 if localFileSize == remoteFileSize:
                     sameFile = True
                     infoMsg = "the local file %s and the remote file " % localFile
-                    infoMsg += "%s has the same size" % remoteFile
+                    infoMsg += "%s have the same size" % remoteFile
                 elif remoteFileSize > localFileSize:
                     infoMsg = "the remote file %s is larger than " % remoteFile
                     infoMsg += "the local file %s" % localFile

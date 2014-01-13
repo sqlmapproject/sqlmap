@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -43,7 +43,9 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if banVer >= "9.0":
+        if banVer >= "9.1":
+            majorVer = "9.1"
+        elif banVer >= "9.0":
             majorVer = "9.0"
         elif banVer >= "8.4":
             majorVer = "8.4"
