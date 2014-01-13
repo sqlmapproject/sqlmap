@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -610,15 +610,15 @@ def paramToDict(place, parameters=None):
 
     return testableParameters
 
-def getDocRoot():
-    docRoot = None
+def getManualDirectories():
+    directories = None
     pagePath = directoryPath(conf.path)
 
     defaultDocRoot = DEFAULT_DOC_ROOTS.get(Backend.getOs(), DEFAULT_DOC_ROOTS[OS.LINUX])
 
     if kb.absFilePaths:
         for absFilePath in kb.absFilePaths:
-            if docRoot:
+            if directories:
                 break
 
             if directoryPath(absFilePath) == '/':
@@ -636,41 +636,41 @@ def getDocRoot():
                     _ = "/%s/" % _
 
                     if _ in absFilePath:
-                        docRoot = "%s%s" % (absFilePath.split(_)[0], _)
+                        directories = "%s%s" % (absFilePath.split(_)[0], _)
                         break
 
             if pagePath and pagePath in absFilePath:
-                docRoot = absFilePath.split(pagePath)[0]
+                directories = absFilePath.split(pagePath)[0]
                 if windowsDriveLetter:
-                    docRoot = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(docRoot))
+                    directories = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(directories))
 
-    docRoot = normalizePath(docRoot)
+    directories = normalizePath(directories)
 
-    if docRoot:
-        infoMsg = "retrieved the web server document root: '%s'" % docRoot
+    if directories:
+        infoMsg = "retrieved the web server document root: '%s'" % directories
         logger.info(infoMsg)
     else:
         warnMsg = "unable to retrieve automatically the web server "
         warnMsg += "document root"
         logger.warn(warnMsg)
 
-        docRoot = []
+        directories = []
 
-        message = "what do you want to use for web server document root?\n"
+        message = "what do you want to use for writable directory?\n"
         message += "[1] common location(s) '%s' (default)\n" % ", ".join(root for root in defaultDocRoot)
-        message += "[2] custom location\n"
+        message += "[2] custom location(s)\n"
         message += "[3] custom directory list file\n"
         message += "[4] brute force search\n"
         choice = readInput(message, default="1").strip()
 
         if choice == "2":
-            message = "please provide the web server document root: "
-            docRoot = readInput(message, default="").split(',')
+            message = "please provide a comma separate list of absolute directory paths: "
+            directories = readInput(message, default="").split(',')
         elif choice == "3":
             message = "what's the list file location?\n"
             listPath = readInput(message, default="")
             checkFile(listPath)
-            docRoot = getFileItems(listPath)
+            directories = getFileItems(listPath)
         elif choice == "4":
             targets = set([conf.hostname])
             _ = conf.hostname.split('.')
@@ -691,31 +691,30 @@ def getDocRoot():
                     for target in targets:
                         item = "%s/%s" % (prefix, suffix)
                         item = item.replace(BRUTE_DOC_ROOT_TARGET_MARK, target).replace("//", '/').rstrip('/')
-                        docRoot.append(item)
+                        directories.append(item)
 
                         if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
                             break
 
-            infoMsg = "using common document root locations: %s" % ','.join(docRoot)
+            infoMsg = "using common directories: %s" % ','.join(directories)
             logger.info(infoMsg)
 
-            msg = "use additional custom "
-            msg += "document root locations [Enter for None]: "
+            msg = "use additional custom directories [Enter for None]: "
             answer = readInput(msg)
 
             if answer:
-                docRoot.extend(answer.split(','))
+                directories.extend(answer.split(','))
 
         else:
-            docRoot = defaultDocRoot
+            directories = defaultDocRoot
 
-    return docRoot
+    return directories
 
-def getDirs():
+def getAutoDirectories():
     directories = set("/")
 
     if kb.absFilePaths:
-        infoMsg = "retrieved web server full paths: "
+        infoMsg = "retrieved web server absolute paths: "
         infoMsg += "'%s'" % ", ".join(ntToPosixSlashes(path) for path in kb.absFilePaths)
         logger.info(infoMsg)
 
@@ -728,7 +727,8 @@ def getDirs():
         warnMsg = "unable to retrieve automatically any web server path"
         logger.warn(warnMsg)
 
-    webDir = extractRegexResult(r"//[^/]+?/(?P<result>.*)/", conf.url)
+    webDir = extractRegexResult(r"//[^/]+?(?P<result>/.*)/", conf.url)
+
     if webDir:
         directories.add(webDir)
 
