@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+# Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 # See the file 'doc/COPYING' for copying permission
 
 import codecs
@@ -77,13 +77,13 @@ def main():
     if stderr:
         failure_email("Update of sqlmap failed with error:\n\n%s" % stderr)
 
-    regressionproc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
+    regressionproc = subprocess.Popen("python /opt/sqlmap/sqlmap.py --live-test --run-case 'MySQL UNION query multi-threaded enumeration'", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
     stdout, stderr = regressionproc.communicate()
 
     if stderr:
         failure_email("Execution of regression test failed with error:\n\n%s" % stderr)
 
-    failed_tests = re.findall("running live test case: (.+?) \((\d+)\/\d+\)[\r]*\n.+test failed (at parsing item \"(.+)\" )?\- scan folder: (\/.+) \- traceback: (.*?)( - SQL injection not detected)?[\r]*\n", stdout, re.M)
+    failed_tests = re.findall("running live test case: (.+?) \((\d+)\/\d+\)[\r]*\n.+test failed (at parsing items: (.+))?\s*\- scan folder: (\/.+) \- traceback: (.*?)( - SQL injection not detected)?[\r]*\n", stdout, re.M)
 
     for failed_test in failed_tests:
         title = failed_test[0]
