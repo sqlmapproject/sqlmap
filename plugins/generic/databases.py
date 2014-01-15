@@ -281,7 +281,7 @@ class Databases:
 
                 for db, table in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
-                    table = safeSQLIdentificatorNaming(table, True)
+                    table = safeSQLIdentificatorNaming(unArrayizeValue(table), True)
 
                     if db not in kb.data.cachedTables:
                         kb.data.cachedTables[db] = [table]
