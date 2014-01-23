@@ -239,6 +239,10 @@ def cmdLineParser():
                              action="store_true",
                              help="Use logical operations for invalidating values")
 
+        injection.add_option("--invalid-string", dest="invalidString",
+                             action="store_true",
+                             help="Use random strings for invalidating values")
+
         injection.add_option("--no-cast", dest="noCast",
                              action="store_true",
                              help="Turn off payload casting mechanism")

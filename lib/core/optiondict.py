@@ -72,6 +72,7 @@ optDict = {
                                "os":                "string",
                                "invalidBignum":     "boolean",
                                "invalidLogical":    "boolean",
+                               "invalidString":     "boolean",
                                "noCast":            "boolean",
                                "noEscape":          "boolean",
                                "prefix":            "string",

@@ -122,6 +122,8 @@ class Agent(object):
                     value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", _, _ + 1)
                 elif conf.invalidBignum:
                     value = randomInt(6)
+                elif conf.invalidString:
+                    value = randomStr(6)
                 else:
                     if newValue.startswith("-"):
                         value = ""
