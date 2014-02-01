@@ -10,8 +10,12 @@
 <root>
     <!-- Microsoft IIS -->
 
+    <regexp value="Microsoft-IIS/(8\.5)">
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2012 R2|8.1"/>
+    </regexp>
+
     <regexp value="Microsoft-IIS/(8\.0)">
-        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2012"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2012|8"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(7\.5)">
