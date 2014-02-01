@@ -711,7 +711,7 @@ def getManualDirectories():
     return directories
 
 def getAutoDirectories():
-    directories = set("/")
+    retVal = set("/")
 
     if kb.absFilePaths:
         infoMsg = "retrieved web server absolute paths: "
@@ -722,17 +722,17 @@ def getAutoDirectories():
             if absFilePath:
                 directory = directoryPath(absFilePath)
                 directory = ntToPosixSlashes(directory)
-                directories.add(directory)
+                retVal.add(directory)
     else:
         warnMsg = "unable to retrieve automatically any web server path"
         logger.warn(warnMsg)
 
-    webDir = extractRegexResult(r"//[^/]+?(?P<result>/.*)/", conf.url)
+    _ = extractRegexResult(r"//[^/]+?(?P<result>/.*)/", conf.url)  # web directory
 
-    if webDir:
-        directories.add(webDir)
+    if _:
+        retVal.add(_)
 
-    return list(directories)
+    return list(retVal)
 
 def filePathToSafeString(filePath):
     """
@@ -1351,6 +1351,10 @@ def parseFilePaths(page):
                     kb.absFilePaths.add(absFilePath)
 
 def getLocalIP():
+    """
+    Get local IP address (exposed to the remote/target)
+    """
+
     retVal = None
 
     try:
@@ -1366,6 +1370,10 @@ def getLocalIP():
     return retVal
 
 def getRemoteIP():
+    """
+    Get remote/target IP address
+    """
+
     retVal = None
 
     try:
@@ -1529,6 +1537,10 @@ def getPageWordSet(page):
     return retVal
 
 def showStaticWords(firstPage, secondPage):
+    """
+    Prints words appearing in two different response pages
+    """
+
     infoMsg = "finding static words in longest matching part of dynamic page content"
     logger.info(infoMsg)
 
@@ -3694,6 +3706,10 @@ def splitFields(fields, delimiter=','):
     return [fields[x + 1:y] for (x, y) in zip(commas, commas[1:])]
 
 def pollProcess(process, suppress_errors=False):
+    """
+    Checks for process status (prints . if still running)
+    """
+
     while True:
         dataToStdout(".")
         time.sleep(1)
