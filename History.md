@@ -57,7 +57,7 @@ an updated version of his **SQL injection: Not only AND 1=1** slides at [2nd Dig
 
 ## 2008
 
-* **December 18**, sqlmap **0.6.3** is released featuring support to retrieve targets from Burp and WebScarab proxies log files, support to test for stacked queries ant time-based blind SQL injection, rough fingerprint of the web server and web application technologies in use and more options to customize the HTTP requests and enumerate more information from the database.
+* **December 18**, sqlmap **0.6.3** is released featuring support to retrieve targets from Burp and WebScarab proxies log files, support to test for stacked queries and time-based blind SQL injection, rough fingerprint of the web server and web application technologies in use and more options to customize the HTTP requests and enumerate more information from the database.
 * **November 2**, sqlmap version **0.6.2** is a "bug fixes" release only.
 * **October 20**, sqlmap first point release, **0.6.1**, goes public. This includes minor bug fixes and the first contact between the tool and [Metasploit](http://metasploit.com): an auxiliary module to launch sqlmap from within Metasploit Framework. The [subversion development repository](https://svn.sqlmap.org/sqlmap/trunk/sqlmap/) goes public again.
 * **September 1**, nearly one year after the previous release, sqlmap **0.6** comes to life featuring a complete code refactoring, support to execute arbitrary SQL **SELECT** statements, more options to enumerate and dump specific information are added, brand new installation packages for Debian, Red Hat, Windows and much more.
