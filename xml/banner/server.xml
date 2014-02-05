@@ -19,15 +19,15 @@
     </regexp>
 
     <regexp value="Microsoft-IIS/(7\.5)">
-        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2008"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2008 R2|7"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(7\.0)">
-        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="Vista"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2008|Vista"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(6\.0)">
-        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2003"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2003|XP"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(5\.2)">
