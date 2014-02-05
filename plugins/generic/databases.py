@@ -227,7 +227,7 @@ class Databases:
                     resumeAvailable = True
                     break
 
-            if resumeAvailable:
+            if resumeAvailable and not conf.freshQueries:
                 for db, table in kb.brute.tables:
                     if db == conf.db:
                         if conf.db not in kb.data.cachedTables:
@@ -458,7 +458,7 @@ class Databases:
                         resumeAvailable = True
                         break
 
-            if resumeAvailable or colList:
+            if resumeAvailable and not conf.freshQueries or colList:
                 columns = {}
 
                 for column in colList:
