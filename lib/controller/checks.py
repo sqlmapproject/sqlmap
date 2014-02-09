@@ -390,7 +390,7 @@ def checkSqlInjection(place, parameter, value):
 
                                 # Perform the test's False request
                                 if not falseResult:
-                                    infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (place, parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -445,7 +445,7 @@ def checkSqlInjection(place, parameter, value):
                                 trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                                 if trueResult:
-                                    infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (place, parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
