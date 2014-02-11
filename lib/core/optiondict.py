@@ -129,6 +129,7 @@ optDict = {
                                "tbl":               "string",
                                "col":               "string",
                                "excludeCol":        "string",
+                               "dumpWhere":         "string",
                                "user":              "string",
                                "excludeSysDbs":     "boolean",
                                "limitStart":        "integer",

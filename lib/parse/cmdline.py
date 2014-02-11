@@ -424,6 +424,9 @@ def cmdLineParser():
                                help="Exclude DBMS system databases when "
                                     "enumerating tables")
 
+        enumeration.add_option("--where", dest="dumpWhere",
+                               help="Use WHERE condition while table dumping")
+
         enumeration.add_option("--start", dest="limitStart", type="int",
                                help="First query output entry to retrieve")
 

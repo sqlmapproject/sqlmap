@@ -42,6 +42,7 @@ from lib.core.settings import NULL
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
 from lib.utils.pivotdumptable import pivotDumpTable
+from lib.utils.pivotdumptable import whereQuery
 
 class Entries:
     """
@@ -175,6 +176,8 @@ class Entries:
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
 
+                    query = whereQuery(query)
+
                     if not entries and query:
                         entries = inject.getValue(query, blind=False, time=False, dump=True)
 
@@ -225,6 +228,8 @@ class Entries:
                         query = rootQuery.blind.count % tbl
                     else:
                         query = rootQuery.blind.count % (conf.db, tbl)
+
+                    query = whereQuery(query)
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
@@ -299,6 +304,8 @@ class Entries:
 
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
+
+                                    query = whereQuery(query)
 
                                     value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
                                     value = '' if value is None else value
