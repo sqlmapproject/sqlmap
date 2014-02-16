@@ -228,7 +228,7 @@ class Web:
                 self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                 self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
-                debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
+                debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                 logger.debug(debugMsg)
 
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
@@ -267,7 +267,7 @@ class Web:
                         self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                         self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
-                        debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
+                        debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                         logger.debug(debugMsg)
 
                         uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
@@ -282,7 +282,7 @@ class Web:
                 self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                 self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
-                debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
+                debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                 logger.debug(debugMsg)
 
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
