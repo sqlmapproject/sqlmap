@@ -5,6 +5,7 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import urlparse
 import os
 import re
 import StringIO
@@ -222,9 +223,9 @@ class Web:
             logger.info(infoMsg)
             self._webFileInject(stagerContent, stagerName, directory)
 
-            for x in list(re.finditer('/', directory)):
-                self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[x.start():])
-                self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
+            for match in re.finditer('/', directory):
+                self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[match.start():])
+                self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                 self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                 debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
