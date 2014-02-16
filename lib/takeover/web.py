@@ -262,9 +262,9 @@ class Web:
                     uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
                     uplPage = uplPage or ""
 
-                    for x in list(re.finditer('/', directory)):
-                        self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[x.start():])
-                        self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
+                    for match in re.finditer('/', directory):
+                        self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[match.start():])
+                        self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                         self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                         debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
@@ -279,7 +279,7 @@ class Web:
 
             if not uploaded:
                 self.webBaseUrl = "%s://%s:%d/" % (conf.scheme, conf.hostname, conf.port)
-                self.webStagerUrl = os.path.join(self.webBaseUrl, stagerName)
+                self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                 self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                 debugMsg = "trying to see if the file is accessible from %s" % self.webStagerUrl
