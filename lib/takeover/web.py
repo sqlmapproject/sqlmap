@@ -224,7 +224,7 @@ class Web:
             self._webFileInject(stagerContent, stagerName, directory)
 
             for match in re.finditer('/', directory):
-                self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[match.start():])
+                self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
                 self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                 self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
@@ -263,7 +263,7 @@ class Web:
                     uplPage = uplPage or ""
 
                     for match in re.finditer('/', directory):
-                        self.webBaseUrl = "%s://%s:%d%s" % (conf.scheme, conf.hostname, conf.port, directory[match.start():])
+                        self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
                         self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
                         self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
