@@ -665,7 +665,7 @@ def checkFalsePositives(injection):
 
         # Simple arithmetic operations which should show basic
         # arithmetic ability of the backend if it's really injectable
-        for i in xrange(1 + conf.level / 2):
+        for i in xrange(conf.level):
             randInt1, randInt2, randInt3 = (_() for j in xrange(3))
 
             randInt1 = min(randInt1, randInt2, randInt3)
