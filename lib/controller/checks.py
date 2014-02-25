@@ -324,6 +324,9 @@ def checkSqlInjection(place, parameter, value):
                     # test's <where> tag
                     if where == PAYLOAD.WHERE.ORIGINAL or conf.prefix:
                         origValue = value
+
+                        if kb.tamperFunctions:
+                            templatePayload = agent.payload(place, parameter, value="", newValue=origValue, where=where)
                     elif where == PAYLOAD.WHERE.NEGATIVE:
                         # Use different page template than the original
                         # one as we are changing parameters value, which
