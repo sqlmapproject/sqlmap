@@ -100,6 +100,8 @@ class Agent(object):
                 origValue = origValue.split('>')[-1]
             elif kb.postHint == POST_HINT.JSON:
                 origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)(?P<result>[^"]+\Z)', origValue)
+            elif kb.postHint == POST_HINT.JSON_LIKE:
+                origValue = extractRegexResult(r'(?s)\'\s*:\s*(?P<result>\d+\Z)', origValue) or extractRegexResult(r"(?s)(?P<result>[^']+\Z)", origValue)
             else:
                 _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"]+\Z)", origValue) or ""
                 origValue = _.split('=', 1)[1] if '=' in _ else ""
@@ -142,6 +144,8 @@ class Agent(object):
             _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
             if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and not '"%s"' % _ in paramString:
                 newValue = '"%s"' % newValue
+            elif kb.postHint == POST_HINT.JSON_LIKE and not isNumber(newValue) and not "'%s'" % _ in paramString:
+                newValue = "'%s'" % newValue
             newValue = newValue.replace(CUSTOM_INJECTION_MARK_CHAR, REPLACEMENT_MARKER)
             retVal = paramString.replace(_, self.addPayloadDelimiters(newValue))
             retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(REPLACEMENT_MARKER, CUSTOM_INJECTION_MARK_CHAR)

@@ -44,6 +44,7 @@ from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import JSON_RECOGNITION_REGEX
+from lib.core.settings import JSON_LIKE_RECOGNITION_REGEX
 from lib.core.settings import MULTIPART_RECOGNITION_REGEX
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import REFERER_ALIASES
@@ -124,6 +125,18 @@ def _setRequestParams():
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*"[^"]+)"', functools.partial(process, repl=r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*\b)', functools.partial(process, repl=r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     kb.postHint = POST_HINT.JSON
+
+            elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
+                message = "JSON-like data found in %s data. " % conf.method
+                message += "Do you want to process it? [Y/n/q] "
+                test = readInput(message, default="Y")
+                if test and test[0] in ("q", "Q"):
+                    raise SqlmapUserQuitException
+                elif test[0] not in ("n", "N"):
+                    conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
+                    conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
+                    conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
+                    kb.postHint = POST_HINT.JSON_LIKE
 
             elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
                 message = "SOAP/XML data found in %s data. " % conf.method

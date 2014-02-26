@@ -71,6 +71,7 @@ class PLACE:
 class POST_HINT:
     SOAP = "SOAP"
     JSON = "JSON"
+    JSON_LIKE = "JSON-like"
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
 

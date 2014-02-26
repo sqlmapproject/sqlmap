@@ -658,6 +658,11 @@ class Connect(object):
                         payload = json.dumps(payload[1:-1])
                     else:
                         payload = json.dumps(payload)[1:-1]
+                elif kb.postHint == POST_HINT.JSON_LIKE:
+                    if payload.startswith("'") and payload.endswith("'"):
+                        payload = json.dumps(payload[1:-1])
+                    else:
+                        payload = json.dumps(payload)[1:-1]
                 value = agent.replacePayload(value, payload)
             else:
                 # GET, POST, URI and Cookie payload needs to be throughly URL encoded
