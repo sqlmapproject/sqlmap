@@ -80,6 +80,7 @@ from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PERMISSION_DENIED_REGEX
 from lib.core.settings import PLAIN_TEXT_CONTENT_TYPE
+from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
@@ -659,10 +660,12 @@ class Connect(object):
                     else:
                         payload = json.dumps(payload)[1:-1]
                 elif kb.postHint == POST_HINT.JSON_LIKE:
-                    if payload.startswith("'") and payload.endswith("'"):
+                    payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
+                    if payload.startswith('"') and payload.endswith('"'):
                         payload = json.dumps(payload[1:-1])
                     else:
                         payload = json.dumps(payload)[1:-1]
+                    payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
                 value = agent.replacePayload(value, payload)
             else:
                 # GET, POST, URI and Cookie payload needs to be throughly URL encoded
