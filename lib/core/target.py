@@ -114,7 +114,7 @@ def _setRequestParams():
 
         if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
             if re.search(JSON_RECOGNITION_REGEX, conf.data):
-                message = "JSON like data found in %s data. " % conf.method
+                message = "JSON data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):
@@ -126,7 +126,7 @@ def _setRequestParams():
                     kb.postHint = POST_HINT.JSON
 
             elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
-                message = "SOAP/XML like data found in %s data. " % conf.method
+                message = "SOAP/XML data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):

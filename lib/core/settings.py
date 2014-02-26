@@ -535,10 +535,10 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Format used for representing invalid unicode characters
 INVALID_UNICODE_CHAR_FORMAT = r"\?%02x"
 
-# Regular expression for SOAP-like POST data
+# Regular expression for SOAP POST data
 SOAP_RECOGNITION_REGEX = r"(?s)\A(<\?xml[^>]+>)?\s*<([^> ]+)( [^>]+)?>.+</\2.*>\s*\Z"
 
-# Regular expression used for detecting JSON-like POST data
+# Regular expression used for detecting JSON POST data
 JSON_RECOGNITION_REGEX = r'(?s)\A(\s*\[)*\s*\{.*"[^"]+"\s*:\s*("[^"]+"|\d+).*\}\s*(\]\s*)*\Z'
 
 # Regular expression used for detecting multipart POST data
