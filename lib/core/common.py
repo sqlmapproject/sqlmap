@@ -295,10 +295,14 @@ class Backend:
 
         # Little precaution, in theory this condition should always be false
         elif kb.dbms is not None and kb.dbms != dbms:
-            msg = "sqlmap previously fingerprinted back-end DBMS "
+            warnMsg = "there seems to be a high probability that "
+            warnMsg += "this could be a false positive case"
+            logger.warn(warnMsg)
+
+            msg = "sqlmap previously fingerprinted back-end DBMS as "
             msg += "%s. However now it has been fingerprinted " % kb.dbms
-            msg += "to be %s. " % dbms
-            msg += "Please, specify which DBMS is "
+            msg += "as %s. " % dbms
+            msg += "Please, specify which DBMS should be "
             msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
 
             while True:
