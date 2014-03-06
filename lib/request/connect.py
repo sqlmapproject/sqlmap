@@ -14,6 +14,7 @@ import string
 import time
 import urllib2
 import urlparse
+import time
 import traceback
 
 from extra.safe2bin.safe2bin import safecharencode
@@ -22,6 +23,7 @@ from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import cpuThrottle
+from lib.core.common import dataToStdout
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import findMultipartPostBoundary
@@ -825,16 +827,20 @@ class Connect(object):
                     warnMsg += "time-based injections because of its high latency time"
                     singleTimeWarnMessage(warnMsg)
 
-                warnMsg = "time-based comparison needs larger statistical "
-                warnMsg += "model. Making a few dummy requests, please wait.."
-                singleTimeWarnMessage(warnMsg)
+                warnMsg = "[%s] [WARNING] time-based comparison requires " % time.strftime("%X")
+                warnMsg += "larger statistical model, please wait"
+                dataToStdout(warnMsg)
 
                 while len(kb.responseTimes) < MIN_TIME_RESPONSES:
                     Connect.queryPage(content=True)
+                    dataToStdout('.')
+
+                dataToStdout("\n")
 
             elif not kb.testMode:
-                warnMsg = "it is very important not to stress the network adapter's "
-                warnMsg += "bandwidth during usage of time-based payloads"
+                warnMsg = "it is very important not to stress the network adapter "
+                warnMsg += "during usage of time-based payloads to prevent potential "
+                warnMsg += "errors "
                 singleTimeWarnMessage(warnMsg)
 
             if not kb.laggingChecked:
