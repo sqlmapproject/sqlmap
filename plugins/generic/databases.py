@@ -331,6 +331,8 @@ class Databases:
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
+                    elif Backend.isDbms(DBMS.HSQLDB):
+                        query = rootQuery.blind.query % (index, unsafeSQLIdentificatorNaming(db))
                     else:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
 
