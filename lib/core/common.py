@@ -1498,7 +1498,7 @@ def safeStringFormat(format_, params):
                 if count < len(params):
                     retVal = retVal[:index] + getUnicode(params[count]) + retVal[index + 2:]
                 else:
-                    raise SqlmapNoneDataException("wrong number of parameters during string formatting")
+                    raise Exception("wrong number of parameters during string formatting")
                 count += 1
 
     return retVal
