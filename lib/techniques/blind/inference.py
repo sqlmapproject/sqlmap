@@ -5,6 +5,7 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
 import threading
 import time
 
@@ -254,7 +255,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 position = (len(charTbl) >> 1)
                 posValue = charTbl[position]
 
-                if CHAR_INFERENCE_MARK not in payload:
+                if not re.search(r"%s\b" % CHAR_INFERENCE_MARK, payload):
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
                 else:
                     # e.g.: ... > '%c' -> ... > ORD(..)
