@@ -2,8 +2,7 @@
 
 <!--
      References:
-     * http://www.http-stats.com/Server
-     * http://en.wikipedia.org
+     * https://en.wikipedia.org/wiki/Internet_Information_Services
      * http://distrowatch.com
 -->
 
@@ -79,11 +78,11 @@
     </regexp>
 
     <regexp value="Apache/2\.2\.3 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="5.8"/>
+        <info type="Linux" distrib="CentOS" release="5.10"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.15 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="6.3"/>
+        <info type="Linux" distrib="CentOS" release="6.5"/>
     </regexp>
 
     <!-- Apache: Debian -->
@@ -142,6 +141,10 @@
 
     <regexp value="Apache/2\.2\.16 \(Debian\)">
         <info type="Linux" distrib="Debian" release="6.0" codename="squeeze"/>
+    </regexp>
+
+    <regexp value="Apache/2\.2\.22 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="7.0" codename="wheezy"/>
     </regexp>
 
     <!-- Apache: Fedora -->
@@ -232,6 +235,18 @@
 
     <regexp value="Apache/2\.2\.22 \(Fedora\)">
         <info type="Linux" distrib="Fedora" release="17" codename="Beefy"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.3 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="18" codename="Spherical"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.4 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="19" codename="Schrodingers"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.6 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="20" codename="Heisenbug"/>
     </regexp>
 
     <!-- Apache: FreeBSD -->
@@ -326,6 +341,10 @@
 
     <regexp value="Apache/2\.2\.21 \(FreeBSD\)">
         <info type="Linux" distrib="FreeBSD" release="9.0"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.6 \(FreeBSD\)">
+        <info type="Linux" distrib="FreeBSD" release="9.2"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
@@ -434,10 +453,6 @@
         <info type="Linux" distrib="Mandriva" release="2010.1|2010.2"/>
     </regexp>
 
-    <regexp value="Apache/2\.2\.19 \(Mandriva Linux/">
-        <info type="Linux" distrib="Mandriva" release="Cooker"/>
-    </regexp>
-
     <!-- Apache: Red Hat -->
 
     <regexp value="Apache/1\.1\.3 Red Hat">
@@ -506,6 +521,10 @@
 
     <regexp value="Apache/2\.2\.15 \(Red Hat\)">
         <info type="Linux" distrib="Red Hat" release="Enterprise 6" codename="Santiago"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.6 \(Red Hat\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 7" codename="Maipo"/>
     </regexp>
 
     <!-- Apache: SuSE -->
@@ -615,6 +634,14 @@
         <info type="Linux" distrib="SuSE" release="12.1"/>
     </regexp>
 
+    <regexp value="Apache/2\.2\.22 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="12.2|12.3"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.6 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="13.1"/>
+    </regexp>
+
     <!-- Apache: Ubuntu -->
 
     <regexp value="Apache/2\.0\.50 \(Ubuntu\)">
@@ -674,7 +701,11 @@
     </regexp>
 
     <regexp value="Apache/2\.2\.22 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="12.04" codename="Precise Pangolin"/>
+        <info type="Linux" distrib="Ubuntu" release="12.04|12.10|13.04" codename="Precise Pangolin|Quantal Quetzal|Raring Ringtail"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.6 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="13.10" codename="Saucy Salamander"/>
     </regexp>
 
     <!-- Nginx -->
