@@ -1116,7 +1116,7 @@ def _setAuthCred():
     """
 
     if kb.passwordMgr:
-        kb.passwordMgr.add_password(None, "%s://%s" % (conf.scheme, conf.hostname), conf.authUsername, conf.authPassword)
+        kb.passwordMgr.add_password(None, "%s://%s:%d" % (conf.scheme, conf.hostname, conf.port), conf.authUsername, conf.authPassword)
 
 def _setHTTPAuthentication():
     """

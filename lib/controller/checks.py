@@ -1210,6 +1210,8 @@ def checkConnection(suppressOutput=False):
         logger.info(infoMsg)
 
     try:
+        Request.queryPage(content=True, noteResponseTime=False)  # dropping first page because it can be totally different than subsequent (e.g. WebGoat) before the Cookie is set up
+
         page, _ = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
 
