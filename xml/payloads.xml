@@ -274,7 +274,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>)</prefix>
-        <suffix>AND ([RANDNUM]=[RANDNUM]</suffix>
+        <suffix> AND ([RANDNUM]=[RANDNUM]</suffix>
     </boundary>
 
     <boundary>
@@ -283,7 +283,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>))</prefix>
-        <suffix>AND (([RANDNUM]=[RANDNUM]</suffix>
+        <suffix> AND (([RANDNUM]=[RANDNUM]</suffix>
     </boundary>
 
     <boundary>
@@ -292,7 +292,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>)))</prefix>
-        <suffix>AND ((([RANDNUM]=[RANDNUM]</suffix>
+        <suffix> AND ((([RANDNUM]=[RANDNUM]</suffix>
     </boundary>
 
     <boundary>
@@ -310,7 +310,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')</prefix>
-        <suffix>AND ('[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix> AND ('[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -319,7 +319,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>'))</prefix>
-        <suffix>AND (('[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix> AND (('[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -328,7 +328,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')))</prefix>
-        <suffix>AND ((('[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix> AND ((('[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -337,7 +337,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>'</prefix>
-        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix> AND '[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -346,7 +346,7 @@ Formats:
         <where>1,2</where>
         <ptype>3</ptype>
         <prefix>')</prefix>
-        <suffix>AND ('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+        <suffix> AND ('[RANDSTR]' LIKE '[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -355,7 +355,7 @@ Formats:
         <where>1,2</where>
         <ptype>3</ptype>
         <prefix>'))</prefix>
-        <suffix>AND (('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+        <suffix> AND (('[RANDSTR]' LIKE '[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -364,7 +364,7 @@ Formats:
         <where>1,2</where>
         <ptype>3</ptype>
         <prefix>')))</prefix>
-        <suffix>AND ((('[RANDSTR]' LIKE '[RANDSTR]</suffix>
+        <suffix> AND ((('[RANDSTR]' LIKE '[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -373,7 +373,7 @@ Formats:
         <where>1,2</where>
         <ptype>3</ptype>
         <prefix>'</prefix>
-        <suffix>AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
+        <suffix> AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -382,7 +382,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>")</prefix>
-        <suffix>AND ("[RANDSTR]"="[RANDSTR]</suffix>
+        <suffix> AND ("[RANDSTR]"="[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -391,7 +391,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>"))</prefix>
-        <suffix>AND (("[RANDSTR]"="[RANDSTR]</suffix>
+        <suffix> AND (("[RANDSTR]"="[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -400,7 +400,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>")))</prefix>
-        <suffix>AND ((("[RANDSTR]"="[RANDSTR]</suffix>
+        <suffix> AND ((("[RANDSTR]"="[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -409,7 +409,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>"</prefix>
-        <suffix>AND "[RANDSTR]"="[RANDSTR]</suffix>
+        <suffix> AND "[RANDSTR]"="[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -418,7 +418,7 @@ Formats:
         <where>1,2</where>
         <ptype>5</ptype>
         <prefix>")</prefix>
-        <suffix>AND ("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+        <suffix> AND ("[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -427,7 +427,7 @@ Formats:
         <where>1,2</where>
         <ptype>5</ptype>
         <prefix>"))</prefix>
-        <suffix>AND (("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+        <suffix> AND (("[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -436,7 +436,7 @@ Formats:
         <where>1,2</where>
         <ptype>5</ptype>
         <prefix>")))</prefix>
-        <suffix>AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
+        <suffix> AND ((("[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -445,7 +445,7 @@ Formats:
         <where>1,2</where>
         <ptype>5</ptype>
         <prefix>"</prefix>
-        <suffix>AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
+        <suffix> AND "[RANDSTR]" LIKE "[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -454,7 +454,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%')</prefix>
-        <suffix>AND ('%'='</suffix>
+        <suffix> AND ('%'='</suffix>
     </boundary>
 
     <boundary>
@@ -463,7 +463,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%'))</prefix>
-        <suffix>AND (('%'='</suffix>
+        <suffix> AND (('%'='</suffix>
     </boundary>
 
     <boundary>
@@ -472,7 +472,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%')))</prefix>
-        <suffix>AND ((('%'='</suffix>
+        <suffix> AND ((('%'='</suffix>
     </boundary>
 
     <boundary>
@@ -481,7 +481,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%'</prefix>
-        <suffix>AND '%'='</suffix>
+        <suffix> AND '%'='</suffix>
     </boundary>
 
     <boundary>
@@ -490,7 +490,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%00')</prefix>
-        <suffix>AND ('[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix> AND ('[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
@@ -499,7 +499,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>%00'</prefix>
-        <suffix>AND '[RANDSTR]'='[RANDSTR]</suffix>
+        <suffix> AND '[RANDSTR]'='[RANDSTR]</suffix>
     </boundary>
 
     <boundary>
