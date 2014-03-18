@@ -1000,6 +1000,10 @@ def _setHTTPProxy():
     """
     global proxyHandler
 
+    for _ in ("http", "https"):
+        if hasattr(proxyHandler, "%s_open" % _):
+            delattr(proxyHandler, "%s_open" % _)
+
     if not conf.proxy:
         if conf.proxyList:
             conf.proxy = conf.proxyList[0]
