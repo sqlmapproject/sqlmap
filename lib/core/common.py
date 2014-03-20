@@ -1192,7 +1192,7 @@ def parseTargetUrl():
     conf.hostname = hostnamePort[0].strip()
 
     conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
-    conf.hostname = conf.hostname.strip("[]")
+    conf.hostname = conf.hostname.strip("[]").replace(CUSTOM_INJECTION_MARK_CHAR, "")
 
     try:
         _ = conf.hostname.encode("idna")
