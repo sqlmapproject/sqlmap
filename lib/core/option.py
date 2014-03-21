@@ -1672,6 +1672,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.permissionFlag = False
     kb.postHint = None
     kb.postSpaceToPlus = False
+    kb.postUrlEncode = True
     kb.prependFlag = False
     kb.processResponseCounter = 0
     kb.previousMethod = None

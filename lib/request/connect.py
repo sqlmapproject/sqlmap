@@ -12,10 +12,9 @@ import re
 import socket
 import string
 import time
+import traceback
 import urllib2
 import urlparse
-import time
-import traceback
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
@@ -616,7 +615,6 @@ class Connect(object):
         pageLength = None
         uri = None
         code = None
-        urlEncodePost = None
 
         if not place:
             place = kb.injection.place or PLACE.GET
@@ -630,10 +628,9 @@ class Connect(object):
         if conf.httpHeaders:
             headers = dict(conf.httpHeaders)
             contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
-            urlEncodePost = contentType and "urlencoded" in contentType or contentType is None
 
-            if (kb.postHint or conf.skipUrlEncode) and urlEncodePost:
-                urlEncodePost = False
+            if (kb.postHint or conf.skipUrlEncode) and kb.postUrlEncode:
+                kb.postUrlEncode = False
                 conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
                 contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
                 conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
@@ -671,8 +668,8 @@ class Connect(object):
                 value = agent.replacePayload(value, payload)
             else:
                 # GET, POST, URI and Cookie payload needs to be throughly URL encoded
-                if place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST, PLACE.CUSTOM_POST) and urlEncodePost:
-                    payload = urlencode(payload, '%', False, place != PLACE.URI)
+                if place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST, PLACE.CUSTOM_POST) and kb.postUrlEncode:
+                    payload = urlencode(payload, '%', False, place != PLACE.URI, place in (PLACE.POST, PLACE.CUSTOM_POST) and kb.postUrlEncode and kb.postSpaceToPlus)
                     value = agent.replacePayload(value, payload)
 
             if conf.hpp:
@@ -815,7 +812,7 @@ class Connect(object):
         if post is not None:
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
-            elif urlEncodePost:
+            elif kb.postUrlEncode:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
         if timeBasedCompare:

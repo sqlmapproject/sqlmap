@@ -577,11 +577,15 @@ def initTargetEnv():
         class _(unicode):
             pass
 
-        original = conf.data
-        conf.data = _(urldecode(conf.data))
-        setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
-
-        kb.postSpaceToPlus = '+' in original
+        for key, value in conf.httpHeaders:
+            if key.upper() == HTTP_HEADER.CONTENT_TYPE.upper():
+                kb.postUrlEncode = "urlencoded" in value
+                break
+        if kb.postUrlEncode:
+            original = conf.data
+            conf.data = _(urldecode(conf.data))
+            setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
+            kb.postSpaceToPlus = '+' in original
 
 def setupTargetEnv():
     _createTargetDirs()
