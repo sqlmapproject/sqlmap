@@ -221,7 +221,7 @@ class Web:
 
             # Upload the file stager with the LIMIT 0, 1 INTO DUMPFILE technique
             infoMsg = "trying to upload the file stager on '%s' " % directory
-            infoMsg += "via LIMIT INTO 'LINES TERMINATED BY' technique"
+            infoMsg += "via LIMIT 'LINES TERMINATED BY' technique"
             logger.info(infoMsg)
             self._webFileInject(stagerContent, stagerName, directory)
 
