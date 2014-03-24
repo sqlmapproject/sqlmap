@@ -16,6 +16,7 @@ from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
 from lib.core.data import logger
 from lib.core.exception import SqlmapDataException
+from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
@@ -43,7 +44,11 @@ class HashDB(object):
 
         return threadData.hashDBCursor
 
-    cursor = property(_get_cursor)
+    def _set_cursor(self, cursor):
+        threadData = getCurrentThreadData()
+        threadData.hashDBCursor = cursor
+
+    cursor = property(_get_cursor, _set_cursor)
 
     def close(self):
         threadData = getCurrentThreadData()
@@ -134,15 +139,29 @@ class HashDB(object):
     def beginTransaction(self):
         threadData = getCurrentThreadData()
         if not threadData.inTransaction:
-            self.cursor.execute('BEGIN TRANSACTION')
+            self.cursor.execute("BEGIN TRANSACTION")
             threadData.inTransaction = True
 
     def endTransaction(self):
         threadData = getCurrentThreadData()
         if threadData.inTransaction:
+            retries = 0
+            while retries < HASHDB_END_TRANSACTION_RETRIES:
+                try:
+                    self.cursor.execute("END TRANSACTION")
+                    threadData.inTransaction = False
+                except sqlite3.OperationalError:
+                    pass
+                else:
+                    return
+
+                retries += 1
+                time.sleep(1)
+
             try:
-                self.cursor.execute('END TRANSACTION')
+                self.cursor.execute("ROLLBACK TRANSACTION")
             except sqlite3.OperationalError:
-                pass
+                self.cursor.close()
+                self.cursor = None
             finally:
                 threadData.inTransaction = False
