@@ -242,6 +242,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
         for match in reqResList:
             request = match if isinstance(match, basestring) else match.group(0)
+            request = re.sub(r"\A[^\w]+", "", request)
 
             schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
 
