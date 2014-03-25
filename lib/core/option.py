@@ -2020,12 +2020,12 @@ def _basicOptionValidation():
         errMsg = "value for option '--stop' (limitStop) must be an integer value greater than zero (>0)"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.level is not None and not (isinstance(conf.level, int) and conf.level > 0):
-        errMsg = "value for option '--level' must be an integer value greater than zero (>0)"
+    if conf.level is not None and not (isinstance(conf.level, int) and conf.level >= 1 and conf.level <= 5):
+        errMsg = "value for option '--level' must be an integer value from range [1, 5]"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.risk is not None and not (isinstance(conf.risk, int) and conf.risk > 0):
-        errMsg = "value for option '--risk' must be an integer value greater than zero (>0)"
+    if conf.risk is not None and not (isinstance(conf.risk, int) and conf.risk >= 1 and conf.risk <= 3):
+        errMsg = "value for option '--risk' must be an integer value from range [1, 3]"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
