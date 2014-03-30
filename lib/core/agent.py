@@ -953,35 +953,35 @@ class Agent(object):
 
         return caseExpression
 
-    def addPayloadDelimiters(self, inpStr):
+    def addPayloadDelimiters(self, value):
         """
         Adds payload delimiters around the input string
         """
 
-        return "%s%s%s" % (PAYLOAD_DELIMITER, inpStr, PAYLOAD_DELIMITER) if inpStr else inpStr
+        return "%s%s%s" % (PAYLOAD_DELIMITER, value, PAYLOAD_DELIMITER) if value else value
 
-    def removePayloadDelimiters(self, inpStr):
+    def removePayloadDelimiters(self, value):
         """
         Removes payload delimiters from inside the input string
         """
 
-        return inpStr.replace(PAYLOAD_DELIMITER, '') if inpStr else inpStr
+        return value.replace(PAYLOAD_DELIMITER, '') if value else value
 
-    def extractPayload(self, inpStr):
+    def extractPayload(self, value):
         """
         Extracts payload from inside of the input string
         """
 
         _ = re.escape(PAYLOAD_DELIMITER)
-        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (_, _), inpStr)
+        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (_, _), value)
 
-    def replacePayload(self, inpStr, payload):
+    def replacePayload(self, value, payload):
         """
         Replaces payload inside the input string with a given payload
         """
 
         _ = re.escape(PAYLOAD_DELIMITER)
-        return re.sub("(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), inpStr) if inpStr else inpStr
+        return re.sub("(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), value) if value else value
 
     def runAsDBMSUser(self, query):
         if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:
