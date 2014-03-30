@@ -1484,7 +1484,12 @@ def safeStringFormat(format_, params):
     u'foobar12'
     """
 
-    retVal = format_.replace("%d", "%s")
+    if format_.count(PAYLOAD_DELIMITER) == 2:
+        _ = format_.split(PAYLOAD_DELIMITER)
+        _[1] = _[1].replace("%d", "%s")
+        retVal = PAYLOAD_DELIMITER.join(_)
+    else:
+        retVal = format_.replace("%d", "%s")
 
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params, 1)
