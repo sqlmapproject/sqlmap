@@ -53,18 +53,18 @@ def cmdLineParser():
 
         # Target options
         target = OptionGroup(parser, "Target", "At least one of these "
-                             "options has to be provided to set the target(s)")
+                             "options has to be provided to define the target(s)")
 
-        target.add_option("-d", dest="direct", help="Direct "
-                          "connection to the database")
+        target.add_option("-d", dest="direct", help="Connection string "
+                          "for direct database connection")
 
-        target.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"www.target.com/vuln.php?id=1\")")
+        target.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.site.com/vuln.php?id=1\")")
 
-        target.add_option("-l", dest="logFile", help="Parse targets from Burp "
-                          "or WebScarab proxy logs")
+        target.add_option("-l", dest="logFile", help="Parse target(s) from Burp "
+                          "or WebScarab proxy log file")
 
-        target.add_option("-m", dest="bulkFile", help="Scan multiple targets enlisted "
-                          "in a given textual file ")
+        target.add_option("-m", dest="bulkFile", help="Scan multiple targets given "
+                          "in a textual file ")
 
         target.add_option("-r", dest="requestFile",
                           help="Load HTTP request from a file")
@@ -86,7 +86,7 @@ def cmdLineParser():
                            help="Character used for splitting parameter values")
 
         request.add_option("--cookie", dest="cookie",
-                           help="HTTP Cookie header")
+                           help="HTTP Cookie header value")
 
         request.add_option("--cookie-del", dest="cDel",
                            help="Character used for splitting cookie values")
@@ -99,17 +99,17 @@ def cmdLineParser():
                            help="Ignore Set-Cookie header from response")
 
         request.add_option("--user-agent", dest="agent",
-                           help="HTTP User-Agent header")
+                           help="HTTP User-Agent header value")
 
         request.add_option("--random-agent", dest="randomAgent",
                            action="store_true",
-                           help="Use randomly selected HTTP User-Agent header")
+                           help="Use randomly selected HTTP User-Agent header value")
 
         request.add_option("--host", dest="host",
-                           help="HTTP Host header")
+                           help="HTTP Host header value")
 
         request.add_option("--referer", dest="referer",
-                           help="HTTP Referer header")
+                           help="HTTP Referer header value")
 
         request.add_option("--headers", dest="headers",
                            help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
@@ -182,7 +182,7 @@ def cmdLineParser():
 
         request.add_option("--hpp", dest="hpp",
                                   action="store_true",
-                                  help="Use HTTP parameter pollution")
+                                  help="Use HTTP parameter pollution method")
 
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
