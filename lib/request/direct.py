@@ -33,7 +33,7 @@ def direct(query, content=True):
     query = agent.adjustLateValues(query)
     threadData = getCurrentThreadData()
 
-    if Backend.isDbms(DBMS.ORACLE) and query.startswith("SELECT ") and " FROM " not in query:
+    if Backend.isDbms(DBMS.ORACLE) and query.upper().startswith("SELECT ") and " FROM " not in query.upper():
         query = "%s FROM DUAL" % query
 
     for sqlTitle, sqlStatements in SQL_STATEMENTS.items():
@@ -50,7 +50,7 @@ def direct(query, content=True):
     output = hashDBRetrieve(query, True, True)
     start = time.time()
 
-    if not select and "EXEC " not in query:
+    if not select and "EXEC " not in query.upper():
         _ = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif not (output and "sqlmapoutput" not in query and "sqlmapfile" not in query):
         output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
