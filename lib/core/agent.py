@@ -44,10 +44,10 @@ class Agent(object):
     def payloadDirect(self, query):
         query = self.cleanupPayload(query)
 
-        if query.startswith("AND "):
-            query = query.replace("AND ", "SELECT ", 1)
-        elif query.startswith(" UNION ALL "):
-            query = query.replace(" UNION ALL ", "", 1)
+        if query.upper().startswith("AND "):
+            query = re.sub(r"(?i)AND ", "SELECT ", query, 1)
+        elif query.upper().startswith(" UNION ALL "):
+            query = re.sub(r"(?i) UNION ALL ", "", query, 1)
         elif query.startswith("; "):
             query = query.replace("; ", "", 1)
 
