@@ -234,7 +234,16 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
         if not re.search(BURP_REQUEST_REGEX, content, re.I | re.S):
             if re.search(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
-                reqResList = [_.decode("base64") for _ in re.findall(BURP_XML_HISTORY_REGEX, content, re.I | re.S)]
+                reqResList = []
+                for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
+                    port, request = match.groups()
+                    request = request.decode("base64")
+                    _ = re.search(r"%s:.+" % HTTP_HEADER.HOST, request)
+                    if _:
+                        host = _.group(0).strip()
+                        if not re.search(r":\d+\Z", host):
+                            request = request.replace(host, "%s:%d" % (host, int(port)))
+                    reqResList.append(request)
             else:
                 reqResList = [content]
         else:

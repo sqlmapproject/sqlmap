@@ -266,7 +266,7 @@ WEBSCARAB_SPLITTER = "### Conversation"
 BURP_REQUEST_REGEX = r"={10,}\s+[^=]+={10,}\s(.+?)\s={10,}"
 
 # Regex used for parsing XML Burp saved history items
-BURP_XML_HISTORY_REGEX = r'<request base64="true"><!\[CDATA\[([^]]+)'
+BURP_XML_HISTORY_REGEX = r'<port>(\d+)</port>.+?<request base64="true"><!\[CDATA\[([^]]+)'
 
 # Encoding used for Unicode data
 UNICODE_ENCODING = "utf8"
