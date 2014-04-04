@@ -94,7 +94,7 @@ def forgeHeaders(items=None):
                         kb.mergeCookies = not _ or _[0] in ("y", "Y")
 
                     if kb.mergeCookies:
-                        _ = lambda x: re.sub("(?i)%s=[^%s]+" % (cookie.name, conf.cDel or DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, cookie.value), x)
+                        _ = lambda x: re.sub("(?i)%s=[^%s]+" % (cookie.name, conf.cDel or DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, getUnicode(cookie.value)), x)
                         headers[HTTP_HEADER.COOKIE] = _(headers[HTTP_HEADER.COOKIE])
 
                         if PLACE.COOKIE in conf.parameters:
@@ -103,7 +103,7 @@ def forgeHeaders(items=None):
                         conf.httpHeaders = [(item[0], item[1] if item[0] != HTTP_HEADER.COOKIE else _(item[1])) for item in conf.httpHeaders]
 
                 elif not kb.testMode:
-                    headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (conf.cDel or DEFAULT_COOKIE_DELIMITER, cookie.name, cookie.value)
+                    headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (conf.cDel or DEFAULT_COOKIE_DELIMITER, cookie.name, getUnicode(cookie.value))
 
         if kb.testMode:
             resetCookieJar(conf.cj)
