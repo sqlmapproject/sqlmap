@@ -10,6 +10,7 @@ import os
 from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.enums import REGISTRY_OPERATION
 
 class Registry:
     """
@@ -49,11 +50,11 @@ class Registry:
     def _createLocalBatchFile(self):
         self._batPathFp = open(self._batPathLocal, "w")
 
-        if self._operation == "read":
+        if self._operation == REGISTRY_OPERATION.READ:
             lines = self._batRead
-        elif self._operation == "add":
+        elif self._operation == REGISTRY_OPERATION.ADD:
             lines = self._batAdd
-        elif self._operation == "delete":
+        elif self._operation == REGISTRY_OPERATION.DELETE:
             lines = self._batDel
 
         for line in lines:
@@ -70,7 +71,7 @@ class Registry:
         os.unlink(self._batPathLocal)
 
     def readRegKey(self, regKey, regValue, parse=False):
-        self._operation = "read"
+        self._operation = REGISTRY_OPERATION.READ
 
         Registry._initVars(self, regKey, regValue, parse=parse)
         self._createRemoteBatchFile()
@@ -90,7 +91,7 @@ class Registry:
         return data
 
     def addRegKey(self, regKey, regValue, regType, regData):
-        self._operation = "add"
+        self._operation = REGISTRY_OPERATION.ADD
 
         Registry._initVars(self, regKey, regValue, regType, regData)
         self._createRemoteBatchFile()
@@ -103,7 +104,7 @@ class Registry:
         self.delRemoteFile(self._batPathRemote)
 
     def delRegKey(self, regKey, regValue):
-        self._operation = "delete"
+        self._operation = REGISTRY_OPERATION.DELETE
 
         Registry._initVars(self, regKey, regValue)
         self._createRemoteBatchFile()
