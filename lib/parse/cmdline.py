@@ -505,12 +505,12 @@ def cmdLineParser():
         takeover.add_option("--os-pwn", dest="osPwn",
                             action="store_true",
                             help="Prompt for an OOB shell, "
-                                 "meterpreter or VNC")
+                                 "Meterpreter or VNC")
 
         takeover.add_option("--os-smbrelay", dest="osSmb",
                             action="store_true",
                             help="One click prompt for an OOB shell, "
-                                 "meterpreter or VNC")
+                                 "Meterpreter or VNC")
 
         takeover.add_option("--os-bof", dest="osBof",
                             action="store_true",
