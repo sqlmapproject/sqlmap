@@ -372,7 +372,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self._regInit()
 
         if not conf.regKey:
-            default = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+            default = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
             msg = "which registry key do you want to read? [%s] " % default
             regKey = readInput(msg, default=default)
         else:
