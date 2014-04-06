@@ -113,7 +113,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         if redurl and kb.redirectChoice == REDIRECTION.YES:
             req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)
             if headers and HTTP_HEADER.SET_COOKIE in headers:
-                req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(conf.cDel or DEFAULT_COOKIE_DELIMITER)[0]
+                req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)[0]
             result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         else:
             result = fp
