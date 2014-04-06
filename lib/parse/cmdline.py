@@ -611,7 +611,7 @@ def cmdLineParser():
                             action="store_true",
                             help="Use DBMS hex function(s) for data retrieval")
 
-        general.add_option("--output-dir", dest="oDir",
+        general.add_option("--output-dir", dest="outputDir",
                             action="store",
                             help="Custom output directory path")
 

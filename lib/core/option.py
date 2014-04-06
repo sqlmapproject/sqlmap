@@ -1507,8 +1507,8 @@ def _cleanupOptions():
     if conf.torType:
         conf.torType = conf.torType.upper()
 
-    if conf.oDir:
-        paths.SQLMAP_OUTPUT_PATH = conf.oDir
+    if conf.outputDir:
+        paths.SQLMAP_OUTPUT_PATH = conf.outputDir
         setPaths()
 
     if conf.string:

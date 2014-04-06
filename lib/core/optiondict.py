@@ -191,7 +191,7 @@ optDict = {
                                "forms":             "boolean",
                                "freshQueries":      "boolean",
                                "hexConvert":        "boolean",
-                               "oDir":              "string",
+                               "outputDir":         "string",
                                "parseErrors":       "boolean",
                                "pivotColumn":       "string",
                                "saveCmdline":       "boolean",

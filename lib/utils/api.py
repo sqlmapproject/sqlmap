@@ -144,20 +144,20 @@ class Task(object):
         self.options = AttribDict(self._original_options)
 
     def set_output_directory(self):
-        if self.get_option("oDir"):
-            if os.path.isdir(self.get_option("oDir")):
-                self.output_directory = self.get_option("oDir")
+        if self.get_option("outputDir"):
+            if os.path.isdir(self.get_option("outputDir")):
+                self.output_directory = self.get_option("outputDir")
             else:
                 try:
-                    os.makedirs(self.get_option("oDir"))
-                    self.output_directory = self.get_option("oDir")
+                    os.makedirs(self.get_option("outputDir"))
+                    self.output_directory = self.get_option("outputDir")
                 except OSError:
                     pass
 
         if not self.output_directory or not os.path.isdir(self.output_directory):
             self.output_directory = tempfile.mkdtemp(prefix="sqlmapoutput-")
             self.temporary_directory = True
-            self.set_option("oDir", self.output_directory)
+            self.set_option("outputDir", self.output_directory)
 
     def clean_filesystem(self):
         if self.output_directory and self.temporary_directory:
