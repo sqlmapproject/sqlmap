@@ -72,7 +72,8 @@ def configFileParser(configFile):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    condition = not config.has_option("Target", "url")
+    condition = not config.has_option("Target", "direct")
+    condition &= not config.has_option("Target", "url")
     condition &= not config.has_option("Target", "logFile")
     condition &= not config.has_option("Target", "bulkFile")
     condition &= not config.has_option("Target", "googleDork")
@@ -81,7 +82,7 @@ def configFileParser(configFile):
 
     if condition:
         errMsg = "missing a mandatory option in the configuration file "
-        errMsg += "(url, logFile, bulkFile, googleDork, requestFile or wizard)"
+        errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile or wizard)"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
     for family, optionData in optDict.items():
