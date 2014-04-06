@@ -47,6 +47,7 @@ from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomRange
 from lib.core.common import randomStr
+from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
@@ -1947,7 +1948,10 @@ def _setProxyList():
     if not conf.proxyFile:
         return
 
-    conf.proxyList = getFileItems(conf.proxyFile)
+    conf.proxyList = []
+    for match in re.finditer(r"(?i)((http[^:]*|socks[^:]*)://)?([\w.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
+        _, type_, address, port = match.groups()
+        conf.proxyList.append("%s://%s:%s" % (type_ or "http", address, port))
 
 def _setTorProxySettings():
     if not conf.tor:
