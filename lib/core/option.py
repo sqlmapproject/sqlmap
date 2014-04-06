@@ -10,6 +10,7 @@ import glob
 import inspect
 import logging
 import os
+import random
 import re
 import socket
 import string
@@ -45,7 +46,6 @@ from lib.core.common import openFile
 from lib.core.common import parseTargetDirect
 from lib.core.common import parseTargetUrl
 from lib.core.common import paths
-from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
@@ -1331,15 +1331,7 @@ def _setHTTPUserAgent():
                 conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, _defaultHTTPUserAgent()))
                 return
 
-        count = len(kb.userAgents)
-
-        if count == 1:
-            userAgent = kb.userAgents[0]
-        else:
-            userAgent = kb.userAgents[randomRange(stop=count - 1)]
-
-        userAgent = sanitizeStr(userAgent)
-        conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, userAgent))
+        userAgent = random.sample(kb.userAgents or [_defaultHTTPUserAgent()], 1)[0]
 
         infoMsg = "fetched random HTTP User-Agent header from "
         infoMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
