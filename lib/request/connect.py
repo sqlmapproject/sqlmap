@@ -191,7 +191,7 @@ class Connect(object):
         the target URL page content
         """
 
-        if conf.delay is not None and isinstance(conf.delay, (int, float)) and conf.delay > 0:
+        if isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
         elif conf.cpuThrottle:
             cpuThrottle(conf.cpuThrottle)

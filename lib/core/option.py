@@ -2034,17 +2034,17 @@ def _basicOptionValidation():
         errMsg = "value for option '--risk' must be an integer value from range [1, 3]"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.limitStart is not None and isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
-       conf.limitStop is not None and isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
+    if isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
+       isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
         errMsg = "value for option '--start' (limitStart) must be smaller or equal than value for --stop (limitStop) option"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.firstChar is not None and isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
-       conf.lastChar is not None and isinstance(conf.lastChar, int) and conf.lastChar < conf.firstChar:
+    if isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
+       isinstance(conf.lastChar, int) and conf.lastChar < conf.firstChar:
         errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.cpuThrottle is not None and isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
+    if isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
         errMsg = "value for option '--cpu-throttle' (cpuThrottle) must be in range [0,100]"
         raise SqlmapSyntaxException(errMsg)
 
