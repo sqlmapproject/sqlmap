@@ -511,7 +511,7 @@ def _setCrawler():
                 crawl(target)
 
                 if conf.verbose in (1, 2):
-                    status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
+                    status = "%d/%d links visited (%d%%)" % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except Exception, ex:
                 errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, ex)
