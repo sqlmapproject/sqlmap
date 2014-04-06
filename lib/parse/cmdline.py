@@ -82,7 +82,7 @@ def cmdLineParser():
         request.add_option("--data", dest="data",
                            help="Data string to be sent through POST")
 
-        request.add_option("--param-del", dest="pDel",
+        request.add_option("--param-del", dest="paramDel",
                            help="Character used for splitting parameter values")
 
         request.add_option("--cookie", dest="cookie",

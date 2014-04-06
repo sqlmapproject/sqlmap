@@ -757,7 +757,7 @@ class Connect(object):
                             cookie = _randomizeParameter(cookie, randomParameter)
 
         if conf.evalCode:
-            delimiter = conf.pDel or DEFAULT_GET_POST_DELIMITER
+            delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
             variables = {}
             originals = {}
 
