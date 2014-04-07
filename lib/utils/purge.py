@@ -44,7 +44,7 @@ def purge(directory):
     for filepath in filepaths:
         try:
             filesize = os.path.getsize(filepath)
-            with open(filepath, 'w+b') as f:
+            with open(filepath, "w+b") as f:
                 f.write("".join(chr(random.randint(0, 255)) for _ in xrange(filesize)))
         except:
             pass
