@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import codecs
 
 from ConfigParser import MissingSectionHeaderError
+from ConfigParser import ParsingError
 
 from lib.core.common import checkFile
 from lib.core.common import unArrayizeValue
@@ -64,8 +65,8 @@ def configFileParser(configFile):
     try:
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
-    except MissingSectionHeaderError:
-        errMsg = "you have provided an invalid configuration file"
+    except (MissingSectionHeaderError, ParsingError), ex:
+        errMsg = "you have provided an invalid configuration file ('%s')" % str(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
