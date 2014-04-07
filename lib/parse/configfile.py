@@ -31,12 +31,17 @@ def configFileProxy(section, option, boolean=False, integer=False):
     global config
 
     if config.has_option(section, option):
-        if boolean:
-            value = config.getboolean(section, option) if config.get(section, option) else False
-        elif integer:
-            value = config.getint(section, option) if config.get(section, option) else 0
-        else:
-            value = config.get(section, option)
+        try:
+            if boolean:
+                value = config.getboolean(section, option) if config.get(section, option) else False
+            elif integer:
+                value = config.getint(section, option) if config.get(section, option) else 0
+            else:
+                value = config.get(section, option)
+        except ValueError, ex:
+            errMsg = "error occurred while processing the option "
+            errMsg += "'%s' in provided configuration file ('%s')" % (option, str(ex))
+            raise SqlmapSyntaxException(errMsg)
 
         if value:
             conf[option] = value
