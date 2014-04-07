@@ -1742,7 +1742,7 @@ def _useWizardInterface():
             break
         else:
             warnMsg = "no GET and/or POST parameter(s) found for testing "
-            warnMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
+            warnMsg += "(e.g. GET parameter 'id' in 'http://www.site.com/vuln.php?id=1')"
             logger.critical(warnMsg)
 
             if conf.crawlDepth or conf.forms:
