@@ -20,6 +20,7 @@ from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
 from lib.controller.checks import identifyWaf
 from lib.core.agent import agent
+from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getPublicTypeMembers
@@ -352,6 +353,7 @@ def start():
                     if not test or test[0] in ("y", "Y"):
                         pass
                     elif test[0] in ("n", "N"):
+                        dataToStdout(os.linesep)
                         continue
                     elif test[0] in ("q", "Q"):
                         break
