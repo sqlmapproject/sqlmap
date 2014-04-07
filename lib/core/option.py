@@ -92,7 +92,6 @@ from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
 from lib.core.optiondict import optDict
-from lib.core.purge import purge
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import BURP_REQUEST_REGEX
 from lib.core.settings import BURP_XML_HISTORY_REGEX
@@ -146,6 +145,7 @@ from lib.request.templates import getPageTemplate
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.google import Google
+from lib.utils.purge import purge
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.keepalive import keepalive
 from thirdparty.oset.pyoset import oset
