@@ -11,15 +11,25 @@
 5.0.
 5.1.
 5.5.
+5.6.
 6.0.
 
 # PostgreSQL
+PostgreSQL 7.0
+PostgreSQL 7.1
+PostgreSQL 7.2
 PostgreSQL 7.3
 PostgreSQL 7.4
+PostgreSQL 8.0
 PostgreSQL 8.1
 PostgreSQL 8.2
 PostgreSQL 8.3
 PostgreSQL 8.4
+PostgreSQL 8.5
+PostgreSQL 9.0
+PostgreSQL 9.1
+PostgreSQL 9.2
+PostgreSQL 9.3
 
 # Oracle
 Oracle Database 9i Standard Edition Release
