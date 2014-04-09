@@ -33,14 +33,22 @@ PostgreSQL 9.3
 
 # Oracle
 Oracle Database 9i Standard Edition Release
+Oracle Database 9i Standard Edition Release 9.
 Oracle Database 9i Express Edition Release
+Oracle Database 9i Express Edition Release 9.
 Oracle Database 9i Enterprise Edition Release
+Oracle Database 9i Enterprise Edition Release 9.
 Oracle Database 10g Standard Edition Release
+Oracle Database 10g Standard Edition Release 10.
 Oracle Database 10g Express Edition Release
 Oracle Database 10g Enterprise Edition Release
+Oracle Database 10g Enterprise Edition Release 10.
 Oracle Database 11g Standard Edition Release
+Oracle Database 11g Standard Edition Release 11.
 Oracle Database 11g Express Edition Release
+Oracle Database 11g Express Edition Release 11.
 Oracle Database 11g Enterprise Edition Release
+Oracle Database 11g Enterprise Edition Release 11.
 
 # Microsoft SQL Server
 Microsoft SQL Server 7.0
