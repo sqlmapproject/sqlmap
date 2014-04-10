@@ -201,7 +201,7 @@ class Agent(object):
         else:
             query = kb.injection.prefix or prefix or ""
 
-            if not (expression and expression[0] == ';') and not (query and query[-1] in ('(', ')') and expression and expression[0] in ('(', ')')):
+            if not (expression and expression[0] == ';') and not (query and query[-1] in ('(', ')') and expression and expression[0] in ('(', ')')) and not (query and query[-1] == '('):
                 query += " "
 
         query = "%s%s" % (query, expression)
