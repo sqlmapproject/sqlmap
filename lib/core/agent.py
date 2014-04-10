@@ -185,7 +185,7 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
-        if where == PAYLOAD.WHERE.REPLACE:
+        if where == PAYLOAD.WHERE.REPLACE and not conf.prefix:
             query = ""
 
         # If the technique is stacked queries (<stype>) do not put a space
@@ -234,7 +234,7 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not append the suffix
-        if where == PAYLOAD.WHERE.REPLACE:
+        if where == PAYLOAD.WHERE.REPLACE and not conf.suffix:
             pass
 
         elif suffix and not comment:
