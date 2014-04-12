@@ -1006,6 +1006,10 @@ def parsePasswordHash(password):
     return password
 
 def cleanQuery(query):
+    """
+    Switch all SQL statement (alike) keywords to upper case
+    """
+
     retVal = query
 
     for sqlStatements in SQL_STATEMENTS.values():
