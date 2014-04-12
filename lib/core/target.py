@@ -462,7 +462,16 @@ def _createFilesDir():
     conf.filePath = paths.SQLMAP_FILES_PATH % conf.hostname
 
     if not os.path.isdir(conf.filePath):
-        os.makedirs(conf.filePath, 0755)
+        try:
+            os.makedirs(conf.filePath, 0755)
+        except OSError, ex:
+            tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
+            warnMsg = "unable to create files directory "
+            warnMsg += "'%s' (%s). " % (conf.filePath, ex)
+            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            logger.warn(warnMsg)
+
+            conf.filePath = tempDir
 
 def _createDumpDir():
     """
