@@ -984,6 +984,10 @@ def banner():
     dataToStdout(_, forceOutput=True)
 
 def parsePasswordHash(password):
+    """
+    In case of Microsoft SQL Server password hash value is expanded to its components
+    """
+
     blank = " " * 8
 
     if not password or password == " ":
