@@ -65,7 +65,16 @@ class Metasploit:
         self._msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
 
         if IS_WIN:
-            _ = normalizePath(os.path.join(conf.msfPath, "..", "scripts", "setenv.bat"))
+            _ = conf.msfPath
+            while _:
+                if os.path.exists(os.path.join(_, "scripts")):
+                    _ = os.path.join(_, "scripts", "setenv.bat")
+                    break
+                else:
+                    old = _
+                    _ = normalizePath(os.path.join(_, ".."))
+                    if _ == old:
+                        break
             self._msfCli = "%s & ruby %s" % (_, self._msfCli)
             self._msfEncode = "ruby %s" % self._msfEncode
             self._msfPayload = "%s & ruby %s" % (_, self._msfPayload)
