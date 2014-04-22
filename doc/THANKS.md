@@ -238,6 +238,9 @@ Dirk Jagdmann, <doj@cubic.org>
 Luke Jahnke, <luke.jahnke@gmail.com>
 * for reporting a bug when running against MySQL < 5.0
 
+Andrew Kitis <andrew.kitis@gmail.com>
+* for contributing a tamper script lowercase.py
+
 David Klein, <david.klein@ipfocus.com.au>
 * for reporting a minor code improvement
 
