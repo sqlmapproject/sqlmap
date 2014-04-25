@@ -179,6 +179,12 @@ class EXPECTED:
     BOOL = "bool"
     INT = "int"
 
+class OPTION_TYPE:
+    BOOLEAN = "boolean"
+    INTEGER = "integer"
+    FLOAT = "float"
+    STRING = "string"
+
 class HASHDB_KEYS:
     DBMS = "DBMS"
     CONF_TMP_PATH = "CONF_TMP_PATH"

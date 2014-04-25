@@ -75,6 +75,7 @@ from lib.core.enums import DUMP_FORMAT
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MOBILES
+from lib.core.enums import OPTION_TYPE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PRIORITY
 from lib.core.enums import PROXY_TYPE
@@ -120,6 +121,7 @@ from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import SITE
 from lib.core.settings import SQLITE_ALIASES
+from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
 from lib.core.settings import SYBASE_ALIASES
@@ -1823,16 +1825,16 @@ def _saveCmdline():
                 datatype = datatype[0]
 
             if value is None:
-                if datatype == "boolean":
+                if datatype == OPTION_TYPE.BOOLEAN:
                     value = "False"
-                elif datatype in ("integer", "float"):
+                elif datatype in (OPTION_TYPE.INTEGER, OPTION_TYPE.FLOAT):
                     if option in ("threads", "verbose"):
                         value = "1"
                     elif option == "timeout":
                         value = "10"
                     else:
                         value = "0"
-                elif datatype == "string":
+                elif datatype == OPTION_TYPE.STRING:
                     value = ""
 
             if isinstance(value, basestring):
@@ -1901,6 +1903,37 @@ def _mergeOptions(inputOptions, overrideOptions):
 
     for key, value in defaults.items():
         if hasattr(conf, key) and conf[key] is None:
+            conf[key] = value
+
+    _ = {}
+    for key, value in os.environ.items():
+        if key.upper().startswith(SQLMAP_ENVIRONMENT_PREFIX):
+            _[key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()] = value
+
+    types_ = {}
+    for group in optDict.keys():
+        types_.update(optDict[group])
+
+    for key in conf:
+        if key.upper() in _:
+            value = _[key.upper()]
+
+            if types_[key] == OPTION_TYPE.BOOLEAN:
+                try:
+                    value = bool(value)
+                except ValueError:
+                    value = False
+            elif types_[key] == OPTION_TYPE.INTEGER:
+                try:
+                    value = int(value)
+                except ValueError:
+                    value = 0
+            elif types_[key] == OPTION_TYPE.FLOAT:
+                try:
+                    value = float(value)
+                except ValueError:
+                    value = 0.0
+
             conf[key] = value
 
     mergedOptions.update(conf)
