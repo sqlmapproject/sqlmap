@@ -1828,10 +1828,8 @@ def _saveCmdline():
                 if datatype == OPTION_TYPE.BOOLEAN:
                     value = "False"
                 elif datatype in (OPTION_TYPE.INTEGER, OPTION_TYPE.FLOAT):
-                    if option in ("threads", "verbose"):
-                        value = "1"
-                    elif option == "timeout":
-                        value = "10"
+                    if option in defaults:
+                        value = str(defaults[option])
                     else:
                         value = "0"
                 elif datatype == OPTION_TYPE.STRING:
