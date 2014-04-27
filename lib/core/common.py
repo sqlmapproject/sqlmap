@@ -1038,6 +1038,10 @@ def setPaths():
     paths.SQLMAP_XML_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "xml")
     paths.SQLMAP_XML_BANNER_PATH = os.path.join(paths.SQLMAP_XML_PATH, "banner")
     paths.SQLMAP_OUTPUT_PATH = paths.get("SQLMAP_OUTPUT_PATH", os.path.join(paths.SQLMAP_ROOT_PATH, "output"))
+
+    if not os.access(paths.SQLMAP_OUTPUT_PATH, os.W_OK):
+        paths.SQLMAP_OUTPUT_PATH = os.path.join(os.path.expanduser("~"), ".sqlmap", "output")
+
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
