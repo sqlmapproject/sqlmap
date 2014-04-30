@@ -50,13 +50,13 @@ from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESTORE_MERGED_OPTIONS
 from lib.core.settings import RESULTS_FILE_FORMAT
-from lib.core.settings import SOAP_RECOGNITION_REGEX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.utils.hashdb import HashDB
 from lib.core.xmldump import dumper as xmldumper
 from thirdparty.odict.odict import OrderedDict
@@ -138,7 +138,7 @@ def _setRequestParams():
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     kb.postHint = POST_HINT.JSON_LIKE
 
-            elif re.search(SOAP_RECOGNITION_REGEX, conf.data):
+            elif re.search(XML_RECOGNITION_REGEX, conf.data):
                 message = "SOAP/XML data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
                 test = readInput(message, default="Y")
