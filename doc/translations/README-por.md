@@ -3,20 +3,20 @@ sqlmap
 
 sqlmap é uma ferramenta de teste de penetração de código aberto que automatiza o processo de detecção e exploração de falhas de injeção SQL. Com essa ferramenta é possível assumir total controle de servidores de banco de dados em páginas web vulneráveis, inclusive de base de dados fora do sistema invadido. Ele possui um motor de detecção poderoso, empregando as últimas e mais devastadoras técnicas de teste de penetração por SQL Injection, que permite acessar a base de dados, o sistema de arquivos subjacente e executar comandos no sistema operacional.
 
-Screenshots
+Imagens
 ----
 
-![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
+![Imagem](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
-Você pode visitar a [coleção de screenshots](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) que demonstra alguns dos recursos apresentados na wiki.
+Você pode visitar a [coleção de imagens](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) que demonstra alguns dos recursos apresentados na wiki.
 
 Instalação
 ----
 
-Você pode fazer o download do arquivo tar mais recente clicando [aqui]
-(https://github.com/sqlmapproject/sqlmap/tarball/master) ou do arquivo zip mais recente clicando [aqui](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Você pode baixar o arquivo tar mais recente clicando [aqui]
+(https://github.com/sqlmapproject/sqlmap/tarball/master) ou o arquivo zip mais recente clicando [aqui](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
-De preferência, você pode fazer o download do sqlmap clonando o repositório [Git](https://github.com/sqlmapproject/sqlmap):
+De preferência, você pode baixar o sqlmap clonando o repositório [Git](https://github.com/sqlmapproject/sqlmap):
 
     git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
@@ -50,4 +50,4 @@ Links
 * Mailing list archive: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demonstrações: [#1](http://www.youtube.com/user/inquisb/videos) e [#2](http://www.youtube.com/user/stamparm/videos)
-* Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+* Imagens: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
