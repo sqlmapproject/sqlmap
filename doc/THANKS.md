@@ -308,6 +308,9 @@ Michael Majchrowicz, <mmajchrowicz@gmail.com>
 * for providing really appreciated feedback
 * for suggesting a lot of ideas and features
 
+Vinícius Henrique Marangoni, <vinicius_marangoni1@hotmail.com>
+* for contributing a Portuguese translation of README.md
+
 Ahmad Maulana, <matdhule@gmail.com>
 * for contributing a tamper script halfversionedmorekeywords.py
 
