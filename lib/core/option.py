@@ -1740,7 +1740,7 @@ def _useWizardInterface():
         message = "POST data (--data) [Enter for None]: "
         conf.data = readInput(message, default=None)
 
-        if filter(lambda x: '=' in str(x), [conf.url, conf.data]) or '*' in conf.url:
+        if filter(lambda _: '=' in unicode(_), (conf.url, conf.data)) or '*' in conf.url:
             break
         else:
             warnMsg = "no GET and/or POST parameter(s) found for testing "
