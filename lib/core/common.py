@@ -1994,7 +1994,10 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
                 except UnicodeDecodeError, ex:
                     return value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
         else:
-            return unicode(value, errors="ignore")  # encoding ignored for non-basestring instances
+            try:
+                return unicode(value)
+            except UnicodeDecodeError:
+                return unicode(str(value), errors="ignore")  # encoding ignored for non-basestring instances
     else:
         try:
             return getUnicode(value, sys.getfilesystemencoding() or sys.stdin.encoding)
