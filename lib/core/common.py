@@ -1992,7 +1992,7 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
                 try:
                     return unicode(value, encoding or kb.get("pageEncoding") or UNICODE_ENCODING)
                 except UnicodeDecodeError, ex:
-                    return value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
+                    value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
         else:
             try:
                 return unicode(value)
