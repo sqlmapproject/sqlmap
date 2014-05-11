@@ -571,7 +571,7 @@ def paramToDict(place, parameters=None):
                         warnMsg += "so sqlmap could be able to run properly"
                         logger.warn(warnMsg)
 
-                        message = "Are you sure you want to continue? [y/N] "
+                        message = "are you sure you want to continue? [y/N] "
                         test = readInput(message, default="N")
                         if test[0] not in ("y", "Y"):
                             raise SqlmapSilentQuitException
