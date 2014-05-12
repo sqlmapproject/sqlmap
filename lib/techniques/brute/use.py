@@ -16,6 +16,7 @@ from lib.core.common import getPageWordSet
 from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -24,6 +25,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.settings import METADB_SUFFIX
@@ -49,6 +51,18 @@ def _addPageTextWords():
     return wordsList
 
 def tableExists(tableFile, regex=None):
+    if kb.tableExistsChoice is None and any(_ not in kb.injection.data for _ in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)):
+        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+        warnMsg += "for common table existence check"
+        logger.warn(warnMsg)
+
+        message = "are you sure you want to continue? [y/N] "
+        test = readInput(message, default="N")
+        kb.tableExistsChoice = test[0] in ("y", "Y")
+
+        if not kb.tableExistsChoice:
+            return None
+
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
 
     if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -141,6 +155,18 @@ def tableExists(tableFile, regex=None):
     return kb.data.cachedTables
 
 def columnExists(columnFile, regex=None):
+    if kb.columnExistsChoice is None and any(_ not in kb.injection.data for _ in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)):
+        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+        warnMsg += "for common column existence check"
+        logger.warn(warnMsg)
+
+        message = "are you sure you want to continue? [y/N] "
+        test = readInput(message, default="N")
+        kb.columnExistsChoice = test[0] in ("y", "Y")
+
+        if not kb.columnExistsChoice:
+            return None
+
     if not conf.tbl:
         errMsg = "missing table parameter"
         raise SqlmapMissingMandatoryOptionException(errMsg)

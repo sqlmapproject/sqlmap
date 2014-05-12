@@ -1606,6 +1606,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.chars.stop = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, lowercase=True), KB_CHARS_BOUNDARY_CHAR)
     kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, _, KB_CHARS_BOUNDARY_CHAR) for _ in randomStr(length=4, lowercase=True))
 
+    kb.columnExistsChoice = None
     kb.commonOutputs = None
     kb.counters = {}
     kb.data = AttribDict()
@@ -1704,6 +1705,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.testQueryCount = 0
     kb.threadContinue = True
     kb.threadException = False
+    kb.tableExistsChoice = None
     kb.timeValidCharsRun = 0
     kb.uChar = NULL
     kb.unionDuplicates = False
