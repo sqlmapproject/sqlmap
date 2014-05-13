@@ -214,7 +214,7 @@ class Web:
             uploaded = False
             directory = ntToPosixSlashes(normalizePath(directory))
 
-            if not isWindowsDriveLetterPath(directory) and directory[0] != '/':
+            if not isWindowsDriveLetterPath(directory) and not directory.startswith('/'):
                 directory = "/%s" % directory
             else:
                 directory = directory[2:] if isWindowsDriveLetterPath(directory) else directory
