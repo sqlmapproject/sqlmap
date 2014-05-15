@@ -137,16 +137,16 @@ class Fingerprint(GenericFingerprint):
         versions = { "2003": ("5.2", (2, 1)),
                      # TODO: verify this
                      #"2003": ("6.0", (2, 1)),
-                     "2008": ("7.0", (1,)),
+                     "2008": ("7.0", (2, 1,)),
                      "2000": ("5.0", (4, 3, 2, 1)),
                      "7": ("6.1", (1, 0)),
-                     "XP": ("5.1", (2, 1)),
+                     "XP": ("5.1", (3, 2, 1)),
                      "NT": ("4.0", (6, 5, 4, 3, 2, 1)) }
 
         # Get back-end DBMS underlying operating system version
         for version, data in versions.items():
-            query = "(SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Windows NT " + data[0] + "%')>0"
+            query = "EXISTS(SELECT %s FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Windows NT " + data[0] + "%')"
             result = inject.checkBooleanExpression(query)
 
             if result:
@@ -169,13 +169,12 @@ class Fingerprint(GenericFingerprint):
 
         # Get back-end DBMS underlying operating system service pack
         sps = versions[Backend.getOsVersion()][1]
-
         for sp in sps:
-            query = "SELECT LEN(%s) FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
-            query += "LIKE '%Service Pack " + getUnicode(sp) + "%'"
-            result = inject.goStacked(query)
+            query = "EXISTS(SELECT %s FROM %s WHERE %s " % (self.tblField, self.fileTblName, self.tblField)
+            query += "LIKE '%Service Pack " + getUnicode(sp) + "%')"
+            result = inject.checkBooleanExpression(query)
 
-            if result is not None and len(result) > 0 and result[0].isdigit():
+            if result:
                 Backend.setOsServicePack(sp)
                 break
 
