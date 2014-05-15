@@ -336,12 +336,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         msg = "this technique is likely to DoS the DBMS process, are you "
         msg += "sure that you want to carry with the exploit? [y/N] "
-        inp = readInput(msg, default="N")
+        choice = readInput(msg, default="N")
 
-        if inp and inp[0].lower() == "y":
-            dos = True
-        else:
-            dos = False
+        dos = choice and choice[0].lower() == "y"
 
         if dos:
             self.initEnv(mandatory=False, detailed=True)
