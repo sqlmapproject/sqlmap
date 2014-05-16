@@ -423,7 +423,8 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     if not kb.testMode and value is None and Backend.getDbms() and conf.dbmsHandler and not conf.noCast and not conf.hexConvert:
         warnMsg = "in case of continuous data retrieval problems you are advised to try "
-        warnMsg += "a switch '--no-cast' or switch '--hex'"
+        warnMsg += "a switch '--no-cast' "
+        warnMsg += "or switch '--hex'" if Backend.getIdentifiedDbms() not in (DBMS.ACCESS, DBMS.FIREBIRD) else ""
         singleTimeWarnMessage(warnMsg)
 
     return extractExpectedValue(value, expected)
