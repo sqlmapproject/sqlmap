@@ -9,6 +9,7 @@ from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import filterPairValues
+from lib.core.common import flattenValue
 from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isListLike
@@ -172,7 +173,7 @@ class Databases:
             kb.data.cachedDbs.sort()
 
         if kb.data.cachedDbs:
-            kb.data.cachedDbs = list(set(kb.data.cachedDbs))
+            kb.data.cachedDbs = list(set(flattenValue(kb.data.cachedDbs)))
 
         return kb.data.cachedDbs
 
