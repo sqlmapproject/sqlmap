@@ -2215,6 +2215,12 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
     if conf.get("direct"):
         return value
 
+    if Backend.isDbms(DBMS.MSSQL) and not kb.tamperFunctions and any(ord(_) > 255 for _ in value):
+        warnMsg = "if you experience problems with "
+        warnMsg += "non-ASCII identifier names "
+        warnMsg += "you are advised to rerun with '--tamper=charunicodeencode'"
+        singleTimeWarnMessage(warnMsg)
+
     count = 0
     result = None if value is None else ""
 
