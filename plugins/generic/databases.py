@@ -173,7 +173,7 @@ class Databases:
             kb.data.cachedDbs.sort()
 
         if kb.data.cachedDbs:
-            kb.data.cachedDbs = list(set(flattenValue(kb.data.cachedDbs)))
+            kb.data.cachedDbs = filter(None, list(set(flattenValue(kb.data.cachedDbs))))
 
         return kb.data.cachedDbs
 
