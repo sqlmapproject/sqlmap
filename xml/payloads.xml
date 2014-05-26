@@ -569,6 +569,62 @@ Formats:
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
+    <!-- Pre-WHERE derived table boundaries (e.g. "SELECT * FROM (SELECT column FROM table WHERE column LIKE '%$_REQUEST["name"]%') AS t1"-->
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>')) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>")) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>)) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>2</ptype>
+        <prefix>') AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>4</ptype>
+        <prefix>") AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>1</ptype>
+        <prefix>) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+    <!-- End of pre-WHERE derived table boundaries -->
+
     <!-- INSERT/UPDATE generic boundaries (e.g. "INSERT INTO table VALUES ('$_REQUEST["name"]',...)"-->
     <boundary>
         <level>5</level>
