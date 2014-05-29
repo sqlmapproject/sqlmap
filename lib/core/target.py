@@ -25,6 +25,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import mergedOptions
 from lib.core.data import paths
+from lib.core.datatype import InjectionDict
 from lib.core.dicts import DBMS_DICT
 from lib.core.dump import dumper
 from lib.core.enums import HASHDB_KEYS
@@ -345,7 +346,7 @@ def _resumeHashDBValues():
     conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 
     for injection in hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []:
-        if injection.place in conf.paramDict and \
+        if isinstance(injection, InjectionDict) and injection.place in conf.paramDict and \
             injection.parameter in conf.paramDict[injection.place]:
 
             if not conf.tech or intersect(conf.tech, injection.data.keys()):

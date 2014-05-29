@@ -48,7 +48,11 @@ def base64pickle(value):
         warnMsg += "instance of a type '%s'" % type(value)
         singleTimeWarnMessage(warnMsg)
 
-        retVal = base64encode(pickle.dumps(str(value), pickle.HIGHEST_PROTOCOL))
+        try:
+            retVal = base64encode(pickle.dumps(value))
+        except:
+            retVal = base64encode(pickle.dumps(str(value), pickle.HIGHEST_PROTOCOL))
+
     return retVal
 
 def base64unpickle(value):
