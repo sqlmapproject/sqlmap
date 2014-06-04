@@ -83,10 +83,6 @@ def main():
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
-        if ".sqlmap" in paths.SQLMAP_OUTPUT_PATH:
-            warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
-            logger.warn(warnMsg)
-
         init()
 
         if conf.profile:
