@@ -20,7 +20,8 @@ def tamper(payload, **kwargs):
     generic comment at the end (to make it work)
 
     Notes:
-        * Useful for bypassing magic_quotes/addslashes feature
+        * Useful for bypassing mysql_real_escape_string/magic_quotes/addslashes feature
+        * Particularly for servers using GBK encoding
 
     Reference:
         * http://shiflett.org/blog/2006/jan/addslashes-versus-mysql-real-escape-string
@@ -42,9 +43,5 @@ def tamper(payload, **kwargs):
             else:
                 retVal += payload[i]
                 continue
-
-        if found:
-            retVal = re.sub("\s*(AND|OR)[\s(]+'[^']+'\s*(=|LIKE)\s*'.*", "", retVal)
-            retVal += "-- "
 
     return retVal
