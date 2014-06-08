@@ -1734,25 +1734,20 @@ def _useWizardInterface():
 
     logger.info("starting wizard interface")
 
-    while True:
-        while not conf.url:
-            message = "Please enter full target URL (-u): "
-            conf.url = readInput(message, default=None)
+    while not conf.url:
+        message = "Please enter full target URL (-u): "
+        conf.url = readInput(message, default=None)
 
-        message = "POST data (--data) [Enter for None]: "
-        conf.data = readInput(message, default=None)
+    message = "POST data (--data) [Enter for None]: "
+    conf.data = readInput(message, default=None)
 
-        if filter(lambda _: '=' in unicode(_), (conf.url, conf.data)) or '*' in conf.url:
-            break
-        else:
-            warnMsg = "no GET and/or POST parameter(s) found for testing "
-            warnMsg += "(e.g. GET parameter 'id' in 'http://www.site.com/vuln.php?id=1')"
-            logger.critical(warnMsg)
-
-            if conf.crawlDepth or conf.forms:
-                break
-            else:
-                conf.url = conf.data = None
+    if not (filter(lambda _: '=' in unicode(_), (conf.url, conf.data)) or '*' in conf.url):
+        warnMsg = "no GET and/or POST parameter(s) found for testing "
+        warnMsg += "(e.g. GET parameter 'id' in 'http://www.site.com/vuln.php?id=1'). "
+        if not conf.crawlDepth and not conf.forms:
+            warnMsg += "Will search for forms"
+            conf.forms = True
+        logger.warn(warnMsg)
 
     choice = None
 
