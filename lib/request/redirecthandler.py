@@ -8,6 +8,8 @@ See the file 'doc/COPYING' for copying permission
 import urllib2
 import urlparse
 
+from StringIO import StringIO
+
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -123,6 +125,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             except:
                 redurl = None
                 result = fp
+                fp.read = StringIO("").read
         else:
             result = fp
 
