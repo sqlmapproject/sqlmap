@@ -1230,9 +1230,6 @@ def checkConnection(suppressOutput=False):
             kb.errorIsNone = True
 
     except SqlmapConnectionException, errMsg:
-        errMsg = getUnicode(errMsg)
-        logger.critical(errMsg)
-
         if conf.ipv6:
             warnMsg = "check connection to a provided "
             warnMsg += "IPv6 address with a tool like ping6 "
@@ -1242,6 +1239,9 @@ def checkConnection(suppressOutput=False):
             singleTimeWarnMessage(warnMsg)
 
         if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
+            errMsg = getUnicode(errMsg)
+            logger.critical(errMsg)
+
             if conf.multipleTargets:
                 return False
 

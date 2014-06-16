@@ -537,8 +537,10 @@ class Connect(object):
                 warnMsg = "unable to connect to the target URL"
             elif "BadStatusLine" in tbMsg:
                 warnMsg = "connection dropped or unknown HTTP "
-                warnMsg += "status code received. Try to force the HTTP User-Agent "
-                warnMsg += "header with option '--user-agent' or switch '--random-agent'"
+                warnMsg += "status code received"
+                if not conf.agent and not conf.randomAgent:
+                    warnMsg += ". Try to force the HTTP User-Agent "
+                    warnMsg += "header with option '--user-agent' or switch '--random-agent'"
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
                 warnMsg += "from the target URL"
