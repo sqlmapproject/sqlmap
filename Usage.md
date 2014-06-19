@@ -447,7 +447,7 @@ Example of valid syntax:
     $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/basic/get_int.php?id=1" \
     --auth-type Basic --auth-cred "testuser:testpass"
 
-### HTTP protocol certificate authentication
+### HTTP protocol private key authentication
 
 Option: `--auth-private`
 
