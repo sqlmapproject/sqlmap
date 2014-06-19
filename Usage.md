@@ -35,7 +35,7 @@
         --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
         --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
         --auth-cred=ACRED   HTTP authentication credentials (name:password)
-        --auth-cert=ACERT   HTTP authentication certificate (key_file,cert_file)
+        --auth-private=A..  HTTP authentication PEM private key file
         --proxy=PROXY       Use a HTTP proxy to connect to the target URL
         --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
         --ignore-proxy      Ignore system default HTTP proxy
@@ -449,9 +449,9 @@ Example of valid syntax:
 
 ### HTTP protocol certificate authentication
 
-Option: `--auth-cert`
+Option: `--auth-private`
 
-This option should be used in cases when the web server requires proper client-side certificate for authentication. Supplied values should be in the form: `key_file,cert_file`, where `key_file` should be the name of a PEM formatted file that contains your private key, while `cert_file` should be the name for a PEM formatted certificate chain file.
+This option should be used in cases when the web server requires proper client-side private key for authentication. Supplied value should be a PEM formatted `key_file` that contains your private key.
 
 ### HTTP(S) proxy
 
