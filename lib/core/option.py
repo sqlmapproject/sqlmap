@@ -1910,7 +1910,7 @@ def _mergeOptions(inputOptions, overrideOptions):
         types_.update(optDict[group])
 
     for key in conf:
-        if key.upper() in _:
+        if key.upper() in _ and key in types_:
             value = _[key.upper()]
 
             if types_[key] == OPTION_TYPE.BOOLEAN:
