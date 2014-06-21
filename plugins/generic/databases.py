@@ -215,10 +215,10 @@ class Databases:
         else:
             dbs = self.getDbs()
 
+        dbs = [_ for _ in dbs if _ and _.strip()]
+
         for db in dbs:
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
-
-        dbs = filter(None, dbs)
 
         if bruteForce:
             resumeAvailable = False
