@@ -746,9 +746,6 @@ class Databases:
         pushValue(conf.tbl)
         pushValue(conf.col)
 
-        conf.db = None
-        conf.tbl = None
-        conf.col = None
         kb.data.cachedTables = {}
         kb.data.cachedColumns = {}
 
