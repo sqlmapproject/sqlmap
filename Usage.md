@@ -349,8 +349,6 @@ For example:
 
 ### HTTP `Cookie` header
 
-**TODO**: needs updating.
-
 Options and switch: `--cookie`, `--cookie-del`, `--load-cookies` and `--drop-set-cookie`
 
 These options and switches can be used in two situations:
@@ -372,6 +370,8 @@ Vice versa, if you provide a HTTP `Cookie` header with option `--cookie` and the
 `Set-Cookie` header at any time, sqlmap will ask you which set of cookies to use for the following HTTP requests.
 
 Note that also the HTTP `Cookie` header is tested against SQL injection if the `--level` is set to **2** or above. Read below for details.
+
+There is also an option `--load-cookies` which can be used to provide a special file containing Netscape/wget formatted cookies.
 
 ### HTTP `User-Agent` header
 
@@ -864,7 +864,7 @@ You can manually tell sqlmap to test for this type of SQL injection with a speci
 
 Option: `--union-from`
 
-**TODO**: needs updating.
+In some UNION query SQL injection cases there is a need to enforce the usage of valid and accessible table name in `FROM` clause. For example, Microsoft Access requires usage of such table. Without providing one UNION query SQL injection won't be able to perform correctly.
 
 ### DNS exfiltration attack
 
@@ -902,7 +902,7 @@ These options can be used to enumerate the back-end database management system i
 
 Switch: `--all`
 
-**TODO**: needs updating.
+This switch can be used in situations where user wants to retrieve everything remotelly accessible by using a single switch. This is not recommended as it will generate large number of requests retrieving both useful and unuseful data.
 
 ### Banner
 
@@ -910,23 +910,42 @@ Switch: `-b` or `--banner`
 
 Most of the modern database management systems have a function and/or  an environment variable which returns the database management system version and eventually details on its patch level, the underlying system. Usually the function is `version()` and the environment variable is `@@version`, but this vary depending on the target DBMS. 
 
+Example against an Oracle target:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int.php?id=1" --hostname
+    
+    [...]
+    [21:50:11] [INFO] fetching banner
+    web application technology: PHP 5.2.6, Apache 2.2.9
+    back-end DBMS: Oracle
+    banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'
+
 ### Session user
 
 Switch: `--current-user`
 
-On majority of modern DBMSes is possible to retrieve the database management system's user which is effectively performing the query against the back-end DBMS from the web application. 
+With this switch it is possible to retrieve the database management system's user which is effectively performing the query against the back-end DBMS from the web application. 
 
 ### Current database
 
 Switch: `--current-db`
 
-It is possible to retrieve the database management system's database name that the web application is connected to.
+With this switch it is possible to retrieve the database management system's database name that the web application is connected to.
 
 ### Server hostname
 
 Switch: `--hostname`
 
-**TODO**: needs updating.
+With this switch it is possible to retrieve the database management system's hostname.
+
+Example against a MySQL target:
+
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" --hostname
+    
+    [...]
+    [21:44:04] [INFO] fetching server hostname
+    [21:44:04] [INFO] retrieved: debian-5.0-i386
+    hostname:    'debian-5.0-i386'
 
 ### Detect whether or not the session user is a database administrator
 
@@ -1763,7 +1782,7 @@ Example against a Microsoft SQL Server target:
 
 Option: `--pivot-column`
 
-**TODO**: needs updating.
+Sometimes (e.g. for Microsoft SQL Server, Sybase and SAP MaxDB) it is not possible to dump the table rows straightforward by using `OFFSET m, n` mechanism because of lack of similar. In such cases sqlmap dumps the content by determining the most suitable `pivot` column (the one with most unique values) whose values are used later on for retrieval of other column values. Sometimes it is necessary to enforce the usage of particular `pivot` column (e.g. `--pivot-column=userid`) if the automatically chosen one is not suitable (e.g. because of lack of table dump results).
 
 ### Save options in a configuration INI file
 
@@ -2130,4 +2149,3 @@ Example against a Microsoft SQL Server target:
     current user is DBA:    True
 
     [*] shutting down at 11:25:52
-
