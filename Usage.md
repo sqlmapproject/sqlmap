@@ -369,9 +369,9 @@ If at any time during the communication, the web application responds with `Set-
 Vice versa, if you provide a HTTP `Cookie` header with option `--cookie` and the target URL sends an HTTP
 `Set-Cookie` header at any time, sqlmap will ask you which set of cookies to use for the following HTTP requests.
 
-Note that also the HTTP `Cookie` header is tested against SQL injection if the `--level` is set to **2** or above. Read below for details.
-
 There is also an option `--load-cookies` which can be used to provide a special file containing Netscape/wget formatted cookies.
+
+Note that also the HTTP `Cookie` header is tested against SQL injection if the `--level` is set to **2** or above. Read below for details.
 
 ### HTTP `User-Agent` header
 
