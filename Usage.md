@@ -864,7 +864,7 @@ You can manually tell sqlmap to test for this type of SQL injection with a speci
 
 Option: `--union-from`
 
-In some UNION query SQL injection cases there is a need to enforce the usage of valid and accessible table name in `FROM` clause. For example, Microsoft Access requires usage of such table. Without providing one UNION query SQL injection won't be able to perform correctly.
+In some UNION query SQL injection cases there is a need to enforce the usage of valid and accessible table name in `FROM` clause. For example, Microsoft Access requires usage of such table. Without providing one UNION query SQL injection won't be able to perform correctly (e.g. `--union-from=users`).
 
 ### DNS exfiltration attack
 
@@ -912,7 +912,7 @@ Most of the modern database management systems have a function and/or  an enviro
 
 Example against an Oracle target:
 
-    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int.php?id=1" --hostname
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int.php?id=1" --banner
     
     [...]
     [21:50:11] [INFO] fetching banner
@@ -1782,7 +1782,9 @@ Example against a Microsoft SQL Server target:
 
 Option: `--pivot-column`
 
-Sometimes (e.g. for Microsoft SQL Server, Sybase and SAP MaxDB) it is not possible to dump the table rows straightforward by using `OFFSET m, n` mechanism because of lack of similar. In such cases sqlmap dumps the content by determining the most suitable `pivot` column (the one with most unique values) whose values are used later on for retrieval of other column values. Sometimes it is necessary to enforce the usage of particular `pivot` column (e.g. `--pivot-column=userid`) if the automatically chosen one is not suitable (e.g. because of lack of table dump results).
+Sometimes (e.g. for Microsoft SQL Server, Sybase and SAP MaxDB) it is not possible to dump the table rows straightforward by using `OFFSET m, n` mechanism because of lack of similar. In such cases sqlmap dumps the content by determining the most suitable `pivot` column (the one with most unique values) whose values are used later on for retrieval of other column values.
+
+Sometimes it is necessary to enforce the usage of particular `pivot` column (e.g. `--pivot-column=userid`) if the automatically chosen one is not suitable (e.g. because of lack of table dump results).
 
 ### Save options in a configuration INI file
 
