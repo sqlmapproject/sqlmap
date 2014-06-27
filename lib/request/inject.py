@@ -286,16 +286,19 @@ def _goBooleanProxy(expression):
 
     initTechnique(kb.technique)
 
+    query = agent.prefixQuery(kb.injection.data[kb.technique].vector)
+    query = agent.suffixQuery(query)
+    payload = agent.payload(newValue=query)
+    output = _goDns(payload, expression)
+
+    if output is not None:
+        return output
+
     vector = kb.injection.data[kb.technique].vector
     vector = vector.replace("[INFERENCE]", expression)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
-
-    output = _goDns(payload, expression)
-
-    if output is not None:
-        return output
 
     timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
