@@ -71,7 +71,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
 
     value = _goDns(payload, expression)
 
-    if value:
+    if value is not None:
         return value
 
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
@@ -291,6 +291,12 @@ def _goBooleanProxy(expression):
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
+
+    output = _goDns(payload, expression)
+
+    if output is not None:
+        return output
+
     timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
     output = hashDBRetrieve(expression, checkConf=True)
