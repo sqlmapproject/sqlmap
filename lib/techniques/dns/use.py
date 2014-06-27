@@ -90,6 +90,8 @@ def dnsUse(payload, expression):
                 else:
                     break
 
+            output = decodeHexValue(output) if conf.hexConvert else output
+
             kb.dnsMode = False
 
         if output is not None:
