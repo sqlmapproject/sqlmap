@@ -41,6 +41,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
 from lib.core.enums import WEB_API
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BACKDOOR_RUN_CMD_TIMEOUT
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import VIEWSTATE_REGEX
@@ -346,7 +347,11 @@ class Web:
             testStr = "command execution test"
             output = self.webBackdoorRunCmd("echo %s" % testStr)
 
-            if output and testStr in output:
+            if output == "0":
+                warnMsg = "the backdoor has been uploaded but required privileges "
+                warnMsg += "for running the system commands are missing"
+                raise SqlmapNoneDataException(warnMsg)
+            elif output and testStr in output:
                 infoMsg = "the backdoor has been successfully "
             else:
                 infoMsg = "the backdoor has probably been successfully "
