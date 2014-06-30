@@ -179,7 +179,12 @@ class Filesystem(GenericFilesystem):
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
 
         logger.debug("executing the PowerShell script to write the %s file" % dFile)
-        self.execCmd("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath)
+
+        commands = ("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
+                    "del /F /Q \"%s\"" % (randPSScriptPath, randPSScriptPath))
+        complComm = " & ".join(command for command in commands)
+
+        self.execCmd(complComm)
 
     def _stackedWriteFileDebugExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
         infoMsg = "using debug.exe to write the %s " % fileType
@@ -224,7 +229,7 @@ class Filesystem(GenericFilesystem):
                 debugMsg += "%s\%s to %s file %s\%s" % (tmpPath, chunkName, fileType, tmpPath, dFileName)
                 logger.debug(debugMsg)
 
-                commands = ("cd \"%s\"" % tmpPath, copyCmd, "del /F %s" % chunkName)
+                commands = ("cd \"%s\"" % tmpPath, copyCmd, "del /F /Q %s" % chunkName)
                 complComm = " & ".join(command for command in commands)
 
                 self.execCmd(complComm)
