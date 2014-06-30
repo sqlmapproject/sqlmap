@@ -173,10 +173,10 @@ class Filesystem(GenericFilesystem):
         encodedBase64File = "tmpf%s.txt" % randomStr(lowercase=True)
         encodedBase64FilePath = "%s\%s" % (tmpPath, encodedBase64File)
 
-        randPSScript = "tmpf%s.ps1" % randomStr(lowercase=True)
+        randPSScript = "tmpps%s.ps1" % randomStr(lowercase=True)
         randPSScriptPath = "%s\%s" % (tmpPath, randPSScript)
 
-        wFileSize = len(wFileContent)
+        wFileSize = len(encodedFileContent)
         chunkMaxSize = 1024
 
         logger.debug("uploading the base64-encoded file to %s, please wait.." % encodedBase64FilePath)
@@ -186,9 +186,10 @@ class Filesystem(GenericFilesystem):
             self.xpCmdshellWriteFile(wEncodedChunk, tmpPath, encodedBase64File)
 
         #psString = "$Content = [System.Convert]::FromBase64String(\"%s\"); Set-Content -Path \"%s\" -Value $Content -Encoding Byte" % (encodedFileContent, dFile)
-        psString = "$Base64 = Get-Content -Path %s; $Content = " % encodedBase64FilePath
+        psString = "$Base64 = Get-Content -Path \"%s\"; " % encodedBase64FilePath
+        psString += "$Base64 = $Base64 -replace \"`t|`n|`r\",\"\"; $Content = "
         psString += "[System.Convert]::FromBase64String($Base64); Set-Content "
-        psString += "-Path %s -Value $Content -Encoding Byte" % dFile
+        psString += "-Path \"%s\" -Value $Content -Encoding Byte" % dFile
 
         logger.debug("uploading the PowerShell base64-decoding script to %s, please wait.." % randPSScriptPath)
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
