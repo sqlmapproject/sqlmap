@@ -184,7 +184,8 @@ class Filesystem(GenericFilesystem):
         $Content = [System.Convert]::FromBase64String("%s")
         Set-Content -Path %s -Value $Content -Encoding Byte
         """ % (encodedFileContent, randPSScriptPath)
-        psString = binToHexQuery.replace("    ", "").replace("\n", ";")
+
+        psString = psString.replace("    ", "").replace("\n", ";")
 
         logger.debug("uploading the PowerShell script to %s, please wait.." % randPSScriptPath)
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
