@@ -175,6 +175,16 @@ class Filesystem(GenericFilesystem):
         encodedFileContent = base64encode(wFileContent)
         #psString = "[System.Text.Encoding]::Default.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File \"%s\"" % (encodedFileContent, dFile)
         psString = "[System.Text.Encoding]::Default.GetString([System.Convert]::FromBase64String(\"%s\")) ^> \"%s\"" % (encodedFileContent, dFile)
+        #psString = "[System.Text.Encoding]::UTF8.GetBytes([System.Convert]::FromBase64String(\"%s\")) | Out-File \"%s\"" % (encodedFileContent, dFile)
+        #psString = "[System.Text.Encoding]::UTF8.GetBytes([System.Convert]::FromBase64String(\"%s\")) ^> \"%s\"" % (encodedFileContent, dFile)
+        #psString = """$Content = Get-Content -Path %s -Encoding Byte
+        #$Base64 = [System.Convert]::ToBase64String($Content)
+        psString = """
+        $Base64 = [System.Convert]::ToBase64String($Content)
+        $Content = [System.Convert]::FromBase64String("%s")
+        Set-Content -Path %s -Value $Content -Encoding Byte
+        """ % (encodedFileContent, randPSScriptPath)
+        psString = binToHexQuery.replace("    ", "").replace("\n", ";")
 
         logger.debug("uploading the PowerShell script to %s, please wait.." % randPSScriptPath)
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
