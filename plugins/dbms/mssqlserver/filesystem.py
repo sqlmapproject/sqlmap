@@ -166,7 +166,6 @@ class Filesystem(GenericFilesystem):
 
     def _stackedWriteFilePS(self, tmpPath, wFileContent, dFile, fileType):
         infoMsg = "using PowerShell to write the %s file content " % fileType
-        #infoMsg += "to file '%s', please wait.." % dFile
         infoMsg += "to file '%s'" % dFile
         logger.info(infoMsg)
 
@@ -332,21 +331,21 @@ class Filesystem(GenericFilesystem):
         with open(wFile, "rb") as f:
             wFileContent = f.read()
 
-        self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
+        self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
         written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         if written is False:
             message = "do you want to try to upload the file with "
-            message += "the PowerShell technique? [Y/n] "
+            message += "the custom Visual Basic script technique? [Y/n] "
             choice = readInput(message, default="Y")
 
             if not choice or choice.lower() == "y":
-                self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+                self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
                 written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         if written is False:
             message = "do you want to try to upload the file with "
-            message += "the debug.exe technique? [Y/n] "
+            message += "the built-in debug.exe technique? [Y/n] "
             choice = readInput(message, default="Y")
 
             if not choice or choice.lower() == "y":
