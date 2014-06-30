@@ -180,7 +180,6 @@ class Filesystem(GenericFilesystem):
         #psString = """$Content = Get-Content -Path %s -Encoding Byte
         #$Base64 = [System.Convert]::ToBase64String($Content)
         psString = """
-        $Base64 = [System.Convert]::ToBase64String($Content)
         $Content = [System.Convert]::FromBase64String("%s")
         Set-Content -Path %s -Value $Content -Encoding Byte
         """ % (encodedFileContent, randPSScriptPath)
