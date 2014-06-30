@@ -181,7 +181,7 @@ class Filesystem(GenericFilesystem):
         logger.debug("executing the PowerShell script to write the %s file" % dFile)
 
         commands = ("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
-                    "del /F /Q \"%s\"" % (randPSScriptPath, randPSScriptPath))
+                    "del /F /Q \"%s\"" % randPSScriptPath)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
