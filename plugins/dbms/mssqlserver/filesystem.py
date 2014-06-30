@@ -175,8 +175,6 @@ class Filesystem(GenericFilesystem):
         print "dFile:", dFile
         print "fileType:", fileType
 
-        randFile = "tmpf%s.txt" % randomStr(lowercase=True)
-        randFilePath = "%s\%s" % (tmpPath, randFile)
         encodedFileContent = base64encode(wFileContent)
 
         # TODO: need to be fixed
@@ -186,10 +184,7 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("converting the base64-encoded file utilizing PowerShell")
 
-        commands = ("cd \"%s\"" % tmpPath,
-                     "powershell -EncodedCommand %s" % base64encode(psString))
-#                     "powershell -EncodedCommand %s" % base64encode(psString),
-#                     "del /F /Q %s" % randFilePath)
+        commands = ("cd \"%s\"" % tmpPath, "powershell -EncodedCommand %s" % base64encode(psString))
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
