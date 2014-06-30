@@ -572,7 +572,7 @@ FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
 MIN_ENCODED_LEN_CHECK = 5
 
 # Timeout in seconds in which Metasploit remote session has to be initialized
-METASPLOIT_SESSION_TIMEOUT = 180
+METASPLOIT_SESSION_TIMEOUT = 300
 
 # Reference: http://www.cookiecentral.com/faq/#3.5
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."

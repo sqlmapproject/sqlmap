@@ -529,7 +529,6 @@ class Metasploit:
                             time.sleep(2)
 
                         initialized = True
-
                     elif timeout:
                         proc.kill()
                         errMsg = "timeout occurred while attempting "
