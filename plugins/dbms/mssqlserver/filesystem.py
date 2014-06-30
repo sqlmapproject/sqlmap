@@ -181,10 +181,14 @@ class Filesystem(GenericFilesystem):
         #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(%s)) > %s" % (encodedFileContent, dFile)
         #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File -Encoding \"ASCII\" %s" % (encodedFileContent, dFile)
         psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) > %s" % (encodedFileContent, dFile)
+        psString = psString.encode('utf-16le')
+        psString = base64encode(psString)
 
-        logger.debug("converting the base64-encoded file utilizing PowerShell")
+        print "psString:", psString
 
-        commands = ("cd \"%s\"" % tmpPath, "powershell -EncodedCommand %s" % base64encode(psString))
+        logger.debug("executing the base64-encoded PowerShell command to write the file")
+
+        commands = ("cd \"%s\"" % tmpPath, "powershell -EncodedCommand %s" % psString)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
