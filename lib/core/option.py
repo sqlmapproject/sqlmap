@@ -1338,6 +1338,8 @@ def _setHTTPUserAgent():
         infoMsg = "fetched random HTTP User-Agent header from "
         infoMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
         logger.info(infoMsg)
+        
+        conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, userAgent))
 
 def _setHTTPReferer():
     """
