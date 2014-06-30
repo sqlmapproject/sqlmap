@@ -170,7 +170,9 @@ class Filesystem(GenericFilesystem):
         infoMsg += "to file '%s'" % dFile
         logger.info(infoMsg)
 
-        print "tmpPath:", tmpPath
+        randPSScript = "tmpf%s.ps1" % randomStr(lowercase=True)
+        randPSScriptPath = "%s\%s" % (tmpPath, randPSScript)
+
         print "wFileContent:", wFileContent
         print "dFile:", dFile
         print "fileType:", fileType
@@ -181,14 +183,14 @@ class Filesystem(GenericFilesystem):
         #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(%s)) > %s" % (encodedFileContent, dFile)
         #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File -Encoding \"ASCII\" %s" % (encodedFileContent, dFile)
         psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) > %s" % (encodedFileContent, dFile)
-        psString = psString.encode('utf-16le')
-        psString = base64encode(psString)
 
-        print "psString:", psString
+        logger.debug("uploading the PowerShell script to %s, please wait.." % randPSScriptPath)
 
-        logger.debug("executing the base64-encoded PowerShell command to write the file")
+        self.xpCmdshellWriteFile(psString, tmpPath, randPSScriptPath)
 
-        commands = ("cd \"%s\"" % tmpPath, "powershell -EncodedCommand %s" % psString)
+        logger.debug("executing the PowerShell script to write the %s file" % dFile)
+
+        commands = ("powershell -File %s" % randPSScriptPath)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
