@@ -185,16 +185,15 @@ class Filesystem(GenericFilesystem):
             wEncodedChunk = encodedFileContent[i:i + chunkMaxSize]
             self.xpCmdshellWriteFile(wEncodedChunk, tmpPath, encodedBase64File)
 
-        #psString = "$Content = [System.Convert]::FromBase64String(\"%s\"); Set-Content -Path \"%s\" -Value $Content -Encoding Byte" % (encodedFileContent, dFile)
         psString = "$Base64 = Get-Content -Path \"%s\"; " % encodedBase64FilePath
         psString += "$Base64 = $Base64 -replace \"`t|`n|`r\",\"\"; $Content = "
         psString += "[System.Convert]::FromBase64String($Base64); Set-Content "
         psString += "-Path \"%s\" -Value $Content -Encoding Byte" % dFile
 
-        logger.debug("uploading the PowerShell base64-decoding script to %s, please wait.." % randPSScriptPath)
+        logger.debug("uploading the PowerShell base64-decoding script to %s" % randPSScriptPath)
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
 
-        logger.debug("executing the PowerShell base64-decoding script to write the %s file" % dFile)
+        logger.debug("executing the PowerShell base64-decoding script to write the %s file, please wait.." % dFile)
 
         commands = ("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
                     "del /F /Q \"%s\"" % randPSScriptPath)
