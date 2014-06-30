@@ -165,27 +165,30 @@ class Filesystem(GenericFilesystem):
 
     def _stackedWriteFilePS(self, tmpPath, wFileContent, dFile, fileType):
         infoMsg = "using PowerShell to write the %s file content " % fileType
-        infoMsg += "to file '%s', please wait.." % dFile
+        #infoMsg += "to file '%s', please wait.." % dFile
+        infoMsg += "to file '%s'" % dFile
         logger.info(infoMsg)
+
+        print "tmpPath:", tmpPath
+        print "wFileContent:", wFileContent
+        print "dFile:", dFile
+        print "fileType:", fileType
 
         randFile = "tmpf%s.txt" % randomStr(lowercase=True)
         randFilePath = "%s\%s" % (tmpPath, randFile)
-        encodedFileContent = hexencode(wFileContent)
+        encodedFileContent = base64encode(wFileContent)
 
         # TODO: need to be fixed
-        psString = "$s = gc '%s';$s = [string]::Join('', $s);$s = $s.Replace('`r',''); $s = $s.Replace('`n','');$b = new-object byte[] $($s.Length/2);0..$($b.Length-1) | %%{$b[$_] = [Convert]::ToByte($s.Substring($($_*2),2),16)};[IO.File]::WriteAllBytes('%s',$b)" % (randFilePath, dFile)
-        psString = psString.encode('utf-16le')
-        psString = psString.encode("base64")[:-1].replace("\n", "")
+        #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(%s)) > %s" % (encodedFileContent, dFile)
+        #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File -Encoding \"ASCII\" %s" % (encodedFileContent, dFile)
+        psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) > %s" % (encodedFileContent, dFile)
 
-        logger.debug("uploading the file hex-encoded content to %s, please wait.." % randFilePath)
-
-        self.xpCmdshellWriteFile(encodedFileContent, tmpPath, randFile)
-
-        logger.debug("converting the file utilizing PowerShell EncodedCommand")
+        logger.debug("converting the base64-encoded file utilizing PowerShell")
 
         commands = ("cd \"%s\"" % tmpPath,
-                     "powershell -EncodedCommand %s" % psString,
-                     "del /F /Q %s" % randFilePath)
+                     "powershell -EncodedCommand %s" % base64encode(psString))
+#                     "powershell -EncodedCommand %s" % base64encode(psString),
+#                     "del /F /Q %s" % randFilePath)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
@@ -344,12 +347,20 @@ class Filesystem(GenericFilesystem):
 
         if written is False:
             message = "do you want to try to upload the file with "
-            message += "another technique? [Y/n] "
+            message += "the PowerShell technique? [Y/n] "
+            choice = readInput(message, default="Y")
+
+            if not choice or choice.lower() == "y":
+                self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+                written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
+
+        if written is False:
+            message = "do you want to try to upload the file with "
+            message += "the debug.exe technique? [Y/n] "
             choice = readInput(message, default="Y")
 
             if not choice or choice.lower() == "y":
                 self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
-                #self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
                 written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         return written
