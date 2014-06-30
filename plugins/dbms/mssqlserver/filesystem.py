@@ -182,18 +182,15 @@ class Filesystem(GenericFilesystem):
         # TODO: need to be fixed
         #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(%s)) > %s" % (encodedFileContent, dFile)
         #psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) | Out-File -Encoding \"ASCII\" %s" % (encodedFileContent, dFile)
-        psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) > %s" % (encodedFileContent, dFile)
+        psString = "[System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String(\"%s\")) ^> %s" % (encodedFileContent, dFile)
 
         logger.debug("uploading the PowerShell script to %s, please wait.." % randPSScriptPath)
 
-        self.xpCmdshellWriteFile(psString, tmpPath, randPSScriptPath)
+        self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
 
         logger.debug("executing the PowerShell script to write the %s file" % dFile)
 
-        commands = ("powershell -File %s" % randPSScriptPath)
-        complComm = " & ".join(command for command in commands)
-
-        self.execCmd(complComm)
+        self.execCmd("powershell -File \"%s\"" % randPSScriptPath)
 
     def _stackedWriteFileDebugExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
         infoMsg = "using debug.exe to write the %s " % fileType
