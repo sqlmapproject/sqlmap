@@ -196,6 +196,7 @@ class Filesystem(GenericFilesystem):
         logger.debug("executing the PowerShell base64-decoding script to write the %s file, please wait.." % dFile)
 
         commands = ("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
+                    "del /F /Q \"%s\"" % encodedBase64FilePath,
                     "del /F /Q \"%s\"" % randPSScriptPath)
         complComm = " & ".join(command for command in commands)
 

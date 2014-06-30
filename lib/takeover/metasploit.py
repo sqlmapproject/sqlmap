@@ -519,7 +519,7 @@ class Metasploit:
                 timeout = time.time() - start_time > METASPLOIT_SESSION_TIMEOUT
 
                 if not initialized:
-                    match = re.search("session ([\d]+) opened", out)
+                    match = re.search("Meterpreter session ([\d]+) opened", out)
 
                     if match:
                         self._loadMetExtensions(proc, match.group(1))
