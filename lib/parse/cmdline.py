@@ -63,6 +63,8 @@ def cmdLineParser():
         target.add_option("-l", dest="logFile", help="Parse target(s) from Burp "
                           "or WebScarab proxy log file")
 
+        target.add_option("-x", dest="sitemapUrl", help="Parse target(s) from remote sitemap(.xml) file")
+
         target.add_option("-m", dest="bulkFile", help="Scan multiple targets given "
                           "in a textual file ")
 
@@ -74,8 +76,6 @@ def cmdLineParser():
 
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
-
-        target.add_option("-x", dest="sitemapUrl", help="Load target URLs from remote sitemap(.xml) file")
 
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
