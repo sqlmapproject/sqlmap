@@ -512,22 +512,18 @@ def _createTargetDirs():
 
     if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
         try:
-            os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
-        except OSError, ex:
-            paths.SQLMAP_OUTPUT_PATH = os.path.join(os.path.expanduser("~"), ".sqlmap", "output")
-            try:
-                if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-                    os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
-                warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
-                logger.warn(warnMsg)
-            except OSError, ex:    
-                tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-                warnMsg = "unable to create regular output directory "
-                warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, ex)
-                warnMsg += "Using temporary directory '%s' instead" % tempDir
-                logger.warn(warnMsg)
+            if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+                os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+            warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
+            logger.warn(warnMsg)
+        except OSError, ex:    
+            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+            warnMsg = "unable to create regular output directory "
+            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, ex)
+            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            logger.warn(warnMsg)
 
-                paths.SQLMAP_OUTPUT_PATH = tempDir
+            paths.SQLMAP_OUTPUT_PATH = tempDir
 
     conf.outputPath = os.path.join(paths.SQLMAP_OUTPUT_PATH, getUnicode(conf.hostname))
 
