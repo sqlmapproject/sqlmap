@@ -19,6 +19,7 @@ optDict = {
                                "sessionFile":       "string",
                                "googleDork":        "string",
                                "configFile":        "string",
+                               "sitemapUrl":        "string",
                              },
 
             "Request":       {

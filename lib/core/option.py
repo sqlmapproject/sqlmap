@@ -135,6 +135,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadPayloads
+from lib.parse.sitemap import parseSitemap
 from lib.request.basic import checkCharEncoding
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
@@ -504,10 +505,13 @@ def _setCrawler():
     if not conf.crawlDepth:
         return
 
-    if not conf.bulkFile:
+    if not any((conf.bulkFile, conf.sitemapUrl)):
         crawl(conf.url)
     else:
-        targets = getFileItems(conf.bulkFile)
+        if conf.bulkFile:
+            targets = getFileItems(conf.bulkFile)
+        else:
+            targets = parseSitemap(conf.sitemapUrl)
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
@@ -618,9 +622,32 @@ def _setBulkMultipleTargets():
         errMsg += "does not exist"
         raise SqlmapFilePathException(errMsg)
 
+    found = False
     for line in getFileItems(conf.bulkFile):
         if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
+            found = True
             kb.targets.add((line.strip(), None, None, None))
+
+    if not found and not conf.forms and not conf.crawlDepth:
+        warnMsg = "no usable links found (with GET parameters)"
+        logger.warn(warnMsg)
+
+def _setSitemapTargets():
+    if not conf.sitemapUrl:
+        return
+
+    infoMsg = "parsing sitemap '%s'" % conf.sitemapUrl
+    logger.info(infoMsg)
+
+    found = False
+    for item in parseSitemap(conf.sitemapUrl):
+        if re.match(r"[^ ]+\?(.+)", item, re.I):
+            found = True
+            kb.targets.add((item.strip(), None, None, None))
+
+    if not found and not conf.forms and not conf.crawlDepth:
+        warnMsg = "no usable links found (with GET parameters)"
+        logger.warn(warnMsg)
 
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
@@ -632,11 +659,14 @@ def _findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    if not conf.bulkFile:
+    if not any((conf.bulkFile, conf.sitemapUrl)):
         page, _ = Request.queryPage(content=True)
         findPageForms(page, conf.url, True, True)
     else:
-        targets = getFileItems(conf.bulkFile)
+        if conf.bulkFile:
+            targets = getFileItems(conf.bulkFile)
+        else:
+            targets = parseSitemap(conf.sitemapUrl)
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
@@ -1449,13 +1479,16 @@ def _cleanupOptions():
     if conf.dFile:
         conf.dFile = ntToPosixSlashes(normalizePath(conf.dFile))
 
+    if conf.sitemapUrl and not conf.sitemapUrl.lower().startswith("http"):
+        conf.sitemapUrl = "http%s://%s" % ('s' if conf.forceSSL else '', conf.sitemapUrl)
+
     if conf.msfPath:
         conf.msfPath = ntToPosixSlashes(normalizePath(conf.msfPath))
 
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if conf.googleDork or conf.logFile or conf.bulkFile or conf.forms or conf.crawlDepth:
+    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.sitemapUrl, conf.forms, conf.crawlDepth)):
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1631,6 +1664,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.extendTests = None
     kb.errorIsNone = True
     kb.fileReadMode = False
+    kb.followSitemapRecursion = None
     kb.forcedDbms = None
     kb.forcePartialUnion = False
     kb.headersFp = {}
@@ -2130,8 +2164,8 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any((conf.url, conf.bulkFile)):
-        errMsg = "switch '--forms' requires usage of option '-u' ('--url') or '-m'"
+    if conf.forms and not any((conf.url, conf.bulkFile, conf.sitemapUrl)):
+        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-m' or '-x'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:
@@ -2266,7 +2300,7 @@ def init():
     parseTargetUrl()
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.liveTest)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.sitemapUrl, conf.requestFile, conf.googleDork, conf.liveTest)):
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
         _setHTTPCookies()
@@ -2279,6 +2313,7 @@ def init():
         _setSafeUrl()
         _setGoogleDorking()
         _setBulkMultipleTargets()
+        _setSitemapTargets()
         _urllib2Opener()
         _checkTor()
         _setCrawler()

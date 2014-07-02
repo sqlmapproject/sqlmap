@@ -75,6 +75,8 @@ def cmdLineParser():
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
 
+        target.add_option("-x", dest="sitemapUrl", help="Load target URLs from remote sitemap(.xml) file")
+
         # Request options
         request = OptionGroup(parser, "Request", "These options can be used "
                               "to specify how to connect to the target URL")
@@ -807,8 +809,8 @@ def cmdLineParser():
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
-            args.purgeOutput, args.pickledOptions)):
-            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --update, --purge-output or --dependencies), "
+            args.purgeOutput, args.pickledOptions, args.sitemapUrl)):
+            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help"
             parser.error(errMsg)
 
