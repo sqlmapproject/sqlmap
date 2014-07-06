@@ -525,7 +525,7 @@ def _createTargetDirs():
 
             paths.SQLMAP_OUTPUT_PATH = tempDir
 
-    conf.outputPath = os.path.join(paths.SQLMAP_OUTPUT_PATH, getUnicode(conf.hostname))
+    conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), getUnicode(conf.hostname))
 
     if not os.path.isdir(conf.outputPath):
         try:
