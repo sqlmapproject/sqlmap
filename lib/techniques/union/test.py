@@ -205,7 +205,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                 content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
                 if not all(_ in content for _ in (phrase, phrase2)):
-                    vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
+                    vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates)
                 elif not kb.unionDuplicates:
                     fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
 
