@@ -14,18 +14,18 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Append a HTTP Request Parameter to ByPass
-    WAF Protection of Varnish Firewall.
+    Append a HTTP Request Parameter to bypass
+    WAF Protection of Varnish Firewall
 
-    You can tamper with different Parameters, like:
-    >> X-forwarded-for: TARGET_CACHESERVER_IP (184.189.250.X)
-    >> X-remote-IP: TARGET_PROXY_IP (184.189.250.X)
-    >> X-originating-IP: TARGET_LOCAL_IP (127.0.0.1)
-    >> x-remote-addr: TARGET_INTERNALUSER_IP (192.168.1.X)
-    >> X-remote-IP: * or %00 or %0A
+    Notes:
+        Reference: http://h30499.www3.hp.com/t5/Fortify-Application-Security/Bypassing-web-application-firewalls-using-HTTP-headers/ba-p/6418366
 
-        http://h30499.www3.hp.com/t5/Fortify-Application-Security/Bypassing-web-application-firewalls-using-HTTP-headers/ba-p/6418366
-
+        Examples:
+        >> X-forwarded-for: TARGET_CACHESERVER_IP (184.189.250.X)
+        >> X-remote-IP: TARGET_PROXY_IP (184.189.250.X)
+        >> X-originating-IP: TARGET_LOCAL_IP (127.0.0.1)
+        >> x-remote-addr: TARGET_INTERNALUSER_IP (192.168.1.X)
+        >> X-remote-IP: * or %00 or %0A
     """
 
     headers = kwargs.get("headers", {})
