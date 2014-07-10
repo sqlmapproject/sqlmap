@@ -621,6 +621,9 @@ class Connect(object):
         if not place:
             place = kb.injection.place or PLACE.GET
 
+        if not auxHeaders:
+            auxHeaders = {}
+
         raise404 = place != PLACE.URI if raise404 is None else raise404
 
         value = agent.adjustLateValues(value)
@@ -735,8 +738,6 @@ class Connect(object):
             uri = conf.url
 
         if value and place == PLACE.CUSTOM_HEADER:
-            if not auxHeaders:
-                auxHeaders = {}
             auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
 
         if conf.rParam:
@@ -873,9 +874,6 @@ class Connect(object):
             if kb.nullConnection == NULLCONNECTION.HEAD:
                 method = HTTPMETHOD.HEAD
             elif kb.nullConnection == NULLCONNECTION.RANGE:
-                if not auxHeaders:
-                    auxHeaders = {}
-
                 auxHeaders[HTTP_HEADER.RANGE] = "bytes=-1"
 
             _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404, skipRead=(kb.nullConnection == NULLCONNECTION.SKIP_READ))
