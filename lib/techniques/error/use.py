@@ -100,7 +100,7 @@ def _oneShotErrorUse(expression, field=None):
                 incrementCounter(kb.technique)
 
                 if page and conf.noCast:
-                    page = re.sub(r"'%s'.*?'%s'" % (kb.chars.start, kb.chars.stop), "", page)
+                    page = re.sub(r"('|\%%27)%s('|\%%27).*?('|\%%27)%s('|\%%27)" % (kb.chars.start, kb.chars.stop), "", page)
 
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
