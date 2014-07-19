@@ -62,6 +62,7 @@ from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import UNKNOWN_DBMS
+from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
@@ -416,7 +417,8 @@ def checkSqlInjection(place, parameter, value):
                             try:
                                 page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
                                 output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-                                        or extractRegexResult(check, listToStrValue(headers.headers \
+                                        or extractRegexResult(check, listToStrValue( \
+                                        [headers[key] for key in headers.keys() if key.lower() != URI_HTTP_HEADER.lower()] \
                                         if headers else None), re.DOTALL | re.IGNORECASE) \
                                         or extractRegexResult(check, threadData.lastRedirectMsg[1] \
                                         if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
