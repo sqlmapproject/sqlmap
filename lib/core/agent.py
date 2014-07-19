@@ -275,7 +275,7 @@ class Agent(object):
                     inferenceQuery = inference.query
 
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
-            else:
+            elif not kb.testMode:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
                 raise SqlmapNoneDataException(errMsg)
