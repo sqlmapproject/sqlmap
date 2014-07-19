@@ -2124,6 +2124,10 @@ def _basicOptionValidation():
         errMsg = "switch '--titles' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.dumpTable and conf.search:
+        errMsg = "switch '--dump' is incompatible with switch '--search'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.data and conf.nullConnection:
         errMsg = "option '--data' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
