@@ -27,6 +27,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
+from lib.core.common import urlencode
 from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
@@ -99,8 +100,10 @@ def _oneShotErrorUse(expression, field=None):
 
                 incrementCounter(kb.technique)
 
-                if page and conf.noCast:
-                    page = re.sub(r"('|\%%27)%s('|\%%27).*?('|\%%27)%s('|\%%27)" % (kb.chars.start, kb.chars.stop), "", page)
+                if page and conf.noEscape:
+                    payload = re.sub(r".*?__PAYLOAD_DELIMITER__(.*)__PAYLOAD_DELIMITER__",r'\g<1>',payload)
+                    payload = urlencode(payload,"")
+                    headers["URI"] = headers["URI"].replace(payload,"")
 
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
