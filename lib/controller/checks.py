@@ -1071,7 +1071,10 @@ def checkWaf():
         conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
         conf.parameters[PLACE.GET] += "%s=%d %s" % (randomStr(), randomInt(), IDS_WAF_CHECK_PAYLOAD)
 
-        falseResult = Request.queryPage()
+        try:
+            falseResult = Request.queryPage()
+        except SqlmapConnectionException:
+            falseResult = None
 
         if not falseResult:
             retVal = True
