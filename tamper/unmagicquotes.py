@@ -44,7 +44,7 @@ def tamper(payload, **kwargs):
                 continue
 
         if found:
-            _ = re.sub("\s*(AND|OR)[\s(]+'[^']+'\s*(=|LIKE)\s*'.*", "", retVal, flags=re.I)
+            _ = re.sub("(?i)\s*(AND|OR)[\s(]+'[^']+'\s*(=|LIKE)\s*'.*", "", retVal)
             if _ != retVal:
                 retVal = _
                 retVal += "-- "
