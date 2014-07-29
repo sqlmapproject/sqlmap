@@ -161,7 +161,7 @@ def stdoutencode(data):
         else:
             retVal = data.encode(sys.stdout.encoding)
     except:
-        retVal = data.encode(UNICODE_ENCODING)
+        retVal = data.encode(UNICODE_ENCODING) if isinstance(data, unicode) else data
 
     return retVal
 
