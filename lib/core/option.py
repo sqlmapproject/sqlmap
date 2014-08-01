@@ -2168,8 +2168,8 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile, conf.sitemapUrl)):
-        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g', '-m' or '-x'"
+    if conf.forms and not any((conf.url, conf.bulkFile, conf.sitemapUrl)):
+        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-m' or '-x'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:
