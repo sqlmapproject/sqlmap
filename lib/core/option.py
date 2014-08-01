@@ -2224,10 +2224,6 @@ def _basicOptionValidation():
         errMsg = "option '--proxy' is incompatible with switch '--ignore-proxy'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and any([conf.logFile, conf.direct, conf.requestFile, conf.googleDork]):
-        errMsg = "switch '--forms' is compatible only with options '-u' ('--url') and '-m'"
-        raise SqlmapSyntaxException(errMsg)
-
     if conf.timeSec < 1:
         errMsg = "value for option '--time-sec' must be a positive integer"
         raise SqlmapSyntaxException(errMsg)
