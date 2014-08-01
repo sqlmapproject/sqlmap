@@ -571,11 +571,11 @@ def _setGoogleDorking():
             if re.search(r"(.*?)\?(.+)", link):
                 kb.targets.add((link, conf.method, conf.data, conf.cookie))
             elif re.search(URI_INJECTABLE_REGEX, link, re.I):
-                if kb.data.onlyGETs is None and conf.data is None:
+                if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
                     test = readInput(message, default="Y")
                     kb.data.onlyGETs = test.lower() != 'n'
-                if not kb.data.onlyGETs:
+                if not kb.data.onlyGETs or conf.googleDork:
                     kb.targets.add((link, conf.method, conf.data, conf.cookie))
 
         return links
@@ -659,14 +659,17 @@ def _findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    if not any((conf.bulkFile, conf.sitemapUrl)):
+    if not any((conf.bulkFile, conf.googleDork, conf.sitemapUrl)):
         page, _ = Request.queryPage(content=True)
         findPageForms(page, conf.url, True, True)
     else:
         if conf.bulkFile:
             targets = getFileItems(conf.bulkFile)
-        else:
+        elif conf.sitemapUrl:
             targets = parseSitemap(conf.sitemapUrl)
+        elif conf.googleDork:
+            targets = [_[0] for _ in kb.targets]
+            kb.targets.clear()
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
@@ -676,6 +679,8 @@ def _findPageForms():
                 if conf.verbose in (1, 2):
                     status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+            except KeyboardInterrupt:
+                break
             except Exception, ex:
                 errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, ex)
                 logger.error(errMsg)
@@ -2168,8 +2173,8 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any((conf.url, conf.bulkFile, conf.sitemapUrl)):
-        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-m' or '-x'"
+    if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile, conf.sitemapUrl)):
+        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g', '-m' or '-x'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:
