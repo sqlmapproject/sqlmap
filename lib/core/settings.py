@@ -579,7 +579,7 @@ NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
 
 # Prefixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_PREFIXES = {
-    OS.LINUX: ("/var/www", "/var/www/%TARGET%", "/var/www/vhosts/%TARGET%", "/var/www/virtual/%TARGET%", "/var/www/clients/vhosts/%TARGET%", "/var/www/clients/virtual/%TARGET%"),
+    OS.LINUX: ("/var/www", "/srv/www", "/var/www/%TARGET%", "/var/www/vhosts/%TARGET%", "/var/www/virtual/%TARGET%", "/var/www/clients/vhosts/%TARGET%", "/var/www/clients/virtual/%TARGET%"),
     OS.WINDOWS: ("/xampp", "/Program Files/xampp/", "/wamp", "/Program Files/wampp/", "/Inetpub/wwwroot", "/Inetpub/wwwroot/%TARGET%", "/Inetpub/vhosts/%TARGET%")
 }
 
