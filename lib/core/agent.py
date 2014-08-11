@@ -824,6 +824,9 @@ class Agent(object):
         @rtype: C{str}
         """
 
+        if " FROM " not in query:
+            return query
+
         limitedQuery = query
         limitStr = queries[Backend.getIdentifiedDbms()].limit.query
         fromIndex = limitedQuery.index(" FROM ")
