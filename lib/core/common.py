@@ -1314,7 +1314,7 @@ def parseUnionPage(page):
     if page is None:
         return None
 
-    if page.startswith(kb.chars.start) and page.endswith(kb.chars.stop):
+    if re.search("(?si)\A%s.*%s\Z" % (kb.chars.start, kb.chars.stop), page):
         if len(page) > LARGE_OUTPUT_THRESHOLD:
             warnMsg = "large output detected. This might take a while"
             logger.warn(warnMsg)
