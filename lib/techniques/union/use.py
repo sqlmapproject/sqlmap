@@ -52,6 +52,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from thirdparty.odict.odict import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
     retVal = hashDBRetrieve("%s%s" % (conf.hexConvert, expression), checkConf=True)  # as union data is stored raw unconverted
@@ -276,12 +277,22 @@ def unionUse(expression, unpack=True, dump=False):
                             with kb.locks.value:
                                 if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
                                     items = parseUnionPage(output)
-
+ 
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
-                                    # in case that we requested N columns and we get M!=N then we have to filter a bit
-                                    if isListLike(items) and len(items) > 1 and len(expressionFieldsList) > 1:
-                                        items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
+                                    if isListLike(items):
+                                        # in case that we requested N columns and we get M!=N then we have to filter a bit
+                                        if len(items) > 1 and len(expressionFieldsList) > 1:
+                                            items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
+                                        items = [_ for _ in flattenValue(items)]
+                                        if len(items) > len(expressionFieldsList):
+                                            filtered = OrderedDict()
+                                            for item in items:
+                                                key = re.sub(r"[^A-Za-z0-9]", "", item).lower()
+                                                if key not in filtered or re.search(r"[^A-Za-z0-9]", item):
+                                                    filtered[key] = item
+                                            items = filtered.values()
+                                        items = [items]
                                     index = None
                                     for index in xrange(len(threadData.shared.buffered)):
                                         if threadData.shared.buffered[index][0] >= num:
