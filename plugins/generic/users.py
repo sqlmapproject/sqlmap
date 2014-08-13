@@ -439,7 +439,7 @@ class Users:
 
         if not kb.data.cachedUsersPrivileges and isInferenceAvailable() and not conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                conditionChar = " LIKE "
+                conditionChar = "LIKE"
             else:
                 conditionChar = "="
 
