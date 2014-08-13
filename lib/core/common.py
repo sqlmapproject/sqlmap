@@ -1512,15 +1512,24 @@ def safeStringFormat(format_, params):
         retVal = retVal.replace("%s", str(params), 1)
     else:
         count, index = 0, 0
-        while index != -1:
-            index = retVal.find("%s")
-            if index != -1:
-                if count < len(params):
+        if retVal.count("%s") == len(params):
+            while index != -1:
+                index = retVal.find("%s")
+                if index != -1:
                     retVal = retVal[:index] + getUnicode(params[count]) + retVal[index + 2:]
+                    count += 1
+        else:
+            count = 0
+            while True:
+                match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
+                if match:
+                    if count > len(params):
+                        raise Exception("wrong number of parameters during string formatting")
+                    else:
+                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
+                        count += 1
                 else:
-                    raise Exception("wrong number of parameters during string formatting")
-                count += 1
-
+                    break
     return retVal
 
 def getFilteredPageContent(page, onlyText=True):
