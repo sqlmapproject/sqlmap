@@ -38,7 +38,7 @@ class Filesystem:
 
     def _checkFileLength(self, localFile, remoteFile, fileRead=False):
         if Backend.isDbms(DBMS.MYSQL):
-            lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % remoteFile
+            lengthQuery = "LENGTH(LOAD_FILE('%s'))" % remoteFile
 
         elif Backend.isDbms(DBMS.PGSQL) and not fileRead:
             lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
