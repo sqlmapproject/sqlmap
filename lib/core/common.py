@@ -80,6 +80,7 @@ from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
+from lib.core.settings import BANNER
 from lib.core.settings import BOLD_PATTERNS
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
@@ -986,7 +987,9 @@ def banner():
     This function prints sqlmap banner with its version
     """
 
-    _ = """\n    %s - %s\n    %s\n\n""" % (VERSION_STRING, DESCRIPTION, SITE)
+    _ = BANNER
+    if not getattr(LOGGER_HANDLER, "is_tty", False):
+        _ = re.sub("\033.+?m", "", _)
     dataToStdout(_, forceOutput=True)
 
 def parsePasswordHash(password):
