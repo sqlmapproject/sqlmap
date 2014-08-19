@@ -10,6 +10,7 @@ import re
 import subprocess
 import string
 import sys
+import time
 
 from lib.core.enums import DBMS
 from lib.core.enums import DBMS_DIRECTORY_NAME
@@ -19,7 +20,7 @@ from lib.core.revision import getRevisionNumber
 # sqlmap version and site
 VERSION = "1.0-dev"
 REVISION = getRevisionNumber()
-VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit")
+VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit-%s" % time.strftime("%Y%M%d", time.gmtime(os.path.getctime(__file__))))
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
