@@ -619,6 +619,7 @@ def checkSqlInjection(place, parameter, value):
 
     if injection:
         checkSuhosinPatch(injection)
+        checkFilteredChars(injection)
 
     return injection
 
@@ -668,8 +669,6 @@ def checkFalsePositives(injection):
 
         kb.injection = injection
 
-        # Simple arithmetic operations which should show basic
-        # arithmetic ability of the backend if it's really injectable
         for i in xrange(conf.level):
             randInt1, randInt2, randInt3 = (_() for j in xrange(3))
 
@@ -690,28 +689,21 @@ def checkFalsePositives(injection):
             if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
                 checkBooleanExpression("%d=%d" % (randInt1, randInt2))
 
-            if checkBooleanExpression("%d>%d" % (randInt1, randInt2)):
+            if checkBooleanExpression("%d=%d" % (randInt1, randInt3)):
                 retVal = None
                 break
 
-            elif checkBooleanExpression("%d>%d" % (randInt2, randInt3)):
+            elif checkBooleanExpression("%d=%d" % (randInt3, randInt2)):
                 retVal = None
                 break
 
-            elif not checkBooleanExpression("%d>%d" % (randInt3, randInt1)):
+            elif not checkBooleanExpression("%d=%d" % (randInt2, randInt2)):
                 retVal = None
                 break
 
         if retVal is None:
-            warnMsg = "false positive or unexploitable injection point detected"
+            warnMsg = "false positive injection point detected"
             logger.warn(warnMsg)
-
-            if PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
-                if all(_.__name__ != "between" for _ in kb.tamperFunctions):
-                    warnMsg = "there is a possibility that the character '>' is "
-                    warnMsg += "filtered by the back-end server. You can try "
-                    warnMsg += "to rerun with '--tamper=between'"
-                    logger.warn(warnMsg)
 
         kb.injection = popValue()
 
@@ -735,6 +727,27 @@ def checkSuhosinPatch(injection):
             logger.warn(warnMsg)
 
         kb.injection = popValue()
+
+def checkFilteredChars(injection):
+    pushValue(kb.injection)
+
+    kb.injection = injection
+    randInt = randomInt()
+
+    if not checkBooleanExpression("(%d)=%d" % (randInt, randInt)):
+        warnMsg = "it appears that some non-alphanumeric characters (i.e. ()) are "
+        warnMsg += "filtered by the back-end server. There is a strong "
+        warnMsg += "possibility that sqlmap won't be able to properly "
+        warnMsg += "exploit this vulnerability"
+        logger.critical(warnMsg)
+
+    if not checkBooleanExpression("%d>%d" % (randInt+1, randInt)):
+        warnMsg = "it appears that the character '>' is "
+        warnMsg += "filtered by the back-end server. You are strongly "
+        warnMsg += "advised to rerun with the '--tamper=between'"
+        logger.warn(warnMsg)
+
+    kb.injection = popValue()
 
 def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:
