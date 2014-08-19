@@ -568,6 +568,10 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
+            if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and responseHeaders[HTTP_HEADER.CONTENT_TYPE] in ("application/octet-stream",):
+                page = unicode(page, errors="replace")
+            else:
+                page = page if isinstance(page, unicode) else getUnicode(page)
             page = page if isinstance(page, unicode) else getUnicode(page)
             socket.setdefaulttimeout(conf.timeout)
 
