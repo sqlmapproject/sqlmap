@@ -741,18 +741,22 @@ def checkFilteredChars(injection):
     kb.injection = injection
     randInt = randomInt()
 
-    if not checkBooleanExpression("(%d)=%d" % (randInt, randInt)):
-        warnMsg = "it appears that some non-alphanumeric characters (i.e. ()) are "
-        warnMsg += "filtered by the back-end server. There is a strong "
-        warnMsg += "possibility that sqlmap won't be able to properly "
-        warnMsg += "exploit this vulnerability"
-        logger.critical(warnMsg)
+    # all other techniques are already using parentheses in tests
+    if len(injection.data) == 1 and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
+        if not checkBooleanExpression("(%d)=%d" % (randInt, randInt)):
+            warnMsg = "it appears that some non-alphanumeric characters (i.e. ()) are "
+            warnMsg += "filtered by the back-end server. There is a strong "
+            warnMsg += "possibility that sqlmap won't be able to properly "
+            warnMsg += "exploit this vulnerability"
+            logger.critical(warnMsg)
 
-    if not checkBooleanExpression("%d>%d" % (randInt+1, randInt)):
-        warnMsg = "it appears that the character '>' is "
-        warnMsg += "filtered by the back-end server. You are strongly "
-        warnMsg += "advised to rerun with the '--tamper=between'"
-        logger.warn(warnMsg)
+    # inference techniques depend on character '>'
+    if not any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.QUERY)):
+        if not checkBooleanExpression("%d>%d" % (randInt+1, randInt)):
+            warnMsg = "it appears that the character '>' is "
+            warnMsg += "filtered by the back-end server. You are strongly "
+            warnMsg += "advised to rerun with the '--tamper=between'"
+            logger.warn(warnMsg)
 
     kb.injection = popValue()
 
