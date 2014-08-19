@@ -278,7 +278,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
                 test = readInput(message, default="Y")
                 if test[0] not in ("y", "Y"):
                     warnMsg += "usage of option '--union-char' "
-                    warnMsg += "(e.g. --union-char=1) "
+                    warnMsg += "(e.g. '--union-char=1') "
                 else:
                     conf.uChar = kb.uChar = str(randomInt(2))
                     validPayload, vector = _unionConfirm(comment, place, parameter, prefix, suffix, count)
@@ -288,7 +288,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
                     warnMsg += "and/or try to force the "
                 else:
                     warnMsg += "forcing the "
-                warnMsg += "back-end DBMS (e.g. --dbms=mysql) "
+                warnMsg += "back-end DBMS (e.g. '--dbms=mysql') "
 
             if not all([validPayload, vector]) and not warnMsg.endswith("consider "):
                 singleTimeWarnMessage(warnMsg)
