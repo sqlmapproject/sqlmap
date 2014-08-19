@@ -2450,7 +2450,7 @@ class SubmitControl(ScalarControl):
         # IE5 defaults SUBMIT value to "Submit Query"; Firebird 0.6 leaves it
         # blank, Konqueror 3.1 defaults to "Submit".  HTML spec. doesn't seem
         # to define this.
-        if self.value is None: self.value = ""
+        if self.value is None and not self.disabled: self.value = ""
         self.readonly = True
 
     def get_labels(self):
