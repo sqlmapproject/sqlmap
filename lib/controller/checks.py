@@ -702,7 +702,7 @@ def checkFalsePositives(injection):
                 break
 
         if retVal is None:
-            warnMsg = "false positive injection point detected"
+            warnMsg = "false positive or unexploitable injection point detected"
             logger.warn(warnMsg)
 
         kb.injection = popValue()
@@ -715,13 +715,17 @@ def checkSuhosinPatch(injection):
     """
 
     if injection.place == PLACE.GET:
+        debugMsg = "checking for parameter length "
+        debugMsg += "constrainting mechanisms"
+        logger.debug(debugMsg)
+
         pushValue(kb.injection)
 
         kb.injection = injection
         randInt = randomInt()
 
         if not checkBooleanExpression("%d=%s%d" % (randInt, ' ' * SUHOSIN_MAX_VALUE_LENGTH, randInt)):
-            warnMsg = "parameter length constraint "
+            warnMsg = "parameter length constrainting "
             warnMsg += "mechanism detected (e.g. Suhosin patch). "
             warnMsg += "Potential problems in enumeration phase can be expected"
             logger.warn(warnMsg)
@@ -729,6 +733,9 @@ def checkSuhosinPatch(injection):
         kb.injection = popValue()
 
 def checkFilteredChars(injection):
+    debugMsg = "checking for filtered characters"
+    logger.debug(debugMsg)
+
     pushValue(kb.injection)
 
     kb.injection = injection
