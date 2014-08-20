@@ -57,6 +57,9 @@ PAYLOAD_DELIMITER = "__PAYLOAD_DELIMITER__"
 CHAR_INFERENCE_MARK = "%c"
 PRINTABLE_CHAR_REGEX = r"[^\x00-\x1f\x7f-\xff]"
 
+# Regular expression used for recognition of textual content-type
+TEXT_CONTENT_TYPE_REGEX = r"(?i)(text|form|message|xml|javascript|ecmascript|json)"
+
 # Regular expression used for recognition of generic permission messages
 PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"
 

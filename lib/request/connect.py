@@ -82,6 +82,7 @@ from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PERMISSION_DENIED_REGEX
 from lib.core.settings import PLAIN_TEXT_CONTENT_TYPE
 from lib.core.settings import REPLACEMENT_MARKER
+from lib.core.settings import TEXT_CONTENT_TYPE_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
@@ -568,11 +569,11 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
-            if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(r"(?i)(text|form|message|xml|javascript|ecmascript|json)", responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
-                page = unicode(page, errors="replace")
-            else:
-                page = page if isinstance(page, unicode) else getUnicode(page)
-            page = page if isinstance(page, unicode) else getUnicode(page)
+            if not isinstance(page, unicode):
+                if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
+                    page = unicode(page, errors="ignore")
+                else:
+                    page = getUnicode(page)
             socket.setdefaulttimeout(conf.timeout)
 
         processResponse(page, responseHeaders)
