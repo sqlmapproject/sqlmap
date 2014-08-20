@@ -748,7 +748,7 @@ def checkFilteredChars(injection):
             warnMsg += "filtered by the back-end server. There is a strong "
             warnMsg += "possibility that sqlmap won't be able to properly "
             warnMsg += "exploit this vulnerability"
-            logger.critical(warnMsg)
+            logger.warn(warnMsg)
 
     # inference techniques depend on character '>'
     if not any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.QUERY)):
