@@ -374,14 +374,17 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     if not found and not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL:
                         warnMsg = "something went wrong with full UNION "
                         warnMsg += "technique (could be because of "
-                        warnMsg += "limitation on retrieved number of entries). "
-                        warnMsg += "Falling back to partial UNION technique"
-                        singleTimeWarnMessage(warnMsg)
+                        warnMsg += "limitation on retrieved number of entries)"
+                        if " FROM " in query.upper():
+                            warnMsg += ". Falling back to partial UNION technique"
+                            singleTimeWarnMessage(warnMsg)
 
-                        kb.forcePartialUnion = True
-                        value = _goUnion(query, unpack, dump)
-                        found = (value is not None) or (value is None and expectingNone)
-                        kb.forcePartialUnion = False
+                            kb.forcePartialUnion = True
+                            value = _goUnion(query, unpack, dump)
+                            found = (value is not None) or (value is None and expectingNone)
+                            kb.forcePartialUnion = False
+                        else:
+                            singleTimeWarnMessage(warnMsg)
 
                 if error and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) and not found:
                     kb.technique = PAYLOAD.TECHNIQUE.ERROR if isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) else PAYLOAD.TECHNIQUE.QUERY
