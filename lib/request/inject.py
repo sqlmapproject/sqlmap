@@ -373,7 +373,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
                     if not found and not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL:
                         warnMsg = "something went wrong with full UNION "
-                        warnMsg += "technique (most probably because of "
+                        warnMsg += "technique (could be because of "
                         warnMsg += "limitation on retrieved number of entries). "
                         warnMsg += "Falling back to partial UNION technique"
                         singleTimeWarnMessage(warnMsg)
