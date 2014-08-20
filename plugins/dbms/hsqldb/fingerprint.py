@@ -77,7 +77,7 @@ class Fingerprint(GenericFingerprint):
         version 1.8.0.4 Added org.hsqldbdb.Library function, getDatabaseFullProductVersion to return the
                         full version string, including the 4th digit (e.g 1.8.0.4).
         version 1.7.2 CASE statements added and INFORMATION_SCHEMA
-         
+
         """
 
         if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \

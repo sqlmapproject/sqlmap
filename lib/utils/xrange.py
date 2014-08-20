@@ -28,7 +28,7 @@ class xrange(object):
             self._slice = slice(*args)
         if self._slice.stop is None:
             raise TypeError("xrange stop must not be None")
-        
+
     @property
     def start(self):
         if self._slice.start is not None:
@@ -75,10 +75,10 @@ class xrange(object):
                 fixed_index = index + self._len()
             else:
                 fixed_index = index
-                
+
             if not 0 <= fixed_index < self._len():
                 raise IndexError("Index %d out of %r" % (index, self))
-            
+
             return self._index(fixed_index)
         else:
             raise TypeError("xrange indices must be slices or integers")

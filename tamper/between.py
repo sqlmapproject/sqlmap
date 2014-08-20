@@ -54,6 +54,6 @@ def tamper(payload, **kwargs):
             if match:
                 _ = "%s %s BETWEEN %s AND %s" % (match.group(2), match.group(4), match.group(5), match.group(5))
                 retVal = retVal.replace(match.group(0), _)
-            
+
 
     return retVal

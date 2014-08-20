@@ -277,7 +277,7 @@ def unionUse(expression, unpack=True, dump=False):
                             with kb.locks.value:
                                 if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
                                     items = parseUnionPage(output)
- 
+
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
                                     if isListLike(items):
