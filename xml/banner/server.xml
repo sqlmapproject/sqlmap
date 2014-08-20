@@ -252,99 +252,99 @@
     <!-- Apache: FreeBSD -->
 
     <regexp value="Apache/2\.0\.16 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.4"/>
+        <info type="FreeBSD" release="4.4"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.28 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.5"/>
+        <info type="FreeBSD" release="4.5"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.36 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.6"/>
+        <info type="FreeBSD" release="4.6"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.43 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.7|5.0"/>
+        <info type="FreeBSD" release="4.7|5.0"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.44 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.8"/>
+        <info type="FreeBSD" release="4.8"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.47 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.9"/>
+        <info type="FreeBSD" release="4.9"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.49 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.10"/>
+        <info type="FreeBSD" release="4.10"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.52 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="4.11"/>
+        <info type="FreeBSD" release="4.11"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.46 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="5.1"/>
+        <info type="FreeBSD" release="5.1"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.48 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="5.2.1"/>
+        <info type="FreeBSD" release="5.2.1"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.50 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="5.3"/>
+        <info type="FreeBSD" release="5.3"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.53 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="5.4"/>
+        <info type="FreeBSD" release="5.4"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.0 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="5.5|6.1"/>
+        <info type="FreeBSD" release="5.5|6.1"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.54 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="6.0"/>
+        <info type="FreeBSD" release="6.0"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.3 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="6.2"/>
+        <info type="FreeBSD" release="6.2"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.6 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="6.3|7.0"/>
+        <info type="FreeBSD" release="6.3|7.0"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.9 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="6.4|7.1"/>
+        <info type="FreeBSD" release="6.4|7.1"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.11 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="7.2"/>
+        <info type="FreeBSD" release="7.2"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.14 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="7.3"/>
+        <info type="FreeBSD" release="7.3"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.13 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="8.0"/>
+        <info type="FreeBSD" release="8.0"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.15 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="8.1"/>
+        <info type="FreeBSD" release="8.1"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.17 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="8.2"/>
+        <info type="FreeBSD" release="8.2"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.21 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="9.0"/>
+        <info type="FreeBSD" release="9.0"/>
     </regexp>
 
     <regexp value="Apache/2\.4\.6 \(FreeBSD\)">
-        <info type="Linux" distrib="FreeBSD" release="9.2"/>
+        <info type="FreeBSD" release="9.2"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
