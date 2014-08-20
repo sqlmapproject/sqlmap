@@ -665,7 +665,7 @@ def getManualDirectories():
         message += "[1] common location(s) '%s' (default)\n" % ", ".join(root for root in defaultDocRoot)
         message += "[2] custom location(s)\n"
         message += "[3] custom directory list file\n"
-        message += "[4] brute force search\n"
+        message += "[4] brute force search"
         choice = readInput(message, default="1").strip()
 
         if choice == "2":
@@ -701,10 +701,10 @@ def getManualDirectories():
                         if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
                             break
 
-            infoMsg = "using common directories: %s" % ','.join(directories)
+            infoMsg = "using generated directory list: %s" % ','.join(directories)
             logger.info(infoMsg)
 
-            msg = "use additional custom directories [Enter for None]: "
+            msg = "use any additional custom directories [Enter for None]: "
             answer = readInput(msg)
 
             if answer:

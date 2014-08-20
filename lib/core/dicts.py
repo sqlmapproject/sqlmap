@@ -223,5 +223,5 @@ DUMP_DATA_PREPROCESS = {
 
 DEFAULT_DOC_ROOTS = {
                         OS.WINDOWS: ("C:/xampp/htdocs/", "C:/Inetpub/wwwroot/"),
-                        OS.LINUX: ("/var/www/",)
+                        OS.LINUX: ("/var/www/", "/var/www/html", "/usr/local/apache2/htdocs", "/var/www/nginx-default")  # Reference: https://wiki.apache.org/httpd/DistrosDefaultLayout
                     }
