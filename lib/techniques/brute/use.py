@@ -51,7 +51,7 @@ def _addPageTextWords():
     return wordsList
 
 def tableExists(tableFile, regex=None):
-    if kb.tableExistsChoice is None and any(_ not in kb.injection.data for _ in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)):
+    if kb.tableExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
         warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
         warnMsg += "for common table existence check"
         logger.warn(warnMsg)
@@ -155,7 +155,7 @@ def tableExists(tableFile, regex=None):
     return kb.data.cachedTables
 
 def columnExists(columnFile, regex=None):
-    if kb.columnExistsChoice is None and any(_ not in kb.injection.data for _ in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)):
+    if kb.columnExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
         warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
         warnMsg += "for common column existence check"
         logger.warn(warnMsg)
