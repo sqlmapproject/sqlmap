@@ -716,7 +716,7 @@ def getManualDirectories():
     return directories
 
 def getAutoDirectories():
-    retVal = set("/")
+    retVal = set()
 
     if kb.absFilePaths:
         infoMsg = "retrieved web server absolute paths: "
