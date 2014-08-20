@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import random
 import re
 import subprocess
 import string
@@ -28,12 +29,13 @@ GIT_REPOSITORY = "git://github.com/sqlmapproject/sqlmap.git"
 ML = "sqlmap-users@lists.sourceforge.net"
 
 # colorful banner
+_ = random.sample(('o', 'x', '^', 'p'), 1)[0]
 BANNER = """\033[01;33m         _
- ___ ___| |_____ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
+ ___ ___| |_%s_%s_ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
 |_ -| . | |     | .'| . |
 |___|_  |_|_|_|_|__,|  _|
       |_|           |_|   \033[0m\033[4m%s\033[0m\n
-""" % ((31 + hash(REVISION) % 6) if REVISION else 30, VERSION_STRING.split('/')[-1], SITE)
+""" % (_, _, (31 + hash(REVISION) % 6) if REVISION else 30, VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True
 DIFF_TOLERANCE = 0.05
