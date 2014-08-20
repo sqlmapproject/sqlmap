@@ -662,7 +662,7 @@ def getManualDirectories():
         directories = []
 
         message = "what do you want to use for writable directory?\n"
-        message += "[1] common location(s) '%s' (default)\n" % ", ".join(root for root in defaultDocRoot)
+        message += "[1] common location(s) ('%s') (default)\n" % ", ".join(root for root in defaultDocRoot)
         message += "[2] custom location(s)\n"
         message += "[3] custom directory list file\n"
         message += "[4] brute force search"
@@ -729,7 +729,7 @@ def getAutoDirectories():
                 directory = ntToPosixSlashes(directory)
                 retVal.add(directory)
     else:
-        warnMsg = "unable to retrieve automatically any web server path"
+        warnMsg = "unable to automatically parse any web server path"
         logger.warn(warnMsg)
 
     _ = extractRegexResult(r"//[^/]+?(?P<result>/.*)/", conf.url)  # web directory
