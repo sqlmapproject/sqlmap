@@ -568,7 +568,7 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
-            if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and responseHeaders[HTTP_HEADER.CONTENT_TYPE] in ("application/octet-stream",):
+            if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(r"(?i)(text|form|message|xml|javascript|ecmascript|json)", responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
                 page = unicode(page, errors="replace")
             else:
                 page = page if isinstance(page, unicode) else getUnicode(page)
