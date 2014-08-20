@@ -1371,7 +1371,7 @@ def _setHTTPUserAgent():
         userAgent = random.sample(kb.userAgents or [_defaultHTTPUserAgent()], 1)[0]
 
         infoMsg = "fetched random HTTP User-Agent header from "
-        infoMsg += "file '%s': %s" % (paths.USER_AGENTS, userAgent)
+        infoMsg += "file '%s': '%s'" % (paths.USER_AGENTS, userAgent)
         logger.info(infoMsg)
         
         conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, userAgent))
