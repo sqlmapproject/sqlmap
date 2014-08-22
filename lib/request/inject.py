@@ -379,10 +379,11 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                             warnMsg += ". Falling back to partial UNION technique"
                             singleTimeWarnMessage(warnMsg)
 
+                            pushValue(kb.forcePartialUnion)
                             kb.forcePartialUnion = True
                             value = _goUnion(query, unpack, dump)
                             found = (value is not None) or (value is None and expectingNone)
-                            kb.forcePartialUnion = False
+                            kb.forcePartialUnion = popValue()
                         else:
                             singleTimeWarnMessage(warnMsg)
 
