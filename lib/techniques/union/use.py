@@ -67,6 +67,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         # Forge the union SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
+        kb.forcePartialUnion = vector[8]
         query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
         where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
         payload = agent.payload(newValue=query, where=where)
@@ -182,12 +183,12 @@ def unionUse(expression, unpack=True, dump=False):
     # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
     if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
+       kb.forcePartialUnion or \
        (dump and (conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and \
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
        not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE \
        and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
-       and not re.search(SQL_SCALAR_REGEX, expression, re.I)\
-       or kb.forcePartialUnion:
+       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:
