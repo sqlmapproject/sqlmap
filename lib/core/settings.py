@@ -327,7 +327,7 @@ REFLECTED_VALUE_MARKER = "__REFLECTED_VALUE__"
 REFLECTED_BORDER_REGEX = r"[^A-Za-z]+"
 
 # Regular expression used for replacing non-alphanum characters
-REFLECTED_REPLACEMENT_REGEX = r".+?"
+REFLECTED_REPLACEMENT_REGEX = r".+"
 
 # Maximum number of alpha-numerical parts in reflected regex (for speed purposes)
 REFLECTED_MAX_REGEX_PARTS = 10
