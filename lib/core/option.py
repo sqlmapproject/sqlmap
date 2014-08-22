@@ -1567,6 +1567,15 @@ def _cleanupOptions():
     if conf.torType:
         conf.torType = conf.torType.upper()
 
+    if conf.col:
+        conf.col = re.sub(r"\s*,\s*", ",", conf.col)
+
+    if conf.excludeCol:
+        conf.excludeCol = re.sub(r"\s*,\s*", ",", conf.excludeCol)
+
+    if conf.binaryFields:
+        conf.binaryFields = re.sub(r"\s*,\s*", ",", conf.binaryFields)
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
