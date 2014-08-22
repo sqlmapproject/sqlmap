@@ -399,6 +399,10 @@ class Dump(object):
 
         columns = prioritySortColumns(tableValues.keys())
 
+        if conf.col:
+            cols = conf.col.split(',')
+            columns = sorted(columns, key=lambda _: cols.index(_) if _ in cols else 0)
+
         for column in columns:
             if column != "__infos__":
                 info = tableValues[column]
