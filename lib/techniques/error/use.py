@@ -35,6 +35,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import HTTP_HEADER
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
@@ -99,14 +100,14 @@ def _oneShotErrorUse(expression, field=None):
 
                 incrementCounter(kb.technique)
 
-                if page and conf.noCast:
+                if page and conf.noEscape:
                     page = re.sub(r"('|\%%27)%s('|\%%27).*?('|\%%27)%s('|\%%27)" % (kb.chars.start, kb.chars.stop), "", page)
 
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
                 output = reduce(lambda x, y: x if x is not None else y, (\
                         extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
-                        extractRegexResult(check, listToStrValue(headers.headers \
+                        extractRegexResult(check, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] \
                         if headers else None), re.DOTALL | re.IGNORECASE), \
                         extractRegexResult(check, threadData.lastRedirectMsg[1] \
                         if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
@@ -117,7 +118,7 @@ def _oneShotErrorUse(expression, field=None):
                     output = getUnicode(output)
                 else:
                     trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
-                        or extractRegexResult(trimcheck, listToStrValue(headers.headers \
+                        or extractRegexResult(trimcheck, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] \
                         if headers else None), re.DOTALL | re.IGNORECASE) \
                         or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
                         if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
