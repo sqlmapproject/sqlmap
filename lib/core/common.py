@@ -1268,7 +1268,14 @@ def expandAsteriskForColumns(expression):
         logger.info(infoMsg)
 
         _ = asterisk.group(2).replace("..", ".").replace(".dbo.", ".")
-        conf.db, conf.tbl = _.split(".", 1) if '.' in _ else (None, _)
+        db, conf.tbl = _.split(".", 1) if '.' in _ else (None, _)
+        if db is None:
+            if expression != conf.query:
+                conf.db = db
+            else:
+                expression = re.sub(r"([^\w])%s" % conf.tbl, "\g<1>%s.%s" % (conf.db, conf.tbl), expression)
+        else:
+            conf.db = db
         conf.db = safeSQLIdentificatorNaming(conf.db)
         conf.tbl = safeSQLIdentificatorNaming(conf.tbl, True)
 
