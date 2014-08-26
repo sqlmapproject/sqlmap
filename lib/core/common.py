@@ -1267,7 +1267,7 @@ def expandAsteriskForColumns(expression):
         infoMsg += "sqlmap will retrieve the column names itself"
         logger.info(infoMsg)
 
-        _ = asterisk.group(2).replace("..", ".")
+        _ = asterisk.group(2).replace("..", ".").replace(".dbo.", ".")
         conf.db, conf.tbl = _.split(".", 1) if '.' in _ else (None, _)
         conf.db = safeSQLIdentificatorNaming(conf.db)
         conf.tbl = safeSQLIdentificatorNaming(conf.tbl, True)
