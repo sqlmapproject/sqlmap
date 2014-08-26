@@ -1260,7 +1260,7 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    asterisk = re.search("^SELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+([\w\.\_]+)\s*", expression, re.I)
+    asterisk = re.search("^SELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+`?([^`\s()]+)", expression, re.I)
 
     if asterisk:
         infoMsg = "you did not provide the fields in your query. "
