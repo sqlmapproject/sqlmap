@@ -343,6 +343,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         getCurrentThreadData().disableStdOut = suppressOutput
 
     try:
+        pushValue(conf.db)
+        pushValue(conf.tbl)
+
         if expected == EXPECTED.BOOL:
             forgeCaseExpression = booleanExpression = expression
 
@@ -433,6 +436,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
         if suppressOutput is not None:
             getCurrentThreadData().disableStdOut = popValue()
+
+        conf.tbl = popValue()
+        conf.db = popValue()
 
     kb.safeCharEncode = False
 
