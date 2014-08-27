@@ -3337,6 +3337,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     try:
         forms = ParseResponse(response, backwards_compat=False)
+    except UnicodeError:
+        pass
     except ParseError:
         warnMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
         logger.warning(warnMsg)

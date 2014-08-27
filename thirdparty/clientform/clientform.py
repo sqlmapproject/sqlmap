@@ -1124,6 +1124,7 @@ def _ParseFileEx(file, base_uri,
         if action is None:
             action = base_uri
         else:
+            action = unicode(action, "utf8") if action and not isinstance(action, unicode) else action
             action = _urljoin(base_uri, action)
         # would be nice to make HTMLForm class (form builder) pluggable
         form = HTMLForm(
