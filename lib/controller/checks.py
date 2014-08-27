@@ -614,6 +614,9 @@ def checkSqlInjection(place, parameter, value):
             logger.warn(warnMsg)
 
         injection = checkFalsePositives(injection)
+
+        if not injection:
+            kb.vulnHosts.remove(conf.hostname)
     else:
         injection = None
 
