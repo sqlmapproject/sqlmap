@@ -434,11 +434,11 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     finally:
         kb.resumeValues = True
 
-        if suppressOutput is not None:
-            getCurrentThreadData().disableStdOut = popValue()
-
         conf.tbl = popValue()
         conf.db = popValue()
+
+        if suppressOutput is not None:
+            getCurrentThreadData().disableStdOut = popValue()
 
     kb.safeCharEncode = False
 
