@@ -59,7 +59,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if not conf.extensiveFp and (Backend.isDbmsWithin(SYBASE_ALIASES) \
-           or conf.dbms in SYBASE_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in SYBASE_ALIASES) and Backend.getVersion() and \
            Backend.getVersion().isdigit():
             setDbms("%s %s" % (DBMS.SYBASE, Backend.getVersion()))
 

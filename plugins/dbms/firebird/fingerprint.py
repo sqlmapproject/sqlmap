@@ -104,7 +104,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if not conf.extensiveFp and (Backend.isDbmsWithin(FIREBIRD_ALIASES) \
-           or conf.dbms in FIREBIRD_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in FIREBIRD_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
             v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")

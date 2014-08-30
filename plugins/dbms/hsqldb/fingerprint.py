@@ -81,7 +81,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \
-           or conf.dbms in HSQLDB_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in HSQLDB_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
             v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")

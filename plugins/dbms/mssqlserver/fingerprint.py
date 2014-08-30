@@ -66,7 +66,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if not conf.extensiveFp and (Backend.isDbmsWithin(MSSQL_ALIASES) \
-           or conf.dbms in MSSQL_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in MSSQL_ALIASES) and Backend.getVersion() and \
            Backend.getVersion().isdigit():
             setDbms("%s %s" % (DBMS.MSSQL, Backend.getVersion()))
 
