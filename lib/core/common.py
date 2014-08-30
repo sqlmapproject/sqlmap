@@ -2841,10 +2841,10 @@ def maskSensitiveData(msg):
     Masks sensitive data in the supplied message
     """
 
-    retVal = msg
+    retVal = getUnicode(msg)
 
     for item in filter(None, map(lambda x: conf.get(x), ("hostname", "googleDork", "authCred", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy"))):
-        regex = SENSITIVE_DATA_REGEX % re.sub("(\W)", r"\\\1", item)
+        regex = SENSITIVE_DATA_REGEX % re.sub("(\W)", r"\\\1", getUnicode(item))
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
             retVal = retVal.replace(value, '*' * len(value))
