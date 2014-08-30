@@ -576,6 +576,11 @@ def paramToDict(place, parameters=None):
                         test = readInput(message, default="N")
                         if test[0] not in ("y", "Y"):
                             raise SqlmapSilentQuitException
+                    elif not _:
+                        warnMsg = "provided value for parameter '%s' is empty. " % parameter
+                        warnMsg += "Please, always use only valid parameter values "
+                        warnMsg += "so sqlmap could be able to run properly"
+                        logger.warn(warnMsg)
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
