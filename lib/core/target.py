@@ -556,7 +556,7 @@ def _createTargetDirs():
             f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
             f.write(" (%s)" % (HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET))
             if conf.data:
-                f.write("\n\n%s" % conf.data)
+                f.write("\n\n%s" % getUnicode(conf.data))
     except IOError, ex:
         if "denied" in str(ex):
             errMsg = "you don't have enough permissions "
