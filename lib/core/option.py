@@ -1501,8 +1501,8 @@ def _cleanupOptions():
         conf.dbms = conf.dbms.capitalize()
 
     if conf.testFilter:
-        if not any([char in conf.testFilter for char in ('.', ')', '(', ']', '[')]):
-            conf.testFilter = conf.testFilter.replace('*', '.*')
+        conf.testFilter = conf.testFilter.strip('*+')
+        conf.testFilter = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testFilter)
 
     if "timeSec" not in kb.explicitSettings:
         if conf.tor:
