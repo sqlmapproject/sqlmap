@@ -385,7 +385,7 @@ class Connect(object):
 
             conn = urllib2.urlopen(req)
 
-            if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and conf.authType == AUTH_TYPE.BASIC:
+            if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and conf.authType.lower() == AUTH_TYPE.BASIC.lower():
                 kb.authHeader = getRequestHeader(req, HTTP_HEADER.AUTHORIZATION)
 
             if not kb.proxyAuthHeader and getRequestHeader(req, HTTP_HEADER.PROXY_AUTHORIZATION):
