@@ -134,7 +134,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s or is < 1.7.2" % DBMS.HSQLDB
+            warnMsg = "the back-end DBMS is not %s or version is < 1.7.2" % DBMS.HSQLDB
             logger.warn(warnMsg)
 
             return False
