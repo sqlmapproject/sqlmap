@@ -112,7 +112,7 @@ def checkSqlInjection(place, parameter, value):
                 kb.extendTests = [] if readInput(msg, default='Y').upper() != 'Y' else ([conf.dbms])
 
             title = test.title
-            stype = test.stype
+            kb.testType = stype = test.stype
             clause = test.clause
             unionExtended = False
 
@@ -1175,6 +1175,7 @@ def identifyWaf():
         infoMsg = "no WAF/IDS/IPS product has been identified"
         logger.info(infoMsg)
 
+    kb.testType = None
     kb.testMode = False
 
     return retVal

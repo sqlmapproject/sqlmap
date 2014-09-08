@@ -1741,6 +1741,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.technique = None
     kb.testMode = False
     kb.testQueryCount = 0
+    kb.testType = None
     kb.threadContinue = True
     kb.threadException = False
     kb.tableExistsChoice = None
