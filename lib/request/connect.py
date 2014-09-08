@@ -858,7 +858,7 @@ class Connect(object):
                 if deviation > WARN_TIME_STDEV:
                     kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
-                    warnMsg = "there is considerable lagging "
+                    warnMsg = "considerable lagging has been detected "
                     warnMsg += "in connection response(s). Please use as high "
                     warnMsg += "value for option '--time-sec' as possible (e.g. "
                     warnMsg += "10 or more)"

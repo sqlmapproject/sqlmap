@@ -104,7 +104,7 @@ def checkSqlInjection(place, parameter, value):
                     if kb.extendTests is None:
                         _ = (Format.getErrorParsedDBMSes() if Backend.getErrorParsedDBMSes() else kb.heuristicDbms)
                         msg = "do you want to include all tests for '%s' " % _
-                        msg += "extending provided level (%d) and risk (%s)? [Y/n]" % (conf.level, conf.risk)
+                        msg += "extending provided level (%d) and risk (%s) values? [Y/n]" % (conf.level, conf.risk)
                         kb.extendTests = [] if readInput(msg, default='Y').upper() != 'Y' else (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms])
             elif kb.extendTests is None and conf.level < 5 and conf.risk < 3:
                 msg = "do you want to include all tests for '%s' " % conf.dbms
