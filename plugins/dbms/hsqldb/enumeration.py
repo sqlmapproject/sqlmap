@@ -30,3 +30,13 @@ class Enumeration(GenericEnumeration):
             kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=True))
 
         return kb.data.banner
+
+    def getPrivileges(self, *args):
+        warnMsg = "on HSQLDB it is not possible to enumerate the user privileges"
+        logger.warn(warnMsg)
+
+        return {}
+
+    def getHostname(self):
+        warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
+        logger.warn(warnMsg)
