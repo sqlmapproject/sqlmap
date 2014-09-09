@@ -674,44 +674,44 @@
         <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER=CURRENT_USER"/>
         <check_udf/>
         <users>
-            <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
             <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
             <blind query="SELECT LIMIT %d 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS" count="SELECT COUNT(DISTINCT(user)) FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
+            <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
         </users>
         <passwords>
             <!-- Passwords only shown in later versions &gt;=2.0  -->
-            <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS" condition="user_name"/>
             <blind query="SELECT LIMIT %d 1 DISTINCT(password_digest) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'" count="SELECT COUNT(DISTINCT(password_digest)) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'"/>
+            <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS" condition="user_name"/>
         </passwords>
         <privileges/>
         <roles/>
         <dbs>
-            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS" />
             <blind query="SELECT LIMIT %d 1 DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS" count="SELECT COUNT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS"/>
+            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS" />
         </dbs>
         <tables>
-            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES" condition="table_schem"/>
             <blind query="SELECT LIMIT %d 1 table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s' " count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s'"/>
+            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES" condition="table_schem"/>
         </tables>
         <columns>
-            <inband query="SELECT column_name,type_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s'" condition="column_name"/>
             <blind query="SELECT column_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s'" query2="SELECT column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <inband query="SELECT column_name,type_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s'" condition="column_name"/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
             <blind query="SELECT LIMIT %d 1 %s FROM %s.%s ORDER BY %s " count="SELECT COUNT(*) FROM %s.%s"/>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
         </dump_table>
         <search_db>
-            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" condition="table_schem"/>
             <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" condition="table_schem"/>
+            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" condition="table_schem"/>
         </search_db>
         <search_table>
-            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" condition="table_name" condition2="table_schem"/>
             <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" condition="table_name" condition2="table_schem"/>
+            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" condition="table_name" condition2="table_schem"/>
         </search_table>
         <search_column>
-            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
             <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s"  count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
+            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
         </search_column>
     </dbms>
 </root>
