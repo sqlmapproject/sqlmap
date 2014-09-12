@@ -549,7 +549,7 @@ def paramToDict(place, parameters=None):
         parts = element.split("=")
 
         if len(parts) >= 2:
-            parameter = parts[0].replace(" ", "")
+            parameter = urldecode(parts[0].replace(" ", ""))
 
             if conf.paramDel and conf.paramDel == '\n':
                 parts[-1] = parts[-1].rstrip()

@@ -19,6 +19,7 @@ from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import splitFields
 from lib.core.common import unArrayizeValue
+from lib.core.common import urlencode
 from lib.core.common import zeroDepthSearch
 from lib.core.data import conf
 from lib.core.data import kb
@@ -153,6 +154,8 @@ class Agent(object):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
             retVal = re.sub(r"(\A|\b)%s=%s" % (re.escape(parameter), re.escape(origValue)), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+            if retVal == paramString and urlencode(parameter) != parameter:
+                retVal = re.sub(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
 
         return retVal
 
