@@ -15,6 +15,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import DBMS
+from lib.core.enums import OS
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.shell import autoCompletion
@@ -117,7 +118,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 
-        autoCompletion(AUTOCOMPLETE_TYPE.OS)
+        autoCompletion(AUTOCOMPLETE_TYPE.OS, OS.WINDOWS if Backend.isOs(OS.WINDOWS) else OS.LINUX)
 
         while True:
             command = None

@@ -342,3 +342,4 @@ class AUTH_TYPE:
 class AUTOCOMPLETE_TYPE:
     SQL = 0
     OS = 1
+    SQLMAP = 2

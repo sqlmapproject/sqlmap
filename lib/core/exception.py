@@ -44,6 +44,9 @@ class SqlmapSilentQuitException(SqlmapBaseException):
 class SqlmapUserQuitException(SqlmapBaseException):
     pass
 
+class SqlmapShellQuitException(SqlmapBaseException):
+    pass
+
 class SqlmapSyntaxException(SqlmapBaseException):
     pass
 

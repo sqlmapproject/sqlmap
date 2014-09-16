@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import shlex
 import sys
 
 from optparse import OptionError
@@ -17,13 +18,21 @@ from lib.core.common import checkDeprecatedOptions
 from lib.core.common import checkSystemEncoding
 from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
+from lib.core.data import cmdLineOptions
+from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.defaults import defaults
+from lib.core.enums import AUTOCOMPLETE_TYPE
+from lib.core.exception import SqlmapShellQuitException
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
 from lib.core.settings import VERSION_STRING
+from lib.core.shell import autoCompletion
+from lib.core.shell import clearHistory
+from lib.core.shell import loadHistory
+from lib.core.shell import saveHistory
 
 def cmdLineParser():
     """
@@ -693,6 +702,9 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Conduct through tests only if positive heuristic(s)")
 
+        miscellaneous.add_option("--sqlmap-shell", dest="sqlmapShell", action="store_true",
+                            help="Prompt for an interactive sqlmap shell")
+
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
                                   help="Simple wizard interface for beginner users")
@@ -765,22 +777,25 @@ def cmdLineParser():
         option = parser.get_option("-h")
         option.help = option.help.capitalize().replace("this help", "basic help")
 
-        args = []
+        argv = []
+        prompt = False
         advancedHelp = True
 
         for arg in sys.argv:
-            args.append(getUnicode(arg, system=True))
+            argv.append(getUnicode(arg, system=True))
 
-        checkDeprecatedOptions(args)
+        checkDeprecatedOptions(argv)
 
         # Hide non-basic options in basic help case
         for i in xrange(len(sys.argv)):
-            if sys.argv[i] == '-hh':
-                sys.argv[i] = '-h'
-            elif sys.argv[i] == '--version':
+            if sys.argv[i] == "-hh":
+                sys.argv[i] = "-h"
+            elif sys.argv[i] == "--version":
                 print VERSION_STRING
                 raise SystemExit
-            elif sys.argv[i] == '-h':
+            elif sys.argv[i] == "--sqlmap-shell":
+                prompt = True
+            elif sys.argv[i] == "-h":
                 advancedHelp = False
                 for group in parser.option_groups[:]:
                     found = False
@@ -792,17 +807,56 @@ def cmdLineParser():
                     if not found:
                         parser.option_groups.remove(group)
 
+        if prompt:
+            cmdLineOptions.sqlmapShell = True
+
+            _ = ["x", "q", "exit", "quit", "clear"]
+            for group in parser.option_groups:
+                for option in group.option_list:
+                    _.extend(option._long_opts)
+                    _.extend(option._short_opts)
+
+            autoCompletion(AUTOCOMPLETE_TYPE.SQLMAP, commands=_)
+
+            while True:
+                command = None
+
+                try:
+                    command = raw_input("sqlmap-shell> ").strip()
+                except (KeyboardInterrupt, EOFError):
+                    print
+                    raise SqlmapShellQuitException
+
+                if not command:
+                    continue
+                elif command.lower() == "clear":
+                    clearHistory()                    
+                    print "[i] history cleared"
+                    saveHistory()
+                elif command.lower() in ("x", "q", "exit", "quit"):
+                    raise SqlmapShellQuitException
+                elif command[0] != '-':
+                    print "[!] invalid option(s) provided"
+                    print "[i] proper example: '-u http://www.site.com/vuln.php?id=1 --banner'"
+                else:
+                    saveHistory()
+                    loadHistory()
+                    break
+
+            for arg in shlex.split(command):
+                argv.append(getUnicode(arg, system=True))
+
         try:
-            (args, _) = parser.parse_args(args)
+            (args, _) = parser.parse_args(argv)
         except SystemExit:
-            if '-h' in sys.argv and not advancedHelp:
+            if "-h" in sys.argv and not advancedHelp:
                 print "\n[!] to see full list of options run with '-hh'"
             raise
 
         # Expand given mnemonic options (e.g. -z "ign,flu,bat")
-        for i in xrange(len(sys.argv) - 1):
-            if sys.argv[i] == '-z':
-                expandMnemonics(sys.argv[i + 1], parser, args)
+        for i in xrange(len(argv) - 1):
+            if argv[i] == "-z":
+                expandMnemonics(argv[i + 1], parser, args)
 
         if args.dummy:
             args.url = args.url or DUMMY_URL

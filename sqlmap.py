@@ -33,6 +33,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.common import unhandledExceptionMessage
 from lib.core.exception import SqlmapBaseException
+from lib.core.exception import SqlmapShellQuitException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import initOptions
@@ -101,7 +102,10 @@ def main():
     except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
 
-    except SqlmapBaseException, ex:
+    except SqlmapShellQuitException:
+        cmdLineOptions.sqlmapShell = False
+
+    except SqlmapBaseException as ex:
         errMsg = getUnicode(ex.message)
         logger.critical(errMsg)
         sys.exit(1)
@@ -137,6 +141,12 @@ def main():
                 conf.hashDB.flush(True)
             except KeyboardInterrupt:
                 pass
+
+        if cmdLineOptions.get("sqlmapShell"):
+            cmdLineOptions.clear()
+            conf.clear()
+            kb.clear()
+            main()
 
         if hasattr(conf, "api"):
             try:

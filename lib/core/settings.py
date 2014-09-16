@@ -239,6 +239,7 @@ BASIC_HELP_ITEMS = (
                         "checkTor",
                         "flushSession",
                         "tor",
+                        "sqlmapShell",
                         "wizard",
                    )
 
@@ -582,6 +583,9 @@ MIN_BINARY_DISK_DUMP_SIZE = 100
 
 # Regular expression used for extracting form tags
 FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"
+
+# Maximum number of lines to save in history file
+MAX_HISTORY_LENGTH = 1000
 
 # Minimum field entry length needed for encoded content (hex, base64,...) check
 MIN_ENCODED_LEN_CHECK = 5
