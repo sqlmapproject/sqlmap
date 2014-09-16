@@ -16,11 +16,11 @@ from lib.core.data import paths
 from lib.core.enums import OS
 
 def saveHistory():
-    historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
+    historyPath = os.path.expanduser(paths.SQLMAP_SHELL_HISTORY)
     readline.write_history_file(historyPath)
 
 def loadHistory():
-    historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
+    historyPath = os.path.expanduser(paths.SQLMAP_SHELL_HISTORY)
 
     if os.path.exists(historyPath):
         try:
