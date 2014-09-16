@@ -789,6 +789,7 @@ def cmdLineParser():
         prompt = "--sqlmap-shell" in argv
 
         if prompt:
+            parser.usage = ""
             cmdLineOptions.sqlmapShell = True
 
             _ = ["x", "q", "exit", "quit", "clear"]
