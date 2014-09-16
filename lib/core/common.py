@@ -1058,7 +1058,9 @@ def setPaths():
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
     # sqlmap files
-    paths.SQLMAP_SHELL_HISTORY = os.path.join(_, "shell.hst")
+    paths.SQL_SHELL_HISTORY = os.path.join(_, "sql.hst")
+    paths.OS_SHELL_HISTORY = os.path.join(_, "os.hst")
+    paths.SQLMAP_SHELL_HISTORY = os.path.join(_, "sqlmap.hst")
     paths.SQLMAP_CONFIG = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")

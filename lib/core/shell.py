@@ -31,24 +31,38 @@ def clearHistory():
 
     readline.clear_history()
 
-def saveHistory():
+def saveHistory(completion=None):
     if not readlineAvailable():
         return
 
-    historyPath = os.path.expanduser(paths.SQLMAP_SHELL_HISTORY)
+    if completion == AUTOCOMPLETE_TYPE.SQL:
+        historyPath = paths.SQL_SHELL_HISTORY
+    elif completion == AUTOCOMPLETE_TYPE.OS:
+        historyPath = paths.OS_SHELL_HISTORY
+    else:
+        historyPath = paths.SQLMAP_SHELL_HISTORY
+
     try:
-        os.remove(historyPath)
+        with open(historyPath, "rw+") as f:
+            f.truncate()
     except:
         pass
 
     readline.set_history_length(MAX_HISTORY_LENGTH)
     readline.write_history_file(historyPath)
 
-def loadHistory():
+def loadHistory(completion=None):
     if not readlineAvailable():
         return
 
-    historyPath = os.path.expanduser(paths.SQLMAP_SHELL_HISTORY)
+    clearHistory()
+
+    if completion == AUTOCOMPLETE_TYPE.SQL:
+        historyPath = paths.SQL_SHELL_HISTORY
+    elif completion == AUTOCOMPLETE_TYPE.OS:
+        historyPath = paths.OS_SHELL_HISTORY
+    else:
+        historyPath = paths.SQLMAP_SHELL_HISTORY
 
     if os.path.exists(historyPath):
         try:
@@ -107,5 +121,5 @@ def autoCompletion(completion=None, os=None, commands=None):
         readline.set_completer(completer.complete)
         readline.parse_and_bind("tab: complete")
 
-    loadHistory()
-    atexit.register(saveHistory)
+    loadHistory(completion)
+    atexit.register(saveHistory, completion)

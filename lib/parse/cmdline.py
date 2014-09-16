@@ -832,15 +832,15 @@ def cmdLineParser():
                 elif command.lower() == "clear":
                     clearHistory()                    
                     print "[i] history cleared"
-                    saveHistory()
+                    saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                 elif command.lower() in ("x", "q", "exit", "quit"):
                     raise SqlmapShellQuitException
                 elif command[0] != '-':
                     print "[!] invalid option(s) provided"
                     print "[i] proper example: '-u http://www.site.com/vuln.php?id=1 --banner'"
                 else:
-                    saveHistory()
-                    loadHistory()
+                    saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
+                    loadHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                     break
 
             for arg in shlex.split(command):
