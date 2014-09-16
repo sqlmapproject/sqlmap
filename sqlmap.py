@@ -81,6 +81,7 @@ def main():
 
         banner()
 
+        conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
@@ -131,7 +132,8 @@ def main():
         dataToStdout(setColor(traceback.format_exc()))
 
     finally:
-        dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
+        if conf.get("showTime"):
+            dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
         kb.threadContinue = False
         kb.threadException = True
