@@ -838,7 +838,7 @@ def cmdLineParser():
             if argv[i] == "-hh":
                 argv[i] = "-h"
             elif argv[i] == "--version":
-                print VERSION_STRING
+                print VERSION_STRING.split('/')[-1]
                 raise SystemExit
             elif argv[i] == "-h":
                 advancedHelp = False
