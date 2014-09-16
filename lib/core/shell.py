@@ -13,6 +13,7 @@ from lib.core import readlineng as readline
 from lib.core.common import Backend
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import OS
 
 def saveHistory():
@@ -47,13 +48,13 @@ class CompleterNG(rlcompleter.Completer):
 
         return matches
 
-def autoCompletion(sqlShell=False, osShell=False):
+def autoCompletion(completion=None):
     # First of all we check if the readline is available, by default
     # it is not in Python default installation on Windows
     if not readline._readline:
         return
 
-    if osShell:
+    if completion == AUTOCOMPLETE_TYPE.OS:
         if Backend.isOs(OS.WINDOWS):
             # Reference: http://en.wikipedia.org/wiki/List_of_DOS_commands
             completer = CompleterNG({

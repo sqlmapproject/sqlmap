@@ -13,6 +13,7 @@ from lib.core.common import isStackingAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import DBMS
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUnsupportedFeatureException
@@ -116,7 +117,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)
 
-        autoCompletion(osShell=True)
+        autoCompletion(AUTOCOMPLETE_TYPE.OS)
 
         while True:
             command = None

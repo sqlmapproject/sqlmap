@@ -15,6 +15,7 @@ from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.dicts import SQL_STATEMENTS
+from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.shell import autoCompletion
@@ -73,7 +74,7 @@ class Custom:
         infoMsg += "'x' or 'q' and press ENTER"
         logger.info(infoMsg)
 
-        autoCompletion(sqlShell=True)
+        autoCompletion(AUTOCOMPLETE_TYPE.SQL)
 
         while True:
             query = None
