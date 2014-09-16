@@ -786,31 +786,17 @@ def cmdLineParser():
 
         checkDeprecatedOptions(argv)
 
-        # Hide non-basic options in basic help case
-        for i in xrange(len(sys.argv)):
-            if sys.argv[i] == "-hh":
-                sys.argv[i] = "-h"
-            elif sys.argv[i] == "--version":
-                print VERSION_STRING
-                raise SystemExit
-            elif sys.argv[i] == "--sqlmap-shell":
-                prompt = True
-            elif sys.argv[i] == "-h":
-                advancedHelp = False
-                for group in parser.option_groups[:]:
-                    found = False
-                    for option in group.option_list:
-                        if option.dest not in BASIC_HELP_ITEMS:
-                            option.help = SUPPRESS_HELP
-                        else:
-                            found = True
-                    if not found:
-                        parser.option_groups.remove(group)
+        prompt = "--sqlmap-shell" in argv
 
         if prompt:
             cmdLineOptions.sqlmapShell = True
 
             _ = ["x", "q", "exit", "quit", "clear"]
+
+            for option in parser.option_list:
+                _.extend(option._long_opts)
+                _.extend(option._short_opts)
+
             for group in parser.option_groups:
                 for option in group.option_list:
                     _.extend(option._long_opts)
@@ -846,10 +832,29 @@ def cmdLineParser():
             for arg in shlex.split(command):
                 argv.append(getUnicode(arg, system=True))
 
+        # Hide non-basic options in basic help case
+        for i in xrange(len(argv)):
+            if argv[i] == "-hh":
+                argv[i] = "-h"
+            elif argv[i] == "--version":
+                print VERSION_STRING
+                raise SystemExit
+            elif argv[i] == "-h":
+                advancedHelp = False
+                for group in parser.option_groups[:]:
+                    found = False
+                    for option in group.option_list:
+                        if option.dest not in BASIC_HELP_ITEMS:
+                            option.help = SUPPRESS_HELP
+                        else:
+                            found = True
+                    if not found:
+                        parser.option_groups.remove(group)
+
         try:
             (args, _) = parser.parse_args(argv)
         except SystemExit:
-            if "-h" in sys.argv and not advancedHelp:
+            if "-h" in argv and not advancedHelp:
                 print "\n[!] to see full list of options run with '-hh'"
             raise
 
