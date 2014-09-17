@@ -44,7 +44,7 @@ def saveHistory(completion=None):
 
     try:
         with open(historyPath, "w+") as f:
-            f.truncate()
+            pass
     except:
         pass
 
