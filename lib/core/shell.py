@@ -49,7 +49,11 @@ def saveHistory(completion=None):
         pass
 
     readline.set_history_length(MAX_HISTORY_LENGTH)
-    readline.write_history_file(historyPath)
+    try:
+        readline.write_history_file(historyPath)
+    except IOError, msg:
+        warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, msg)
+        logger.warn(warnMsg)
 
 def loadHistory(completion=None):
     if not readlineAvailable():
