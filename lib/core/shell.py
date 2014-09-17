@@ -43,7 +43,7 @@ def saveHistory(completion=None):
         historyPath = paths.SQLMAP_SHELL_HISTORY
 
     try:
-        with open(historyPath, "rw+") as f:
+        with open(historyPath, "w+") as f:
             f.truncate()
     except:
         pass
