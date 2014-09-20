@@ -110,6 +110,9 @@ class Agent(object):
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             origValue = origValue[origValue.index(',') + 1:]
+            match = re.search(r"([^;]+)=(?P<value>[^;]+);?\Z", origValue)
+            if match:
+                origValue = match.group("value")
 
         if conf.prefix:
             value = origValue
