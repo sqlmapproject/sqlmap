@@ -226,6 +226,9 @@ Daniel Huckmann, <sanitybit@gmail.com>
 Daliev Ilya, <daliser@yandex.ru>
 * for reporting a bug
 
+Mehmet İnce, <mehmet@mehmetince.net>
+* for contributing a tamper script xforwardedfor.py
+
 Jovon Itwaru, <jovon.itwaru@gmail.com>
 * for reporting a minor bug
 
