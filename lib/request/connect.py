@@ -768,7 +768,7 @@ class Connect(object):
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
-            variables = {}
+            variables = {"uri": uri}
             originals = {}
 
             for item in filter(None, (get, post if not kb.postHint else None)):
@@ -787,6 +787,7 @@ class Connect(object):
 
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
+            uri = variables["uri"]
 
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:
