@@ -1004,7 +1004,7 @@ def _setWafFunctions():
 
             _ = dict(inspect.getmembers(module))
             if "detect" not in _:
-                errMsg = "missing function 'detect(page, headers, code)' "
+                errMsg = "missing function 'detect(get_page)' "
                 errMsg += "in WAF script '%s'" % found
                 raise SqlmapGenericException(errMsg)
             else:
