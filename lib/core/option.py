@@ -998,6 +998,8 @@ def _setWafFunctions():
                 sys.path.insert(0, dirname)
 
             try:
+                if filename[:-3] in sys.modules:
+                    del sys.modules[filename[:-3]]
                 module = __import__(filename[:-3])
             except ImportError, msg:
                 raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], msg))
