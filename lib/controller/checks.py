@@ -851,11 +851,12 @@ def heuristicCheckSqlInjection(place, parameter):
 
     kb.heuristicMode = True
 
-    payload = "%s%s%s" % (prefix, "%s'%s%s" % (randomStr(), DUMMY_XSS_CHECK_APPENDIX, randomStr()), suffix)
+    value = "%s%s%s" % (randomStr(), DUMMY_XSS_CHECK_APPENDIX, randomStr())
+    payload = "%s%s%s" % (prefix, "'%s" % value, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
-    if DUMMY_XSS_CHECK_APPENDIX in (page or ""):
+    if value in (page or ""):
         infoMsg = "heuristic (XSS) test shows that %s " % place
         infoMsg += "parameter '%s' might " % parameter
         infoMsg += "be vulnerable to XSS attacks"
