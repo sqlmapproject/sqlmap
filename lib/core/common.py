@@ -2931,7 +2931,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
     retVal = content
 
-    if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism:
+    if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism and not kb.heuristicMode:
         def _(value):
             while 2 * REFLECTED_REPLACEMENT_REGEX in value:
                 value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
@@ -2966,7 +2966,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
                     retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
 
-            if retVal != content and not kb.heuristicMode:
+            if retVal != content:
                 kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
                 if not suppressWarning:
                     warnMsg = "reflective value(s) found and filtering out"

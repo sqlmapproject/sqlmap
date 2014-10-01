@@ -58,6 +58,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import DUMMY_XSS_CHECK_APPENDIX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
@@ -847,6 +848,20 @@ def heuristicCheckSqlInjection(place, parameter):
     else:
         infoMsg += "not be injectable"
         logger.warn(infoMsg)
+
+    kb.heuristicMode = True
+
+    payload = "%s%s%s" % (prefix, "%s%s%s" % (randomStr(), DUMMY_XSS_CHECK_APPENDIX, randomStr()), suffix)
+    payload = agent.payload(place, parameter, newValue=payload)
+    page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+
+    if DUMMY_XSS_CHECK_APPENDIX in (page or ""):
+        infoMsg = "heuristic (XSS) test shows that %s " % place
+        infoMsg += "parameter '%s' might " % parameter
+        infoMsg += "be vulnerable to XSS attacks"
+        logger.info(infoMsg)
+
+    kb.heuristicMode = False
 
     return kb.heuristicTest
 
