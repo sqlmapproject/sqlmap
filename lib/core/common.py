@@ -98,6 +98,7 @@ from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
+from lib.core.settings import GIT_PAGE
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
@@ -2828,13 +2829,14 @@ def unhandledExceptionMessage():
     Returns detailed message about occurred unhandled exception
     """
 
-    errMsg = "unhandled exception in %s, retry your " % VERSION_STRING
-    errMsg += "run with the latest development version from the GitHub "
-    errMsg += "repository. If the exception persists, please send by e-mail "
-    errMsg += "to '%s' or open a new issue at '%s' with the following text " % (ML, ISSUES_PAGE)
-    errMsg += "and any information required to reproduce the bug. The "
+    errMsg = "unhandled exception occurred in %s. It is recommended to retry your " % VERSION_STRING
+    errMsg += "run with the latest development version from official GitHub "
+    errMsg += "repository at '%s'. If the exception persists, please open a new issue " % GIT_PAGE
+    errMsg += "at '%s' (or less preferably send by e-mail to '%s') " % (ISSUES_PAGE, ML)
+    errMsg += "with the following text and any other information required to "
+    errMsg += "reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "
-    errMsg += "and get back to you.\n"
+    errMsg += "and get back to you\n"
     errMsg += "sqlmap version: %s%s\n" % (VERSION, "-%s" % REVISION if REVISION else "")
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM

@@ -26,6 +26,7 @@ DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
 GIT_REPOSITORY = "git://github.com/sqlmapproject/sqlmap.git"
+GIT_PAGE = "https://github.com/sqlmapproject/sqlmap"
 ML = "sqlmap-users@lists.sourceforge.net"
 
 # colorful banner
