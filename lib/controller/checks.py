@@ -851,7 +851,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     kb.heuristicMode = True
 
-    payload = "%s%s%s" % (prefix, "%s%s%s" % (randomStr(), DUMMY_XSS_CHECK_APPENDIX, randomStr()), suffix)
+    payload = "%s%s%s" % (prefix, "%s'%s%s" % (randomStr(), DUMMY_XSS_CHECK_APPENDIX, randomStr()), suffix)
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
