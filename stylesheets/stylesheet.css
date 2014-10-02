@@ -162,7 +162,6 @@ code, pre {
   font-family: monospace, serif;
   _font-family: 'courier new', monospace;
   color: #222;
-  margin-bottom: 30px;
   font-size: 13px;
 }
 
@@ -234,10 +233,17 @@ form {
 } 
 
 #main-content h1:before {
-  content: "/";
-  color: #9ddcff;
+  content: "';";
+  color: #ff2020;
   padding-right: 0.3em;
   margin-left: -0.9em;
+}
+
+#main-content h1:after {
+  content: "();--";
+  color: #ff2020;
+  padding-left: 0.1em;
+  margin-right: -0.9em;
 }
 
 #main-content h2 {
