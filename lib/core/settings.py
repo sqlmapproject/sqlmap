@@ -34,7 +34,7 @@ BANNER = """\033[01;33m         _
  ___ ___| |_____ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
 |_ -| . | |     | .'| . |
 |___|_  |_|_|_|_|__,|  _|
-      |_|           |_|   \033[0m\033[4m%s\033[0m\n
+      |_|           |_|   \033[0m\033[4;37m%s\033[0m\n
 """ % ((31 + hash(REVISION) % 6) if REVISION else 30, VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True
