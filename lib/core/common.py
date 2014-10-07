@@ -2810,7 +2810,7 @@ def decodeIntToUnicode(value):
     if isinstance(value, int):
         try:
             # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE,):
                 _ = "%x" % value
                 if len(_) % 2 == 1:
                     _ = "0%s" % _
