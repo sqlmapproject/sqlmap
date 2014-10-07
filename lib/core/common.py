@@ -1520,10 +1520,10 @@ def safeStringFormat(format_, params):
 
     if format_.count(PAYLOAD_DELIMITER) == 2:
         _ = format_.split(PAYLOAD_DELIMITER)
-        _[1] = _[1].replace("%d", "%s")
+        _[1] = re.sub(r"(\A|[^A-Za-z0-9])(%d)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>", _[1])
         retVal = PAYLOAD_DELIMITER.join(_)
     else:
-        retVal = format_.replace("%d", "%s")
+        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%d)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>", format_)
 
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params, 1)
