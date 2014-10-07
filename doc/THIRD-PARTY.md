@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   Copyright (C) 2008-2009, Jose Fonseca.
 * The KeepAlive library located under thirdparty/keepalive/.
   Copyright (C) 2002-2003, Michael D. Stenner.
-* The MultipartPost library located under thirdparty/multipartpost/.
+* The MultipartPost library located under thirdparty/multipart/.
   Copyright (C) 2006, Will Holcomb.
 * The XDot library located under thirdparty/xdot/.
   Copyright (C) 2008, Jose Fonseca.
