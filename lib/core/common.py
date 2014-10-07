@@ -1542,7 +1542,7 @@ def safeStringFormat(format_, params):
             while True:
                 match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
                 if match:
-                    if count > len(params):
+                    if count >= len(params):
                         raise Exception("wrong number of parameters during string formatting")
                     else:
                         retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
