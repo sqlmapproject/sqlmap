@@ -85,7 +85,11 @@ def checkSqlInjection(place, parameter, value):
     # Set the flag for SQL injection test mode
     kb.testMode = True
 
-    for test in getSortedInjectionTests():
+    tests = getSortedInjectionTests()
+
+    while tests:
+        test = tests.pop(0)
+
         try:
             if kb.endDetection:
                 break
@@ -597,6 +601,7 @@ def checkSqlInjection(place, parameter, value):
                     choice = readInput(msg, default=str(conf.verbose), checkBatch=False).strip()
                 conf.verbose = int(choice)
                 setVerbosity()
+                tests.insert(0, test)
             elif choice[0] in ("n", "N"):
                 return None
             elif choice[0] in ("e", "E"):
