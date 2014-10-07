@@ -20,6 +20,8 @@ This file lists bundled packages and their associated licensing terms.
 * The Oset library located under thirdparty/oset/.
   Copyright (C) 2010, BlueDynamics Alliance, Austria.
   Copyright (C) 2009, Raymond Hettinger, and others.
+* The PrettyPrint library located under thirdparty/prettyprint/.
+  Copyright (C) 2010, Chris Hall.
 * The SocksiPy library located under thirdparty/socks/.
   Copyright (C) 2006, Dan-Haim.
 
@@ -281,8 +283,6 @@ be bound by the terms and conditions of this License Agreement.
   Copyright (C) 2012, Marcel Hellkamp.
 * The PageRank library located under thirdparty/pagerank/.
   Copyright (C) 2010, Corey Goldberg.
-* The PrettyPrint library located under thirdparty/prettyprint/.
-  Copyright (C) 2010, Chris Hall.
 * The Termcolor library located under thirdparty/termcolor/.
   Copyright (C) 2008-2011, Volvox Development Team.
 
