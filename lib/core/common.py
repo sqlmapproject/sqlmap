@@ -2809,14 +2809,11 @@ def decodeIntToUnicode(value):
 
     if isinstance(value, int):
         try:
-            # http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ord
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+            if value > 255:
                 _ = "%x" % value
                 if len(_) % 2 == 1:
                     _ = "0%s" % _
-                retVal = getUnicode(hexdecode(_))
-            elif value > 255:
-                retVal = unichr(value)
+                retVal = getUnicode(hexdecode(_), encoding="UTF-16" if Backend.isDbms(DBMS.MSSQL) else None)
             else:
                 retVal = getUnicode(chr(value))
         except:
