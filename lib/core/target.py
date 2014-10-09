@@ -44,7 +44,9 @@ from lib.core.option import _setKnowledgeBaseAttributes
 from lib.core.option import _setAuthCred
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import HOST_ALIASES
+from lib.core.settings import ARRAY_LIKE_RECOGNITION_REGEX
 from lib.core.settings import JSON_RECOGNITION_REGEX
 from lib.core.settings import JSON_LIKE_RECOGNITION_REGEX
 from lib.core.settings import MULTIPART_RECOGNITION_REGEX
@@ -145,6 +147,17 @@ def _setRequestParams():
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     kb.postHint = POST_HINT.JSON_LIKE
+
+            elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
+                message = "Array-like data found in %s data. " % conf.method
+                message += "Do you want to process it? [Y/n/q] "
+                test = readInput(message, default="Y")
+                if test and test[0] in ("q", "Q"):
+                    raise SqlmapUserQuitException
+                elif test[0] not in ("n", "N"):
+                    conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
+                    conf.data = re.sub(r"(=[^%s]+)" % DEFAULT_GET_POST_DELIMITER, r"\g<1>%s" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
+                    kb.postHint = POST_HINT.ARRAY_LIKE
 
             elif re.search(XML_RECOGNITION_REGEX, conf.data):
                 message = "SOAP/XML data found in %s data. " % conf.method
