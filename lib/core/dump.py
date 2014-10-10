@@ -73,6 +73,13 @@ class Dump(object):
 
         kb.dataOutputFlag = True
 
+    def flush(self):
+        if self._outputFP:
+            try:
+                self._outputFP.flush()
+            except IOError:
+                pass
+
     def setOutputFile(self):
         self._outputFile = os.path.join(conf.outputPath, "log")
         try:

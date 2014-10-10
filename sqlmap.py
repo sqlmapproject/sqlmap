@@ -156,6 +156,9 @@ def main():
             except KeyboardInterrupt:
                 pass
 
+        if conf.get("dumper"):
+            conf.dumper.flush()
+
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if conf.get("threads", 0) > 1 or conf.get("dnsServer"):
             os._exit(0)
