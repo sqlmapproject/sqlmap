@@ -660,6 +660,9 @@ fufuh, <fufuh(at)users.sourceforge.net>
 Hans Wurst, <wurstwass0r(at)googlemail.com>
 * for reporting a couple of bugs
 
+Hysia, <hysia(at)huorui.net>
+* for contributing a Chinese translation of README.md
+
 james, <james(at)ev6.net>
 * for reporting a bug
 
@@ -718,6 +721,9 @@ smith, <esmyl911(at)gmail.com>
 
 Soma Cruz, <oleg.kupreev(at)gmail.com>
 * for reporting a minor bug
+
+Spiros94, <cont(at)eyrhka.gr>
+* for contributing a Greek translation of README.md
 
 Stuffe, <stuffe.dk(at)gmail.com>
 * for reporting a minor bug and a feature request
