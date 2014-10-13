@@ -136,6 +136,9 @@ def cmdLineParser():
         request.add_option("--auth-private", dest="authPrivate",
                            help="HTTP authentication PEM private key file")
 
+        request.add_option("--ignore-401", dest="ignore401", action="store_true",
+                          help="Ignore HTTP Error 401 (Unauthorized)")
+
         request.add_option("--proxy", dest="proxy",
                            help="Use a proxy to connect to the target URL")
 
@@ -726,9 +729,6 @@ def cmdLineParser():
                           help=SUPPRESS_HELP)
 
         parser.add_option("--force-dns", dest="forceDns", action="store_true",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--ignore-401", dest="ignore401", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
