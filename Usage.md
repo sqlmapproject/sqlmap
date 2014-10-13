@@ -1753,17 +1753,17 @@ Example against a Microsoft SQL Server target:
 
     $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --parse-errors
     [...]
-    [11:12:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [xx:xx:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
     [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
     [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
     [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [11:12:17] [INFO] target URL appears to have 3 columns in query
+    [xx:xx:17] [INFO] target URL appears to have 3 columns in query
     [...]
 
 ### Pivot column
