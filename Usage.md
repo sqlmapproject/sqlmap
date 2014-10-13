@@ -1778,37 +1778,6 @@ Sometimes it is necessary to enforce the usage of particular `pivot` column (e.g
 
 Switch: `--save`
 
-It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above. 
-
-### Parse DBMS error messages from response pages
-
-Switch: `--parse-errors`
-
-If the web application is configured in debug mode so that it displays in the HTTP responses the back-end database management system error messages, sqlmap can parse and display them for you.
-
-This is useful for debugging purposes like understanding why a certain enumeration or takeover switch does not work - it might be a matter of session user's privileges and in this case you would see a DBMS error message along the lines of `Access denied for user  <SESSION USER>`. 
-
-Example against a Microsoft SQL Server target:
-
-    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" -z "ign,flu,tec=U" --parse-errors
-    [...]
-    [xx:xx:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
-    <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [xx:xx:17] [INFO] target URL appears to have 3 columns in query
-    [...]
-
-### Save options in a configuration INI file
-
-Switch: `--save`
-
 It is possible to save the command line options to a configuration INI file. The generated file can then be edited and passed to sqlmap with the `-c` option as explained above.
 
 ### Update sqlmap
