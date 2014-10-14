@@ -51,9 +51,3 @@ sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Εικόνες: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
-
-Μεταφράσεις
-----
-
-* [Portuguese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pt-BR.md)
-* [Indonesian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)

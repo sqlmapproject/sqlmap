@@ -50,9 +50,3 @@ sqlmap 可以运行在 [Python](http://www.python.org/download/)  **2.6.x**  和
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * 教程: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * 截图: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
-
-翻译
-----
-
-* [葡萄牙文](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pt-BR.md)
-* [印度尼西亚文](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)
