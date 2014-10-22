@@ -219,7 +219,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
             if not(conf.scope and not re.search(conf.scope, url, re.I)):
                 if not kb.targets or url not in addedTargetUrls:
-                    kb.targets.add((url, method, None, cookie))
+                    kb.targets.add((url, method, None, cookie, None))
                     addedTargetUrls.add(url)
 
     def _parseBurpLog(content):
@@ -561,14 +561,14 @@ def _setGoogleDorking():
         for link in links:
             link = urldecode(link)
             if re.search(r"(.*?)\?(.+)", link):
-                kb.targets.add((link, conf.method, conf.data, conf.cookie))
+                kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
             elif re.search(URI_INJECTABLE_REGEX, link, re.I):
                 if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
                     test = readInput(message, default="Y")
                     kb.data.onlyGETs = test.lower() != 'n'
                 if not kb.data.onlyGETs or conf.googleDork:
-                    kb.targets.add((link, conf.method, conf.data, conf.cookie))
+                    kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
 
         return links
 
@@ -618,7 +618,7 @@ def _setBulkMultipleTargets():
     for line in getFileItems(conf.bulkFile):
         if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
             found = True
-            kb.targets.add((line.strip(), None, None, None))
+            kb.targets.add((line.strip(), None, None, None, None))
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
@@ -635,7 +635,7 @@ def _setSitemapTargets():
     for item in parseSitemap(conf.sitemapUrl):
         if re.match(r"[^ ]+\?(.+)", item, re.I):
             found = True
-            kb.targets.add((item.strip(), None, None, None))
+            kb.targets.add((item.strip(), None, None, None, None))
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
