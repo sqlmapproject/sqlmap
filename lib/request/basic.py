@@ -53,7 +53,7 @@ def forgeHeaders(items=None):
             del items[_]
 
     headers = OrderedDict(conf.httpHeaders)
-    headers.update(items or {})
+    headers.update(items.items())
 
     class _str(str):
         def capitalize(self):
