@@ -251,7 +251,7 @@ def start():
         return True
 
     if conf.url and not any((conf.forms, conf.crawlDepth)):
-        kb.targets.add((conf.url, conf.method, conf.data, conf.cookie))
+        kb.targets.add((conf.url, conf.method, conf.data, conf.cookie, None))
 
     if conf.configFile and not kb.targets:
         errMsg = "you did not edit the configuration file properly, set "
@@ -264,13 +264,16 @@ def start():
         logger.info(infoMsg)
 
     hostCount = 0
+    initialHeaders = list(conf.httpHeaders)
 
-    for targetUrl, targetMethod, targetData, targetCookie in kb.targets:
+    for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         try:
             conf.url = targetUrl
             conf.method = targetMethod
             conf.data = targetData
             conf.cookie = targetCookie
+            conf.httpHeaders = list(initialHeaders)
+            conf.httpHeaders.extend(targetHeaders or [])
 
             initTargetEnv()
             parseTargetUrl()

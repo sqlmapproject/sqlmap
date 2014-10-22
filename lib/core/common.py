@@ -3391,7 +3391,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                     logger.debug(debugMsg)
                     continue
 
-                target = (url, method, data, conf.cookie)
+                target = (url, method, data, conf.cookie, None)
                 retVal.add(target)
     else:
         errMsg = "there were no forms found at the given target URL"

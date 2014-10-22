@@ -271,6 +271,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             params = False
             newline = None
             lines = request.split('\n')
+            headers = []
 
             for index in xrange(len(lines)):
                 line = lines[index]
@@ -320,14 +321,14 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                             port = filterStringValue(splitValue[1], "[0-9]")
 
                     # Avoid to add a static content length header to
-                    # conf.httpHeaders and consider the following lines as
+                    # headers and consider the following lines as
                     # POSTed data
                     if key.upper() == HTTP_HEADER.CONTENT_LENGTH.upper():
                         params = True
 
                     # Avoid proxy and connection type related headers
                     elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
-                        conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
+                        headers.append((getUnicode(key), getUnicode(value)))
 
                     if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
                         params = True
@@ -355,7 +356,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     if not kb.targets or url not in addedTargetUrls:
-                        kb.targets.add((url, method, data, cookie))
+                        kb.targets.add((url, method, data, cookie, tuple(headers)))
                         addedTargetUrls.add(url)
 
     fp = openFile(reqFile, "rb")
