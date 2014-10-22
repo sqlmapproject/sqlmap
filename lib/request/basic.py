@@ -38,6 +38,7 @@ from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 from lib.utils.htmlentities import htmlEntities
 from thirdparty.chardet import detect
+from thirdparty.odict.odict import OrderedDict
 
 def forgeHeaders(items=None):
     """
@@ -51,7 +52,7 @@ def forgeHeaders(items=None):
         if items[_] is None:
             del items[_]
 
-    headers = dict(conf.httpHeaders)
+    headers = OrderedDict(conf.httpHeaders)
     headers.update(items or {})
 
     class _str(str):
@@ -62,7 +63,7 @@ def forgeHeaders(items=None):
             return _str(self)
 
     _ = headers
-    headers = {}
+    headers = OrderedDict()
     for key, value in _.items():
         success = False
         if key.upper() not in (_.upper() for _ in getPublicTypeMembers(HTTP_HEADER, True)):
