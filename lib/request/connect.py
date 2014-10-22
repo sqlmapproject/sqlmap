@@ -92,8 +92,9 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
-from thirdparty.socks.socks import ProxyError
 from thirdparty.multipart import multipartpost
+from thirdparty.odict.odict import OrderedDict
+from thirdparty.socks.socks import ProxyError
 
 
 class Connect(object):
@@ -638,7 +639,7 @@ class Connect(object):
         threadData = getCurrentThreadData()
 
         if conf.httpHeaders:
-            headers = dict(conf.httpHeaders)
+            headers = OrderedDict(conf.httpHeaders)
             contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
 
             if (kb.postHint or conf.skipUrlEncode) and kb.postUrlEncode:
