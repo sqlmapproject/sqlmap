@@ -561,7 +561,7 @@ def paramToDict(place, parameters=None):
 
             if condition:
                 testableParameters[parameter] = "=".join(parts[1:])
-                if not conf.multipleTargets:
+                if not conf.multipleTargets and not (conf.csrfToken and parameter == conf.csrfToken):
                     _ = urldecode(testableParameters[parameter], convall=True)
                     if (_.strip(DUMMY_SQL_INJECTION_CHARS) != _\
                       or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _))\
