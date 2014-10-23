@@ -349,6 +349,16 @@ def _setRequestParams():
             errMsg = "CSRF protection token parameter '%s' not " % conf.csrfToken
             errMsg += "found in provided GET and/or POST values"
             raise SqlmapGenericException(errMsg)
+    else:
+        for place in (PLACE.GET, PLACE.POST):
+            for parameter in conf.paramDict.get(place, {}):
+                if parameter.lower().startswith("csrf"):
+                    message = "%s parameter '%s' appears to hold CSRF protection token. " % (place, parameter)
+                    message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
+                    test = readInput(message, default="N")
+                    if test and test[0] in ("y", "Y"):
+                        conf.csrfToken = parameter
+                    break
 
 def _setHashDB():
     """
