@@ -2179,6 +2179,14 @@ def _basicOptionValidation():
         errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g', '-m' or '-x'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.csrfUrl and not conf.csrfToken:
+        errMsg = "option '--csrf-url' requires usage of option '--csrf-token'"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.csrfToken and conf.threads:
+        errMsg = "option '--csrf-url' is incompatible with option '--threads'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:
         errMsg = "option '-r' is incompatible with option '-u' ('--url')"
         raise SqlmapSyntaxException(errMsg)
