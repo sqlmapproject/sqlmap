@@ -603,8 +603,8 @@ METASPLOIT_SESSION_TIMEOUT = 300
 # Reference: http://www.cookiecentral.com/faq/#3.5
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
 
-# Prefixes used for automatic recognition of parameters carrying CSRF protection tokens
-CSRF_TOKEN_PARAMETER_PREFIXES = ("csrf", "xsrf")
+# Infixes used for automatic recognition of parameters carrying CSRF protection tokens
+CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf")
 
 # Prefixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_PREFIXES = {
