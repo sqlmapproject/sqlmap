@@ -191,7 +191,7 @@ def cmdLineParser():
                            help="Skip URL encoding of payload data")
 
         request.add_option("--csrf-token", dest="csrfToken",
-                           help="Parameter used as a CSRF protection token")
+                           help="Parameter used to hold CSRF protection token")
 
         request.add_option("--csrf-url", dest="csrfUrl",
                            help="URL address to visit to extract CSRF protection token")
