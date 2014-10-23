@@ -43,6 +43,7 @@ from lib.core.option import _setDBMS
 from lib.core.option import _setKnowledgeBaseAttributes
 from lib.core.option import _setAuthCred
 from lib.core.settings import ASTERISK_MARKER
+from lib.core.settings import CSRF_TOKEN_PARAMETER_PREFIXES
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import HOST_ALIASES
@@ -352,7 +353,7 @@ def _setRequestParams():
     else:
         for place in (PLACE.GET, PLACE.POST):
             for parameter in conf.paramDict.get(place, {}):
-                if parameter.lower().startswith("csrf"):
+                if any(parameter.lower().startswith(_) for _ in CSRF_TOKEN_PARAMETER_PREFIXES):
                     message = "%s parameter '%s' appears to hold CSRF protection token. " % (place, parameter)
                     message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
                     test = readInput(message, default="N")
