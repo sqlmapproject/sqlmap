@@ -768,7 +768,7 @@ class Connect(object):
                         token = page
 
                 if not token:
-                    errMsg = "CSRF token value '%s' can't be found at '%s'" % (conf.csrfToken, conf.csrfUrl or conf.url)
+                    errMsg = "CSRF protection token '%s' can't be found at '%s'" % (conf.csrfToken, conf.csrfUrl or conf.url)
                     if not conf.csrfUrl:
                         errMsg += ". You can try to rerun by providing "
                         errMsg += "a valid value for option '--csrf-url'"
