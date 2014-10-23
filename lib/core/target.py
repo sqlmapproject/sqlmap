@@ -344,6 +344,12 @@ def _setRequestParams():
         errMsg += "within the given request data"
         raise SqlmapGenericException(errMsg)
 
+    if conf.csrfToken:
+        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
+            errMsg = "CSRF protection token parameter '%s' not " % conf.csrfToken
+            errMsg += "found in provided GET and/or POST values"
+            raise SqlmapGenericException(errMsg)
+
 def _setHashDB():
     """
     Check and set the HashDB SQLite file for query resume functionality.

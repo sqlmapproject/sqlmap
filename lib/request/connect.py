@@ -63,6 +63,7 @@ from lib.core.enums import WEB_API
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapTokenException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
@@ -747,6 +748,34 @@ class Connect(object):
 
         if value and place == PLACE.CUSTOM_HEADER:
             auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
+
+        if conf.csrfToken:
+            def _adjustParameter(paramString, parameter, newValue):
+                retVal = paramString
+                match = re.search("%s=(?P<value>[^&]*)" % parameter, paramString)
+                if match:
+                    origValue = match.group("value")
+                    retVal = re.sub("%s=[^&]*" % parameter, "%s=%s" % (parameter, newValue), paramString)
+                return retVal
+
+            page, _, _ = Connect.getPage(url=conf.csrfUrl or conf.url, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
+            match = re.search(r"<input[^>]+name=[\"']?%s[\"']?\s[^>]*value=(\"([^\"]+)|'([^']+)|([^ >]+))" % conf.csrfToken, page)
+            token = (match.group(2) or match.group(3) or match.group(4)) if match else None
+
+            if not token:
+                errMsg = "CSRF token value '%s' can't be found at '%s'" % (conf.csrfToken, conf.csrfUrl or conf.url)
+                if not conf.csrfUrl:
+                    errMsg += ". You can try to rerun by providing "
+                    errMsg += "a valid value for option '--csrf-url'"
+                raise SqlmapTokenException, errMsg
+
+            if token:
+                for item in (PLACE.GET, PLACE.POST):
+                    if item in conf.parameters:
+                        if item == PLACE.GET and get:
+                            get = _adjustParameter(get, conf.csrfToken, token)
+                        elif item == PLACE.POST and post:
+                            post = _adjustParameter(post, conf.csrfToken, token)
 
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):

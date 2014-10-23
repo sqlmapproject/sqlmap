@@ -190,6 +190,12 @@ def cmdLineParser():
                            action="store_true",
                            help="Skip URL encoding of payload data")
 
+        request.add_option("--csrf-token", dest="csrfToken",
+                           help="Parameter used as a CSRF protection token")
+
+        request.add_option("--csrf-url", dest="csrfUrl",
+                           help="URL address to visit to extract CSRF protection token")
+
         request.add_option("--force-ssl", dest="forceSSL",
                            action="store_true",
                            help="Force usage of SSL/HTTPS")

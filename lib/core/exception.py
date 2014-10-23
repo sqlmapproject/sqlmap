@@ -53,6 +53,9 @@ class SqlmapSyntaxException(SqlmapBaseException):
 class SqlmapThreadException(SqlmapBaseException):
     pass
 
+class SqlmapTokenException(SqlmapBaseException):
+    pass
+
 class SqlmapUndefinedMethod(SqlmapBaseException):
     pass
 

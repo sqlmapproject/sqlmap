@@ -457,6 +457,12 @@ def start():
                             infoMsg = "skipping %s parameter '%s'" % (place, parameter)
                             logger.info(infoMsg)
 
+                        elif parameter == conf.csrfToken:
+                            testSqlInj = False
+
+                            infoMsg = "skipping CSRF protection token parameter '%s'" % parameter
+                            logger.info(infoMsg)
+
                         # Ignore session-like parameters for --level < 4
                         elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
                             testSqlInj = False
