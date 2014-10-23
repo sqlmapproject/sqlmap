@@ -346,9 +346,9 @@ def _setRequestParams():
         raise SqlmapGenericException(errMsg)
 
     if conf.csrfToken:
-        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
+        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))) and not conf.csrfToken in set(_[0].lower() for _ in conf.httpHeaders):
             errMsg = "CSRF protection token parameter '%s' not " % conf.csrfToken
-            errMsg += "found in provided GET and/or POST values"
+            errMsg += "found in provided GET, POST or header values"
             raise SqlmapGenericException(errMsg)
     else:
         for place in (PLACE.GET, PLACE.POST):
