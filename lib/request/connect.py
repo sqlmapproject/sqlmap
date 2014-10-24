@@ -767,6 +767,19 @@ class Connect(object):
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                         token = page
 
+                if not token and any(cookie.name == conf.csrfToken for cookie in conf.cj):
+                    for cookie in conf.cj:
+                        if cookie.name == conf.csrfToken:
+                            token = cookie.value
+                            if not any (conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
+                                if post:
+                                    post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
+                                elif get:
+                                    get = "%s%s%s=%s" % (get, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
+                                else:
+                                    get = "%s=%s" % (conf.csrfToken, token)
+                            break
+
                 if not token:
                     errMsg = "CSRF protection token '%s' can't be found at '%s'" % (conf.csrfToken, conf.csrfUrl or conf.url)
                     if not conf.csrfUrl:
@@ -775,11 +788,11 @@ class Connect(object):
                     raise SqlmapTokenException, errMsg
 
             if token:
-                for item in (PLACE.GET, PLACE.POST):
-                    if item in conf.parameters:
-                        if item == PLACE.GET and get:
+                for place in (PLACE.GET, PLACE.POST):
+                    if place in conf.parameters:
+                        if place == PLACE.GET and get:
                             get = _adjustParameter(get, conf.csrfToken, token)
-                        elif item == PLACE.POST and post:
+                        elif place == PLACE.POST and post:
                             post = _adjustParameter(post, conf.csrfToken, token)
 
                 for i in xrange(len(conf.httpHeaders)):
