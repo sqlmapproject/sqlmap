@@ -9,8 +9,10 @@ import codecs
 import contextlib
 import cookielib
 import copy
+import hashlib
 import httplib
 import inspect
+import json
 import logging
 import ntpath
 import os
@@ -23,6 +25,7 @@ import sys
 import tempfile
 import time
 import urllib
+import urllib2
 import urlparse
 import unicodedata
 
@@ -99,6 +102,7 @@ from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
 from lib.core.settings import GIT_PAGE
+from lib.core.settings import GITHUB_REPORT_OAUTH_TOKEN
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
@@ -876,7 +880,7 @@ def readInput(message, default=None, checkBatch=True):
         message = "\n%s" % message
         kb.prependFlag = False
 
-    if conf.answers:
+    if conf.get("answers"):
         for item in conf.answers.split(','):
             question = item.split('=')[0].strip()
             answer = item.split('=')[1] if len(item.split('=')) > 1 else None
@@ -892,7 +896,7 @@ def readInput(message, default=None, checkBatch=True):
                 break
 
     if retVal is None:
-        if checkBatch and conf.batch:
+        if checkBatch and conf.get("batch"):
             if isListLike(default):
                 options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
             elif default:
@@ -2842,6 +2846,43 @@ def unhandledExceptionMessage():
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
 
     return maskSensitiveData(errMsg)
+
+def createGithubIssue(errMsg, excMsg):
+    """
+    Automatically create a Github issue with unhandled exception information
+    """
+
+    msg = "\ndo you want to automatically create a new (anonymized) issue "
+    msg += "with the unhandled exception information at "
+    msg += "the official Github repository? [y/N] "
+    test = readInput(msg, default="N")
+    if test[0] in ("y", "Y"):
+        ex = None
+        errMsg = errMsg[errMsg.find("\n"):]
+
+        for match in re.finditer(r'File "(.+?)", line', excMsg):
+            file = match.group(1).replace('\\', "/")
+            file = file[file.find("sqlmap"):].replace("sqlmap/", "", 1)
+            excMsg = excMsg.replace(match.group(1), file)
+
+        data = {"title": "Unhandled exception (#%s)" % hashlib.md5(excMsg).hexdigest()[:8], "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
+        req = urllib2.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN})
+
+        try:
+            f = urllib2.urlopen(req)
+            content = f.read()
+        except Exception, ex:
+            content = None
+
+        issueUrl = re.search(r"https://github.com/sqlmapproject/sqlmap/issues/\d+", content or "")
+        if issueUrl:
+            infoMsg = "created Github issue can been found at the address '%s'" % issueUrl.group(0)
+            logger.info(infoMsg)
+        else:
+            warnMsg = "something went wrong while creating a Github issue"
+            if ex:
+                warnMsg += " ('%s')" % ex
+            logger.warn(warnMsg)
 
 def maskSensitiveData(msg):
     """

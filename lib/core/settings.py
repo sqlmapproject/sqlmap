@@ -474,6 +474,9 @@ DEFAULT_COOKIE_DELIMITER = ';'
 # Unix timestamp used for forcing cookie expiration when provided with --load-cookies
 FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 
+# Github OAuth token used for creating an automatic Issue for unhandled exceptions
+GITHUB_REPORT_OAUTH_TOKEN = "d6c0c7bf3f2298a7b85f82176c46d2f8d494fcc5"
+
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
 

@@ -21,6 +21,7 @@ from lib.utils import versioncheck  # this has to be the first non-standard impo
 
 from lib.controller.controller import start
 from lib.core.common import banner
+from lib.core.common import createGithubIssue
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import setColor
@@ -127,9 +128,11 @@ def main():
     except:
         print
         errMsg = unhandledExceptionMessage()
+        excMsg = traceback.format_exc()
         logger.critical(errMsg)
         kb.stickyLevel = logging.CRITICAL
-        dataToStdout(setColor(traceback.format_exc()))
+        dataToStdout(excMsg)
+        createGithubIssue(errMsg, excMsg)
 
     finally:
         if conf.get("showTime"):
