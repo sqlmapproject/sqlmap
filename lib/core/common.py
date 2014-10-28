@@ -1286,7 +1286,7 @@ def expandAsteriskForColumns(expression):
             if expression != conf.query:
                 conf.db = db
             else:
-                expression = re.sub(r"([^\w])%s" % conf.tbl, "\g<1>%s.%s" % (conf.db, conf.tbl), expression)
+                expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), "\g<1>%s.%s" % (conf.db, conf.tbl), expression)
         else:
             conf.db = db
         conf.db = safeSQLIdentificatorNaming(conf.db)
@@ -2503,11 +2503,11 @@ def removeDynamicContent(page):
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
-                page = re.sub(r'(?s)^.+%s' % suffix, suffix, page)
+                page = re.sub(r'(?s)^.+%s' % re.escape(suffix), suffix, page)
             elif suffix is None:
-                page = re.sub(r'(?s)%s.+$' % prefix, prefix, page)
+                page = re.sub(r'(?s)%s.+$' % re.escape(prefix), prefix, page)
             else:
-                page = re.sub(r'(?s)%s.+%s' % (prefix, suffix), '%s%s' % (prefix, suffix), page)
+                page = re.sub(r'(?s)%s.+%s' % (re.escape(prefix), re.escape(suffix)), '%s%s' % (prefix, suffix), page)
 
     return page
 

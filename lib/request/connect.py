@@ -752,14 +752,14 @@ class Connect(object):
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
                 retVal = paramString
-                match = re.search("%s=(?P<value>[^&]*)" % parameter, paramString)
+                match = re.search("%s=(?P<value>[^&]*)" % re.escape(parameter), paramString)
                 if match:
                     origValue = match.group("value")
-                    retVal = re.sub("%s=[^&]*" % parameter, "%s=%s" % (parameter, newValue), paramString)
+                    retVal = re.sub("%s=[^&]*" % re.escape(parameter), "%s=%s" % (parameter, newValue), paramString)
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            match = re.search(r"<input[^>]+name=[\"']?%s[\"']?\s[^>]*value=(\"([^\"]+)|'([^']+)|([^ >]+))" % conf.csrfToken, page or "")
+            match = re.search(r"<input[^>]+name=[\"']?%s[\"']?\s[^>]*value=(\"([^\"]+)|'([^']+)|([^ >]+))" % re.escape(conf.csrfToken), page or "")
             token = (match.group(2) or match.group(3) or match.group(4)) if match else None
 
             if not token:
@@ -802,10 +802,10 @@ class Connect(object):
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):
                 retVal = paramString
-                match = re.search("%s=(?P<value>[^&;]+)" % randomParameter, paramString)
+                match = re.search("%s=(?P<value>[^&;]+)" % re.escape(randomParameter), paramString)
                 if match:
                     origValue = match.group("value")
-                    retVal = re.sub("%s=[^&;]+" % randomParameter, "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
+                    retVal = re.sub("%s=[^&;]+" % re.escape(randomParameter), "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
                 return retVal
 
             for randomParameter in conf.rParam:
@@ -847,7 +847,7 @@ class Connect(object):
                         found = False
                         value = unicode(value)
 
-                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), name, re.escape(delimiter))
+                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
                         if re.search(regex, (get or "")):
                             found = True
                             get = re.sub(regex, "\g<1>%s\g<3>" % value, get)

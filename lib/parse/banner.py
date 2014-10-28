@@ -63,7 +63,7 @@ class MSSQLBannerHandler(ContentHandler):
     def endElement(self, name):
         if name == "signature":
             for version in (self._version, self._versionAlt):
-                if version and re.search(r" %s[\.\ ]+" % version, self._banner):
+                if version and re.search(r" %s[\.\ ]+" % re.escape(version), self._banner):
                     self._feedInfo("dbmsRelease", self._release)
                     self._feedInfo("dbmsVersion", self._version)
                     self._feedInfo("dbmsServicePack", self._servicePack)

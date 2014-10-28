@@ -147,7 +147,7 @@ class Entries:
                 for column in colList:
                     _ = agent.preprocessField(tbl, column)
                     if _ != column:
-                        colString = re.sub(r"\b%s\b" % column, _, colString)
+                        colString = re.sub(r"\b%s\b" % re.escape(column), _, colString)
 
                 entriesCount = 0
 
