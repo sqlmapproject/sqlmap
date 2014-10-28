@@ -2855,15 +2855,14 @@ def createGithubIssue(errMsg, excMsg):
     msg = "\ndo you want to automatically create a new (anonymized) issue "
     msg += "with the unhandled exception information at "
     msg += "the official Github repository? [y/N] "
-    test = readInput(msg, default="N")
-    if test[0] in ("y", "Y"):
+    try:
+        test = readInput(msg, default="N")
+    except:
+        test = None
+
+    if test and test[0] in ("y", "Y"):
         ex = None
         errMsg = errMsg[errMsg.find("\n"):]
-
-        for match in re.finditer(r'File "(.+?)", line', excMsg):
-            file = match.group(1).replace('\\', "/")
-            file = file[file.find("sqlmap"):].replace("sqlmap/", "", 1)
-            excMsg = excMsg.replace(match.group(1), file)
 
         data = {"title": "Unhandled exception (#%s)" % hashlib.md5(excMsg).hexdigest()[:8], "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
         req = urllib2.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN})

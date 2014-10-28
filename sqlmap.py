@@ -9,6 +9,7 @@ import bdb
 import inspect
 import logging
 import os
+import re
 import sys
 import time
 import traceback
@@ -129,6 +130,12 @@ def main():
         print
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
+
+        for match in re.finditer(r'File "(.+?)", line', excMsg):
+            file = match.group(1).replace('\\', "/")
+            file = file[file.find("sqlmap"):].replace("sqlmap/", "", 1)
+            excMsg = excMsg.replace(match.group(1), file)
+
         logger.critical(errMsg)
         kb.stickyLevel = logging.CRITICAL
         dataToStdout(excMsg)
