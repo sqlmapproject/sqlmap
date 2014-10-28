@@ -767,10 +767,10 @@ class Connect(object):
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                         token = page
 
-                if not token and any(cookie.name == conf.csrfToken for cookie in conf.cj):
-                    for cookie in conf.cj:
-                        if cookie.name == conf.csrfToken:
-                            token = cookie.value
+                if not token and any(_.name == conf.csrfToken for _ in conf.cj):
+                    for _ in conf.cj:
+                        if _.name == conf.csrfToken:
+                            token = _.value
                             if not any (conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
                                 if post:
                                     post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
