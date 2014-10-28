@@ -132,9 +132,10 @@ def main():
         excMsg = traceback.format_exc()
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):
-            file = match.group(1).replace('\\', "/")
-            file = file[file.find("sqlmap"):].replace("sqlmap/", "", 1)
-            excMsg = excMsg.replace(match.group(1), file)
+            file_ = match.group(1).replace('\\', "/")
+            file_ = file_[file_.find("sqlmap"):] if "sqlmap" in file_ else file_
+            file_ = file_.replace("sqlmap/", "", 1)
+            excMsg = excMsg.replace(match.group(1), file_)
 
         logger.critical(errMsg)
         kb.stickyLevel = logging.CRITICAL
