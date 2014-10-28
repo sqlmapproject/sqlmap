@@ -134,7 +134,7 @@ def main():
         for match in re.finditer(r'File "(.+?)", line', excMsg):
             file_ = match.group(1).replace('\\', "/")
             file_ = file_[file_.find("sqlmap"):] if "sqlmap" in file_ else file_
-            file_ = file_.replace("sqlmap/", "", 1)
+            file_ = re.sub(r"(?i)sqlmap[^/]*/", "", file_, 1)
             excMsg = excMsg.replace(match.group(1), file_)
 
         logger.critical(errMsg)
