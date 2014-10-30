@@ -16,7 +16,7 @@ Enumerating database table's columns (switch `--columns`):
 
 ![Database table's columns dump](images/sqlmap_enumerating_columns.png)
 
-Mnemonics (option `-z` set to `"flu,ign,bat,tec=B"`):
+Mnemonics (option `-z` set to `"flu,bat,tec=B"`):
 
 ![Mnemonics usage](images/sqlmap_mnemonics.png)
 
