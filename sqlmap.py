@@ -132,9 +132,10 @@ def main():
         excMsg = traceback.format_exc()
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):
-            file_ = match.group(1).replace('\\', "/")
-            file_ = file_[file_.find("sqlmap"):] if "sqlmap" in file_ else file_
-            file_ = re.sub(r"(?i)sqlmap[^/]*/", "", file_, 1)
+            file_ = match.group(1)
+            file_ = os.path.relpath(file_, os.path.dirname(__file__))
+            file_ = file_.replace("\\", '/')
+            file_ = re.sub(r"\.\./", '/', file_).lstrip('/')
             excMsg = excMsg.replace(match.group(1), file_)
 
         logger.critical(errMsg)
