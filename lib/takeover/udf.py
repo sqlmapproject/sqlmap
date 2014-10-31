@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 
 from lib.core.agent import agent
+from lib.core.common import checkFile
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import isStackingAvailable
@@ -146,6 +147,7 @@ class UDF:
 
         if len(self.udfToCreate) > 0:
             self.udfSetRemotePath()
+            checkFile(self.udfLocalFile)
             written = self.writeFile(self.udfLocalFile, self.udfRemoteFile, "binary", forceCheck=True)
 
             if written is not True:
