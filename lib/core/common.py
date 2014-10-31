@@ -989,7 +989,7 @@ def checkFile(filename):
     Checks for file existence
     """
 
-    if not os.path.isfile(filename):
+    if filename is None or not os.path.isfile(filename):
         raise SqlmapFilePathException("unable to read file '%s'" % filename)
 
 def banner():

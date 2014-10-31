@@ -750,6 +750,8 @@ def dictionaryAttack(attack_dict):
                     else:
                         logger.info("using default dictionary")
 
+                    dictPaths = filter(None, dictPaths)
+
                     for dictPath in dictPaths:
                         checkFile(dictPath)
 
