@@ -228,7 +228,7 @@ class Xp_cmdshell:
 
             if output and isListLike(output) and len(output) > 1:
                 _ = ""
-                lines = [_ for _ in flattenValue(output) if _ is not None]
+                lines = [line for line in flattenValue(output) if line is not None]
 
                 for i in xrange(len(lines)):
                     line = lines[i] or ""
