@@ -860,6 +860,9 @@ def cmdLineParser():
 
         try:
             (args, _) = parser.parse_args(argv)
+        except UnicodeEncodeError, ex:
+            print "\n[!] %s" % ex.object.encode("unicode-escape")
+            raise SystemExit
         except SystemExit:
             if "-h" in argv and not advancedHelp:
                 print "\n[!] to see full list of options run with '-hh'"
