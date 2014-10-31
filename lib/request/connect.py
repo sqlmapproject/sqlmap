@@ -273,7 +273,6 @@ class Connect(object):
                     url, params = url.split('?', 1)
                     params = urlencode(params)
                     url = "%s?%s" % (url, params)
-                    requestMsg += "?%s" % params
 
             elif multipart:
                 # Needed in this form because of potential circle dependency
