@@ -78,10 +78,10 @@ class Takeover(GenericTakeover):
         self.udfSharedLibName = "libs%s" % randomStr(lowercase=True)
 
         if Backend.isOs(OS.WINDOWS):
-            self.udfLocalFile += "/mysql/windows/%d/lib_mysqludf_sys.dll" % Backend.getArch()
+            self.udfLocalFile = os.path.join(self.udfLocalFile, "mysql", "windows", "%d" % Backend.getArch(), "lib_mysqludf_sys.dll")
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile += "/mysql/linux/%d/lib_mysqludf_sys.so" % Backend.getArch()
+            self.udfLocalFile = os.path.join(self.udfLocalFile, "mysql", "linux", "%d" % Backend.getArch(), "lib_mysqludf_sys.so")
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):
