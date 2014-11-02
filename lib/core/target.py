@@ -17,6 +17,7 @@ from lib.core.common import Backend
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
+from lib.core.common import normalizeUnicode
 from lib.core.common import paramToDict
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
@@ -573,7 +574,7 @@ def _createTargetDirs():
 
             paths.SQLMAP_OUTPUT_PATH = tempDir
 
-    conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), getUnicode(conf.hostname))
+    conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), normalizeUnicode(getUnicode(conf.hostname)))
 
     if not os.path.isdir(conf.outputPath):
         try:
