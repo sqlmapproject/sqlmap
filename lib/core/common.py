@@ -9,6 +9,7 @@ import codecs
 import contextlib
 import cookielib
 import copy
+import getpass
 import hashlib
 import httplib
 import inspect
@@ -2845,7 +2846,7 @@ def unhandledExceptionMessage():
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else ("DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
 
-    return maskSensitiveData(errMsg)
+    return errMsg
 
 def createGithubIssue(errMsg, excMsg):
     """
@@ -2895,6 +2896,9 @@ def maskSensitiveData(msg):
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
             retVal = retVal.replace(value, '*' * len(value))
+
+    if getpass.getuser():
+        retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), "*" * len(getpass.getuser()), retVal)
 
     return retVal
 

@@ -25,6 +25,7 @@ from lib.core.common import banner
 from lib.core.common import createGithubIssue
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
+from lib.core.common import maskSensitiveData
 from lib.core.common import setColor
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
@@ -137,6 +138,9 @@ def main():
             file_ = file_.replace("\\", '/')
             file_ = re.sub(r"\.\./", '/', file_).lstrip('/')
             excMsg = excMsg.replace(match.group(1), file_)
+
+        errMsg = maskSensitiveData(errMsg)
+        excMsg = maskSensitiveData(excMsg)
 
         logger.critical(errMsg)
         kb.stickyLevel = logging.CRITICAL
