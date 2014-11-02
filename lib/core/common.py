@@ -857,8 +857,13 @@ def dataToOutFile(filename, data):
     if data:
         retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
-        with codecs.open(retVal, "wb", UNICODE_ENCODING) as f:
-            f.write(data)
+        try:
+            with codecs.open(retVal, "wb", UNICODE_ENCODING) as f:
+                f.write(data)
+        except IOError, ex:
+            errMsg = "something went wrong while trying to write "
+            errMsg += "to the output file ('%s')" % ex
+            raise SqlmapGenericException(errMsg)
 
     return retVal
 
