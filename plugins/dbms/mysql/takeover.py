@@ -5,6 +5,7 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
 import re
 
 from lib.core.agent import agent

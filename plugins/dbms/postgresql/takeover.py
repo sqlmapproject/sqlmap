@@ -5,6 +5,8 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
+
 from lib.core.common import Backend
 from lib.core.common import randomStr
 from lib.core.data import kb
