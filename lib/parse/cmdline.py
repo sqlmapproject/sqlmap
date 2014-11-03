@@ -41,7 +41,7 @@ def cmdLineParser():
 
     checkSystemEncoding()
 
-    _ = getUnicode(os.path.normpath(sys.argv[0]), system=True)
+    _ = getUnicode(os.path.normpath(sys.argv[0]), encoding=sys.getfilesystemencoding())
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % _ if " " in _ else _)
@@ -788,7 +788,7 @@ def cmdLineParser():
         advancedHelp = True
 
         for arg in sys.argv:
-            argv.append(getUnicode(arg, system=True))
+            argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
 
         checkDeprecatedOptions(argv)
 
@@ -837,7 +837,7 @@ def cmdLineParser():
                     break
 
             for arg in shlex.split(command):
-                argv.append(getUnicode(arg, system=True))
+                argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
 
         # Hide non-basic options in basic help case
         for i in xrange(len(argv)):

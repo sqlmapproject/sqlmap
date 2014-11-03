@@ -923,7 +923,7 @@ def readInput(message, default=None, checkBatch=True):
 
             try:
                 retVal = raw_input() or default
-                retVal = getUnicode(retVal, system=True) if retVal else retVal
+                retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
             except:
                 time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
                 kb.prependFlag = True
@@ -1064,7 +1064,7 @@ def setPaths():
     paths.SQLMAP_XML_BANNER_PATH = os.path.join(paths.SQLMAP_XML_PATH, "banner")
 
     _ = os.path.join(os.path.expanduser("~"), ".sqlmap")
-    paths.SQLMAP_OUTPUT_PATH = getUnicode(paths.get("SQLMAP_OUTPUT_PATH", os.path.join(_, "output")), system=True)
+    paths.SQLMAP_OUTPUT_PATH = getUnicode(paths.get("SQLMAP_OUTPUT_PATH", os.path.join(_, "output")), encoding=sys.getfilesystemencoding())
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
@@ -2009,7 +2009,7 @@ def getPartRun(alias=True):
     else:
         return retVal
 
-def getUnicode(value, encoding=None, system=False, noneToNull=False):
+def getUnicode(value, encoding=None, noneToNull=False):
     """
     Return the unicode representation of the supplied value:
 
@@ -2028,25 +2028,19 @@ def getUnicode(value, encoding=None, system=False, noneToNull=False):
         value = list(getUnicode(_, encoding, system, noneToNull) for _ in value)
         return value
 
-    if not system:
-        if isinstance(value, unicode):
-            return value
-        elif isinstance(value, basestring):
-            while True:
-                try:
-                    return unicode(value, encoding or kb.get("pageEncoding") or UNICODE_ENCODING)
-                except UnicodeDecodeError, ex:
-                    value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
-        else:
+    if isinstance(value, unicode):
+        return value
+    elif isinstance(value, basestring):
+        while True:
             try:
-                return unicode(value)
-            except UnicodeDecodeError:
-                return unicode(str(value), errors="ignore")  # encoding ignored for non-basestring instances
+                return unicode(value, encoding or kb.get("pageEncoding") or UNICODE_ENCODING)
+            except UnicodeDecodeError, ex:
+                value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
     else:
         try:
-            return getUnicode(value, sys.getfilesystemencoding() or sys.stdin.encoding)
-        except:
-            return getUnicode(value, UNICODE_ENCODING)
+            return unicode(value)
+        except UnicodeDecodeError:
+            return unicode(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
 def longestCommonPrefix(*sequences):
     """

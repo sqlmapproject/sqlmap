@@ -285,7 +285,7 @@ def runCase(parse):
     elif result is False:  # this means no SQL injection has been detected - if None, ignore
         retVal = False
 
-    console = getUnicode(console, system=True)
+    console = getUnicode(console, encoding=sys.stdin.encoding)
 
     if parse and retVal:
         with codecs.open(conf.dumper.getOutputFile(), "rb", UNICODE_ENCODING) as f:
