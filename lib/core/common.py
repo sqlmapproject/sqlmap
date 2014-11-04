@@ -2025,7 +2025,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         return NULL
 
     if isListLike(value):
-        value = list(getUnicode(_, encoding, system, noneToNull) for _ in value)
+        value = list(getUnicode(_, encoding, noneToNull) for _ in value)
         return value
 
     if isinstance(value, unicode):
