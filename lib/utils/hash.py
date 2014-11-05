@@ -665,7 +665,7 @@ def dictionaryAttack(attack_dict):
             if not hash_:
                 continue
 
-            hash_ = hash_.split()[0]
+            hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
             regex = hashRecognition(hash_)
 
             if regex and regex not in hash_regexes:
@@ -682,7 +682,7 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
-                hash_ = hash_.split()[0]
+                hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
 
                 if re.match(hash_regex, hash_):
                     item = None
