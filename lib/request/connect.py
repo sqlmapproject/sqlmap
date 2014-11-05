@@ -62,6 +62,7 @@ from lib.core.enums import REDIRECTION
 from lib.core.enums import WEB_API
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapTokenException
 from lib.core.exception import SqlmapValueException
@@ -651,7 +652,13 @@ class Connect(object):
         if payload:
             if kb.tamperFunctions:
                 for function in kb.tamperFunctions:
-                    payload = function(payload=payload, headers=auxHeaders)
+                    try:
+                        payload = function(payload=payload, headers=auxHeaders)
+                    except Exception, ex:
+                        errMsg = "error occurred while running tamper "
+                        errMsg += "function '%s' ('%s')" % (function.func_name, ex)
+                        raise SqlmapGenericException(errMsg)
+
                     if not isinstance(payload, basestring):
                         errMsg = "tamper function '%s' returns " % function.func_name
                         errMsg += "invalid payload type ('%s')" % type(payload)
