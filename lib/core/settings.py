@@ -624,6 +624,9 @@ BRUTE_DOC_ROOT_TARGET_MARK = "%TARGET%"
 # Character used as a boundary in kb.chars (preferably less frequent letter)
 KB_CHARS_BOUNDARY_CHAR = 'q'
 
+# Letters of lower frequency used in kb.chars
+KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
+
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
 table{
