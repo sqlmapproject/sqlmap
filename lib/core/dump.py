@@ -66,7 +66,11 @@ class Dump(object):
         if kb.get("multiThreadMode"):
             self._lock.acquire()
 
-        self._outputFP.write(text)
+        try:
+            self._outputFP.write(text)
+        except IOError, ex:
+            errMsg = "error occurred while writing to log file ('%s')" % ex
+            raise SqlmapGenericException(errMsg)
 
         if kb.get("multiThreadMode"):
             self._lock.release()
