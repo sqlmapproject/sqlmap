@@ -337,12 +337,17 @@ class Entries:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
                                                         "table": safeSQLIdentificatorNaming(tbl, True),
                                                         "db": safeSQLIdentificatorNaming(conf.db)}
-                    attackDumpedTable()
+                    try:
+                        attackDumpedTable()
+                    except Exception, ex:
+                        errMsg = "an error occurred while attacking "
+                        errMsg += "table dump ('%s')" % ex
+                        logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
-            except SqlmapConnectionException, e:
-                errMsg = "connection exception detected in dumping phase: "
-                errMsg += "'%s'" % e
+            except SqlmapConnectionException, ex:
+                errMsg = "connection exception detected in dumping phase "
+                errMsg += "('%s')" % ex
                 logger.critical(errMsg)
 
             finally:
