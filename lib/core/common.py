@@ -1693,13 +1693,16 @@ def getConsoleWidth(default=80):
         width = int(os.getenv("COLUMNS"))
     else:
         try:
-            with open(os.devnull, 'w') as FNULL:
-                process = execute("stty size", shell=True, stdout=PIPE, stderr=FNULL)
-                stdout, _ = process.communicate()
-                items = stdout.split()
+            try:
+                FNULL = open(os.devnull, 'w')
+            except IOError:
+                FNULL = None
+            process = execute("stty size", shell=True, stdout=PIPE, stderr=FNULL or PIPE)
+            stdout, _ = process.communicate()
+            items = stdout.split()
 
-                if len(items) == 2 and items[1].isdigit():
-                    width = int(items[1])
+            if len(items) == 2 and items[1].isdigit():
+                width = int(items[1])
         except OSError:
             pass
 
