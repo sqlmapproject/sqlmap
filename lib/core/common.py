@@ -1069,9 +1069,10 @@ def setPaths():
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
     # sqlmap files
-    paths.SQL_SHELL_HISTORY = os.path.join(_, "sql.hst")
     paths.OS_SHELL_HISTORY = os.path.join(_, "os.hst")
+    paths.SQL_SHELL_HISTORY = os.path.join(_, "sql.hst")
     paths.SQLMAP_SHELL_HISTORY = os.path.join(_, "sqlmap.hst")
+    paths.GITHUB_HISTORY = os.path.join(_, "github.hst")
     paths.SQLMAP_CONFIG = os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap-%s.conf" % randomStr())
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
@@ -2859,6 +2860,20 @@ def createGithubIssue(errMsg, excMsg):
     Automatically create a Github issue with unhandled exception information
     """
 
+    issues = []
+    try:
+        issues = getFileItems(paths.GITHUB_HISTORY, unique=True)
+    except:
+        pass
+    finally:
+        issues = set(issues)
+
+    _ = re.sub(r"'[^']+'", "''", excMsg)
+    key = hashlib.md5(_).hexdigest()[:8]
+
+    if key in issues:
+        return
+
     msg = "\ndo you want to automatically create a new (anonymized) issue "
     msg += "with the unhandled exception information at "
     msg += "the official Github repository? [y/N] "
@@ -2871,9 +2886,8 @@ def createGithubIssue(errMsg, excMsg):
         ex = None
         errMsg = errMsg[errMsg.find("\n"):]
 
-        _ = re.sub(r"'[^']+'", "''", excMsg)
 
-        data = {"title": "Unhandled exception (#%s)" % hashlib.md5(_).hexdigest()[:8], "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
+        data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
         req = urllib2.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN})
 
         try:
@@ -2886,6 +2900,12 @@ def createGithubIssue(errMsg, excMsg):
         if issueUrl:
             infoMsg = "created Github issue can been found at the address '%s'" % issueUrl.group(0)
             logger.info(infoMsg)
+
+            try:
+                with open(paths.GITHUB_HISTORY, "a+b") as f:
+                    f.write("%s\n" % key)
+            except:
+                pass
         else:
             warnMsg = "something went wrong while creating a Github issue"
             if ex:
