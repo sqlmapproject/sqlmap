@@ -33,8 +33,8 @@ class BigArray(list):
     def __init__(self):
         self.chunks = [[]]
         self.cache = None
-        self.length = 0
         self.filenames = set()
+        self.protected = False
         self._os_remove = os.remove
 
     def append(self, value):
@@ -78,6 +78,14 @@ class BigArray(list):
             with open(self.chunks[index], "rb") as fp:
                 self.cache = Cache(index, pickle.load(fp), False)
 
+    def __getstate__(self):
+        self.protected = True
+        return self.chunks, self.filenames, self.protected
+
+    def __setstate__(self, state):
+        self.__init__()
+        self.chunks, self.filenames, self.protected = state
+
     def __getslice__(self, i, j):
         retval = BigArray()
         i = max(0, len(self) + i if i < 0 else i)
@@ -120,8 +128,9 @@ class BigArray(list):
         return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
 
     def __del__(self):
-        for filename in self.filenames:
-            try:
-                self._os_remove(filename)
-            except:
-                pass
+        if not self.protected:
+            for filename in self.filenames:
+                try:
+                    self._os_remove(filename)
+                except:
+                    pass
