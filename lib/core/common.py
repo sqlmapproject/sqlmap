@@ -2871,7 +2871,9 @@ def createGithubIssue(errMsg, excMsg):
         ex = None
         errMsg = errMsg[errMsg.find("\n"):]
 
-        data = {"title": "Unhandled exception (#%s)" % hashlib.md5(excMsg).hexdigest()[:8], "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
+        _ = re.sub(r"'[^']+'", "''", excMsg)
+
+        data = {"title": "Unhandled exception (#%s)" % hashlib.md5(_).hexdigest()[:8], "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
         req = urllib2.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN})
 
         try:
