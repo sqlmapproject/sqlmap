@@ -35,6 +35,7 @@ class BigArray(list):
         self.cache = None
         self.length = 0
         self.filenames = set()
+        self._os_remove = os.remove
 
     def append(self, value):
         self.chunks[-1].append(value)
@@ -121,6 +122,6 @@ class BigArray(list):
     def __del__(self):
         for filename in self.filenames:
             try:
-                os.remove(filename)
+                self._os_remove(filename)
             except:
                 pass
