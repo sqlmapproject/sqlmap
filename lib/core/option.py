@@ -2282,7 +2282,7 @@ def _resolveCrossReferences():
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
-    if not inputOptions.disableColoring:
+    if IS_WIN:
         coloramainit()
 
     _setConfAttributes()

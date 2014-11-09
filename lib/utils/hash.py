@@ -69,6 +69,7 @@ from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
+from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
 
@@ -508,6 +509,9 @@ def hashRecognition(value):
     return retVal
 
 def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
+    if IS_WIN:
+        coloramainit()
+
     count = 0
     rotator = 0
     hashes = set([item[0][1] for item in attack_info])
@@ -581,6 +585,9 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 proc_count.value -= 1
 
 def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
+    if IS_WIN:
+        coloramainit()
+
     count = 0
     rotator = 0
 
