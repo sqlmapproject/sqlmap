@@ -10,6 +10,7 @@ from xml.etree import ElementTree as et
 from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
+from lib.core.exception import SqlmapInstallationException
 
 def cleanupVals(text, tag):
     if tag in ("clause", "where"):
@@ -67,6 +68,13 @@ def parseXmlNode(node):
         conf.tests.append(test)
 
 def loadPayloads():
-    doc = et.parse(paths.PAYLOADS_XML)
+    try:
+        doc = et.parse(paths.PAYLOADS_XML)
+    except Exception, ex:
+        errMsg = "something seems to be wrong with "
+        errMsg += "the file '%s' ('%s'). Please make " % (paths.PAYLOADS_XML, ex)
+        errMsg += "sure that you haven't made any changes to it"
+        raise SqlmapInstallationException, errMsg
+
     root = doc.getroot()
     parseXmlNode(root)

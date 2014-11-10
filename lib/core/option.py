@@ -84,6 +84,7 @@ from lib.core.enums import WIZARD
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
+from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
@@ -402,7 +403,13 @@ def _loadQueries():
         return retVal
 
     tree = ElementTree()
-    tree.parse(paths.QUERIES_XML)
+    try:
+        tree.parse(paths.QUERIES_XML)
+    except Exception, ex:
+        errMsg = "something seems to be wrong with "
+        errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, ex)
+        errMsg += "sure that you haven't made any changes to it"
+        raise SqlmapInstallationException, errMsg
 
     for node in tree.findall("*"):
         queries[node.attrib['value']] = iterate(node)
