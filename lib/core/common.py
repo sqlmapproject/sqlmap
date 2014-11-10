@@ -1544,13 +1544,14 @@ def safeStringFormat(format_, params):
     elif not isListLike(params):
         retVal = retVal.replace("%s", str(params), 1)
     else:
-        count, index = 0, 0
-        if retVal.count("%s") == len(params):
-            while index != -1:
-                index = retVal.find("%s")
-                if index != -1:
-                    retVal = retVal[:index] + getUnicode(params[count]) + retVal[index + 2:]
-                    count += 1
+        start, end = 0, len(retVal)
+        match = re.search(r"%s(.+)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), retVal)
+        if match and PAYLOAD_DELIMITER not in match.group(1):
+            start, end = match.start(), match.end()
+        if retVal.count("%s", start, end) == len(params):
+            for param in params:
+                index = retVal.find("%s", start)
+                retVal = retVal[:index] + getUnicode(param) + retVal[index + 2:]
         else:
             count = 0
             while True:
