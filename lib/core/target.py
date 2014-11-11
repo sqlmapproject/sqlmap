@@ -565,8 +565,15 @@ def _createTargetDirs():
                 os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
             warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
             logger.warn(warnMsg)
-        except OSError, ex:    
-            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+        except OSError, ex:
+            try:
+                tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+            except IOError, _:
+                errMsg = "unable to write to the temporary directory ('%s'). " % _
+                errMsg += "Please make sure that your disk is not full and "
+                errMsg += "that you have sufficient write permissions to "
+                errMsg += "create temporary files and/or directories"
+                raise SqlmapGenericException(errMsg)
             warnMsg = "unable to create regular output directory "
             warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, ex)
             warnMsg += "Using temporary directory '%s' instead" % tempDir
@@ -580,7 +587,14 @@ def _createTargetDirs():
         try:
             os.makedirs(conf.outputPath, 0755)
         except OSError, ex:
-            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+            try:
+                tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+            except IOError, _:
+                errMsg = "unable to write to the temporary directory ('%s'). " % _
+                errMsg += "Please make sure that your disk is not full and "
+                errMsg += "that you have sufficient write permissions to "
+                errMsg += "create temporary files and/or directories"
+                raise SqlmapGenericException(errMsg)
             warnMsg = "unable to create output directory "
             warnMsg += "'%s' (%s). " % (conf.outputPath, ex)
             warnMsg += "Using temporary directory '%s' instead" % tempDir
