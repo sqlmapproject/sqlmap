@@ -152,7 +152,7 @@ class Google(object):
                         warnMsg += "to get error page information (%d)" % e.code
                         logger.critical(warnMsg)
                         return None
-                except (urllib2.URLError, socket.error, socket.timeout):
+                except:
                     errMsg = "unable to connect to DuckDuckGo"
                     raise SqlmapConnectionException(errMsg)
 
