@@ -1225,7 +1225,14 @@ def parseTargetUrl():
     if CUSTOM_INJECTION_MARK_CHAR in conf.url:
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
-    urlSplit = urlparse.urlsplit(conf.url)
+    try:
+        urlSplit = urlparse.urlsplit(conf.url)
+    except ValueError, ex:
+        errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, ex)
+        errMsg += "Please be sure that you don't have any leftover characters (e.g. '[' or ']') "
+        errMsg += "in the hostname part"
+        raise SqlmapGenericException(errMsg)
+
     hostnamePort = urlSplit.netloc.split(":") if not re.search("\[.+\]", urlSplit.netloc) else filter(None, (re.search("\[.+\]", urlSplit.netloc).group(0), re.search("\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
     conf.scheme = urlSplit.scheme.strip().lower() if not conf.forceSSL else "https"
