@@ -339,7 +339,7 @@ class Entries:
                                                         "db": safeSQLIdentificatorNaming(conf.db)}
                     try:
                         attackDumpedTable()
-                    except Exception, ex:
+                    except (IOError, OSError), ex:
                         errMsg = "an error occurred while attacking "
                         errMsg += "table dump ('%s')" % ex
                         logger.critical(errMsg)
