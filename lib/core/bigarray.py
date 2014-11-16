@@ -13,6 +13,7 @@ except:
 import os
 import tempfile
 
+from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 
 class Cache(object):
@@ -63,12 +64,17 @@ class BigArray(list):
         return ValueError, "%s is not in list" % value
 
     def _dump(self, value):
-        handle, filename = tempfile.mkstemp(prefix="sqlmapba-")
-        self.filenames.add(filename)
-        os.close(handle)
-        with open(filename, "w+b") as fp:
-            pickle.dump(value, fp, pickle.HIGHEST_PROTOCOL)
-        return filename
+        try:
+            handle, filename = tempfile.mkstemp(prefix="sqlmapba-")
+            self.filenames.add(filename)
+            os.close(handle)
+            with open(filename, "w+b") as fp:
+                pickle.dump(value, fp, pickle.HIGHEST_PROTOCOL)
+            return filename
+        except IOError, ex:
+            errMsg = "exception occurred while storing data "
+            errMsg += "to a temporary file ('%s')" % ex
+            raise SqlmapSystemException, errMsg
 
     def _checkcache(self, index):
         if (self.cache and self.cache.index != index and self.cache.dirty):
