@@ -348,14 +348,14 @@ def _setRequestParams():
 
     if conf.csrfToken:
         if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))) and not conf.csrfToken in set(_[0].lower() for _ in conf.httpHeaders) and not conf.csrfToken in conf.paramDict.get(PLACE.COOKIE, {}):
-            errMsg = "CSRF protection token parameter '%s' not " % conf.csrfToken
+            errMsg = "anti-CSRF token parameter '%s' not " % conf.csrfToken
             errMsg += "found in provided GET, POST, Cookie or header values"
             raise SqlmapGenericException(errMsg)
     else:
         for place in (PLACE.GET, PLACE.POST, PLACE.COOKIE):
             for parameter in conf.paramDict.get(place, {}):
                 if any(parameter.lower().count(_) for _ in CSRF_TOKEN_PARAMETER_INFIXES):
-                    message = "%s parameter '%s' appears to hold CSRF protection token. " % (place, parameter)
+                    message = "%s parameter '%s' appears to hold anti-CSRF token. " % (place, parameter)
                     message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
                     test = readInput(message, default="N")
                     if test and test[0] in ("y", "Y"):

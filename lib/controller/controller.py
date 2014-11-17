@@ -460,7 +460,7 @@ def start():
                         elif parameter == conf.csrfToken:
                             testSqlInj = False
 
-                            infoMsg = "skipping CSRF protection token parameter '%s'" % parameter
+                            infoMsg = "skipping anti-CSRF token parameter '%s'" % parameter
                             logger.info(infoMsg)
 
                         # Ignore session-like parameters for --level < 4
