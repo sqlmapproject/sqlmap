@@ -19,7 +19,7 @@ try:
 except ImportError:
     pass
 
-_protocols = [ssl.PROTOCOL_SSLv3, ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_SSLv23]
+_protocols = [ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_SSLv23]
 
 class HTTPSConnection(httplib.HTTPSConnection):
     """
