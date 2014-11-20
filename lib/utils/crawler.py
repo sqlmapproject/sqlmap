@@ -149,7 +149,7 @@ def crawl(target):
             logger.warn(warnMsg)
         else:
             for url in threadData.shared.value:
-                kb.targets.add((url, conf.method, None, None, None))
+                kb.targets.add((url, None, None, None, None))
 
         storeResultsToFile(kb.targets)
 
