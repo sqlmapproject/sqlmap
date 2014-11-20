@@ -1747,6 +1747,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.reduceTests = None
     kb.stickyDBMS = False
     kb.stickyLevel = None
+    kb.storeCrawlingChoice = None
     kb.storeHashesChoice = None
     kb.suppressResumeInfo = False
     kb.technique = None
