@@ -3479,8 +3479,17 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                     logger.debug(debugMsg)
                     continue
 
-                target = (url, method, data, conf.cookie, None)
-                retVal.add(target)
+                # flag to know if we are dealing with the same target host
+                _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (response.geturl(), url)))
+
+                if conf.scope:
+                    if not re.search(conf.scope, url, re.I):
+                        continue
+                elif not _:
+                    continue
+                else:
+                    target = (url, method, data, conf.cookie, None)
+                    retVal.add(target)
     else:
         errMsg = "there were no forms found at the given target URL"
         if raise_:
@@ -3490,17 +3499,6 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     if addToTargets and retVal:
         for target in retVal:
-            url = target[0]
-
-            # flag to know if we are dealing with the same target host
-            _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (response.geturl(), url)))
-
-            if conf.scope:
-                if not re.search(conf.scope, url, re.I):
-                    continue
-            elif not _:
-                continue
-
             kb.targets.add(target)
 
     return retVal
