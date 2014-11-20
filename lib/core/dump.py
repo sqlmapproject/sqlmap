@@ -391,7 +391,7 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
-        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
+        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(db))))
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
@@ -399,7 +399,7 @@ class Dump(object):
             if not os.path.isdir(dumpDbPath):
                 os.makedirs(dumpDbPath, 0755)
 
-            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower()))
+            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (normalizeUnicode(unsafeSQLIdentificatorNaming(table)), conf.dumpFormat.lower()))
             appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
 
