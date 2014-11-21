@@ -23,6 +23,7 @@ optDict = {
                              },
 
             "Request":       {
+                               "method":            "string",
                                "data":              "string",
                                "paramDel":          "string",
                                "cookie":            "string",

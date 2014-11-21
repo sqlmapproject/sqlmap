@@ -269,7 +269,7 @@ def start():
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         try:
             conf.url = targetUrl
-            conf.method = targetMethod
+            conf.method = targetMethod.upper() if targetMethod else targetMethod
             conf.data = targetData
             conf.cookie = targetCookie
             conf.httpHeaders = list(initialHeaders)

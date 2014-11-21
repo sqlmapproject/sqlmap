@@ -307,7 +307,7 @@ class Connect(object):
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
-                if PLACE.POST in conf.parameters and not post and method in (None, HTTPMETHOD.POST):
+                if PLACE.POST in conf.parameters and not post and method != HTTPMETHOD.GET:
                     post = conf.parameters[PLACE.POST]
 
             elif get:
@@ -634,6 +634,7 @@ class Connect(object):
             auxHeaders = {}
 
         raise404 = place != PLACE.URI if raise404 is None else raise404
+        method = method or conf.method
 
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
