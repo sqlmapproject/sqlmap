@@ -1252,16 +1252,6 @@ def _setHTTPAuthentication():
         checkFile(key_file)
         authHandler = HTTPSPKIAuthHandler(key_file)
 
-def _setHTTPMethod():
-    """
-    Check and set the HTTP method to perform HTTP requests through.
-    """
-
-    conf.method = HTTPMETHOD.POST if conf.data is not None else HTTPMETHOD.GET
-
-    debugMsg = "setting the HTTP method to %s" % conf.method
-    logger.debug(debugMsg)
-
 def _setHTTPExtraHeaders():
     if conf.headers:
         debugMsg = "setting extra HTTP headers"
@@ -2330,7 +2320,6 @@ def init():
         _setHTTPCookies()
         _setHTTPReferer()
         _setHTTPUserAgent()
-        _setHTTPMethod()
         _setHTTPAuthentication()
         _setHTTPProxy()
         _setDNSCache()
