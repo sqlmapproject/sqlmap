@@ -85,6 +85,8 @@ def checkSqlInjection(place, parameter, value):
     # Set the flag for SQL injection test mode
     kb.testMode = True
 
+    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
+
     tests = getSortedInjectionTests()
 
     while tests:
@@ -403,7 +405,7 @@ def checkSqlInjection(place, parameter, value):
 
                                 # Perform the test's False request
                                 if not falseResult:
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (place, parameter, title)
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (paramType, parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -414,7 +416,7 @@ def checkSqlInjection(place, parameter, value):
                                 candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage and _.strip() not in threadData.lastComparisonHeaders else None for _ in (trueSet - falseSet)))
                                 if candidates:
                                     conf.string = candidates[0]
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (place, parameter, title, repr(conf.string).lstrip('u').strip("'"))
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (paramType, parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -437,7 +439,7 @@ def checkSqlInjection(place, parameter, value):
                                     result = output == "1"
 
                                     if result:
-                                        infoMsg = "%s parameter '%s' is '%s' injectable " % (place, parameter, title)
+                                        infoMsg = "%s parameter '%s' is '%s' injectable " % (paramType, parameter, title)
                                         logger.info(infoMsg)
 
                                         injectable = True
@@ -459,7 +461,7 @@ def checkSqlInjection(place, parameter, value):
                                 trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                                 if trueResult:
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (place, parameter, title)
+                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (paramType, parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -495,7 +497,7 @@ def checkSqlInjection(place, parameter, value):
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
                             if isinstance(reqPayload, basestring):
-                                infoMsg = "%s parameter '%s' is '%s' injectable" % (place, parameter, title)
+                                infoMsg = "%s parameter '%s' is '%s' injectable" % (paramType, parameter, title)
                                 logger.info(infoMsg)
 
                                 injectable = True
@@ -787,6 +789,8 @@ def heuristicCheckSqlInjection(place, parameter):
 
     origValue = conf.paramDict[place][parameter]
 
+    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
+
     prefix = ""
     suffix = ""
 
@@ -812,8 +816,8 @@ def heuristicCheckSqlInjection(place, parameter):
     parseFilePaths(page)
     result = wasLastResponseDBMSError()
 
-    infoMsg = "heuristic (basic) test shows that %s " % place
-    infoMsg += "parameter '%s' might " % parameter
+    infoMsg = "heuristic (basic) test shows that %s parameter " % paramType
+    infoMsg += "'%s' might " % parameter
 
     def _(page):
         return any(_ in (page or "") for _ in FORMAT_EXCEPTION_STRINGS)
@@ -861,9 +865,11 @@ def heuristicCheckSqlInjection(place, parameter):
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
+    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
+
     if value in (page or ""):
-        infoMsg = "heuristic (XSS) test shows that %s " % place
-        infoMsg += "parameter '%s' might " % parameter
+        infoMsg = "heuristic (XSS) test shows that %s parameter " % paramType
+        infoMsg += "'%s' might " % parameter
         infoMsg += "be vulnerable to XSS attacks"
         logger.info(infoMsg)
 
@@ -885,7 +891,9 @@ def checkDynParam(place, parameter, value):
     dynResult = None
     randInt = randomInt()
 
-    infoMsg = "testing if %s parameter '%s' is dynamic" % (place, parameter)
+    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
+
+    infoMsg = "testing if %s parameter '%s' is dynamic" % (paramType, parameter)
     logger.info(infoMsg)
 
     try:
@@ -893,7 +901,7 @@ def checkDynParam(place, parameter, value):
         dynResult = Request.queryPage(payload, place, raise404=False)
 
         if not dynResult:
-            infoMsg = "confirming that %s parameter '%s' is dynamic" % (place, parameter)
+            infoMsg = "confirming that %s parameter '%s' is dynamic" % (paramType, parameter)
             logger.info(infoMsg)
 
             randInt = randomInt()
