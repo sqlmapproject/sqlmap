@@ -75,7 +75,6 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import SORT_ORDER
 from lib.core.exception import SqlmapDataException
-from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapMissingDependence
@@ -997,7 +996,7 @@ def checkFile(filename):
     """
 
     if filename is None or not os.path.isfile(filename):
-        raise SqlmapFilePathException("unable to read file '%s'" % filename)
+        raise SqlmapSystemException("unable to read file '%s'" % filename)
 
 def banner():
     """
@@ -2820,7 +2819,7 @@ def openFile(filename, mode='r'):
         errMsg += "Please check %s permissions on a file " % ("write" if \
           mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
-        raise SqlmapFilePathException(errMsg)
+        raise SqlmapSystemException(errMsg)
 
 def decodeIntToUnicode(value):
     """
