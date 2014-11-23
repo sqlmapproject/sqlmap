@@ -81,6 +81,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
@@ -845,7 +846,7 @@ def dataToTrafficFile(data):
     except IOError, ex:
         errMsg = "something went wrong while trying "
         errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, ex)
-        raise SqlmapGenericException(errMsg)
+        raise SqlmapSystemException(errMsg)
 
 def dataToDumpFile(dumpFile, data):
     dumpFile.write(data)
@@ -1918,7 +1919,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     except (IOError, OSError), ex:
         errMsg = "something went wrong while trying "
         errMsg += "to read the content of file '%s' ('%s')" % (filename, ex)
-        raise SqlmapGenericException(errMsg)
+        raise SqlmapSystemException(errMsg)
 
     return retVal if not unique else retVal.keys()
 
