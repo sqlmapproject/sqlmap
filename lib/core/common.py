@@ -992,10 +992,22 @@ def sanitizeStr(value):
 
 def checkFile(filename):
     """
-    Checks for file existence
+    Checks for file existence and readability
     """
 
+    valid = True
+
     if filename is None or not os.path.isfile(filename):
+        valid = False
+
+    if valid:
+        try:
+            with open(filename, "rb") as f:
+                pass
+        except:
+            valid = False
+
+    if not valid:
         raise SqlmapSystemException("unable to read file '%s'" % filename)
 
 def banner():
