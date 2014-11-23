@@ -1889,31 +1889,36 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
 
     checkFile(filename)
 
-    with codecs.open(filename, 'r', UNICODE_ENCODING, errors="ignore") if unicode_ else open(filename, 'r') as f:
-        for line in (f.readlines() if unicode_ else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
-            if commentPrefix:
-                if line.find(commentPrefix) != -1:
-                    line = line[:line.find(commentPrefix)]
+    try:
+        with codecs.open(filename, 'r', UNICODE_ENCODING, errors="ignore") if unicode_ else open(filename, 'r') as f:
+            for line in (f.readlines() if unicode_ else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
+                if commentPrefix:
+                    if line.find(commentPrefix) != -1:
+                        line = line[:line.find(commentPrefix)]
 
-            line = line.strip()
+                line = line.strip()
 
-            if not unicode_:
-                try:
-                    line = str.encode(line)
-                except UnicodeDecodeError:
-                    continue
+                if not unicode_:
+                    try:
+                        line = str.encode(line)
+                    except UnicodeDecodeError:
+                        continue
 
-            if line:
-                if lowercase:
-                    line = line.lower()
+                if line:
+                    if lowercase:
+                        line = line.lower()
 
-                if unique and line in retVal:
-                    continue
+                    if unique and line in retVal:
+                        continue
 
-                if unique:
-                    retVal[line] = True
-                else:
-                    retVal.append(line)
+                    if unique:
+                        retVal[line] = True
+                    else:
+                        retVal.append(line)
+    except (IOError, OSError), ex:
+        errMsg = "something went wrong while trying "
+        errMsg += "to read the content of file '%s' ('%s')" % (filename, ex)
+        raise SqlmapGenericException(errMsg)
 
     return retVal if not unique else retVal.keys()
 
