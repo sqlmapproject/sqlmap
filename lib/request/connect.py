@@ -355,6 +355,7 @@ class Connect(object):
             post = unicodeencode(post, kb.pageEncoding)
 
             if method:
+                method = unicodeencode(method)
                 req = MethodRequest(url, post, headers)
                 req.set_method(method)
             else:
