@@ -156,12 +156,27 @@ class Agent(object):
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
+            def _(pattern, repl, string):
+                retVal = string
+                match = None
+                for match in re.finditer(pattern, string):
+                    pass
+                if match:
+                    while True:
+                        _ = re.search(r"\\g<([^>]+)>", repl)
+                        if _:
+                            repl = repl.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
+                        else:
+                            break
+                    retVal = string[:match.start()] + repl + string[match.end():]
+                return retVal
+
             if origValue:
-                retVal = re.sub(r"(\A|\b)%s=%s(\Z|\b)" % (re.escape(parameter), re.escape(origValue)), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = _(r"(\A|\b)%s=%s(\Z|\b)" % (re.escape(parameter), re.escape(origValue)), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
             else:
-                retVal = re.sub(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = _(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
             if retVal == paramString and urlencode(parameter) != parameter:
-                retVal = re.sub(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = _(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
 
         return retVal
 
