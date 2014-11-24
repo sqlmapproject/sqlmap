@@ -557,6 +557,9 @@ def paramToDict(place, parameters=None):
         if len(parts) >= 2:
             parameter = urldecode(parts[0].replace(" ", ""))
 
+            if not parameter:
+                continue
+
             if conf.paramDel and conf.paramDel == '\n':
                 parts[-1] = parts[-1].rstrip()
 
