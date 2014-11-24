@@ -90,6 +90,7 @@ from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
@@ -361,9 +362,14 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                         kb.targets.add((url, method, data, cookie, tuple(headers)))
                         addedTargetUrls.add(url)
 
-    fp = openFile(reqFile, "rb")
-
-    content = fp.read()
+    checkFile(reqFile)
+    try:
+        with openFile(reqFile, "rb") as f:
+            content = f.read()
+    except (IOError, OSError, MemoryError), ex:
+        errMsg = "something went wrong while trying "
+        errMsg += "to read the content of file '%s' ('%s')" % (reqFile, ex)
+        raise SqlmapSystemException(errMsg)
 
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)

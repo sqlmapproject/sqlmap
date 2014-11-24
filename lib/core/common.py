@@ -1930,7 +1930,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
                         retVal[line] = True
                     else:
                         retVal.append(line)
-    except (IOError, OSError), ex:
+    except (IOError, OSError, MemoryError), ex:
         errMsg = "something went wrong while trying "
         errMsg += "to read the content of file '%s' ('%s')" % (filename, ex)
         raise SqlmapSystemException(errMsg)
