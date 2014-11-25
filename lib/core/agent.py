@@ -10,6 +10,7 @@ import re
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getSQLSnippet
+from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -87,7 +88,7 @@ class Agent(object):
 
         paramString = conf.parameters[place]
         paramDict = conf.paramDict[place]
-        origValue = paramDict[parameter]
+        origValue = getUnicode(paramDict[parameter])
 
         if place == PLACE.URI:
             paramString = origValue
