@@ -11,6 +11,7 @@ from ConfigParser import MissingSectionHeaderError
 from ConfigParser import ParsingError
 
 from lib.core.common import checkFile
+from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
@@ -65,7 +66,7 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    configFP = codecs.open(configFile, "rb", UNICODE_ENCODING)
+    configFP = openFile(configFile, "rb")
 
     try:
         config = UnicodeRawConfigParser()
