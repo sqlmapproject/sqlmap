@@ -5,20 +5,26 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import codecs
 import httplib
+import os
 import re
 import urlparse
+import tempfile
 import time
 
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import findPageForms
+from lib.core.common import readInput
+from lib.core.common import safeCSValue
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request.connect import Connect as Request
@@ -115,9 +121,6 @@ def crawl(target):
         logger.info(infoMsg)
 
         for i in xrange(conf.crawlDepth):
-            if i > 0 and conf.threads == 1:
-                singleTimeWarnMessage("running in a single-thread mode. This could take a while")
-
             threadData.shared.count = 0
             threadData.shared.length = len(threadData.shared.unprocessed)
             numThreads = min(conf.threads, len(threadData.shared.unprocessed))
@@ -125,7 +128,7 @@ def crawl(target):
             if not conf.bulkFile:
                 logger.info("searching for links with depth %d" % (i + 1))
 
-            runThreads(numThreads, crawlThread)
+            runThreads(numThreads, crawlThread, threadChoice=(i>0))
             clearConsoleLine(True)
 
             if threadData.shared.deeper:
@@ -146,4 +149,33 @@ def crawl(target):
             logger.warn(warnMsg)
         else:
             for url in threadData.shared.value:
-                kb.targets.add((url, None, None, None))
+                kb.targets.add((url, None, None, None, None))
+
+        storeResultsToFile(kb.targets)
+
+def storeResultsToFile(results):
+    if not results:
+        return
+
+    if kb.storeCrawlingChoice is None:
+        message = "do you want to store crawling results to a temporary file "
+        message += "for eventual further processing with other tools [y/N] "
+        test = readInput(message, default="N")
+        kb.storeCrawlingChoice = test[0] in ("y", "Y")
+
+    if kb.storeCrawlingChoice:
+        handle, filename = tempfile.mkstemp(prefix="sqlmapcrawling-", suffix=".csv" if conf.forms else ".txt")
+        os.close(handle)
+
+        infoMsg = "writing crawling results to a temporary file '%s' " % filename
+        logger.info(infoMsg)
+
+        with codecs.open(filename, "w+b", UNICODE_ENCODING) as f:
+            if conf.forms:
+                f.write("URL,POST\n")
+
+            for url, _, data, _, _ in results:
+                if conf.forms:
+                    f.write("%s,%s\n" % (safeCSValue(url), safeCSValue(data or "")))
+                else:
+                    f.write("%s\n" % url)

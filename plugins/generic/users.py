@@ -101,7 +101,9 @@ class Users:
             values = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(values):
-                kb.data.cachedUsers = arrayizeValue(values)
+                kb.data.cachedUsers = []
+                for value in arrayizeValue(values):
+                    kb.data.cachedUsers.append(unArrayizeValue(value))
 
         if not kb.data.cachedUsers and isInferenceAvailable() and not conf.direct:
             infoMsg = "fetching number of database users"

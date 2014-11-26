@@ -69,6 +69,7 @@ from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
+from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
 
@@ -508,6 +509,9 @@ def hashRecognition(value):
     return retVal
 
 def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
+    if IS_WIN:
+        coloramainit()
+
     count = 0
     rotator = 0
     hashes = set([item[0][1] for item in attack_info])
@@ -581,6 +585,9 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 proc_count.value -= 1
 
 def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
+    if IS_WIN:
+        coloramainit()
+
     count = 0
     rotator = 0
 
@@ -665,7 +672,7 @@ def dictionaryAttack(attack_dict):
             if not hash_:
                 continue
 
-            hash_ = hash_.split()[0]
+            hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
             regex = hashRecognition(hash_)
 
             if regex and regex not in hash_regexes:
@@ -682,7 +689,7 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
-                hash_ = hash_.split()[0]
+                hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
 
                 if re.match(hash_regex, hash_):
                     item = None
@@ -749,6 +756,8 @@ def dictionaryAttack(attack_dict):
                         logger.info("using custom list of dictionaries")
                     else:
                         logger.info("using default dictionary")
+
+                    dictPaths = filter(None, dictPaths)
 
                     for dictPath in dictPaths:
                         checkFile(dictPath)

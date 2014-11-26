@@ -322,7 +322,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
 
-                                dataToStdout("%s\r\n" % status, True)
+                                dataToStdout("%s\n" % status, True)
 
                 runThreads(numThreads, unionThread)
 

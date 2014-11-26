@@ -116,7 +116,7 @@ def tableExists(tableFile, regex=None):
 
                 if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
+                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
@@ -224,11 +224,11 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
+                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
             kb.locks.io.release()
@@ -257,9 +257,9 @@ def columnExists(columnFile, regex=None):
                 result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
             if result:
-                columns[column] = 'numeric'
+                columns[column] = "numeric"
             else:
-                columns[column] = 'non-numeric'
+                columns[column] = "non-numeric"
 
         kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
 

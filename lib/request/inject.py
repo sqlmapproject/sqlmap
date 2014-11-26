@@ -38,6 +38,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
+from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
@@ -371,11 +372,18 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 if union and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                     kb.technique = PAYLOAD.TECHNIQUE.UNION
                     kb.forcePartialUnion = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector[8]
-                    value = _goUnion(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
+                    fallback = not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL and not kb.forcePartialUnion
+
+                    try:
+                        value = _goUnion(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
+                    except SqlmapConnectionException:
+                        if not fallback:
+                            raise
+
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-                    if not found and not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL and not kb.forcePartialUnion:
+                    if not found and fallback:
                         warnMsg = "something went wrong with full UNION "
                         warnMsg += "technique (could be because of "
                         warnMsg += "limitation on retrieved number of entries)"

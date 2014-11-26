@@ -98,7 +98,7 @@ def dnsUse(payload, expression):
             retVal = output
 
             if kb.dnsTest is not None:
-                dataToStdout("[%s] [INFO] %s: %s\r\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
+                dataToStdout("[%s] [INFO] %s: %s\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
 
                 if count > 0:
                     hashDBWrite(expression, output)

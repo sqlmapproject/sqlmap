@@ -26,6 +26,7 @@ DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
 GIT_REPOSITORY = "git://github.com/sqlmapproject/sqlmap.git"
+GIT_PAGE = "https://github.com/sqlmapproject/sqlmap"
 ML = "sqlmap-users@lists.sourceforge.net"
 
 # colorful banner
@@ -33,7 +34,7 @@ BANNER = """\033[01;33m         _
  ___ ___| |_____ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
 |_ -| . | |     | .'| . |
 |___|_  |_|_|_|_|__,|  _|
-      |_|           |_|   \033[0m\033[4m%s\033[0m\n
+      |_|           |_|   \033[0m\033[4;37m%s\033[0m\n
 """ % ((31 + hash(REVISION) % 6) if REVISION else 30, VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True
@@ -473,6 +474,9 @@ DEFAULT_COOKIE_DELIMITER = ';'
 # Unix timestamp used for forcing cookie expiration when provided with --load-cookies
 FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 
+# Github OAuth token used for creating an automatic Issue for unhandled exceptions
+GITHUB_REPORT_OAUTH_TOKEN = "d6c0c7bf3f2298a7b85f82176c46d2f8d494fcc5"
+
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
 
@@ -509,6 +513,9 @@ DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.ascii_letters)
 # Alphabet used for heuristic checks
 HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', '[', ']', ',', '.')
 
+# String used for dummy XSS check of a tested parameter value
+DUMMY_XSS_CHECK_APPENDIX = "<'\">"
+
 # Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 
@@ -531,7 +538,7 @@ VALID_TIME_CHARS_RUN_THRESHOLD = 100
 CHECK_ZERO_COLUMNS_THRESHOLD = 10
 
 # Boldify all logger messages containing these "patterns"
-BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "test shows that")
+BOLD_PATTERNS = ("' injectable", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "test shows that", "the back-end DBMS is", "created Github")
 
 # Generic www root directory names
 GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "httpdocs", "public", "wwwroot", "www")
@@ -543,7 +550,7 @@ MAX_HELP_OPTION_LENGTH = 18
 MAX_CONNECT_RETRIES = 100
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException")
+FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal")
 
 # Regular expression used for extracting ASP.NET view state values
 VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'
@@ -568,6 +575,9 @@ JSON_LIKE_RECOGNITION_REGEX = r"(?s)\A(\s*\[)*\s*\{.*'[^']+'\s*:\s*('[^']+'|\d+)
 
 # Regular expression used for detecting multipart POST data
 MULTIPART_RECOGNITION_REGEX = r"(?i)Content-Disposition:[^;]+;\s*name="
+
+# Regular expression used for detecting Array-like POST data
+ARRAY_LIKE_RECOGNITION_REGEX = r"(\A|%s)(\w+)\[\]=.+%s\2\[\]=" % (DEFAULT_GET_POST_DELIMITER, DEFAULT_GET_POST_DELIMITER)
 
 # Default POST data content-type
 DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=utf-8"
@@ -596,6 +606,9 @@ METASPLOIT_SESSION_TIMEOUT = 300
 # Reference: http://www.cookiecentral.com/faq/#3.5
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
 
+# Infixes used for automatic recognition of parameters carrying anti-CSRF tokens
+CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf")
+
 # Prefixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_PREFIXES = {
     OS.LINUX: ("/var/www", "/usr/local/apache", "/usr/local/apache2", "/usr/local/www/apache22", "/usr/local/www/apache24", "/usr/local/httpd", "/var/www/nginx-default", "/srv/www", "/var/www/%TARGET%", "/var/www/vhosts/%TARGET%", "/var/www/virtual/%TARGET%", "/var/www/clients/vhosts/%TARGET%", "/var/www/clients/virtual/%TARGET%"),
@@ -610,6 +623,9 @@ BRUTE_DOC_ROOT_TARGET_MARK = "%TARGET%"
 
 # Character used as a boundary in kb.chars (preferably less frequent letter)
 KB_CHARS_BOUNDARY_CHAR = 'q'
+
+# Letters of lower frequency used in kb.chars
+KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
 
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>

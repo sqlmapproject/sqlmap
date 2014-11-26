@@ -23,6 +23,9 @@ class SqlmapFilePathException(SqlmapBaseException):
 class SqlmapGenericException(SqlmapBaseException):
     pass
 
+class SqlmapInstallationException(SqlmapBaseException):
+    pass
+
 class SqlmapMissingDependence(SqlmapBaseException):
     pass
 
@@ -50,7 +53,13 @@ class SqlmapShellQuitException(SqlmapBaseException):
 class SqlmapSyntaxException(SqlmapBaseException):
     pass
 
+class SqlmapSystemException(SqlmapBaseException):
+    pass
+
 class SqlmapThreadException(SqlmapBaseException):
+    pass
+
+class SqlmapTokenException(SqlmapBaseException):
     pass
 
 class SqlmapUndefinedMethod(SqlmapBaseException):

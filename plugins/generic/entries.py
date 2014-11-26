@@ -147,7 +147,7 @@ class Entries:
                 for column in colList:
                     _ = agent.preprocessField(tbl, column)
                     if _ != column:
-                        colString = re.sub(r"\b%s\b" % column, _, colString)
+                        colString = re.sub(r"\b%s\b" % re.escape(column), _, colString)
 
                 entriesCount = 0
 
@@ -337,12 +337,17 @@ class Entries:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
                                                         "table": safeSQLIdentificatorNaming(tbl, True),
                                                         "db": safeSQLIdentificatorNaming(conf.db)}
-                    attackDumpedTable()
+                    try:
+                        attackDumpedTable()
+                    except (IOError, OSError), ex:
+                        errMsg = "an error occurred while attacking "
+                        errMsg += "table dump ('%s')" % ex
+                        logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
-            except SqlmapConnectionException, e:
-                errMsg = "connection exception detected in dumping phase: "
-                errMsg += "'%s'" % e
+            except SqlmapConnectionException, ex:
+                errMsg = "connection exception detected in dumping phase "
+                errMsg += "('%s')" % ex
                 logger.critical(errMsg)
 
             finally:
