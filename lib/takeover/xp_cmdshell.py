@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import Backend
-from lib.core.common import flattenValue
 from lib.core.common import getLimitRange
 from lib.core.common import getSQLSnippet
 from lib.core.common import hashDBWrite
@@ -227,16 +226,12 @@ class Xp_cmdshell:
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isListLike(output) and len(output) > 1:
-                _ = ""
-                lines = [line for line in flattenValue(output) if line is not None]
+                if not (output[0] or "").strip():
+                    output = output[1:]
+                elif not (output[-1] or "").strip():
+                    output = output[:-1]
 
-                for i in xrange(len(lines)):
-                    line = lines[i] or ""
-                    if line is None or i in (0, len(lines) - 1) and not line.strip():
-                        continue
-                    _ += "%s\n" % line
-
-                output = _.rstrip('\n')
+                output = "\n".join(line for line in filter(None, output))
 
         return output
 

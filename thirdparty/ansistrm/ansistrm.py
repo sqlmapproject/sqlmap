@@ -62,8 +62,6 @@ class ColorizingStreamHandler(logging.StreamHandler):
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
-        except IOError:
-            pass
         except:
             self.handleError(record)
 

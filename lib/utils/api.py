@@ -164,8 +164,8 @@ class Task(object):
             shutil.rmtree(self.output_directory)
 
     def engine_start(self):
-        self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)],
-                             shell=False, stdin=PIPE, close_fds=False)
+        self.process = Popen("python sqlmap.py --pickled-options %s" % base64pickle(self.options),
+                             shell=True, stdin=PIPE, close_fds=False)
 
     def engine_stop(self):
         if self.process:

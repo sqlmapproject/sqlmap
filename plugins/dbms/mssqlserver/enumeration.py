@@ -14,7 +14,6 @@ from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import safeSQLIdentificatorNaming
-from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -50,8 +49,6 @@ class Enumeration(GenericEnumeration):
             users = kb.data.cachedUsers
 
         for user in users:
-            user = unArrayizeValue(user)
-
             if user is None:
                 continue
 

@@ -74,7 +74,7 @@ def _oneShotErrorUse(expression, field=None):
         try:
             while True:
                 check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-                trimcheck = "%s(?P<result>[^<]*)" % (kb.chars.start)
+                trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
 
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
@@ -129,10 +129,6 @@ def _oneShotErrorUse(expression, field=None):
                         warnMsg += "(due to its length and/or content): "
                         warnMsg += safecharencode(trimmed)
                         logger.warn(warnMsg)
-
-                        if not kb.testMode:
-                            check = "(?P<result>.*?)%s" % kb.chars.stop[:2]
-                            output = extractRegexResult(check, trimmed, re.IGNORECASE)
 
                 if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
                     if offset == 1:

@@ -261,7 +261,7 @@ class Search:
                         if tblConsider == "2":
                             continue
                     else:
-                        for db in conf.db.split(",") if conf.db else (self.getCurrentDb(),):
+                        for db in conf.db.split(","):
                             db = safeSQLIdentificatorNaming(db)
                             if db not in foundTbls:
                                 foundTbls[db] = []
@@ -501,7 +501,7 @@ class Search:
                         if db not in foundCols[column]:
                             foundCols[column][db] = []
                 else:
-                    for db in conf.db.split(",") if conf.db else (self.getCurrentDb(),):
+                    for db in conf.db.split(","):
                         db = safeSQLIdentificatorNaming(db)
                         if db not in foundCols[column]:
                             foundCols[column][db] = []

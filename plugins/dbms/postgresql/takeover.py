@@ -5,8 +5,6 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import os
-
 from lib.core.common import Backend
 from lib.core.common import randomStr
 from lib.core.data import kb
@@ -60,10 +58,10 @@ class Takeover(GenericTakeover):
             raise SqlmapUnsupportedFeatureException(errMsg)
 
         if Backend.isOs(OS.WINDOWS):
-            self.udfLocalFile = os.path.join(self.udfLocalFile, "postgresql", "windows", "%d" % Backend.getArch(), majorVer, "lib_postgresqludf_sys.dll")
+            self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (Backend.getArch(), majorVer)
             self.udfSharedLibExt = "dll"
         else:
-            self.udfLocalFile = os.path.join(self.udfLocalFile, "postgresql", "linux", "%d" % Backend.getArch(), majorVer, "lib_postgresqludf_sys.so")
+            self.udfLocalFile += "/postgresql/linux/%d/%s/lib_postgresqludf_sys.so" % (Backend.getArch(), majorVer)
             self.udfSharedLibExt = "so"
 
     def udfCreateFromSharedLib(self, udf, inpRet):

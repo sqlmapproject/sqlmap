@@ -62,9 +62,7 @@ from lib.core.enums import REDIRECTION
 from lib.core.enums import WEB_API
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
-from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapSyntaxException
-from lib.core.exception import SqlmapTokenException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
@@ -94,9 +92,8 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
-from thirdparty.multipart import multipartpost
-from thirdparty.odict.odict import OrderedDict
 from thirdparty.socks.socks import ProxyError
+from thirdparty.multipart import multipartpost
 
 
 class Connect(object):
@@ -274,6 +271,7 @@ class Connect(object):
                     url, params = url.split('?', 1)
                     params = urlencode(params)
                     url = "%s?%s" % (url, params)
+                    requestMsg += "?%s" % params
 
             elif multipart:
                 # Needed in this form because of potential circle dependency
@@ -307,7 +305,7 @@ class Connect(object):
                     url = "%s?%s" % (url, get)
                     requestMsg += "?%s" % get
 
-                if PLACE.POST in conf.parameters and not post and method != HTTPMETHOD.GET:
+                if PLACE.POST in conf.parameters and not post and method in (None, HTTPMETHOD.POST):
                     post = conf.parameters[PLACE.POST]
 
             elif get:
@@ -355,7 +353,6 @@ class Connect(object):
             post = unicodeencode(post, kb.pageEncoding)
 
             if method:
-                method = unicodeencode(method)
                 req = MethodRequest(url, post, headers)
                 req.set_method(method)
             else:
@@ -388,7 +385,7 @@ class Connect(object):
 
             conn = urllib2.urlopen(req)
 
-            if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
+            if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and conf.authType.lower() == AUTH_TYPE.BASIC.lower():
                 kb.authHeader = getRequestHeader(req, HTTP_HEADER.AUTHORIZATION)
 
             if not kb.proxyAuthHeader and getRequestHeader(req, HTTP_HEADER.PROXY_AUTHORIZATION):
@@ -635,14 +632,13 @@ class Connect(object):
             auxHeaders = {}
 
         raise404 = place != PLACE.URI if raise404 is None else raise404
-        method = method or conf.method
 
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
 
         if conf.httpHeaders:
-            headers = OrderedDict(conf.httpHeaders)
+            headers = dict(conf.httpHeaders)
             contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
 
             if (kb.postHint or conf.skipUrlEncode) and kb.postUrlEncode:
@@ -654,13 +650,7 @@ class Connect(object):
         if payload:
             if kb.tamperFunctions:
                 for function in kb.tamperFunctions:
-                    try:
-                        payload = function(payload=payload, headers=auxHeaders)
-                    except Exception, ex:
-                        errMsg = "error occurred while running tamper "
-                        errMsg += "function '%s' ('%s')" % (function.func_name, ex)
-                        raise SqlmapGenericException(errMsg)
-
+                    payload = function(payload=payload, headers=auxHeaders)
                     if not isinstance(payload, basestring):
                         errMsg = "tamper function '%s' returns " % function.func_name
                         errMsg += "invalid payload type ('%s')" % type(payload)
@@ -757,63 +747,13 @@ class Connect(object):
         if value and place == PLACE.CUSTOM_HEADER:
             auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
 
-        if conf.csrfToken:
-            def _adjustParameter(paramString, parameter, newValue):
-                retVal = paramString
-                match = re.search("%s=(?P<value>[^&]*)" % re.escape(parameter), paramString)
-                if match:
-                    origValue = match.group("value")
-                    retVal = re.sub("%s=[^&]*" % re.escape(parameter), "%s=%s" % (parameter, newValue), paramString)
-                return retVal
-
-            page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            match = re.search(r"<input[^>]+name=[\"']?%s[\"']?\s[^>]*value=(\"([^\"]+)|'([^']+)|([^ >]+))" % re.escape(conf.csrfToken), page or "")
-            token = (match.group(2) or match.group(3) or match.group(4)) if match else None
-
-            if not token:
-                if conf.csrfUrl != conf.url and code == httplib.OK:
-                    if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
-                        token = page
-
-                if not token and any(_.name == conf.csrfToken for _ in conf.cj):
-                    for _ in conf.cj:
-                        if _.name == conf.csrfToken:
-                            token = _.value
-                            if not any (conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
-                                if post:
-                                    post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
-                                elif get:
-                                    get = "%s%s%s=%s" % (get, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
-                                else:
-                                    get = "%s=%s" % (conf.csrfToken, token)
-                            break
-
-                if not token:
-                    errMsg = "anti-CSRF token '%s' can't be found at '%s'" % (conf.csrfToken, conf.csrfUrl or conf.url)
-                    if not conf.csrfUrl:
-                        errMsg += ". You can try to rerun by providing "
-                        errMsg += "a valid value for option '--csrf-url'"
-                    raise SqlmapTokenException, errMsg
-
-            if token:
-                for place in (PLACE.GET, PLACE.POST):
-                    if place in conf.parameters:
-                        if place == PLACE.GET and get:
-                            get = _adjustParameter(get, conf.csrfToken, token)
-                        elif place == PLACE.POST and post:
-                            post = _adjustParameter(post, conf.csrfToken, token)
-
-                for i in xrange(len(conf.httpHeaders)):
-                    if conf.httpHeaders[i][0].lower() == conf.csrfToken.lower():
-                        conf.httpHeaders[i] = (conf.httpHeaders[i][0], token)
-
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):
                 retVal = paramString
-                match = re.search("%s=(?P<value>[^&;]+)" % re.escape(randomParameter), paramString)
+                match = re.search("%s=(?P<value>[^&;]+)" % randomParameter, paramString)
                 if match:
                     origValue = match.group("value")
-                    retVal = re.sub("%s=[^&;]+" % re.escape(randomParameter), "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
+                    retVal = re.sub("%s=[^&;]+" % randomParameter, "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
                 return retVal
 
             for randomParameter in conf.rParam:
@@ -828,7 +768,7 @@ class Connect(object):
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
-            variables = {"uri": uri}
+            variables = {}
             originals = {}
 
             for item in filter(None, (get, post if not kb.postHint else None)):
@@ -847,7 +787,6 @@ class Connect(object):
 
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
-            uri = variables["uri"]
 
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:
@@ -855,7 +794,7 @@ class Connect(object):
                         found = False
                         value = unicode(value)
 
-                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
+                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), name, re.escape(delimiter))
                         if re.search(regex, (get or "")):
                             found = True
                             get = re.sub(regex, "\g<1>%s\g<3>" % value, get)
@@ -944,7 +883,7 @@ class Connect(object):
             elif kb.nullConnection == NULLCONNECTION.RANGE:
                 auxHeaders[HTTP_HEADER.RANGE] = "bytes=-1"
 
-            _, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, raise404=raise404, skipRead=(kb.nullConnection == NULLCONNECTION.SKIP_READ))
+            _, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, raise404=raise404, skipRead=(kb.nullConnection == NULLCONNECTION.SKIP_READ))
 
             if headers:
                 if kb.nullConnection in (NULLCONNECTION.HEAD, NULLCONNECTION.SKIP_READ) and HTTP_HEADER.CONTENT_LENGTH in headers:
@@ -956,7 +895,7 @@ class Connect(object):
 
         if not pageLength:
             try:
-                page, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+                page, headers, code = Connect.getPage(url=uri, get=get, post=post, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, method=method, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
             except MemoryError:
                 page, headers, code = None, None, None
                 warnMsg = "site returned insanely large response"

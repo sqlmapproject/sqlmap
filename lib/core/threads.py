@@ -106,7 +106,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     kb.threadContinue = True
     kb.threadException = False
 
-    if threadChoice and numThreads == 1 and not (kb.injection.data and not any(_ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in kb.injection.data)):
+    if threadChoice and numThreads == 1 and any(_ in kb.injection.data for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY, PAYLOAD.TECHNIQUE.UNION)):
         while True:
             message = "please enter number of threads? [Enter for %d (current)] " % numThreads
             choice = readInput(message, default=str(numThreads))
@@ -115,11 +115,11 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                     errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
                     logger.critical(errMsg)
                 else:
-                    conf.threads = numThreads = int(choice)
+                    numThreads = int(choice)
                     break
 
         if numThreads == 1:
-            warnMsg = "running in a single-thread mode. This could take a while"
+            warnMsg = "running in a single-thread mode. This could take a while."
             logger.warn(warnMsg)
 
     try:

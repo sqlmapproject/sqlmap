@@ -13,7 +13,6 @@ except:
 import os
 import tempfile
 
-from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
 
 class Cache(object):
@@ -34,9 +33,8 @@ class BigArray(list):
     def __init__(self):
         self.chunks = [[]]
         self.cache = None
+        self.length = 0
         self.filenames = set()
-        self.protected = False
-        self._os_remove = os.remove
 
     def append(self, value):
         self.chunks[-1].append(value)
@@ -64,17 +62,12 @@ class BigArray(list):
         return ValueError, "%s is not in list" % value
 
     def _dump(self, value):
-        try:
-            handle, filename = tempfile.mkstemp(prefix="sqlmapba-")
-            self.filenames.add(filename)
-            os.close(handle)
-            with open(filename, "w+b") as fp:
-                pickle.dump(value, fp, pickle.HIGHEST_PROTOCOL)
-            return filename
-        except IOError, ex:
-            errMsg = "exception occurred while storing data "
-            errMsg += "to a temporary file ('%s')" % ex
-            raise SqlmapSystemException, errMsg
+        handle, filename = tempfile.mkstemp(prefix="sqlmapba-")
+        self.filenames.add(filename)
+        os.close(handle)
+        with open(filename, "w+b") as fp:
+            pickle.dump(value, fp, pickle.HIGHEST_PROTOCOL)
+        return filename
 
     def _checkcache(self, index):
         if (self.cache and self.cache.index != index and self.cache.dirty):
@@ -83,14 +76,6 @@ class BigArray(list):
         if not (self.cache and self.cache.index == index):
             with open(self.chunks[index], "rb") as fp:
                 self.cache = Cache(index, pickle.load(fp), False)
-
-    def __getstate__(self):
-        self.protected = True
-        return self.chunks, self.filenames, self.protected
-
-    def __setstate__(self, state):
-        self.__init__()
-        self.chunks, self.filenames, self.protected = state
 
     def __getslice__(self, i, j):
         retval = BigArray()
@@ -134,9 +119,8 @@ class BigArray(list):
         return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
 
     def __del__(self):
-        if not self.protected:
-            for filename in self.filenames:
-                try:
-                    self._os_remove(filename)
-                except:
-                    pass
+        for filename in self.filenames:
+            try:
+                os.remove(filename)
+            except:
+                pass

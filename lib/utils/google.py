@@ -46,8 +46,10 @@ class Google(object):
         try:
             conn = self.opener.open("http://www.google.com/ncr")
             conn.info()  # retrieve session cookie
-        except Exception, ex:
-            errMsg = "unable to connect to Google ('%s')" % ex
+        except urllib2.HTTPError, e:
+            e.info()
+        except urllib2.URLError:
+            errMsg = "unable to connect to Google"
             raise SqlmapConnectionException(errMsg)
 
     def search(self, dork):
@@ -152,7 +154,7 @@ class Google(object):
                         warnMsg += "to get error page information (%d)" % e.code
                         logger.critical(warnMsg)
                         return None
-                except:
+                except (urllib2.URLError, socket.error, socket.timeout):
                     errMsg = "unable to connect to DuckDuckGo"
                     raise SqlmapConnectionException(errMsg)
 

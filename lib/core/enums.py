@@ -74,7 +74,6 @@ class POST_HINT:
     JSON_LIKE = "JSON-like"
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
-    ARRAY_LIKE = "Array-like"
 
 class HTTPMETHOD:
     GET = "GET"

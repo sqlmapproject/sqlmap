@@ -9,7 +9,6 @@ import bdb
 import inspect
 import logging
 import os
-import re
 import sys
 import time
 import traceback
@@ -22,10 +21,8 @@ from lib.utils import versioncheck  # this has to be the first non-standard impo
 
 from lib.controller.controller import start
 from lib.core.common import banner
-from lib.core.common import createGithubIssue
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
-from lib.core.common import maskSensitiveData
 from lib.core.common import setColor
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
@@ -130,22 +127,9 @@ def main():
     except:
         print
         errMsg = unhandledExceptionMessage()
-        excMsg = traceback.format_exc()
-
-        for match in re.finditer(r'File "(.+?)", line', excMsg):
-            file_ = match.group(1)
-            file_ = os.path.relpath(file_, os.path.dirname(__file__))
-            file_ = file_.replace("\\", '/')
-            file_ = re.sub(r"\.\./", '/', file_).lstrip('/')
-            excMsg = excMsg.replace(match.group(1), file_)
-
-        errMsg = maskSensitiveData(errMsg)
-        excMsg = maskSensitiveData(excMsg)
-
         logger.critical(errMsg)
         kb.stickyLevel = logging.CRITICAL
-        dataToStdout(excMsg)
-        createGithubIssue(errMsg, excMsg)
+        dataToStdout(setColor(traceback.format_exc()))
 
     finally:
         if conf.get("showTime"):
@@ -171,9 +155,6 @@ def main():
                 conf.database_cursor.disconnect()
             except KeyboardInterrupt:
                 pass
-
-        if conf.get("dumper"):
-            conf.dumper.flush()
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if conf.get("threads", 0) > 1 or conf.get("dnsServer"):

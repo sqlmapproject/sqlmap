@@ -6,13 +6,12 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
-import sys
 
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
 from lib.core.common import getSQLSnippet
-from lib.core.common import getUnicode
 from lib.core.common import isStackingAvailable
+from lib.core.convert import utf8decode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.dicts import SQL_STATEMENTS
@@ -82,7 +81,7 @@ class Custom:
 
             try:
                 query = raw_input("sql-shell> ")
-                query = getUnicode(query, encoding=sys.stdin.encoding)
+                query = utf8decode(query)
             except KeyboardInterrupt:
                 print
                 errMsg = "user aborted"

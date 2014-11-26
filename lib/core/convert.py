@@ -41,7 +41,6 @@ def base64pickle(value):
     """
 
     retVal = None
-
     try:
         retVal = base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
     except:
@@ -64,14 +63,7 @@ def base64unpickle(value):
     'foobar'
     """
 
-    retVal = None
-
-    try:
-        retVal = pickle.loads(base64decode(value))
-    except TypeError: 
-        retVal = pickle.loads(base64decode(bytes(value)))
-
-    return retVal
+    return pickle.loads(base64decode(value))
 
 def hexdecode(value):
     """

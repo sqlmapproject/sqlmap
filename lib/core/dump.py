@@ -66,23 +66,12 @@ class Dump(object):
         if kb.get("multiThreadMode"):
             self._lock.acquire()
 
-        try:
-            self._outputFP.write(text)
-        except IOError, ex:
-            errMsg = "error occurred while writing to log file ('%s')" % ex
-            raise SqlmapGenericException(errMsg)
+        self._outputFP.write(text)
 
         if kb.get("multiThreadMode"):
             self._lock.release()
 
         kb.dataOutputFlag = True
-
-    def flush(self):
-        if self._outputFP:
-            try:
-                self._outputFP.flush()
-            except IOError:
-                pass
 
     def setOutputFile(self):
         self._outputFile = os.path.join(conf.outputPath, "log")
@@ -391,7 +380,7 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
-        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(db))))
+        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
@@ -399,7 +388,7 @@ class Dump(object):
             if not os.path.isdir(dumpDbPath):
                 os.makedirs(dumpDbPath, 0755)
 
-            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (normalizeUnicode(unsafeSQLIdentificatorNaming(table)), conf.dumpFormat.lower()))
+            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower()))
             appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
 

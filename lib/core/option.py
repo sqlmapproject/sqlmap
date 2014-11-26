@@ -84,13 +84,11 @@ from lib.core.enums import WIZARD
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
-from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
-from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.log import FORMATTER
@@ -108,7 +106,6 @@ from lib.core.settings import DUMMY_URL
 from lib.core.settings import INJECT_HERE_MARK
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
-from lib.core.settings import KB_CHARS_LOW_FREQUENCY_ALPHABET
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MAX_CONNECT_RETRIES
 from lib.core.settings import MAX_NUMBER_OF_THREADS
@@ -222,7 +219,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
             if not(conf.scope and not re.search(conf.scope, url, re.I)):
                 if not kb.targets or url not in addedTargetUrls:
-                    kb.targets.add((url, method, None, cookie, None))
+                    kb.targets.add((url, method, None, cookie))
                     addedTargetUrls.add(url)
 
     def _parseBurpLog(content):
@@ -236,7 +233,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
                     port, request = match.groups()
                     request = request.decode("base64")
-                    _ = re.search(r"%s:.+" % re.escape(HTTP_HEADER.HOST), request)
+                    _ = re.search(r"%s:.+" % HTTP_HEADER.HOST, request)
                     if _:
                         host = _.group(0).strip()
                         if not re.search(r":\d+\Z", host):
@@ -274,7 +271,6 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             params = False
             newline = None
             lines = request.split('\n')
-            headers = []
 
             for index in xrange(len(lines)):
                 line = lines[index]
@@ -286,7 +282,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 line = line.strip('\r')
                 match = re.search(r"\A(%s) (.+) HTTP/[\d.]+\Z" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), line) if not method else None
 
-                if len(line) == 0 and method and method != HTTPMETHOD.GET and data is None:
+                if len(line) == 0 and method in (HTTPMETHOD.POST, HTTPMETHOD.PUT) and data is None:
                     data = ""
                     params = True
 
@@ -324,14 +320,14 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                             port = filterStringValue(splitValue[1], "[0-9]")
 
                     # Avoid to add a static content length header to
-                    # headers and consider the following lines as
+                    # conf.httpHeaders and consider the following lines as
                     # POSTed data
                     if key.upper() == HTTP_HEADER.CONTENT_LENGTH.upper():
                         params = True
 
                     # Avoid proxy and connection type related headers
                     elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
-                        headers.append((getUnicode(key), getUnicode(value)))
+                        conf.httpHeaders.append((getUnicode(key), getUnicode(value)))
 
                     if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
                         params = True
@@ -359,17 +355,12 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     if not kb.targets or url not in addedTargetUrls:
-                        kb.targets.add((url, method, data, cookie, tuple(headers)))
+                        kb.targets.add((url, method, data, cookie))
                         addedTargetUrls.add(url)
 
-    checkFile(reqFile)
-    try:
-        with openFile(reqFile, "rb") as f:
-            content = f.read()
-    except (IOError, OSError, MemoryError), ex:
-        errMsg = "something went wrong while trying "
-        errMsg += "to read the content of file '%s' ('%s')" % (reqFile, ex)
-        raise SqlmapSystemException(errMsg)
+    fp = openFile(reqFile, "rb")
+
+    content = fp.read()
 
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)
@@ -409,13 +400,7 @@ def _loadQueries():
         return retVal
 
     tree = ElementTree()
-    try:
-        tree.parse(paths.QUERIES_XML)
-    except Exception, ex:
-        errMsg = "something seems to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, ex)
-        errMsg += "sure that you haven't made any changes to it"
-        raise SqlmapInstallationException, errMsg
+    tree.parse(paths.QUERIES_XML)
 
     for node in tree.findall("*"):
         queries[node.attrib['value']] = iterate(node)
@@ -575,14 +560,14 @@ def _setGoogleDorking():
         for link in links:
             link = urldecode(link)
             if re.search(r"(.*?)\?(.+)", link):
-                kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
+                kb.targets.add((link, conf.method, conf.data, conf.cookie))
             elif re.search(URI_INJECTABLE_REGEX, link, re.I):
                 if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
                     test = readInput(message, default="Y")
                     kb.data.onlyGETs = test.lower() != 'n'
                 if not kb.data.onlyGETs or conf.googleDork:
-                    kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
+                    kb.targets.add((link, conf.method, conf.data, conf.cookie))
 
         return links
 
@@ -632,7 +617,7 @@ def _setBulkMultipleTargets():
     for line in getFileItems(conf.bulkFile):
         if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
             found = True
-            kb.targets.add((line.strip(), None, None, None, None))
+            kb.targets.add((line.strip(), None, None, None))
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
@@ -649,7 +634,7 @@ def _setSitemapTargets():
     for item in parseSitemap(conf.sitemapUrl):
         if re.match(r"[^ ]+\?(.+)", item, re.I):
             found = True
-            kb.targets.add((item.strip(), None, None, None, None))
+            kb.targets.add((item.strip(), None, None, None))
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
@@ -948,13 +933,13 @@ def _setTamperingFunctions():
 
             try:
                 module = __import__(filename[:-3])
-            except (ImportError, SyntaxError), msg:
+            except ImportError, msg:
                 raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], msg))
 
             priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper" and inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs":
+                if name == "tamper":
                     found = True
                     kb.tamperFunctions.append(function)
                     function.func_name = module.__name__
@@ -1013,15 +998,13 @@ def _setWafFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                if filename[:-3] in sys.modules:
-                    del sys.modules[filename[:-3]]
                 module = __import__(filename[:-3])
             except ImportError, msg:
                 raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], msg))
 
             _ = dict(inspect.getmembers(module))
             if "detect" not in _:
-                errMsg = "missing function 'detect(get_page)' "
+                errMsg = "missing function 'detect(page, headers, code)' "
                 errMsg += "in WAF script '%s'" % found
                 raise SqlmapGenericException(errMsg)
             else:
@@ -1257,6 +1240,16 @@ def _setHTTPAuthentication():
         key_file = os.path.expanduser(conf.authPrivate)
         checkFile(key_file)
         authHandler = HTTPSPKIAuthHandler(key_file)
+
+def _setHTTPMethod():
+    """
+    Check and set the HTTP method to perform HTTP requests through.
+    """
+
+    conf.method = HTTPMETHOD.POST if conf.data is not None else HTTPMETHOD.GET
+
+    debugMsg = "setting the HTTP method to %s" % conf.method
+    logger.debug(debugMsg)
 
 def _setHTTPExtraHeaders():
     if conf.headers:
@@ -1647,8 +1640,8 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.chars = AttribDict()
     kb.chars.delimiter = randomStr(length=6, lowercase=True)
-    kb.chars.start = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
-    kb.chars.stop = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
+    kb.chars.start = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, lowercase=True), KB_CHARS_BOUNDARY_CHAR)
+    kb.chars.stop = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, lowercase=True), KB_CHARS_BOUNDARY_CHAR)
     kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, _, KB_CHARS_BOUNDARY_CHAR) for _ in randomStr(length=4, lowercase=True))
 
     kb.columnExistsChoice = None
@@ -1743,7 +1736,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.reduceTests = None
     kb.stickyDBMS = False
     kb.stickyLevel = None
-    kb.storeCrawlingChoice = None
     kb.storeHashesChoice = None
     kb.suppressResumeInfo = False
     kb.technique = None
@@ -1786,11 +1778,11 @@ def _useWizardInterface():
         message = "Please enter full target URL (-u): "
         conf.url = readInput(message, default=None)
 
-    message = "%s data (--data) [Enter for None]: " % ((conf.method if conf.method != HTTPMETHOD.GET else conf.method) or HTTPMETHOD.POST)
+    message = "POST data (--data) [Enter for None]: "
     conf.data = readInput(message, default=None)
 
     if not (filter(lambda _: '=' in unicode(_), (conf.url, conf.data)) or '*' in conf.url):
-        warnMsg = "no GET and/or %s parameter(s) found for testing " % ((conf.method if conf.method != HTTPMETHOD.GET else conf.method) or HTTPMETHOD.POST)
+        warnMsg = "no GET and/or POST parameter(s) found for testing "
         warnMsg += "(e.g. GET parameter 'id' in 'http://www.site.com/vuln.php?id=1'). "
         if not conf.crawlDepth and not conf.forms:
             warnMsg += "Will search for forms"
@@ -2184,14 +2176,6 @@ def _basicOptionValidation():
         errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g', '-m' or '-x'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.csrfUrl and not conf.csrfToken:
-        errMsg = "option '--csrf-url' requires usage of option '--csrf-token'"
-        raise SqlmapSyntaxException(errMsg)
-
-    if conf.csrfToken and conf.threads > 1:
-        errMsg = "option '--csrf-url' is incompatible with option '--threads'"
-        raise SqlmapSyntaxException(errMsg)
-
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:
         errMsg = "option '-r' is incompatible with option '-u' ('--url')"
         raise SqlmapSyntaxException(errMsg)
@@ -2286,7 +2270,7 @@ def _resolveCrossReferences():
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
-    if IS_WIN:
+    if not inputOptions.disableColoring:
         coloramainit()
 
     _setConfAttributes()
@@ -2326,6 +2310,7 @@ def init():
         _setHTTPCookies()
         _setHTTPReferer()
         _setHTTPUserAgent()
+        _setHTTPMethod()
         _setHTTPAuthentication()
         _setHTTPProxy()
         _setDNSCache()

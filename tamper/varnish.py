@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Append a HTTP header 'X-originating-IP' to bypass
+    Append a HTTP Request Parameter to bypass
     WAF Protection of Varnish Firewall
 
     Notes:

@@ -10,7 +10,6 @@ import re
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getSQLSnippet
-from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -33,8 +32,6 @@ from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import DEFAULT_COOKIE_DELIMITER
-from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
@@ -88,7 +85,7 @@ class Agent(object):
 
         paramString = conf.parameters[place]
         paramDict = conf.paramDict[place]
-        origValue = getUnicode(paramDict[parameter])
+        origValue = paramDict[parameter]
 
         if place == PLACE.URI:
             paramString = origValue
@@ -102,8 +99,10 @@ class Agent(object):
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                 origValue = origValue.split('>')[-1]
-            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
-                origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)\s*(?P<result>[^"\[,]+\Z)', origValue)
+            elif kb.postHint == POST_HINT.JSON:
+                origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)(?P<result>[^"]+\Z)', origValue)
+            elif kb.postHint == POST_HINT.JSON_LIKE:
+                origValue = extractRegexResult(r'(?s)\'\s*:\s*(?P<result>\d+\Z)', origValue) or extractRegexResult(r"(?s)(?P<result>[^']+\Z)", origValue)
             else:
                 _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"&]+\Z)", origValue) or ""
                 origValue = _.split('=', 1)[1] if '=' in _ else ""
@@ -111,9 +110,6 @@ class Agent(object):
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             origValue = origValue[origValue.index(',') + 1:]
-            match = re.search(r"([^;]+)=(?P<value>[^;]+);?\Z", origValue)
-            if match:
-                origValue = match.group("value")
 
         if conf.prefix:
             value = origValue
@@ -157,27 +153,9 @@ class Agent(object):
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
-            def _(pattern, repl, string):
-                retVal = string
-                match = None
-                for match in re.finditer(pattern, string):
-                    pass
-                if match:
-                    while True:
-                        _ = re.search(r"\\g<([^>]+)>", repl)
-                        if _:
-                            repl = repl.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
-                        else:
-                            break
-                    retVal = string[:match.start()] + repl + string[match.end():]
-                return retVal
-
-            if origValue:
-                retVal = _(r"(\A|\b)%s=%s(\Z|\b)" % (re.escape(parameter), re.escape(origValue)), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
-            else:
-                retVal = _(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+            retVal = re.sub(r"(\A|\b)%s=%s" % (re.escape(parameter), re.escape(origValue)), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
             if retVal == paramString and urlencode(parameter) != parameter:
-                retVal = _(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = re.sub(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
 
         return retVal
 
@@ -1009,7 +987,7 @@ class Agent(object):
         """
 
         _ = re.escape(PAYLOAD_DELIMITER)
-        return re.sub("(?s)(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), value) if value else value
+        return re.sub("(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), value) if value else value
 
     def runAsDBMSUser(self, query):
         if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:

@@ -132,15 +132,8 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             seq1 = seq1[count:]
             seq2 = seq2[count:]
 
-        while True:
-            try:
-                seqMatcher.set_seq1(seq1)
-                seqMatcher.set_seq2(seq2)
-            except MemoryError:
-                seq1 = seq1[:len(seq1) / 4]
-                seq2 = seq2[:len(seq2) / 4]
-            else:
-                break
+        seqMatcher.set_seq1(seq1)
+        seqMatcher.set_seq2(seq2)
 
         ratio = round(seqMatcher.quick_ratio(), 3)
 
