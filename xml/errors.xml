@@ -50,7 +50,7 @@
     <dbms value="IBM DB2">
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
-        <error regexp="db2_\w+\("/>
+        <error regexp="\bdb2_\w+\("/>
     </dbms>
 
     <!-- Informix -->
