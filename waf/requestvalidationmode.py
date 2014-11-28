@@ -5,7 +5,7 @@ Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import randomInt
+from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "ASP.NET RequestValidationMode (Microsoft)"
 
@@ -14,7 +14,8 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = re.search(r"ASP\.NET has detected data in the request that is potentially dangerous", page, re.I) is not None
+        retval = "ASP.NET has detected data in the request that is potentially dangerous" in page
+        retval |= "Request Validation has detected a potentially dangerous client input value" in page
         if retval:
             break
 
