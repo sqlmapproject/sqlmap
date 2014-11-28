@@ -861,7 +861,7 @@ def dataToOutFile(filename, data):
         retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
         try:
-            with codecs.open(retVal, "wb", UNICODE_ENCODING) as f:
+            with openFile(retVal, "wb") as f:
                 f.write(data)
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
@@ -1813,7 +1813,7 @@ def readCachedFileContent(filename, mode='rb'):
         with kb.locks.cache:
             if filename not in kb.cache.content:
                 checkFile(filename)
-                with codecs.open(filename, mode, UNICODE_ENCODING) as f:
+                with openFile(filename, mode) as f:
                     kb.cache.content[filename] = f.read()
 
     return kb.cache.content[filename]
@@ -1878,7 +1878,7 @@ def initCommonOutputs():
     kb.commonOutputs = {}
     key = None
 
-    with codecs.open(paths.COMMON_OUTPUTS, 'r', UNICODE_ENCODING) as f:
+    with openFile(paths.COMMON_OUTPUTS, 'r') as f:
         for line in f.readlines():  # xreadlines doesn't return unicode strings when codec.open() is used
             if line.find('#') != -1:
                 line = line[:line.find('#')]
@@ -1905,7 +1905,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     checkFile(filename)
 
     try:
-        with codecs.open(filename, 'r', UNICODE_ENCODING, errors="ignore") if unicode_ else open(filename, 'r') as f:
+        with openFile(filename, 'r', errors="ignore") if unicode_ else open(filename, 'r') as f:
             for line in (f.readlines() if unicode_ else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
                 if commentPrefix:
                     if line.find(commentPrefix) != -1:
@@ -2822,13 +2822,13 @@ def showHttpErrorCodes():
           for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
 
-def openFile(filename, mode='r'):
+def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace"):
     """
     Returns file handle of a given filename
     """
 
     try:
-        return codecs.open(filename, mode, UNICODE_ENCODING, "replace")
+        return codecs.open(filename, mode, encoding, errors)
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
         errMsg += "Please check %s permissions on a file " % ("write" if \

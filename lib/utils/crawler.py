@@ -16,6 +16,7 @@ import time
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import findPageForms
+from lib.core.common import openFile
 from lib.core.common import readInput
 from lib.core.common import safeCSValue
 from lib.core.common import singleTimeWarnMessage
@@ -170,7 +171,7 @@ def storeResultsToFile(results):
         infoMsg = "writing crawling results to a temporary file '%s' " % filename
         logger.info(infoMsg)
 
-        with codecs.open(filename, "w+b", UNICODE_ENCODING) as f:
+        with openFile(filename, "w+b") as f:
             if conf.forms:
                 f.write("URL,POST\n")
 
