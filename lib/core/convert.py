@@ -145,17 +145,21 @@ def htmlunescape(value):
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function
-    raise NotImplementedError
+    sys.stdout.write(message)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 def stdoutencode(data):
     retVal = None
 
     try:
+        data = data or ""
+
         # Reference: http://bugs.python.org/issue1602
         if IS_WIN:
-            output = data.encode("ascii", "replace")
+            output = data.encode(sys.stdout.encoding, "replace")
 
-            if output != data:
+            if '?' in output:
                 warnMsg = "cannot properly display Unicode characters "
                 warnMsg += "inside Windows OS command prompt "
                 warnMsg += "(http://bugs.python.org/issue1602). All "

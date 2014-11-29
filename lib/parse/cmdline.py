@@ -791,7 +791,7 @@ def cmdLineParser():
         advancedHelp = True
 
         for arg in sys.argv:
-            argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
+            argv.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
 
         checkDeprecatedOptions(argv)
 

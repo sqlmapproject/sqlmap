@@ -2068,7 +2068,10 @@ def getUnicode(value, encoding=None, noneToNull=False):
             try:
                 return unicode(value, encoding or kb.get("pageEncoding") or UNICODE_ENCODING)
             except UnicodeDecodeError, ex:
-                value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
+                try:
+                    return unicode(value, UNICODE_ENCODING)
+                except:
+                    value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
     else:
         try:
             return unicode(value)
