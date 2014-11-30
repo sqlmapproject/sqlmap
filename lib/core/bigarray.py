@@ -15,6 +15,7 @@ import tempfile
 
 from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_LENGTH
+from lib.core.settings import BIGARRAY_TEMP_PREFIX
 
 class Cache(object):
     """
@@ -35,14 +36,12 @@ class BigArray(list):
         self.chunks = [[]]
         self.cache = None
         self.filenames = set()
-        self.protected = False
         self._os_remove = os.remove
 
     def append(self, value):
         self.chunks[-1].append(value)
         if len(self.chunks[-1]) >= BIGARRAY_CHUNK_LENGTH:
             filename = self._dump(self.chunks[-1])
-            del(self.chunks[-1][:])
             self.chunks[-1] = filename
             self.chunks.append([])
 
@@ -65,7 +64,7 @@ class BigArray(list):
 
     def _dump(self, value):
         try:
-            handle, filename = tempfile.mkstemp(prefix="sqlmapba-")
+            handle, filename = tempfile.mkstemp(prefix=BIGARRAY_TEMP_PREFIX)
             self.filenames.add(filename)
             os.close(handle)
             with open(filename, "w+b") as fp:
@@ -85,12 +84,11 @@ class BigArray(list):
                 self.cache = Cache(index, pickle.load(fp), False)
 
     def __getstate__(self):
-        self.protected = True
-        return self.chunks, self.filenames, self.protected
+        return self.chunks, self.filenames
 
     def __setstate__(self, state):
         self.__init__()
-        self.chunks, self.filenames, self.protected = state
+        self.chunks, self.filenames = state
 
     def __getslice__(self, i, j):
         retval = BigArray()
@@ -132,11 +130,3 @@ class BigArray(list):
 
     def __len__(self):
         return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
-
-    def __del__(self):
-        if not self.protected:
-            for filename in self.filenames:
-                try:
-                    self._os_remove(filename)
-                except:
-                    pass

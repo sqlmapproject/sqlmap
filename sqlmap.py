@@ -6,11 +6,13 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import bdb
+import glob
 import inspect
 import logging
 import os
 import re
 import sys
+import tempfile
 import time
 import traceback
 import warnings
@@ -42,6 +44,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import initOptions
 from lib.core.option import init
 from lib.core.profiling import profile
+from lib.core.settings import BIGARRAY_TEMP_PREFIX
 from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
@@ -150,6 +153,12 @@ def main():
     finally:
         if conf.get("showTime"):
             dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
+
+        for filename in glob.glob("%s*" % os.path.join(tempfile.gettempdir(), BIGARRAY_TEMP_PREFIX)):
+            try:
+                os.remove(filename)
+            except:
+                pass
 
         kb.threadContinue = False
         kb.threadException = True
