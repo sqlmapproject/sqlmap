@@ -40,6 +40,7 @@ from subprocess import PIPE
 from subprocess import Popen as execute
 from xml.dom import minidom
 from xml.sax import parse
+from xml.sax import SAXParseException
 
 from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
@@ -77,6 +78,7 @@ from lib.core.enums import SORT_ORDER
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
@@ -1758,8 +1760,14 @@ def parseXmlFile(xmlFile, handler):
     Parses XML file by a given handler
     """
 
-    with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
-        parse(stream, handler)
+    try:
+        with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
+            parse(stream, handler)
+    except (SAXParseException, UnicodeError), ex:
+        errMsg = "something seems to be wrong with "
+        errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, ex)
+        errMsg += "sure that you haven't made any changes to it"
+        raise SqlmapInstallationException, errMsg
 
 def getSQLSnippet(dbms, sfile, **variables):
     """
