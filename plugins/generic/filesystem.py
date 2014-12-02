@@ -10,6 +10,7 @@ import os
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import Backend
+from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
 from lib.core.common import decodeHexValue
 from lib.core.common import isNumPosStrValue
@@ -255,6 +256,8 @@ class Filesystem:
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
         written = False
+
+        checkFile(localFile)
 
         self.checkDbmsOs()
 
