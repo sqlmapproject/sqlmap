@@ -19,7 +19,11 @@ try:
 except (ImportError, OSError):
     pass
 else:
-    _multiprocessing = multiprocessing
+    try:
+        if multiprocessing.cpu_count() > 1:
+            _multiprocessing = multiprocessing
+    except NotImplementedError:
+        pass
 
 import gc
 import os
