@@ -9,7 +9,6 @@ import re
 
 from xml.sax.handler import ContentHandler
 
-from lib.core.common import checkFile
 from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
@@ -49,7 +48,6 @@ def htmlParser(page):
     """
 
     xmlfile = paths.ERRORS_XML
-    checkFile(xmlfile)
     handler = HTMLHandler(page)
 
     parseXmlFile(xmlfile, handler)

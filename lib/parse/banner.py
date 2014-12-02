@@ -9,7 +9,6 @@ import re
 
 from xml.sax.handler import ContentHandler
 
-from lib.core.common import checkFile
 from lib.core.common import Backend
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
@@ -103,8 +102,6 @@ def bannerParser(banner):
 
     if not xmlfile:
         return
-
-    checkFile(xmlfile)
 
     if Backend.isDbms(DBMS.MSSQL):
         handler = MSSQLBannerHandler(banner, kb.bannerFp)

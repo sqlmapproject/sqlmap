@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 import itertools
 import os
 
-from lib.core.common import checkFile
 from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
@@ -36,7 +35,6 @@ def headersParser(headers):
     for header in itertools.ifilter(lambda x: x in kb.headerPaths, headers):
         value = headers[header]
         xmlfile = kb.headerPaths[header]
-        checkFile(xmlfile)
 
         handler = FingerprintHandler(value, kb.headersFp)
 
