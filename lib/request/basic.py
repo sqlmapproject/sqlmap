@@ -27,6 +27,7 @@ from lib.core.data import logger
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapCompressionException
+from lib.core.settings import BLOCKED_IP_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -305,6 +306,8 @@ def decodePage(page, contentEncoding, contentType):
 def processResponse(page, responseHeaders):
     kb.processResponseCounter += 1
 
+    page = page or ""
+
     parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None)
 
     if conf.parseErrors:
@@ -323,3 +326,7 @@ def processResponse(page, responseHeaders):
                         continue
                     conf.paramDict[PLACE.POST][name] = value
                 conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
+
+    if re.search(BLOCKED_IP_REGEX, page):
+        errMsg = "it appears that you have been blocked by the target server"
+        singleTimeLogMessage(errMsg, logging.ERROR)
