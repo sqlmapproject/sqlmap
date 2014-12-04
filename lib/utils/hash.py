@@ -840,7 +840,7 @@ def dictionaryAttack(attack_dict):
                         try:
                             process.terminate()
                             process.join()
-                        except OSError:
+                        except (OSError, AttributeError):
                             pass
 
                 finally:
@@ -934,7 +934,7 @@ def dictionaryAttack(attack_dict):
                             try:
                                 process.terminate()
                                 process.join()
-                            except OSError:
+                            except (OSError, AttributeError):
                                 pass
 
                     finally:
