@@ -54,6 +54,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
+from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
@@ -1163,6 +1164,8 @@ def identifyWaf():
     def _(*args, **kwargs):
         page, headers, code = None, None, None
         try:
+            pushValue(kb.redirectChoice)
+            kb.redirectChoice = REDIRECTION.NO
             if kwargs.get("get"):
                 kwargs["get"] = urlencode(kwargs["get"])
             kwargs["raise404"] = False
@@ -1170,6 +1173,8 @@ def identifyWaf():
             page, headers, code = Request.getPage(*args, **kwargs)
         except Exception:
             pass
+        finally:
+            kb.redirectChoice = popValue()
         return page or "", headers or {}, code
 
     retVal = False

@@ -166,6 +166,7 @@ class HTTP_HEADER:
     COOKIE = "Cookie"
     SET_COOKIE = "Set-Cookie"
     HOST = "Host"
+    LOCATION = "Location"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"
     PROXY_CONNECTION = "Proxy-Connection"
