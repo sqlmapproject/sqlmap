@@ -93,7 +93,10 @@ def setHandler():
                 if sqlalchemy.connector:
                     conf.dbmsConnector = sqlalchemy
                 else:
-                    conf.dbmsConnector.connect()
+                    try:
+                        conf.dbmsConnector.connect()
+                    except NameError:
+                        pass
             else:
                 conf.dbmsConnector.connect()
 
