@@ -46,7 +46,7 @@ def checkDependencies():
                 import jpype
         except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
-            warnMsg += "in order to directly connect to the database "
+            warnMsg += "in order to directly connect to the DBMS "
             warnMsg += "%s. Download from %s" % (dbmsName, data[2])
             logger.warn(warnMsg)
             missing_libraries.add(data[1])
