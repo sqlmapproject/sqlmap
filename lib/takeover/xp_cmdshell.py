@@ -52,10 +52,9 @@ class Xp_cmdshell:
             inject.goStacked(agent.runAsDBMSUser(cmd))
 
         self._randStr = randomStr(lowercase=True)
-        self._xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
-        self.xpCmdshellStr = "master..%s" % self._xpCmdshellNew
+        self.xpCmdshellStr = "master..new_xp_cmdshell"
 
-        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr, XP_CMDSHELL_NEW=self._xpCmdshellNew)
+        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr)
 
         if Backend.isVersionWithin(("2005", "2008")):
             cmd += ";RECONFIGURE WITH OVERRIDE"

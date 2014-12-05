@@ -162,7 +162,7 @@ class Miscellaneous:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
             if Backend.isDbms(DBMS.MSSQL):
-                return
+                udfDict = {"master..new_xp_cmdshell": None}
 
             if udfDict is None:
                 udfDict = self.sysUdfs
