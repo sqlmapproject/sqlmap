@@ -139,8 +139,15 @@ class HashDB(object):
     def beginTransaction(self):
         threadData = getCurrentThreadData()
         if not threadData.inTransaction:
-            self.cursor.execute("BEGIN TRANSACTION")
-            threadData.inTransaction = True
+            try:
+                self.cursor.execute("BEGIN TRANSACTION")
+            except:
+                # Reference: http://stackoverflow.com/a/25245731
+                self.cursor.close()
+                threadData.hashDBCursor = None
+                self.cursor.execute("BEGIN TRANSACTION")
+            finally:
+                threadData.inTransaction = True
 
     def endTransaction(self):
         threadData = getCurrentThreadData()
