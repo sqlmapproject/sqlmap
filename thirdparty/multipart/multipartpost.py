@@ -88,7 +88,11 @@ class MultipartPostHandler(urllib2.BaseHandler):
         for (key, fd) in files:
             file_size = os.fstat(fd.fileno())[stat.ST_SIZE] if isinstance(fd, file) else fd.len
             filename = fd.name.split('/')[-1] if '/' in fd.name else fd.name.split('\\')[-1]
-            contenttype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+            try:
+                contenttype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+            except:
+                # Reference: http://bugs.python.org/issue9291
+                contenttype = 'application/octet-stream'
             buf += '--%s\r\n' % boundary
             buf += 'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (key, filename)
             buf += 'Content-Type: %s\r\n' % contenttype
