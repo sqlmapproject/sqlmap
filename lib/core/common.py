@@ -1171,7 +1171,7 @@ def parseTargetDirect():
         raise SqlmapSyntaxException(errMsg)
 
     for dbmsName, data in DBMS_DICT.items():
-        if conf.dbms in data[0]:
+        if dbmsName == conf.dbms or conf.dbms.lower() in data[0]:
             try:
                 if dbmsName in (DBMS.ACCESS, DBMS.SQLITE, DBMS.FIREBIRD):
                     if remote:
@@ -1182,7 +1182,9 @@ def parseTargetDirect():
                         conf.hostname = "localhost"
                         conf.port = 0
                 elif not remote:
-                    errMsg = "missing remote connection details"
+                    errMsg = "missing remote connection details (e.g. "
+                    errMsg += "'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' "
+                    errMsg += "or 'access://DATABASE_FILEPATH')"
                     raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
