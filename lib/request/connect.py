@@ -11,6 +11,7 @@ import logging
 import re
 import socket
 import string
+import struct
 import time
 import traceback
 import urllib2
@@ -528,7 +529,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, ProxyError, SqlmapCompressionException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, struct.error, ProxyError, SqlmapCompressionException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
@@ -542,6 +543,8 @@ class Connect(object):
                 warnMsg = "connection timed out to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target URL"
+            elif "unpack requires a string argument of length 4" in tbMsg:
+                warnMsg = "there has been a problem with NTLM authentication"
             elif "BadStatusLine" in tbMsg:
                 warnMsg = "connection dropped or unknown HTTP "
                 warnMsg += "status code received"
