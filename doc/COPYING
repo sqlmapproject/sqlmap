@@ -5,8 +5,8 @@ sqlmap is (C) 2006-2014 Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar.
 
 This program is free software; you may redistribute and/or modify it under
 the terms of the GNU General Public License as published by the Free
-Software Foundation; Version 2 with the clarifications and exceptions
-described below. This guarantees your right to use, modify, and
+Software Foundation; Version 2 (or later) with the clarifications and
+exceptions described below. This guarantees your right to use, modify, and
 redistribute this software under certain conditions. If you wish to embed
 sqlmap technology into proprietary software, we sell alternative licenses
 (contact sales@sqlmap.org).
