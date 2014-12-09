@@ -573,6 +573,11 @@ def start():
                         errMsg += "expression that you have chosen "
                         errMsg += "does not match exclusively True responses"
 
+                    if not conf.tamper:
+                        errMsg += " If you suspect that there is some kind of protection mechanism "
+                        errMsg += "involved (e.g. WAF) maybe you could retry "
+                        errMsg += "with an option '--tamper' (e.g. '--tamper=space2comment')"
+
                     raise SqlmapNotVulnerableException(errMsg)
             else:
                 # Flush the flag
