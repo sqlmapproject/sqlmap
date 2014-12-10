@@ -3472,18 +3472,18 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     except UnicodeError:
         pass
     except ParseError:
-        warnMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
-        logger.warning(warnMsg)
-        response.seek(0)
-        filtered = _("".join(re.findall(FORM_SEARCH_REGEX, response.read())), response.geturl())
-        try:
-            forms = ParseResponse(filtered, backwards_compat=False)
-        except ParseError:
-            errMsg = "no success"
-            if raise_:
-                raise SqlmapGenericException(errMsg)
-            else:
-                logger.debug(errMsg)
+        if "<html" in (content or ""):
+            warnMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
+            logger.warning(warnMsg)
+            filtered = _("".join(re.findall(FORM_SEARCH_REGEX, content)), url)
+            try:
+                forms = ParseResponse(filtered, backwards_compat=False)
+            except ParseError:
+                errMsg = "no success"
+                if raise_:
+                    raise SqlmapGenericException(errMsg)
+                else:
+                    logger.debug(errMsg)
 
     if forms:
         for form in forms:
