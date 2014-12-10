@@ -71,8 +71,8 @@ def configFileParser(configFile):
     try:
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
-    except (MissingSectionHeaderError, ParsingError), ex:
-        errMsg = "you have provided an invalid configuration file ('%s')" % str(ex)
+    except Exception, ex:
+        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % str(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
