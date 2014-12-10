@@ -1264,7 +1264,7 @@ def parseTargetUrl():
     try:
         _ = conf.hostname.encode("idna")
     except LookupError:
-        _ = conf.hostname
+        _ = conf.hostname.encode(UNICODE_ENCODING)
     except UnicodeError:
         _ = None
 
@@ -3385,7 +3385,10 @@ def asciifyUrl(url, forceQuote=False):
         return url
 
     # idna-encode domain
-    hostname = parts.hostname.encode("idna")
+    try:
+        hostname = parts.hostname.encode("idna")
+    except LookupError:
+        hostname = parts.hostname.encode(UNICODE_ENCODING)
 
     # UTF8-quote the other parts. We check each part individually if
     # if needs to be quoted - that should catch some additional user
