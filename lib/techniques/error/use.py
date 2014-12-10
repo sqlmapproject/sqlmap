@@ -134,6 +134,12 @@ def _oneShotErrorUse(expression, field=None):
                             check = "(?P<result>.*?)%s" % kb.chars.stop[:2]
                             output = extractRegexResult(check, trimmed, re.IGNORECASE)
 
+                            if not output:
+                                check = "(?P<result>[^\s<>'\"]+)"
+                                output = extractRegexResult(check, trimmed, re.IGNORECASE)
+                            else:
+                                output = output.rstrip()
+
                 if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
                     if offset == 1:
                         retVal = output
