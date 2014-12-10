@@ -1263,6 +1263,8 @@ def parseTargetUrl():
 
     try:
         _ = conf.hostname.encode("idna")
+    except LookupError:
+        _ = conf.hostname
     except UnicodeError:
         _ = None
 
