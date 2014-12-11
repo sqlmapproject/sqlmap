@@ -1265,6 +1265,8 @@ def checkNullConnection():
 def checkConnection(suppressOutput=False):
     if not any((conf.proxy, conf.tor, conf.dummy)):
         try:
+            debugMsg = "resolving hostname '%s'" % conf.hostname
+            logger.debug(debugMsg)
             socket.getaddrinfo(conf.hostname, None)
         except socket.gaierror:
             errMsg = "host '%s' does not exist" % conf.hostname
