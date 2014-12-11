@@ -853,8 +853,16 @@ def dataToTrafficFile(data):
         raise SqlmapSystemException(errMsg)
 
 def dataToDumpFile(dumpFile, data):
-    dumpFile.write(data)
-    dumpFile.flush()
+    try:
+        dumpFile.write(data)
+        dumpFile.flush()
+    except IOError, ex:
+        if "No space left" in str(ex):
+            errMsg = "no space left on output device"
+            logger.error(errMsg)
+        else:
+            raise
+
 
 def dataToOutFile(filename, data):
     retVal = None
