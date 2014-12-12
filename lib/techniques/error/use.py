@@ -281,7 +281,7 @@ def errorUse(expression, dump=False):
             # Count the number of SQL query entries output
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 
-            if " ORDER BY " in expression.upper():
+            if " ORDER BY " in countedExpression.upper():
                 _ = countedExpression.upper().rindex(" ORDER BY ")
                 countedExpression = countedExpression[:_]
 
