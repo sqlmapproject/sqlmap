@@ -1886,7 +1886,13 @@ def _saveCmdline():
             config.set(family, option, value)
 
     confFP = openFile(paths.SQLMAP_CONFIG, "wb")
-    config.write(confFP)
+
+    try:
+        config.write(confFP)
+    except IOError, ex:
+        errMsg = "something went wrong while trying "
+        errMsg += "to write to the configuration INI file '%s' ('%s')" % (paths.SQLMAP_CONFIG, ex)
+        raise SqlmapSystemException(errMsg)
 
     infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
