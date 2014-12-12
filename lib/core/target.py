@@ -566,7 +566,7 @@ def _createTargetDirs():
                 os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
             warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
             logger.warn(warnMsg)
-        except OSError, ex:
+        except (OSError, IOError), ex:
             try:
                 tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
             except IOError, _:
@@ -587,7 +587,7 @@ def _createTargetDirs():
     if not os.path.isdir(conf.outputPath):
         try:
             os.makedirs(conf.outputPath, 0755)
-        except OSError, ex:
+        except (OSError, IOError), ex:
             try:
                 tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
             except IOError, _:

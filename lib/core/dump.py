@@ -9,6 +9,7 @@ import cgi
 import codecs
 import os
 import re
+import tempfile
 import threading
 
 from lib.core.common import Backend
@@ -32,6 +33,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import DUMP_FORMAT
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapValueException
+from lib.core.exception import SqlmapSystemException
 from lib.core.replication import Replication
 from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import METADB_SUFFIX
@@ -397,7 +399,24 @@ class Dump(object):
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if not os.path.isdir(dumpDbPath):
-                os.makedirs(dumpDbPath, 0755)
+                try:
+                    os.makedirs(dumpDbPath, 0755)
+                except (OSError, IOError), ex:
+                    try:
+                        tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
+                    except IOError, _:
+                        errMsg = "unable to write to the temporary directory ('%s'). " % _
+                        errMsg += "Please make sure that your disk is not full and "
+                        errMsg += "that you have sufficient write permissions to "
+                        errMsg += "create temporary files and/or directories"
+                        raise SqlmapSystemException(errMsg)
+
+                    warnMsg = "unable to create dump directory "
+                    warnMsg += "'%s' (%s). " % (dumpDbPath, ex)
+                    warnMsg += "Using temporary directory '%s' instead" % tempDir
+                    logger.warn(warnMsg)
+
+                    dumpDbPath = tempDir
 
             dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (normalizeUnicode(unsafeSQLIdentificatorNaming(table)), conf.dumpFormat.lower()))
             appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
