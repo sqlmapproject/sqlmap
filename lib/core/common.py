@@ -2849,13 +2849,13 @@ def showHttpErrorCodes():
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.warn(msg)
 
-def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace"):
+def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", buffering=1):
     """
     Returns file handle of a given filename
     """
 
     try:
-        return codecs.open(filename, mode, encoding, errors)
+        return codecs.open(filename, mode, encoding, errors, buffering)
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
         errMsg += "Please check %s permissions on a file " % ("write" if \

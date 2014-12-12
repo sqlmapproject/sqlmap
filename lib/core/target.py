@@ -18,6 +18,7 @@ from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
 from lib.core.common import normalizeUnicode
+from lib.core.common import openFile
 from lib.core.common import paramToDict
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
@@ -497,7 +498,7 @@ def _setResultsFile():
 
     if not conf.resultsFP:
         conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
-        conf.resultsFP = codecs.open(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
+        conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
         conf.resultsFP.writelines("Target URL,Place,Parameter,Techniques%s" % os.linesep)
 
         logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
