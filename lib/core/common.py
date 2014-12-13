@@ -1741,7 +1741,7 @@ def getConsoleWidth(default=80):
 
             if len(items) == 2 and items[1].isdigit():
                 width = int(items[1])
-        except OSError:
+        except (OSError, MemoryError):
             pass
 
     if width is None:
