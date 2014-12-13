@@ -2847,7 +2847,7 @@ def showHttpErrorCodes():
         if any((str(_).startswith('4') or str(_).startswith('5')) and _ != httplib.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
             msg = "too many 4xx and/or 5xx HTTP error codes "
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
-            logger.warn(msg)
+            logger.debug(msg)
 
 def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", buffering=1):
     """
