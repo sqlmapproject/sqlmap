@@ -519,7 +519,7 @@ def _createFilesDir():
         except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
             warnMsg = "unable to create files directory "
-            warnMsg += "'%s' (%s). " % (conf.filePath, ex)
+            warnMsg += "'%s' (%s). " % (conf.filePath, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
@@ -541,7 +541,7 @@ def _createDumpDir():
         except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
-            warnMsg += "'%s' (%s). " % (conf.dumpPath, ex)
+            warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
@@ -576,7 +576,7 @@ def _createTargetDirs():
                 errMsg += "create temporary files and/or directories"
                 raise SqlmapGenericException(errMsg)
             warnMsg = "unable to create regular output directory "
-            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, ex)
+            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
