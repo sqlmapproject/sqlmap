@@ -355,14 +355,14 @@ class Connect(object):
 
             post = unicodeencode(post, kb.pageEncoding)
 
-            if method:
+            if method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                 method = unicodeencode(method)
                 req = MethodRequest(url, post, headers)
                 req.set_method(method)
             else:
                 req = urllib2.Request(url, post, headers)
 
-            requestHeaders += "\n".join("%s: %s" % (key.capitalize() if isinstance(key, basestring) else key, getUnicode(value)) for (key, value) in req.header_items())
+            requestHeaders += "\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in req.header_items())
 
             if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
                 conf.cj._policy._now = conf.cj._now = int(time.time())
