@@ -10,7 +10,7 @@ import re
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "Baidu Web Application Firewall (Baidu yunjiasu)"
+__product__ = "Yunjiasu Web Application Firewall (Baidu)"
 
 def detect(get_page):
     retval = False
