@@ -654,6 +654,10 @@ clav, <elclav(at)gmail.com>
 dragoun dash, <dragoun.dash(at)gmail.com>
 * for reporting a minor bug
 
+flsf, <jianmaflsf@gmail.com>
+* for contributing WAF scripts 360.py, anquanbao.py, baidu.py, safedog.py
+* for contributing a minor patch
+
 fufuh, <fufuh(at)users.sourceforge.net>
 * for reporting a bug when running on Windows
 
