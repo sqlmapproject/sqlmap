@@ -895,7 +895,7 @@ def readInput(message, default=None, checkBatch=True):
     elif message[-1] == ']':
         message += " "
 
-    if kb.prependFlag:
+    if kb.get("prependFlag"):
         message = "\n%s" % message
         kb.prependFlag = False
 
@@ -1819,7 +1819,7 @@ def getSQLSnippet(dbms, sfile, **variables):
         if choice and choice[0].lower() == "y":
             for var in variables:
                 msg = "insert value for variable '%s': " % var
-                val = readInput(msg)
+                val = readInput(msg, default="")
                 retVal = retVal.replace(r"%%%s%%" % var, val)
 
     return retVal
