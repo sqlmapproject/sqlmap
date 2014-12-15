@@ -473,7 +473,7 @@ def cmdLineParser():
         enumeration.add_option("--sql-file", dest="sqlFile",
                                help="Execute SQL statements from given file(s)")
 
-        # User-defined function options
+        # Brute force options
         brute = OptionGroup(parser, "Brute force", "These "
                           "options can be used to run brute force "
                           "checks")
