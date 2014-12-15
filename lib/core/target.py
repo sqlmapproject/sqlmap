@@ -225,7 +225,7 @@ def _setRequestParams():
         elif test[0] in ("q", "Q"):
             raise SqlmapUserQuitException
 
-    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
+    for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, unicode(conf.httpHeaders))):
         _ = re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
         if CUSTOM_INJECTION_MARK_CHAR in _:
             if kb.processUserMarks is None:
