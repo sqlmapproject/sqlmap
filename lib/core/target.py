@@ -597,7 +597,7 @@ def _createTargetDirs():
                 errMsg += "create temporary files and/or directories"
                 raise SqlmapGenericException(errMsg)
             warnMsg = "unable to create output directory "
-            warnMsg += "'%s' (%s). " % (conf.outputPath, ex)
+            warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % tempDir
             logger.warn(warnMsg)
 
