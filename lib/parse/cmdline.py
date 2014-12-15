@@ -24,6 +24,7 @@ from lib.core.data import logger
 from lib.core.defaults import defaults
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.exception import SqlmapShellQuitException
+from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
@@ -839,8 +840,11 @@ def cmdLineParser():
                     loadHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                     break
 
-            for arg in shlex.split(command):
-                argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
+            try:
+                for arg in shlex.split(command):
+                    argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
+            except ValueError, ex:
+                raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex
 
         # Hide non-basic options in basic help case
         for i in xrange(len(argv)):
