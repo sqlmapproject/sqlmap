@@ -10,7 +10,7 @@ import re
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "Safedog Web Application Firewall (safedog)"
+__product__ = "Safedog Web Application Firewall (Safedog)"
 
 def detect(get_page):
     retval = False
