@@ -857,7 +857,7 @@ def dataToDumpFile(dumpFile, data):
         dumpFile.write(data)
         dumpFile.flush()
     except IOError, ex:
-        if "No space left" in str(ex):
+        if "No space left" in getUnicode(ex):
             errMsg = "no space left on output device"
             logger.error(errMsg)
         else:

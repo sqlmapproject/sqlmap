@@ -11,6 +11,7 @@ from ConfigParser import MissingSectionHeaderError
 from ConfigParser import ParsingError
 
 from lib.core.common import checkFile
+from lib.core.common import getUnicode
 from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
@@ -41,7 +42,7 @@ def configFileProxy(section, option, boolean=False, integer=False):
                 value = config.get(section, option)
         except ValueError, ex:
             errMsg = "error occurred while processing the option "
-            errMsg += "'%s' in provided configuration file ('%s')" % (option, str(ex))
+            errMsg += "'%s' in provided configuration file ('%s')" % (option, getUnicode(ex))
             raise SqlmapSyntaxException(errMsg)
 
         if value:
@@ -72,7 +73,7 @@ def configFileParser(configFile):
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
     except Exception, ex:
-        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % str(ex)
+        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getUnicode(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
