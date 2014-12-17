@@ -77,8 +77,12 @@ class HashDB(object):
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not 'locked' in ex.message:
+                        if not "locked" in ex.message:
                             raise
+                    except sqlite3.DatabaseError, ex:
+                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, ex)
+                        errMsg += "If the problem persists please rerun with `--flush-session`"
+                        raise SqlmapDataException, errMsg
                     else:
                         break
         return retVal if not unserialize else unserializeObject(retVal)
