@@ -122,6 +122,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)[0]
             try:
                 result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+            except urllib2.HTTPError, e:
+                result = e
             except:
                 redurl = None
                 result = fp
