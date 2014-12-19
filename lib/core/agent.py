@@ -162,6 +162,7 @@ class Agent(object):
                 match = None
                 for match in re.finditer(pattern, string):
                     pass
+
                 if match:
                     while True:
                         _ = re.search(r"\\g<([^>]+)>", repl)
@@ -173,7 +174,8 @@ class Agent(object):
                 return retVal
 
             if origValue:
-                retVal = _(r"(\A|\b)%s=%s(\Z|\b)" % (re.escape(parameter), re.escape(origValue)), "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                regex = r"(\A|\b)%s=%s%s" % (re.escape(parameter), re.escape(origValue), r"(\Z|\b)" if origValue[-1].isalnum() else "")
+                retVal = _(regex, "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
             else:
                 retVal = _(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
             if retVal == paramString and urlencode(parameter) != parameter:

@@ -5,6 +5,7 @@
     <dbms value="MySQL">
         <error regexp="SQL syntax.*MySQL"/>
         <error regexp="Warning.*mysql_.*"/>
+        <error regexp="MySqlException \(0x"/>
         <error regexp="valid MySQL result"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc\.exceptions"/>
