@@ -1564,8 +1564,12 @@ def safeStringFormat(format_, params):
     """
     Avoids problems with inappropriate string format strings
 
-    >>> safeStringFormat('foobar%d%s', ('1', 2))
+    >>> safeStringFormat('foobar%s%s', ('1', 2))
     u'foobar12'
+    >>> safeStringFormat('foobar %d%s', ('1', 2))
+    u'foobar 12'
+    >>> safeStringFormat('foobar=%d%s', ('1', 2))
+    u'foobar=12'
     """
 
     if format_.count(PAYLOAD_DELIMITER) == 2:

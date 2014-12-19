@@ -26,7 +26,9 @@ def tamper(payload, **kwargs):
         * http://shiflett.org/blog/2006/jan/addslashes-versus-mysql-real-escape-string
 
     >>> tamper("1' AND 1=1")
-    '1%bf%27 AND 1=1-- '
+    '1%bf%27 AND 1=1'
+    >>> tamper("1' AND '1'='1")
+    '1%bf%27-- '
     """
 
     retVal = payload
