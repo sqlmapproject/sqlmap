@@ -9,6 +9,7 @@ import os
 import zipfile
 
 from lib.core.exception import SqlmapDataException
+from lib.core.exception import SqlmapInstallationException
 from lib.core.settings import UNICODE_ENCODING
 
 class Wordlist(object):
@@ -21,6 +22,7 @@ class Wordlist(object):
         self.fp = None
         self.index = 0
         self.counter = -1
+        self.current = None
         self.iter = None
         self.custom = custom or []
         self.proc_id = proc_id
@@ -37,15 +39,15 @@ class Wordlist(object):
         elif self.index == len(self.filenames):
             self.iter = iter(self.custom)
         else:
-            current = self.filenames[self.index]
-            if os.path.splitext(current)[1].lower() == ".zip":
-                _ = zipfile.ZipFile(current, 'r')
+            self.current = self.filenames[self.index]
+            if os.path.splitext(self.current)[1].lower() == ".zip":
+                _ = zipfile.ZipFile(self.current, 'r')
                 if len(_.namelist()) == 0:
-                    errMsg = "no file(s) inside '%s'" % current
+                    errMsg = "no file(s) inside '%s'" % self.current
                     raise SqlmapDataException(errMsg)
                 self.fp = _.open(_.namelist()[0])
             else:
-                self.fp = open(current, 'r')
+                self.fp = open(self.current, 'r')
             self.iter = iter(self.fp)
 
         self.index += 1
@@ -61,6 +63,11 @@ class Wordlist(object):
             self.counter += 1
             try:
                 retVal = self.iter.next().rstrip()
+            except zipfile.error, ex:
+                errMsg = "something seems to be wrong with "
+                errMsg += "the file '%s' ('%s'). Please make " % (self.current, ex)
+                errMsg += "sure that you haven't made any changes to it"
+                raise SqlmapInstallationException, errMsg
             except StopIteration:
                 self.adjust()
                 retVal = self.iter.next().rstrip()
