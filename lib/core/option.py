@@ -986,6 +986,11 @@ def _setTamperingFunctions():
                 errMsg += "in tamper script '%s'" % tfile
                 raise SqlmapGenericException(errMsg)
 
+        if kb.tamperFunctions and len(kb.tamperFunctions) > 3:
+            warnMsg = "using too many tamper scripts is usually not "
+            warnMsg += "a good idea"
+            logger.warning(warnMsg)
+
         if resolve_priorities and priorities:
             priorities.sort(reverse=True)
             kb.tamperFunctions = []
