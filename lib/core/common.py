@@ -1564,8 +1564,8 @@ def safeStringFormat(format_, params):
     """
     Avoids problems with inappropriate string format strings
 
-    >>> safeStringFormat('foobar%d%s', ('1', 2))
-    u'foobar12'
+    >>> safeStringFormat('SELECT foo FROM %s LIMIT %d', ('bar', '1'))
+    u'SELECT foo FROM bar LIMIT 1'
     """
 
     if format_.count(PAYLOAD_DELIMITER) == 2:
