@@ -2190,7 +2190,7 @@ def _basicOptionValidation():
         errMsg = "switch '--predict-output' is incompatible with option '--threads' and switch '-o'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.threads > MAX_NUMBER_OF_THREADS:
+    if conf.threads > MAX_NUMBER_OF_THREADS and not conf.get("skipThreadCheck"):
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 

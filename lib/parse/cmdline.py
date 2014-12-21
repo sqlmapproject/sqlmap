@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import re
 import shlex
 import sys
 
@@ -850,6 +851,9 @@ def cmdLineParser():
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
+            elif re.match(r"\A\d+!\Z", argv[i]) and argv[max(0, i - 1)] == "--threads" or re.match(r"\A--threads.+\d+!\Z", argv[i]):
+                argv[i] = argv[i][:-1]
+                conf.skipThreadCheck = True
             elif argv[i] == "--version":
                 print VERSION_STRING.split('/')[-1]
                 raise SystemExit

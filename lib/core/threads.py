@@ -110,13 +110,18 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         while True:
             message = "please enter number of threads? [Enter for %d (current)] " % numThreads
             choice = readInput(message, default=str(numThreads))
-            if choice and choice.isdigit():
-                if int(choice) > MAX_NUMBER_OF_THREADS:
-                    errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
-                    logger.critical(errMsg)
-                else:
-                    conf.threads = numThreads = int(choice)
-                    break
+            if choice:
+                skipThreadCheck = False
+                if choice.endswith('!'):
+                    choice = choice[:-1]
+                    skipThreadCheck = True
+                if choice.isdigit():
+                    if int(choice) > MAX_NUMBER_OF_THREADS and not skipThreadCheck:
+                        errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
+                        logger.critical(errMsg)
+                    else:
+                        conf.threads = numThreads = int(choice)
+                        break
 
         if numThreads == 1:
             warnMsg = "running in a single-thread mode. This could take a while"
