@@ -565,7 +565,7 @@ def paramToDict(place, parameters=None):
                 parts[-1] = parts[-1].rstrip()
 
             condition = not conf.testParameter
-            condition |= parameter in conf.testParameter
+            condition |= conf.testParameter is not None and parameter in conf.testParameter
             condition |= place == PLACE.COOKIE and len(intersect((PLACE.COOKIE,), conf.testParameter, True)) > 0
 
             if condition:
