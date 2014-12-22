@@ -105,7 +105,7 @@ class Enumeration(GenericEnumeration):
 
                 if not isNoneValue(value):
                     value = filter(None, arrayizeValue(value))
-                    value = [safeSQLIdentificatorNaming(_, True) for _ in value]
+                    value = [safeSQLIdentificatorNaming(unArrayizeValue(_), True) for _ in value]
                     kb.data.cachedTables[db] = value
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
