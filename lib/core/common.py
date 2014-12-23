@@ -2511,6 +2511,9 @@ def findDynamicContent(firstPage, secondPage):
     are dynamic, proper markings will be made
     """
 
+    if not firstPage or not secondPage:
+        return
+
     infoMsg = "searching for dynamic content"
     logger.info(infoMsg)
 
