@@ -52,8 +52,13 @@ class BigArray(list):
     def pop(self):
         if len(self.chunks[-1]) < 1:
             self.chunks.pop()
-            with open(self.chunks[-1], "rb") as fp:
-                self.chunks[-1] = pickle.load(fp)
+            try:
+                with open(self.chunks[-1], "rb") as fp:
+                    self.chunks[-1] = pickle.load(fp)
+            except IOError, ex:
+                errMsg = "exception occurred while retrieving data "
+                errMsg += "from a temporary file ('%s')" % ex
+                raise SqlmapSystemException, errMsg
         return self.chunks[-1].pop()
 
     def index(self, value):
@@ -80,8 +85,13 @@ class BigArray(list):
             filename = self._dump(self.cache.data)
             self.chunks[self.cache.index] = filename
         if not (self.cache and self.cache.index == index):
-            with open(self.chunks[index], "rb") as fp:
-                self.cache = Cache(index, pickle.load(fp), False)
+            try:
+                with open(self.chunks[index], "rb") as fp:
+                    self.cache = Cache(index, pickle.load(fp), False)
+            except IOError, ex:
+                errMsg = "exception occurred while retrieving data "
+                errMsg += "from a temporary file ('%s')" % ex
+                raise SqlmapSystemException, errMsg
 
     def __getstate__(self):
         return self.chunks, self.filenames
