@@ -323,7 +323,7 @@ def task_new():
     taskid = hexencode(os.urandom(8))
     DataStore.tasks[taskid] = Task(taskid)
 
-    logger.debug(" [%s] Created new task" % taskid)
+    logger.debug("Created new task: '%s'" % taskid)
     return jsonize({"success": True, "taskid": taskid})
 
 
