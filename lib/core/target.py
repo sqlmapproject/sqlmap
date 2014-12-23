@@ -40,6 +40,7 @@ from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapMissingPrivileges
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import _setDBMS
 from lib.core.option import _setKnowledgeBaseAttributes
@@ -498,7 +499,22 @@ def _setResultsFile():
 
     if not conf.resultsFP:
         conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
-        conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
+        try:
+            conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
+        except (OSError, IOError), ex:
+            try:
+                warnMsg = "unable to create results file '%s' ('%s'). " % (conf.resultsFilename, getUnicode(ex))
+                conf.resultsFilename = tempfile.mkstemp(prefix="sqlmapresults-", suffix=".csv")[1]
+                conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
+                warnMsg += "Using temporary file '%s' instead" % conf.resultsFilename
+                logger.warn(warnMsg)
+            except IOError, _:
+                errMsg = "unable to write to the temporary directory ('%s'). " % _
+                errMsg += "Please make sure that your disk is not full and "
+                errMsg += "that you have sufficient write permissions to "
+                errMsg += "create temporary files and/or directories"
+                raise SqlmapSystemException(errMsg)
+
         conf.resultsFP.writelines("Target URL,Place,Parameter,Techniques%s" % os.linesep)
 
         logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
@@ -574,7 +590,8 @@ def _createTargetDirs():
                 errMsg += "Please make sure that your disk is not full and "
                 errMsg += "that you have sufficient write permissions to "
                 errMsg += "create temporary files and/or directories"
-                raise SqlmapGenericException(errMsg)
+                raise SqlmapSystemException(errMsg)
+
             warnMsg = "unable to create regular output directory "
             warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % tempDir
@@ -595,7 +612,8 @@ def _createTargetDirs():
                 errMsg += "Please make sure that your disk is not full and "
                 errMsg += "that you have sufficient write permissions to "
                 errMsg += "create temporary files and/or directories"
-                raise SqlmapGenericException(errMsg)
+                raise SqlmapSystemException(errMsg)
+
             warnMsg = "unable to create output directory "
             warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % tempDir
