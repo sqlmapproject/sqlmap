@@ -638,7 +638,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                         rotator = 0
                     status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
-                    if not user.startswith(DUMMY_USER_PREFIX):
+                    if user and not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
 
                     if not hasattr(conf, "api"):
