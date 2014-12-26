@@ -135,10 +135,16 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         while True:
             try:
                 seqMatcher.set_seq1(seq1)
+            except MemoryError:
+                seq1 = seq1[:len(seq1) / 1024]
+            else:
+                break
+
+        while True:
+            try:
                 seqMatcher.set_seq2(seq2)
             except MemoryError:
-                seq1 = seq1[:len(seq1) / 4]
-                seq2 = seq2[:len(seq2) / 4]
+                seq2 = seq2[:len(seq2) / 1024]
             else:
                 break
 
