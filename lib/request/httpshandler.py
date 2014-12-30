@@ -53,7 +53,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
                     break
                 else:
                     sock.close()
-            except ssl.SSLError, errMsg:
+            except (ssl.SSLError, socket.error), errMsg:
                 logger.debug("SSL connection error occurred ('%s')" % errMsg)
 
         if not success:
