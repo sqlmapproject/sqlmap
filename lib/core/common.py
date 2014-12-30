@@ -2928,6 +2928,7 @@ def createGithubIssue(errMsg, excMsg):
     _ = re.sub(r"'[^']+'", "''", excMsg)
     _ = re.sub(r"\s+line \d+", "", _)
     _ = re.sub(r'File ".+?/(\w+\.py)', "\g<1>", _)
+    _ = re.sub(r".+\Z", "", _)
     key = hashlib.md5(_).hexdigest()[:8]
 
     if key in issues:
