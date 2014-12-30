@@ -1079,7 +1079,12 @@ def _setHTTPProxy():
     debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
     logger.debug(debugMsg)
 
-    _ = urlparse.urlsplit(conf.proxy)
+    try:
+        _ = urlparse.urlsplit(conf.proxy)
+    except Exception, ex:
+        errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, ex)
+        raise SqlmapSyntaxException, errMsg
+
     hostnamePort = _.netloc.split(":")
 
     scheme = _.scheme.upper()
