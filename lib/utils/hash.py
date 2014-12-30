@@ -769,9 +769,9 @@ def dictionaryAttack(attack_dict):
 
                     kb.wordlists = dictPaths
 
-                except SqlmapFilePathException, msg:
+                except Exception, ex:
                     warnMsg = "there was a problem while loading dictionaries"
-                    warnMsg += " ('%s')" % msg
+                    warnMsg += " ('%s')" % ex
                     logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "
