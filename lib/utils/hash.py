@@ -665,7 +665,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
 def dictionaryAttack(attack_dict):
     suffix_list = [""]
-    custom_wordlist = []
+    custom_wordlist = [""]
     hash_regexes = []
     results = []
     resumes = []
