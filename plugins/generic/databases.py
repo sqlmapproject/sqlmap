@@ -772,6 +772,9 @@ class Databases:
         return kb.data.cachedColumns
 
     def _tableGetCount(self, db, table):
+        if not db or not table:
+            return None
+
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             db = db.upper()
             table = table.upper()
