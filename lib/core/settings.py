@@ -517,7 +517,7 @@ MAX_DNS_LABEL = 63
 DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.ascii_letters)
 
 # Alphabet used for heuristic checks
-HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', '[', ']', ',', '.')
+HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', ',', '.')
 
 # String used for dummy XSS check of a tested parameter value
 DUMMY_XSS_CHECK_APPENDIX = "<'\">"
