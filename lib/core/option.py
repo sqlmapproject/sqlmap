@@ -2187,6 +2187,13 @@ def _basicOptionValidation():
         errMsg = "option '--regexp' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.regexp:
+        try:
+            re.compile(conf.regexp)
+        except re.error, ex:
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.regexp, ex)
+            raise SqlmapSyntaxException(errMsg)
+
     if conf.dumpTable and conf.dumpAll:
         errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
         raise SqlmapSyntaxException(errMsg)
