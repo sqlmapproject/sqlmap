@@ -43,7 +43,7 @@ def cmdLineParser():
 
     checkSystemEncoding()
 
-    _ = getUnicode(os.path.normpath(sys.argv[0]), encoding=sys.getfilesystemencoding())
+    _ = getUnicode(os.path.basename(sys.argv[0]), encoding=sys.getfilesystemencoding())
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % _ if " " in _ else _)
