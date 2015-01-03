@@ -28,6 +28,7 @@ from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import intersect
+from lib.core.common import isListLike
 from lib.core.common import parseTargetUrl
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -189,7 +190,9 @@ def _randomFillBlankFields(value):
     return retVal
 
 def _saveToHashDB():
-    injections = hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []
+    injections = hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True)
+    if not isListLike(injections):
+        injections = []
     injections.extend(_ for _ in kb.injections if _ and _.place is not None and _.parameter is not None)
 
     _ = dict()
