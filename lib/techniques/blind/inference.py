@@ -59,6 +59,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     """
 
     abortedFlag = False
+    showEta = False
     partialValue = u""
     finalValue = None
     retrievedLength = 0
