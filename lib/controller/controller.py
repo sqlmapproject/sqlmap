@@ -372,8 +372,7 @@ def start():
             if not checkConnection(suppressOutput=conf.forms) or not checkString() or not checkRegexp():
                 continue
 
-            if conf.checkWaf:
-                checkWaf()
+            checkWaf()
 
             if conf.identifyWaf:
                 identifyWaf()

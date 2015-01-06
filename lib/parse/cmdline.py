@@ -676,10 +676,6 @@ def cmdLineParser():
         miscellaneous.add_option("--beep", dest="beep", action="store_true",
                                   help="Make a beep sound when SQL injection is found")
 
-        miscellaneous.add_option("--check-waf", dest="checkWaf",
-                                  action="store_true",
-                                  help="Heuristically check for WAF/IPS/IDS protection")
-
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true",
                                   help="Clean up the DBMS from sqlmap specific "

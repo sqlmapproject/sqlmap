@@ -209,7 +209,6 @@ optDict = {
                                "alert":             "string",
                                "answers":           "string",
                                "beep":              "boolean",
-                               "checkWaf":          "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",
                                "disableColoring":   "boolean",

@@ -40,6 +40,9 @@ BANNER = """\033[01;33m         _
 DIFF_TOLERANCE = 0.05
 CONSTANT_RATIO = 0.9
 
+# Ratio used in heuristic check for WAF/IDS/IPS protected targets
+IDS_WAF_CHECK_RATIO = 0.5
+
 # Lower and upper values for match ratio in case of stable page
 LOWER_RATIO_BOUND = 0.02
 UPPER_RATIO_BOUND = 0.98

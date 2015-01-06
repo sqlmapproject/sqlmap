@@ -59,6 +59,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_XSS_CHECK_APPENDIX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
@@ -68,6 +69,7 @@ from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
+from lib.core.settings import IDS_WAF_CHECK_RATIO
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression
@@ -1094,56 +1096,32 @@ def checkWaf():
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
     """
 
-    if not conf.checkWaf:
-        return False
-
     infoMsg = "heuristically checking if the target is protected by "
     infoMsg += "some kind of WAF/IPS/IDS"
     logger.info(infoMsg)
 
     retVal = False
-
     backup = dict(conf.parameters)
-
     payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
 
     conf.parameters = dict(backup)
-    conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
+    conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
     conf.parameters[PLACE.GET] += "%s=%s" % (randomStr(), payload)
 
     logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
 
-    kb.matchRatio = None
-    Request.queryPage()
-
-    if kb.errorIsNone and kb.matchRatio is None:
-        kb.matchRatio = LOWER_RATIO_BOUND
-
-    conf.parameters = dict(backup)
-    conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
-    conf.parameters[PLACE.GET] += "%s=%d" % (randomStr(), randomInt())
-
-    trueResult = Request.queryPage()
-
-    if trueResult:
+    try:
+        retVal = Request.queryPage(getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
+    except SqlmapConnectionException:
+        retVal = True
+    finally:
+        kb.matchRatio = None
         conf.parameters = dict(backup)
-        conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + "&"
-        conf.parameters[PLACE.GET] += "%s=%d %s" % (randomStr(), randomInt(), IDS_WAF_CHECK_PAYLOAD)
-
-        try:
-            falseResult = Request.queryPage()
-        except SqlmapConnectionException:
-            falseResult = None
-
-        if not falseResult:
-            retVal = True
-
-    conf.parameters = dict(backup)
 
     if retVal:
         warnMsg = "it appears that the target is protected. Please "
         warnMsg += "consider usage of tamper scripts (option '--tamper')"
-        logger.warn(warnMsg)
+        logger.critical(warnMsg)
     else:
         infoMsg = "it appears that the target is not protected"
         logger.info(infoMsg)
