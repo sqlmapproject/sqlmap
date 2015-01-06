@@ -31,7 +31,6 @@ from lib.core.settings import BLOCKED_IP_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
-from lib.core.settings import ML
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
 from lib.core.settings import VIEWSTATE_REGEX
@@ -196,7 +195,7 @@ def checkCharEncoding(encoding, warn=True):
     except LookupError:
         if warn:
             warnMsg = "unknown web page charset '%s'. " % encoding
-            warnMsg += "Please report by e-mail to %s." % ML
+            warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
             singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
 

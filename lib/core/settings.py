@@ -27,7 +27,6 @@ SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
 GIT_REPOSITORY = "git://github.com/sqlmapproject/sqlmap.git"
 GIT_PAGE = "https://github.com/sqlmapproject/sqlmap"
-ML = "sqlmap-users@lists.sourceforge.net"
 
 # colorful banner
 BANNER = """\033[01;33m         _

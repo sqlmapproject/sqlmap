@@ -117,7 +117,6 @@ from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MIN_VALID_DELAYED_RESPONSE
-from lib.core.settings import ML
 from lib.core.settings import NETSCAPE_FORMAT_HEADER_COOKIES
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_AMP_MARKER
@@ -2898,7 +2897,7 @@ def unhandledExceptionMessage():
     errMsg = "unhandled exception occurred in %s. It is recommended to retry your " % VERSION_STRING
     errMsg += "run with the latest development version from official GitHub "
     errMsg += "repository at '%s'. If the exception persists, please open a new issue " % GIT_PAGE
-    errMsg += "at '%s' (or less preferably send by e-mail to '%s') " % (ISSUES_PAGE, ML)
+    errMsg += "at '%s' " % ISSUES_PAGE
     errMsg += "with the following text and any other information required to "
     errMsg += "reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "

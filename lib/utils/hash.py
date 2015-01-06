@@ -68,7 +68,6 @@ from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
 from lib.core.settings import ITOA64
-from lib.core.settings import ML
 from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
@@ -578,7 +577,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
-                warnMsg += "Please report by e-mail to %s" % ML
+                warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -652,7 +651,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
-                warnMsg += "Please report by e-mail to %s" % ML
+                warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
