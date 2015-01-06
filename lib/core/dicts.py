@@ -215,6 +215,7 @@ DEPRECATED_OPTIONS = {
                         "--no-unescape": "use '--no-escape' instead",
                         "--binary": "use '--binary-fields' instead",
                         "--check-payload": None,
+                        "--check-waf": None,
                      }
 
 DUMP_DATA_PREPROCESS = {
