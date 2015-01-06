@@ -1,7 +1,7 @@
 COPYING -- Describes the terms under which sqlmap is distributed. A copy
 of the GNU General Public License (GPL) is appended to this file.
 
-sqlmap is (C) 2006-2014 Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar.
+sqlmap is (C) 2006-2015 Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar.
 
 This program is free software; you may redistribute and/or modify it under
 the terms of the GNU General Public License as published by the Free
