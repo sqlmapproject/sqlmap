@@ -23,10 +23,10 @@ def _size_of(object):
     Returns total size of a given object (in bytes)
     """
 
+    retval = sys.getsizeof(object)
     if hasattr(object, "__iter__"):
-        return sum(_size_of(_) for _ in object)
-    else:
-        return sys.getsizeof(object)
+        retval += sum(_size_of(_) for _ in object)
+    return retval
 
 class Cache(object):
     """
