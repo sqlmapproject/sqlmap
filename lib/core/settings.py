@@ -443,8 +443,8 @@ WAF_ATTACK_VECTORS = (
 # Used for status representation in dictionary attack phase
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 
-# Chunk length (in items) used by BigArray objects (only last chunk and cached one are held in memory)
-BIGARRAY_CHUNK_LENGTH = 1024
+# Approximate chunk length (in bytes) used by BigArray objects (only last chunk and cached one are held in memory)
+BIGARRAY_CHUNK_SIZE = 1024 * 1024
 
 # Prefix used for storing dumped chunks in BigArray objects
 BIGARRAY_TEMP_PREFIX = "sqlmapba-%d-" % os.getpid()

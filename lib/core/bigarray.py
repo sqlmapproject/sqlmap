@@ -11,11 +11,22 @@ except:
    import pickle
 
 import os
+import sys
 import tempfile
 
 from lib.core.exception import SqlmapSystemException
-from lib.core.settings import BIGARRAY_CHUNK_LENGTH
+from lib.core.settings import BIGARRAY_CHUNK_SIZE
 from lib.core.settings import BIGARRAY_TEMP_PREFIX
+
+def _size_of(object):
+    """
+    Returns total size of a given object (in bytes)
+    """
+
+    if hasattr(object, "__iter__"):
+        return sum(_size_of(_) for _ in object)
+    else:
+        return sys.getsizeof(object)
 
 class Cache(object):
     """
@@ -34,13 +45,20 @@ class BigArray(list):
 
     def __init__(self):
         self.chunks = [[]]
+        self.chunk_length = sys.maxint
         self.cache = None
         self.filenames = set()
         self._os_remove = os.remove
+        self._size_counter = 0
 
     def append(self, value):
         self.chunks[-1].append(value)
-        if len(self.chunks[-1]) >= BIGARRAY_CHUNK_LENGTH:
+        if self.chunk_length == sys.maxint:
+            self._size_counter += _size_of(value)
+            if self._size_counter >= BIGARRAY_CHUNK_SIZE:
+                self.chunk_length = len(self.chunks[-1])
+                self._size_counter = None
+        if len(self.chunks[-1]) >= self.chunk_length:
             filename = self._dump(self.chunks[-1])
             self.chunks[-1] = filename
             self.chunks.append([])
@@ -54,7 +72,7 @@ class BigArray(list):
             self.chunks.pop()
             try:
                 with open(self.chunks[-1], "rb") as fp:
-                    self.chunks[-1] = self._load(fp)
+                    self.chunks[-1] = pickle.load(fp)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
@@ -67,35 +85,13 @@ class BigArray(list):
                 return index
         return ValueError, "%s is not in list" % value
 
-    def _load(self, fp):
-        retval = []
-        unpickler = pickle.Unpickler(fp)
-        _ = unpickler.load()
-        if not isinstance(_, list):
-            retval.append(_)
-            while True:
-                try:
-                    retval.append(unpickler.load())
-                except EOFError:
-                    break
-        else:
-            retval = _
-        return retval
-
     def _dump(self, chunk):
         try:
             handle, filename = tempfile.mkstemp(prefix=BIGARRAY_TEMP_PREFIX)
             self.filenames.add(filename)
             os.close(handle)
-            try:
-                with open(filename, "w+b") as fp:
-                    pickle.dump(chunk, fp, pickle.HIGHEST_PROTOCOL)
-            except MemoryError:
-                with open(filename, "w+b") as fp:
-                    pickler = pickle.Pickler(fp, pickle.HIGHEST_PROTOCOL)
-                    pickler.fast = True
-                    for value in chunk:
-                        pickler.dump(value)
+            with open(filename, "w+b") as fp:
+                pickle.dump(chunk, fp, pickle.HIGHEST_PROTOCOL)
             return filename
         except IOError, ex:
             errMsg = "exception occurred while storing data "
@@ -109,7 +105,7 @@ class BigArray(list):
         if not (self.cache and self.cache.index == index):
             try:
                 with open(self.chunks[index], "rb") as fp:
-                    self.cache = Cache(index, self._load(fp), False)
+                    self.cache = Cache(index, pickle.load(fp), False)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
@@ -133,8 +129,8 @@ class BigArray(list):
     def __getitem__(self, y):
         if y < 0:
             y += len(self)
-        index = y / BIGARRAY_CHUNK_LENGTH
-        offset = y % BIGARRAY_CHUNK_LENGTH
+        index = y / self.chunk_length
+        offset = y % self.chunk_length
         chunk = self.chunks[index]
         if isinstance(chunk, list):
             return chunk[offset]
@@ -143,8 +139,8 @@ class BigArray(list):
             return self.cache.data[offset]
 
     def __setitem__(self, y, value):
-        index = y / BIGARRAY_CHUNK_LENGTH
-        offset = y % BIGARRAY_CHUNK_LENGTH
+        index = y / self.chunk_length
+        offset = y % self.chunk_length
         chunk = self.chunks[index]
         if isinstance(chunk, list):
             chunk[offset] = value
@@ -161,4 +157,4 @@ class BigArray(list):
             yield self[i]
 
     def __len__(self):
-        return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * BIGARRAY_CHUNK_LENGTH + len(self.chunks[-1])
+        return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * self.chunk_length + len(self.chunks[-1])
