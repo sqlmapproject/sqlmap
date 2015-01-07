@@ -181,7 +181,7 @@ def _setRequestParams():
                     kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
             elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
-                message = "Multipart like data found in %s data. " % conf.method
+                message = "Multipart-like data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
                 test = readInput(message, default="Y")
                 if test and test[0] in ("q", "Q"):
