@@ -19,16 +19,18 @@ from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_SIZE
 from lib.core.settings import BIGARRAY_TEMP_PREFIX
 
-def _size_of(object):
+DEFAULT_SIZE_OF = sys.getsizeof(object())
+
+def _size_of(object_):
     """
-    Returns total size of a given object (in bytes)
+    Returns total size of a given object_ (in bytes)
     """
 
-    retval = sys.getsizeof(object)
-    if isinstance(object, dict):
-        retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(object.items()))
-    elif hasattr(object, "__iter__"):
-        retval += sum(_size_of(_) for _ in object)
+    retval = sys.getsizeof(object_, DEFAULT_SIZE_OF)
+    if isinstance(object_, dict):
+        retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(object_.items()))
+    elif hasattr(object_, "__iter__"):
+        retval += sum(_size_of(_) for _ in object_)
     return retval
 
 class Cache(object):
