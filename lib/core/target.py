@@ -97,6 +97,7 @@ def _setRequestParams():
 
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST if not conf.method or conf.method == HTTPMETHOD.GET else conf.method
+        hintNames = []
 
         def process(match, repl):
             retVal = match.group(0)
@@ -109,7 +110,8 @@ def _setRequestParams():
                         retVal = retVal.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
                     else:
                         break
-
+                if CUSTOM_INJECTION_MARK_CHAR in retVal:
+                    hintNames.append((retVal.split(CUSTOM_INJECTION_MARK_CHAR)[0], match.group("name")))
             return retVal
 
         if kb.processUserMarks is None and CUSTOM_INJECTION_MARK_CHAR in conf.data:
@@ -280,7 +282,15 @@ def _setRequestParams():
                     parts = value.split(CUSTOM_INJECTION_MARK_CHAR)
 
                     for i in xrange(len(parts) - 1):
-                        conf.paramDict[place]["%s#%d%s" % (("%s " % kb.postHint) if kb.postHint else "", i + 1, CUSTOM_INJECTION_MARK_CHAR)] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
+                        name = None
+                        if kb.postHint:
+                            for ending, _ in hintNames:
+                                if parts[i].endswith(ending):
+                                    name = "%s %s" % (kb.postHint, _)
+                                    break
+                        if name is None:
+                            name = "%s#%s%s" % (("%s " % kb.postHint) if kb.postHint else "", i + 1, CUSTOM_INJECTION_MARK_CHAR)
+                        conf.paramDict[place][name] = "".join("%s%s" % (parts[j], CUSTOM_INJECTION_MARK_CHAR if i == j else "") for j in xrange(len(parts)))
 
                     if place == PLACE.URI and PLACE.GET in conf.paramDict:
                         del conf.paramDict[PLACE.GET]
