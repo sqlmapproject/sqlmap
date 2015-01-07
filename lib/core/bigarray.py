@@ -10,6 +10,7 @@ try:
 except:
    import pickle
 
+import itertools
 import os
 import sys
 import tempfile
@@ -24,7 +25,9 @@ def _size_of(object):
     """
 
     retval = sys.getsizeof(object)
-    if hasattr(object, "__iter__"):
+    if isinstance(object, dict):
+        retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(object.items()))
+    elif hasattr(object, "__iter__"):
         retval += sum(_size_of(_) for _ in object)
     return retval
 
