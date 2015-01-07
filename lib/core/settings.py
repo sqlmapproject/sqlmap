@@ -444,7 +444,7 @@ WAF_ATTACK_VECTORS = (
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 
 # Chunk length (in items) used by BigArray objects (only last chunk and cached one are held in memory)
-BIGARRAY_CHUNK_LENGTH = 4096
+BIGARRAY_CHUNK_LENGTH = 1024
 
 # Prefix used for storing dumped chunks in BigArray objects
 BIGARRAY_TEMP_PREFIX = "sqlmapba-%d-" % os.getpid()

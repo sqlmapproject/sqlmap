@@ -54,7 +54,7 @@ class BigArray(list):
             self.chunks.pop()
             try:
                 with open(self.chunks[-1], "rb") as fp:
-                    self.chunks[-1] = pickle.load(fp)
+                    self.chunks[-1] = self._load(fp)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
@@ -67,13 +67,35 @@ class BigArray(list):
                 return index
         return ValueError, "%s is not in list" % value
 
-    def _dump(self, value):
+    def _load(self, fp):
+        retval = []
+        unpickler = pickle.Unpickler(fp)
+        _ = unpickler.load()
+        if not isinstance(_, list):
+            retval.append(_)
+            while True:
+                try:
+                    retval.append(unpickler.load())
+                except EOFError:
+                    break
+        else:
+            retval = _
+        return retval
+
+    def _dump(self, chunk):
         try:
             handle, filename = tempfile.mkstemp(prefix=BIGARRAY_TEMP_PREFIX)
             self.filenames.add(filename)
             os.close(handle)
-            with open(filename, "w+b") as fp:
-                pickle.dump(value, fp, pickle.HIGHEST_PROTOCOL)
+            try:
+                with open(filename, "w+b") as fp:
+                    pickle.dump(chunk, fp, pickle.HIGHEST_PROTOCOL)
+            except MemoryError:
+                with open(filename, "w+b") as fp:
+                    pickler = pickle.Pickler(fp, pickle.HIGHEST_PROTOCOL)
+                    pickler.fast = True
+                    for value in chunk:
+                        pickler.dump(value)
             return filename
         except IOError, ex:
             errMsg = "exception occurred while storing data "
@@ -87,7 +109,7 @@ class BigArray(list):
         if not (self.cache and self.cache.index == index):
             try:
                 with open(self.chunks[index], "rb") as fp:
-                    self.cache = Cache(index, pickle.load(fp), False)
+                    self.cache = Cache(index, self._load(fp), False)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
