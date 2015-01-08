@@ -957,7 +957,7 @@ def dictionaryAttack(attack_dict):
 
     if len(hash_regexes) == 0:
         warnMsg = "unknown hash format. "
-        warnMsg += "Please report by e-mail to %s" % ML
+        warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
         logger.warn(warnMsg)
 
     if len(results) == 0:
