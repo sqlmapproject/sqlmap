@@ -3278,7 +3278,10 @@ def expandMnemonics(mnemonics, parser, args):
                     if opt.startswith(name):
                         options[opt] = option
 
-            if name in options:
+            if not options:
+                warnMsg = "mnemonic '%s' can't be resolved" % name
+                logger.warn(warnMsg)
+            elif name in options:
                 found = name
                 debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
                 logger.debug(debugMsg)
@@ -3288,7 +3291,8 @@ def expandMnemonics(mnemonics, parser, args):
                 warnMsg += "Resolved to shortest of those ('%s')" % found
                 logger.warn(warnMsg)
 
-            found = options[found]
+            if found:
+                found = options[found]
         else:
             found = pointer.current[0]
             debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
