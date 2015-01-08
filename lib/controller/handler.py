@@ -72,7 +72,7 @@ def setHandler():
         items.insert(0, _)
 
     for dbms, aliases, Handler, Connector in items:
-        if conf.dbms and conf.dbms.lower() != dbms.lower():
+        if conf.dbms and conf.dbms.lower() != dbms and conf.dbms.lower() not in aliases:
             debugMsg = "skipping test for %s" % dbms
             logger.debug(debugMsg)
             continue
