@@ -611,6 +611,9 @@ MIN_ENCODED_LEN_CHECK = 5
 # Timeout in seconds in which Metasploit remote session has to be initialized
 METASPLOIT_SESSION_TIMEOUT = 300
 
+# Suffix used to mark variables having keyword names
+EVALCODE_KEYWORD_SUFFIX = "_KEYWORD"
+
 # Reference: http://www.cookiecentral.com/faq/#3.5
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
 

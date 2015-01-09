@@ -5,8 +5,10 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import compiler
 import httplib
 import json
+import keyword
 import logging
 import re
 import socket
@@ -72,6 +74,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
+from lib.core.settings import EVALCODE_KEYWORD_SUFFIX
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
@@ -831,23 +834,54 @@ class Connect(object):
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
             variables = {"uri": uri}
             originals = {}
+            keywords = keyword.kwlist
 
             for item in filter(None, (get, post if not kb.postHint else None)):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
+                        name = name.strip()
+                        if name in keywords:
+                            name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
-                        evaluateCode("%s=%s" % (name.strip(), repr(value)), variables)
+                        evaluateCode("%s=%s" % (name, repr(value)), variables)
 
             if cookie:
                 for part in cookie.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER):
                     if '=' in part:
                         name, value = part.split('=', 1)
+                        name = name.strip()
+                        if name in keywords:
+                            name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True)
-                        evaluateCode("%s=%s" % (name.strip(), repr(value)), variables)
+                        evaluateCode("%s=%s" % (name, repr(value)), variables)
+
+            while True:
+                try:
+                    compiler.parse(conf.evalCode.replace(';', '\n'))
+                except SyntaxError, ex:
+                    original = replacement = ex.text.strip()
+                    for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
+                        if _ in keywords:
+                            replacement = replacement.replace(_, "%s%s" % (_, EVALCODE_KEYWORD_SUFFIX))
+                            break
+                    if original == replacement:
+                        conf.evalCode = conf.evalCode.replace(EVALCODE_KEYWORD_SUFFIX, "")
+                        break
+                    else:
+                        conf.evalCode = conf.evalCode.replace(ex.text.strip(), replacement)
+                else:
+                    break
 
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
+
+            for variable in variables.keys():
+                if variable.endswith(EVALCODE_KEYWORD_SUFFIX):
+                    value = variables[variable]
+                    del variables[variable]
+                    variables[variable.replace(EVALCODE_KEYWORD_SUFFIX, "")] = value
+
             uri = variables["uri"]
 
             for name, value in variables.items():
