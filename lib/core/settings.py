@@ -446,9 +446,6 @@ ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 # Approximate chunk length (in bytes) used by BigArray objects (only last chunk and cached one are held in memory)
 BIGARRAY_CHUNK_SIZE = 1024 * 1024
 
-# Prefix used for storing dumped chunks in BigArray objects
-BIGARRAY_TEMP_PREFIX = "sqlmapba-%d-" % os.getpid()
-
 # Only console display last n table rows
 TRIM_STDOUT_DUMP_SIZE = 256
 

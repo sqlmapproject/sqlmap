@@ -15,6 +15,7 @@ import re
 import socket
 import string
 import sys
+import tempfile
 import threading
 import time
 import urllib2
@@ -1437,6 +1438,17 @@ def _checkDependencies():
     if conf.dependencies:
         checkDependencies()
 
+def _createTemporaryDirectory():
+    """
+    Creates temporary directory for this run.
+    """
+
+    if not os.path.isdir(tempfile.gettempdir()):
+        os.makedirs(tempfile.gettempdir())
+    tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
+    if not os.path.isdir(tempfile.tempdir):
+        os.makedirs(tempfile.tempdir)
+
 def _cleanupOptions():
     """
     Cleanup configuration attributes.
@@ -2332,6 +2344,7 @@ def init():
     _cleanupOptions()
     _purgeOutput()
     _checkDependencies()
+    _createTemporaryDirectory()
     _basicOptionValidation()
     _setProxyList()
     _setTorProxySettings()
