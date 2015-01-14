@@ -153,7 +153,8 @@ def main():
         if conf.get("showTime"):
             dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
-        shutil.rmtree(tempfile.tempdir, ignore_errors=True)
+        if kb.get("tempDir"):
+            shutil.rmtree(kb.tempDir, ignore_errors=True)
 
         kb.threadContinue = False
         kb.threadException = True

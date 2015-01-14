@@ -1445,7 +1445,7 @@ def _createTemporaryDirectory():
 
     if not os.path.isdir(tempfile.gettempdir()):
         os.makedirs(tempfile.gettempdir())
-    tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
+    kb.tempDir = tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
     if not os.path.isdir(tempfile.tempdir):
         os.makedirs(tempfile.tempdir)
 
@@ -1772,6 +1772,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.storeHashesChoice = None
     kb.suppressResumeInfo = False
     kb.technique = None
+    kb.tempDir = None
     kb.testMode = False
     kb.testQueryCount = 0
     kb.testType = None
