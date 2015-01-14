@@ -1450,9 +1450,10 @@ def _createTemporaryDirectory():
         errMsg = "there has been a problem while accessing "
         errMsg += "system's temporary directory location(s) ('%s'). Please " % ex
         errMsg += "make sure that there is enough disk space left. If problem persists, "
-        errMsg += "try to set environment variable 'TMP' to a location "
+        errMsg += "try to set environment variable 'TEMP' to a location "
         errMsg += "writeable by the current user"
         raise SqlmapSystemException, errMsg
+
     kb.tempDir = tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
     if not os.path.isdir(tempfile.tempdir):
         os.makedirs(tempfile.tempdir)
