@@ -75,7 +75,7 @@ class AttribDict(dict):
         for attr in dir(self):
             if not attr.startswith('_'):
                 value = getattr(self, attr)
-                if not isinstance(value, (types.BuiltinFunctionType, types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
+                if not isinstance(value, (types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
                     setattr(retVal, attr, copy.deepcopy(value, memo))
 
         for key, value in self.items():
