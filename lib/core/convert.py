@@ -5,6 +5,7 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import base64
 import json
 import pickle
 import sys
@@ -20,7 +21,7 @@ def base64decode(value):
     'foobar'
     """
 
-    return value.decode("base64")
+    return base64.b64decode("base64")
 
 def base64encode(value):
     """
@@ -30,7 +31,7 @@ def base64encode(value):
     'Zm9vYmFy'
     """
 
-    return value.encode("base64")[:-1].replace("\n", "")
+    return base64.b64encode(value)
 
 def base64pickle(value):
     """
