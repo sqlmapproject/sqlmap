@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import cgi
 import codecs
+import hashlib
 import os
 import re
 import tempfile
@@ -21,7 +22,9 @@ from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
 from lib.core.common import randomInt
+from lib.core.common import randomStr
 from lib.core.common import safeCSValue
+from lib.core.common import unicodeencode
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -380,6 +383,7 @@ class Dump(object):
         rtable = None
         dumpFP = None
         appendToFile = False
+        warnFile = False
 
         if tableValues is None:
             return
@@ -393,7 +397,13 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
-        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(db))))
+        _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
+        if len(_) < len(db):
+            _ = unicodeencode(re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
+            dumpDbPath = os.path.join(conf.dumpPath, "%s-%s" % (_, hashlib.md5(unicodeencode(db)).hexdigest()[:8]))
+            warnFile = True
+        else:
+            dumpDbPath = os.path.join(conf.dumpPath, _)
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
@@ -418,7 +428,14 @@ class Dump(object):
 
                     dumpDbPath = tempDir
 
-            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (normalizeUnicode(unsafeSQLIdentificatorNaming(table)), conf.dumpFormat.lower()))
+            _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(table)))
+            if len(_) < len(table):
+                _ = unicodeencode(re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(table)))
+                dumpFileName = os.path.join(dumpDbPath, "%s-%s.%s" % (_, hashlib.md5(unicodeencode(table)).hexdigest()[:8], conf.dumpFormat.lower()))
+                warnFile = True
+            else:
+                dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (_, conf.dumpFormat.lower()))
+
             appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
 
@@ -604,7 +621,12 @@ class Dump(object):
             else:
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
-            logger.info("table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName))
+
+            msg = "table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName)
+            if not warnFile:
+                logger.info(msg)
+            else:
+                logger.warn(msg)
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         if hasattr(conf, "api"):
