@@ -817,6 +817,7 @@ def cmdLineParser():
 
                 try:
                     command = raw_input("sqlmap-shell> ").strip()
+                    command = getUnicode(command, encoding=sys.stdin.encoding)
                 except (KeyboardInterrupt, EOFError):
                     print
                     raise SqlmapShellQuitException
