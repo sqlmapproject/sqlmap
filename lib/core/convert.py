@@ -21,7 +21,7 @@ def base64decode(value):
     'foobar'
     """
 
-    return base64.b64decode("base64")
+    return base64.b64decode(value)
 
 def base64encode(value):
     """
