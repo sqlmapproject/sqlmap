@@ -818,21 +818,23 @@ class Connect(object):
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):
                 retVal = paramString
-                match = re.search("%s=(?P<value>[^&;]+)" % re.escape(randomParameter), paramString)
+                match = re.search(r"(\A|\b)%s=(?P<value>[^&;]+)" % re.escape(randomParameter), paramString)
                 if match:
                     origValue = match.group("value")
-                    retVal = re.sub("%s=[^&;]+" % re.escape(randomParameter), "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
+                    retVal = re.sub(r"(\A|\b)%s=[^&;]+" % re.escape(randomParameter), "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
                 return retVal
 
             for randomParameter in conf.rParam:
-                for item in (PLACE.GET, PLACE.POST, PLACE.COOKIE):
+                for item in (PLACE.GET, PLACE.POST, PLACE.COOKIE, PLACE.URI, PLACE.CUSTOM_POST):
                     if item in conf.parameters:
                         if item == PLACE.GET and get:
                             get = _randomizeParameter(get, randomParameter)
-                        elif item == PLACE.POST and post:
+                        elif item in (PLACE.POST, PLACE.CUSTOM_POST) and post:
                             post = _randomizeParameter(post, randomParameter)
                         elif item == PLACE.COOKIE and cookie:
                             cookie = _randomizeParameter(cookie, randomParameter)
+                        elif item == PLACE.URI and uri:
+                            uri = _randomizeParameter(uri, randomParameter)
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER

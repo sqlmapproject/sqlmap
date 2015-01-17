@@ -3360,6 +3360,8 @@ def randomizeParameterValue(value):
 
     retVal = value
 
+    value = re.sub(r"%[0-9a-fA-F]{2}", "", value)
+
     for match in re.finditer('[A-Z]+', value):
         retVal = retVal.replace(match.group(), randomStr(len(match.group())).upper())
 
