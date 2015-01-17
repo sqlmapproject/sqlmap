@@ -304,8 +304,12 @@ class Connect(object):
                         get = urlencode(get, limit=True)
 
                 if get:
-                    url = "%s?%s" % (url, get)
-                    requestMsg += "?%s" % get
+                    if '?' in url:
+                        url = "%s%s%s" % (url, DEFAULT_GET_POST_DELIMITER, get)
+                        requestMsg += "%s%s" % (DEFAULT_GET_POST_DELIMITER, get)
+                    else:
+                        url = "%s?%s" % (url, get)
+                        requestMsg += "?%s" % get
 
                 if PLACE.POST in conf.parameters and not post and method != HTTPMETHOD.GET:
                     post = conf.parameters[PLACE.POST]
