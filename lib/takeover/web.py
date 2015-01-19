@@ -213,6 +213,9 @@ class Web:
             if success:
                 break
 
+            if not directory:
+                continue
+
             uploaded = False
             directory = ntToPosixSlashes(normalizePath(directory))
 
