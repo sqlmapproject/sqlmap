@@ -595,7 +595,7 @@ def _createTargetDirs():
         except (OSError, IOError), ex:
             try:
                 tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-            except IOError, _:
+            except Exception, _:
                 errMsg = "unable to write to the temporary directory ('%s'). " % _
                 errMsg += "Please make sure that your disk is not full and "
                 errMsg += "that you have sufficient write permissions to "
@@ -617,7 +617,7 @@ def _createTargetDirs():
         except (OSError, IOError), ex:
             try:
                 tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-            except IOError, _:
+            except Exception, _:
                 errMsg = "unable to write to the temporary directory ('%s'). " % _
                 errMsg += "Please make sure that your disk is not full and "
                 errMsg += "that you have sufficient write permissions to "
