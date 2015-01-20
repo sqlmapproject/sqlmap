@@ -1119,9 +1119,17 @@ def checkWaf():
         conf.parameters = dict(backup)
 
     if retVal:
-        warnMsg = "it appears that the target is protected. Please "
-        warnMsg += "consider usage of tamper scripts (option '--tamper')"
+        warnMsg = "it appears that the target "
+        warnMsg += "is protected"
         logger.critical(warnMsg)
+
+        if not conf.identifyWaf:
+            message = "do you want sqlmap to try to detect backend "
+            message += "WAF/IPS/IDS? [y/N] "
+            output = readInput(message, default="N")
+
+            if output and output[0] in ("Y", "y"):
+                conf.identifyWaf = True
     else:
         infoMsg = "it appears that the target is not protected"
         logger.info(infoMsg)
@@ -1184,8 +1192,8 @@ def identifyWaf():
         if output and output[0] not in ("Y", "y"):
             raise SqlmapUserQuitException
     else:
-        infoMsg = "no WAF/IDS/IPS product has been identified"
-        logger.info(infoMsg)
+        warnMsg = "no WAF/IDS/IPS product has been identified"
+        logger.warn(warnMsg)
 
     kb.testType = None
     kb.testMode = False
