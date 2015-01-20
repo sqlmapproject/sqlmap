@@ -28,6 +28,7 @@ from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
+from lib.parse.sitemap import parseSitemap
 from lib.request.connect import Connect as Request
 from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
 from thirdparty.oset.pyoset import oset
@@ -115,6 +116,26 @@ def crawl(target):
 
         threadData.shared.deeper = set()
         threadData.shared.unprocessed = set([target])
+
+        if not conf.sitemapUrl:
+            message = "do you want to check for the existence of "
+            message += "site's sitemap(.xml) [Y/n] "
+            test = readInput(message, default="Y")
+            if test[0] not in ("n", "N"):
+                items = None
+                url = "%s://%s/sitemap.xml" % (conf.scheme, conf.hostname)
+                try:
+                    items = parseSitemap(url)
+                except:
+                    pass
+                finally:
+                    if items:
+                        for item in items:
+                            if re.search(r"(.*?)\?(.+)", item):
+                                threadData.shared.value.add(item)
+                        if conf.crawlDepth > 1:
+                            threadData.shared.unprocessed.update(items)
+                    logger.info("%s links found" % ("no" if not items else len(items)))
 
         infoMsg = "starting crawler"
         if conf.bulkFile:
