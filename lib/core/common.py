@@ -14,6 +14,7 @@ import hashlib
 import httplib
 import inspect
 import json
+import locale
 import logging
 import ntpath
 import os
@@ -1556,6 +1557,22 @@ def normalizePath(filepath):
         retVal = retVal.strip("\r\n")
         retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else posixpath.normpath(retVal)
 
+    return retVal
+
+def safeExpandUser(filepath):
+    """
+    Patch for a Python Issue18171 (http://bugs.python.org/issue18171)
+    """
+
+    retVal = filepath
+
+    try:
+        retVal = os.path.expanduser(filepath)
+    except UnicodeDecodeError:
+        _ = locale.getdefaultlocale()
+        retVal = getUnicode(os.path.expanduser(filepath.encode(_[1] if _ and len(_) > 1 else UNICODE_ENCODING)))
+
+    print retVal
     return retVal
 
 def safeStringFormat(format_, params):

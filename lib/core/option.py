@@ -52,6 +52,7 @@ from lib.core.common import readCachedFileContent
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
+from lib.core.common import safeExpandUser
 from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
 from lib.core.common import setPaths
@@ -496,7 +497,7 @@ def _setRequestFromFile():
 
     addedTargetUrls = set()
 
-    conf.requestFile = os.path.expanduser(conf.requestFile)
+    conf.requestFile = safeExpandUser(conf.requestFile)
 
     infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
     logger.info(infoMsg)
@@ -619,7 +620,7 @@ def _setBulkMultipleTargets():
     if not conf.bulkFile:
         return
 
-    conf.bulkFile = os.path.expanduser(conf.bulkFile)
+    conf.bulkFile = safeExpandUser(conf.bulkFile)
 
     infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
     logger.info(infoMsg)
@@ -1268,7 +1269,7 @@ def _setHTTPAuthentication():
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
 
-        _ = os.path.expanduser(conf.authPrivate)
+        _ = safeExpandUser(conf.authPrivate)
         checkFile(_)
         authHandler = HTTPSPKIAuthHandler(_)
 
@@ -1475,7 +1476,7 @@ def _cleanupOptions():
 
     for key, value in conf.items():
         if value and any(key.endswith(_) for _ in ("Path", "File")):
-            conf[key] = os.path.expanduser(value)
+            conf[key] = safeExpandUser(value)
 
     if conf.testParameter:
         conf.testParameter = urldecode(conf.testParameter)
