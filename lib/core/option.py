@@ -1268,9 +1268,9 @@ def _setHTTPAuthentication():
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
 
-        key_file = os.path.expanduser(conf.authPrivate)
-        checkFile(key_file)
-        authHandler = HTTPSPKIAuthHandler(key_file)
+        _ = os.path.expanduser(conf.authPrivate)
+        checkFile(_)
+        authHandler = HTTPSPKIAuthHandler(_)
 
 def _setHTTPExtraHeaders():
     if conf.headers:
