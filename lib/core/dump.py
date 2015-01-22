@@ -39,10 +39,12 @@ from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapSystemException
 from lib.core.replication import Replication
 from lib.core.settings import HTML_DUMP_CSS_STYLE
+from lib.core.settings import IS_WIN
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import MIN_BINARY_DISK_DUMP_SIZE
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import WINDOWS_RESERVED_NAMES
 from thirdparty.magic import magic
 
 from extra.safe2bin.safe2bin import safechardecode
@@ -398,7 +400,7 @@ class Dump(object):
             return
 
         _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
-        if len(_) < len(db):
+        if len(_) < len(db) or IS_WIN and db.upper() in WINDOWS_RESERVED_NAMES:
             _ = unicodeencode(re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
             dumpDbPath = os.path.join(conf.dumpPath, "%s-%s" % (_, hashlib.md5(unicodeencode(db)).hexdigest()[:8]))
             warnFile = True
@@ -429,7 +431,7 @@ class Dump(object):
                     dumpDbPath = tempDir
 
             _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(table)))
-            if len(_) < len(table):
+            if len(_) < len(table) or IS_WIN and table.upper() in WINDOWS_RESERVED_NAMES:
                 _ = unicodeencode(re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(table)))
                 dumpFileName = os.path.join(dumpDbPath, "%s-%s.%s" % (_, hashlib.md5(unicodeencode(table)).hexdigest()[:8], conf.dumpFormat.lower()))
                 warnFile = True
