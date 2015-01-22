@@ -1096,9 +1096,9 @@ def checkWaf():
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
     """
 
-    infoMsg = "heuristically checking if the target is protected by "
-    infoMsg += "some kind of WAF/IPS/IDS"
-    logger.info(infoMsg)
+    dbmMsg = "heuristically checking if the target is protected by "
+    dbmMsg += "some kind of WAF/IPS/IDS"
+    logger.debug(dbmMsg)
 
     retVal = False
     backup = dict(conf.parameters)
@@ -1119,8 +1119,8 @@ def checkWaf():
         conf.parameters = dict(backup)
 
     if retVal:
-        warnMsg = "it appears that the target "
-        warnMsg += "is protected"
+        warnMsg = "heuristics detected that the target "
+        warnMsg += "is protected by some kind of WAF/IPS/IDS"
         logger.critical(warnMsg)
 
         if not conf.identifyWaf:
@@ -1130,9 +1130,6 @@ def checkWaf():
 
             if output and output[0] in ("Y", "y"):
                 conf.identifyWaf = True
-    else:
-        infoMsg = "it appears that the target is not protected"
-        logger.info(infoMsg)
 
     return retVal
 
