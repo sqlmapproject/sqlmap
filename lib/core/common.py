@@ -582,10 +582,15 @@ def paramToDict(place, parameters=None):
                         warnMsg += "so sqlmap could be able to run properly"
                         logger.warn(warnMsg)
 
-                        message = "are you sure you want to continue? [y/N] "
+                        message = "are you really sure that you want to continue (sqlmap could have problems)? [y/N] "
                         test = readInput(message, default="N")
                         if test[0] not in ("y", "Y"):
                             raise SqlmapSilentQuitException
+                        else:
+                            original = [_ for _ in string.ascii_letters + string.digits]
+                            shuffled = list(original)
+                            random.shuffle(shuffled)
+                            kb.easterEgg = dict(_ for _ in zip(original, shuffled))
                     elif not _:
                         warnMsg = "provided value for parameter '%s' is empty. " % parameter
                         warnMsg += "Please, always use only valid parameter values "
@@ -823,6 +828,9 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
                 message = stdoutencode(data)
             else:
                 message = data
+
+            if kb.easterEgg:
+                message = "".join(kb.easterEgg.get(_, _) for _ in message)
 
             if hasattr(conf, "api"):
                 sys.stdout.write(message, status, content_type)
