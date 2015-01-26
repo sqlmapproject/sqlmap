@@ -829,7 +829,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             else:
                 message = data
 
-            if kb.easterEgg:
+            if kb.get("easterEgg"):
                 message = "".join(kb.easterEgg.get(_, _) for _ in message)
 
             if hasattr(conf, "api"):

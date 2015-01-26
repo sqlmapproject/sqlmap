@@ -478,7 +478,7 @@ def _adjustLoggingFormatter():
 
     def format(record):
         message = FORMATTER._format(record)
-        if kb.easterEgg:
+        if kb.get("easterEgg"):
             message = "".join(kb.easterEgg.get(_, _) for _ in message)
         message = boldifyMessage(message)
         if kb.prependFlag:
