@@ -2994,6 +2994,8 @@ def createGithubIssue(errMsg, excMsg):
             warnMsg = "something went wrong while creating a Github issue"
             if ex:
                 warnMsg += " ('%s')" % ex
+            if "Unauthorized" in warnMsg:
+                warnMsg += ". Please update to the latest revision"
             logger.warn(warnMsg)
 
 def maskSensitiveData(msg):
