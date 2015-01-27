@@ -1458,7 +1458,11 @@ def _createTemporaryDirectory():
         errMsg += "writeable by the current user"
         raise SqlmapSystemException, errMsg
 
-    kb.tempDir = tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
+    if "sqlmap" not in (tempfile.tempdir or ""):
+        tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
+
+    kb.tempDir = tempfile.tempdir
+
     if not os.path.isdir(tempfile.tempdir):
         os.makedirs(tempfile.tempdir)
 
