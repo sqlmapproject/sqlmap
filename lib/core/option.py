@@ -481,7 +481,7 @@ def _adjustLoggingFormatter():
         if kb.get("easterEgg"):
             message = "".join(kb.easterEgg.get(_, _) for _ in message)
         message = boldifyMessage(message)
-        if kb.prependFlag:
+        if kb.get("prependFlag"):
             message = "\n%s" % message
             kb.prependFlag = False
         return message
