@@ -586,6 +586,8 @@ def paramToDict(place, parameters=None):
                         test = readInput(message, default="N")
                         if test[0] not in ("y", "Y"):
                             raise SqlmapSilentQuitException
+                        elif test.lower() == "yy":
+                            pass
                         else:
                             original = [_ for _ in string.ascii_letters + string.digits]
                             shuffled = list(original)
