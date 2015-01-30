@@ -544,7 +544,6 @@ def paramToDict(place, parameters=None):
     if place in conf.parameters and not parameters:
         parameters = conf.parameters[place]
 
-    parameters = parameters.replace(", ", ",")
     parameters = re.sub(r"&(\w{1,4});", r"%s\g<1>%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), parameters)
     if place == PLACE.COOKIE:
         splitParams = parameters.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)
