@@ -478,8 +478,6 @@ def _adjustLoggingFormatter():
 
     def format(record):
         message = FORMATTER._format(record)
-        if kb.get("easterEgg"):
-            message = "".join(kb.easterEgg.get(_, _) for _ in message)
         message = boldifyMessage(message)
         if kb.get("prependFlag"):
             message = "\n%s" % message
@@ -1719,7 +1717,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.followSitemapRecursion = None
     kb.forcedDbms = None
     kb.forcePartialUnion = False
-    kb.easterEgg = None
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicMode = False

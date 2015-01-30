@@ -586,13 +586,6 @@ def paramToDict(place, parameters=None):
                         test = readInput(message, default="N")
                         if test[0] not in ("y", "Y"):
                             raise SqlmapSilentQuitException
-                        elif test.lower() == "yy":
-                            pass
-                        else:
-                            original = [_ for _ in string.ascii_letters + string.digits]
-                            shuffled = list(original)
-                            random.shuffle(shuffled)
-                            kb.easterEgg = dict(_ for _ in zip(original, shuffled))
                     elif not _:
                         warnMsg = "provided value for parameter '%s' is empty. " % parameter
                         warnMsg += "Please, always use only valid parameter values "
@@ -830,9 +823,6 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
                 message = stdoutencode(data)
             else:
                 message = data
-
-            if kb.get("easterEgg"):
-                message = "".join(kb.easterEgg.get(_, _) for _ in message)
 
             if hasattr(conf, "api"):
                 sys.stdout.write(message, status, content_type)
