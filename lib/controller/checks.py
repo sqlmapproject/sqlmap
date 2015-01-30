@@ -1101,22 +1101,17 @@ def checkWaf():
     logger.debug(dbmMsg)
 
     retVal = False
-    backup = dict(conf.parameters)
     payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
 
-    conf.parameters = dict(backup)
-    conf.parameters[PLACE.GET] = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
-    conf.parameters[PLACE.GET] += "%s=%s" % (randomStr(), payload)
-
-    logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
+    value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
+    value += agent.addPayloadDelimiters("%s=%s" % (randomStr(), payload))
 
     try:
-        retVal = Request.queryPage(getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
+        retVal = Request.queryPage(place=PLACE.GET, value=value, getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
     except SqlmapConnectionException:
         retVal = True
     finally:
         kb.matchRatio = None
-        conf.parameters = dict(backup)
 
     if retVal:
         warnMsg = "heuristics detected that the target "
