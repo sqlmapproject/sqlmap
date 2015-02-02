@@ -788,7 +788,7 @@ def cmdLineParser():
         prompt = False
         advancedHelp = True
 
-        for arg in sys.argv:
+        for arg in (sys.argv if not IS_WIN else shlex.split(" ".join(sys.argv))):
             argv.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
 
         checkDeprecatedOptions(argv)
