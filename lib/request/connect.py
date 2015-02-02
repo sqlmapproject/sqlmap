@@ -329,7 +329,9 @@ class Connect(object):
             if kb.proxyAuthHeader:
                 headers[HTTP_HEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
-            headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
+            if HTTP_HEADER.ACCEPT not in headers:
+                headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
+
             headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
             headers[HTTP_HEADER.HOST] = host or getHostHeader(url)
 
