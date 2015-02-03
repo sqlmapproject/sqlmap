@@ -3003,9 +3003,9 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(value, '*' * len(value))
 
     if not conf.get("hostname"):
-        match = re.search(r"(?i)sqlmap.+(-u|--url)\s+([^ ]+)", retVal)
+        match = re.search(r"(?i)sqlmap.+(-u|--url)(\s+|=)([^ ]+)", retVal)
         if match:
-            retVal = retVal.replace(match.group(2), '*' * len(match.group(2)))
+            retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
 
     if getpass.getuser():
