@@ -788,7 +788,16 @@ def cmdLineParser():
         prompt = False
         advancedHelp = True
 
-        for arg in (sys.argv if not IS_WIN else shlex.split(" ".join(sys.argv))):
+        _ = sys.argv
+
+        # Python on Windows has problems with quote/whitespace cases like: python -c "import sys; print sys.argv" --dummy='foo: bar'  # ['-c', "--dummy='foo:", "bar'"]
+        if IS_WIN:
+            try:
+                _ = shlex.split(" ".join(sys.argv), posix=False)
+            except ValueError:
+                pass
+
+        for arg in _:
             argv.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
 
         checkDeprecatedOptions(argv)
