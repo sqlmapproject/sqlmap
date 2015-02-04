@@ -5,6 +5,7 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import types
 import urllib2
 import urlparse
 
@@ -124,6 +125,25 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
             except urllib2.HTTPError, e:
                 result = e
+
+                # Dirty hack for http://bugs.python.org/issue15701
+                try:
+                    result.info()
+                except AttributeError:
+                    def _(self):
+                        return getattr(self, "hdrs") or {}
+                    result.info = types.MethodType(_, result)
+
+                if not hasattr(result, "read"):
+                    def _(self, length=None):
+                        return e.msg
+                    result.read = types.MethodType(_, result)
+
+                if not getattr(result, "url", None):
+                    result.url = redurl
+
+                if not getattr(result, "code", None):
+                    result.code = 999
             except:
                 redurl = None
                 result = fp
