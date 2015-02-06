@@ -62,7 +62,7 @@ def modulePath():
     except NameError:
         _ = inspect.getsourcefile(modulePath)
 
-    return os.path.dirname(os.path.realpath(getUnicode(_, sys.getfilesystemencoding())))
+    return getUnicode(os.path.dirname(os.path.realpath(_)), sys.getfilesystemencoding())
 
 def main():
     """
