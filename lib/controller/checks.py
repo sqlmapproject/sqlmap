@@ -196,25 +196,6 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-            elif not (kb.extendTests and intersect(dbms, kb.extendTests)):
-                # Skip test if the risk is higher than the provided (or default)
-                # value
-                # Parse test's <risk>
-                if test.risk > conf.risk:
-                    debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
-                    debugMsg += "is higher than the provided (%d)" % conf.risk
-                    logger.debug(debugMsg)
-                    continue
-
-                # Skip test if the level is higher than the provided (or default)
-                # value
-                # Parse test's <level>
-                if test.level > conf.level:
-                    debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
-                    debugMsg += "is higher than the provided (%d)" % conf.level
-                    logger.debug(debugMsg)
-                    continue
-
             if dbms is not None:
                 if injection.dbms is not None and not intersect(injection.dbms, dbms):
                     debugMsg = "skipping test '%s' because " % title
@@ -234,6 +215,25 @@ def checkSqlInjection(place, parameter, value):
                     debugMsg += "the parsed error message(s) showed "
                     debugMsg += "that the back-end DBMS could be "
                     debugMsg += "%s" % Format.getErrorParsedDBMSes()
+                    logger.debug(debugMsg)
+                    continue
+
+            if not (kb.extendTests and intersect(dbms, kb.extendTests)):
+                # Skip test if the risk is higher than the provided (or default)
+                # value
+                # Parse test's <risk>
+                if test.risk > conf.risk:
+                    debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
+                    debugMsg += "is higher than the provided (%d)" % conf.risk
+                    logger.debug(debugMsg)
+                    continue
+
+                # Skip test if the level is higher than the provided (or default)
+                # value
+                # Parse test's <level>
+                if test.level > conf.level:
+                    debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
+                    debugMsg += "is higher than the provided (%d)" % conf.level
                     logger.debug(debugMsg)
                     continue
 
