@@ -113,9 +113,6 @@ Tag: <test>
 
             NOTE: useful to test for UNION query (inband) SQL injection.
 
-        Sub-tag: <oob>
-            # TODO
-
     Sub-tag: <details>
         Which details can be infered if the payload succeed.
 
@@ -148,7 +145,6 @@ Tag: <test>
             <grep></grep>
             <time></time>
             <union></union>
-            <oob></oob>
         </response>
         <details>
             <dbms></dbms>
