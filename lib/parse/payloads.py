@@ -5,6 +5,8 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
+
 from xml.etree import ElementTree as et
 
 from lib.core.data import conf
@@ -67,14 +69,32 @@ def parseXmlNode(node):
 
         conf.tests.append(test)
 
-def loadPayloads():
+def loadBoundaries():
     try:
-        doc = et.parse(paths.PAYLOADS_XML)
+        doc = et.parse(paths.BOUNDARIES_XML)
     except Exception, ex:
         errMsg = "something seems to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (paths.PAYLOADS_XML, ex)
+        errMsg += "the file '%s' ('%s'). Please make " % (paths.BOUNDARIES_XML, ex)
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
+
+    root = doc.getroot()
+    parseXmlNode(root)
+
+def loadPayloads():
+    payloadFiles = os.listdir(paths.SQLMAP_XML_PAYLOADS_PATH)
+    payloadFiles.sort()
+
+    for payloadFile in payloadFiles:
+        payloadFilePath = os.path.join(paths.SQLMAP_XML_PAYLOADS_PATH, payloadFile)
+
+        try:
+            doc = et.parse(payloadFilePath)
+        except Exception, ex:
+            errMsg = "something seems to be wrong with "
+            errMsg += "the file '%s' ('%s'). Please make " % (payloadFilePath, ex)
+            errMsg += "sure that you haven't made any changes to it"
+            raise SqlmapInstallationException, errMsg
 
     root = doc.getroot()
     parseXmlNode(root)

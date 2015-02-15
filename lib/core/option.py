@@ -130,6 +130,7 @@ from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
+from lib.parse.payloads import loadBoundaries
 from lib.parse.payloads import loadPayloads
 from lib.parse.sitemap import parseSitemap
 from lib.request.basic import checkCharEncoding
@@ -2400,6 +2401,7 @@ def init():
     _setWriteFile()
     _setMetasploit()
     _setDBMSAuthentication()
+    loadBoundaries()
     loadPayloads()
     _setPrefixSuffix()
     update()
