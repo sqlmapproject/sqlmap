@@ -233,7 +233,7 @@ def checkSqlInjection(place, parameter, value):
                 # Skip test if the level is higher than the provided (or default)
                 # value
                 # Parse test's <level>
-                if not conf.testFilter and not test.level > conf.level:
+                if not conf.testFilter and test.level > conf.level:
                     debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
                     debugMsg += "is higher than the provided (%d)" % conf.level
                     logger.debug(debugMsg)
