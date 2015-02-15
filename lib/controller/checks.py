@@ -188,9 +188,11 @@ def checkSqlInjection(place, parameter, value):
             else:
                 dbms = None
 
-            # Skip tests if title is not included by the given filter
-            if conf.testFilter:
-                if not any(conf.testFilter in str(item) or re.search(conf.testFilter, str(item), re.I) for item in (test.title, test.vector, dbms)):
+            # Skip tests if title, vector or DBMS is not included by the
+            # given test filter
+            if conf.testFilter and not any(conf.testFilter in str(item) or \
+               re.search(conf.testFilter, str(item), re.I) for item in \
+               (test.title, test.vector, dbms)):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "its name/vector/dbms is not included by the given filter"
                     logger.debug(debugMsg)
@@ -222,7 +224,7 @@ def checkSqlInjection(place, parameter, value):
                 # Skip test if the risk is higher than the provided (or default)
                 # value
                 # Parse test's <risk>
-                if test.risk > conf.risk:
+                if not conf.testFilter and test.risk > conf.risk:
                     debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
                     debugMsg += "is higher than the provided (%d)" % conf.risk
                     logger.debug(debugMsg)
@@ -231,7 +233,7 @@ def checkSqlInjection(place, parameter, value):
                 # Skip test if the level is higher than the provided (or default)
                 # value
                 # Parse test's <level>
-                if test.level > conf.level:
+                if not conf.testFilter and not test.level > conf.level:
                     debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
                     debugMsg += "is higher than the provided (%d)" % conf.level
                     logger.debug(debugMsg)
