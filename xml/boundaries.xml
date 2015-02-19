@@ -412,7 +412,7 @@ Formats:
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
-    <!-- Pre-WHERE derived table boundaries (e.g. "SELECT * FROM (SELECT column FROM table WHERE column LIKE '%$_REQUEST["name"]%') AS t1"-->
+    <!-- Pre-WHERE derived table boundaries - e.g. "SELECT * FROM (SELECT column FROM table WHERE column LIKE '%$_REQUEST["name"]%') AS t1"-->
     <boundary>
         <level>5</level>
         <clause>1</clause>
