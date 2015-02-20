@@ -650,9 +650,12 @@ def heuristicCheckDbms(injection):
 
     pushValue(kb.injection)
     kb.injection = injection
-    randStr1, randStr2 = randomStr(), randomStr()
 
     for dbms in getPublicTypeMembers(DBMS, True):
+        if not FROM_DUMMY_TABLE.get(dbms, ""):
+            continue
+
+        randStr1, randStr2 = randomStr(), randomStr()
         Backend.forceDbms(dbms)
 
         if checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr1)):
