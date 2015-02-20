@@ -1352,9 +1352,9 @@
     <!-- End of time-based blind tests - Parameter replace -->
 
 
-    <!-- Time-based blind tests - GROUP BY and ORDER BY clause -->
+    <!-- Time-based blind tests - ORDER BY, GROUP BY clause -->
     <test>
-        <title>MySQL &gt;= 5.0.11 time-based blind - GROUP BY and ORDER BY clause</title>
+        <title>MySQL &gt;= 5.0.11 time-based blind - ORDER BY, GROUP BY clause</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1374,7 +1374,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1393,7 +1393,7 @@
     </test>
 
     <test>
-        <title>PostgreSQL &gt; 8.1 time-based blind - GROUP BY and ORDER BY clause</title>
+        <title>PostgreSQL &gt; 8.1 time-based blind - ORDER BY, GROUP BY clause</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1413,7 +1413,7 @@
     </test>
 
     <test>
-        <title>PostgreSQL time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
+        <title>PostgreSQL time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1474,7 +1474,7 @@
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clause (DBMS_LOCK.SLEEP)</title>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_LOCK.SLEEP)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1493,7 +1493,7 @@
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clause (DBMS_PIPE.RECEIVE_MESSAGE)</title>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_PIPE.RECEIVE_MESSAGE)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1512,7 +1512,7 @@
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1531,7 +1531,7 @@
     </test>
 
     <test>
-        <title>HSQLDB &gt;= 1.7.2 time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
+        <title>HSQLDB &gt;= 1.7.2 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1552,7 +1552,7 @@
     </test>    
     
     <test>
-        <title>HSQLDB &gt; 2.0 time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
+        <title>HSQLDB &gt; 2.0 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1571,5 +1571,5 @@
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access -->
-    <!-- End of time-based blind tests - GROUP BY and ORDER BY clause -->
+    <!-- End of time-based blind tests - ORDER BY, GROUP BY clause -->
 </root>
