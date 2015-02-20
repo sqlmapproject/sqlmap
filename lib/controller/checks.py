@@ -179,7 +179,6 @@ def checkSqlInjection(place, parameter, value):
                 logger.debug(debugMsg)
                 continue
 
-
             # Skip DBMS-specific test if it does not match either the
             # previously identified or the user's provided DBMS (either
             # from program switch or from parsed error message(s))
@@ -250,11 +249,11 @@ def checkSqlInjection(place, parameter, value):
 
             if clause != [0] and injection.clause and injection.clause != [0] and not clauseMatch:
                 debugMsg = "skipping test '%s' because the clauses " % title
-                debugMsg += "differs from the clause already identified"
+                debugMsg += "differ from the clause already identified"
                 logger.debug(debugMsg)
                 continue
 
-            # Skip test if the user provided custom character
+            # Skip test if the user provided custom character (for UNION-based payloads)
             if conf.uChar is not None and ("random number" in title or "(NULL)" in title):
                 debugMsg = "skipping test '%s' because the user " % title
                 debugMsg += "provided a specific character, %s" % conf.uChar
@@ -314,13 +313,12 @@ def checkSqlInjection(place, parameter, value):
                 # Parse boundary's <prefix>, <suffix> and <ptype>
                 prefix = boundary.prefix if boundary.prefix else ""
                 suffix = boundary.suffix if boundary.suffix else ""
+                ptype = boundary.ptype
 
                 # Options --prefix/--suffix have a higher priority (if set by user)
                 prefix = conf.prefix if conf.prefix is not None else prefix
                 suffix = conf.suffix if conf.suffix is not None else suffix
                 comment = None if conf.suffix is not None else comment
-
-                ptype = boundary.ptype
 
                 # If the previous injections succeeded, we know which prefix,
                 # suffix and parameter type to use for further tests, no
@@ -329,7 +327,9 @@ def checkSqlInjection(place, parameter, value):
                 condBound &= (injection.prefix != prefix or injection.suffix != suffix)
                 condType = injection.ptype is not None and injection.ptype != ptype
 
-                if condBound or condType:
+                # If the payload is an inline query test for it regardless
+                # of previously identified injection types
+                if stype != PAYLOAD.TECHNIQUE.QUERY and (condBound or condType):
                     continue
 
                 # For each test's <where>
