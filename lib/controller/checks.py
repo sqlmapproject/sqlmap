@@ -350,6 +350,7 @@ def checkSqlInjection(place, parameter, value):
                         # will likely result in a different content
                         kb.data.setdefault("randomInt", str(randomInt(10)))
                         kb.data.setdefault("randomStr", str(randomStr(10)))
+
                         if conf.invalidLogical:
                             _ = int(kb.data.randomInt[:2])
                             origValue = "%s AND %s=%s" % (value, _, _ + 1)
@@ -359,6 +360,7 @@ def checkSqlInjection(place, parameter, value):
                             origValue = kb.data.randomStr[:6]
                         else:
                             origValue = "-%s" % kb.data.randomInt[:4]
+
                         templatePayload = agent.payload(place, parameter, value="", newValue=origValue, where=where)
                     elif where == PAYLOAD.WHERE.REPLACE:
                         origValue = ""
