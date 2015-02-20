@@ -4,7 +4,7 @@
     <!-- UNION query tests -->
     <test>
         <title>MySQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -26,7 +26,7 @@
 
     <test>
         <title>MySQL UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -48,7 +48,7 @@
 
     <test>
         <title>MySQL UNION query ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -70,7 +70,7 @@
 
     <test>
         <title>MySQL UNION query ([CHAR]) - 1 to 10 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -92,7 +92,7 @@
 
     <test>
         <title>MySQL UNION query (NULL) - 1 to 10 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -114,7 +114,7 @@
 
     <test>
         <title>MySQL UNION query ([RANDNUM]) - 1 to 10 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -136,7 +136,7 @@
 
     <test>
         <title>MySQL UNION query ([CHAR]) - 11 to 20 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -158,7 +158,7 @@
 
     <test>
         <title>MySQL UNION query (NULL) - 11 to 20 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -180,7 +180,7 @@
 
     <test>
         <title>MySQL UNION query ([RANDNUM]) - 11 to 20 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -202,7 +202,7 @@
 
     <test>
         <title>MySQL UNION query ([CHAR]) - 21 to 30 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -224,7 +224,7 @@
 
     <test>
         <title>MySQL UNION query (NULL) - 21 to 30 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -246,7 +246,7 @@
 
     <test>
         <title>MySQL UNION query ([RANDNUM]) - 21 to 30 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -268,7 +268,7 @@
 
     <test>
         <title>MySQL UNION query ([CHAR]) - 31 to 40 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -290,7 +290,7 @@
 
     <test>
         <title>MySQL UNION query (NULL) - 31 to 40 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -312,7 +312,7 @@
 
     <test>
         <title>MySQL UNION query ([RANDNUM]) - 31 to 40 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -334,7 +334,7 @@
 
     <test>
         <title>MySQL UNION query ([CHAR]) - 41 to 50 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -356,7 +356,7 @@
 
     <test>
         <title>MySQL UNION query (NULL) - 41 to 50 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -378,7 +378,7 @@
 
     <test>
         <title>MySQL UNION query ([RANDNUM]) - 41 to 50 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -400,7 +400,7 @@
 
     <test>
         <title>Generic UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -419,7 +419,7 @@
 
     <test>
         <title>Generic UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -438,7 +438,7 @@
 
     <test>
         <title>Generic UNION query ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -457,7 +457,7 @@
 
     <test>
         <title>Generic UNION query ([CHAR]) - 1 to 10 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -476,7 +476,7 @@
 
     <test>
         <title>Generic UNION query (NULL) - 1 to 10 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -495,7 +495,7 @@
 
     <test>
         <title>Generic UNION query ([RANDNUM]) - 1 to 10 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -514,7 +514,7 @@
 
     <test>
         <title>Generic UNION query ([CHAR]) - 11 to 20 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -533,7 +533,7 @@
 
     <test>
         <title>Generic UNION query (NULL) - 11 to 20 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -552,7 +552,7 @@
 
     <test>
         <title>Generic UNION query ([RANDNUM]) - 11 to 20 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -571,7 +571,7 @@
 
     <test>
         <title>Generic UNION query ([CHAR]) - 21 to 30 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -590,7 +590,7 @@
 
     <test>
         <title>Generic UNION query (NULL) - 21 to 30 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -609,7 +609,7 @@
 
     <test>
         <title>Generic UNION query ([RANDNUM]) - 21 to 30 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -628,7 +628,7 @@
 
     <test>
         <title>Generic UNION query ([CHAR]) - 31 to 40 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -647,7 +647,7 @@
 
     <test>
         <title>Generic UNION query (NULL) - 31 to 40 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -666,7 +666,7 @@
 
     <test>
         <title>Generic UNION query ([RANDNUM]) - 31 to 40 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -685,7 +685,7 @@
 
     <test>
         <title>Generic UNION query ([CHAR]) - 41 to 50 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -703,7 +703,7 @@
     </test>
     <test>
         <title>Generic UNION query (NULL) - 41 to 50 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
@@ -722,7 +722,7 @@
 
     <test>
         <title>Generic UNION query ([RANDNUM]) - 41 to 50 columns</title>
-        <stype>3</stype>
+        <stype>6</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
