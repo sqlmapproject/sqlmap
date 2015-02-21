@@ -145,10 +145,10 @@ INFERENCE_EQUALS_CHAR = "="
 # Character used for operation "not-equals" in inference
 INFERENCE_NOT_EQUALS_CHAR = "!="
 
-# String used for representation of unknown dbms
+# String used for representation of unknown DBMS
 UNKNOWN_DBMS = "Unknown"
 
-# String used for representation of unknown dbms version
+# String used for representation of unknown DBMS version
 UNKNOWN_DBMS_VERSION = "Unknown"
 
 # Dynamicity mark length used in dynamicity removal engine
