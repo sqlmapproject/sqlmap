@@ -2823,7 +2823,7 @@ def getSortedInjectionTests():
             retVal = SORT_ORDER.LAST
 
         elif 'details' in test and 'dbms' in test.details:
-            if test.details.dbms in Backend.getErrorParsedDBMSes():
+            if intersect(test.details.dbms, Backend.getErrorParsedDBMSes()):
                 retVal = SORT_ORDER.SECOND
             else:
                 retVal = SORT_ORDER.THIRD
