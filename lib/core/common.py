@@ -438,10 +438,9 @@ class Backend:
 
         This functions is called to:
 
-        1. Sort the tests, getSortedInjectionTests() - detection phase.
-        2. Ask user whether or not skip specific DBMS tests in detection phase,
+        1. Ask user whether or not skip specific DBMS tests in detection phase,
            lib/controller/checks.py - detection phase.
-        3. Sort the fingerprint of the DBMS, lib/controller/handler.py -
+        2. Sort the fingerprint of the DBMS, lib/controller/handler.py -
            fingerprint phase.
         """
 
@@ -449,6 +448,13 @@ class Backend:
 
     @staticmethod
     def getIdentifiedDbms():
+        """
+        This functions is called to:
+
+        1. Sort the tests, getSortedInjectionTests() - detection phase.
+        2. Etc.
+        """
+
         dbms = None
 
         if not kb:
@@ -2823,14 +2829,14 @@ def getSortedInjectionTests():
             retVal = SORT_ORDER.LAST
 
         elif 'details' in test and 'dbms' in test.details:
-            if intersect(test.details.dbms, Backend.getErrorParsedDBMSes()):
+            if intersect(test.details.dbms, Backend.getIdentifiedDbms()):
                 retVal = SORT_ORDER.SECOND
             else:
                 retVal = SORT_ORDER.THIRD
 
         return retVal
 
-    if Backend.getErrorParsedDBMSes():
+    if Backend.getIdentifiedDbms():
         retVal = sorted(retVal, key=priorityFunction)
 
     return retVal
