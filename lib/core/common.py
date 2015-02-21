@@ -462,9 +462,9 @@ class Backend:
         elif Backend.getForcedDbms() is not None:
             dbms = Backend.getForcedDbms()
         elif Backend.getDbms() is not None:
-            dbms = kb.dbms
+            dbms = Backend.getDbms()
         elif conf.get("dbms"):
-            dbms = conf.dbms
+            dbms = conf.get("dbms")
         elif Backend.getErrorParsedDBMSes():
             dbms = unArrayizeValue(Backend.getErrorParsedDBMSes())
         elif kb.get("injection") and kb.injection.dbms:

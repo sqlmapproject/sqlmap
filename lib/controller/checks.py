@@ -277,8 +277,8 @@ def checkSqlInjection(place, parameter, value):
             infoMsg = "testing '%s'" % title
             logger.info(infoMsg)
 
-            # Force back-end DBMS according to the current
-            # test value for proper payload unescaping
+            # Force back-end DBMS according to the current test DBMS value
+            # for proper payload unescaping
             Backend.forceDbms(dbms[0] if isinstance(dbms, list) else dbms)
 
             # Parse test's <request>
