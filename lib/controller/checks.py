@@ -65,7 +65,6 @@ from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import UNKNOWN_DBMS
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
@@ -125,8 +124,8 @@ def checkSqlInjection(place, parameter, value):
             if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) \
                and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or \
                kb.heuristicDbms or injection.dbms):
-                msg = "do you want to include all tests for '%s' " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or injection.dbms)
-                msg += "extending provided "
+                msg = "for the remaining tests, do you want to include all tests "
+                msg += "for '%s' extending provided " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or injection.dbms)
                 msg += "level (%d)" % conf.level if conf.level < 5 else ""
                 msg += " and " if conf.level < 5 and conf.risk < 3 else ""
                 msg += "risk (%d)" % conf.risk if conf.risk < 3 else ""
@@ -436,6 +435,7 @@ def checkSqlInjection(place, parameter, value):
                                 trueSet = set(extractTextTagContent(truePage))
                                 falseSet = set(extractTextTagContent(falsePage))
                                 candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage and _.strip() not in threadData.lastComparisonHeaders else None for _ in (trueSet - falseSet)))
+
                                 if candidates:
                                     conf.string = candidates[0]
                                     infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (paramType, parameter, title, repr(conf.string).lstrip('u').strip("'"))
@@ -509,8 +509,8 @@ def checkSqlInjection(place, parameter, value):
                                     Backend.forceDbms(kb.heuristicDbms)
 
                             if unionExtended:
-                                infoMsg = "automatically extending ranges "
-                                infoMsg += "for UNION query injection technique tests as "
+                                infoMsg = "automatically extending ranges for UNION "
+                                infoMsg += "query injection technique tests as "
                                 infoMsg += "there is at least one other (potential) "
                                 infoMsg += "technique found"
                                 singleTimeLogMessage(infoMsg)
@@ -555,12 +555,15 @@ def checkSqlInjection(place, parameter, value):
                             for dKey, dValue in test.details.items():
                                 if dKey == "dbms":
                                     injection.dbms = dValue
+
                                     if not isinstance(dValue, list):
                                         Backend.setDbms(dValue)
                                     else:
                                         Backend.forceDbms(dValue[0], True)
+
                                 elif dKey == "dbms_version" and injection.dbms_version is None and not conf.testFilter:
                                     injection.dbms_version = Backend.setVersion(dValue)
+
                                 elif dKey == "os" and injection.os is None:
                                     injection.os = Backend.setOs(dValue)
 
@@ -806,14 +809,12 @@ def checkFilteredChars(injection):
 
 def heuristicCheckSqlInjection(place, parameter):
     if kb.nullConnection:
-        debugMsg = "heuristic check skipped "
-        debugMsg += "because NULL connection used"
+        debugMsg = "heuristic check skipped because NULL connection used"
         logger.debug(debugMsg)
         return None
 
     if wasLastResponseDBMSError():
-        debugMsg = "heuristic check skipped "
-        debugMsg += "because original page content "
+        debugMsg = "heuristic check skipped because original page content "
         debugMsg += "contains DBMS error"
         logger.debug(debugMsg)
         return None
