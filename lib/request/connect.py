@@ -848,7 +848,7 @@ class Connect(object):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        name = name.strip()
+                        name = re.sub(r"[^\w]", "", name.strip())
                         if name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
@@ -858,7 +858,7 @@ class Connect(object):
                 for part in cookie.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        name = name.strip()
+                        name = re.sub(r"[^\w]", "", name.strip())
                         if name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True)
