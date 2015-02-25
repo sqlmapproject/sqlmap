@@ -371,6 +371,9 @@ Yonny Mutai, <yonnym(at)googlemail.com>
 Roberto Nemirovsky, <roberto.paes(at)gmail.com>
 * for pointing out some enhancements
 
+Sebastian Nerz, <sebastian.nerz(at)syss.de>
+* for reporting a (potential) vulnerability in --eval
+
 Simone Onofri, <simone.onofri(at)gmail.com>
 * for patching the PHP web backdoor to make it work properly also on Windows
 
