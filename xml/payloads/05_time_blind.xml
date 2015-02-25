@@ -1036,15 +1036,15 @@
     </test>
 
     <test>
-        <title>MySQL time-based blind - Parameter replace (bool*int)</title>
+        <title>MySQL time-based blind - Parameter replace (bool)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>([INFERENCE])*SLEEP([SLEEPTIME])</vector>
+        <vector>([INFERENCE] AND SLEEP([SLEEPTIME]))</vector>
         <request>
-            <payload>([RANDNUM]=[RANDNUM])*SLEEP([SLEEPTIME])</payload>
+            <payload>([RANDNUM]=[RANDNUM] AND SLEEP([SLEEPTIME]))</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
