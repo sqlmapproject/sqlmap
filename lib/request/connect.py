@@ -852,7 +852,7 @@ class Connect(object):
                         if name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
-                        evaluateCode("%s=%s" % (name, repr(value)), variables)
+                        variables[name] = value
 
             if cookie:
                 for part in cookie.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER):
@@ -862,7 +862,7 @@ class Connect(object):
                         if name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True)
-                        evaluateCode("%s=%s" % (name, repr(value)), variables)
+                        variables[name] = value
 
             while True:
                 try:
