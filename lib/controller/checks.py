@@ -299,7 +299,7 @@ def checkSqlInjection(place, parameter, value):
                 # Skip boundary if the level is higher than the provided (or
                 # default) value
                 # Parse boundary's <level>
-                if boundary.level > conf.level:
+                if boundary.level > conf.level and not (kb.extendTests and intersect(payloadDbms, kb.extendTests, True)):
                     continue
 
                 # Skip boundary if it does not match against test's <clause>
