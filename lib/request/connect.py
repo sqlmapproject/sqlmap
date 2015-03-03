@@ -332,7 +332,9 @@ class Connect(object):
             if HTTP_HEADER.ACCEPT not in headers:
                 headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
-            headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
+            if HTTP_HEADER.ACCEPT_ENCODING not in headers:
+                headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
+
             headers[HTTP_HEADER.HOST] = host or getHostHeader(url)
 
             if post is not None and HTTP_HEADER.CONTENT_TYPE not in headers:
