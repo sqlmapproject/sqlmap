@@ -53,7 +53,8 @@ class HTTPSConnection(httplib.HTTPSConnection):
                     break
                 else:
                     sock.close()
-            except (ssl.SSLError, socket.error), errMsg:
+            except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
+                self._tunnel_host = None
                 logger.debug("SSL connection error occurred ('%s')" % errMsg)
 
         if not success:
