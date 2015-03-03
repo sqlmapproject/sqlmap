@@ -102,6 +102,7 @@
             <dbms>SQLite</dbms>
         </details>
     </test>
+
     <test>
         <title>Firebird inline queries</title>
         <stype>3</stype>
