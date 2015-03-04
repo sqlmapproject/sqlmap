@@ -694,7 +694,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--identify-waf", dest="identifyWaf",
                                   action="store_true",
-                                  help="Make a through testing for a WAF/IPS/IDS protection")
+                                  help="Make a thorough testing for a WAF/IPS/IDS protection")
 
         miscellaneous.add_option("--mobile", dest="mobile",
                                   action="store_true",
@@ -710,7 +710,7 @@ def cmdLineParser():
 
         miscellaneous.add_option("--smart", dest="smart",
                                   action="store_true",
-                                  help="Conduct through tests only if positive heuristic(s)")
+                                  help="Conduct thorough tests only if positive heuristic(s)")
 
         miscellaneous.add_option("--sqlmap-shell", dest="sqlmapShell", action="store_true",
                             help="Prompt for an interactive sqlmap shell")
