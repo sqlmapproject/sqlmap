@@ -413,6 +413,7 @@ Tag: <test>
             <dbms>MySQL</dbms>
         </details>
     </test>
+
     <test>
         <title>MySQL OR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (bool*int)</title>
         <stype>1</stype>
