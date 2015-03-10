@@ -719,16 +719,14 @@ def checkFalsePositives(injection):
         kb.injection = injection
 
         for i in xrange(conf.level):
-            randInt1, randInt2, randInt3 = (_() for j in xrange(3))
+            while True:
+                randInt1, randInt2, randInt3 = (_() for j in xrange(3))
 
-            randInt1 = min(randInt1, randInt2, randInt3)
-            randInt3 = max(randInt1, randInt2, randInt3)
+                randInt1 = min(randInt1, randInt2, randInt3)
+                randInt3 = max(randInt1, randInt2, randInt3)
 
-            while randInt1 >= randInt2:
-                randInt2 = _()
-
-            while randInt2 >= randInt3:
-                randInt3 = _()
+                if randInt3 > randInt2 > randInt1:
+                    break
 
             if not checkBooleanExpression("%d=%d" % (randInt1, randInt1)):
                 retVal = None
