@@ -111,7 +111,10 @@ try:
 
     # This is necessary because find_library returns None if it doesn't find the library
     if dll:
-        libmagic = ctypes.CDLL(dll)
+        try:
+            libmagic = ctypes.CDLL(dll)
+        except WindowsError:
+            pass
 
     if not libmagic or not libmagic._name:
         import sys
