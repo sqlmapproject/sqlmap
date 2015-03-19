@@ -1302,13 +1302,13 @@ def parseTargetUrl():
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
-    if not conf.referer and intersect(REFERER_ALIASES, conf.testParameter, True):
+    if not conf.referer and (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3):
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = filter(lambda (key, value): key != HTTP_HEADER.REFERER, conf.httpHeaders)
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url))
 
-    if not conf.host and intersect(HOST_ALIASES, conf.testParameter, True):
+    if not conf.host and (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5):
         debugMsg = "setting the HTTP Host header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = filter(lambda (key, value): key != HTTP_HEADER.HOST, conf.httpHeaders)

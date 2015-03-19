@@ -321,7 +321,7 @@ class Connect(object):
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
-            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer})
+            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host})
 
             if kb.authHeader:
                 headers[HTTP_HEADER.AUTHORIZATION] = kb.authHeader
@@ -332,10 +332,11 @@ class Connect(object):
             if HTTP_HEADER.ACCEPT not in headers:
                 headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
+            if HTTP_HEADER.HOST not in headers:
+                headers[HTTP_HEADER.HOST] = getHostHeader(url)
+
             if HTTP_HEADER.ACCEPT_ENCODING not in headers:
                 headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
-
-            headers[HTTP_HEADER.HOST] = host or getHostHeader(url)
 
             if post is not None and HTTP_HEADER.CONTENT_TYPE not in headers:
                 headers[HTTP_HEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
