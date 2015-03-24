@@ -367,11 +367,14 @@ class Connect(object):
             post = unicodeencode(post, kb.pageEncoding)
 
             if is_websocket:
+                # WebSocket will add Host field of headers automatically
+                disallowed_headers = ['Host']
                 ws = websocket.WebSocket()
-                ws.connect(url)
+                ws.connect(url, header=["%s: %s" % _ for _ in headers.items() if _[0] not in disallowed_headers], cookie=cookie)
                 ws.send(urldecode(post) if post else '')
                 response = ws.recv()
                 ws.close()
+                # WebSocket class does not have response headers
                 return response, {}, 101
 
             elif method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
@@ -554,7 +557,7 @@ class Connect(object):
             if "no host given" in tbMsg:
                 warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
-            elif "forcibly closed" in tbMsg:
+            elif "forcibly closed" in tbMsg or "Connection is already closed" in tbMsg:
                 warnMsg = "connection was forcibly closed by the target URL"
             elif "timed out" in tbMsg:
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
