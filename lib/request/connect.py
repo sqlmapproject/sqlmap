@@ -18,7 +18,13 @@ import time
 import traceback
 import urllib2
 import urlparse
-import websocket
+
+try:
+    import websocket
+    from websocket import WebSocketException
+except ImportError:
+    class WebSocketException(Exception):
+        pass
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
@@ -551,7 +557,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, struct.error, ProxyError, SqlmapCompressionException, websocket.WebSocketException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, struct.error, ProxyError, SqlmapCompressionException, WebSocketException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
