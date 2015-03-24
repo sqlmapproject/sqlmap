@@ -18,6 +18,7 @@ import time
 import traceback
 import urllib2
 import urlparse
+import websocket
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
@@ -232,6 +233,7 @@ class Connect(object):
         retrying = kwargs.get("retrying",           False)
         crawling = kwargs.get("crawling",           False)
         skipRead = kwargs.get("skipRead",           False)
+        is_websocket = conf.url.startswith("ws")
 
         if not urlparse.urlsplit(url).netloc:
             url = urlparse.urljoin(conf.url, url)
@@ -364,7 +366,24 @@ class Connect(object):
             url = unicodeencode(url)
             post = unicodeencode(post, kb.pageEncoding)
 
-            if method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
+            if is_websocket:
+                try:
+                    ws = websocket.WebSocket()
+                    ws.connect(url)
+                    ws.send(urldecode(post) if post else '')
+                    response = ws.recv()
+                    ws.close()
+                    return response, {}, 101
+
+                except websocket.WebSocketConnectionClosedException:
+                    # TODO: more exception to handle
+                    warnMsg = "connection was forcibly closed by the target URL"
+                    logger.critical(warnMsg)
+                    return Connect._retryProxy(**kwargs)
+                except Exception:
+                    return None, None, None
+
+            elif method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                 method = unicodeencode(method)
                 req = MethodRequest(url, post, headers)
                 req.set_method(method)
