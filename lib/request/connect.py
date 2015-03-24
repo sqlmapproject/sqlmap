@@ -367,21 +367,12 @@ class Connect(object):
             post = unicodeencode(post, kb.pageEncoding)
 
             if is_websocket:
-                try:
-                    ws = websocket.WebSocket()
-                    ws.connect(url)
-                    ws.send(urldecode(post) if post else '')
-                    response = ws.recv()
-                    ws.close()
-                    return response, {}, 101
-
-                except websocket.WebSocketConnectionClosedException:
-                    # TODO: more exception to handle
-                    warnMsg = "connection was forcibly closed by the target URL"
-                    logger.critical(warnMsg)
-                    return Connect._retryProxy(**kwargs)
-                except Exception:
-                    return None, None, None
+                ws = websocket.WebSocket()
+                ws.connect(url)
+                ws.send(urldecode(post) if post else '')
+                response = ws.recv()
+                ws.close()
+                return response, {}, 101
 
             elif method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                 method = unicodeencode(method)
@@ -557,7 +548,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, struct.error, ProxyError, SqlmapCompressionException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, struct.error, ProxyError, SqlmapCompressionException, websocket.WebSocketException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
@@ -582,6 +573,10 @@ class Connect(object):
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
                 warnMsg += "from the target URL"
+            elif "Handshake status" in tbMsg:
+                status = re.search("Handshake status ([\d]{3})", tbMsg)
+                errMsg = "websocket handshake status %s" % status.group(1) if status else 'unknown'
+                raise SqlmapConnectionException(errMsg)
             else:
                 warnMsg = "unable to connect to the target URL"
 
