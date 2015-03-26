@@ -1578,7 +1578,6 @@ def safeExpandUser(filepath):
         _ = locale.getdefaultlocale()
         retVal = getUnicode(os.path.expanduser(filepath.encode(_[1] if _ and len(_) > 1 else UNICODE_ENCODING)))
 
-    print retVal
     return retVal
 
 def safeStringFormat(format_, params):
