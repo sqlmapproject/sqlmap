@@ -332,7 +332,7 @@ class Connect(object):
             if HTTP_HEADER.ACCEPT not in headers:
                 headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
-            if HTTP_HEADER.HOST not in headers:
+            if HTTP_HEADER.HOST not in headers or not target:
                 headers[HTTP_HEADER.HOST] = getHostHeader(url)
 
             if HTTP_HEADER.ACCEPT_ENCODING not in headers:
