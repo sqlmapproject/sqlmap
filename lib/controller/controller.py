@@ -30,6 +30,8 @@ from lib.core.common import hashDBWrite
 from lib.core.common import intersect
 from lib.core.common import isListLike
 from lib.core.common import parseTargetUrl
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeCSValue
@@ -488,6 +490,10 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
+                            if place == PLACE.COOKIE:
+                                pushValue(kb.mergeCookies)
+                                kb.mergeCookies = False
+
                             check = heuristicCheckSqlInjection(place, parameter)
 
                             if check != HEURISTIC_TEST.POSITIVE:
@@ -522,6 +528,9 @@ def start():
                                 warnMsg = "%s parameter '%s' is not " % (paramType, parameter)
                                 warnMsg += "injectable"
                                 logger.warn(warnMsg)
+
+                            if place == PLACE.COOKIE:
+                                kb.mergeCookies = popValue()
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if kb.vainRun and not conf.multipleTargets:

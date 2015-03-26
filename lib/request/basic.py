@@ -94,7 +94,7 @@ def forgeHeaders(items=None):
                         _ = readInput(message, default="Y")
                         kb.mergeCookies = not _ or _[0] in ("y", "Y")
 
-                    if kb.mergeCookies:
+                    if kb.mergeCookies and kb.injection.place != PLACE.COOKIE:
                         _ = lambda x: re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(cookie.name), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), "%s=%s" % (cookie.name, getUnicode(cookie.value)), x)
                         headers[HTTP_HEADER.COOKIE] = _(headers[HTTP_HEADER.COOKIE])
 
