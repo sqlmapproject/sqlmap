@@ -538,7 +538,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, struct.error, ProxyError, SqlmapCompressionException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, httplib.ResponseNotReady, struct.error, ProxyError, SqlmapCompressionException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
