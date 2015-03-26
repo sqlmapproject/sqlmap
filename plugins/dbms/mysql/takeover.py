@@ -28,6 +28,7 @@ class Takeover(GenericTakeover):
     def __init__(self):
         self.__basedir = None
         self.__datadir = None
+        self.__plugindir = None
 
         GenericTakeover.__init__(self)
 
@@ -37,12 +38,12 @@ class Takeover(GenericTakeover):
         banVer = kb.bannerFp["dbmsVersion"]
 
         if banVer >= "5.0.67":
-            logger.info("retrieving MySQL plugin directory absolute path")
-            self.__basedir = unArrayizeValue(inject.getValue("SELECT @@plugin_dir"))
+            if self.__plugindir is None:
+                logger.info("retrieving MySQL plugin directory absolute path")
+                self.__plugindir = unArrayizeValue(inject.getValue("SELECT @@plugin_dir"))
 
-        # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
-        if banVer >= "5.1.19":
-            if self.__basedir is None:
+            # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
+            if self.__plugindir is None and banVer >= "5.1.19":
                 logger.info("retrieving MySQL base directory absolute path")
 
                 # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
@@ -53,14 +54,15 @@ class Takeover(GenericTakeover):
                 else:
                     Backend.setOs(OS.LINUX)
 
-            # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
-            if Backend.isOs(OS.WINDOWS):
-                self.__basedir += "/lib/plugin"
-            else:
-                self.__basedir += "/lib/mysql/plugin"
+                # The DLL must be in C:\Program Files\MySQL\MySQL Server 5.1\lib\plugin
+                if Backend.isOs(OS.WINDOWS):
+                    self.__plugindir = "%s/lib/plugin" % self.__basedir
+                else:
+                    self.__plugindir = "%s/lib/mysql/plugin" % self.__basedir
 
-            self.__basedir = ntToPosixSlashes(normalizePath(self.__basedir))
-            self.udfRemoteFile = "%s/%s.%s" % (self.__basedir, self.udfSharedLibName, self.udfSharedLibExt)
+                self.__plugindir = ntToPosixSlashes(normalizePath(self.__plugindir))
+
+            self.udfRemoteFile = "%s/%s.%s" % (self.__plugindir, self.udfSharedLibName, self.udfSharedLibExt)
 
         # On MySQL 4.1 < 4.1.25 and on MySQL 4.1 >= 4.1.25 with NO plugin_dir set in my.ini configuration file
         # On MySQL 5.0 < 5.0.67 and on MySQL 5.0 >= 5.0.67 with NO plugin_dir set in my.ini configuration file
