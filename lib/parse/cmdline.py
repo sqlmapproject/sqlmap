@@ -294,7 +294,7 @@ def cmdLineParser():
                                   "default %d)" % defaults.level)
 
         detection.add_option("--risk", dest="risk", type="int",
-                             help="Risk of tests to perform (0-3, "
+                             help="Risk of tests to perform (1-3, "
                                   "default %d)" % defaults.level)
 
         detection.add_option("--string", dest="string",
