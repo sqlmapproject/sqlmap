@@ -606,7 +606,10 @@ def cmdLineParser():
                             help="Force character encoding used for data retrieval")
 
         general.add_option("--crawl", dest="crawlDepth", type="int",
-                                  help="Crawl the website starting from the target URL")
+                            help="Crawl the website starting from the target URL")
+
+        general.add_option("--crawl-exclude", dest="crawlExclude",
+                           help="Regexp to exclude pages from crawling (e.g. \"logout\")")
 
         general.add_option("--csv-del", dest="csvDel",
                                   help="Delimiting character used in CSV output "

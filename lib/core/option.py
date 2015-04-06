@@ -2234,6 +2234,13 @@ def _basicOptionValidation():
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.regexp, ex)
             raise SqlmapSyntaxException(errMsg)
 
+    if conf.crawlExclude:
+        try:
+            re.compile(conf.crawlExclude)
+        except re.error, ex:
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.crawlExclude, ex)
+            raise SqlmapSyntaxException(errMsg)
+
     if conf.dumpTable and conf.dumpAll:
         errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
         raise SqlmapSyntaxException(errMsg)
@@ -2248,6 +2255,10 @@ def _basicOptionValidation():
 
     if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile, conf.sitemapUrl)):
         errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g', '-m' or '-x'"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.crawlExclude and not conf.crawlDepth:
+        errMsg = "option '--crawl-exclude' requires usage of switch '--crawl'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.csrfUrl and not conf.csrfToken:

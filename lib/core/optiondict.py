@@ -188,6 +188,7 @@ optDict = {
                                "batch":             "boolean",
                                "charset":           "string",
                                "crawlDepth":        "integer",
+                               "crawlExclude":      "string",
                                "csvDel":            "string",
                                "dumpFormat":        "string",
                                "eta":               "boolean",

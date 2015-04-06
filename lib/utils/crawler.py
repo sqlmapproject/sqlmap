@@ -48,6 +48,10 @@ def crawl(target):
                         current = threadData.shared.unprocessed.pop()
                         if current in visited:
                             continue
+                        elif conf.crawlExclude and re.search(conf.crawlExclude, current):
+                            dbgMsg = "skipping '%s'" % current
+                            logger.debug(dbgMsg)
+                            continue
                         else:
                             visited.add(current)
                     else:
