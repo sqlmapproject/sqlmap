@@ -127,7 +127,7 @@ def crawl(target):
             test = readInput(message, default="n")
             if test[0] in ("y", "Y"):
                 items = None
-                url = "%s://%s:%d/sitemap.xml" % (conf.scheme, conf.hostname, conf.port)
+                url = urlparse.urljoin(target, "/sitemap.xml")
                 try:
                     items = parseSitemap(url)
                 except:
