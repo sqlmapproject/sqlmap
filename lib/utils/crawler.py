@@ -123,9 +123,9 @@ def crawl(target):
 
         if not conf.sitemapUrl:
             message = "do you want to check for the existence of "
-            message += "site's sitemap(.xml) [Y/n] "
-            test = readInput(message, default="Y")
-            if test[0] not in ("n", "N"):
+            message += "site's sitemap(.xml) [y/N] "
+            test = readInput(message, default="n")
+            if test[0] in ("y", "Y"):
                 items = None
                 url = "%s://%s:%d/sitemap.xml" % (conf.scheme, conf.hostname, conf.port)
                 try:
