@@ -51,6 +51,7 @@ optDict = {
                                "retries":           "integer",
                                "rParam":            "string",
                                "safUrl":            "string",
+                               "safPost":           "string",
                                "saFreq":            "integer",
                                "skipUrlEncode":     "boolean",
                                "csrfToken":         "string",

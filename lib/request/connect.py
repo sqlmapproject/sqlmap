@@ -971,11 +971,10 @@ class Connect(object):
                     warnMsg += "10 or more)"
                     logger.critical(warnMsg)
 
-
         if conf.safUrl and conf.saFreq > 0:
             kb.queryCounter += 1
             if kb.queryCounter % conf.saFreq == 0:
-                Connect.getPage(url=conf.safUrl, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
+                Connect.getPage(url=conf.safUrl, post=conf.safPost, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
 
         start = time.time()
 

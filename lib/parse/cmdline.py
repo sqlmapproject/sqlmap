@@ -188,6 +188,9 @@ def cmdLineParser():
         request.add_option("--safe-url", dest="safUrl",
                            help="URL address to visit frequently during testing")
 
+        request.add_option("--safe-post", dest="safPost",
+                           help="POST data to send to a safe URL")
+
         request.add_option("--safe-freq", dest="saFreq", type="int",
                            help="Test requests between two visits to a given safe URL")
 
