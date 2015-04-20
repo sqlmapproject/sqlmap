@@ -1140,16 +1140,16 @@ def _setSafeUrl():
     """
     Check and set the safe URL options.
     """
-    if not conf.safUrl:
+    if not conf.safeUrl:
         return
 
-    if not re.search("^http[s]*://", conf.safUrl):
-        if ":443/" in conf.safUrl:
-            conf.safUrl = "https://" + conf.safUrl
+    if not re.search("^http[s]*://", conf.safeUrl):
+        if ":443/" in conf.safeUrl:
+            conf.safeUrl = "https://" + conf.safeUrl
         else:
-            conf.safUrl = "http://" + conf.safUrl
+            conf.safeUrl = "http://" + conf.safeUrl
 
-    if conf.saFreq <= 0:
+    if conf.safeFreq <= 0:
         errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe URL feature"
         raise SqlmapSyntaxException(errMsg)
 
