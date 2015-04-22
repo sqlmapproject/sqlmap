@@ -191,6 +191,9 @@ def cmdLineParser():
         request.add_option("--safe-post", dest="safePost",
                            help="POST data to send to a safe URL")
 
+        request.add_option("--safe-req", dest="safeReqFile",
+                           help="Load safe HTTP request from a file")
+
         request.add_option("--safe-freq", dest="safeFreq", type="int",
                            help="Test requests between two visits to a given safe URL")
 

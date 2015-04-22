@@ -52,6 +52,7 @@ optDict = {
                                "rParam":            "string",
                                "safeUrl":           "string",
                                "safePost":          "string",
+                               "safeReqFile":       "string",
                                "safeFreq":          "integer",
                                "skipUrlEncode":     "boolean",
                                "csrfToken":         "string",
