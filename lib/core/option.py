@@ -2261,6 +2261,14 @@ def _basicOptionValidation():
         errMsg = "option '--crawl-exclude' requires usage of switch '--crawl'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.safePost and not conf.safeUrl:
+        errMsg = "option '--safe-post' requires usage of option '--safe-url'"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.safeFreq and not conf.safeUrl:
+        errMsg = "option '--safe-freq' requires usage of option '--safe-url'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.csrfUrl and not conf.csrfToken:
         errMsg = "option '--csrf-url' requires usage of option '--csrf-token'"
         raise SqlmapSyntaxException(errMsg)
