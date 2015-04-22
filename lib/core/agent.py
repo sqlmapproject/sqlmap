@@ -119,7 +119,7 @@ class Agent(object):
                 header = paramString.split(',')[0]
 
                 if header.upper() == HTTP_HEADER.AUTHORIZATION.upper():
-                    origValue = origValue.split(' ')[-1]
+                    origValue = origValue.split(' ')[-1].split(':')[-1]
 
         if conf.prefix:
             value = origValue
