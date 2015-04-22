@@ -256,6 +256,35 @@ class Filesystem(GenericFilesystem):
 
             self.execCmd(complComm)
 
+    def _stackedWriteFileCertutilExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
+        infoMsg = "using Certutil.exe to write the %s " % fileType
+        infoMsg += "file content to file '%s', please wait.." % dFile
+        logger.info(infoMsg)
+        chunkSize = 500
+
+        dFileName = ntpath.basename(dFile)
+
+        randFile = "tmpf%s.txt" % randomStr(lowercase=True)
+        randFilePath = "%s\%s" % (tmpPath, randFile)
+
+        encodedFileContent = base64encode(wFileContent)
+
+        splittedEncodedFileContent = '\n'.join([encodedFileContent[i:i+chunkSize] for i in range(0, len(encodedFileContent), chunkSize)])
+
+        logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
+
+        self.xpCmdshellWriteFile(splittedEncodedFileContent, tmpPath, randFile)
+
+        logger.debug("decoding the file to %s.." % dFile)
+
+        commands = ("cd \"%s\"" % tmpPath, "certutil -decode %s %s" % (randFile, dFile),
+                     "del /F /Q %s" % randFile)
+        complComm = " & ".join(command for command in commands)
+
+        self.execCmd(complComm)
+
+
+
     def _stackedWriteFileVbs(self, tmpPath, wFileContent, dFile, fileType):
         infoMsg = "using a custom visual basic script to write the "
         infoMsg += "%s file content to file '%s', please wait.." % (fileType, dFile)
@@ -350,25 +379,20 @@ class Filesystem(GenericFilesystem):
         with open(wFile, "rb") as f:
             wFileContent = f.read()
 
-        self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+        message = "Try to upload the file with "
+        message += "[P]owershell, [C]ertutil, [V]bs, [D]ebug technique ?"
+
+        choice = readInput(message, default="P")
+
+        if choice.lower() == "c":
+            self._stackedWriteFileCertutilExe(tmpPath, wFile, wFileContent, dFile, fileType)
+        elif choice.lower() == "v":
+            self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
+        elif choice.lower() == "d":
+            self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
+        else:
+            self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+
         written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
-
-        if written is False:
-            message = "do you want to try to upload the file with "
-            message += "the custom Visual Basic script technique? [Y/n] "
-            choice = readInput(message, default="Y")
-
-            if not choice or choice.lower() == "y":
-                self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
-                written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
-
-        if written is False:
-            message = "do you want to try to upload the file with "
-            message += "the built-in debug.exe technique? [Y/n] "
-            choice = readInput(message, default="Y")
-
-            if not choice or choice.lower() == "y":
-                self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
-                written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         return written

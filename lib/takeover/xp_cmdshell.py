@@ -32,6 +32,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
+from sys import stdout
 
 class Xp_cmdshell:
     """
@@ -136,12 +137,17 @@ class Xp_cmdshell:
             echoedLine = "echo %s " % line
             echoedLine += ">> \"%s\%s\"" % (tmpPath, randDestFile)
             echoedLines.append(echoedLine)
-
+        logger.info("%d lines to write..."%len(echoedLines))
+        logger.info("")
+        writtedLine = 0
         for echoedLine in echoedLines:
+            writtedLine += 1
             cmd += "%s & " % echoedLine
             charCounter += len(echoedLine)
 
             if charCounter >= maxLen:
+                stdout.write("\033[F")
+                logger.info("[%d/%d]" %(writtedLine, len(echoedLines)))
                 self.xpCmdshellExecCmd(cmd)
 
                 cmd = ""
