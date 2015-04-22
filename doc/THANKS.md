@@ -621,6 +621,9 @@ abc abc, <biedimc(at)gmx.net>
 Abuse 007, <abuse007(at)gmail.com>
 * for reporting a bug
 
+agix, <florian.gaultier@gmail.com>
+* for contributing the file upload via certutil.exe functionality
+
 Alex, <m3zero(at)gmail.com>
 * for reporting a minor bug
 

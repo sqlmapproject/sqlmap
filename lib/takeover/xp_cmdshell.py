@@ -142,13 +142,13 @@ class Xp_cmdshell:
             charCounter += len(echoedLine)
 
             if charCounter >= maxLen:
-                self.xpCmdshellExecCmd(cmd)
+                self.xpCmdshellExecCmd(cmd.rstrip(" & "))
 
                 cmd = ""
                 charCounter = 0
 
         if cmd:
-            self.xpCmdshellExecCmd(cmd)
+            self.xpCmdshellExecCmd(cmd.rstrip(" & "))
 
     def xpCmdshellForgeCmd(self, cmd, insertIntoTable=None):
         # When user provides DBMS credentials (with --dbms-cred) we need to
