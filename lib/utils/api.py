@@ -77,10 +77,17 @@ class Database(object):
         self.connection.commit()
 
     def execute(self, statement, arguments=None):
-        if arguments:
-            self.cursor.execute(statement, arguments)
-        else:
-            self.cursor.execute(statement)
+        while True:
+            try:
+                if arguments:
+                    self.cursor.execute(statement, arguments)
+                else:
+                    self.cursor.execute(statement)
+            except sqlite3.OperationalError, ex:
+                if not "locked" in ex.message:
+                    raise
+            else:
+                break
 
         if statement.lstrip().upper().startswith("SELECT"):
             return self.cursor.fetchall()
