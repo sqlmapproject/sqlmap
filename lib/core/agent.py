@@ -28,6 +28,7 @@ from lib.core.data import queries
 from lib.core.dicts import DUMP_DATA_PREPROCESS
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
@@ -114,6 +115,11 @@ class Agent(object):
             match = re.search(r"([^;]+)=(?P<value>[^;]+);?\Z", origValue)
             if match:
                 origValue = match.group("value")
+            elif ',' in paramString:
+                header = paramString.split(',')[0]
+
+                if header.upper() == HTTP_HEADER.AUTHORIZATION.upper():
+                    origValue = origValue.split(' ')[-1]
 
         if conf.prefix:
             value = origValue
