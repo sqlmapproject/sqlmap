@@ -155,7 +155,7 @@ class Task(object):
 
     def engine_start(self):
         self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)],
-                             shell=False, stdin=PIPE, close_fds=False)
+                             shell=False, stdin=PIPE, close_fds=True)
 
     def engine_stop(self):
         if self.process:
