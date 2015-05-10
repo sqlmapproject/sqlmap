@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 """
 Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
@@ -81,4 +81,3 @@ class _GetchMacCarbon(object):
 
 
 getch = _Getch()
-

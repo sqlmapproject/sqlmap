@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 """
 Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
@@ -95,4 +95,3 @@ def checkDependencies():
     if len(missing_libraries) == 0:
         infoMsg = "all dependencies are installed"
         logger.info(infoMsg)
-
