@@ -1248,7 +1248,8 @@ def parseTargetUrl():
         errMsg += "on this platform"
         raise SqlmapGenericException(errMsg)
 
-    if not re.search("^http[s]*://", conf.url, re.I):
+    if not re.search("^http[s]*://", conf.url, re.I) and \
+            not re.search("^ws[s]*://", conf.url, re.I):
         if ":443/" in conf.url:
             conf.url = "https://" + conf.url
         else:

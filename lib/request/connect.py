@@ -19,6 +19,13 @@ import traceback
 import urllib2
 import urlparse
 
+try:
+    import websocket
+    from websocket import WebSocketException
+except ImportError:
+    class WebSocketException(Exception):
+        pass
+
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
@@ -232,6 +239,7 @@ class Connect(object):
         retrying = kwargs.get("retrying",           False)
         crawling = kwargs.get("crawling",           False)
         skipRead = kwargs.get("skipRead",           False)
+        is_websocket = conf.url.startswith("ws")
 
         if not urlparse.urlsplit(url).netloc:
             url = urlparse.urljoin(conf.url, url)
@@ -364,7 +372,18 @@ class Connect(object):
             url = unicodeencode(url)
             post = unicodeencode(post, kb.pageEncoding)
 
-            if method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
+            if is_websocket:
+                # WebSocket will add Host field of headers automatically
+                disallowed_headers = ['Host']
+                ws = websocket.WebSocket()
+                ws.connect(url, header=["%s: %s" % _ for _ in headers.items() if _[0] not in disallowed_headers], cookie=cookie)
+                ws.send(urldecode(post) if post else '')
+                response = ws.recv()
+                ws.close()
+                # WebSocket class does not have response headers
+                return response, {}, 101
+
+            elif method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                 method = unicodeencode(method)
                 req = MethodRequest(url, post, headers)
                 req.set_method(method)
@@ -538,13 +557,13 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, httplib.ResponseNotReady, struct.error, ProxyError, SqlmapCompressionException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.BadStatusLine, httplib.IncompleteRead, httplib.ResponseNotReady, struct.error, ProxyError, SqlmapCompressionException, WebSocketException), e:
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
                 warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
-            elif "forcibly closed" in tbMsg:
+            elif "forcibly closed" in tbMsg or "Connection is already closed" in tbMsg:
                 warnMsg = "connection was forcibly closed by the target URL"
             elif "timed out" in tbMsg:
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
@@ -563,6 +582,10 @@ class Connect(object):
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
                 warnMsg += "from the target URL"
+            elif "Handshake status" in tbMsg:
+                status = re.search("Handshake status ([\d]{3})", tbMsg)
+                errMsg = "websocket handshake status %s" % status.group(1) if status else 'unknown'
+                raise SqlmapConnectionException(errMsg)
             else:
                 warnMsg = "unable to connect to the target URL"
 
