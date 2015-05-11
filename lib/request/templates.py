@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """
 Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
@@ -19,4 +19,3 @@ def getPageTemplate(payload, place):
         retVal = kb.pageTemplates[(payload, place)]
 
     return retVal
-
