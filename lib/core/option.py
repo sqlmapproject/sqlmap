@@ -2180,6 +2180,16 @@ def _setTorSocksProxySettings():
     socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, conf.torPort or DEFAULT_TOR_SOCKS_PORT)
     socks.wrapmodule(urllib2)
 
+def _checkWebSocket():
+    infoMsg = "checking URL is WebSocket or not"
+    logger.debug(infoMsg)
+    if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
+        try:
+            from websocket import ABNF
+        except ImportError:
+            errMsg = "it seems that python 'websocket-client' third-party library not be installed. "
+            raise SqlmapMissingDependence(errMsg)
+
 def _checkTor():
     if not conf.checkTor:
         return
@@ -2449,6 +2459,7 @@ def init():
     _setWafFunctions()
     _setTrafficOutputFP()
     _resolveCrossReferences()
+    _checkWebSocket()
 
     parseTargetUrl()
     parseTargetDirect()
