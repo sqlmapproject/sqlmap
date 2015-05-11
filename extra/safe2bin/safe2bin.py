@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python2
 
 """
 safe2bin.py - Simple safe(hex) to binary format converter
