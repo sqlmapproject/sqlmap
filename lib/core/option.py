@@ -2181,13 +2181,15 @@ def _setTorSocksProxySettings():
     socks.wrapmodule(urllib2)
 
 def _checkWebSocket():
-    infoMsg = "checking URL is WebSocket or not"
+    infoMsg = "checking for WebSocket"
     logger.debug(infoMsg)
+
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
             from websocket import ABNF
         except ImportError:
-            errMsg = "it seems that python 'websocket-client' third-party library not be installed. "
+            errMsg = "sqlmap requires third-party module 'websocket-client' "
+            errMsg += "in order to use WebSocket funcionality"
             raise SqlmapMissingDependence(errMsg)
 
 def _checkTor():

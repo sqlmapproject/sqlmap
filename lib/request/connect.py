@@ -599,7 +599,7 @@ class Connect(object):
                 warnMsg += "from the target URL"
             elif "Handshake status" in tbMsg:
                 status = re.search("Handshake status ([\d]{3})", tbMsg)
-                errMsg = "websocket handshake status %s" % status.group(1) if status else 'unknown'
+                errMsg = "websocket handshake status %s" % status.group(1) if status else "unknown"
                 raise SqlmapConnectionException(errMsg)
             else:
                 warnMsg = "unable to connect to the target URL"
