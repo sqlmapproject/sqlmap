@@ -73,6 +73,7 @@ optDict = {
             "Injection":     {
                                "testParameter":     "string",
                                "skip":              "string",
+                               "skipStatic":        "boolean",
                                "dbms":              "string",
                                "dbmsCred":          "string",
                                "os":                "string",

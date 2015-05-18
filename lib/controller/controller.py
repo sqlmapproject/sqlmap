@@ -476,13 +476,18 @@ def start():
                             infoMsg = "ignoring %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
-                        elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech:
+                        elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech or conf.skipStatic:
                             check = checkDynParam(place, parameter, value)
 
                             if not check:
                                 warnMsg = "%s parameter '%s' does not appear dynamic" % (paramType, parameter)
                                 logger.warn(warnMsg)
 
+                                if conf.skipStatic:
+                                    infoMsg = "skipping static %s parameter '%s'" % (paramType, parameter)
+                                    logger.info(infoMsg)
+
+                                    testSqlInj = False
                             else:
                                 infoMsg = "%s parameter '%s' is dynamic" % (paramType, parameter)
                                 logger.info(infoMsg)
