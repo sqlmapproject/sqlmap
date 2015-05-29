@@ -212,7 +212,7 @@ class Connect(object):
             cpuThrottle(conf.cpuThrottle)
 
         if conf.dummy:
-            return randomStr(int(randomInt()), alphabet=[chr(_) for _ in xrange(256)]), {}, int(randomInt())
+            return getUnicode(randomStr(int(randomInt()), alphabet=[chr(_) for _ in xrange(256)]), {}, int(randomInt())), None, None
 
         threadData = getCurrentThreadData()
         with kb.locks.request:
