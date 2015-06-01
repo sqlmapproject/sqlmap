@@ -7,8 +7,10 @@ See the file 'doc/COPYING' for copying permission
 
 import httplib
 import socket
+import sys
 import urllib2
 
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 
@@ -19,7 +21,7 @@ try:
 except ImportError:
     pass
 
-_protocols = filter(None, (getattr(ssl, _, None) for _ in ("PROTOCOL_SSLv3", "PROTOCOL_TLSv1", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2")))
+_protocols = filter(None, (getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2")))
 
 class HTTPSConnection(httplib.HTTPSConnection):
     """
@@ -41,21 +43,42 @@ class HTTPSConnection(httplib.HTTPSConnection):
 
         success = False
 
-        for protocol in _protocols:
-            try:
-                sock = create_sock()
-                _ = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=protocol)
-                if _:
-                    success = True
-                    self.sock = _
-                    _protocols.remove(protocol)
-                    _protocols.insert(0, protocol)
-                    break
-                else:
-                    sock.close()
-            except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
-                self._tunnel_host = None
-                logger.debug("SSL connection error occurred ('%s')" % errMsg)
+        if not kb.tlsSNI:
+            for protocol in _protocols:
+                try:
+                    sock = create_sock()
+                    _ = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=protocol)
+                    if _:
+                        success = True
+                        self.sock = _
+                        _protocols.remove(protocol)
+                        _protocols.insert(0, protocol)
+                        break
+                    else:
+                        sock.close()
+                except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
+                    self._tunnel_host = None
+                    logger.debug("SSL connection error occurred ('%s')" % errMsg)
+
+        # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
+        #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
+        if not success and hasattr(ssl, "SSLContext"):
+            for protocol in filter(lambda _: _ >= ssl.PROTOCOL_TLSv1, _protocols):
+                try:
+                    sock = create_sock()
+                    context = ssl.SSLContext(protocol)
+                    _ = context.wrap_socket(sock, do_handshake_on_connect=False, server_hostname=self.host)
+                    if _:
+                        kb.tlsSNI = success = True
+                        self.sock = _
+                        _protocols.remove(protocol)
+                        _protocols.insert(0, protocol)
+                        break
+                    else:
+                        sock.close()
+                except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
+                    self._tunnel_host = None
+                    logger.debug("SSL connection error occurred ('%s')" % errMsg)
 
         if not success:
             raise SqlmapConnectionException("can't establish SSL connection")

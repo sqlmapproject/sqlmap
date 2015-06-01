@@ -1836,6 +1836,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.safeReq = AttribDict()
     kb.singleLogFlags = set()
     kb.reduceTests = None
+    kb.tlsSNI = None
     kb.stickyDBMS = False
     kb.stickyLevel = None
     kb.storeCrawlingChoice = None
