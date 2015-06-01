@@ -36,7 +36,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        match = re.search(r"(?i)(\b(AND|OR)\b\s+)(?!.*\b(AND|OR)\b)([^>]+?)\s*>\s*([^>]+)\s*\Z", payload)
+        match = re.search(r"(?i)(\b(AND|OR)\b\s+)(?!.*\b(AND|OR)\b)([^>]+?)\s*>\s*([^>#-]+)", payload)
 
         if match:
             _ = "%sGREATEST(%s,%s+1)=%s" % (match.group(1), match.group(4), match.group(5), match.group(4))
