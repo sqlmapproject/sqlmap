@@ -66,6 +66,12 @@ def forgeHeaders(items=None):
     headers = OrderedDict()
     for key, value in _.items():
         success = False
+
+        for _ in headers:
+            if _.upper() == key.upper():
+                del headers[_]
+                break
+
         if key.upper() not in (_.upper() for _ in getPublicTypeMembers(HTTP_HEADER, True)):
             try:
                 headers[_str(key)] = value  # dirty hack for http://bugs.python.org/issue12455
