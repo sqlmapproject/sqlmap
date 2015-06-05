@@ -1007,6 +1007,14 @@ def sanitizeStr(value):
 
     return getUnicode(value).replace("\n", " ").replace("\r", "")
 
+def getHeader(headers, key):
+    retVal = None
+    for _ in (headers or {}):
+        if _.upper() == key.upper():
+            retVal = headers[_]
+            break
+    return retVal
+
 def checkFile(filename):
     """
     Checks for file existence and readability

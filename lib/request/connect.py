@@ -37,6 +37,7 @@ from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import findMultipartPostBoundary
 from lib.core.common import getCurrentThreadData
+from lib.core.common import getHeader
 from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
 from lib.core.common import getUnicode
@@ -338,16 +339,16 @@ class Connect(object):
             if kb.proxyAuthHeader:
                 headers[HTTP_HEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
-            if HTTP_HEADER.ACCEPT not in headers:
+            if not getHeader(headers, HTTP_HEADER.ACCEPT):
                 headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
-            if HTTP_HEADER.HOST not in headers or not target:
+            if not getHeader(headers, HTTP_HEADER.HOST) or not target:
                 headers[HTTP_HEADER.HOST] = getHostHeader(url)
 
-            if HTTP_HEADER.ACCEPT_ENCODING not in headers:
+            if not getHeader(headers, HTTP_HEADER.ACCEPT_ENCODING):
                 headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
 
-            if post is not None and HTTP_HEADER.CONTENT_TYPE not in headers:
+            if post is not None and not getHeader(headers, HTTP_HEADER.CONTENT_TYPE):
                 headers[HTTP_HEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
 
             if headers.get(HTTP_HEADER.CONTENT_TYPE) == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
