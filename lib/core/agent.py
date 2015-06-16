@@ -33,6 +33,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -187,6 +188,9 @@ class Agent(object):
             if retVal == paramString and urlencode(parameter) != parameter:
                 retVal = _(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
 
+        if retVal:
+            retVal = retVal.replace(BOUNDARY_BACKSLASH_MARKER, '\\')
+
         return retVal
 
     def fullPayload(self, query):
@@ -237,7 +241,7 @@ class Agent(object):
             if not (expression and expression[0] == ';') and not (query and query[-1] in ('(', ')') and expression and expression[0] in ('(', ')')) and not (query and query[-1] == '('):
                 query += " "
 
-        query = "%s%s" % (query, expression)
+        query = "%s%s" % (query.replace('\\', BOUNDARY_BACKSLASH_MARKER), expression)
 
         return query
 
@@ -271,7 +275,7 @@ class Agent(object):
             pass
 
         elif suffix and not comment:
-            expression += suffix
+            expression += suffix.replace('\\', BOUNDARY_BACKSLASH_MARKER)
 
         return re.sub(r"(?s);\W*;", ";", expression)
 
