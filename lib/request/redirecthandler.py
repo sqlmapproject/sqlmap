@@ -61,8 +61,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
                 kb.resendPostOnRedirect = choice.upper() == 'Y'
 
-                if kb.resendPostOnRedirect:
-                    self.redirect_request = self._redirect_request
+            if kb.resendPostOnRedirect:
+                self.redirect_request = self._redirect_request
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
         newurl = newurl.replace(' ', '%20')

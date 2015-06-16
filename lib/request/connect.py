@@ -639,6 +639,12 @@ class Connect(object):
             _ = urlparse.urlsplit(conn.redurl)
             _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
             requestMsg = re.sub("(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % re.escape(getUnicode(_)), requestMsg, 1)
+
+            if kb.resendPostOnRedirect is False:
+                requestMsg = re.sub("(\[#\d+\]:\n)POST ", "\g<1>GET ", requestMsg)
+                requestMsg = re.sub("(?i)Content-length: \d+\n", "", requestMsg)
+                requestMsg = re.sub("(?s)\n\n.+", "\n", requestMsg)
+
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, conn.code, status)
         else:
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
