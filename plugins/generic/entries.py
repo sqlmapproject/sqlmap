@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -42,6 +42,7 @@ from lib.core.settings import NULL
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
 from lib.utils.pivotdumptable import pivotDumpTable
+from lib.utils.pivotdumptable import whereQuery
 
 class Entries:
     """
@@ -64,7 +65,7 @@ class Entries:
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if Backend.isDbms(DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.db = conf.db.upper()
 
             if  ',' in conf.db:
@@ -122,6 +123,17 @@ class Entries:
 
                 columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]
                 colList = sorted(filter(None, columns.keys()))
+
+                if conf.excludeCol:
+                    colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
+                if not colList:
+                    warnMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg += " (no usable column names)"
+                    logger.warn(warnMsg)
+                    continue
+
                 colNames = colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
@@ -135,7 +147,7 @@ class Entries:
                 for column in colList:
                     _ = agent.preprocessField(tbl, column)
                     if _ != column:
-                        colString = re.sub(r"\b%s\b" % column, _, colString)
+                        colString = re.sub(r"\b%s\b" % re.escape(column), _, colString)
 
                 entriesCount = 0
 
@@ -163,6 +175,8 @@ class Entries:
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
+
+                    query = whereQuery(query)
 
                     if not entries and query:
                         entries = inject.getValue(query, blind=False, time=False, dump=True)
@@ -214,6 +228,8 @@ class Entries:
                         query = rootQuery.blind.count % tbl
                     else:
                         query = rootQuery.blind.count % (conf.db, tbl)
+
+                    query = whereQuery(query)
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
@@ -289,6 +305,8 @@ class Entries:
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
 
+                                    query = whereQuery(query)
+
                                     value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
                                     value = '' if value is None else value
 
@@ -319,12 +337,17 @@ class Entries:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
                                                         "table": safeSQLIdentificatorNaming(tbl, True),
                                                         "db": safeSQLIdentificatorNaming(conf.db)}
-                    attackDumpedTable()
+                    try:
+                        attackDumpedTable()
+                    except (IOError, OSError), ex:
+                        errMsg = "an error occurred while attacking "
+                        errMsg += "table dump ('%s')" % ex
+                        logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
-            except SqlmapConnectionException, e:
-                errMsg = "connection exception detected in dumping phase: "
-                errMsg += "'%s'" % e
+            except SqlmapConnectionException, ex:
+                errMsg = "connection exception detected in dumping phase "
+                errMsg += "('%s')" % ex
                 logger.critical(errMsg)
 
             finally:
@@ -420,7 +443,12 @@ class Entries:
                     continue
 
                 conf.tbl = table
-                conf.col = ",".join(column for column in filter(None, sorted(columns)))
+                colList = filter(None, sorted(columns))
+
+                if conf.excludeCol:
+                    colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
+                conf.col = ",".join(colList)
                 kb.data.cachedColumns = {}
                 kb.data.dumpedTable = {}
 

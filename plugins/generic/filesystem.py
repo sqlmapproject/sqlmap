@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -10,6 +10,7 @@ import os
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import Backend
+from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
 from lib.core.common import decodeHexValue
 from lib.core.common import isNumPosStrValue
@@ -38,7 +39,7 @@ class Filesystem:
 
     def _checkFileLength(self, localFile, remoteFile, fileRead=False):
         if Backend.isDbms(DBMS.MYSQL):
-            lengthQuery = "SELECT LENGTH(LOAD_FILE('%s'))" % remoteFile
+            lengthQuery = "LENGTH(LOAD_FILE('%s'))" % remoteFile
 
         elif Backend.isDbms(DBMS.PGSQL) and not fileRead:
             lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
@@ -66,20 +67,20 @@ class Filesystem:
                 if localFileSize == remoteFileSize:
                     sameFile = True
                     infoMsg = "the local file %s and the remote file " % localFile
-                    infoMsg += "%s has the same size" % remoteFile
+                    infoMsg += "%s have the same size (%db)" % (remoteFile, localFileSize)
                 elif remoteFileSize > localFileSize:
-                    infoMsg = "the remote file %s is larger than " % remoteFile
-                    infoMsg += "the local file %s" % localFile
+                    infoMsg = "the remote file %s is larger (%db) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "the local file %s (%db)" % (localFile, localFileSize)
                 else:
-                    infoMsg = "the remote file %s is smaller than " % remoteFile
-                    infoMsg += "file '%s' (%d bytes)" % (localFile, localFileSize)
+                    infoMsg = "the remote file %s is smaller (%db) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "file %s (%db)" % (localFile, localFileSize)
 
                 logger.info(infoMsg)
             else:
                 sameFile = False
-                warnMsg = "it looks like the file has not been written, this "
-                warnMsg += "can occur if the DBMS process' user has no write "
-                warnMsg += "privileges in the destination path"
+                warnMsg = "it looks like the file has not been written (usually "
+                warnMsg += "occurs if the DBMS process' user has no write "
+                warnMsg += "privileges in the destination path)"
                 logger.warn(warnMsg)
 
         return sameFile
@@ -255,6 +256,8 @@ class Filesystem:
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
         written = False
+
+        checkFile(localFile)
 
         self.checkDbmsOs()
 

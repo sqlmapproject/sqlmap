@@ -3,13 +3,13 @@
 ## Reporting bugs
 
 **Bug reports are welcome**!
-Please report all bugs on the [issue tracker](https://github.com/sqlmapproject/sqlmap/issues) or, alternatively, to the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users).
+Please report all bugs on the [issue tracker](https://github.com/sqlmapproject/sqlmap/issues).
 
 ### Guidelines
 
-* Before you submit a bug report, search both open and closed issues to make sure the issue has not come up before. Also, check the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki) for anything relevant.
+* Before you submit a bug report, search both [open](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aopen+is%3Aissue) and [closed](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) issues to make sure the issue has not come up before. Also, check the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki) for anything relevant.
 * Make sure you can reproduce the bug with the latest development version of sqlmap.
-* Your report should give detailed instructions for how to reproduce the problem. If sqlmap raises an unhandled exception, the traceback is needed. Details of the unexpected behaviour are welcome too. A small test case (just a few lines) is ideal.
+* Your report should give detailed instructions on how to reproduce the problem. If sqlmap raises an unhandled exception, the entire traceback is needed. Details of the unexpected behaviour are welcome too. A small test case (just a few lines) is ideal.
 * If you are making an enhancement request, lay out the rationale for the feature you are requesting. *Why would this feature be useful?*
 * If you are not sure whether something is a bug, or want to discuss a potential new feature before putting in an enhancement request, the [mailing list](https://lists.sourceforge.net/lists/listinfo/sqlmap-users) is a good place to bring it up.
 
@@ -35,4 +35,4 @@ In order to maintain consistency and readability throughout the code, we ask tha
 
 ### Licensing
 
-By submitting code contributions to the sqlmap developers, to the mailing lists, or via Git pull request, checking them into the sqlmap source code repository, it is understood (unless you specify otherwise) that you are offering the sqlmap project the unlimited, non-exclusive right to reuse, modify, and relicense the code. sqlmap will always be available Open Source, but this is important because the inability to relicense code has caused devastating problems for other Free Software projects (such as KDE and NASM). If you wish to specify special license conditions of your contributions, just say so when you send them.
+By submitting code contributions to the sqlmap developers, to the mailing list, or via Git pull request, checking them into the sqlmap source code repository, it is understood (unless you specify otherwise) that you are offering the sqlmap copyright holders the unlimited, non-exclusive right to reuse, modify, and relicense the code. This is important because the inability to relicense code has caused devastating problems for other software projects (such as KDE and NASM). If you wish to specify special license conditions of your contributions, just say so when you send them.

@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import imp
 import logging
 import os
+import re
 import sys
 import warnings
 
 _sqlalchemy = None
 try:
     f, pathname, desc = imp.find_module("sqlalchemy", sys.path[1:])
-    _sqlalchemy = imp.load_module("sqlalchemy", f, pathname, desc)
-    warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
+    _ = imp.load_module("sqlalchemy", f, pathname, desc)
+    if hasattr(_, "dialects"):
+        _sqlalchemy = _
+        warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
 except ImportError:
     pass
 
@@ -49,7 +52,7 @@ class SQLAlchemy(GenericConnector):
                     conf.direct = "%s////%s" % (_[0], os.path.abspath(self.db))
 
                 if self.dialect:
-                    conf.direct = conf.direct.replace(conf.dbms, self.dialect)
+                    conf.direct = conf.direct.replace(conf.dbms, self.dialect, 1)
 
                 engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False} if self.dialect == "sqlite" else {})
                 self.connector = engine.connect()
@@ -67,14 +70,14 @@ class SQLAlchemy(GenericConnector):
                 retVal.append(tuple(row))
             return retVal
         except _sqlalchemy.exc.ProgrammingError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg.message if hasattr(msg, "message") else msg)
             return None
 
     def execute(self, query):
         try:
             self.cursor = self.connector.execute(query)
         except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg.message if hasattr(msg, "message") else msg)
         except _sqlalchemy.exc.InternalError, msg:
             raise SqlmapConnectionException(msg[1])
 

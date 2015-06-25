@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -14,6 +14,7 @@ from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -49,6 +50,8 @@ class Enumeration(GenericEnumeration):
             users = kb.data.cachedUsers
 
         for user in users:
+            user = unArrayizeValue(user)
+
             if user is None:
                 continue
 
@@ -102,7 +105,7 @@ class Enumeration(GenericEnumeration):
 
                 if not isNoneValue(value):
                     value = filter(None, arrayizeValue(value))
-                    value = [safeSQLIdentificatorNaming(_, True) for _ in value]
+                    value = [safeSQLIdentificatorNaming(unArrayizeValue(_), True) for _ in value]
                     kb.data.cachedTables[db] = value
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
@@ -263,6 +266,10 @@ class Enumeration(GenericEnumeration):
         infoMsgTbl = ""
         infoMsgDb = ""
         colList = conf.col.split(",")
+
+        if conf.excludeCol:
+            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
         origTbl = conf.tbl
         origDb = conf.db
         colCond = rootQuery.inband.condition
@@ -311,7 +318,7 @@ class Enumeration(GenericEnumeration):
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
-            for db in dbs.keys():
+            for db in filter(None, dbs.keys()):
                 db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
@@ -341,7 +348,7 @@ class Enumeration(GenericEnumeration):
                                 conf.tbl = foundTbl
                                 conf.col = column
 
-                                self.getColumns(onlyColNames=True, bruteForce=False)
+                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
                                 if db in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[db]\
                                   and not isNoneValue(kb.data.cachedColumns[db][foundTbl]):
@@ -400,7 +407,7 @@ class Enumeration(GenericEnumeration):
                             conf.tbl = tbl
                             conf.col = column
 
-                            self.getColumns(onlyColNames=True, bruteForce=False)
+                            self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
                             if db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[db]:
                                 dbs[db][tbl].update(kb.data.cachedColumns[db][tbl])

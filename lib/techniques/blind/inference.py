@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -40,6 +40,7 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
+from lib.core.settings import MAX_BISECTION_LENGTH
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
@@ -58,6 +59,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     """
 
     abortedFlag = False
+    showEta = False
     partialValue = u""
     finalValue = None
     retrievedLength = 0
@@ -135,6 +137,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if length and (lastChar > 0 or firstChar > 0):
             length = min(length, lastChar or length) - firstChar
 
+        if length and length > MAX_BISECTION_LENGTH:
+            length = None
+
         showEta = conf.eta and isinstance(length, int)
         numThreads = min(conf.threads, length)
 
@@ -194,7 +199,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             value are not equal there will be a deliberate delay).
             """
 
-            if CHAR_INFERENCE_MARK not in payload:
+            if "'%s'" % CHAR_INFERENCE_MARK not in payload:
                 forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
             else:
                 # e.g.: ... > '%c' -> ... > ORD(..)
@@ -221,7 +226,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if charTbl is None:
                 charTbl = type(asciiTbl)(asciiTbl)
 
-            originalTbl = type(asciiTbl)(charTbl)
+            originalTbl = type(charTbl)(charTbl)
 
             if continuousOrder and shiftTable is None:
                 # Used for gradual expanding into unicode charspace
@@ -250,7 +255,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 position = (len(charTbl) >> 1)
                 posValue = charTbl[position]
 
-                if CHAR_INFERENCE_MARK not in payload:
+                if "'%s'" % CHAR_INFERENCE_MARK not in payload:
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
                 else:
                     # e.g.: ... > '%c' -> ... > ORD(..)
@@ -309,10 +314,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
-                                        conf.timeSec += 1
-
-                                        warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                        logger.warn(warnMsg)
+                                        if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
+                                            conf.timeSec += 1
+                                            warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                            logger.warn(warnMsg)
 
                                         if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
                                             dbgMsg = "turning off time auto-adjustment mechanism"
@@ -340,10 +345,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         if minValue == maxChar or maxValue == minChar:
                             return None
 
-                        # If we are working with non-continuous elements, set
-                        # both minValue and character afterwards are possible
-                        # candidates
-                        for retVal in (originalTbl[originalTbl.index(minValue)], originalTbl[originalTbl.index(minValue) + 1]):
+                        for index in xrange(len(originalTbl)):
+                            if originalTbl[index] == minValue:
+                                break
+
+                        # If we are working with non-continuous elements, both minValue and character after
+                        # are possible candidates
+                        for retVal in (originalTbl[index], originalTbl[index + 1]):
                             forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, retVal))
                             result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                             incrementCounter(kb.technique)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -16,6 +16,7 @@ from lib.core.common import getPageWordSet
 from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -24,6 +25,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.settings import METADB_SUFFIX
@@ -49,6 +51,18 @@ def _addPageTextWords():
     return wordsList
 
 def tableExists(tableFile, regex=None):
+    if kb.tableExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
+        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+        warnMsg += "for common table existence check"
+        logger.warn(warnMsg)
+
+        message = "are you sure you want to continue? [y/N] "
+        test = readInput(message, default="N")
+        kb.tableExistsChoice = test[0] in ("y", "Y")
+
+        if not kb.tableExistsChoice:
+            return None
+
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
 
     if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
@@ -102,7 +116,7 @@ def tableExists(tableFile, regex=None):
 
                 if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
+                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
@@ -141,6 +155,18 @@ def tableExists(tableFile, regex=None):
     return kb.data.cachedTables
 
 def columnExists(columnFile, regex=None):
+    if kb.columnExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
+        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+        warnMsg += "for common column existence check"
+        logger.warn(warnMsg)
+
+        message = "are you sure you want to continue? [y/N] "
+        test = readInput(message, default="N")
+        kb.columnExistsChoice = test[0] in ("y", "Y")
+
+        if not kb.columnExistsChoice:
+            return None
+
     if not conf.tbl:
         errMsg = "missing table parameter"
         raise SqlmapMissingMandatoryOptionException(errMsg)
@@ -198,11 +224,11 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2) and not hasattr(conf, "api"):
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\r\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
+                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
             kb.locks.io.release()
@@ -231,9 +257,9 @@ def columnExists(columnFile, regex=None):
                 result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
             if result:
-                columns[column] = 'numeric'
+                columns[column] = "numeric"
             else:
-                columns[column] = 'non-numeric'
+                columns[column] = "non-numeric"
 
         kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
 

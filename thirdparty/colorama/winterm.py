@@ -73,7 +73,7 @@ class WinTerm(object):
         position.X += 1
         position.Y += 1
         return position
-    
+
     def set_cursor_position(self, position=None, on_stderr=False):
         if position is None:
             #I'm not currently tracking the position, so there is no default.

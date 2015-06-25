@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -26,7 +26,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"[A-Za-z_]+", payload):
+        for match in re.finditer(r"\b[A-Za-z_]+\b", payload):
             word = match.group()
 
             if len(word) < 2:
@@ -39,6 +39,11 @@ def tamper(payload, **kwargs):
                     _ += "%s%s" % ("/**/" if randomRange(0, 1) else "", word[i])
 
                 _ += word[-1]
+
+                if "/**/" not in _:
+                    index = randomRange(1, len(word) - 1)
+                    _ = word[:index] + "/**/" + word[index:]
+
                 retVal = retVal.replace(word, _)
 
     return retVal

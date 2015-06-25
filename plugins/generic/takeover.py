@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -336,12 +336,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         msg = "this technique is likely to DoS the DBMS process, are you "
         msg += "sure that you want to carry with the exploit? [y/N] "
-        inp = readInput(msg, default="N")
+        choice = readInput(msg, default="N")
 
-        if inp and inp[0].lower() == "y":
-            dos = True
-        else:
-            dos = False
+        dos = choice and choice[0].lower() == "y"
 
         if dos:
             self.initEnv(mandatory=False, detailed=True)
@@ -372,7 +369,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
         self._regInit()
 
         if not conf.regKey:
-            default = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+            default = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
             msg = "which registry key do you want to read? [%s] " % default
             regKey = readInput(msg, default=default)
         else:

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -15,7 +14,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import PGSQL_ALIASES
-from lib.core.settings import PGSQL_SYSTEM_DBS
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
@@ -65,7 +63,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.postgresql.org/docs/9.1/interactive/release.html (up to 9.1.3)
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(PGSQL_ALIASES) or conf.dbms in PGSQL_ALIASES):
+        if not conf.extensiveFp and (Backend.isDbmsWithin(PGSQL_ALIASES) or (conf.dbms or "").lower() in PGSQL_ALIASES):
             setDbms(DBMS.PGSQL)
 
             self.getBanner()
@@ -171,13 +169,3 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)
-
-    def forceDbmsEnum(self):
-        if conf.db not in PGSQL_SYSTEM_DBS and conf.db != "public":
-            conf.db = "public"
-
-            warnMsg = "on %s it is possible to enumerate " % DBMS.PGSQL
-            warnMsg += "only on the current schema and/or system databases. "
-            warnMsg += "sqlmap is going to use 'public' schema as a "
-            warnMsg += "database name"
-            singleTimeWarnMessage(warnMsg)

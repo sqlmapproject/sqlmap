@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import codecs
 
 from ConfigParser import MissingSectionHeaderError
+from ConfigParser import ParsingError
 
 from lib.core.common import checkFile
+from lib.core.common import getUnicode
+from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
@@ -30,12 +33,17 @@ def configFileProxy(section, option, boolean=False, integer=False):
     global config
 
     if config.has_option(section, option):
-        if boolean:
-            value = config.getboolean(section, option) if config.get(section, option) else False
-        elif integer:
-            value = config.getint(section, option) if config.get(section, option) else 0
-        else:
-            value = config.get(section, option)
+        try:
+            if boolean:
+                value = config.getboolean(section, option) if config.get(section, option) else False
+            elif integer:
+                value = config.getint(section, option) if config.get(section, option) else 0
+            else:
+                value = config.get(section, option)
+        except ValueError, ex:
+            errMsg = "error occurred while processing the option "
+            errMsg += "'%s' in provided configuration file ('%s')" % (option, getUnicode(ex))
+            raise SqlmapSyntaxException(errMsg)
 
         if value:
             conf[option] = value
@@ -59,29 +67,31 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    configFP = codecs.open(configFile, "rb", UNICODE_ENCODING)
+    configFP = openFile(configFile, "rb")
 
     try:
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
-    except MissingSectionHeaderError:
-        errMsg = "you have provided an invalid configuration file"
+    except Exception, ex:
+        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getUnicode(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    condition = not config.has_option("Target", "url")
+    condition = not config.has_option("Target", "direct")
+    condition &= not config.has_option("Target", "url")
     condition &= not config.has_option("Target", "logFile")
     condition &= not config.has_option("Target", "bulkFile")
     condition &= not config.has_option("Target", "googleDork")
     condition &= not config.has_option("Target", "requestFile")
+    condition &= not config.has_option("Target", "sitemapUrl")
     condition &= not config.has_option("Target", "wizard")
 
     if condition:
         errMsg = "missing a mandatory option in the configuration file "
-        errMsg += "(url, logFile, bulkFile, googleDork, requestFile or wizard)"
+        errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile, sitemapUrl or wizard)"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
     for family, optionData in optDict.items():

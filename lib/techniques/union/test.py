@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -187,7 +187,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
         if content and phrase in content:
             validPayload = payload
             kb.unionDuplicates = len(re.findall(phrase, content, re.I)) > 1
-            vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates)
+            vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, False)
 
             if where == PAYLOAD.WHERE.ORIGINAL:
                 # Prepare expression with delimiters
@@ -205,7 +205,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                 content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
                 if not all(_ in content for _ in (phrase, phrase2)):
-                    vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
+                    vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True)
                 elif not kb.unionDuplicates:
                     fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
 
@@ -221,7 +221,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                     if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
                         warnMsg = "output with limited number of rows detected. Switching to partial mode"
                         logger.warn(warnMsg)
-                        vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates)
+                        vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates, False)
 
             unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
 
@@ -278,7 +278,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
                 test = readInput(message, default="Y")
                 if test[0] not in ("y", "Y"):
                     warnMsg += "usage of option '--union-char' "
-                    warnMsg += "(e.g. --union-char=1) "
+                    warnMsg += "(e.g. '--union-char=1') "
                 else:
                     conf.uChar = kb.uChar = str(randomInt(2))
                     validPayload, vector = _unionConfirm(comment, place, parameter, prefix, suffix, count)
@@ -288,7 +288,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
                     warnMsg += "and/or try to force the "
                 else:
                     warnMsg += "forcing the "
-                warnMsg += "back-end DBMS (e.g. --dbms=mysql) "
+                warnMsg += "back-end DBMS (e.g. '--dbms=mysql') "
 
             if not all([validPayload, vector]) and not warnMsg.endswith("consider "):
                 singleTimeWarnMessage(warnMsg)

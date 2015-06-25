@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -261,7 +261,7 @@ class Search:
                         if tblConsider == "2":
                             continue
                     else:
-                        for db in conf.db.split(","):
+                        for db in conf.db.split(",") if conf.db else (self.getCurrentDb(),):
                             db = safeSQLIdentificatorNaming(db)
                             if db not in foundTbls:
                                 foundTbls[db] = []
@@ -349,7 +349,7 @@ class Search:
             elif test[0] in ("q", "Q"):
                 raise SqlmapUserQuitException
             else:
-                regex = "|".join(conf.col.split(","))
+                regex = '|'.join(conf.col.split(','))
                 conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS, regex))
 
                 message = "do you want to dump entries? [Y/n] "
@@ -368,6 +368,10 @@ class Search:
         infoMsgTbl = ""
         infoMsgDb = ""
         colList = conf.col.split(",")
+
+        if conf.excludeCol:
+            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+
         origTbl = conf.tbl
         origDb = conf.db
         colCond = rootQuery.inband.condition
@@ -497,7 +501,7 @@ class Search:
                         if db not in foundCols[column]:
                             foundCols[column][db] = []
                 else:
-                    for db in conf.db.split(","):
+                    for db in conf.db.split(",") if conf.db else (self.getCurrentDb(),):
                         db = safeSQLIdentificatorNaming(db)
                         if db not in foundCols[column]:
                             foundCols[column][db] = []

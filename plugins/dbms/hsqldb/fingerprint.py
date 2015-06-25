@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -9,13 +9,11 @@ import re
 
 from lib.core.common import Backend
 from lib.core.common import Format
-from lib.core.common import getUnicode
 from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
-from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -79,11 +77,11 @@ class Fingerprint(GenericFingerprint):
         version 1.8.0.4 Added org.hsqldbdb.Library function, getDatabaseFullProductVersion to return the
                         full version string, including the 4th digit (e.g 1.8.0.4).
         version 1.7.2 CASE statements added and INFORMATION_SCHEMA
-         
+
         """
 
         if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \
-           or conf.dbms in HSQLDB_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in HSQLDB_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
             v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")
@@ -136,7 +134,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s or is < 1.7.2" % DBMS.HSQLDB
+            warnMsg = "the back-end DBMS is not %s or version is < 1.7.2" % DBMS.HSQLDB
             logger.warn(warnMsg)
 
             return False

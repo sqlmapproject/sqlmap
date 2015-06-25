@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -9,6 +9,7 @@ from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import filterPairValues
+from lib.core.common import flattenValue
 from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isListLike
@@ -20,6 +21,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -62,6 +64,12 @@ class Databases:
         if not kb.data.currentDb:
             kb.data.currentDb = unArrayizeValue(inject.getValue(query, safeCharEncode=False))
 
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL):
+            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
+            warnMsg += "schema names for enumeration as the counterpart to database "
+            warnMsg += "names on other DBMSes"
+            singleTimeWarnMessage(warnMsg)
+
         return kb.data.currentDb
 
     def getDbs(self):
@@ -76,20 +84,14 @@ class Databases:
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        elif Backend.isDbms(DBMS.ORACLE):
-            warnMsg = "schema names are going to be used on Oracle "
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL):
+            warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             logger.warn(warnMsg)
 
             infoMsg = "fetching database (schema) names"
-        elif Backend.isDbms(DBMS.DB2):
-            warnMsg = "schema names are going to be used on IBM DB2 "
-            warnMsg += "for enumeration as the counterpart to database "
-            warnMsg += "names on other DBMSes"
-            logger.warn(warnMsg)
 
-            infoMsg = "fetching database (schema) names"
         else:
             infoMsg = "fetching database names"
 
@@ -171,7 +173,7 @@ class Databases:
             kb.data.cachedDbs.sort()
 
         if kb.data.cachedDbs:
-            kb.data.cachedDbs = list(set(kb.data.cachedDbs))
+            kb.data.cachedDbs = filter(None, list(set(flattenValue(kb.data.cachedDbs))))
 
         return kb.data.cachedDbs
 
@@ -213,10 +215,10 @@ class Databases:
         else:
             dbs = self.getDbs()
 
+        dbs = [_ for _ in dbs if _ and _.strip()]
+
         for db in dbs:
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
-
-        dbs = filter(None, dbs)
 
         if bruteForce:
             resumeAvailable = False
@@ -226,7 +228,7 @@ class Databases:
                     resumeAvailable = True
                     break
 
-            if resumeAvailable:
+            if resumeAvailable and not conf.freshQueries:
                 for db, table in kb.brute.tables:
                     if db == conf.db:
                         if conf.db not in kb.data.cachedTables:
@@ -280,7 +282,7 @@ class Databases:
 
                 for db, table in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
-                    table = safeSQLIdentificatorNaming(table, True)
+                    table = safeSQLIdentificatorNaming(unArrayizeValue(table), True)
 
                     if db not in kb.data.cachedTables:
                         kb.data.cachedTables[db] = [table]
@@ -330,6 +332,8 @@ class Databases:
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
+                    elif Backend.isDbms(DBMS.HSQLDB):
+                        query = rootQuery.blind.query % (index, unsafeSQLIdentificatorNaming(db))
                     else:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
 
@@ -378,6 +382,11 @@ class Databases:
 
             conf.db = self.getCurrentDb()
 
+            if not conf.db:
+                errMsg = "unable to retrieve the current "
+                errMsg += "database name"
+                raise SqlmapNoneDataException(errMsg)
+
         elif conf.db is not None:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.db = conf.db.upper()
@@ -393,9 +402,12 @@ class Databases:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                 conf.col = conf.col.upper()
 
-            colList = conf.col.split(",")
+            colList = conf.col.split(',')
         else:
             colList = []
+
+        if conf.excludeCol:
+            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
 
         for col in colList:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
@@ -425,8 +437,7 @@ class Databases:
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
 
-        for tbl in tblList:
-            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
+        tblList = filter(None, (safeSQLIdentificatorNaming(_, True) for _ in tblList))
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
@@ -450,7 +461,7 @@ class Databases:
                         resumeAvailable = True
                         break
 
-            if resumeAvailable or colList:
+            if resumeAvailable and not conf.freshQueries or colList:
                 columns = {}
 
                 for column in colList:
@@ -549,6 +560,19 @@ class Databases:
                             name = safeSQLIdentificatorNaming(columnData[0])
 
                             if name:
+                                if conf.getComments:
+                                    _ = queries[Backend.getIdentifiedDbms()].column_comment
+                                    if hasattr(_, "query"):
+                                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                            query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(name.upper()))
+                                        else:
+                                            query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(name))
+                                        comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+                                    else:
+                                        warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
+                                        warnMsg += "possible to get column comments"
+                                        singleTimeWarnMessage(warnMsg)
+
                                 if len(columnData) == 1:
                                     columns[name] = None
                                 else:
@@ -592,7 +616,7 @@ class Databases:
                 infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
@@ -661,6 +685,19 @@ class Databases:
                     column = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                     if not isNoneValue(column):
+                        if conf.getComments:
+                            _ = queries[Backend.getIdentifiedDbms()].column_comment
+                            if hasattr(_, "query"):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                    query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(column.upper()))
+                                else:
+                                    query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(column))
+                                comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                            else:
+                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
+                                warnMsg += "possible to get column comments"
+                                singleTimeWarnMessage(warnMsg)
+
                         if not onlyColNames:
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
@@ -709,9 +746,6 @@ class Databases:
         pushValue(conf.tbl)
         pushValue(conf.col)
 
-        conf.db = None
-        conf.tbl = None
-        conf.col = None
         kb.data.cachedTables = {}
         kb.data.cachedColumns = {}
 
@@ -738,6 +772,9 @@ class Databases:
         return kb.data.cachedColumns
 
     def _tableGetCount(self, db, table):
+        if not db or not table:
+            return None
+
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
             db = db.upper()
             table = table.upper()

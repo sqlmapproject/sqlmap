@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -44,6 +44,7 @@ from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.settings import MAX_BUFFERED_PARTIAL_UNION_LENGTH
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -51,6 +52,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from thirdparty.odict.odict import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
     retVal = hashDBRetrieve("%s%s" % (conf.hexConvert, expression), checkConf=True)  # as union data is stored raw unconverted
@@ -65,6 +67,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         # Forge the union SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
+        kb.forcePartialUnion = vector[8]
         query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
         where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
         payload = agent.payload(newValue=query, where=where)
@@ -180,6 +183,7 @@ def unionUse(expression, unpack=True, dump=False):
     # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
     if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
+       kb.forcePartialUnion or \
        (dump and (conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and \
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
        not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE \
@@ -271,28 +275,31 @@ def unionUse(expression, unpack=True, dump=False):
                             break
 
                         if output:
-                            if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
-                                items = parseUnionPage(output)
+                            with kb.locks.value:
+                                if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
+                                    items = parseUnionPage(output)
 
-                                with kb.locks.value:
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
-                                    # in case that we requested N columns and we get M!=N then we have to filter a bit
-                                    if isListLike(items) and len(items) > 1 and len(expressionFieldsList) > 1:
-                                        items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
+                                    if isListLike(items):
+                                        # in case that we requested N columns and we get M!=N then we have to filter a bit
+                                        if len(items) > 1 and len(expressionFieldsList) > 1:
+                                            items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
+                                        items = [_ for _ in flattenValue(items)]
+                                        if len(items) > len(expressionFieldsList):
+                                            filtered = OrderedDict()
+                                            for item in items:
+                                                key = re.sub(r"[^A-Za-z0-9]", "", item).lower()
+                                                if key not in filtered or re.search(r"[^A-Za-z0-9]", item):
+                                                    filtered[key] = item
+                                            items = filtered.values()
+                                        items = [items]
                                     index = None
                                     for index in xrange(len(threadData.shared.buffered)):
                                         if threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, items))
-                                    while threadData.shared.buffered and threadData.shared.lastFlushed + 1 == threadData.shared.buffered[0][0]:
-                                        threadData.shared.lastFlushed += 1
-                                        _ = threadData.shared.buffered[0][1]
-                                        if not isNoneValue(_):
-                                            threadData.shared.value.extend(arrayizeValue(_))
-                                        del threadData.shared.buffered[0]
-                            else:
-                                with kb.locks.value:
+                                else:
                                     index = None
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
@@ -300,15 +307,22 @@ def unionUse(expression, unpack=True, dump=False):
                                         if threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, None))
-                                items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
+
+                                    items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
+
+                                while threadData.shared.buffered and (threadData.shared.lastFlushed + 1 >= threadData.shared.buffered[0][0] or len(threadData.shared.buffered) > MAX_BUFFERED_PARTIAL_UNION_LENGTH):
+                                    threadData.shared.lastFlushed, _ = threadData.shared.buffered[0]
+                                    if not isNoneValue(_):
+                                        threadData.shared.value.extend(arrayizeValue(_))
+                                    del threadData.shared.buffered[0]
 
                             if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
-                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items)))))
+                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", safecharencode(",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items))) if not isinstance(items, basestring) else items))
 
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
 
-                                dataToStdout("%s\r\n" % status, True)
+                                dataToStdout("%s\n" % status, True)
 
                 runThreads(numThreads, unionThread)
 

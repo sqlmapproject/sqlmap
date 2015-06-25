@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -70,7 +70,7 @@ class FingerprintHandler(ContentHandler):
                 self._feedInfo("technology", attrs.get("technology"))
 
             if self._sp.isdigit():
-                self._feedInfo("sp", "Service Pack %s" % self._match.group(int(self._sp)))
+                self._feedInfo("sp", "Service Pack %s" % int(self._sp))
 
             self._regexp = None
             self._match = None

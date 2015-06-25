@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -20,7 +20,7 @@ class ProgressBar(object):
         self._oldProgBar = ""
         self._min = int(minValue)
         self._max = int(maxValue)
-        self._span = self._max - self._min
+        self._span = max(self._max - self._min, 0.001)
         self._width = totalWidth if totalWidth else conf.progressWidth
         self._amount = 0
         self._times = []
@@ -49,7 +49,7 @@ class ProgressBar(object):
         diffFromMin = float(self._amount - self._min)
         percentDone = (diffFromMin / float(self._span)) * 100.0
         percentDone = round(percentDone)
-        percentDone = int(percentDone)
+        percentDone = min(100, int(percentDone))
 
         # Figure out how many hash bars the percentage should be
         allFull = self._width - len("100%% [] %s/%s  ETA 00:00" % (self._max, self._max))

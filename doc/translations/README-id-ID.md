@@ -1,0 +1,53 @@
+sqlmap
+==
+
+sqlmap merupakan alat _(tool)_ bantu _open source_ dalam melakukan tes penetrasi yang mengotomasi proses deteksi dan eksploitasi kelemahan _SQL injection_ dan pengambil-alihan server basisdata. sqlmap dilengkapi dengan pendeteksi canggih, fitur-fitur hanal bagi _penetration tester_, beragam cara untuk mendeteksi basisdata, hingga mengakses _file system_ dan mengeksekusi perintah dalam sistem operasi melalui koneksi _out-of-band_. 
+
+Tangkapan Layar
+----
+
+![Tangkapan Layar](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
+
+Anda dapat mengunjungi [koleksi tangkapan layar](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) yang mendemonstrasikan beberapa fitur dalam wiki.
+
+Instalasi
+----
+
+Anda dapat mengunduh tarball versi terbaru [di sini]
+(https://github.com/sqlmapproject/sqlmap/tarball/master) atau zipball [di sini](https://github.com/sqlmapproject/sqlmap/zipball/master).
+
+Sebagai alternatif, Anda dapat mengunduh sqlmap dengan men-_clone_ repositori [Git](https://github.com/sqlmapproject/sqlmap):
+
+    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+
+sqlmap berfungsi langsung pada [Python](http://www.python.org/download/) versi **2.6.x** dan **2.7.x** pada platform apapun.
+
+Penggunaan
+----
+
+Untuk mendapatkan daftar opsi dasar gunakan:
+
+    python sqlmap.py -h
+
+Untuk mendapatkan daftar opsi lanjut gunakan:
+
+    python sqlmap.py -hh
+
+Anda dapat mendapatkan contoh penggunaan [di sini](https://gist.github.com/stamparm/5335217).
+Untuk mendapatkan gambaran singkat kemampuan sqlmap, daftar fitur yang didukung, deskripsi dari semua opsi, berikut dengan contohnya, Anda disarankan untuk membaca [manual pengguna](https://github.com/sqlmapproject/sqlmap/wiki).
+
+Tautan
+----
+
+* Situs: http://sqlmap.org
+* Unduh: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) atau [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* RSS feed dari commits: https://github.com/sqlmapproject/sqlmap/commits/master.atom
+* Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
+* Wiki Manual Penggunaan: https://github.com/sqlmapproject/sqlmap/wiki
+* Pertanyaan yang Sering Ditanyakan (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
+* Berlangganan milis: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
+* RSS feed dari milis: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
+* Arsip milis: http://news.gmane.org/gmane.comp.security.sqlmap
+* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* Video Demo [#1](http://www.youtube.com/user/inquisb/videos) dan [#2](http://www.youtube.com/user/stamparm/videos)
+* Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

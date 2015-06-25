@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+# Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 # See the file 'doc/COPYING' for copying permission
 
 id
@@ -2545,3 +2545,54 @@ command
 brand_id
 disablepostctrl
 fieldname
+
+# site:id
+ajar
+akses
+aktif
+akun
+alamat
+batas
+cabang
+deskripsi
+foto
+harga
+hp
+jeda
+jenis
+jml
+judul
+kata_kunci
+kata_sandi
+katakunci
+katasandi
+kategori
+kelas
+keterangan
+kode
+kunci
+lahir
+nama
+nama_akun
+nama_pengguna
+namaakun
+namapengguna
+pekerjaan
+pendidikan
+pengguna
+penjelasan
+perusahaan
+ponsel
+ruang
+sandi
+soal
+surat_elektronik
+surel
+tanggal
+tanggal_lahir
+tempat
+tempat_lahir
+tmp_lahir
+universitas
+urut
+waktu

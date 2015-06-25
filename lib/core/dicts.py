@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -138,7 +138,7 @@ DBMS_DICT = {
                 DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
                 DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "sybase"),
                 DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/", "ibm_db_sa"),
-                DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
+                DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
             }
 
 FROM_DUMMY_TABLE = {
@@ -203,9 +203,11 @@ SQL_STATEMENTS = {
 
 POST_HINT_CONTENT_TYPES = {
                                 POST_HINT.JSON: "application/json",
+                                POST_HINT.JSON_LIKE: "application/json",
                                 POST_HINT.MULTIPART: "multipart/form-data",
                                 POST_HINT.SOAP: "application/soap+xml",
                                 POST_HINT.XML: "application/xml",
+                                POST_HINT.ARRAY_LIKE: "application/x-www-form-urlencoded; charset=utf-8",
                           }
 
 DEPRECATED_OPTIONS = {
@@ -213,6 +215,7 @@ DEPRECATED_OPTIONS = {
                         "--no-unescape": "use '--no-escape' instead",
                         "--binary": "use '--binary-fields' instead",
                         "--check-payload": None,
+                        "--check-waf": None,
                      }
 
 DUMP_DATA_PREPROCESS = {
@@ -222,5 +225,5 @@ DUMP_DATA_PREPROCESS = {
 
 DEFAULT_DOC_ROOTS = {
                         OS.WINDOWS: ("C:/xampp/htdocs/", "C:/Inetpub/wwwroot/"),
-                        OS.LINUX: ("/var/www/",)
+                        OS.LINUX: ("/var/www/", "/var/www/html", "/usr/local/apache2/htdocs", "/var/www/nginx-default")  # Reference: https://wiki.apache.org/httpd/DistrosDefaultLayout
                     }

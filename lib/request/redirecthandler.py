@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import types
 import urllib2
 import urlparse
 
+from StringIO import StringIO
+
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import getHostHeader
@@ -57,8 +61,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
                 kb.resendPostOnRedirect = choice.upper() == 'Y'
 
-                if kb.resendPostOnRedirect:
-                    self.redirect_request = self._redirect_request
+            if kb.resendPostOnRedirect:
+                self.redirect_request = self._redirect_request
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
         newurl = newurl.replace(' ', '%20')
@@ -103,17 +107,47 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
 
         if redurl:
-            if not urlparse.urlsplit(redurl).netloc:
-                redurl = urlparse.urljoin(req.get_full_url(), redurl)
+            try:
+                if not urlparse.urlsplit(redurl).netloc:
+                    redurl = urlparse.urljoin(req.get_full_url(), redurl)
 
-            self._infinite_loop_check(req)
-            self._ask_redirect_choice(code, redurl, req.get_method())
+                self._infinite_loop_check(req)
+                self._ask_redirect_choice(code, redurl, req.get_method())
+            except ValueError:
+                redurl = None
+                result = fp
 
         if redurl and kb.redirectChoice == REDIRECTION.YES:
             req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)
             if headers and HTTP_HEADER.SET_COOKIE in headers:
-                req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(DEFAULT_COOKIE_DELIMITER)[0]
-            result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+                req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)[0]
+            try:
+                result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+            except urllib2.HTTPError, e:
+                result = e
+
+                # Dirty hack for http://bugs.python.org/issue15701
+                try:
+                    result.info()
+                except AttributeError:
+                    def _(self):
+                        return getattr(self, "hdrs") or {}
+                    result.info = types.MethodType(_, result)
+
+                if not hasattr(result, "read"):
+                    def _(self, length=None):
+                        return e.msg
+                    result.read = types.MethodType(_, result)
+
+                if not getattr(result, "url", None):
+                    result.url = redurl
+
+                if not getattr(result, "code", None):
+                    result.code = 999
+            except:
+                redurl = None
+                result = fp
+                fp.read = StringIO("").read
         else:
             result = fp
 
@@ -128,5 +162,5 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     def _infinite_loop_check(self, req):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= MAX_SINGLE_URL_REDIRECTIONS or len(req.redirect_dict) >= MAX_TOTAL_REDIRECTIONS):
             errMsg = "infinite redirect loop detected (%s). " % ", ".join(item for item in req.redirect_dict.keys())
-            errMsg += "please check all provided parameters and/or provide missing ones."
+            errMsg += "Please check all provided parameters and/or provide missing ones"
             raise SqlmapConnectionException(errMsg)

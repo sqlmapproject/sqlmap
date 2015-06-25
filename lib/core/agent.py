@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -10,6 +10,7 @@ import re
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import getSQLSnippet
+from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -19,6 +20,7 @@ from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import splitFields
 from lib.core.common import unArrayizeValue
+from lib.core.common import urlencode
 from lib.core.common import zeroDepthSearch
 from lib.core.data import conf
 from lib.core.data import kb
@@ -26,11 +28,15 @@ from lib.core.data import queries
 from lib.core.dicts import DUMP_DATA_PREPROCESS
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
+from lib.core.settings import DEFAULT_COOKIE_DELIMITER
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
@@ -44,10 +50,10 @@ class Agent(object):
     def payloadDirect(self, query):
         query = self.cleanupPayload(query)
 
-        if query.startswith("AND "):
-            query = query.replace("AND ", "SELECT ", 1)
-        elif query.startswith(" UNION ALL "):
-            query = query.replace(" UNION ALL ", "", 1)
+        if query.upper().startswith("AND "):
+            query = re.sub(r"(?i)AND ", "SELECT ", query, 1)
+        elif query.upper().startswith(" UNION ALL "):
+            query = re.sub(r"(?i) UNION ALL ", "", query, 1)
         elif query.startswith("; "):
             query = query.replace("; ", "", 1)
 
@@ -84,7 +90,7 @@ class Agent(object):
 
         paramString = conf.parameters[place]
         paramDict = conf.paramDict[place]
-        origValue = paramDict[parameter]
+        origValue = getUnicode(paramDict[parameter])
 
         if place == PLACE.URI:
             paramString = origValue
@@ -98,14 +104,26 @@ class Agent(object):
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                 origValue = origValue.split('>')[-1]
-            elif kb.postHint == POST_HINT.JSON:
-                origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)(?P<result>[^"]+\Z)', origValue)
+            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+                origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)\s*(?P<result>[^"\[,]+\Z)', origValue)
             else:
-                origValue = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"]+\Z)", origValue)
+                _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"&]+\Z)", origValue) or ""
+                origValue = _.split('=', 1)[1] if '=' in _ else ""
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             origValue = origValue[origValue.index(',') + 1:]
+            match = re.search(r"([^;]+)=(?P<value>[^;]+);?\Z", origValue)
+            if match:
+                origValue = match.group("value")
+            elif ',' in paramString:
+                header = paramString.split(',')[0]
+
+                if header.upper() == HTTP_HEADER.AUTHORIZATION.upper():
+                    origValue = origValue.split(' ')[-1].split(':')[-1]
+
+        if conf.prefix:
+            value = origValue
 
         if value is None:
             if where == PAYLOAD.WHERE.ORIGINAL:
@@ -117,7 +135,9 @@ class Agent(object):
                     _ = randomInt(2)
                     value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", _, _ + 1)
                 elif conf.invalidBignum:
-                    value = "%d.%d" % (randomInt(6), randomInt(1))
+                    value = randomInt(6)
+                elif conf.invalidString:
+                    value = randomStr(6)
                 else:
                     if newValue.startswith("-"):
                         value = ""
@@ -136,14 +156,40 @@ class Agent(object):
             _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
             if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and not '"%s"' % _ in paramString:
                 newValue = '"%s"' % newValue
+            elif kb.postHint == POST_HINT.JSON_LIKE and not isNumber(newValue) and not "'%s'" % _ in paramString:
+                newValue = "'%s'" % newValue
             newValue = newValue.replace(CUSTOM_INJECTION_MARK_CHAR, REPLACEMENT_MARKER)
             retVal = paramString.replace(_, self.addPayloadDelimiters(newValue))
             retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(REPLACEMENT_MARKER, CUSTOM_INJECTION_MARK_CHAR)
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
-            retVal = paramString.replace("%s=%s" % (parameter, origValue),
-                                         "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)))
+            def _(pattern, repl, string):
+                retVal = string
+                match = None
+                for match in re.finditer(pattern, string):
+                    pass
+
+                if match:
+                    while True:
+                        _ = re.search(r"\\g<([^>]+)>", repl)
+                        if _:
+                            repl = repl.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
+                        else:
+                            break
+                    retVal = string[:match.start()] + repl + string[match.end():]
+                return retVal
+
+            if origValue:
+                regex = r"(\A|\b)%s=%s%s" % (re.escape(parameter), re.escape(origValue), r"(\Z|\b)" if origValue[-1].isalnum() else "")
+                retVal = _(regex, "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+            else:
+                retVal = _(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+            if retVal == paramString and urlencode(parameter) != parameter:
+                retVal = _(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+
+        if retVal:
+            retVal = retVal.replace(BOUNDARY_BACKSLASH_MARKER, '\\')
 
         return retVal
 
@@ -176,7 +222,7 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
-        if where == PAYLOAD.WHERE.REPLACE:
+        if where == PAYLOAD.WHERE.REPLACE and not conf.prefix:
             query = ""
 
         # If the technique is stacked queries (<stype>) do not put a space
@@ -192,10 +238,11 @@ class Agent(object):
         else:
             query = kb.injection.prefix or prefix or ""
 
-            if not (expression and expression[0] == ";"):
+            if not (expression and expression[0] == ';') and not (query and query[-1] in ('(', ')') and expression and expression[0] in ('(', ')')) and not (query and query[-1] == '('):
                 query += " "
 
-        query = "%s%s" % (query, expression)
+        if query:
+            query = "%s%s" % (query.replace('\\', BOUNDARY_BACKSLASH_MARKER), expression)
 
         return query
 
@@ -225,11 +272,11 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not append the suffix
-        if where == PAYLOAD.WHERE.REPLACE:
+        if where == PAYLOAD.WHERE.REPLACE and not conf.suffix:
             pass
 
         elif suffix and not comment:
-            expression += " %s" % suffix
+            expression += suffix.replace('\\', BOUNDARY_BACKSLASH_MARKER)
 
         return re.sub(r"(?s);\W*;", ";", expression)
 
@@ -251,7 +298,7 @@ class Agent(object):
             payload = payload.replace(_, randomStr())
 
         if origValue is not None:
-            payload = payload.replace("[ORIGVALUE]", origValue if origValue.isdigit() else "'%s'" % origValue)
+            payload = payload.replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
 
         if "[INFERENCE]" in payload:
             if Backend.getIdentifiedDbms() is not None:
@@ -266,7 +313,7 @@ class Agent(object):
                     inferenceQuery = inference.query
 
                 payload = payload.replace("[INFERENCE]", inferenceQuery)
-            else:
+            elif not kb.testMode:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
                 raise SqlmapNoneDataException(errMsg)
@@ -351,7 +398,8 @@ class Agent(object):
                 else:
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
-            if conf.hexConvert or conf.binaryFields and field in conf.binaryFields.split(','):
+            kb.binaryField = conf.binaryFields and field in conf.binaryFields.split(',')
+            if conf.hexConvert or kb.binaryField:
                 nulledCastedField = self.hexConvertField(nulledCastedField)
 
         return nulledCastedField
@@ -814,6 +862,9 @@ class Agent(object):
         @rtype: C{str}
         """
 
+        if " FROM " not in query:
+            return query
+
         limitedQuery = query
         limitStr = queries[Backend.getIdentifiedDbms()].limit.query
         fromIndex = limitedQuery.index(" FROM ")
@@ -943,33 +994,35 @@ class Agent(object):
 
         return caseExpression
 
-    def addPayloadDelimiters(self, inpStr):
+    def addPayloadDelimiters(self, value):
         """
         Adds payload delimiters around the input string
         """
 
-        return "%s%s%s" % (PAYLOAD_DELIMITER, inpStr, PAYLOAD_DELIMITER) if inpStr else inpStr
+        return "%s%s%s" % (PAYLOAD_DELIMITER, value, PAYLOAD_DELIMITER) if value else value
 
-    def removePayloadDelimiters(self, inpStr):
+    def removePayloadDelimiters(self, value):
         """
         Removes payload delimiters from inside the input string
         """
 
-        return inpStr.replace(PAYLOAD_DELIMITER, '') if inpStr else inpStr
+        return value.replace(PAYLOAD_DELIMITER, '') if value else value
 
-    def extractPayload(self, inpStr):
+    def extractPayload(self, value):
         """
         Extracts payload from inside of the input string
         """
 
-        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), inpStr)
+        _ = re.escape(PAYLOAD_DELIMITER)
+        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (_, _), value)
 
-    def replacePayload(self, inpStr, payload):
+    def replacePayload(self, value, payload):
         """
         Replaces payload inside the input string with a given payload
         """
 
-        return re.sub("(%s.*?%s)" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), inpStr) if inpStr else inpStr
+        _ = re.escape(PAYLOAD_DELIMITER)
+        return re.sub("(?s)(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)).replace("\\", r"\\"), value) if value else value
 
     def runAsDBMSUser(self, query):
         if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:

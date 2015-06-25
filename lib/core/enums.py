@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -71,8 +71,10 @@ class PLACE:
 class POST_HINT:
     SOAP = "SOAP"
     JSON = "JSON"
+    JSON_LIKE = "JSON-like"
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
+    ARRAY_LIKE = "Array-like"
 
 class HTTPMETHOD:
     GET = "GET"
@@ -135,8 +137,14 @@ class MOBILES:
 
 class PROXY_TYPE:
     HTTP = "HTTP"
+    HTTPS = "HTTPS"
     SOCKS4 = "SOCKS4"
     SOCKS5 = "SOCKS5"
+
+class REGISTRY_OPERATION:
+    READ = "read"
+    ADD = "add"
+    DELETE = "delete"
 
 class DUMP_FORMAT:
     CSV = "CSV"
@@ -158,6 +166,7 @@ class HTTP_HEADER:
     COOKIE = "Cookie"
     SET_COOKIE = "Set-Cookie"
     HOST = "Host"
+    LOCATION = "Location"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"
     PROXY_CONNECTION = "Proxy-Connection"
@@ -166,11 +175,18 @@ class HTTP_HEADER:
     SERVER = "Server"
     USER_AGENT = "User-Agent"
     TRANSFER_ENCODING = "Transfer-Encoding"
+    URI = "URI"
     VIA = "Via"
 
 class EXPECTED:
     BOOL = "bool"
     INT = "int"
+
+class OPTION_TYPE:
+    BOOLEAN = "boolean"
+    INTEGER = "integer"
+    FLOAT = "float"
+    STRING = "string"
 
 class HASHDB_KEYS:
     DBMS = "DBMS"
@@ -192,10 +208,10 @@ class PAYLOAD:
     SQLINJECTION = {
                         1: "boolean-based blind",
                         2: "error-based",
-                        3: "UNION query",
+                        3: "inline query",
                         4: "stacked queries",
                         5: "AND/OR time-based blind",
-                        6: "inline query",
+                        6: "UNION query",
                    }
 
     PARAMETER = {
@@ -234,10 +250,10 @@ class PAYLOAD:
     class TECHNIQUE:
         BOOLEAN = 1
         ERROR = 2
-        UNION = 3
+        QUERY = 3
         STACKED = 4
         TIME = 5
-        QUERY = 6
+        UNION = 6
 
     class WHERE:
         ORIGINAL = 1
@@ -323,4 +339,9 @@ class AUTH_TYPE:
     BASIC = "basic"
     DIGEST = "digest"
     NTLM = "ntlm"
-    CERT = "cert"
+    PKI = "pki"
+
+class AUTOCOMPLETE_TYPE:
+    SQL = 0
+    OS = 1
+    SQLMAP = 2

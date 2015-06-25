@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -120,7 +120,7 @@ class Popen(subprocess.Popen):
                     nAvail = maxsize
                 if nAvail > 0:
                     (errCode, read) = ReadFile(x, nAvail, None)
-            except ValueError:
+            except (ValueError, NameError):
                 return self._close(which)
             except (subprocess.pywintypes.error, Exception), why:
                 if why[0] in (109, errno.ESHUTDOWN):
@@ -197,4 +197,6 @@ def send_all(p, data):
 
     while len(data):
         sent = p.send(data)
+        if not isinstance(sent, int):
+            break
         data = buffer(data, sent)

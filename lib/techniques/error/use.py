@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -35,6 +35,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import HTTP_HEADER
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
 from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
@@ -73,7 +74,7 @@ def _oneShotErrorUse(expression, field=None):
         try:
             while True:
                 check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-                trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
+                trimcheck = "%s(?P<result>[^<]*)" % (kb.chars.start)
 
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
@@ -99,11 +100,14 @@ def _oneShotErrorUse(expression, field=None):
 
                 incrementCounter(kb.technique)
 
+                if page and conf.noEscape:
+                    page = re.sub(r"('|\%%27)%s('|\%%27).*?('|\%%27)%s('|\%%27)" % (kb.chars.start, kb.chars.stop), "", page)
+
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
                 output = reduce(lambda x, y: x if x is not None else y, (\
                         extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
-                        extractRegexResult(check, listToStrValue(headers.headers \
+                        extractRegexResult(check, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] \
                         if headers else None), re.DOTALL | re.IGNORECASE), \
                         extractRegexResult(check, threadData.lastRedirectMsg[1] \
                         if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
@@ -114,7 +118,7 @@ def _oneShotErrorUse(expression, field=None):
                     output = getUnicode(output)
                 else:
                     trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
-                        or extractRegexResult(trimcheck, listToStrValue(headers.headers \
+                        or extractRegexResult(trimcheck, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] \
                         if headers else None), re.DOTALL | re.IGNORECASE) \
                         or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
                         if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
@@ -125,6 +129,16 @@ def _oneShotErrorUse(expression, field=None):
                         warnMsg += "(due to its length and/or content): "
                         warnMsg += safecharencode(trimmed)
                         logger.warn(warnMsg)
+
+                        if not kb.testMode:
+                            check = "(?P<result>.*?)%s" % kb.chars.stop[:2]
+                            output = extractRegexResult(check, trimmed, re.IGNORECASE)
+
+                            if not output:
+                                check = "(?P<result>[^\s<>'\"]+)"
+                                output = extractRegexResult(check, trimmed, re.IGNORECASE)
+                            else:
+                                output = output.rstrip()
 
                 if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
                     if offset == 1:
@@ -267,7 +281,7 @@ def errorUse(expression, dump=False):
             # Count the number of SQL query entries output
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 
-            if " ORDER BY " in expression.upper():
+            if " ORDER BY " in countedExpression.upper():
                 _ = countedExpression.upper().rindex(" ORDER BY ")
                 countedExpression = countedExpression[:_]
 

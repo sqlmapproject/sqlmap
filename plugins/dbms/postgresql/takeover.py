@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
+
 from lib.core.common import Backend
+from lib.core.common import checkFile
+from lib.core.common import decloakToTemp
 from lib.core.common import randomStr
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import OS
+from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 from plugins.generic.takeover import Takeover as GenericTakeover
@@ -43,7 +48,9 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if banVer >= "9.0":
+        if banVer >= "9.1":
+            majorVer = "9.1"
+        elif banVer >= "9.0":
             majorVer = "9.0"
         elif banVer >= "8.4":
             majorVer = "8.4"
@@ -55,12 +62,20 @@ class Takeover(GenericTakeover):
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
             raise SqlmapUnsupportedFeatureException(errMsg)
 
-        if Backend.isOs(OS.WINDOWS):
-            self.udfLocalFile += "/postgresql/windows/%d/%s/lib_postgresqludf_sys.dll" % (Backend.getArch(), majorVer)
-            self.udfSharedLibExt = "dll"
-        else:
-            self.udfLocalFile += "/postgresql/linux/%d/%s/lib_postgresqludf_sys.so" % (Backend.getArch(), majorVer)
-            self.udfSharedLibExt = "so"
+        try:
+            if Backend.isOs(OS.WINDOWS):
+                _ = os.path.join(self.udfLocalFile, "postgresql", "windows", "%d" % Backend.getArch(), majorVer, "lib_postgresqludf_sys.dll_")
+                checkFile(_)
+                self.udfLocalFile = decloakToTemp(_)
+                self.udfSharedLibExt = "dll"
+            else:
+                _ = os.path.join(self.udfLocalFile, "postgresql", "linux", "%d" % Backend.getArch(), majorVer, "lib_postgresqludf_sys.so_")
+                checkFile(_)
+                self.udfLocalFile = decloakToTemp(_)
+                self.udfSharedLibExt = "so"
+        except SqlmapSystemException:
+            errMsg = "unsupported feature on PostgreSQL %s (%s-bit)" % (majorVer, Backend.getArch())
+            raise SqlmapUnsupportedFeatureException(errMsg)
 
     def udfCreateFromSharedLib(self, udf, inpRet):
         if udf in self.udfToCreate:

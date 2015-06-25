@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -42,3 +42,5 @@ if __name__ == "__main__":
         server(args.host, args.port)
     elif args.client is True:
         client(args.host, args.port)
+    else:
+        apiparser.print_help()

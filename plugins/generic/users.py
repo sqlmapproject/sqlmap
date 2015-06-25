@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -101,7 +101,11 @@ class Users:
             values = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(values):
-                kb.data.cachedUsers = arrayizeValue(values)
+                kb.data.cachedUsers = []
+                for value in arrayizeValue(values):
+                    value = unArrayizeValue(value)
+                    if not isNoneValue(value):
+                        kb.data.cachedUsers.append(value)
 
         if not kb.data.cachedUsers and isInferenceAvailable() and not conf.direct:
             infoMsg = "fetching number of database users"
@@ -114,7 +118,9 @@ class Users:
 
             count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-            if not isNumPosStrValue(count):
+            if count == 0:
+                return kb.data.cachedUsers
+            elif not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the number of database users"
                 raise SqlmapNoneDataException(errMsg)
 
@@ -294,7 +300,7 @@ class Users:
 
         if not kb.data.cachedUsersPasswords:
             errMsg = "unable to retrieve the password hashes for the "
-            errMsg += "database users (most probably because the session "
+            errMsg += "database users (probably because the session "
             errMsg += "user has no read privileges over the relevant "
             errMsg += "system database table)"
             logger.error(errMsg)
@@ -389,6 +395,9 @@ class Users:
                         else:
                             privilege = value[count]
 
+                            if privilege is None:
+                                continue
+
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
                             if Backend.isDbms(DBMS.PGSQL) and getUnicode(privilege).isdigit():
@@ -415,17 +424,18 @@ class Users:
                             elif Backend.isDbms(DBMS.DB2):
                                 privs = privilege.split(",")
                                 privilege = privs[0]
-                                privs = privs[1]
-                                privs = list(privs.strip())
-                                i = 1
+                                if len(privs) > 1:
+                                    privs = privs[1]
+                                    privs = list(privs.strip())
+                                    i = 1
 
-                                for priv in privs:
-                                    if priv.upper() in ("Y", "G"):
-                                        for position, db2Priv in DB2_PRIVS.items():
-                                            if position == i:
-                                                privilege += ", " + db2Priv
+                                    for priv in privs:
+                                        if priv.upper() in ("Y", "G"):
+                                            for position, db2Priv in DB2_PRIVS.items():
+                                                if position == i:
+                                                    privilege += ", " + db2Priv
 
-                                    i += 1
+                                        i += 1
 
                                 privileges.add(privilege)
 
@@ -436,7 +446,7 @@ class Users:
 
         if not kb.data.cachedUsersPrivileges and isInferenceAvailable() and not conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                conditionChar = " LIKE "
+                conditionChar = "LIKE"
             else:
                 conditionChar = "="
 
@@ -506,7 +516,11 @@ class Users:
                         query = rootQuery.blind.query % (index, user)
                     else:
                         query = rootQuery.blind.query % (user, index)
+
                     privilege = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                    if privilege is None:
+                        continue
 
                     # In PostgreSQL we get 1 if the privilege is True,
                     # 0 otherwise

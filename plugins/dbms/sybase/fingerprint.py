@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
 from lib.core.common import Format
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -58,7 +59,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if not conf.extensiveFp and (Backend.isDbmsWithin(SYBASE_ALIASES) \
-           or conf.dbms in SYBASE_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in SYBASE_ALIASES) and Backend.getVersion() and \
            Backend.getVersion().isdigit():
             setDbms("%s %s" % (DBMS.SYBASE, Backend.getVersion()))
 
@@ -74,7 +75,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("tempdb_id()=tempdb_id()")
+            result = inject.checkBooleanExpression("@@transtate=@@transtate")
 
         if result:
             infoMsg = "confirming %s" % DBMS.SYBASE
@@ -98,12 +99,17 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.SYBASE
             logger.info(infoMsg)
 
-            for version in xrange(12, 16):
-                result = inject.checkBooleanExpression("@@VERSION_NUMBER/1000=%d" % version)
+            result = unArrayizeValue(inject.getValue("SUBSTRING(@@VERSION,1,1)"))
 
-                if result:
-                    Backend.setVersion(str(version))
-                    break
+            if result and result.isdigit():
+                Backend.setVersion(str(result))
+            else:
+                for version in xrange(12, 16):
+                    result = inject.checkBooleanExpression("PATINDEX('%%/%d[./]%%',@@VERSION)>0" % version)
+
+                    if result:
+                        Backend.setVersion(str(version))
+                        break
 
             return True
         else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -16,6 +16,7 @@ from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
 from lib.core.data import logger
 from lib.core.exception import SqlmapDataException
+from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import UNICODE_ENCODING
@@ -43,7 +44,11 @@ class HashDB(object):
 
         return threadData.hashDBCursor
 
-    cursor = property(_get_cursor)
+    def _set_cursor(self, cursor):
+        threadData = getCurrentThreadData()
+        threadData.hashDBCursor = cursor
+
+    cursor = property(_get_cursor, _set_cursor)
 
     def close(self):
         threadData = getCurrentThreadData()
@@ -58,7 +63,7 @@ class HashDB(object):
     @staticmethod
     def hashKey(key):
         key = key.encode(UNICODE_ENCODING) if isinstance(key, unicode) else repr(key)
-        retVal = int(hashlib.md5(key).hexdigest()[:8], 16)
+        retVal = int(hashlib.md5(key).hexdigest()[:12], 16)
         return retVal
 
     def retrieve(self, key, unserialize=False):
@@ -72,8 +77,12 @@ class HashDB(object):
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not 'locked' in ex.message:
+                        if not "locked" in ex.message:
                             raise
+                    except sqlite3.DatabaseError, ex:
+                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, ex)
+                        errMsg += "If the problem persists please rerun with `--flush-session`"
+                        raise SqlmapDataException, errMsg
                     else:
                         break
         return retVal if not unserialize else unserializeObject(retVal)
@@ -134,15 +143,36 @@ class HashDB(object):
     def beginTransaction(self):
         threadData = getCurrentThreadData()
         if not threadData.inTransaction:
-            self.cursor.execute('BEGIN TRANSACTION')
-            threadData.inTransaction = True
+            try:
+                self.cursor.execute("BEGIN TRANSACTION")
+            except:
+                # Reference: http://stackoverflow.com/a/25245731
+                self.cursor.close()
+                threadData.hashDBCursor = None
+                self.cursor.execute("BEGIN TRANSACTION")
+            finally:
+                threadData.inTransaction = True
 
     def endTransaction(self):
         threadData = getCurrentThreadData()
         if threadData.inTransaction:
+            retries = 0
+            while retries < HASHDB_END_TRANSACTION_RETRIES:
+                try:
+                    self.cursor.execute("END TRANSACTION")
+                    threadData.inTransaction = False
+                except sqlite3.OperationalError:
+                    pass
+                else:
+                    return
+
+                retries += 1
+                time.sleep(1)
+
             try:
-                self.cursor.execute('END TRANSACTION')
+                self.cursor.execute("ROLLBACK TRANSACTION")
             except sqlite3.OperationalError:
-                pass
+                self.cursor.close()
+                self.cursor = None
             finally:
                 threadData.inTransaction = False

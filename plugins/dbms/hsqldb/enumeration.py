@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2013 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -13,7 +13,6 @@ from lib.core.data import queries
 from lib.core.common import Backend
 from lib.core.common import unArrayizeValue
 from lib.request import inject
-from lib.parse.banner import bannerParser
 
 class Enumeration(GenericEnumeration):
     def __init__(self):
@@ -31,3 +30,13 @@ class Enumeration(GenericEnumeration):
             kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=True))
 
         return kb.data.banner
+
+    def getPrivileges(self, *args):
+        warnMsg = "on HSQLDB it is not possible to enumerate the user privileges"
+        logger.warn(warnMsg)
+
+        return {}
+
+    def getHostname(self):
+        warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
+        logger.warn(warnMsg)
