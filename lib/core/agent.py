@@ -245,8 +245,7 @@ class Agent(object):
             if not (expression and expression[0] == ';') and not (query and query[-1] in ('(', ')') and expression and expression[0] in ('(', ')')) and not (query and query[-1] == '('):
                 query += " "
 
-        if query:
-            query = "%s%s" % (query.replace('\\', BOUNDARY_BACKSLASH_MARKER), expression)
+        query = "%s%s" % ((query or "").replace('\\', BOUNDARY_BACKSLASH_MARKER), expression)
 
         return query
 
