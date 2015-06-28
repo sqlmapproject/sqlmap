@@ -289,7 +289,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 line = line.strip('\r')
                 match = re.search(r"\A(%s) (.+) HTTP/[\d.]+\Z" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), line) if not method else None
 
-                if len(line) == 0 and method and method != HTTPMETHOD.GET and data is None:
+                if len(line.strip()) == 0 and method and method != HTTPMETHOD.GET and data is None:
                     data = ""
                     params = True
 
