@@ -217,6 +217,9 @@ class Agent(object):
         if conf.direct:
             return self.payloadDirect(expression)
 
+        if expression is None:
+            return None
+
         expression = self.cleanupPayload(expression)
         expression = unescaper.escape(expression)
         query = None
@@ -257,6 +260,9 @@ class Agent(object):
 
         if conf.direct:
             return self.payloadDirect(expression)
+
+        if expression is None:
+            return None
 
         expression = self.cleanupPayload(expression)
 
