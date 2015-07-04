@@ -386,9 +386,12 @@ def checkSqlInjection(place, parameter, value):
                     # Forge request payload by prepending with boundary's
                     # prefix and appending the boundary's suffix to the
                     # test's ' <payload><comment> ' string
-                    boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
-                    boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
-                    reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                    if fstPayload:
+                        boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
+                        boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
+                        reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                    else:
+                        reqPayload = None
 
                     # Perform the test's request and check whether or not the
                     # payload was successful

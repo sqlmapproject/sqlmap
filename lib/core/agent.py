@@ -68,7 +68,7 @@ class Agent(object):
 
         return query
 
-    def payload(self, place=None, parameter=None, value=None, newValue="", where=None):
+    def payload(self, place=None, parameter=None, value=None, newValue=None, where=None):
         """
         This method replaces the affected parameter with the SQL
         injection statement to request
