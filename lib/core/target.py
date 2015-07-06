@@ -80,6 +80,7 @@ def _setRequestParams():
         return
 
     testableParameters = False
+    skipHeaders = False
 
     # Perform checks on GET parameters
     if conf.parameters.get(PLACE.GET):
@@ -123,11 +124,17 @@ def _setRequestParams():
             else:
                 kb.processUserMarks = not test or test[0] not in ("n", "N")
 
-                if kb.processUserMarks and "=%s" % CUSTOM_INJECTION_MARK_CHAR in conf.data:
-                    warnMsg = "it seems that you've provided empty parameter value(s) "
-                    warnMsg += "for testing. Please, always use only valid parameter values "
-                    warnMsg += "so sqlmap could be able to run properly"
-                    logger.warn(warnMsg)
+                if kb.processUserMarks:
+                    skipHeaders = True
+
+                    conf.parameters.clear()
+                    conf.paramDict.clear()
+
+                    if "=%s" % CUSTOM_INJECTION_MARK_CHAR in conf.data:
+                        warnMsg = "it seems that you've provided empty parameter value(s) "
+                        warnMsg += "for testing. Please, always use only valid parameter values "
+                        warnMsg += "so sqlmap could be able to run properly"
+                        logger.warn(warnMsg)
 
         if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
             if re.search(JSON_RECOGNITION_REGEX, conf.data):
@@ -241,11 +248,17 @@ def _setRequestParams():
                 else:
                     kb.processUserMarks = not test or test[0] not in ("n", "N")
 
-                    if kb.processUserMarks and "=%s" % CUSTOM_INJECTION_MARK_CHAR in _:
-                        warnMsg = "it seems that you've provided empty parameter value(s) "
-                        warnMsg += "for testing. Please, always use only valid parameter values "
-                        warnMsg += "so sqlmap could be able to run properly"
-                        logger.warn(warnMsg)
+                    if kb.processUserMarks:
+                        skipHeaders = True
+
+                        conf.parameters.clear()
+                        conf.paramDict.clear()
+
+                        if "=%s" % CUSTOM_INJECTION_MARK_CHAR in _:
+                            warnMsg = "it seems that you've provided empty parameter value(s) "
+                            warnMsg += "for testing. Please, always use only valid parameter values "
+                            warnMsg += "so sqlmap could be able to run properly"
+                            logger.warn(warnMsg)
 
             if not kb.processUserMarks:
                 if place == PLACE.URI:
@@ -304,49 +317,50 @@ def _setRequestParams():
             if conf.get(item):
                 conf[item] = conf[item].replace(CUSTOM_INJECTION_MARK_CHAR, "")
 
-    # Perform checks on Cookie parameters
-    if conf.cookie:
-        conf.parameters[PLACE.COOKIE] = conf.cookie
-        paramDict = paramToDict(PLACE.COOKIE, conf.cookie)
+    if not skipHeaders:
+        # Perform checks on Cookie parameters
+        if conf.cookie:
+            conf.parameters[PLACE.COOKIE] = conf.cookie
+            paramDict = paramToDict(PLACE.COOKIE, conf.cookie)
 
-        if paramDict:
-            conf.paramDict[PLACE.COOKIE] = paramDict
-            testableParameters = True
+            if paramDict:
+                conf.paramDict[PLACE.COOKIE] = paramDict
+                testableParameters = True
 
-    # Perform checks on header values
-    if conf.httpHeaders:
-        for httpHeader, headerValue in conf.httpHeaders:
-            # Url encoding of the header values should be avoided
-            # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
+        # Perform checks on header values
+        if conf.httpHeaders:
+            for httpHeader, headerValue in conf.httpHeaders:
+                # Url encoding of the header values should be avoided
+                # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
 
-            httpHeader = httpHeader.title()
+                httpHeader = httpHeader.title()
 
-            if httpHeader == HTTP_HEADER.USER_AGENT:
-                conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
+                if httpHeader == HTTP_HEADER.USER_AGENT:
+                    conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
+                    condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
 
-                if condition:
-                    conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
-                    testableParameters = True
+                    if condition:
+                        conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
+                        testableParameters = True
 
-            elif httpHeader == HTTP_HEADER.REFERER:
-                conf.parameters[PLACE.REFERER] = urldecode(headerValue)
+                elif httpHeader == HTTP_HEADER.REFERER:
+                    conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
+                    condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
 
-                if condition:
-                    conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
-                    testableParameters = True
+                    if condition:
+                        conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
+                        testableParameters = True
 
-            elif httpHeader == HTTP_HEADER.HOST:
-                conf.parameters[PLACE.HOST] = urldecode(headerValue)
+                elif httpHeader == HTTP_HEADER.HOST:
+                    conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))
+                    condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))
 
-                if condition:
-                    conf.paramDict[PLACE.HOST] = {PLACE.HOST: headerValue}
-                    testableParameters = True
+                    if condition:
+                        conf.paramDict[PLACE.HOST] = {PLACE.HOST: headerValue}
+                        testableParameters = True
 
     if not conf.parameters:
         errMsg = "you did not provide any GET, POST and Cookie "
