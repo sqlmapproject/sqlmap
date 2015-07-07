@@ -114,7 +114,7 @@ def cmdLineParser():
                            action="store_true",
                            help="Ignore Set-Cookie header from response")
 
-        request.add_option("-H", "--user-agent", dest="agent",
+        request.add_option("--user-agent", dest="agent",
                            help="HTTP User-Agent header value")
 
         request.add_option("--random-agent", dest="randomAgent",
@@ -126,6 +126,9 @@ def cmdLineParser():
 
         request.add_option("--referer", dest="referer",
                            help="HTTP Referer header value")
+
+        request.add_option("-H", "--header", dest="header",
+                           help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
 
         request.add_option("--headers", dest="headers",
                            help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
@@ -799,6 +802,7 @@ def cmdLineParser():
         argv = []
         prompt = False
         advancedHelp = True
+        extraHeaders = []
 
         for arg in sys.argv:
             argv.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
@@ -860,6 +864,9 @@ def cmdLineParser():
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
+            elif argv[i] == "-H":
+                if i + 1 < len(argv):
+                    extraHeaders.append(argv[i + 1])
             elif re.match(r"\A\d+!\Z", argv[i]) and argv[max(0, i - 1)] == "--threads" or re.match(r"\A--threads.+\d+!\Z", argv[i]):
                 argv[i] = argv[i][:-1]
                 conf.skipThreadCheck = True
@@ -887,6 +894,12 @@ def cmdLineParser():
             if "-h" in argv and not advancedHelp:
                 print "\n[!] to see full list of options run with '-hh'"
             raise
+
+        if extraHeaders:
+            if not args.headers:
+                args.headers = ""
+            delimiter = "\\n" if "\\n" in args.headers else "\n"
+            args.headers += delimiter + delimiter.join(extraHeaders)
 
         # Expand given mnemonic options (e.g. -z "ign,flu,bat")
         for i in xrange(len(argv) - 1):

@@ -1339,6 +1339,9 @@ def _setHTTPExtraHeaders():
         conf.headers = conf.headers.split("\n") if "\n" in conf.headers else conf.headers.split("\\n")
 
         for headerValue in conf.headers:
+            if not headerValue.strip():
+                continue
+
             if headerValue.count(':') >= 1:
                 header, value = (_.lstrip() for _ in headerValue.split(":", 1))
 
