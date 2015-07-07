@@ -114,7 +114,7 @@ def cmdLineParser():
                            action="store_true",
                            help="Ignore Set-Cookie header from response")
 
-        request.add_option("--user-agent", dest="agent",
+        request.add_option("-H", "--user-agent", dest="agent",
                            help="HTTP User-Agent header value")
 
         request.add_option("--random-agent", dest="randomAgent",
