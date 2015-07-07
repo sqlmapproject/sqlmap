@@ -209,7 +209,6 @@ optDict = {
                              },
 
             "Miscellaneous": {
-                               "mnemonics":         "string",
                                "alert":             "string",
                                "answers":           "string",
                                "beep":              "boolean",
