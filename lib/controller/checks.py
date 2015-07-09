@@ -525,6 +525,17 @@ def checkSqlInjection(place, parameter, value):
                                 infoMsg += "there is at least one other (potential) "
                                 infoMsg += "technique found"
                                 singleTimeLogMessage(infoMsg)
+                            elif not injection.data:
+                                _ = test.request.columns.split('-')[-1]
+                                if _.isdigit() and int(_) > 10:
+                                    if kb.futileUnion is None:
+                                        msg = "it is not recommended to perform "
+                                        msg += "extended UNION tests if there is not "
+                                        msg += "at least one other (potential) "
+                                        msg += "technique found. Do you want to skip? [Y/n] "
+                                        kb.futileUnion = readInput(msg, default="Y").strip().upper() == 'N'
+                                    if kb.futileUnion is False:
+                                        continue
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
