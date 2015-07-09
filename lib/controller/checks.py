@@ -426,7 +426,7 @@ def checkSqlInjection(place, parameter, value):
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
                             truePage = threadData.lastComparisonPage or ""
 
-                            if trueResult:
+                            if trueResult and truePage != falsePage:
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
 
                                 # Perform the test's False request
