@@ -90,6 +90,7 @@ def checkSqlInjection(place, parameter, value):
 
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
     tests = getSortedInjectionTests()
+    seenPayload = set()
 
     while tests:
         test = tests.pop(0)
@@ -390,6 +391,11 @@ def checkSqlInjection(place, parameter, value):
                         boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
                         boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
                         reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                        if reqPayload:
+                            if reqPayload in seenPayload:
+                                continue
+                            else:
+                                seenPayload.add(reqPayload)
                     else:
                         reqPayload = None
 
