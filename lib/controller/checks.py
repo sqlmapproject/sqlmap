@@ -552,7 +552,7 @@ def checkSqlInjection(place, parameter, value):
 
                         kb.previousMethod = method
 
-                        if conf.dummy:
+                        if conf.dummy or conf.offline:
                             injectable = False
 
                     # If the injection test was successful feed the injection
@@ -1142,7 +1142,7 @@ def checkWaf():
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
     """
 
-    if any((conf.string, conf.notString, conf.regexp)):
+    if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline)):
         return None
 
     dbmMsg = "heuristically checking if the target is protected by "
@@ -1290,7 +1290,7 @@ def checkNullConnection():
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
-    if not any((conf.proxy, conf.tor, conf.dummy)):
+    if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
         try:
             debugMsg = "resolving hostname '%s'" % conf.hostname
             logger.debug(debugMsg)
@@ -1303,7 +1303,7 @@ def checkConnection(suppressOutput=False):
             errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getUnicode(ex))
             raise SqlmapConnectionException(errMsg)
 
-    if not suppressOutput and not conf.dummy:
+    if not suppressOutput and not conf.dummy and not conf.offline:
         infoMsg = "testing connection to the target URL"
         logger.info(infoMsg)
 

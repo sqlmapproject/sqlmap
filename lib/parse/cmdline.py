@@ -715,6 +715,10 @@ def cmdLineParser():
                                   action="store_true",
                                   help="Imitate smartphone through HTTP User-Agent header")
 
+        miscellaneous.add_option("--offline", dest="offline",
+                                  action="store_true",
+                                  help="Work in offline mode (only use session data)")
+
         miscellaneous.add_option("--page-rank", dest="pageRank",
                                   action="store_true",
                                   help="Display page rank (PR) for Google dork results")
