@@ -155,8 +155,11 @@ def _formatInjection(inj):
     return data
 
 def _showInjections():
-    header = "sqlmap identified the following injection points with "
-    header += "a total of %d HTTP(s) requests" % kb.testQueryCount
+    if kb.testQueryCount > 0:
+        header = "sqlmap identified the following injection point(s) with "
+        header += "a total of %d HTTP(s) requests" % kb.testQueryCount
+    else:
+        header = "sqlmap resumed the following injection point(s) from stored session"
 
     if hasattr(conf, "api"):
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
