@@ -1015,7 +1015,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the target URL is stable. This can take up to a second"
+    infoMsg = "testing if the target URL is stable. Delay can take up to a second"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
@@ -1308,9 +1308,9 @@ def checkConnection(suppressOutput=False):
         logger.info(infoMsg)
 
     try:
+        kb.originalPageTime = time.time()
         page, _ = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
-        kb.originalPageTime = time.time()
 
         kb.errorIsNone = False
 
