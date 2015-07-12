@@ -484,7 +484,7 @@ DEFAULT_COOKIE_DELIMITER = ';'
 FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 
 # Github OAuth token used for creating an automatic Issue for unhandled exceptions
-GITHUB_REPORT_OAUTH_TOKEN = "6c16fa87190a100aceea8e71cb0c1ba8e4096c7a"
+GITHUB_REPORT_OAUTH_TOKEN = "YzQzM2M2YzgzMDExN2I5ZDMyYjAzNTIzODIwZDA2MDFmMmVjODI1Ng=="
 
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
