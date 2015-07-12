@@ -53,7 +53,6 @@ from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import safeExpandUser
-from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
 from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage

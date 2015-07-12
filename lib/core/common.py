@@ -97,7 +97,6 @@ from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
-from lib.core.settings import DESCRIPTION
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
@@ -134,9 +133,7 @@ from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
 from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
-from lib.core.settings import REVISION
 from lib.core.settings import SENSITIVE_DATA_REGEX
-from lib.core.settings import SITE
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import TIME_STDEV_COEFF
@@ -146,7 +143,6 @@ from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 from lib.core.threads import getCurrentThreadData
 from lib.utils.sqlalchemy import _sqlalchemy
@@ -1027,7 +1023,7 @@ def checkFile(filename):
 
     if valid:
         try:
-            with open(filename, "rb") as f:
+            with open(filename, "rb"):
                 pass
         except:
             valid = False

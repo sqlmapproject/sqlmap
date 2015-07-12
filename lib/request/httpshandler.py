@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import httplib
 import socket
-import sys
 import urllib2
 
 from lib.core.data import kb

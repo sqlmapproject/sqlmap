@@ -12,7 +12,6 @@ import os
 import re
 import shutil
 import sys
-import tempfile
 import time
 import traceback
 import warnings
@@ -28,7 +27,6 @@ from lib.core.common import createGithubIssue
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import maskSensitiveData
-from lib.core.common import setColor
 from lib.core.common import setPaths
 from lib.core.common import weAreFrozen
 from lib.core.data import cmdLineOptions

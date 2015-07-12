@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 import imp
 import logging
 import os
-import re
 import sys
 import warnings
 

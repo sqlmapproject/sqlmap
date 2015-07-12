@@ -59,7 +59,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
-from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS

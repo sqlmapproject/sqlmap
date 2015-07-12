@@ -8,7 +8,6 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import os
-import shutil
 import sqlite3
 import sys
 import tempfile

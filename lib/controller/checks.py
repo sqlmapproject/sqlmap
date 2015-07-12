@@ -15,7 +15,6 @@ from subprocess import Popen as execute
 
 from extra.beep.beep import beep
 from lib.core.agent import agent
-from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
@@ -46,7 +45,6 @@ from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.decorators import cachedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
-from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
@@ -66,7 +64,6 @@ from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import URI_HTTP_HEADER
-from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IDS_WAF_CHECK_RATIO

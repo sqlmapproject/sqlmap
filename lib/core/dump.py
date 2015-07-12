@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import cgi
-import codecs
 import hashlib
 import os
 import re
@@ -22,7 +21,6 @@ from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
 from lib.core.common import randomInt
-from lib.core.common import randomStr
 from lib.core.common import safeCSValue
 from lib.core.common import unicodeencode
 from lib.core.common import unsafeSQLIdentificatorNaming

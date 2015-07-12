@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
-import random
 import re
 import subprocess
 import string

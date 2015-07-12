@@ -43,7 +43,7 @@ def saveHistory(completion=None):
         historyPath = paths.SQLMAP_SHELL_HISTORY
 
     try:
-        with open(historyPath, "w+") as f:
+        with open(historyPath, "w+"):
             pass
     except:
         pass
@@ -92,7 +92,7 @@ class CompleterNG(rlcompleter.Completer):
                     matches.append(word)
 
         return matches
-        
+
 def autoCompletion(completion=None, os=None, commands=None):
     if not readlineAvailable():
         return

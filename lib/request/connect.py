@@ -822,7 +822,6 @@ class Connect(object):
                 retVal = paramString
                 match = re.search("%s=(?P<value>[^&]*)" % re.escape(parameter), paramString)
                 if match:
-                    origValue = match.group("value")
                     retVal = re.sub("%s=[^&]*" % re.escape(parameter), "%s=%s" % (parameter, newValue), paramString)
                 return retVal
 
