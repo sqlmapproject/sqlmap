@@ -689,7 +689,7 @@ def cmdLineParser():
                                   help="Set question answers (e.g. \"quit=N,follow=N\")")
 
         miscellaneous.add_option("--beep", dest="beep", action="store_true",
-                                  help="Make a beep sound when SQL injection is found")
+                                  help="Beep on question and/or when SQL injection is found")
 
         miscellaneous.add_option("--cleanup", dest="cleanup",
                                   action="store_true",

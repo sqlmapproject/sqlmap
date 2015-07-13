@@ -43,6 +43,7 @@ from xml.dom import minidom
 from xml.sax import parse
 from xml.sax import SAXParseException
 
+from extra.beep.beep import beep
 from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
@@ -931,6 +932,10 @@ def readInput(message, default=None, checkBatch=True):
             retVal = default
         else:
             logging._acquireLock()
+
+            if conf.get("beep"):
+                beep()
+
             dataToStdout("\r%s" % message, forceOutput=True, bold=True)
             kb.prependFlag = False
 
