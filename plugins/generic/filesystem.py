@@ -27,6 +27,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUndefinedMethod
 from lib.request import inject
+from binascii import a2b_hex
 
 class Filesystem:
     """
@@ -232,7 +233,7 @@ class Filesystem:
                 fileContent = newFileContent
 
             if fileContent is not None:
-                fileContent = decodeHexValue(fileContent)
+                fileContent = a2b_hex(fileContent)
 
                 if fileContent:
                     localFilePath = dataToOutFile(remoteFile, fileContent)
