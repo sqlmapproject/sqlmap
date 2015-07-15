@@ -872,7 +872,7 @@ def dataToOutFile(filename, data):
         retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
         try:
-            with openFile(retVal, "wb") as f:
+            with open(retVal, "w+b") as f:
                 f.write(data)
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
@@ -3714,7 +3714,7 @@ def applyFunctionRecursively(value, function):
 
     return retVal
 
-def decodeHexValue(value):
+def decodeHexValue(value, raw=False):
     """
     Returns value decoded from DBMS specific hexadecimal representation
 
@@ -3729,7 +3729,7 @@ def decodeHexValue(value):
         if value and isinstance(value, basestring) and len(value) % 2 == 0:
             retVal = hexdecode(retVal)
 
-            if not kb.binaryField:
+            if not kb.binaryField and not raw:
                 if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
                     try:
                         retVal = retVal.decode("utf-16-le")

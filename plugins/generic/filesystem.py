@@ -232,7 +232,7 @@ class Filesystem:
                 fileContent = newFileContent
 
             if fileContent is not None:
-                fileContent = decodeHexValue(fileContent)
+                fileContent = decodeHexValue(fileContent, True)
 
                 if fileContent:
                     localFilePath = dataToOutFile(remoteFile, fileContent)
