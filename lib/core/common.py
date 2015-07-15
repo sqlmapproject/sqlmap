@@ -872,7 +872,7 @@ def dataToOutFile(filename, data):
         retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
         try:
-            with openFile(retVal, "wb") as f:
+            with open(retVal, "wb") as f:
                 f.write(data)
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
