@@ -1864,6 +1864,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.technique = None
     kb.tempDir = None
     kb.testMode = False
+    kb.testOnlyCustom = False
     kb.testQueryCount = 0
     kb.testType = None
     kb.threadContinue = True

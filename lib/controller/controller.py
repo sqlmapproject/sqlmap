@@ -430,6 +430,9 @@ def start():
                     if skip:
                         continue
 
+                    if kb.testOnlyCustom and place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
+                        continue
+
                     if place not in conf.paramDict:
                         continue
 
