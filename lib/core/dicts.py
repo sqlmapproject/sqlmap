@@ -105,13 +105,22 @@ PGSQL_PRIVS = {
                     3: "catupd",
                 }
 
+# Reference(s): http://stackoverflow.com/a/17672504
+#               http://docwiki.embarcadero.com/InterBase/XE7/en/RDB$USER_PRIVILEGES
+
 FIREBIRD_PRIVS = {
                     "S": "SELECT",
                     "I": "INSERT",
                     "U": "UPDATE",
                     "D": "DELETE",
-                    "R": "REFERENCES",
+                    "R": "REFERENCE",
                     "E": "EXECUTE",
+                    "X": "EXECUTE",
+                    "A": "ALL",
+                    "M": "MEMBER",
+                    "T": "DECRYPT",
+                    "E": "ENCRYPT",
+                    "B": "SUBSCRIBE",
                 }
 
 DB2_PRIVS = {
