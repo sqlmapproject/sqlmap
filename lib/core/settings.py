@@ -611,6 +611,9 @@ MIN_ENCODED_LEN_CHECK = 5
 # Timeout in seconds in which Metasploit remote session has to be initialized
 METASPLOIT_SESSION_TIMEOUT = 300
 
+# Replacement for non-ALNUM chars in variables
+EVALCODE_NONALNUM_REP = "_%s_"  # %s to be changed for hex(ord(char))
+
 # Suffix used to mark variables having keyword names
 EVALCODE_KEYWORD_SUFFIX = "_KEYWORD"
 

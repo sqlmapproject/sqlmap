@@ -82,6 +82,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
+from lib.core.settings import EVALCODE_NONALNUM_REP
 from lib.core.settings import EVALCODE_KEYWORD_SUFFIX
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
@@ -892,12 +893,25 @@ class Connect(object):
             variables = {"uri": uri}
             originals = {}
             keywords = keyword.kwlist
+            regex_nonalnum = '(%s)' % \
+                (EVALCODE_NONALNUM_REP % '0x([0-9a-f]{1,2})')
 
             for item in filter(None, (get, post if not kb.postHint else None)):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        name = re.sub(r"[^\w]", "", name.strip())
+                        # modify non-alnum delimiters already in name
+                        for p in re.findall(regex_nonalnum, name):
+                            b = EVALCODE_NONALNUM_REP % hex(ord(p[0][0]))
+                            e = EVALCODE_NONALNUM_REP % hex(ord(p[0][-1]))
+                            name = name.replace(
+                                p[0], "%s%s%s" % (b, p[0][1:-1], e))
+                        # modify non-alnum characters
+                        name = "".join(
+                            c if re.search(r"^\w$", c)
+                            else EVALCODE_NONALNUM_REP % hex(ord(c))
+                            for c in name)
+                        # modify keywords
                         if name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
@@ -934,10 +948,17 @@ class Connect(object):
             evaluateCode(conf.evalCode, variables)
 
             for variable in variables.keys():
+                original = variable
+                value = variables[variable]
+                # restore non-alnum characters
+                for p in re.findall(regex_nonalnum, variable):
+                    variable = variable.replace(p[0], chr(int(p[1], 16)))
+                # restore keywords
                 if variable.endswith(EVALCODE_KEYWORD_SUFFIX):
-                    value = variables[variable]
-                    del variables[variable]
-                    variables[variable.replace(EVALCODE_KEYWORD_SUFFIX, "")] = value
+                    variable = variable.replace(EVALCODE_KEYWORD_SUFFIX, "")
+                if variable != original:
+                    del variables[original]
+                    variables[variable] = value
 
             uri = variables["uri"]
 
