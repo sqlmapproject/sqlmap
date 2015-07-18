@@ -501,47 +501,49 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
-                            if place == PLACE.COOKIE:
-                                pushValue(kb.mergeCookies)
-                                kb.mergeCookies = False
+                            try:
+                                if place == PLACE.COOKIE:
+                                    pushValue(kb.mergeCookies)
+                                    kb.mergeCookies = False
 
-                            check = heuristicCheckSqlInjection(place, parameter)
+                                check = heuristicCheckSqlInjection(place, parameter)
 
-                            if check != HEURISTIC_TEST.POSITIVE:
-                                if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
-                                    infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
-                                    logger.info(infoMsg)
-                                    continue
+                                if check != HEURISTIC_TEST.POSITIVE:
+                                    if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
+                                        infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
+                                        logger.info(infoMsg)
+                                        continue
 
-                            infoMsg = "testing for SQL injection on %s " % paramType
-                            infoMsg += "parameter '%s'" % parameter
-                            logger.info(infoMsg)
+                                infoMsg = "testing for SQL injection on %s " % paramType
+                                infoMsg += "parameter '%s'" % parameter
+                                logger.info(infoMsg)
 
-                            injection = checkSqlInjection(place, parameter, value)
-                            proceed = not kb.endDetection
+                                injection = checkSqlInjection(place, parameter, value)
+                                proceed = not kb.endDetection
 
-                            if injection is not None and injection.place is not None:
-                                kb.injections.append(injection)
+                                if injection is not None and injection.place is not None:
+                                    kb.injections.append(injection)
 
-                                # In case when user wants to end detection phase (Ctrl+C)
-                                if not proceed:
-                                    break
+                                    # In case when user wants to end detection phase (Ctrl+C)
+                                    if not proceed:
+                                        break
 
-                                msg = "%s parameter '%s' " % (injection.place, injection.parameter)
-                                msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
-                                test = readInput(msg, default="N")
+                                    msg = "%s parameter '%s' " % (injection.place, injection.parameter)
+                                    msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
+                                    test = readInput(msg, default="N")
 
-                                if test[0] not in ("y", "Y"):
-                                    proceed = False
-                                    paramKey = (conf.hostname, conf.path, None, None)
-                                    kb.testedParams.add(paramKey)
-                            else:
-                                warnMsg = "%s parameter '%s' is not " % (paramType, parameter)
-                                warnMsg += "injectable"
-                                logger.warn(warnMsg)
+                                    if test[0] not in ("y", "Y"):
+                                        proceed = False
+                                        paramKey = (conf.hostname, conf.path, None, None)
+                                        kb.testedParams.add(paramKey)
+                                else:
+                                    warnMsg = "%s parameter '%s' is not " % (paramType, parameter)
+                                    warnMsg += "injectable"
+                                    logger.warn(warnMsg)
 
-                            if place == PLACE.COOKIE:
-                                kb.mergeCookies = popValue()
+                            finally:
+                                if place == PLACE.COOKIE:
+                                    kb.mergeCookies = popValue()
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if kb.vainRun and not conf.multipleTargets:
