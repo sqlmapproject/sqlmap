@@ -604,7 +604,7 @@ def _createTargetDirs():
 
             warnMsg = "unable to create regular output directory "
             warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
             logger.warn(warnMsg)
 
             paths.SQLMAP_OUTPUT_PATH = tempDir
@@ -626,7 +626,7 @@ def _createTargetDirs():
 
             warnMsg = "unable to create output directory "
             warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
             logger.warn(warnMsg)
 
             conf.outputPath = tempDir
