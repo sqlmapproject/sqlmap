@@ -2483,8 +2483,10 @@ def extractTextTagContent(page):
     """
 
     page = page or ""
+
     if REFLECTED_VALUE_MARKER in page:
         page = re.sub(r"(?si)[^\s>]*%s[^\s<]*" % REFLECTED_VALUE_MARKER, "", page)
+
     return filter(None, (_.group('result').strip() for _ in re.finditer(TEXT_TAG_REGEX, page)))
 
 def trimAlphaNum(value):
