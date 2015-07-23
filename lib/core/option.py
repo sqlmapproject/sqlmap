@@ -765,12 +765,12 @@ def _setMetasploit():
 
     if conf.msfPath:
         for path in (conf.msfPath, os.path.join(conf.msfPath, "bin")):
-            if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole")):
+            if any(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfcli", "msfconsole")):
                 msfEnvPathExists = True
                 if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfvenom",)):
-                    kb.msfVenom = True
+                    kb.oldMsf = False
                 elif all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfencode", "msfpayload")):
-                    kb.msfVenom = False
+                    kb.oldMsf = True
                 else:
                     msfEnvPathExists = False
                 conf.msfPath = path
@@ -806,9 +806,9 @@ def _setMetasploit():
             if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole")):
                 msfEnvPathExists = True
                 if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfvenom",)):
-                    kb.msfVenom = True
+                    kb.oldMsf = False
                 elif all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfencode", "msfpayload")):
-                    kb.msfVenom = False
+                    kb.oldMsf = True
                 else:
                     msfEnvPathExists = False
 
@@ -1811,10 +1811,10 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.matchRatio = None
     kb.maxConnectionsFlag = False
     kb.mergeCookies = None
-    kb.msfVenom = False
     kb.multiThreadMode = False
     kb.negativeLogic = False
     kb.nullConnection = None
+    kb.oldMsf = None
     kb.orderByColumns = None
     kb.originalCode = None
     kb.originalPage = None
