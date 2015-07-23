@@ -1012,7 +1012,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the target URL is stable. Delay can take up to a second"
+    infoMsg = "testing if the target URL is stable"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
