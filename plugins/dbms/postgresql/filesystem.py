@@ -53,6 +53,8 @@ class Filesystem(GenericFilesystem):
         # http://www.postgresql.org/docs/8.3/interactive/lo-funcs.html
 
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
+        inject.goStacked("SELECT lo_create(%d)" % self.oid)
+        inject.goStacked("DELETE FROM pg_largeobject WHERE loid=%d" % self.oid)
 
         for offset in xrange(0, wFileSize, LOBLKSIZE):
             fcEncodedList = self.fileContentEncode(content[offset:offset + LOBLKSIZE], "base64", False)
