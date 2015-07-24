@@ -611,6 +611,9 @@ MIN_ENCODED_LEN_CHECK = 5
 # Timeout in seconds in which Metasploit remote session has to be initialized
 METASPLOIT_SESSION_TIMEOUT = 300
 
+# Reference: http://www.postgresql.org/docs/9.0/static/catalog-pg-largeobject.html
+LOBLKSIZE = 2048
+
 # Suffix used to mark variables having keyword names
 EVALCODE_KEYWORD_SUFFIX = "_KEYWORD"
 
