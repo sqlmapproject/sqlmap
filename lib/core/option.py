@@ -9,6 +9,7 @@ import cookielib
 import glob
 import inspect
 import logging
+import httplib
 import os
 import random
 import re
