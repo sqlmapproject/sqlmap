@@ -79,7 +79,9 @@ class Agent(object):
 
         retVal = ""
 
-        if where is None and isTechniqueAvailable(kb.technique):
+        if kb.forceWhere:
+            where = kb.forceWhere
+        elif where is None and isTechniqueAvailable(kb.technique):
             where = kb.injection.data[kb.technique].where
 
         if kb.injection.place is not None:

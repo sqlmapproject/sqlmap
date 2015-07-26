@@ -7,6 +7,8 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
@@ -97,8 +99,11 @@ class Filesystem(GenericFilesystem):
         debugMsg = "exporting the %s file content to file '%s'" % (fileType, dFile)
         logger.debug(debugMsg)
 
+        pushValue(kb.forceWhere)
+        kb.forceWhere = PAYLOAD.WHERE.NEGATIVE
         sqlQuery = "%s INTO DUMPFILE '%s'" % (fcEncodedStr, dFile)
         unionUse(sqlQuery, unpack=False)
+        kb.forceWhere = popValue()
 
         warnMsg = "expect junk characters inside the "
         warnMsg += "file as a leftover from UNION query"
