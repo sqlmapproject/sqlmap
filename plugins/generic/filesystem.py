@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import sys
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
@@ -13,11 +14,13 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
 from lib.core.common import decodeHexValue
+from lib.core.common import getUnicode
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
 from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -62,6 +65,7 @@ class Filesystem:
 
             if isNumPosStrValue(remoteFileSize):
                 remoteFileSize = long(remoteFileSize)
+                localFile = getUnicode(localFile, encoding=sys.getfilesystemencoding())
                 sameFile = False
 
                 if localFileSize == remoteFileSize:
