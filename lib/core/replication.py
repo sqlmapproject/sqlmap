@@ -70,7 +70,7 @@ class Replication(object):
             try:
                 self.parent.cursor.execute(sql, parameters)
             except sqlite3.OperationalError, ex:
-                errMsg = "problem occurred ('%s') while accessing sqlite database " % ex
+                errMsg = "problem occurred ('%s') while accessing sqlite database " % unicode(ex)
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
                 errMsg += "it's not used by some other program"
                 raise SqlmapGenericException(errMsg)

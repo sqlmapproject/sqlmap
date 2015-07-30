@@ -74,7 +74,7 @@ class Dump(object):
         try:
             self._outputFP.write(text)
         except IOError, ex:
-            errMsg = "error occurred while writing to log file ('%s')" % ex
+            errMsg = "error occurred while writing to log file ('%s')" % getUnicode(ex)
             raise SqlmapGenericException(errMsg)
 
         if kb.get("multiThreadMode"):
@@ -94,7 +94,7 @@ class Dump(object):
         try:
             self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
         except IOError, ex:
-            errMsg = "error occurred while opening log file ('%s')" % ex
+            errMsg = "error occurred while opening log file ('%s')" % getUnicode(ex)
             raise SqlmapGenericException(errMsg)
 
     def getOutputFile(self):

@@ -1521,7 +1521,7 @@ def _createTemporaryDirectory():
             os.makedirs(tempfile.gettempdir())
     except IOError, ex:
         errMsg = "there has been a problem while accessing "
-        errMsg += "system's temporary directory location(s) ('%s'). Please " % ex
+        errMsg += "system's temporary directory location(s) ('%s'). Please " % getUnicode(ex)
         errMsg += "make sure that there is enough disk space left. If problem persists, "
         errMsg += "try to set environment variable 'TEMP' to a location "
         errMsg += "writeable by the current user"

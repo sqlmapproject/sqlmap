@@ -862,7 +862,7 @@ def cmdLineParser():
                 for arg in shlex.split(command):
                     argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
             except ValueError, ex:
-                raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex
+                raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % getUnicode(ex)
 
         # Hide non-basic options in basic help case
         for i in xrange(len(argv)):

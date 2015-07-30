@@ -876,7 +876,7 @@ def dataToOutFile(filename, data):
                 f.write(data)
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
-            errMsg += "to the output file ('%s')" % ex
+            errMsg += "to the output file ('%s')" % getUnicode(ex)
             raise SqlmapGenericException(errMsg)
 
     return retVal
@@ -3662,7 +3662,7 @@ def evaluateCode(code, variables=None):
     except KeyboardInterrupt:
         raise
     except Exception, ex:
-        errMsg = "an error occurred while evaluating provided code ('%s'). " % ex
+        errMsg = "an error occurred while evaluating provided code ('%s') " % getUnicode(ex)
         raise SqlmapGenericException(errMsg)
 
 def serializeObject(object_):
