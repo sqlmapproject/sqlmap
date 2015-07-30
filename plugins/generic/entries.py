@@ -341,13 +341,13 @@ class Entries:
                         attackDumpedTable()
                     except (IOError, OSError), ex:
                         errMsg = "an error occurred while attacking "
-                        errMsg += "table dump ('%s')" % getUnicode(ex)
+                        errMsg += "table dump ('%s')" % ex.message
                         logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
             except SqlmapConnectionException, ex:
                 errMsg = "connection exception detected in dumping phase "
-                errMsg += "('%s')" % getUnicode(ex)
+                errMsg += "('%s')" % ex.message
                 logger.critical(errMsg)
 
             finally:

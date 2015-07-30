@@ -770,7 +770,7 @@ def dictionaryAttack(attack_dict):
 
                 except Exception, ex:
                     warnMsg = "there was a problem while loading dictionaries"
-                    warnMsg += " ('%s')" % getUnicode(ex)
+                    warnMsg += " ('%s')" % ex.message
                     logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "

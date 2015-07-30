@@ -1298,7 +1298,7 @@ def checkConnection(suppressOutput=False):
             raise SqlmapConnectionException(errMsg)
         except socket.error, ex:
             errMsg = "problem occurred while "
-            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getUnicode(ex))
+            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, ex.message)
             raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput and not conf.dummy and not conf.offline:
