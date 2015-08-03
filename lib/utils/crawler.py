@@ -186,12 +186,14 @@ def storeResultsToFile(results):
         test = readInput(message, default="N")
         kb.storeCrawlingChoice = test[0] in ("y", "Y")
 
-    if kb.storeCrawlingChoice:
-        handle, filename = tempfile.mkstemp(prefix="sqlmapcrawling-", suffix=".csv" if conf.forms else ".txt")
-        os.close(handle)
-
-        infoMsg = "writing crawling results to a temporary file '%s' " % filename
-        logger.info(infoMsg)
+    if kb.storeCrawlingChoice or conf.batchCrawlFile:
+        if conf.batchCrawlFile:
+            filename = conf.batchCrawlFile
+        else:
+            handle, filename = tempfile.mkstemp(prefix="sqlmapcrawling-", suffix=".csv" if conf.forms else ".txt")
+            os.close(handle)
+            infoMsg = "writing crawling results to a temporary file '%s' " % filename
+            logger.info(infoMsg)
 
         with openFile(filename, "w+b") as f:
             if conf.forms:
