@@ -508,7 +508,9 @@ def _setResultsFile():
         return
 
     if not conf.resultsFP:
-        conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
+        if not len(conf.resultsFilename):
+            conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
+        
         try:
             conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
         except (OSError, IOError), ex:
