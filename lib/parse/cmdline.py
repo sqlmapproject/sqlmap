@@ -610,6 +610,12 @@ def cmdLineParser():
                             help="Log all HTTP traffic into a "
                             "textual file")
 
+        general.add_option("--crawl-file", dest="crawlFile", action="store",
+                            help="Destination file for crawled links")
+
+        general.add_option("--results-file", dest="resultsFilename", action="store",
+                            help="Destination file for results in multi-target mode")
+
         general.add_option("--batch", dest="batch",
                             action="store_true",
                             help="Never ask for user input, use the default behaviour")
