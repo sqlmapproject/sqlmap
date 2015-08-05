@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -41,7 +41,7 @@ def update():
         logger.debug(debugMsg)
 
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
-        process = execute("git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
+        process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
         pollProcess(process, True)
         stdout, stderr = process.communicate()
         success = not process.returncode

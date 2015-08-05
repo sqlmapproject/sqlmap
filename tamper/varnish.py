@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Append a HTTP Request Parameter to bypass
+    Append a HTTP header 'X-originating-IP' to bypass
     WAF Protection of Varnish Firewall
 
     Notes:

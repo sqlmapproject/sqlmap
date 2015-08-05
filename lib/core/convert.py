@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import base64
 import json
 import pickle
 import sys
@@ -20,7 +21,7 @@ def base64decode(value):
     'foobar'
     """
 
-    return value.decode("base64")
+    return base64.b64decode(value)
 
 def base64encode(value):
     """
@@ -30,7 +31,7 @@ def base64encode(value):
     'Zm9vYmFy'
     """
 
-    return value.encode("base64")[:-1].replace("\n", "")
+    return base64.b64encode(value)
 
 def base64pickle(value):
     """
@@ -41,6 +42,7 @@ def base64pickle(value):
     """
 
     retVal = None
+
     try:
         retVal = base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
     except:
@@ -63,7 +65,14 @@ def base64unpickle(value):
     'foobar'
     """
 
-    return pickle.loads(base64decode(value))
+    retVal = None
+
+    try:
+        retVal = pickle.loads(base64decode(value))
+    except TypeError: 
+        retVal = pickle.loads(base64decode(bytes(value)))
+
+    return retVal
 
 def hexdecode(value):
     """
@@ -137,17 +146,21 @@ def htmlunescape(value):
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function
-    raise NotImplementedError
+    sys.stdout.write(message)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 def stdoutencode(data):
     retVal = None
 
     try:
+        data = data or ""
+
         # Reference: http://bugs.python.org/issue1602
         if IS_WIN:
-            output = data.encode("ascii", "replace")
+            output = data.encode(sys.stdout.encoding, "replace")
 
-            if output != data:
+            if '?' in output and '?' not in data:
                 warnMsg = "cannot properly display Unicode characters "
                 warnMsg += "inside Windows OS command prompt "
                 warnMsg += "(http://bugs.python.org/issue1602). All "

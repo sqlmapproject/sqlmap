@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -101,7 +101,11 @@ class Users:
             values = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(values):
-                kb.data.cachedUsers = arrayizeValue(values)
+                kb.data.cachedUsers = []
+                for value in arrayizeValue(values):
+                    value = unArrayizeValue(value)
+                    if not isNoneValue(value):
+                        kb.data.cachedUsers.append(value)
 
         if not kb.data.cachedUsers and isInferenceAvailable() and not conf.direct:
             infoMsg = "fetching number of database users"
@@ -420,17 +424,18 @@ class Users:
                             elif Backend.isDbms(DBMS.DB2):
                                 privs = privilege.split(",")
                                 privilege = privs[0]
-                                privs = privs[1]
-                                privs = list(privs.strip())
-                                i = 1
+                                if len(privs) > 1:
+                                    privs = privs[1]
+                                    privs = list(privs.strip())
+                                    i = 1
 
-                                for priv in privs:
-                                    if priv.upper() in ("Y", "G"):
-                                        for position, db2Priv in DB2_PRIVS.items():
-                                            if position == i:
-                                                privilege += ", " + db2Priv
+                                    for priv in privs:
+                                        if priv.upper() in ("Y", "G"):
+                                            for position, db2Priv in DB2_PRIVS.items():
+                                                if position == i:
+                                                    privilege += ", " + db2Priv
 
-                                    i += 1
+                                        i += 1
 
                                 privileges.add(privilege)
 

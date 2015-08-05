@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -70,7 +70,7 @@ class Replication(object):
             try:
                 self.parent.cursor.execute(sql, parameters)
             except sqlite3.OperationalError, ex:
-                errMsg = "problem occurred ('%s') while accessing sqlite database " % ex
+                errMsg = "problem occurred ('%s') while accessing sqlite database " % unicode(ex)
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
                 errMsg += "it's not used by some other program"
                 raise SqlmapGenericException(errMsg)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -59,6 +59,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     """
 
     abortedFlag = False
+    showEta = False
     partialValue = u""
     finalValue = None
     retrievedLength = 0
@@ -313,10 +314,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
-                                        conf.timeSec += 1
-
-                                        warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                        logger.warn(warnMsg)
+                                        if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
+                                            conf.timeSec += 1
+                                            warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                            logger.warn(warnMsg)
 
                                         if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
                                             dbgMsg = "turning off time auto-adjustment mechanism"

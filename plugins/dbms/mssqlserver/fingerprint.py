@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -66,7 +66,7 @@ class Fingerprint(GenericFingerprint):
 
     def checkDbms(self):
         if not conf.extensiveFp and (Backend.isDbmsWithin(MSSQL_ALIASES) \
-           or conf.dbms in MSSQL_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in MSSQL_ALIASES) and Backend.getVersion() and \
            Backend.getVersion().isdigit():
             setDbms("%s %s" % (DBMS.MSSQL, Backend.getVersion()))
 

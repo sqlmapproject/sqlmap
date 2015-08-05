@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -44,10 +44,14 @@ def tamper(payload, **kwargs):
             word = match.group()
 
             if word.upper() in kb.keywords:
-                _ = str()
+                while True:
+                    _ = ""
 
-                for i in xrange(len(word)):
-                    _ += word[i].upper() if randomRange(0, 1) else word[i].lower()
+                    for i in xrange(len(word)):
+                        _ += word[i].upper() if randomRange(0, 1) else word[i].lower()
+
+                    if len(_) > 1 and _ not in (_.lower(), _.upper()):
+                        break
 
                 retVal = retVal.replace(word, _)
 

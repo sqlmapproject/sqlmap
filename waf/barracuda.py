@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -18,6 +18,7 @@ def detect(get_page):
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
         retval = re.search(r"\Abarra_counter_session=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
+        retval |= re.search(r"(\A|\b)barracuda_", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         if retval:
             break
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -162,7 +162,7 @@ class Miscellaneous:
             inject.goStacked("DROP TABLE %s" % self.cmdTblName, silent=True)
 
             if Backend.isDbms(DBMS.MSSQL):
-                return
+                udfDict = {"master..new_xp_cmdshell": None}
 
             if udfDict is None:
                 udfDict = self.sysUdfs

@@ -15,6 +15,7 @@
 import urllib
 
 def get_pagerank(url):
+    url = url.encode('utf8') if isinstance(url, unicode) else url
     _ = 'http://toolbarqueries.google.com/tbr?client=navclient-auto&features=Rank&ch=%s&q=info:%s' % (check_hash(hash_url(url)), urllib.quote(url))
     try:
         f = urllib.urlopen(_)

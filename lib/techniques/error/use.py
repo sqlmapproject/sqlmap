@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -74,7 +74,7 @@ def _oneShotErrorUse(expression, field=None):
         try:
             while True:
                 check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-                trimcheck = "%s(?P<result>.*?)</" % (kb.chars.start)
+                trimcheck = "%s(?P<result>[^<]*)" % (kb.chars.start)
 
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
@@ -129,6 +129,16 @@ def _oneShotErrorUse(expression, field=None):
                         warnMsg += "(due to its length and/or content): "
                         warnMsg += safecharencode(trimmed)
                         logger.warn(warnMsg)
+
+                        if not kb.testMode:
+                            check = "(?P<result>.*?)%s" % kb.chars.stop[:2]
+                            output = extractRegexResult(check, trimmed, re.IGNORECASE)
+
+                            if not output:
+                                check = "(?P<result>[^\s<>'\"]+)"
+                                output = extractRegexResult(check, trimmed, re.IGNORECASE)
+                            else:
+                                output = output.rstrip()
 
                 if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)):
                     if offset == 1:
@@ -271,7 +281,7 @@ def errorUse(expression, dump=False):
             # Count the number of SQL query entries output
             countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 
-            if " ORDER BY " in expression.upper():
+            if " ORDER BY " in countedExpression.upper():
                 _ = countedExpression.upper().rindex(" ORDER BY ")
                 countedExpression = countedExpression[:_]
 

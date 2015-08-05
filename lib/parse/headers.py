@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import itertools
 import os
 
-from lib.core.common import checkFile
 from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
@@ -36,7 +35,6 @@ def headersParser(headers):
     for header in itertools.ifilter(lambda x: x in kb.headerPaths, headers):
         value = headers[header]
         xmlfile = kb.headerPaths[header]
-        checkFile(xmlfile)
 
         handler = FingerprintHandler(value, kb.headersFp)
 

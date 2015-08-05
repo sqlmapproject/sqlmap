@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -81,7 +81,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \
-           or conf.dbms in HSQLDB_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in HSQLDB_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
             v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")
@@ -134,7 +134,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s or is < 1.7.2" % DBMS.HSQLDB
+            warnMsg = "the back-end DBMS is not %s or version is < 1.7.2" % DBMS.HSQLDB
             logger.warn(warnMsg)
 
             return False

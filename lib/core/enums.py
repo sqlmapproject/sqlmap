@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -74,6 +74,7 @@ class POST_HINT:
     JSON_LIKE = "JSON-like"
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
+    ARRAY_LIKE = "Array-like"
 
 class HTTPMETHOD:
     GET = "GET"
@@ -165,6 +166,7 @@ class HTTP_HEADER:
     COOKIE = "Cookie"
     SET_COOKIE = "Set-Cookie"
     HOST = "Host"
+    LOCATION = "Location"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"
     PROXY_CONNECTION = "Proxy-Connection"
@@ -206,10 +208,10 @@ class PAYLOAD:
     SQLINJECTION = {
                         1: "boolean-based blind",
                         2: "error-based",
-                        3: "UNION query",
+                        3: "inline query",
                         4: "stacked queries",
                         5: "AND/OR time-based blind",
-                        6: "inline query",
+                        6: "UNION query",
                    }
 
     PARAMETER = {
@@ -248,10 +250,10 @@ class PAYLOAD:
     class TECHNIQUE:
         BOOLEAN = 1
         ERROR = 2
-        UNION = 3
+        QUERY = 3
         STACKED = 4
         TIME = 5
-        QUERY = 6
+        UNION = 6
 
     class WHERE:
         ORIGINAL = 1
@@ -338,3 +340,8 @@ class AUTH_TYPE:
     DIGEST = "digest"
     NTLM = "ntlm"
     PKI = "pki"
+
+class AUTOCOMPLETE_TYPE:
+    SQL = 0
+    OS = 1
+    SQLMAP = 2

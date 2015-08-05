@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -11,6 +11,8 @@ from ConfigParser import MissingSectionHeaderError
 from ConfigParser import ParsingError
 
 from lib.core.common import checkFile
+from lib.core.common import getUnicode
+from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
 from lib.core.data import conf
@@ -40,7 +42,7 @@ def configFileProxy(section, option, boolean=False, integer=False):
                 value = config.get(section, option)
         except ValueError, ex:
             errMsg = "error occurred while processing the option "
-            errMsg += "'%s' in provided configuration file ('%s')" % (option, str(ex))
+            errMsg += "'%s' in provided configuration file ('%s')" % (option, getUnicode(ex))
             raise SqlmapSyntaxException(errMsg)
 
         if value:
@@ -65,13 +67,13 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    configFP = codecs.open(configFile, "rb", UNICODE_ENCODING)
+    configFP = openFile(configFile, "rb")
 
     try:
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
-    except (MissingSectionHeaderError, ParsingError), ex:
-        errMsg = "you have provided an invalid configuration file ('%s')" % str(ex)
+    except Exception, ex:
+        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % ex.message
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -64,7 +64,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
     colList = filter(None, sorted(colList, key=lambda x: len(x) if x else MAX_INT))
 
     if conf.pivotColumn:
-        if any(re.search(r"(.+\.)?%s" % conf.pivotColumn, _, re.I) for _ in colList):
+        if any(re.search(r"(.+\.)?%s" % re.escape(conf.pivotColumn), _, re.I) for _ in colList):
             infoMsg = "using column '%s' as a pivot " % conf.pivotColumn
             infoMsg += "for retrieving row data"
             logger.info(infoMsg)
@@ -173,7 +173,7 @@ def whereQuery(query):
         prefix, suffix = query.split(" ORDER BY ") if " ORDER BY " in query else (query, "")
 
         if "%s)" % conf.tbl.upper() in prefix.upper():
-            prefix = re.sub(r"(?i)%s\)" % conf.tbl, "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)
+            prefix = re.sub(r"(?i)%s\)" % re.escape(conf.tbl), "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)
         elif re.search(r"(?i)\bWHERE\b", prefix):
             prefix += " AND %s" % conf.dumpWhere
         else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -143,7 +143,7 @@ class Fingerprint(GenericFingerprint):
         """
 
         if not conf.extensiveFp and (Backend.isDbmsWithin(MYSQL_ALIASES) \
-           or conf.dbms in MYSQL_ALIASES) and Backend.getVersion() and \
+           or (conf.dbms or "").lower() in MYSQL_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
             v = Backend.getVersion().replace(">", "")
             v = v.replace("=", "")

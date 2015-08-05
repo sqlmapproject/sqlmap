@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -106,20 +106,25 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     kb.threadContinue = True
     kb.threadException = False
 
-    if threadChoice and numThreads == 1 and any(_ in kb.injection.data for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY, PAYLOAD.TECHNIQUE.UNION)):
+    if threadChoice and numThreads == 1 and not (kb.injection.data and not any(_ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in kb.injection.data)):
         while True:
             message = "please enter number of threads? [Enter for %d (current)] " % numThreads
             choice = readInput(message, default=str(numThreads))
-            if choice and choice.isdigit():
-                if int(choice) > MAX_NUMBER_OF_THREADS:
-                    errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
-                    logger.critical(errMsg)
-                else:
-                    numThreads = int(choice)
-                    break
+            if choice:
+                skipThreadCheck = False
+                if choice.endswith('!'):
+                    choice = choice[:-1]
+                    skipThreadCheck = True
+                if choice.isdigit():
+                    if int(choice) > MAX_NUMBER_OF_THREADS and not skipThreadCheck:
+                        errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
+                        logger.critical(errMsg)
+                    else:
+                        conf.threads = numThreads = int(choice)
+                        break
 
         if numThreads == 1:
-            warnMsg = "running in a single-thread mode. This could take a while."
+            warnMsg = "running in a single-thread mode. This could take a while"
             logger.warn(warnMsg)
 
     try:

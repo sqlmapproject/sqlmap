@@ -3,7 +3,7 @@
 """
 beep.py - Make a beep sound
 
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -45,6 +45,10 @@ def _win_wav_play(filename):
     winsound.PlaySound(filename, winsound.SND_FILENAME)
 
 def _linux_wav_play(filename):
+    for _ in ("aplay", "paplay", "play"):
+        if not os.system("%s '%s' 2>/dev/null" % (_, filename)):
+            return
+
     import ctypes
 
     PA_STREAM_PLAYBACK = 1

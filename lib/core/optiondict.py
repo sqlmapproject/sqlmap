@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -23,6 +23,7 @@ optDict = {
                              },
 
             "Request":       {
+                               "method":            "string",
                                "data":              "string",
                                "paramDel":          "string",
                                "cookie":            "string",
@@ -49,9 +50,13 @@ optDict = {
                                "timeout":           "float",
                                "retries":           "integer",
                                "rParam":            "string",
-                               "safUrl":            "string",
-                               "saFreq":            "integer",
+                               "safeUrl":           "string",
+                               "safePost":          "string",
+                               "safeReqFile":       "string",
+                               "safeFreq":          "integer",
                                "skipUrlEncode":     "boolean",
+                               "csrfToken":         "string",
+                               "csrfUrl":           "string",
                                "forceSSL":          "boolean",
                                "hpp":               "boolean",
                                "evalCode":          "string",
@@ -68,6 +73,7 @@ optDict = {
             "Injection":     {
                                "testParameter":     "string",
                                "skip":              "string",
+                               "skipStatic":        "boolean",
                                "dbms":              "string",
                                "dbmsCred":          "string",
                                "os":                "string",
@@ -185,6 +191,7 @@ optDict = {
                                "batch":             "boolean",
                                "charset":           "string",
                                "crawlDepth":        "integer",
+                               "crawlExclude":      "string",
                                "csvDel":            "string",
                                "dumpFormat":        "string",
                                "eta":               "boolean",
@@ -202,16 +209,15 @@ optDict = {
                              },
 
             "Miscellaneous": {
-                               "mnemonics":         "string",
                                "alert":             "string",
                                "answers":           "string",
                                "beep":              "boolean",
-                               "checkWaf":          "boolean",
                                "cleanup":           "boolean",
                                "dependencies":      "boolean",
                                "disableColoring":   "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
+                               "offline":           "boolean",
                                "pageRank":          "boolean",
                                "purgeOutput":       "boolean",
                                "smart":             "boolean",

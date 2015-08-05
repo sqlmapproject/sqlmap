@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -13,14 +13,60 @@ from lib.core import readlineng as readline
 from lib.core.common import Backend
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import OS
+from lib.core.settings import MAX_HISTORY_LENGTH
 
-def saveHistory():
-    historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
-    readline.write_history_file(historyPath)
+def readlineAvailable():
+    """
+    Check if the readline is available. By default
+    it is not in Python default installation on Windows
+    """
 
-def loadHistory():
-    historyPath = os.path.expanduser(paths.SQLMAP_HISTORY)
+    return readline._readline is not None
+
+def clearHistory():
+    if not readlineAvailable():
+        return
+
+    readline.clear_history()
+
+def saveHistory(completion=None):
+    if not readlineAvailable():
+        return
+
+    if completion == AUTOCOMPLETE_TYPE.SQL:
+        historyPath = paths.SQL_SHELL_HISTORY
+    elif completion == AUTOCOMPLETE_TYPE.OS:
+        historyPath = paths.OS_SHELL_HISTORY
+    else:
+        historyPath = paths.SQLMAP_SHELL_HISTORY
+
+    try:
+        with open(historyPath, "w+"):
+            pass
+    except:
+        pass
+
+    readline.set_history_length(MAX_HISTORY_LENGTH)
+    try:
+        readline.write_history_file(historyPath)
+    except IOError, msg:
+        warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, msg)
+        logger.warn(warnMsg)
+
+def loadHistory(completion=None):
+    if not readlineAvailable():
+        return
+
+    clearHistory()
+
+    if completion == AUTOCOMPLETE_TYPE.SQL:
+        historyPath = paths.SQL_SHELL_HISTORY
+    elif completion == AUTOCOMPLETE_TYPE.OS:
+        historyPath = paths.OS_SHELL_HISTORY
+    else:
+        historyPath = paths.SQLMAP_SHELL_HISTORY
 
     if os.path.exists(historyPath):
         try:
@@ -47,14 +93,12 @@ class CompleterNG(rlcompleter.Completer):
 
         return matches
 
-def autoCompletion(sqlShell=False, osShell=False):
-    # First of all we check if the readline is available, by default
-    # it is not in Python default installation on Windows
-    if not readline._readline:
+def autoCompletion(completion=None, os=None, commands=None):
+    if not readlineAvailable():
         return
 
-    if osShell:
-        if Backend.isOs(OS.WINDOWS):
+    if completion == AUTOCOMPLETE_TYPE.OS:
+        if os == OS.WINDOWS:
             # Reference: http://en.wikipedia.org/wiki/List_of_DOS_commands
             completer = CompleterNG({
                                       "copy": None, "del": None, "dir": None,
@@ -75,5 +119,11 @@ def autoCompletion(sqlShell=False, osShell=False):
         readline.set_completer(completer.complete)
         readline.parse_and_bind("tab: complete")
 
-    loadHistory()
-    atexit.register(saveHistory)
+    elif commands:
+        completer = CompleterNG(dict(((_, None) for _ in commands)))
+        readline.set_completer_delims(' ')
+        readline.set_completer(completer.complete)
+        readline.parse_and_bind("tab: complete")
+
+    loadHistory(completion)
+    atexit.register(saveHistory, completion)

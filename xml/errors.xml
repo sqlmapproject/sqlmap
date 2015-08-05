@@ -5,6 +5,7 @@
     <dbms value="MySQL">
         <error regexp="SQL syntax.*MySQL"/>
         <error regexp="Warning.*mysql_.*"/>
+        <error regexp="MySqlException \(0x"/>
         <error regexp="valid MySQL result"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc\.exceptions"/>
@@ -17,15 +18,16 @@
         <error regexp="valid PostgreSQL result"/>
         <error regexp="Npgsql\."/>
         <error regexp="org\.postgresql\.util\.PSQLException"/>
+        <error regexp="ERROR:\s\ssyntax error at or near "/>
     </dbms>
 
     <!-- Microsoft SQL Server -->
     <dbms value="Microsoft SQL Server">
         <error regexp="Driver.* SQL[\-\_\ ]*Server"/>
         <error regexp="OLE DB.* SQL Server"/>
-        <error regexp="(\W|\A)SQL Server.*Driver"/>
+        <error regexp="\bSQL Server.*Driver"/>
         <error regexp="Warning.*mssql_.*"/>
-        <error regexp="(\W|\A)SQL Server.*[0-9a-fA-F]{8}"/>
+        <error regexp="\bSQL Server.*[0-9a-fA-F]{8}"/>
         <error regexp="(?s)Exception.*\WSystem\.Data\.SqlClient\."/>
         <error regexp="(?s)Exception.*\WRoadhouse\.Cms\."/>
     </dbms>
@@ -39,7 +41,7 @@
 
     <!-- Oracle -->
     <dbms value="Oracle">
-        <error regexp="ORA-[0-9][0-9][0-9][0-9]"/>
+        <error regexp="\bORA-[0-9][0-9][0-9][0-9]"/>
         <error regexp="Oracle error"/>
         <error regexp="Oracle.*Driver"/>
         <error regexp="Warning.*\Woci_.*"/>
@@ -50,7 +52,7 @@
     <dbms value="IBM DB2">
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
-        <error regexp="db2_\w+\("/>
+        <error regexp="\bdb2_\w+\("/>
     </dbms>
 
     <!-- Informix -->

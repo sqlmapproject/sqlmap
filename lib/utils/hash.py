@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -19,7 +19,11 @@ try:
 except (ImportError, OSError):
     pass
 else:
-    _multiprocessing = multiprocessing
+    try:
+        if multiprocessing.cpu_count() > 1:
+            _multiprocessing = multiprocessing
+    except NotImplementedError:
+        pass
 
 import gc
 import os
@@ -40,6 +44,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import normalizeUnicode
@@ -55,7 +60,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
-from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
@@ -64,11 +68,11 @@ from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
 from lib.core.settings import ITOA64
-from lib.core.settings import ML
 from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
+from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
 
@@ -324,7 +328,7 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
         return output
 
     cipher = md5(salt)
-    cipher.update(password)
+    cipher.update(password.encode(UNICODE_ENCODING))
     hash_ = cipher.digest()
 
     for i in xrange(count):
@@ -400,9 +404,10 @@ def attackCachedUsersPasswords():
 
         for user in kb.data.cachedUsersPasswords.keys():
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
-                value = kb.data.cachedUsersPasswords[user][i].lower().split()[0]
-                if value in lut:
-                    kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', lut[value])
+                if (kb.data.cachedUsersPasswords[user][i] or "").strip():
+                    value = kb.data.cachedUsersPasswords[user][i].lower().split()[0]
+                    if value in lut:
+                        kb.data.cachedUsersPasswords[user][i] += "%s    clear-text password: %s" % ('\n' if kb.data.cachedUsersPasswords[user][i][-1] != '\n' else '', lut[value])
 
 def attackDumpedTable():
     if kb.data.dumpedTable:
@@ -508,6 +513,9 @@ def hashRecognition(value):
     return retVal
 
 def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
+    if IS_WIN:
+        coloramainit()
+
     count = 0
     rotator = 0
     hashes = set([item[0][1] for item in attack_info])
@@ -569,7 +577,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
-                warnMsg += "Please report by e-mail to %s" % ML
+                warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -581,6 +589,9 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 proc_count.value -= 1
 
 def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
+    if IS_WIN:
+        coloramainit()
+
     count = 0
     rotator = 0
 
@@ -626,7 +637,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                         rotator = 0
                     status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
-                    if not user.startswith(DUMMY_USER_PREFIX):
+                    if user and not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
 
                     if not hasattr(conf, "api"):
@@ -640,7 +651,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
-                warnMsg += "Please report by e-mail to %s" % ML
+                warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -653,7 +664,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
 def dictionaryAttack(attack_dict):
     suffix_list = [""]
-    custom_wordlist = []
+    custom_wordlist = [""]
     hash_regexes = []
     results = []
     resumes = []
@@ -665,7 +676,7 @@ def dictionaryAttack(attack_dict):
             if not hash_:
                 continue
 
-            hash_ = hash_.split()[0]
+            hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
             regex = hashRecognition(hash_)
 
             if regex and regex not in hash_regexes:
@@ -682,7 +693,7 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
-                hash_ = hash_.split()[0]
+                hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
 
                 if re.match(hash_regex, hash_):
                     item = None
@@ -750,14 +761,16 @@ def dictionaryAttack(attack_dict):
                     else:
                         logger.info("using default dictionary")
 
+                    dictPaths = filter(None, dictPaths)
+
                     for dictPath in dictPaths:
                         checkFile(dictPath)
 
                     kb.wordlists = dictPaths
 
-                except SqlmapFilePathException, msg:
+                except Exception, ex:
                     warnMsg = "there was a problem while loading dictionaries"
-                    warnMsg += " ('%s')" % msg
+                    warnMsg += " ('%s')" % ex.message
                     logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "
@@ -827,7 +840,7 @@ def dictionaryAttack(attack_dict):
                         try:
                             process.terminate()
                             process.join()
-                        except OSError:
+                        except (OSError, AttributeError):
                             pass
 
                 finally:
@@ -921,7 +934,7 @@ def dictionaryAttack(attack_dict):
                             try:
                                 process.terminate()
                                 process.join()
-                            except OSError:
+                            except (OSError, AttributeError):
                                 pass
 
                     finally:
@@ -944,7 +957,7 @@ def dictionaryAttack(attack_dict):
 
     if len(hash_regexes) == 0:
         warnMsg = "unknown hash format. "
-        warnMsg += "Please report by e-mail to %s" % ML
+        warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
         logger.warn(warnMsg)
 
     if len(results) == 0:

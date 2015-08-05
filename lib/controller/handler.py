@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -71,9 +71,9 @@ def setHandler():
         items.remove(_)
         items.insert(0, _)
 
-    for name, aliases, Handler, Connector in items:
-        if conf.dbms and conf.dbms not in aliases:
-            debugMsg = "skipping test for %s" % name
+    for dbms, aliases, Handler, Connector in items:
+        if conf.dbms and conf.dbms.lower() != dbms and conf.dbms.lower() not in aliases:
+            debugMsg = "skipping test for %s" % dbms
             logger.debug(debugMsg)
             continue
 
@@ -84,7 +84,7 @@ def setHandler():
             logger.debug("forcing timeout to 10 seconds")
             conf.timeout = 10
 
-            dialect = DBMS_DICT[name][3]
+            dialect = DBMS_DICT[dbms][3]
 
             if dialect:
                 sqlalchemy = SQLAlchemy(dialect=dialect)
@@ -93,7 +93,10 @@ def setHandler():
                 if sqlalchemy.connector:
                     conf.dbmsConnector = sqlalchemy
                 else:
-                    conf.dbmsConnector.connect()
+                    try:
+                        conf.dbmsConnector.connect()
+                    except NameError:
+                        pass
             else:
                 conf.dbmsConnector.connect()
 
