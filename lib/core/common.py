@@ -3831,7 +3831,7 @@ def resetCookieJar(cookieJar):
                 with open(filename, "w+b") as f:
                     f.write("%s\n" % NETSCAPE_FORMAT_HEADER_COOKIES)
                     for line in lines:
-                        _ = line.split()
+                        _ = line.split("\t")
                         if len(_) == 7:
                             _[4] = FORCE_COOKIE_EXPIRATION_TIME
                             f.write("\n%s" % "\t".join(_))
