@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -75,7 +75,7 @@ class AttribDict(dict):
         for attr in dir(self):
             if not attr.startswith('_'):
                 value = getattr(self, attr)
-                if not isinstance(value, (types.BuiltinFunctionType, types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
+                if not isinstance(value, (types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
                     setattr(retVal, attr, copy.deepcopy(value, memo))
 
         for key, value in self.items():

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -41,4 +41,4 @@ FORMATTER = logging.Formatter("\r[%(asctime)s] [%(levelname)s] %(message)s", "%H
 
 LOGGER_HANDLER.setFormatter(FORMATTER)
 LOGGER.addHandler(LOGGER_HANDLER)
-LOGGER.setLevel(logging.WARN)
+LOGGER.setLevel(logging.INFO)

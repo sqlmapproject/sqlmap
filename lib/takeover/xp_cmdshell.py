@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import flattenValue
 from lib.core.common import getLimitRange
 from lib.core.common import getSQLSnippet
 from lib.core.common import hashDBWrite
@@ -51,10 +52,9 @@ class Xp_cmdshell:
             inject.goStacked(agent.runAsDBMSUser(cmd))
 
         self._randStr = randomStr(lowercase=True)
-        self._xpCmdshellNew = "xp_%s" % randomStr(lowercase=True)
-        self.xpCmdshellStr = "master..%s" % self._xpCmdshellNew
+        self.xpCmdshellStr = "master..new_xp_cmdshell"
 
-        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr, XP_CMDSHELL_NEW=self._xpCmdshellNew)
+        cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr)
 
         if Backend.isVersionWithin(("2005", "2008")):
             cmd += ";RECONFIGURE WITH OVERRIDE"
@@ -142,13 +142,13 @@ class Xp_cmdshell:
             charCounter += len(echoedLine)
 
             if charCounter >= maxLen:
-                self.xpCmdshellExecCmd(cmd)
+                self.xpCmdshellExecCmd(cmd.rstrip(" & "))
 
                 cmd = ""
                 charCounter = 0
 
         if cmd:
-            self.xpCmdshellExecCmd(cmd)
+            self.xpCmdshellExecCmd(cmd.rstrip(" & "))
 
     def xpCmdshellForgeCmd(self, cmd, insertIntoTable=None):
         # When user provides DBMS credentials (with --dbms-cred) we need to
@@ -226,12 +226,16 @@ class Xp_cmdshell:
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
             if output and isListLike(output) and len(output) > 1:
-                if not (output[0] or "").strip():
-                    output = output[1:]
-                elif not (output[-1] or "").strip():
-                    output = output[:-1]
+                _ = ""
+                lines = [line for line in flattenValue(output) if line is not None]
 
-                output = "\n".join(line for line in filter(None, output))
+                for i in xrange(len(lines)):
+                    line = lines[i] or ""
+                    if line is None or i in (0, len(lines) - 1) and not line.strip():
+                        continue
+                    _ += "%s\n" % line
+
+                output = _.rstrip('\n')
 
         return output
 

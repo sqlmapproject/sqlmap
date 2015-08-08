@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -21,6 +21,9 @@ class SqlmapFilePathException(SqlmapBaseException):
     pass
 
 class SqlmapGenericException(SqlmapBaseException):
+    pass
+
+class SqlmapInstallationException(SqlmapBaseException):
     pass
 
 class SqlmapMissingDependence(SqlmapBaseException):
@@ -50,7 +53,13 @@ class SqlmapShellQuitException(SqlmapBaseException):
 class SqlmapSyntaxException(SqlmapBaseException):
     pass
 
+class SqlmapSystemException(SqlmapBaseException):
+    pass
+
 class SqlmapThreadException(SqlmapBaseException):
+    pass
+
+class SqlmapTokenException(SqlmapBaseException):
     pass
 
 class SqlmapUndefinedMethod(SqlmapBaseException):

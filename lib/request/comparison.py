@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -132,8 +132,21 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             seq1 = seq1[count:]
             seq2 = seq2[count:]
 
-        seqMatcher.set_seq1(seq1)
-        seqMatcher.set_seq2(seq2)
+        while True:
+            try:
+                seqMatcher.set_seq1(seq1)
+            except MemoryError:
+                seq1 = seq1[:len(seq1) / 1024]
+            else:
+                break
+
+        while True:
+            try:
+                seqMatcher.set_seq2(seq2)
+            except MemoryError:
+                seq2 = seq2[:len(seq2) / 1024]
+            else:
+                break
 
         ratio = round(seqMatcher.quick_ratio(), 3)
 

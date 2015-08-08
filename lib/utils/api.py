@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import logging
 import os
-import shutil
 import sqlite3
 import sys
 import tempfile
@@ -29,8 +28,10 @@ from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
 from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import PART_RUN_CONTENT_TYPES
+from lib.core.exception import SqlmapConnectionException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
+from lib.core.settings import IS_WIN
 from lib.core.subprocessng import Popen
 from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
@@ -66,17 +67,27 @@ class Database(object):
         logger.debug("REST-JSON API %s connected to IPC database" % who)
 
     def disconnect(self):
-        self.cursor.close()
-        self.connection.close()
+        if self.cursor:
+            self.cursor.close()
+
+        if self.connection:
+            self.connection.close()
 
     def commit(self):
         self.connection.commit()
 
     def execute(self, statement, arguments=None):
-        if arguments:
-            self.cursor.execute(statement, arguments)
-        else:
-            self.cursor.execute(statement)
+        while True:
+            try:
+                if arguments:
+                    self.cursor.execute(statement, arguments)
+                else:
+                    self.cursor.execute(statement)
+            except sqlite3.OperationalError, ex:
+                if not "locked" in ex.message:
+                    raise
+            else:
+                break
 
         if statement.lstrip().upper().startswith("SELECT"):
             return self.cursor.fetchall()
@@ -103,7 +114,6 @@ class Database(object):
 class Task(object):
     def __init__(self, taskid):
         self.process = None
-        self.temporary_directory = False
         self.output_directory = None
         self.options = None
         self._original_options = None
@@ -143,29 +153,9 @@ class Task(object):
     def reset_options(self):
         self.options = AttribDict(self._original_options)
 
-    def set_output_directory(self):
-        if self.get_option("outputDir"):
-            if os.path.isdir(self.get_option("outputDir")):
-                self.output_directory = self.get_option("outputDir")
-            else:
-                try:
-                    os.makedirs(self.get_option("outputDir"))
-                    self.output_directory = self.get_option("outputDir")
-                except OSError:
-                    pass
-
-        if not self.output_directory or not os.path.isdir(self.output_directory):
-            self.output_directory = tempfile.mkdtemp(prefix="sqlmapoutput-")
-            self.temporary_directory = True
-            self.set_option("outputDir", self.output_directory)
-
-    def clean_filesystem(self):
-        if self.output_directory and self.temporary_directory:
-            shutil.rmtree(self.output_directory)
-
     def engine_start(self):
-        self.process = Popen("python sqlmap.py --pickled-options %s" % base64pickle(self.options),
-                             shell=True, stdin=PIPE, close_fds=False)
+        self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)],
+                             shell=False, stdin=PIPE, close_fds=not IS_WIN)
 
     def engine_stop(self):
         if self.process:
@@ -273,8 +263,11 @@ class LogRecorder(logging.StreamHandler):
 
 def setRestAPILog():
     if hasattr(conf, "api"):
-        conf.database_cursor = Database(conf.database)
-        conf.database_cursor.connect("client")
+        try:
+            conf.database_cursor = Database(conf.database)
+            conf.database_cursor.connect("client")
+        except sqlite3.OperationalError, ex:
+            raise SqlmapConnectionException, "%s ('%s')" % (ex, conf.database)
 
         # Set a logging handler that writes log messages to a IPC database
         logger.removeHandler(LOGGER_HANDLER)
@@ -344,7 +337,7 @@ def task_new():
     taskid = hexencode(os.urandom(8))
     DataStore.tasks[taskid] = Task(taskid)
 
-    logger.debug(" [%s] Created new task" % taskid)
+    logger.debug("Created new task: '%s'" % taskid)
     return jsonize({"success": True, "taskid": taskid})
 
 
@@ -354,7 +347,6 @@ def task_delete(taskid):
     Delete own task ID
     """
     if taskid in DataStore.tasks:
-        DataStore.tasks[taskid].clean_filesystem()
         DataStore.tasks.pop(taskid)
 
         logger.debug("[%s] Deleted task" % taskid)
@@ -388,9 +380,6 @@ def task_flush(taskid):
     Flush task spool (delete all tasks)
     """
     if is_admin(taskid):
-        for task in DataStore.tasks:
-            DataStore.tasks[task].clean_filesystem()
-
         DataStore.tasks = dict()
         logger.debug("[%s] Flushed task pool" % taskid)
         return jsonize({"success": True})
@@ -465,9 +454,6 @@ def scan_start(taskid):
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
-
-    # Overwrite output directory value to a temporary directory
-    DataStore.tasks[taskid].set_output_directory()
 
     # Launch sqlmap engine in a separate process
     DataStore.tasks[taskid].engine_start()
@@ -663,9 +649,9 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
 
     # TODO: write a simple client with requests, for now use curl from command line
     logger.error("Not yet implemented, use curl from command line instead for now, for example:")
-    print "\n\t$ curl http://%s:%d/task/new" % (host, port)
+    print "\n\t$ taskid=$(curl http://%s:%d/task/new 2>1 | grep -o -I '[a-f0-9]\{16\}') && echo $taskid" % (host, port)
     print ("\t$ curl -H \"Content-Type: application/json\" "
            "-X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' "
-           "http://%s:%d/scan/:taskid/start") % (host, port)
-    print "\t$ curl http://%s:%d/scan/:taskid/data" % (host, port)
-    print "\t$ curl http://%s:%d/scan/:taskid/log\n" % (host, port)
+           "http://%s:%d/scan/$taskid/start") % (host, port)
+    print "\t$ curl http://%s:%d/scan/$taskid/data" % (host, port)
+    print "\t$ curl http://%s:%d/scan/$taskid/log\n" % (host, port)

@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
+
+import sys
 
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import getSQLSnippet
+from lib.core.common import getUnicode
 from lib.core.common import isStackingAvailable
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -125,6 +128,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
             try:
                 command = raw_input("os-shell> ")
+                command = getUnicode(command, encoding=sys.stdin.encoding)
             except KeyboardInterrupt:
                 print
                 errMsg = "user aborted"

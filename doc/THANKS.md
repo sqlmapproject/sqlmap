@@ -154,7 +154,7 @@ Jose Fonseca, <jose.r.fonseca(at)gmail.com>
     http://code.google.com/p/jrfonseca/wiki/XDot
 
 Alan Franzoni, <alan.franzoni(at)gmail.com>
-* for helping me out with Python subprocess library
+* for helping out with Python subprocess library
 
 Harold Fry, <harold(at)violaceo.us>
 * for suggesting a minor enhancement
@@ -275,7 +275,7 @@ Guido Landi, <lists(at)keamera.org>
 * for reporting a couple of bugs
 * for the great technical discussions
 * for Microsoft SQL Server 2000 and Microsoft SQL Server 2005 'sp_replwritetovarbin' stored procedure heap-based buffer overflow (MS09-004) exploit development
-* for presenting with me at SOURCE Conference 2009 in Barcelona (Spain) on September 21, 2009 and at CONfidence 2009 in Warsaw (Poland) on November 20, 2009
+* for presenting with Bernardo at SOURCE Conference 2009 in Barcelona (Spain) on September 21, 2009 and at CONfidence 2009 in Warsaw (Poland) on November 20, 2009
 
 Lee Lawson, <Lee.Lawson(at)dns.co.uk>
 * for reporting a minor bug
@@ -369,7 +369,10 @@ Yonny Mutai, <yonnym(at)googlemail.com>
 * for reporting a minor bug
 
 Roberto Nemirovsky, <roberto.paes(at)gmail.com>
-* for pointing me out some enhancements
+* for pointing out some enhancements
+
+Sebastian Nerz, <sebastian.nerz(at)syss.de>
+* for reporting a (potential) vulnerability in --eval
 
 Simone Onofri, <simone.onofri(at)gmail.com>
 * for patching the PHP web backdoor to make it work properly also on Windows
@@ -425,7 +428,7 @@ Ole Rasmussen, <olerass(at)gmail.com>
 * for suggesting a feature
 
 Alberto Revelli, <r00t(at)northernfortress.net>
-* for inspiring me to write sqlmap user's manual in SGML
+* for inspiring to write sqlmap user's manual in SGML
 * for his great Microsoft SQL Server take over tool, sqlninja, http://sqlninja.sourceforge.net
 
 David Rhoades, <david.rhoades(at)mavensecurity.com>
@@ -556,7 +559,7 @@ Kazim Bugra Tombul, <mhackmail(at)gmail.com>
 * for reporting a minor bug
 
 Efrain Torres, <et(at)metasploit.com>
-* for helping me out to improve the Metasploit Framework sqlmap auxiliary module and for commiting it on the Metasploit official subversion repository
+* for helping out to improve the Metasploit Framework sqlmap auxiliary module and for commiting it on the Metasploit official subversion repository
 * for his great Metasploit WMAP Framework
 
 Sandro Tosi, <matrixhasu(at)gmail.com>
@@ -618,6 +621,9 @@ abc abc, <biedimc(at)gmx.net>
 Abuse 007, <abuse007(at)gmail.com>
 * for reporting a bug
 
+agix, <florian.gaultier@gmail.com>
+* for contributing the file upload via certutil.exe functionality
+
 Alex, <m3zero(at)gmail.com>
 * for reporting a minor bug
 
@@ -654,11 +660,18 @@ clav, <elclav(at)gmail.com>
 dragoun dash, <dragoun.dash(at)gmail.com>
 * for reporting a minor bug
 
+flsf, <jianmaflsf@gmail.com>
+* for contributing WAF scripts 360.py, anquanbao.py, baidu.py, safedog.py
+* for contributing a minor patch
+
 fufuh, <fufuh(at)users.sourceforge.net>
 * for reporting a bug when running on Windows
 
 Hans Wurst, <wurstwass0r(at)googlemail.com>
 * for reporting a couple of bugs
+
+Hysia, <hysia(at)huorui.net>
+* for contributing a Chinese translation of README.md
 
 james, <james(at)ev6.net>
 * for reporting a bug
@@ -718,6 +731,9 @@ smith, <esmyl911(at)gmail.com>
 
 Soma Cruz, <oleg.kupreev(at)gmail.com>
 * for reporting a minor bug
+
+Spiros94, <cont(at)eyrhka.gr>
+* for contributing a Greek translation of README.md
 
 Stuffe, <stuffe.dk(at)gmail.com>
 * for reporting a minor bug and a feature request

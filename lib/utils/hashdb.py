@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -77,8 +77,12 @@ class HashDB(object):
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not 'locked' in ex.message:
+                        if not "locked" in ex.message:
                             raise
+                    except sqlite3.DatabaseError, ex:
+                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, ex)
+                        errMsg += "If the problem persists please rerun with `--flush-session`"
+                        raise SqlmapDataException, errMsg
                     else:
                         break
         return retVal if not unserialize else unserializeObject(retVal)
@@ -139,8 +143,15 @@ class HashDB(object):
     def beginTransaction(self):
         threadData = getCurrentThreadData()
         if not threadData.inTransaction:
-            self.cursor.execute("BEGIN TRANSACTION")
-            threadData.inTransaction = True
+            try:
+                self.cursor.execute("BEGIN TRANSACTION")
+            except:
+                # Reference: http://stackoverflow.com/a/25245731
+                self.cursor.close()
+                threadData.hashDBCursor = None
+                self.cursor.execute("BEGIN TRANSACTION")
+            finally:
+                threadData.inTransaction = True
 
     def endTransaction(self):
         threadData = getCurrentThreadData()

@@ -612,8 +612,8 @@
         <!-- NOTE: On DB2 it is not possible to list password hashes, since they are handled by the OS -->        
         <passwords/>
         <privileges>
-            <inband query="SELECT grantee,RTRIM(tabschema)||'.'||tabname||CHR(44)||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM syscat.tabauth" condition="grantee"/>
-            <blind query="SELECT tabschema||'.'||tabname||CHR(44)||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS foobar WHERE LIMIT=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
+            <inband query="SELECT grantee,RTRIM(tabschema)||'.'||tabname||','||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM syscat.tabauth" condition="grantee"/>
+            <blind query="SELECT tabschema||'.'||tabname||','||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS foobar WHERE LIMIT=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
         </privileges>
         <roles/>
         <!-- NOTE: in DB2 schema names are the counterpart to database names on other DBMSes -->
@@ -626,8 +626,8 @@
             <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,tabname FROM sysstat.tables WHERE tabschema='%s') AS foobar WHERE LIMIT=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT name,RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
-            <blind query="SELECT name FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" query2="SELECT RTRIM(coltype)||CHR(40)||RTRIM(CAST(length AS CHAR(254)))||CHR(41) FROM sysibm.syscolumns WHERE tbname='%s' AND name='%s' AND tbcreator='%s'" count="SELECT COUNT(name) FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
+            <inband query="SELECT name,RTRIM(coltype)||'('||RTRIM(CAST(length AS CHAR(254)))||')' FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
+            <blind query="SELECT name FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" query2="SELECT RTRIM(coltype)||'('||RTRIM(CAST(length AS CHAR(254)))||')' FROM sysibm.syscolumns WHERE tbname='%s' AND name='%s' AND tbcreator='%s'" count="SELECT COUNT(name) FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>

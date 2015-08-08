@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -322,7 +322,7 @@ def unionUse(expression, unpack=True, dump=False):
                                 if len(status) > width:
                                     status = "%s..." % status[:width - 3]
 
-                                dataToStdout("%s\r\n" % status, True)
+                                dataToStdout("%s\n" % status, True)
 
                 runThreads(numThreads, unionThread)
 

@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2014 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import cgi
-import codecs
+import hashlib
 import os
 import re
+import tempfile
 import threading
 
 from lib.core.common import Backend
@@ -21,6 +22,7 @@ from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
 from lib.core.common import randomInt
 from lib.core.common import safeCSValue
+from lib.core.common import unicodeencode
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
@@ -32,12 +34,15 @@ from lib.core.enums import DBMS
 from lib.core.enums import DUMP_FORMAT
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapValueException
+from lib.core.exception import SqlmapSystemException
 from lib.core.replication import Replication
 from lib.core.settings import HTML_DUMP_CSS_STYLE
+from lib.core.settings import IS_WIN
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import MIN_BINARY_DISK_DUMP_SIZE
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import WINDOWS_RESERVED_NAMES
 from thirdparty.magic import magic
 
 from extra.safe2bin.safe2bin import safechardecode
@@ -66,19 +71,30 @@ class Dump(object):
         if kb.get("multiThreadMode"):
             self._lock.acquire()
 
-        self._outputFP.write(text)
+        try:
+            self._outputFP.write(text)
+        except IOError, ex:
+            errMsg = "error occurred while writing to log file ('%s')" % ex.message
+            raise SqlmapGenericException(errMsg)
 
         if kb.get("multiThreadMode"):
             self._lock.release()
 
         kb.dataOutputFlag = True
 
+    def flush(self):
+        if self._outputFP:
+            try:
+                self._outputFP.flush()
+            except IOError:
+                pass
+
     def setOutputFile(self):
         self._outputFile = os.path.join(conf.outputPath, "log")
         try:
-            self._outputFP = codecs.open(self._outputFile, "ab" if not conf.flushSession else "wb", UNICODE_ENCODING)
+            self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
         except IOError, ex:
-            errMsg = "error occurred while opening log file ('%s')" % ex
+            errMsg = "error occurred while opening log file ('%s')" % ex.message
             raise SqlmapGenericException(errMsg)
 
     def getOutputFile(self):
@@ -367,6 +383,7 @@ class Dump(object):
         rtable = None
         dumpFP = None
         appendToFile = False
+        warnFile = False
 
         if tableValues is None:
             return
@@ -380,15 +397,45 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
-        dumpDbPath = os.path.join(conf.dumpPath, re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
+        _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
+        if len(_) < len(db) or IS_WIN and db.upper() in WINDOWS_RESERVED_NAMES:
+            _ = unicodeencode(re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(db)))
+            dumpDbPath = os.path.join(conf.dumpPath, "%s-%s" % (_, hashlib.md5(unicodeencode(db)).hexdigest()[:8]))
+            warnFile = True
+        else:
+            dumpDbPath = os.path.join(conf.dumpPath, _)
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if not os.path.isdir(dumpDbPath):
-                os.makedirs(dumpDbPath, 0755)
+                try:
+                    os.makedirs(dumpDbPath, 0755)
+                except (OSError, IOError), ex:
+                    try:
+                        tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
+                    except IOError, _:
+                        errMsg = "unable to write to the temporary directory ('%s'). " % _
+                        errMsg += "Please make sure that your disk is not full and "
+                        errMsg += "that you have sufficient write permissions to "
+                        errMsg += "create temporary files and/or directories"
+                        raise SqlmapSystemException(errMsg)
 
-            dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower()))
+                    warnMsg = "unable to create dump directory "
+                    warnMsg += "'%s' (%s). " % (dumpDbPath, ex)
+                    warnMsg += "Using temporary directory '%s' instead" % tempDir
+                    logger.warn(warnMsg)
+
+                    dumpDbPath = tempDir
+
+            _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(table)))
+            if len(_) < len(table) or IS_WIN and table.upper() in WINDOWS_RESERVED_NAMES:
+                _ = unicodeencode(re.sub(r"[^\w]", "_", unsafeSQLIdentificatorNaming(table)))
+                dumpFileName = os.path.join(dumpDbPath, "%s-%s.%s" % (_, hashlib.md5(unicodeencode(table)).hexdigest()[:8], conf.dumpFormat.lower()))
+                warnFile = True
+            else:
+                dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (_, conf.dumpFormat.lower()))
+
             appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
 
@@ -574,7 +621,12 @@ class Dump(object):
             else:
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
-            logger.info("table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName))
+
+            msg = "table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName)
+            if not warnFile:
+                logger.info(msg)
+            else:
+                logger.warn(msg)
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         if hasattr(conf, "api"):
