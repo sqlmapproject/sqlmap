@@ -191,7 +191,7 @@ def checkCharEncoding(encoding, warn=True):
     # Reference: http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
         encoding = translate[encoding]
-    elif encoding in ("null", "{charset}", "*"):
+    elif encoding in ("null", "{charset}", "*") or not re.search(r"\w", encoding):
         return None
 
     # Reference: http://www.iana.org/assignments/character-sets
