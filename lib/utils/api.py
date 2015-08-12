@@ -155,11 +155,12 @@ class Task(object):
 
     def engine_start(self):
         self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)],
-                             shell=False, stdin=PIPE, close_fds=not IS_WIN)
+                             shell=False, close_fds=not IS_WIN)
 
     def engine_stop(self):
         if self.process:
-            return self.process.terminate()
+            self.process.terminate()
+            return self.process.wait()
         else:
             return None
 
@@ -168,7 +169,8 @@ class Task(object):
 
     def engine_kill(self):
         if self.process:
-            return self.process.kill()
+            self.process.kill()
+            return self.process.wait()
         else:
             return None
 
