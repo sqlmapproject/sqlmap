@@ -107,6 +107,7 @@ from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import DUMMY_URL
+from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INJECT_HERE_MARK
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
@@ -1994,6 +1995,9 @@ def _saveCmdline():
         for option, value, datatype in optionData:
             if datatype and isListLike(datatype):
                 datatype = datatype[0]
+
+            if option in IGNORE_SAVE_OPTIONS:
+                value = None
 
             if value is None:
                 if datatype == OPTION_TYPE.BOOLEAN:
