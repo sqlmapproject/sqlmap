@@ -2017,10 +2017,10 @@ def _saveCmdline():
         config.write(confFP)
     except IOError, ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to write to the configuration INI file '%s' ('%s')" % (paths.SQLMAP_CONFIG, ex)
+        errMsg += "to write to the configuration file '%s' ('%s')" % (paths.SQLMAP_CONFIG, ex)
         raise SqlmapSystemException(errMsg)
 
-    infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
+    infoMsg = "saved command line options to the configuration file '%s'" % paths.SQLMAP_CONFIG
     logger.info(infoMsg)
 
 def setVerbosity():
