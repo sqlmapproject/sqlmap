@@ -202,7 +202,7 @@ optDict = {
                                "outputDir":         "string",
                                "parseErrors":       "boolean",
                                "pivotColumn":       "string",
-                               "saveCmdline":       "boolean",
+                               "saveConfig":        "string",
                                "scope":             "string",
                                "testFilter":        "string",
                                "updateAll":         "boolean",

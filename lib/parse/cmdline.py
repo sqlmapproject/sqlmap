@@ -662,8 +662,7 @@ def cmdLineParser():
         general.add_option("--pivot-column", dest="pivotColumn",
                                help="Pivot column name")
 
-        general.add_option("--save", dest="saveCmdline",
-                            action="store_true",
+        general.add_option("--save", dest="saveConfig",
                             help="Save options to a configuration INI file")
 
         general.add_option("--scope", dest="scope",

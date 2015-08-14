@@ -1964,16 +1964,16 @@ def _useWizardInterface():
 
     dataToStdout("\nsqlmap is running, please wait..\n\n")
 
-def _saveCmdline():
+def _saveConfig():
     """
-    Saves the command line options on a sqlmap configuration INI file
+    Saves the command line options to a sqlmap configuration INI file
     Format.
     """
 
-    if not conf.saveCmdline:
+    if not conf.saveConfig:
         return
 
-    debugMsg = "saving command line options on a sqlmap configuration INI file"
+    debugMsg = "saving command line options to a sqlmap configuration INI file"
     logger.debug(debugMsg)
 
     config = UnicodeRawConfigParser()
@@ -1997,7 +1997,7 @@ def _saveCmdline():
                 datatype = datatype[0]
 
             if option in IGNORE_SAVE_OPTIONS:
-                value = None
+                continue
 
             if value is None:
                 if datatype == OPTION_TYPE.BOOLEAN:
@@ -2015,16 +2015,16 @@ def _saveCmdline():
 
             config.set(family, option, value)
 
-    confFP = openFile(paths.SQLMAP_CONFIG, "wb")
+    confFP = openFile(conf.saveConfig, "wb")
 
     try:
         config.write(confFP)
     except IOError, ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to write to the configuration file '%s' ('%s')" % (paths.SQLMAP_CONFIG, ex)
+        errMsg += "to write to the configuration file '%s' ('%s')" % (conf.saveConfig, ex)
         raise SqlmapSystemException(errMsg)
 
-    infoMsg = "saved command line options to the configuration file '%s'" % paths.SQLMAP_CONFIG
+    infoMsg = "saved command line options to the configuration file '%s'" % conf.saveConfig
     logger.info(infoMsg)
 
 def setVerbosity():
@@ -2479,7 +2479,7 @@ def init():
 
     _useWizardInterface()
     setVerbosity()
-    _saveCmdline()
+    _saveConfig()
     _setRequestFromFile()
     _cleanupOptions()
     _dirtyPatches()

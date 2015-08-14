@@ -387,7 +387,7 @@ CODECS_LIST_PAGE = "http://docs.python.org/library/codecs.html#standard-encoding
 SQL_SCALAR_REGEX = r"\A(SELECT(?!\s+DISTINCT\(?))?\s*\w*\("
 
 # Option/switch values to ignore during configuration save
-IGNORE_SAVE_OPTIONS = ("saveCmdline",)
+IGNORE_SAVE_OPTIONS = ("saveConfig",)
 
 # IP address of the localhost
 LOCALHOST = "127.0.0.1"
