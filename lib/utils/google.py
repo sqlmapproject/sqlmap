@@ -31,7 +31,7 @@ from lib.request.httpshandler import HTTPSHandler
 class Google(object):
     """
     This class defines methods used to perform Google dorking (command
-    line option '-g <google dork>'
+    line option '-g <google dork>')
     """
 
     def __init__(self, handlers):
