@@ -889,7 +889,7 @@ class Connect(object):
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
-            variables = {"uri": uri}
+            variables = {"uri": uri, "lastPage": threadData.lastPage}
             originals = {}
             keywords = keyword.kwlist
 
@@ -1064,6 +1064,7 @@ class Connect(object):
             page, headers, code = Connect.getPage(url=conf.secondOrder, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
+        threadData.lastPage = page
 
         kb.originalCode = kb.originalCode or code
 
