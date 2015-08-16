@@ -2280,8 +2280,10 @@ def findMultipartPostBoundary(post):
     candidates = []
 
     for match in re.finditer(r"(?m)^--(.+?)(--)?$", post or ""):
-        _ = match.group(1).strip().strip('-')
-        if _ in done:
+        _ = re.search(r"\w+", match.group(1))
+        _ = _.group(0) if _ else None
+
+        if _ is None or _ in done:
             continue
         else:
             candidates.append((post.count(_), _))
