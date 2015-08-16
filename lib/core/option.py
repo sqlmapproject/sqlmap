@@ -314,6 +314,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 # Headers
                 elif re.search(r"\A\S+: ", line):
                     key, value = line.split(": ", 1)
+                    value = value.replace("\r", "").replace("\n", "")
 
                     # Cookie and Host headers
                     if key.upper() == HTTP_HEADER.COOKIE.upper():
