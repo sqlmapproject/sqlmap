@@ -12,6 +12,7 @@ import sys
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.data import logger
 
 def base64decode(value):
     """
@@ -21,7 +22,16 @@ def base64decode(value):
     'foobar'
     """
 
-    return base64.b64decode(value)
+    retVal = None
+
+    try:
+        retVal = base64.b64decode(value)
+    except:
+        errMsg = "Invalid Base64 string"
+        logger.error(errMsg)
+        exit()
+    
+    return retVal
 
 def base64encode(value):
     """
@@ -71,6 +81,10 @@ def base64unpickle(value):
         retVal = pickle.loads(base64decode(value))
     except TypeError: 
         retVal = pickle.loads(base64decode(bytes(value)))
+    except:
+        errMsg = "Cannot deserialize object"
+        logger.error(errMsg)
+        exit()
 
     return retVal
 
