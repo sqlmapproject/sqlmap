@@ -134,6 +134,7 @@ def _setRequestParams():
                 if test and test[0] in ("q", "Q"):
                     raise SqlmapUserQuitException
                 elif test[0] not in ("n", "N"):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*"[^"]+)"', functools.partial(process, repl=r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*\b)', functools.partial(process, repl=r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
@@ -152,6 +153,7 @@ def _setRequestParams():
                 if test and test[0] in ("q", "Q"):
                     raise SqlmapUserQuitException
                 elif test[0] not in ("n", "N"):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
@@ -175,6 +177,7 @@ def _setRequestParams():
                 if test and test[0] in ("q", "Q"):
                     raise SqlmapUserQuitException
                 elif test[0] not in ("n", "N"):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
@@ -186,6 +189,7 @@ def _setRequestParams():
                 if test and test[0] in ("q", "Q"):
                     raise SqlmapUserQuitException
                 elif test[0] not in ("n", "N"):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*[\"'](?P<name>[^\n]+?)[\"']).+?)(((\r)?\n)+--)", functools.partial(process, repl=r"\g<1>%s\g<4>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     kb.postHint = POST_HINT.MULTIPART
@@ -683,7 +687,7 @@ def initTargetEnv():
         class _(unicode):
             pass
 
-        kb.postUrlEncode = False
+        kb.postUrlEncode = True
 
         for key, value in conf.httpHeaders:
             if key.upper() == HTTP_HEADER.CONTENT_TYPE.upper():
