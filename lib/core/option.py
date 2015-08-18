@@ -2063,7 +2063,12 @@ def _mergeOptions(inputOptions, overrideOptions):
     """
 
     if inputOptions.pickledOptions:
-        inputOptions = base64unpickle(inputOptions.pickledOptions)
+        try:
+            inputOptions = base64unpickle(inputOptions.pickledOptions)
+        except Exception, ex:
+            errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
+            errMsg += " ('%s')" % ex.message if ex.message else ""
+            raise SqlmapSyntaxException(errMsg)
 
     if inputOptions.configFile:
         configFileParser(inputOptions.configFile)
