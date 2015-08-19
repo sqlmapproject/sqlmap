@@ -867,6 +867,8 @@ def cmdLineParser():
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
+            elif re.search(r"\A-\w=.+", argv[i]):
+                print "[!] potentially miswritten (illegal '=') short option detected ('%s')" % argv[i]
             elif argv[i] == "-H":
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
