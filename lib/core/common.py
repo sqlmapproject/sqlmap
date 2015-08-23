@@ -2941,7 +2941,7 @@ def unhandledExceptionMessage():
     errMsg += "sqlmap version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
-    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap.py\b", "sqlmap.py", " ".join(sys.argv))
+    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else ("DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
 
