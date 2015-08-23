@@ -1583,9 +1583,10 @@ def safeExpandUser(filepath):
 
     try:
         retVal = os.path.expanduser(filepath)
-    except UnicodeDecodeError:
+    except UnicodeError:
         _ = locale.getdefaultlocale()
-        retVal = getUnicode(os.path.expanduser(filepath.encode(_[1] if _ and len(_) > 1 else UNICODE_ENCODING)))
+        encoding = _[1] if _ and len(_) > 1 else UNICODE_ENCODING
+        retVal = getUnicode(os.path.expanduser(filepath.encode(encoding)), encoding=encoding)
 
     return retVal
 
@@ -2115,7 +2116,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
     elif isinstance(value, basestring):
         while True:
             try:
-                return unicode(value, encoding or kb.get("pageEncoding") or UNICODE_ENCODING)
+                return unicode(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
             except UnicodeDecodeError, ex:
                 try:
                     return unicode(value, UNICODE_ENCODING)
