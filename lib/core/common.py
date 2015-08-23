@@ -3027,7 +3027,6 @@ def maskSensitiveData(msg):
         if match:
             retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
-
     if getpass.getuser():
         retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), "*" * len(getpass.getuser()), retVal)
 
