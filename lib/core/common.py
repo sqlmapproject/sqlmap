@@ -3470,8 +3470,13 @@ def asciifyUrl(url, forceQuote=False):
             netloc = ':' + password + netloc
         netloc = username + netloc
 
-    if parts.port:
-        netloc += ':' + str(parts.port)
+    try:
+        port = parts.port
+    except:
+        port = None
+
+    if port:
+        netloc += ':' + str(port)
 
     return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment])
 
