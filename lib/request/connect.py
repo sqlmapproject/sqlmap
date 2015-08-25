@@ -893,7 +893,12 @@ class Connect(object):
             originals = {}
             keywords = keyword.kwlist
 
-            for item in filter(None, (get, post if not kb.postHint else None)):
+            if not get and PLACE.URI in conf.parameters:
+                query = urlparse.urlsplit(uri).query or ""
+            else:
+                query = None
+
+            for item in filter(None, (get, post if not kb.postHint else None, query)):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
@@ -955,6 +960,10 @@ class Connect(object):
                         if re.search(regex, (post or "")):
                             found = True
                             post = re.sub(regex, "\g<1>%s\g<3>" % value, post)
+
+                        if re.search(regex, (query or "")):
+                            found = True
+                            uri = re.sub(regex.replace(r"\A", r"\?"), "\g<1>%s\g<3>" % value, uri)
 
                         regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), name, re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
                         if re.search(regex, (cookie or "")):
