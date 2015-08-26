@@ -1792,6 +1792,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.endDetection = False
     kb.explicitSettings = set()
     kb.extendTests = None
+    kb.errorChunkLength = None
     kb.errorIsNone = True
     kb.fileReadMode = False
     kb.followSitemapRecursion = None

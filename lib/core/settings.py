@@ -323,11 +323,11 @@ CUSTOM_INJECTION_MARK_CHAR = '*'
 # Other way to declare injection position
 INJECT_HERE_MARK = '%INJECT HERE%'
 
-# Maximum length used for retrieving data over MySQL error based payload due to "known" problems with longer result strings
-MYSQL_ERROR_CHUNK_LENGTH = 50
+# Minimum chunk length used for retrieving data over error based payloads
+MIN_ERROR_CHUNK_LENGTH = 8
 
-# Maximum length used for retrieving data over MSSQL error based payload due to trimming problems with longer result strings
-MSSQL_ERROR_CHUNK_LENGTH = 100
+# Maximum chunk length used for retrieving data over error based payloads
+MAX_ERROR_CHUNK_LENGTH = 1024
 
 # Do not escape the injected statement if it contains any of the following SQL keywords
 EXCLUDE_UNESCAPE = ("WAITFOR DELAY ", " INTO DUMPFILE ", " INTO OUTFILE ", "CREATE ", "BULK ", "EXEC ", "RECONFIGURE ", "DECLARE ", "'%s'" % CHAR_INFERENCE_MARK)
