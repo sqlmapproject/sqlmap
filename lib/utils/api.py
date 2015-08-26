@@ -13,8 +13,6 @@ import sys
 import tempfile
 import time
 
-from subprocess import PIPE
-
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
 from lib.core.convert import hexencode

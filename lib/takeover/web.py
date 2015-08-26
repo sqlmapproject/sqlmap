@@ -205,7 +205,6 @@ class Web:
         backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi))
 
         stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
-        success = False
 
         for directory in directories:
             if not directory:
@@ -356,7 +355,5 @@ class Web:
             infoMsg += "uploaded on '%s' - " % self.webDirectory
             infoMsg += self.webBackdoorUrl
             logger.info(infoMsg)
-
-            success = True
 
             break
