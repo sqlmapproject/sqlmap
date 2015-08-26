@@ -64,11 +64,11 @@ def _oneShotErrorUse(expression, field=None):
     threadData.resumed = retVal is not None and not partialValue
 
     if Backend.isDbms(DBMS.MYSQL):
-        chunk_length = MYSQL_ERROR_CHUNK_LENGTH
+        chunkLength = MYSQL_ERROR_CHUNK_LENGTH
     elif Backend.isDbms(DBMS.MSSQL):
-        chunk_length = MSSQL_ERROR_CHUNK_LENGTH
+        chunkLength = MSSQL_ERROR_CHUNK_LENGTH
     else:
-        chunk_length = None
+        chunkLength = None
 
     if retVal is None or partialValue:
         try:
@@ -84,7 +84,7 @@ def _oneShotErrorUse(expression, field=None):
                         if extendedField != field:  # e.g. MIN(surname)
                             nulledCastedField = extendedField.replace(field, nulledCastedField)
                             field = extendedField
-                        nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
+                        nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunkLength)
 
                 # Forge the error-based SQL injection request
                 vector = kb.injection.data[kb.technique].vector
@@ -146,8 +146,8 @@ def _oneShotErrorUse(expression, field=None):
                     else:
                         retVal += output if output else ''
 
-                    if output and len(output) >= chunk_length:
-                        offset += chunk_length
+                    if output and len(output) >= chunkLength:
+                        offset += chunkLength
                     else:
                         break
 
