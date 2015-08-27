@@ -861,6 +861,9 @@ def dataToDumpFile(dumpFile, data):
         if "No space left" in getUnicode(ex):
             errMsg = "no space left on output device"
             logger.error(errMsg)
+        elif "Permission denied" in getUnicode(ex):
+            errMsg = "permission denied when flushing dump data"
+            logger.error(errMsg)
         else:
             raise
 
