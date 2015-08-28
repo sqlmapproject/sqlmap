@@ -1581,6 +1581,9 @@ def _cleanupOptions():
     else:
         conf.skip = []
 
+    if conf.cookie:
+        conf.cookie = re.sub(r"[\r\n]", "", conf.cookie)
+
     if conf.delay:
         conf.delay = float(conf.delay)
 
