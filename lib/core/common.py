@@ -2603,11 +2603,11 @@ def removeDynamicContent(page):
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
-                page = re.sub(r'(?s)^.+%s' % re.escape(suffix), suffix, page)
+                page = re.sub(r'(?s)^.+%s' % re.escape(suffix), suffix.replace('\\', r'\\'), page)
             elif suffix is None:
-                page = re.sub(r'(?s)%s.+$' % re.escape(prefix), prefix, page)
+                page = re.sub(r'(?s)%s.+$' % re.escape(prefix), prefix.replace('\\', r'\\'), page)
             else:
-                page = re.sub(r'(?s)%s.+%s' % (re.escape(prefix), re.escape(suffix)), '%s%s' % (prefix, suffix), page)
+                page = re.sub(r'(?s)%s.+%s' % (re.escape(prefix), re.escape(suffix)), '%s%s' % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
 
     return page
 
