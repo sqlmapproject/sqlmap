@@ -41,7 +41,13 @@ class Wordlist(object):
         else:
             self.current = self.filenames[self.index]
             if os.path.splitext(self.current)[1].lower() == ".zip":
-                _ = zipfile.ZipFile(self.current, 'r')
+                try:
+                    _ = zipfile.ZipFile(self.current, 'r')
+                except zipfile.error, ex:
+                    errMsg = "something seems to be wrong with "
+                    errMsg += "the file '%s' ('%s'). Please make " % (self.current, ex)
+                    errMsg += "sure that you haven't made any changes to it"
+                    raise SqlmapInstallationException, errMsg
                 if len(_.namelist()) == 0:
                     errMsg = "no file(s) inside '%s'" % self.current
                     raise SqlmapDataException(errMsg)
