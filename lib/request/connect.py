@@ -374,7 +374,7 @@ class Connect(object):
                 headers[unicodeencode(key, kb.pageEncoding)] = unicodeencode(item, kb.pageEncoding)
 
             url = unicodeencode(url)
-            post = unicodeencode(post, kb.pageEncoding)
+            post = unicodeencode(post)
 
             if websocket_:
                 ws = websocket.WebSocket()
