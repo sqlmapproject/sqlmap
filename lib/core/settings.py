@@ -443,6 +443,9 @@ BRUTE_COLUMN_EXISTS_TEMPLATE = "EXISTS(SELECT %s FROM %s)"
 # Payload used for checking of existence of IDS/WAF (dummier the better)
 IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1-- ../../../etc/passwd"
 
+# Data inside shellcodeexec to be filled with random string
+SHELLCODEEXEC_RANDOM_STRING_MARKER = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
 # Vectors used for provoking specific WAF/IDS/IPS behavior(s)
 WAF_ATTACK_VECTORS = (
                         "",  # NIL
