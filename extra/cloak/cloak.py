@@ -37,7 +37,7 @@ def decloak(inputFile=None, data=None):
             data = f.read()
     try:
         data = zlib.decompress(hideAscii(data))
-    except Exception:
+    except:
         print 'ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile
         sys.exit(1)
     finally:
