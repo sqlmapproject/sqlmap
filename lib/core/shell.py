@@ -10,7 +10,6 @@ import os
 import rlcompleter
 
 from lib.core import readlineng as readline
-from lib.core.common import Backend
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import AUTOCOMPLETE_TYPE
@@ -43,7 +42,7 @@ def saveHistory(completion=None):
         historyPath = paths.SQLMAP_SHELL_HISTORY
 
     try:
-        with open(historyPath, "w+") as f:
+        with open(historyPath, "w+"):
             pass
     except:
         pass
@@ -92,7 +91,7 @@ class CompleterNG(rlcompleter.Completer):
                     matches.append(word)
 
         return matches
-        
+
 def autoCompletion(completion=None, os=None, commands=None):
     if not readlineAvailable():
         return

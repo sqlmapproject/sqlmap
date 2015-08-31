@@ -391,11 +391,13 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                             warnMsg += ". Falling back to partial UNION technique"
                             singleTimeWarnMessage(warnMsg)
 
-                            pushValue(kb.forcePartialUnion)
-                            kb.forcePartialUnion = True
-                            value = _goUnion(query, unpack, dump)
-                            found = (value is not None) or (value is None and expectingNone)
-                            kb.forcePartialUnion = popValue()
+                            try:
+                                pushValue(kb.forcePartialUnion)
+                                kb.forcePartialUnion = True
+                                value = _goUnion(query, unpack, dump)
+                                found = (value is not None) or (value is None and expectingNone)
+                            finally:
+                                kb.forcePartialUnion = popValue()
                         else:
                             singleTimeWarnMessage(warnMsg)
 
@@ -450,7 +452,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     kb.safeCharEncode = False
 
-    if not kb.testMode and value is None and Backend.getDbms() and conf.dbmsHandler and not conf.noCast and not conf.hexConvert:
+    if not any((kb.testMode, conf.dummy, conf.offline)) and value is None and Backend.getDbms() and conf.dbmsHandler and not conf.noCast and not conf.hexConvert:
         warnMsg = "in case of continuous data retrieval problems you are advised to try "
         warnMsg += "a switch '--no-cast' "
         warnMsg += "or switch '--hex'" if Backend.getIdentifiedDbms() not in (DBMS.ACCESS, DBMS.FIREBIRD) else ""

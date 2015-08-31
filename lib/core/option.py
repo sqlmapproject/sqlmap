@@ -9,6 +9,7 @@ import cookielib
 import glob
 import inspect
 import logging
+import httplib
 import os
 import random
 import re
@@ -53,7 +54,6 @@ from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import safeExpandUser
-from lib.core.common import sanitizeStr
 from lib.core.common import setOptimize
 from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
@@ -107,6 +107,7 @@ from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORT
 from lib.core.settings import DUMMY_URL
+from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INJECT_HERE_MARK
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
@@ -289,7 +290,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 line = line.strip('\r')
                 match = re.search(r"\A(%s) (.+) HTTP/[\d.]+\Z" % "|".join(getPublicTypeMembers(HTTPMETHOD, True)), line) if not method else None
 
-                if len(line) == 0 and method and method != HTTPMETHOD.GET and data is None:
+                if len(line.strip()) == 0 and method and method != HTTPMETHOD.GET and data is None:
                     data = ""
                     params = True
 
@@ -311,8 +312,9 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     params = True
 
                 # Headers
-                elif re.search(r"\A\S+: ", line):
-                    key, value = line.split(": ", 1)
+                elif re.search(r"\A\S+:", line):
+                    key, value = line.split(":", 1)
+                    value = value.strip().replace("\r", "").replace("\n", "")
 
                     # Cookie and Host headers
                     if key.upper() == HTTP_HEADER.COOKIE.upper():
@@ -766,8 +768,14 @@ def _setMetasploit():
 
     if conf.msfPath:
         for path in (conf.msfPath, os.path.join(conf.msfPath, "bin")):
-            if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
+            if any(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfcli", "msfconsole")):
                 msfEnvPathExists = True
+                if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfvenom",)):
+                    kb.oldMsf = False
+                elif all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfencode", "msfpayload")):
+                    kb.oldMsf = True
+                else:
+                    msfEnvPathExists = False
                 conf.msfPath = path
                 break
 
@@ -798,15 +806,23 @@ def _setMetasploit():
         for envPath in envPaths:
             envPath = envPath.replace(";", "")
 
-            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole", "msfencode", "msfpayload")):
-                infoMsg = "Metasploit Framework has been found "
-                infoMsg += "installed in the '%s' path" % envPath
-                logger.info(infoMsg)
-
+            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole")):
                 msfEnvPathExists = True
-                conf.msfPath = envPath
+                if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfvenom",)):
+                    kb.oldMsf = False
+                elif all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfencode", "msfpayload")):
+                    kb.oldMsf = True
+                else:
+                    msfEnvPathExists = False
 
-                break
+                if msfEnvPathExists:
+                    infoMsg = "Metasploit Framework has been found "
+                    infoMsg += "installed in the '%s' path" % envPath
+                    logger.info(infoMsg)
+
+                    conf.msfPath = envPath
+
+                    break
 
     if not msfEnvPathExists:
         errMsg = "unable to locate Metasploit Framework installation. "
@@ -1325,6 +1341,9 @@ def _setHTTPExtraHeaders():
         conf.headers = conf.headers.split("\n") if "\n" in conf.headers else conf.headers.split("\\n")
 
         for headerValue in conf.headers:
+            if not headerValue.strip():
+                continue
+
             if headerValue.count(':') >= 1:
                 header, value = (_.lstrip() for _ in headerValue.split(":", 1))
 
@@ -1504,7 +1523,7 @@ def _createTemporaryDirectory():
             os.makedirs(tempfile.gettempdir())
     except IOError, ex:
         errMsg = "there has been a problem while accessing "
-        errMsg += "system's temporary directory location(s) ('%s'). Please " % ex
+        errMsg += "system's temporary directory location(s) ('%s'). Please " % ex.message
         errMsg += "make sure that there is enough disk space left. If problem persists, "
         errMsg += "try to set environment variable 'TEMP' to a location "
         errMsg += "writeable by the current user"
@@ -1561,6 +1580,9 @@ def _cleanupOptions():
         conf.skip = re.split(PARAMETER_SPLITTING_REGEX, conf.skip)
     else:
         conf.skip = []
+
+    if conf.cookie:
+        conf.cookie = re.sub(r"[\r\n]", "", conf.cookie)
 
     if conf.delay:
         conf.delay = float(conf.delay)
@@ -1669,6 +1691,13 @@ def _cleanupOptions():
     threadData = getCurrentThreadData()
     threadData.reset()
 
+def _dirtyPatches():
+    """
+    Place for "dirty" Python related patches
+    """
+
+    httplib._MAXLINE = 1 * 1024 * 1024  # to accept overly long result lines (e.g. SQLi results in HTTP header responses)
+
 def _purgeOutput():
     """
     Safely removes (purges) output directory.
@@ -1766,11 +1795,14 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.endDetection = False
     kb.explicitSettings = set()
     kb.extendTests = None
+    kb.errorChunkLength = None
     kb.errorIsNone = True
     kb.fileReadMode = False
     kb.followSitemapRecursion = None
     kb.forcedDbms = None
     kb.forcePartialUnion = False
+    kb.forceWhere = None
+    kb.futileUnion = None
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicMode = False
@@ -1797,9 +1829,11 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.multiThreadMode = False
     kb.negativeLogic = False
     kb.nullConnection = None
+    kb.oldMsf = None
     kb.orderByColumns = None
     kb.originalCode = None
     kb.originalPage = None
+    kb.originalPageTime = None
     kb.originalTimeDelay = None
     kb.originalUrls = dict()
 
@@ -1845,6 +1879,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.technique = None
     kb.tempDir = None
     kb.testMode = False
+    kb.testOnlyCustom = False
     kb.testQueryCount = 0
     kb.testType = None
     kb.threadContinue = True
@@ -1934,16 +1969,16 @@ def _useWizardInterface():
 
     dataToStdout("\nsqlmap is running, please wait..\n\n")
 
-def _saveCmdline():
+def _saveConfig():
     """
-    Saves the command line options on a sqlmap configuration INI file
+    Saves the command line options to a sqlmap configuration INI file
     Format.
     """
 
-    if not conf.saveCmdline:
+    if not conf.saveConfig:
         return
 
-    debugMsg = "saving command line options on a sqlmap configuration INI file"
+    debugMsg = "saving command line options to a sqlmap configuration INI file"
     logger.debug(debugMsg)
 
     config = UnicodeRawConfigParser()
@@ -1966,6 +2001,9 @@ def _saveCmdline():
             if datatype and isListLike(datatype):
                 datatype = datatype[0]
 
+            if option in IGNORE_SAVE_OPTIONS:
+                continue
+
             if value is None:
                 if datatype == OPTION_TYPE.BOOLEAN:
                     value = "False"
@@ -1982,16 +2020,16 @@ def _saveCmdline():
 
             config.set(family, option, value)
 
-    confFP = openFile(paths.SQLMAP_CONFIG, "wb")
+    confFP = openFile(conf.saveConfig, "wb")
 
     try:
         config.write(confFP)
     except IOError, ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to write to the configuration INI file '%s' ('%s')" % (paths.SQLMAP_CONFIG, ex)
+        errMsg += "to write to the configuration file '%s' ('%s')" % (conf.saveConfig, ex)
         raise SqlmapSystemException(errMsg)
 
-    infoMsg = "saved command line options on '%s' configuration file" % paths.SQLMAP_CONFIG
+    infoMsg = "saved command line options to the configuration file '%s'" % conf.saveConfig
     logger.info(infoMsg)
 
 def setVerbosity():
@@ -2029,7 +2067,12 @@ def _mergeOptions(inputOptions, overrideOptions):
     """
 
     if inputOptions.pickledOptions:
-        inputOptions = base64unpickle(inputOptions.pickledOptions)
+        try:
+            inputOptions = base64unpickle(inputOptions.pickledOptions)
+        except Exception, ex:
+            errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
+            errMsg += " ('%s')" % ex.message if ex.message else ""
+            raise SqlmapSyntaxException(errMsg)
 
     if inputOptions.configFile:
         configFileParser(inputOptions.configFile)
@@ -2446,9 +2489,10 @@ def init():
 
     _useWizardInterface()
     setVerbosity()
-    _saveCmdline()
+    _saveConfig()
     _setRequestFromFile()
     _cleanupOptions()
+    _dirtyPatches()
     _purgeOutput()
     _checkDependencies()
     _createTemporaryDirectory()

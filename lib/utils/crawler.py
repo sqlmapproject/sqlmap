@@ -5,7 +5,6 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import codecs
 import httplib
 import os
 import re
@@ -19,13 +18,11 @@ from lib.core.common import findPageForms
 from lib.core.common import openFile
 from lib.core.common import readInput
 from lib.core.common import safeCSValue
-from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.parse.sitemap import parseSitemap

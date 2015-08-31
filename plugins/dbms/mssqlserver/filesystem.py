@@ -343,7 +343,6 @@ class Filesystem(GenericFilesystem):
         logger.info(infoMsg)
 
         chunkMaxSize = 500
-        dFileName = ntpath.basename(dFile)
 
         randFile = "tmpf%s.txt" % randomStr(lowercase=True)
         randFilePath = "%s\%s" % (tmpPath, randFile)

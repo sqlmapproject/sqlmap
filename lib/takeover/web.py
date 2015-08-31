@@ -205,7 +205,6 @@ class Web:
         backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi))
 
         stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
-        success = False
 
         for directory in directories:
             if not directory:
@@ -263,8 +262,8 @@ class Web:
 
                     with open(filename, "w+") as f:
                         _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
-                        _ = _.replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
-                        f.write(utf8encode(_))
+                        _ = _.replace("WRITABLE_DIR", utf8encode(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
+                        f.write(_)
 
                     self.unionWriteFile(filename, self.webStagerFilePath, "text", forceCheck=True)
 
@@ -356,7 +355,5 @@ class Web:
             infoMsg += "uploaded on '%s' - " % self.webDirectory
             infoMsg += self.webBackdoorUrl
             logger.info(infoMsg)
-
-            success = True
 
             break

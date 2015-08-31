@@ -77,7 +77,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
 
     if page:
         # In case of an DBMS error page return None
-        if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()):
+        if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()) and not kb.negativeLogic:
             return None
 
         # Dynamic content lines to be excluded before comparison
@@ -164,6 +164,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
 
     elif ratio > UPPER_RATIO_BOUND:
         return True
+
+    elif ratio < LOWER_RATIO_BOUND:
+        return False
 
     elif kb.matchRatio is None:
         return None

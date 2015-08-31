@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import sys
 
 from lib.core.agent import agent
 from lib.core.common import dataToOutFile
@@ -13,6 +14,7 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
 from lib.core.common import decodeHexValue
+from lib.core.common import getUnicode
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
 from lib.core.common import isStackingAvailable
@@ -42,7 +44,7 @@ class Filesystem:
             lengthQuery = "LENGTH(LOAD_FILE('%s'))" % remoteFile
 
         elif Backend.isDbms(DBMS.PGSQL) and not fileRead:
-            lengthQuery = "SELECT LENGTH(data) FROM pg_largeobject WHERE loid=%d" % self.oid
+            lengthQuery = "SELECT SUM(LENGTH(data)) FROM pg_largeobject WHERE loid=%d" % self.oid
 
         elif Backend.isDbms(DBMS.MSSQL):
             self.createSupportTbl(self.fileTblName, self.tblField, "VARBINARY(MAX)")
@@ -62,6 +64,7 @@ class Filesystem:
 
             if isNumPosStrValue(remoteFileSize):
                 remoteFileSize = long(remoteFileSize)
+                localFile = getUnicode(localFile, encoding=sys.getfilesystemencoding())
                 sameFile = False
 
                 if localFileSize == remoteFileSize:
@@ -105,20 +108,27 @@ class Filesystem:
 
         return sqlQueries
 
-    def fileEncode(self, fileName, encoding, single):
+    def fileEncode(self, fileName, encoding, single, chunkSize=256):
         """
         Called by MySQL and PostgreSQL plugins to write a file on the
         back-end DBMS underlying file system
         """
 
-        retVal = []
         with open(fileName, "rb") as f:
-            content = f.read().encode(encoding).replace("\n", "")
+            content = f.read()
+
+        return self.fileContentEncode(content, encoding, single, chunkSize)
+
+    def fileContentEncode(self, content, encoding, single, chunkSize=256):
+        retVal = []
+
+        if encoding:
+            content = content.encode(encoding).replace("\n", "")
 
         if not single:
-            if len(content) > 256:
-                for i in xrange(0, len(content), 256):
-                    _ = content[i:i + 256]
+            if len(content) > chunkSize:
+                for i in xrange(0, len(content), chunkSize):
+                    _ = content[i:i + chunkSize]
 
                     if encoding == "hex":
                         _ = "0x%s" % _
@@ -232,7 +242,7 @@ class Filesystem:
                 fileContent = newFileContent
 
             if fileContent is not None:
-                fileContent = decodeHexValue(fileContent)
+                fileContent = decodeHexValue(fileContent, True)
 
                 if fileContent:
                     localFilePath = dataToOutFile(remoteFile, fileContent)

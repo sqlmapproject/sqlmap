@@ -59,7 +59,6 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
-from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
@@ -668,8 +667,9 @@ def dictionaryAttack(attack_dict):
     hash_regexes = []
     results = []
     resumes = []
-    processException = False
     user_hash = []
+    processException = False
+    foundHash = False
 
     for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
@@ -693,6 +693,7 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
+                foundHash = True
                 hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
 
                 if re.match(hash_regex, hash_):
@@ -770,7 +771,7 @@ def dictionaryAttack(attack_dict):
 
                 except Exception, ex:
                     warnMsg = "there was a problem while loading dictionaries"
-                    warnMsg += " ('%s')" % ex
+                    warnMsg += " ('%s')" % ex.message
                     logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "
@@ -955,9 +956,8 @@ def dictionaryAttack(attack_dict):
 
     results.extend(resumes)
 
-    if len(hash_regexes) == 0:
-        warnMsg = "unknown hash format. "
-        warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
+    if foundHash and len(hash_regexes) == 0:
+        warnMsg = "unknown hash format"
         logger.warn(warnMsg)
 
     if len(results) == 0:

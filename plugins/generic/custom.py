@@ -120,9 +120,12 @@ class Custom:
             if not sfile:
                 continue
 
-            query = getSQLSnippet(Backend.getDbms(), sfile)
+            snippet = getSQLSnippet(Backend.getDbms(), sfile)
 
-            infoMsg = "executing SQL statement%s from file '%s'" % ("s" if ";" in query else "", sfile)
-            logger.info(infoMsg)
-
-            conf.dumper.query(query, self.sqlQuery(query))
+            if snippet and all(query.strip().upper().startswith("SELECT") for query in filter(None, snippet.split(';' if ';' in snippet else '\n'))):
+                for query in filter(None, snippet.split(';' if ';' in snippet else '\n')):
+                    query = query.strip()
+                    if query:
+                        conf.dumper.query(query, self.sqlQuery(query))
+            else:
+                conf.dumper.query(snippet, self.sqlQuery(snippet))

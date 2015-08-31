@@ -202,14 +202,13 @@ optDict = {
                                "outputDir":         "string",
                                "parseErrors":       "boolean",
                                "pivotColumn":       "string",
-                               "saveCmdline":       "boolean",
+                               "saveConfig":        "string",
                                "scope":             "string",
                                "testFilter":        "string",
                                "updateAll":         "boolean",
                              },
 
             "Miscellaneous": {
-                               "mnemonics":         "string",
                                "alert":             "string",
                                "answers":           "string",
                                "beep":              "boolean",
@@ -218,6 +217,7 @@ optDict = {
                                "disableColoring":   "boolean",
                                "googlePage":        "integer",
                                "mobile":            "boolean",
+                               "offline":           "boolean",
                                "pageRank":          "boolean",
                                "purgeOutput":       "boolean",
                                "smart":             "boolean",

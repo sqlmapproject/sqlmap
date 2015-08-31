@@ -212,7 +212,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             return not result
 
-        def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None):
+        def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None, retried=None):
             """
             continuousOrder means that distance between each two neighbour's
             numerical values is exactly 1
@@ -310,7 +310,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         kb.originalTimeDelay = conf.timeSec
 
                                     kb.timeValidCharsRun = 0
-                                    if (conf.timeSec - kb.originalTimeDelay) < MAX_TIME_REVALIDATION_STEPS:
+                                    if retried < MAX_TIME_REVALIDATION_STEPS:
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
@@ -324,7 +324,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = ADJUST_TIME_DELAY.NO
 
-                                        return getChar(idx, originalTbl, continuousOrder, expand, shiftTable)
+                                        return getChar(idx, originalTbl, continuousOrder, expand, shiftTable, (retried or 0) + 1)
                                     else:
                                         errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
                                         logger.error(errMsg)

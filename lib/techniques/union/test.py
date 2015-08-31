@@ -81,73 +81,74 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
             return found
 
-    pushValue(kb.errorIsNone)
-    items, ratios = [], []
-    kb.errorIsNone = False
-    lowerCount, upperCount = conf.uColsStart, conf.uColsStop
+    try:
+        pushValue(kb.errorIsNone)
+        items, ratios = [], []
+        kb.errorIsNone = False
+        lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
-    if lowerCount == 1:
-        found = kb.orderByColumns or _orderByTechnique()
-        if found:
-            kb.orderByColumns = found
-            infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
-            singleTimeLogMessage(infoMsg)
-            return found
+        if lowerCount == 1:
+            found = kb.orderByColumns or _orderByTechnique()
+            if found:
+                kb.orderByColumns = found
+                infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
+                singleTimeLogMessage(infoMsg)
+                return found
 
-    if abs(upperCount - lowerCount) < MIN_UNION_RESPONSES:
-        upperCount = lowerCount + MIN_UNION_RESPONSES
+        if abs(upperCount - lowerCount) < MIN_UNION_RESPONSES:
+            upperCount = lowerCount + MIN_UNION_RESPONSES
 
-    min_, max_ = MAX_RATIO, MIN_RATIO
-    pages = {}
+        min_, max_ = MAX_RATIO, MIN_RATIO
+        pages = {}
 
-    for count in xrange(lowerCount, upperCount + 1):
-        query = agent.forgeUnionQuery('', -1, count, comment, prefix, suffix, kb.uChar, where)
-        payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
-        page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+        for count in xrange(lowerCount, upperCount + 1):
+            query = agent.forgeUnionQuery('', -1, count, comment, prefix, suffix, kb.uChar, where)
+            payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
+            page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+            if not isNullValue(kb.uChar):
+                pages[count] = page
+            ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
+            ratios.append(ratio)
+            min_, max_ = min(min_, ratio), max(max_, ratio)
+            items.append((count, ratio))
+
         if not isNullValue(kb.uChar):
-            pages[count] = page
-        ratio = comparison(page, headers, getRatioValue=True) or MIN_RATIO
-        ratios.append(ratio)
-        min_, max_ = min(min_, ratio), max(max_, ratio)
-        items.append((count, ratio))
+            for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
+                contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
+                if len(filter(lambda x: x[1], contains)) == 1:
+                    retVal = filter(lambda x: x[1], contains)[0][0]
+                    break
 
-    if not isNullValue(kb.uChar):
-        for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
-            contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
-            if len(filter(lambda x: x[1], contains)) == 1:
-                retVal = filter(lambda x: x[1], contains)[0][0]
-                break
+        if not retVal:
+            ratios.pop(ratios.index(min_))
+            ratios.pop(ratios.index(max_))
 
-    if not retVal:
-        ratios.pop(ratios.index(min_))
-        ratios.pop(ratios.index(max_))
+            minItem, maxItem = None, None
 
-        minItem, maxItem = None, None
+            for item in items:
+                if item[1] == min_:
+                    minItem = item
+                elif item[1] == max_:
+                    maxItem = item
 
-        for item in items:
-            if item[1] == min_:
-                minItem = item
-            elif item[1] == max_:
-                maxItem = item
+            if all(map(lambda x: x == min_ and x != max_, ratios)):
+                retVal = maxItem[0]
 
-        if all(map(lambda x: x == min_ and x != max_, ratios)):
-            retVal = maxItem[0]
+            elif all(map(lambda x: x != min_ and x == max_, ratios)):
+                retVal = minItem[0]
 
-        elif all(map(lambda x: x != min_ and x == max_, ratios)):
-            retVal = minItem[0]
+            elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
+                    deviation = stdev(ratios)
+                    lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
 
-        elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
-                deviation = stdev(ratios)
-                lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
+                    if min_ < lower:
+                        retVal = minItem[0]
 
-                if min_ < lower:
-                    retVal = minItem[0]
-
-                if max_ > upper:
-                    if retVal is None or abs(max_ - upper) > abs(min_ - lower):
-                        retVal = maxItem[0]
-
-    kb.errorIsNone = popValue()
+                    if max_ > upper:
+                        if retVal is None or abs(max_ - upper) > abs(min_ - lower):
+                            retVal = maxItem[0]
+    finally:
+        kb.errorIsNone = popValue()
 
     if retVal:
         infoMsg = "target URL appears to be UNION injectable with %d columns" % retVal

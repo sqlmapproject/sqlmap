@@ -6,7 +6,6 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import cgi
-import codecs
 import hashlib
 import os
 import re
@@ -22,7 +21,6 @@ from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
 from lib.core.common import randomInt
-from lib.core.common import randomStr
 from lib.core.common import safeCSValue
 from lib.core.common import unicodeencode
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -76,7 +74,7 @@ class Dump(object):
         try:
             self._outputFP.write(text)
         except IOError, ex:
-            errMsg = "error occurred while writing to log file ('%s')" % ex
+            errMsg = "error occurred while writing to log file ('%s')" % ex.message
             raise SqlmapGenericException(errMsg)
 
         if kb.get("multiThreadMode"):
@@ -96,7 +94,7 @@ class Dump(object):
         try:
             self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
         except IOError, ex:
-            errMsg = "error occurred while opening log file ('%s')" % ex
+            errMsg = "error occurred while opening log file ('%s')" % ex.message
             raise SqlmapGenericException(errMsg)
 
     def getOutputFile(self):

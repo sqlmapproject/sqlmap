@@ -361,6 +361,9 @@ class UDF:
                     warnMsg += "<= %d are allowed" % len(udfList)
                     logger.warn(warnMsg)
 
+            if not isinstance(choice, int):
+                break
+
             cmd = ""
             count = 1
             udfToCall = udfList[choice - 1]

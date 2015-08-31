@@ -35,10 +35,11 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
-from lib.core.settings import MYSQL_ERROR_CHUNK_LENGTH
-from lib.core.settings import MSSQL_ERROR_CHUNK_LENGTH
+from lib.core.settings import MIN_ERROR_CHUNK_LENGTH
+from lib.core.settings import MAX_ERROR_CHUNK_LENGTH
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
@@ -50,7 +51,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
 
-def _oneShotErrorUse(expression, field=None):
+def _oneShotErrorUse(expression, field=None, chunkTest=False):
     offset = 1
     partialValue = None
     threadData = getCurrentThreadData()
@@ -63,12 +64,28 @@ def _oneShotErrorUse(expression, field=None):
 
     threadData.resumed = retVal is not None and not partialValue
 
-    if Backend.isDbms(DBMS.MYSQL):
-        chunk_length = MYSQL_ERROR_CHUNK_LENGTH
-    elif Backend.isDbms(DBMS.MSSQL):
-        chunk_length = MSSQL_ERROR_CHUNK_LENGTH
-    else:
-        chunk_length = None
+    if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)) and kb.errorChunkLength is None and not chunkTest and not kb.testMode:
+        debugMsg = "searching for error chunk length..."
+        logger.debug(debugMsg)
+
+        current = MAX_ERROR_CHUNK_LENGTH
+        while current >= MIN_ERROR_CHUNK_LENGTH:
+            testChar = str(current % 10)
+            testQuery = "SELECT %s('%s',%d)" % ("REPEAT" if Backend.isDbms(DBMS.MYSQL) else "REPLICATE", testChar, current)
+            result = unArrayizeValue(_oneShotErrorUse(testQuery, chunkTest=True))
+            if result and testChar in result:
+                if result == testChar * current:
+                    kb.errorChunkLength = current
+                    break
+                else:
+                    current = len(result) - len(kb.chars.stop)
+            else:
+                current = current / 2
+
+        if kb.errorChunkLength:
+            hashDBWrite(HASHDB_KEYS.KB_ERROR_CHUNK_LENGTH, kb.errorChunkLength)
+        else:
+            kb.errorChunkLength = 0
 
     if retVal is None or partialValue:
         try:
@@ -79,12 +96,12 @@ def _oneShotErrorUse(expression, field=None):
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
 
-                    if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)) and not any(_ in field for _ in ("COUNT", "CASE")):  # skip chunking of scalar expression (unneeded)
+                    if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL)) and not any(_ in field for _ in ("COUNT", "CASE")) and kb.errorChunkLength and not chunkTest:
                         extendedField = re.search(r"[^ ,]*%s[^ ,]*" % re.escape(field), expression).group(0)
                         if extendedField != field:  # e.g. MIN(surname)
                             nulledCastedField = extendedField.replace(field, nulledCastedField)
                             field = extendedField
-                        nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
+                        nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, kb.errorChunkLength)
 
                 # Forge the error-based SQL injection request
                 vector = kb.injection.data[kb.technique].vector
@@ -125,10 +142,11 @@ def _oneShotErrorUse(expression, field=None):
                         threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
                     if trimmed:
-                        warnMsg = "possible server trimmed output detected "
-                        warnMsg += "(due to its length and/or content): "
-                        warnMsg += safecharencode(trimmed)
-                        logger.warn(warnMsg)
+                        if not chunkTest:
+                            warnMsg = "possible server trimmed output detected "
+                            warnMsg += "(due to its length and/or content): "
+                            warnMsg += safecharencode(trimmed)
+                            logger.warn(warnMsg)
 
                         if not kb.testMode:
                             check = "(?P<result>.*?)%s" % kb.chars.stop[:2]
@@ -146,8 +164,8 @@ def _oneShotErrorUse(expression, field=None):
                     else:
                         retVal += output if output else ''
 
-                    if output and len(output) >= chunk_length:
-                        offset += chunk_length
+                    if output and kb.errorChunkLength and len(output) >= kb.errorChunkLength and not chunkTest:
+                        offset += kb.errorChunkLength
                     else:
                         break
 

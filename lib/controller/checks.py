@@ -15,7 +15,6 @@ from subprocess import Popen as execute
 
 from extra.beep.beep import beep
 from lib.core.agent import agent
-from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
@@ -46,7 +45,6 @@ from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.decorators import cachedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
-from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
@@ -66,7 +64,6 @@ from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import URI_HTTP_HEADER
-from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IDS_WAF_CHECK_RATIO
@@ -90,6 +87,7 @@ def checkSqlInjection(place, parameter, value):
 
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
     tests = getSortedInjectionTests()
+    seenPayload = set()
 
     while tests:
         test = tests.pop(0)
@@ -386,9 +384,17 @@ def checkSqlInjection(place, parameter, value):
                     # Forge request payload by prepending with boundary's
                     # prefix and appending the boundary's suffix to the
                     # test's ' <payload><comment> ' string
-                    boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
-                    boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
-                    reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                    if fstPayload:
+                        boundPayload = agent.prefixQuery(fstPayload, prefix, where, clause)
+                        boundPayload = agent.suffixQuery(boundPayload, comment, suffix, where)
+                        reqPayload = agent.payload(place, parameter, newValue=boundPayload, where=where)
+                        if reqPayload:
+                            if reqPayload in seenPayload:
+                                continue
+                            else:
+                                seenPayload.add(reqPayload)
+                    else:
+                        reqPayload = None
 
                     # Perform the test's request and check whether or not the
                     # payload was successful
@@ -423,7 +429,7 @@ def checkSqlInjection(place, parameter, value):
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
                             truePage = threadData.lastComparisonPage or ""
 
-                            if trueResult:
+                            if trueResult and not(truePage == falsePage and not kb.nullConnection):
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
 
                                 # Perform the test's False request
@@ -516,6 +522,17 @@ def checkSqlInjection(place, parameter, value):
                                 infoMsg += "there is at least one other (potential) "
                                 infoMsg += "technique found"
                                 singleTimeLogMessage(infoMsg)
+                            elif not injection.data:
+                                _ = test.request.columns.split('-')[-1]
+                                if _.isdigit() and int(_) > 10:
+                                    if kb.futileUnion is None:
+                                        msg = "it is not recommended to perform "
+                                        msg += "extended UNION tests if there is not "
+                                        msg += "at least one other (potential) "
+                                        msg += "technique found. Do you want to skip? [Y/n] "
+                                        kb.futileUnion = readInput(msg, default="Y").strip().upper() == 'N'
+                                    if kb.futileUnion is False:
+                                        continue
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
@@ -532,7 +549,7 @@ def checkSqlInjection(place, parameter, value):
 
                         kb.previousMethod = method
 
-                        if conf.dummy:
+                        if conf.dummy or conf.offline:
                             injectable = False
 
                     # If the injection test was successful feed the injection
@@ -706,7 +723,8 @@ def checkFalsePositives(injection):
 
     retVal = injection
 
-    if all(_ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in injection.data):
+    if all(_ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in injection.data) or\
+      (len(injection.data) == 1 and PAYLOAD.TECHNIQUE.UNION in injection.data and "Generic" in injection.data[PAYLOAD.TECHNIQUE.UNION].title):
         pushValue(kb.injection)
 
         infoMsg = "checking if the injection point on %s " % injection.place
@@ -994,11 +1012,15 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the target URL is stable. This can take a couple of seconds"
+    infoMsg = "testing if the target URL is stable"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
-    time.sleep(1)
+
+    delay = 1 - (time.time() - (kb.originalPageTime or 0))
+    delay = max(0, min(1, delay))
+    time.sleep(delay)
+
     secondPage, _ = Request.queryPage(content=True, raise404=False)
 
     if kb.redirectChoice:
@@ -1117,7 +1139,7 @@ def checkWaf():
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
     """
 
-    if any((conf.string, conf.notString, conf.regexp)):
+    if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline)):
         return None
 
     dbmMsg = "heuristically checking if the target is protected by "
@@ -1227,10 +1249,10 @@ def checkNullConnection():
     infoMsg = "testing NULL connection to the target URL"
     logger.info(infoMsg)
 
-    pushValue(kb.pageCompress)
-    kb.pageCompress = False
-
     try:
+        pushValue(kb.pageCompress)
+        kb.pageCompress = False
+
         page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD)
 
         if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
@@ -1260,12 +1282,13 @@ def checkNullConnection():
         errMsg = getUnicode(errMsg)
         raise SqlmapConnectionException(errMsg)
 
-    kb.pageCompress = popValue()
+    finally:
+        kb.pageCompress = popValue()
 
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
-    if not any((conf.proxy, conf.tor, conf.dummy)):
+    if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
         try:
             debugMsg = "resolving hostname '%s'" % conf.hostname
             logger.debug(debugMsg)
@@ -1275,14 +1298,15 @@ def checkConnection(suppressOutput=False):
             raise SqlmapConnectionException(errMsg)
         except socket.error, ex:
             errMsg = "problem occurred while "
-            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getUnicode(ex))
+            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, ex.message)
             raise SqlmapConnectionException(errMsg)
 
-    if not suppressOutput and not conf.dummy:
+    if not suppressOutput and not conf.dummy and not conf.offline:
         infoMsg = "testing connection to the target URL"
         logger.info(infoMsg)
 
     try:
+        kb.originalPageTime = time.time()
         page, _ = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
 

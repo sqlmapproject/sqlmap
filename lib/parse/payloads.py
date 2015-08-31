@@ -10,7 +10,6 @@ import os
 from xml.etree import ElementTree as et
 
 from lib.core.data import conf
-from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
 from lib.core.exception import SqlmapInstallationException
@@ -88,8 +87,6 @@ def loadPayloads():
 
     for payloadFile in payloadFiles:
         payloadFilePath = os.path.join(paths.SQLMAP_XML_PAYLOADS_PATH, payloadFile)
-
-        #logger.debug("Parsing payloads from file '%s'" % payloadFile)
 
         try:
             doc = et.parse(payloadFilePath)

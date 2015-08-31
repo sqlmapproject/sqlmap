@@ -742,32 +742,33 @@ class Databases:
         infoMsg = "enumerating database management system schema"
         logger.info(infoMsg)
 
-        pushValue(conf.db)
-        pushValue(conf.tbl)
-        pushValue(conf.col)
+        try:
+            pushValue(conf.db)
+            pushValue(conf.tbl)
+            pushValue(conf.col)
 
-        kb.data.cachedTables = {}
-        kb.data.cachedColumns = {}
+            kb.data.cachedTables = {}
+            kb.data.cachedColumns = {}
 
-        self.getTables()
+            self.getTables()
 
-        infoMsg = "fetched tables: "
-        infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (unsafeSQLIdentificatorNaming(db), ".." if \
-                   Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) \
-                   else ".", unsafeSQLIdentificatorNaming(t)) for t in tbl) for db, tbl in \
-                   kb.data.cachedTables.items()])
-        logger.info(infoMsg)
+            infoMsg = "fetched tables: "
+            infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (unsafeSQLIdentificatorNaming(db), ".." if \
+                    Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) \
+                    else ".", unsafeSQLIdentificatorNaming(t)) for t in tbl) for db, tbl in \
+                    kb.data.cachedTables.items()])
+            logger.info(infoMsg)
 
-        for db, tables in kb.data.cachedTables.items():
-            for tbl in tables:
-                conf.db = db
-                conf.tbl = tbl
+            for db, tables in kb.data.cachedTables.items():
+                for tbl in tables:
+                    conf.db = db
+                    conf.tbl = tbl
 
-                self.getColumns()
-
-        conf.col = popValue()
-        conf.tbl = popValue()
-        conf.db = popValue()
+                    self.getColumns()
+        finally:
+            conf.col = popValue()
+            conf.tbl = popValue()
+            conf.db = popValue()
 
         return kb.data.cachedColumns
 
