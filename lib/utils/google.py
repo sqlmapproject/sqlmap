@@ -21,8 +21,11 @@ from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTP_HEADER
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
-from lib.core.settings import GOOGLE_REGEX
+from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import DUMMY_SEARCH_USER_AGENT
 from lib.core.settings import DUCKDUCKGO_REGEX
+from lib.core.settings import DISCONNECT_SEARCH_REGEX
+from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
@@ -108,54 +111,67 @@ class Google(object):
             raise SqlmapGenericException(warnMsg)
 
         if not retVal:
-            message = "no usable links found. "
-            message += "do you want to (re)try with DuckDuckGo? [Y/n] "
-            output = readInput(message, default="Y")
+            message = "no usable links found. What do you want to do?"
+            message += "\n[1] (re)try with DuckDuckGo (default)"
+            message += "\n[2] (re)try with Disconnect Search"
+            message += "\n[3] quit"
+            choice = readInput(message, default="1").strip().upper()
 
-            if output.strip().lower() != 'n':
+            if choice == "Q":
+                raise SqlmapUserQuitException
+            elif choice == "2":
+                url = "https://search.disconnect.me/searchTerms/search?"
+                url += "start=nav&option=Web"
+                url += "&query=%s" % urlencode(dork, convall=True)
+                url += "&ses=Google&location_option=US"
+                url += "&nextDDG=%s" % urlencode("/search?q=&num=100&hl=en&start=%d&sa=N" % ((gpage - 1) * 10), convall=True)
+                url += "&sa=N&showIcons=false&filterIcons=none&js_enabled=1"
+                regex = DISCONNECT_SEARCH_REGEX
+            else:
                 url = "https://duckduckgo.com/d.js?"
                 url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
+                regex = DUCKDUCKGO_REGEX
 
-                if not conf.randomAgent:
-                    self.opener.addheaders = [_ for _ in self.opener.addheaders if _[0].lower() != HTTP_HEADER.USER_AGENT.lower()]
-                    self.opener.addheaders.append((HTTP_HEADER.USER_AGENT, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"))
+            if not conf.randomAgent:
+                self.opener.addheaders = [_ for _ in self.opener.addheaders if _[0].lower() != HTTP_HEADER.USER_AGENT.lower()]
+                self.opener.addheaders.append((HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT))
 
-                self.opener.addheaders = [_ for _ in self.opener.addheaders if _[0].lower() != HTTP_HEADER.ACCEPT_ENCODING.lower()]
-                self.opener.addheaders.append((HTTP_HEADER.ACCEPT_ENCODING, HTTP_ACCEPT_ENCODING_HEADER_VALUE))
+            self.opener.addheaders = [_ for _ in self.opener.addheaders if _[0].lower() != HTTP_HEADER.ACCEPT_ENCODING.lower()]
+            self.opener.addheaders.append((HTTP_HEADER.ACCEPT_ENCODING, HTTP_ACCEPT_ENCODING_HEADER_VALUE))
 
+            try:
+                conn = self.opener.open(url)
+
+                requestMsg = "HTTP request:\nGET %s" % url
+                requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
+                logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
+
+                page = conn.read()
+                code = conn.code
+                status = conn.msg
+                responseHeaders = conn.info()
+                page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+
+                responseMsg = "HTTP response (%s - %d):\n" % (status, code)
+
+                if conf.verbose <= 4:
+                    responseMsg += getUnicode(responseHeaders, UNICODE_ENCODING)
+                elif conf.verbose > 4:
+                    responseMsg += "%s\n%s\n" % (responseHeaders, page)
+
+                logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
+            except urllib2.HTTPError, e:
                 try:
-                    conn = self.opener.open(url)
+                    page = e.read()
+                except socket.timeout:
+                    warnMsg = "connection timed out while trying "
+                    warnMsg += "to get error page information (%d)" % e.code
+                    logger.critical(warnMsg)
+                    return None
+            except:
+                errMsg = "unable to connect"
+                raise SqlmapConnectionException(errMsg)
 
-                    requestMsg = "HTTP request:\nGET %s" % url
-                    requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
-                    logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
-
-                    page = conn.read()
-                    code = conn.code
-                    status = conn.msg
-                    responseHeaders = conn.info()
-                    page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
-
-                    responseMsg = "HTTP response (%s - %d):\n" % (status, code)
-
-                    if conf.verbose <= 4:
-                        responseMsg += getUnicode(responseHeaders, UNICODE_ENCODING)
-                    elif conf.verbose > 4:
-                        responseMsg += "%s\n%s\n" % (responseHeaders, page)
-
-                    logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-                except urllib2.HTTPError, e:
-                    try:
-                        page = e.read()
-                    except socket.timeout:
-                        warnMsg = "connection timed out while trying "
-                        warnMsg += "to get error page information (%d)" % e.code
-                        logger.critical(warnMsg)
-                        return None
-                except:
-                    errMsg = "unable to connect to DuckDuckGo"
-                    raise SqlmapConnectionException(errMsg)
-
-            retVal = [urllib.unquote(match.group(1)) for match in re.finditer(DUCKDUCKGO_REGEX, page, re.I | re.S)]
+            retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I | re.S)]
 
         return retVal
