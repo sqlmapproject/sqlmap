@@ -92,8 +92,8 @@ def _setRequestParams():
 
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and conf.data is None:
-        errMsg = "HTTP POST method depends on HTTP data value to be posted"
-        raise SqlmapSyntaxException(errMsg)
+        logger.warn("detected empty POST body")
+        conf.data = ""
 
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST if not conf.method or conf.method == HTTPMETHOD.GET else conf.method
