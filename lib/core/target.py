@@ -223,11 +223,11 @@ def _setRequestParams():
         message += "in the target URL itself? [Y/n/q] "
         test = readInput(message, default="Y")
 
-        if not test or test[0] not in ("n", "N"):
+        if test and test[0] in ("q", "Q"):
+            raise SqlmapUserQuitException
+        elif not test or test[0] not in ("n", "N"):
             conf.url = "%s%s" % (conf.url, CUSTOM_INJECTION_MARK_CHAR)
             kb.processUserMarks = True
-        elif test[0] in ("q", "Q"):
-            raise SqlmapUserQuitException
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
         _ = re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
