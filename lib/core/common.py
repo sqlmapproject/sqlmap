@@ -3556,7 +3556,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         for form in forms:
             try:
                 for control in form.controls:
-                    if hasattr(control, "items") and not control.disabled:
+                    if hasattr(control, "items") and not any((control.disabled, control.readonly)):
                         # if control has selectable items select first non-disabled
                         for item in control.items:
                             if not item.disabled:
