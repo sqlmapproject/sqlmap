@@ -70,13 +70,13 @@ class Filesystem:
                 if localFileSize == remoteFileSize:
                     sameFile = True
                     infoMsg = "the local file '%s' and the remote file " % localFile
-                    infoMsg += "'%s' have the same size (%dB)" % (remoteFile, localFileSize)
+                    infoMsg += "'%s' have the same size (%d B)" % (remoteFile, localFileSize)
                 elif remoteFileSize > localFileSize:
-                    infoMsg = "the remote file '%s' is larger (%dB) than " % (remoteFile, remoteFileSize)
+                    infoMsg = "the remote file '%s' is larger (%d B) than " % (remoteFile, remoteFileSize)
                     infoMsg += "the local file '%s' (%dB)" % (localFile, localFileSize)
                 else:
-                    infoMsg = "the remote file '%s' is smaller (%dB) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "file '%s' (%dB)" % (localFile, localFileSize)
+                    infoMsg = "the remote file '%s' is smaller (%d B) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "file '%s' (%d B)" % (localFile, localFileSize)
 
                 logger.info(infoMsg)
             else:
