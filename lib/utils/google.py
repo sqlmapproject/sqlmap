@@ -99,7 +99,7 @@ class Google(object):
                 warnMsg += "to get error page information (%d)" % e.code
                 logger.critical(warnMsg)
                 return None
-        except (urllib2.URLError, socket.error, socket.timeout):
+        except (urllib2.URLError, httplib.error, socket.error, socket.timeout):
             errMsg = "unable to connect to Google"
             raise SqlmapConnectionException(errMsg)
 
