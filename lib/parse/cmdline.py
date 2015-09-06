@@ -566,6 +566,11 @@ def cmdLineParser():
                             help="Remote absolute path of temporary files "
                                  "directory")
 
+        takeover.add_option("--rw-dirs", dest="rwDirs",
+                            help="Remote absolute path of writable "
+                                 "directories for overriding defaults "
+                                 "(comma separated if multiple)")
+
         # Windows registry options
         windows = OptionGroup(parser, "Windows registry access", "These "
                                "options can be used to access the back-end "
