@@ -75,6 +75,12 @@ GOOGLE_REGEX = r"url\?\w+=((?![^>]+webcache\.googleusercontent\.com)http[^>]+)&(
 # Regular expression used for extracting results from DuckDuckGo search
 DUCKDUCKGO_REGEX = r'"u":"([^"]+)'
 
+# Regular expression used for extracting results from Disconnect Search
+DISCONNECT_SEARCH_REGEX = r'<p class="url wrapword">([^<]+)</p>'
+
+# Dummy user agent for search (if default one returns different results)
+DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0"
+
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
 
@@ -436,6 +442,9 @@ BRUTE_COLUMN_EXISTS_TEMPLATE = "EXISTS(SELECT %s FROM %s)"
 
 # Payload used for checking of existence of IDS/WAF (dummier the better)
 IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1-- ../../../etc/passwd"
+
+# Data inside shellcodeexec to be filled with random string
+SHELLCODEEXEC_RANDOM_STRING_MARKER = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Vectors used for provoking specific WAF/IDS/IPS behavior(s)
 WAF_ATTACK_VECTORS = (

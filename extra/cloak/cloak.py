@@ -24,17 +24,19 @@ def hideAscii(data):
 
     return retVal
 
-def cloak(inputFile):
-    f = open(inputFile, 'rb')
-    data = zlib.compress(f.read())
-    f.close()
+def cloak(inputFile=None, data=None):
+    if data is None:
+        with open(inputFile, "rb") as f:
+            data = f.read()
 
-    return hideAscii(data)
+    return hideAscii(zlib.compress(data))
 
-def decloak(inputFile):
-    f = open(inputFile, 'rb')
+def decloak(inputFile=None, data=None):
+    if data is None:
+        with open(inputFile, "rb") as f:
+            data = f.read()
     try:
-        data = zlib.decompress(hideAscii(f.read()))
+        data = zlib.decompress(hideAscii(data))
     except:
         print 'ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile
         sys.exit(1)

@@ -8,10 +8,13 @@ See the file 'doc/COPYING' for copying permission
 import os
 import re
 import sys
+import tempfile
 import time
 
 from subprocess import PIPE
 
+from extra.cloak.cloak import cloak
+from extra.cloak.cloak import decloak
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import getLocalIP
@@ -34,6 +37,7 @@ from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.settings import IS_WIN
 from lib.core.settings import METASPLOIT_SESSION_TIMEOUT
+from lib.core.settings import SHELLCODEEXEC_RANDOM_STRING_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
@@ -288,7 +292,7 @@ class Metasploit:
 
     def _selectRhost(self):
         if self.connectionStr.startswith("bind"):
-            message = "what is the back-end DBMS address? [%s] " % self.remoteIP
+            message = "what is the back-end DBMS address? [Enter for '%s' (detected)] " % self.remoteIP
             address = readInput(message, default=self.remoteIP)
 
             if not address:
@@ -304,7 +308,7 @@ class Metasploit:
 
     def _selectLhost(self):
         if self.connectionStr.startswith("reverse"):
-            message = "what is the local address? [%s] " % self.localIP
+            message = "what is the local address? [Enter for '%s' (detected)] " % self.localIP
             address = readInput(message, default=self.localIP)
 
             if not address:
@@ -640,6 +644,14 @@ class Metasploit:
 
         if Backend.isOs(OS.WINDOWS):
             self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "windows", "shellcodeexec.x%s.exe_" % "32")
+            content = decloak(self.shellcodeexecLocal)
+            if SHELLCODEEXEC_RANDOM_STRING_MARKER in content:
+                content = content.replace(SHELLCODEEXEC_RANDOM_STRING_MARKER, randomStr(len(SHELLCODEEXEC_RANDOM_STRING_MARKER)))
+                _ = cloak(data=content)
+                handle, self.shellcodeexecLocal = tempfile.mkstemp(suffix="%s.exe_" % "32")
+                os.close(handle)
+                with open(self.shellcodeexecLocal, "w+b") as f:
+                    f.write(_)
         else:
             self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "linux", "shellcodeexec.x%s_" % Backend.getArch())
 

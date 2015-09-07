@@ -55,10 +55,10 @@ class Filesystem:
         localFileSize = os.path.getsize(localFile)
 
         if fileRead and Backend.isDbms(DBMS.PGSQL):
-            logger.info("length of read file %s cannot be checked on PostgreSQL" % remoteFile)
+            logger.info("length of read file '%s' cannot be checked on PostgreSQL" % remoteFile)
             sameFile = True
         else:
-            logger.debug("checking the length of the remote file %s" % remoteFile)
+            logger.debug("checking the length of the remote file '%s'" % remoteFile)
             remoteFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
             sameFile = None
 
@@ -69,14 +69,14 @@ class Filesystem:
 
                 if localFileSize == remoteFileSize:
                     sameFile = True
-                    infoMsg = "the local file %s and the remote file " % localFile
-                    infoMsg += "%s have the same size (%db)" % (remoteFile, localFileSize)
+                    infoMsg = "the local file '%s' and the remote file " % localFile
+                    infoMsg += "'%s' have the same size (%d B)" % (remoteFile, localFileSize)
                 elif remoteFileSize > localFileSize:
-                    infoMsg = "the remote file %s is larger (%db) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "the local file %s (%db)" % (localFile, localFileSize)
+                    infoMsg = "the remote file '%s' is larger (%d B) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "the local file '%s' (%dB)" % (localFile, localFileSize)
                 else:
-                    infoMsg = "the remote file %s is smaller (%db) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "file %s (%db)" % (localFile, localFileSize)
+                    infoMsg = "the remote file '%s' is smaller (%d B) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "file '%s' (%d B)" % (localFile, localFileSize)
 
                 logger.info(infoMsg)
             else:
@@ -153,7 +153,7 @@ class Filesystem:
         if forceCheck is not True:
             message = "do you want confirmation that the local file '%s' " % localFile
             message += "has been successfully written on the back-end DBMS "
-            message += "file system (%s)? [Y/n] " % remoteFile
+            message += "file system ('%s')? [Y/n] " % remoteFile
             output = readInput(message, default="Y")
 
         if forceCheck or (output and output.lower() == "y"):
@@ -276,14 +276,14 @@ class Filesystem:
 
         if conf.direct or isStackingAvailable():
             if isStackingAvailable():
-                debugMsg = "going to upload the %s file with " % fileType
+                debugMsg = "going to upload the file '%s' with " % fileType
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
 
             written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
-            debugMsg = "going to upload the %s file with " % fileType
+            debugMsg = "going to upload the file '%s' with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 
