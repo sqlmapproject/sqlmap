@@ -152,8 +152,10 @@ class Task(object):
         self.options = AttribDict(self._original_options)
 
     def engine_start(self):
-        self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)],
-                             shell=False, close_fds=not IS_WIN)
+        if os.path.exists("sqlmap.py"):
+            self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
+        else:
+            self.process = Popen(["sqlmap", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
 
     def engine_stop(self):
         if self.process:
