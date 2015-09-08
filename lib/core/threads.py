@@ -10,7 +10,7 @@ import threading
 import time
 import traceback
 
-from thread import error as threadError
+from thread import error as ThreadError
 
 from lib.core.data import conf
 from lib.core.data import kb
@@ -89,9 +89,9 @@ def exceptionHandledFunction(threadFunction):
         kb.threadContinue = False
         kb.threadException = True
         raise
-    except Exception, errMsg:
+    except Exception, ex:
         # thread is just going to be silently killed
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
 def setDaemon(thread):
     # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
@@ -145,8 +145,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
             try:
                 thread.start()
-            except threadError, errMsg:
-                errMsg = "error occurred while starting new thread ('%s')" % errMsg
+            except ThreadError, ex:
+                errMsg = "error occurred while starting new thread ('%s')" % ex.message
                 logger.critical(errMsg)
                 break
 
@@ -178,10 +178,10 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if forwardException:
             raise
 
-    except (SqlmapConnectionException, SqlmapValueException), errMsg:
+    except (SqlmapConnectionException, SqlmapValueException), ex:
         print
         kb.threadException = True
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+        logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
     except:
         from lib.core.common import unhandledExceptionMessage
