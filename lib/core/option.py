@@ -638,7 +638,7 @@ def _setBulkMultipleTargets():
     for line in getFileItems(conf.bulkFile):
         if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
             found = True
-            kb.targets.add((line.strip(), None, None, None, None))
+            kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
