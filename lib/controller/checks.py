@@ -1278,8 +1278,8 @@ def checkNullConnection():
                     infoMsg = "NULL connection is supported with 'skip-read' method"
                     logger.info(infoMsg)
 
-    except SqlmapConnectionException, errMsg:
-        errMsg = getUnicode(errMsg)
+    except SqlmapConnectionException, ex:
+        errMsg = getUnicode(ex.message)
         raise SqlmapConnectionException(errMsg)
 
     finally:
@@ -1326,7 +1326,7 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-    except SqlmapConnectionException, errMsg:
+    except SqlmapConnectionException, ex:
         if conf.ipv6:
             warnMsg = "check connection to a provided "
             warnMsg += "IPv6 address with a tool like ping6 "
@@ -1336,7 +1336,7 @@ def checkConnection(suppressOutput=False):
             singleTimeWarnMessage(warnMsg)
 
         if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
-            errMsg = getUnicode(errMsg)
+            errMsg = getUnicode(ex.message)
             logger.critical(errMsg)
 
             if conf.multipleTargets:
