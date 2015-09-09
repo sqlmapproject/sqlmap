@@ -50,7 +50,7 @@ class Google(object):
             conn = self.opener.open("http://www.google.com/ncr")
             conn.info()  # retrieve session cookie
         except Exception, ex:
-            errMsg = "unable to connect to Google ('%s')" % ex
+            errMsg = "unable to connect to Google ('%s')" % ex.message
             raise SqlmapConnectionException(errMsg)
 
     def search(self, dork):

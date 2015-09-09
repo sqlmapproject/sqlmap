@@ -79,7 +79,7 @@ class BigArray(list):
                     self.chunks[-1] = pickle.load(fp)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
-                errMsg += "from a temporary file ('%s')" % ex
+                errMsg += "from a temporary file ('%s')" % ex.message
                 raise SqlmapSystemException, errMsg
         return self.chunks[-1].pop()
 
@@ -99,7 +99,7 @@ class BigArray(list):
             return filename
         except (OSError, IOError), ex:
             errMsg = "exception occurred while storing data "
-            errMsg += "to a temporary file ('%s'). Please " % ex
+            errMsg += "to a temporary file ('%s'). Please " % ex.message
             errMsg += "make sure that there is enough disk space left. If problem persists, "
             errMsg += "try to set environment variable 'TEMP' to a location "
             errMsg += "writeable by the current user"
@@ -115,7 +115,7 @@ class BigArray(list):
                     self.cache = Cache(index, pickle.load(fp), False)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
-                errMsg += "from a temporary file ('%s')" % ex
+                errMsg += "from a temporary file ('%s')" % ex.message
                 raise SqlmapSystemException, errMsg
 
     def __getstate__(self):

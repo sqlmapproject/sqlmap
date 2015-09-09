@@ -3008,7 +3008,7 @@ def createGithubIssue(errMsg, excMsg):
         else:
             warnMsg = "something went wrong while creating a Github issue"
             if ex:
-                warnMsg += " ('%s')" % ex
+                warnMsg += " ('%s')" % ex.message
             if "Unauthorized" in warnMsg:
                 warnMsg += ". Please update to the latest revision"
             logger.warn(warnMsg)
@@ -3567,7 +3567,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 request = form.click()
             except (ValueError, TypeError), ex:
                 errMsg = "there has been a problem while "
-                errMsg += "processing page forms ('%s')" % ex
+                errMsg += "processing page forms ('%s')" % ex.message
                 if raise_:
                     raise SqlmapGenericException(errMsg)
                 else:
