@@ -805,7 +805,7 @@ class Databases:
 
         elif "." in conf.tbl:
             if not conf.db:
-                conf.db, conf.tbl = conf.tbl.split(".")
+                conf.db, conf.tbl = conf.tbl.split('.', 1)
 
         if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
             warnMsg = "missing database parameter. sqlmap is going to "
