@@ -12,6 +12,8 @@ import sqlite3
 import sys
 import tempfile
 import time
+import urllib2
+from pprint import pformat
 
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
@@ -31,6 +33,7 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import IS_WIN
 from lib.core.subprocessng import Popen
+from lib.parse.cmdline import cmdLineParser
 from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
 from thirdparty.bottle.bottle import hook
@@ -640,18 +643,72 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     run(host=host, port=port, quiet=True, debug=False)
 
 
+def _cpost(url, data=None):
+    logger.debug("Calling " + url)
+    try:
+        if data is not None:
+            data = jsonize(data)
+        req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+        response = urllib2.urlopen(req)
+        text = dejsonize(response.read())
+    except:
+        logger.error("Failed to load and parse " + url)
+        raise
+    return text
+
+
 def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API client
     """
+    help_message = ("Available commands:\nhelp\nnew: start a new scan\n"
+                    "use TASKID: run task commands for this task\n"
+                    "data, log, status: task commands\nexit")
     addr = "http://%s:%d" % (host, port)
     logger.info("Starting REST-JSON API client to '%s'..." % addr)
+    logger.info(help_message)
 
-    # TODO: write a simple client with requests, for now use curl from command line
-    logger.error("Not yet implemented, use curl from command line instead for now, for example:")
-    print "\n\t$ taskid=$(curl http://%s:%d/task/new 2>1 | grep -o -I '[a-f0-9]\{16\}') && echo $taskid" % (host, port)
-    print ("\t$ curl -H \"Content-Type: application/json\" "
-           "-X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' "
-           "http://%s:%d/scan/$taskid/start") % (host, port)
-    print "\t$ curl http://%s:%d/scan/$taskid/data" % (host, port)
-    print "\t$ curl http://%s:%d/scan/$taskid/log\n" % (host, port)
+    taskid = ''
+    while True:
+        command = raw_input('>>> ').strip()
+        if command in ('data', 'log', 'status'):
+            if taskid == '':
+                logger.error("No task id in use")
+                continue
+            res = _cpost(addr + '/scan/' + taskid + '/' + command)
+            if not res['success']:
+                logger.error("Failed to execute command " + command)
+            logger.info(pformat(res, width=1))
+        elif command == 'new':
+            command = raw_input('Give sqlmap parameters e.g.: -u http://testphp.vulnweb.com/artists.php?artist=1 -o\n>>> ').strip()
+            # new task
+            res = _cpost(addr + '/task/new')
+            if not res['success']:
+                logger.error("Failed to create task")
+                continue
+            taskid = res['taskid']
+            logger.info('Task ID is ' + taskid)
+
+            # start scan
+            original_argv = sys.argv
+            sys.argv = [sys.argv[0]] + command.split()
+            try:
+                d = cmdLineParser().__dict__
+            except:
+                continue
+            d = {k: v for k, v in d.iteritems() if v is not None}
+            sys.argv = original_argv
+            res = _cpost(addr + '/scan/' + taskid + '/start', d)
+            if not res['success']:
+                logger.error("Failed to start scan")
+                continue
+            logger.info("Scanning started")
+        elif command[0:3] == 'use':
+            taskid = command.split()[1].strip()
+            logger.info("Task ID is now " + taskid)
+        elif command in ('exit', 'bye', 'quit'):
+            return
+        elif command in ('help', '?'):
+            logger.info(help_message)
+        else:
+            logger.error("Unknown command")
