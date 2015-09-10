@@ -647,16 +647,17 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     run(host=host, port=port, quiet=True, debug=False)
 
 
-def _client(url, data=None):
+def _client(url, options=None):
     logger.debug("Calling " + url)
     try:
-        if data is not None:
-            data = jsonize(data)
+        data = None
+        if options is not None:
+            data = jsonize(options)
         req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
         response = urllib2.urlopen(req)
         text = response.read()
     except:
-        if data:
+        if options:
             logger.error("Failed to load and parse " + url)
         raise
     return text
@@ -707,12 +708,12 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             argv = ["sqlmap.py"] + shlex.split(command)[1:]
 
             try:
-                d = cmdLineParser(argv).__dict__
+                cmdLineOptions = cmdLineParser(argv).__dict__
             except:
                 taskid = None
                 continue
 
-            d = { k: v for k, v in d.iteritems() if v is not None }
+            cmdLineOptions = { k: v for k, v in cmdLineOptions.iteritems() if v is not None }
 
             raw = _client(addr + "/task/new")
             res = dejsonize(raw)
@@ -722,7 +723,7 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             taskid = res["taskid"]
             logger.info("New task ID is '%s'" % taskid)
 
-            raw = _client(addr + "/scan/" + taskid + "/start", d)
+            raw = _client(addr + "/scan/" + taskid + "/start", cmdLineOptions)
             res = dejsonize(raw)
             if not res["success"]:
                 logger.error("Failed to start scan")
