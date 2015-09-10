@@ -36,14 +36,17 @@ from lib.core.shell import clearHistory
 from lib.core.shell import loadHistory
 from lib.core.shell import saveHistory
 
-def cmdLineParser():
+def cmdLineParser(argv=None):
     """
     This function parses the command line parameters and arguments
     """
 
+    if not argv:
+        argv = sys.argv
+
     checkSystemEncoding()
 
-    _ = getUnicode(os.path.basename(sys.argv[0]), encoding=sys.getfilesystemencoding())
+    _ = getUnicode(os.path.basename(argv[0]), encoding=sys.getfilesystemencoding())
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % _ if " " in _ else _)
@@ -802,14 +805,15 @@ def cmdLineParser():
         option = parser.get_option("-h")
         option.help = option.help.capitalize().replace("this help", "basic help")
 
-        argv = []
+        _ = []
         prompt = False
         advancedHelp = True
         extraHeaders = []
 
-        for arg in sys.argv:
-            argv.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
+        for arg in argv:
+            _.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
 
+        argv = _
         checkDeprecatedOptions(argv)
 
         prompt = "--sqlmap-shell" in argv

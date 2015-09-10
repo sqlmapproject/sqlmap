@@ -8,13 +8,15 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import os
+import re
+import shlex
 import sqlite3
 import sys
 import tempfile
 import time
 import urllib2
-from pprint import pformat
 
+from lib.core.common import dataToStdout
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
 from lib.core.convert import hexencode
@@ -645,16 +647,17 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     run(host=host, port=port, quiet=True, debug=False)
 
 
-def _cpost(url, data=None):
+def _client(url, data=None):
     logger.debug("Calling " + url)
     try:
         if data is not None:
             data = jsonize(data)
         req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
         response = urllib2.urlopen(req)
-        text = dejsonize(response.read())
+        text = response.read()
     except:
-        logger.error("Failed to load and parse " + url)
+        if data:
+            logger.error("Failed to load and parse " + url)
         raise
     return text
 
@@ -663,54 +666,94 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
     """
     REST-JSON API client
     """
-    help_message = ("Available commands:\nhelp\nnew: start a new scan\n"
-                    "use TASKID: run task commands for this task\n"
-                    "data, log, status: task commands\nexit")
     addr = "http://%s:%d" % (host, port)
     logger.info("Starting REST-JSON API client to '%s'..." % addr)
-    logger.info(help_message)
 
-    taskid = ''
+    try:
+        _client(addr)
+    except Exception, ex:
+        if not isinstance(ex, urllib2.HTTPError):
+            errMsg = "there has been a problem while connecting to the "
+            errMsg += "REST-JSON API server at '%s' " % addr
+            errMsg += "(%s)" % ex
+            logger.critical(errMsg)
+            return
+
+    taskid = None
+    logger.info("Type 'help' or '?' for list of available commands")
+
     while True:
-        command = raw_input('>>> ').strip()
-        if command in ('data', 'log', 'status'):
-            if taskid == '':
-                logger.error("No task id in use")
-                continue
-            res = _cpost(addr + '/scan/' + taskid + '/' + command)
-            if not res['success']:
-                logger.error("Failed to execute command " + command)
-            logger.info(pformat(res, width=1))
-        elif command == 'new':
-            command = raw_input('Give sqlmap parameters e.g.: -u http://testphp.vulnweb.com/artists.php?artist=1 -o\n>>> ').strip()
-            # new task
-            res = _cpost(addr + '/task/new')
-            if not res['success']:
-                logger.error("Failed to create task")
-                continue
-            taskid = res['taskid']
-            logger.info('Task ID is ' + taskid)
+        try:
+            command = raw_input("api%s> " % (" (%s)" % taskid if taskid else "")).strip()
+        except (EOFError, KeyboardInterrupt):
+            print
+            break
 
-            # start scan
-            original_argv = sys.argv
-            sys.argv = [sys.argv[0]] + command.split()
-            try:
-                d = cmdLineParser().__dict__
-            except:
+        if command.lower() in ("data", "log", "status"):
+            if not taskid:
+                logger.error("No task ID in use")
                 continue
-            d = {k: v for k, v in d.iteritems() if v is not None}
-            sys.argv = original_argv
-            res = _cpost(addr + '/scan/' + taskid + '/start', d)
-            if not res['success']:
+            raw = _client(addr + "/scan/" + taskid + "/" + command)
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to execute command " + command)
+            dataToStdout("%s\n" % raw)
+
+        elif command.lower().startswith("new"):
+            if ' ' not in command:
+                logger.error("Program arguments are missing")
+                continue
+
+            argv = ["sqlmap.py"] + shlex.split(command)[1:]
+
+            try:
+                d = cmdLineParser(argv).__dict__
+            except:
+                taskid = None
+                continue
+
+            d = { k: v for k, v in d.iteritems() if v is not None }
+
+            raw = _client(addr + "/task/new")
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to create new task")
+                continue
+            taskid = res["taskid"]
+            logger.info("New task ID is '%s'" % taskid)
+
+            raw = _client(addr + "/scan/" + taskid + "/start", d)
+            res = dejsonize(raw)
+            if not res["success"]:
                 logger.error("Failed to start scan")
                 continue
             logger.info("Scanning started")
-        elif command[0:3] == 'use':
-            taskid = command.split()[1].strip()
-            logger.info("Task ID is now " + taskid)
-        elif command in ('exit', 'bye', 'quit'):
+
+        elif command.lower().startswith("use"):
+            taskid = (command.split()[1] if ' ' in command else "").strip("'\"")
+            if not taskid:
+                logger.error("Task ID is missing")
+                taskid = None
+                continue
+            elif not re.search(r"\A[0-9a-fA-F]{16}\Z", taskid):
+                logger.error("Invalid task ID '%s'" % taskid)
+                taskid = None
+                continue
+            logger.info("Switching to task ID '%s' " % taskid)
+
+        elif command.lower() in ("exit", "bye", "quit", 'q'):
             return
-        elif command in ('help', '?'):
-            logger.info(help_message)
-        else:
-            logger.error("Unknown command")
+
+        elif command.lower() in ("help", "?"):
+            msg =  "help        Show this help message\n"
+            msg += "new ARGS    Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "use TASKID  Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
+            msg += "data        Retrieve and show data for current task\n"
+            msg += "log         Retrieve and show log for current task\n"
+            msg += "status      Retrieve and show status for current task\n"
+            msg += "exit        Exit this client\n"
+
+            dataToStdout(msg)
+
+        elif command:
+            logger.error("Unknown command '%s'" % command)
