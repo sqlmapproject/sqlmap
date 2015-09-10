@@ -554,7 +554,7 @@ def scan_log_limited(taskid, start, end):
     json_log_messages = list()
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_log_limited()")
+        logger.warning("[%s] Invalid task ID provided to scan_log_limited()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     if not start.isdigit() or not end.isdigit() or end < start:
@@ -583,7 +583,7 @@ def scan_log(taskid):
     json_log_messages = list()
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_log()")
+        logger.warning("[%s] Invalid task ID provided to scan_log()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all log messages from the IPC database
