@@ -909,14 +909,15 @@ def readInput(message, default=None, checkBatch=True):
             answer = item.split('=')[1] if len(item.split('=')) > 1 else None
             if answer and question.lower() in message.lower():
                 retVal = getUnicode(answer, UNICODE_ENCODING)
+            elif answer is None and retVal:
+                retVal = "%s,%s" % (retVal, getUnicode(item, UNICODE_ENCODING))
 
-                infoMsg = "%s%s" % (message, retVal)
-                logger.info(infoMsg)
+    if retVal:
+        infoMsg = "%s%s" % (message, retVal)
+        logger.info(infoMsg)
 
-                debugMsg = "used the given answer"
-                logger.debug(debugMsg)
-
-                break
+        debugMsg = "used the given answer"
+        logger.debug(debugMsg)
 
     if retVal is None:
         if checkBatch and conf.get("batch"):
