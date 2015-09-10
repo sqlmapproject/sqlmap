@@ -34,6 +34,7 @@ from lib.core.common import boldifyMessage
 from lib.core.common import checkFile
 from lib.core.common import dataToStdout
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
 from lib.core.common import findPageForms

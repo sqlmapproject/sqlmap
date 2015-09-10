@@ -25,7 +25,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
-from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import intersect
