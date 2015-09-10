@@ -40,6 +40,7 @@ from lib.core.common import getCurrentThreadData
 from lib.core.common import getHeader
 from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import pushValue
@@ -497,22 +498,22 @@ class Connect(object):
                     if hasattr(conn.fp, '_sock'):
                         conn.fp._sock.close()
                     conn.close()
-                except Exception, msg:
-                    warnMsg = "problem occurred during connection closing ('%s')" % msg
+                except Exception, ex:
+                    warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
                     logger.warn(warnMsg)
 
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError, ex:
             page = None
             responseHeaders = None
 
             try:
-                page = e.read() if not skipRead else None
-                responseHeaders = e.info()
-                responseHeaders[URI_HTTP_HEADER] = e.geturl()
+                page = ex.read() if not skipRead else None
+                responseHeaders = ex.info()
+                responseHeaders[URI_HTTP_HEADER] = ex.geturl()
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % e.code
+                warnMsg += "to get error page information (%d)" % ex.code
                 logger.warn(warnMsg)
                 return None, None, None
             except KeyboardInterrupt:
@@ -522,13 +523,13 @@ class Connect(object):
             finally:
                 page = page if isinstance(page, unicode) else getUnicode(page)
 
-            code = e.code
+            code = ex.code
 
             kb.originalCode = kb.originalCode or code
             threadData.lastHTTPError = (threadData.lastRequestUID, code)
             kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
 
-            status = getUnicode(e.msg)
+            status = getUnicode(ex.msg)
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
@@ -545,11 +546,11 @@ class Connect(object):
 
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
-            if e.code == httplib.UNAUTHORIZED and not conf.ignore401:
+            if ex.code == httplib.UNAUTHORIZED and not conf.ignore401:
                 errMsg = "not authorized, try to provide right HTTP "
                 errMsg += "authentication type and valid credentials (%d)" % code
                 raise SqlmapConnectionException(errMsg)
-            elif e.code == httplib.NOT_FOUND:
+            elif ex.code == httplib.NOT_FOUND:
                 if raise404:
                     errMsg = "page not found (%d)" % code
                     raise SqlmapConnectionException(errMsg)
@@ -557,11 +558,11 @@ class Connect(object):
                     debugMsg = "page not found (%d)" % code
                     singleTimeLogMessage(debugMsg, logging.DEBUG)
                     processResponse(page, responseHeaders)
-            elif e.code == httplib.GATEWAY_TIMEOUT:
+            elif ex.code == httplib.GATEWAY_TIMEOUT:
                 if ignoreTimeout:
                     return None, None, None
                 else:
-                    warnMsg = "unable to connect to the target URL (%d - %s)" % (e.code, httplib.responses[e.code])
+                    warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, httplib.responses[ex.code])
                     if threadData.retriesCount < conf.retries and not kb.threadException:
                         warnMsg += ". sqlmap is going to retry the request"
                         logger.critical(warnMsg)
@@ -575,7 +576,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, ProxyError, SqlmapCompressionException, WebSocketException), e:
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, ProxyError, SqlmapCompressionException, WebSocketException):
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
@@ -718,7 +719,7 @@ class Connect(object):
                         payload = function(payload=payload, headers=auxHeaders)
                     except Exception, ex:
                         errMsg = "error occurred while running tamper "
-                        errMsg += "function '%s' ('%s')" % (function.func_name, ex)
+                        errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
                         raise SqlmapGenericException(errMsg)
 
                     if not isinstance(payload, basestring):

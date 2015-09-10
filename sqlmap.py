@@ -25,6 +25,7 @@ from lib.controller.controller import start
 from lib.core.common import banner
 from lib.core.common import createGithubIssue
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import maskSensitiveData
 from lib.core.common import setPaths
@@ -119,7 +120,7 @@ def main():
         cmdLineOptions.sqlmapShell = False
 
     except SqlmapBaseException as ex:
-        errMsg = getUnicode(ex.message)
+        errMsg = getSafeExString(ex)
         logger.critical(errMsg)
         sys.exit(1)
 

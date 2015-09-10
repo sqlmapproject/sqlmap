@@ -12,6 +12,7 @@ import socket
 import urllib
 import urllib2
 
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import readInput
 from lib.core.common import urlencode
@@ -50,7 +51,7 @@ class Google(object):
             conn = self.opener.open("http://www.google.com/ncr")
             conn.info()  # retrieve session cookie
         except Exception, ex:
-            errMsg = "unable to connect to Google ('%s')" % ex.message
+            errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
             raise SqlmapConnectionException(errMsg)
 
     def search(self, dork):

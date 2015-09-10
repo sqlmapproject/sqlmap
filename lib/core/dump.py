@@ -15,6 +15,7 @@ import threading
 from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import isListLike
 from lib.core.common import normalizeUnicode
@@ -74,7 +75,7 @@ class Dump(object):
         try:
             self._outputFP.write(text)
         except IOError, ex:
-            errMsg = "error occurred while writing to log file ('%s')" % ex.message
+            errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
         if kb.get("multiThreadMode"):
@@ -94,7 +95,7 @@ class Dump(object):
         try:
             self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
         except IOError, ex:
-            errMsg = "error occurred while opening log file ('%s')" % ex.message
+            errMsg = "error occurred while opening log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
     def getOutputFile(self):

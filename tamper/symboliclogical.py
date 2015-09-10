@@ -19,7 +19,7 @@ def tamper(payload, **kwargs):
     Replaces AND and OR logical operators with their symbolic counterparts (&& and ||)
 
     >>> tamper("1 AND '1'='1")
-    '1 && '1'='1'
+    "1 %26%26 '1'='1"
     """
 
     retVal = payload

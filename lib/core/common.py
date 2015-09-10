@@ -879,7 +879,7 @@ def dataToOutFile(filename, data):
                 f.write(data)
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
-            errMsg += "to the output file ('%s')" % ex.message
+            errMsg += "to the output file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
     return retVal
@@ -3008,7 +3008,7 @@ def createGithubIssue(errMsg, excMsg):
         else:
             warnMsg = "something went wrong while creating a Github issue"
             if ex:
-                warnMsg += " ('%s')" % ex.message
+                warnMsg += " ('%s')" % getSafeExString(ex)
             if "Unauthorized" in warnMsg:
                 warnMsg += ". Please update to the latest revision"
             logger.warn(warnMsg)
@@ -3567,7 +3567,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 request = form.click()
             except (ValueError, TypeError), ex:
                 errMsg = "there has been a problem while "
-                errMsg += "processing page forms ('%s')" % ex.message
+                errMsg += "processing page forms ('%s')" % getSafeExString(ex)
                 if raise_:
                     raise SqlmapGenericException(errMsg)
                 else:
@@ -3670,7 +3670,7 @@ def evaluateCode(code, variables=None):
     except KeyboardInterrupt:
         raise
     except Exception, ex:
-        errMsg = "an error occurred while evaluating provided code ('%s') " % ex.message
+        errMsg = "an error occurred while evaluating provided code ('%s') " % getSafeExString(ex)
         raise SqlmapGenericException(errMsg)
 
 def serializeObject(object_):
@@ -3977,3 +3977,18 @@ def pollProcess(process, suppress_errors=False):
                     dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
 
             break
+
+def getSafeExString(ex):
+    """
+    Safe way how to get the proper exception represtation as a string
+    (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
+    """
+
+    retVal = ex
+
+    if getattr(ex, "message", None):
+        retVal = ex.message
+    elif getattr(ex, "msg", None):
+        retVal = ex.msg
+
+    return getUnicode(retVal)

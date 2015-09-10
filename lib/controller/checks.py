@@ -22,6 +22,7 @@ from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getLastRequestHTTPError
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import intersect
@@ -1279,7 +1280,7 @@ def checkNullConnection():
                     logger.info(infoMsg)
 
     except SqlmapConnectionException, ex:
-        errMsg = getUnicode(ex.message)
+        errMsg = getSafeExString(ex)
         raise SqlmapConnectionException(errMsg)
 
     finally:
@@ -1298,7 +1299,7 @@ def checkConnection(suppressOutput=False):
             raise SqlmapConnectionException(errMsg)
         except socket.error, ex:
             errMsg = "problem occurred while "
-            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, ex.message)
+            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput and not conf.dummy and not conf.offline:
@@ -1336,7 +1337,7 @@ def checkConnection(suppressOutput=False):
             singleTimeWarnMessage(warnMsg)
 
         if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
-            errMsg = getUnicode(ex.message)
+            errMsg = getSafeExString(ex)
             logger.critical(errMsg)
 
             if conf.multipleTargets:

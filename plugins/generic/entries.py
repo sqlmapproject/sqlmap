@@ -12,6 +12,7 @@ from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
 from lib.core.common import getLimitRange
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isListLike
@@ -341,13 +342,13 @@ class Entries:
                         attackDumpedTable()
                     except (IOError, OSError), ex:
                         errMsg = "an error occurred while attacking "
-                        errMsg += "table dump ('%s')" % ex.message
+                        errMsg += "table dump ('%s')" % getSafeExString(ex)
                         logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
             except SqlmapConnectionException, ex:
                 errMsg = "connection exception detected in dumping phase "
-                errMsg += "('%s')" % ex.message
+                errMsg += "('%s')" % getSafeExString(ex)
                 logger.critical(errMsg)
 
             finally:

@@ -11,6 +11,7 @@ import sqlite3
 import threading
 import time
 
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import unserializeObject
@@ -77,7 +78,7 @@ class HashDB(object):
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not "locked" in ex.message:
+                        if not "locked" in getSafeExString(ex):
                             raise
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, ex)
@@ -127,7 +128,7 @@ class HashDB(object):
 
                         if retries == 0:
                             warnMsg = "there has been a problem while writing to "
-                            warnMsg += "the session file ('%s')" % ex.message
+                            warnMsg += "the session file ('%s')" % getSafeExString(ex)
                             logger.warn(warnMsg)
 
                         if retries >= HASHDB_FLUSH_RETRIES:

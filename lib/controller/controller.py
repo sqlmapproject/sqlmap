@@ -24,6 +24,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -648,7 +649,7 @@ def start():
             raise
 
         except SqlmapBaseException, ex:
-            errMsg = getUnicode(ex.message)
+            errMsg = getSafeExString(ex)
 
             if conf.multipleTargets:
                 errMsg += ", skipping to the next %s" % ("form" if conf.forms else "URL")

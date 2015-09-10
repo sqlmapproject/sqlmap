@@ -17,6 +17,7 @@ import time
 import urllib2
 
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import unArrayizeValue
 from lib.core.convert import base64pickle
 from lib.core.convert import hexencode
@@ -87,7 +88,7 @@ class Database(object):
                 else:
                     self.cursor.execute(statement)
             except sqlite3.OperationalError, ex:
-                if not "locked" in ex.message:
+                if not "locked" in getSafeExString(ex):
                     raise
             else:
                 break
