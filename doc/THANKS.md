@@ -173,6 +173,9 @@ Ivan Giacomelli, <truemilk(at)insiberia.net>
 * for suggesting a minor enhancement
 * for reviewing the documentation
 
+Dimitris Giannitsaros, <daremon(at)gmail.com>
+* for contributing a REST-JSON API client
+
 Nico Golde, <nico(at)ngolde.de>
 * for reporting a couple of bugs
 
