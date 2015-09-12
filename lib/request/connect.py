@@ -5,6 +5,7 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import binascii
 import compiler
 import httplib
 import json
@@ -576,7 +577,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, ProxyError, SqlmapCompressionException, WebSocketException):
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException):
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
