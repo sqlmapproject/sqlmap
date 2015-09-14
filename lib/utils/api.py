@@ -368,18 +368,19 @@ def task_delete(taskid):
 ###################
 
 
+@get("/admin/list")
 @get("/admin/<taskid>/list")
-def task_list(taskid):
+def task_list(taskid=None):
     """
     List task pull
     """
-    if is_admin(taskid):
-        logger.debug("[%s] Listed task pool" % taskid)
+    logger.debug("[%s] Listed task pool")
+    if taskid is not None:
         tasks = list(DataStore.tasks)
-        return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
     else:
-        logger.warning("[%s] Unauthorized call to task_list()" % taskid)
-        return jsonize({"success": False, "message": "Unauthorized"})
+        tasks = {x: dejsonize(scan_status(x))['status']
+                 for x in list(DataStore.tasks)}
+    return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
 
 
 @get("/admin/<taskid>/flush")
@@ -475,7 +476,9 @@ def scan_stop(taskid):
     """
     Stop a scan
     """
-    if taskid not in DataStore.tasks:
+    if (taskid not in DataStore.tasks or
+            DataStore.tasks[taskid].engine_process() is None or
+            DataStore.tasks[taskid].engine_has_terminated()):
         logger.warning("[%s] Invalid task ID provided to scan_stop()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
@@ -490,7 +493,9 @@ def scan_kill(taskid):
     """
     Kill a scan
     """
-    if taskid not in DataStore.tasks:
+    if (taskid not in DataStore.tasks or
+            DataStore.tasks[taskid].engine_process() is None or
+            DataStore.tasks[taskid].engine_has_terminated()):
         logger.warning("[%s] Invalid task ID provided to scan_kill()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
@@ -691,7 +696,7 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             print
             break
 
-        if command.lower() in ("data", "log", "status"):
+        if command.lower() in ("data", "log", "status", "stop", "kill"):
             if not taskid:
                 logger.error("No task ID in use")
                 continue
@@ -743,6 +748,13 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
                 continue
             logger.info("Switching to task ID '%s' " % taskid)
 
+        elif command.lower() == "list":
+            raw = _client(addr + "/admin/list")
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to execute command " + command)
+            dataToStdout("%s\n" % raw)
+
         elif command.lower() in ("exit", "bye", "quit", 'q'):
             return
 
@@ -753,6 +765,9 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             msg += "data        Retrieve and show data for current task\n"
             msg += "log         Retrieve and show log for current task\n"
             msg += "status      Retrieve and show status for current task\n"
+            msg += "stop        Stop current task\n"
+            msg += "kill        Kill current task\n"
+            msg += "list        Display all tasks\n"
             msg += "exit        Exit this client\n"
 
             dataToStdout(msg)
