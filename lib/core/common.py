@@ -3979,7 +3979,7 @@ def pollProcess(process, suppress_errors=False):
 
             break
 
-def getSafeExString(ex):
+def getSafeExString(ex, encoding=None):
     """
     Safe way how to get the proper exception represtation as a string
     (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
@@ -3992,4 +3992,4 @@ def getSafeExString(ex):
     elif getattr(ex, "msg", None):
         retVal = ex.msg
 
-    return getUnicode(retVal)
+    return getUnicode(retVal, encoding=encoding)
