@@ -721,7 +721,9 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
                 taskid = None
                 continue
 
-            cmdLineOptions = { k: v for k, v in cmdLineOptions.iteritems() if v is not None }
+            for key in list(cmdLineOptions):
+                if cmdLineOptions[key] is None:
+                    del cmdLineOptions[key]
 
             raw = _client(addr + "/task/new")
             res = dejsonize(raw)
