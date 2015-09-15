@@ -116,7 +116,8 @@ class Database(object):
 
 
 class Task(object):
-    def __init__(self, taskid):
+    def __init__(self, taskid, remote_addr):
+        self.remote_addr = remote_addr
         self.process = None
         self.output_directory = None
         self.options = None
@@ -343,7 +344,9 @@ def task_new():
     Create new task ID
     """
     taskid = hexencode(os.urandom(8))
-    DataStore.tasks[taskid] = Task(taskid)
+    remote_addr = request.remote_addr
+
+    DataStore.tasks[taskid] = Task(taskid, remote_addr)
 
     logger.debug("Created new task: '%s'" % taskid)
     return jsonize({"success": True, "taskid": taskid})
@@ -368,20 +371,22 @@ def task_delete(taskid):
 ###################
 
 
-@get("/admin/list")
 @get("/admin/<taskid>/list")
 def task_list(taskid=None):
     """
     List task pull
     """
-    logger.debug("[%s] Listed task pool")
-    if taskid is not None:
+    if is_admin(taskid):
         tasks = list(DataStore.tasks)
     else:
-        tasks = {x: dejsonize(scan_status(x))['status']
-                 for x in list(DataStore.tasks)}
+        tasks = []
+        for key in DataStore.tasks:
+            if DataStore.tasks[key].remote_addr == request.remote_addr:
+                tasks.append(key)
+    tasks = {x: dejsonize(scan_status(x))['status']
+             for x in list(DataStore.tasks)}
+    logger.debug("[%s] Listed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
     return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
-
 
 @get("/admin/<taskid>/flush")
 def task_flush(taskid):
@@ -390,11 +395,13 @@ def task_flush(taskid):
     """
     if is_admin(taskid):
         DataStore.tasks = dict()
-        logger.debug("[%s] Flushed task pool" % taskid)
-        return jsonize({"success": True})
     else:
-        logger.warning("[%s] Unauthorized call to task_flush()" % taskid)
-        return jsonize({"success": False, "message": "Unauthorized"})
+        for key in list(DataStore.tasks):
+            if DataStore.tasks[key].remote_addr == request.remote_addr:
+                del DataStore.tasks[key]
+
+    logger.debug("[%s] Flushed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
+    return jsonize({"success": True})
 
 ##################################
 # sqlmap core interact functions #
@@ -719,7 +726,9 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
                 taskid = None
                 continue
 
-            cmdLineOptions = { k: v for k, v in cmdLineOptions.iteritems() if v is not None }
+            for key in list(cmdLineOptions):
+                if cmdLineOptions[key] is None:
+                    del cmdLineOptions[key]
 
             raw = _client(addr + "/task/new")
             res = dejsonize(raw)
@@ -749,7 +758,7 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             logger.info("Switching to task ID '%s' " % taskid)
 
         elif command.lower() == "list":
-            raw = _client(addr + "/admin/list")
+            raw = _client(addr + "/admin/0/list")
             res = dejsonize(raw)
             if not res["success"]:
                 logger.error("Failed to execute command " + command)
