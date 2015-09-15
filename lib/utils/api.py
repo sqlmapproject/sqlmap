@@ -116,7 +116,8 @@ class Database(object):
 
 
 class Task(object):
-    def __init__(self, taskid):
+    def __init__(self, taskid, remote_addr):
+        self.remote_addr = remote_addr
         self.process = None
         self.output_directory = None
         self.options = None
@@ -343,7 +344,9 @@ def task_new():
     Create new task ID
     """
     taskid = hexencode(os.urandom(8))
-    DataStore.tasks[taskid] = Task(taskid)
+    remote_addr = request.remote_addr
+
+    DataStore.tasks[taskid] = Task(taskid, remote_addr)
 
     logger.debug("Created new task: '%s'" % taskid)
     return jsonize({"success": True, "taskid": taskid})
@@ -374,13 +377,15 @@ def task_list(taskid):
     List task pull
     """
     if is_admin(taskid):
-        logger.debug("[%s] Listed task pool" % taskid)
         tasks = list(DataStore.tasks)
-        return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
     else:
-        logger.warning("[%s] Unauthorized call to task_list()" % taskid)
-        return jsonize({"success": False, "message": "Unauthorized"})
+        tasks = []
+        for key in DataStore.tasks:
+            if DataStore.tasks[key].remote_addr == request.remote_addr:
+                tasks.append(key)
 
+    logger.debug("[%s] Listed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
+    return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
 
 @get("/admin/<taskid>/flush")
 def task_flush(taskid):
@@ -389,11 +394,13 @@ def task_flush(taskid):
     """
     if is_admin(taskid):
         DataStore.tasks = dict()
-        logger.debug("[%s] Flushed task pool" % taskid)
-        return jsonize({"success": True})
     else:
-        logger.warning("[%s] Unauthorized call to task_flush()" % taskid)
-        return jsonize({"success": False, "message": "Unauthorized"})
+        for key in list(DataStore.tasks):
+            if DataStore.tasks[key].remote_addr == request.remote_addr:
+                del DataStore.tasks[key]
+
+    logger.debug("[%s] Flushed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
+    return jsonize({"success": True})
 
 ##################################
 # sqlmap core interact functions #
