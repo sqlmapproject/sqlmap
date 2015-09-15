@@ -630,7 +630,7 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
-            if not isinstance(page, unicode):
+            if isinstance(page, basestring) and not isinstance(page, unicode):
                 if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
                     page = unicode(page, errors="ignore")
                 else:
