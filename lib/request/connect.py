@@ -891,7 +891,7 @@ class Connect(object):
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
-            variables = {"uri": uri, "lastPage": threadData.lastPage}
+            variables = {"uri": uri, "lastPage": threadData.lastPage, "_locals": locals()}
             originals = {}
             keywords = keyword.kwlist
 
