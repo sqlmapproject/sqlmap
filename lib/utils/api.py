@@ -661,7 +661,7 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
 
 
 def _client(url, options=None):
-    logger.debug("Calling " + url)
+    logger.debug("Calling %s" % url)
     try:
         data = None
         if options is not None:
@@ -671,7 +671,7 @@ def _client(url, options=None):
         text = response.read()
     except:
         if options:
-            logger.error("Failed to load and parse " + url)
+            logger.error("Failed to load and parse %s" % url)
         raise
     return text
 
@@ -707,10 +707,10 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             if not taskid:
                 logger.error("No task ID in use")
                 continue
-            raw = _client(addr + "/scan/" + taskid + "/" + command)
+            raw = _client("%s/scan/%s/%s" % (addr, taskid, command))
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to execute command " + command)
+                logger.error("Failed to execute command %s" % command)
             dataToStdout("%s\n" % raw)
 
         elif command.startswith("new"):
@@ -730,7 +730,7 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
                 if cmdLineOptions[key] is None:
                     del cmdLineOptions[key]
 
-            raw = _client(addr + "/task/new")
+            raw = _client("%s/task/new" % addr)
             res = dejsonize(raw)
             if not res["success"]:
                 logger.error("Failed to create new task")
@@ -738,7 +738,7 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             taskid = res["taskid"]
             logger.info("New task ID is '%s'" % taskid)
 
-            raw = _client(addr + "/scan/" + taskid + "/start", cmdLineOptions)
+            raw = _client("%s/scan/%s/start" % (addr, taskid), cmdLineOptions)
             res = dejsonize(raw)
             if not res["success"]:
                 logger.error("Failed to start scan")
@@ -758,10 +758,12 @@ def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
             logger.info("Switching to task ID '%s' " % taskid)
 
         elif command in ("list", "flush"):
-            raw = _client(addr + "/admin/0/" + command)
+            raw = _client("%s/admin/%s/%s" % (addr, taskid or 0, command))
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to execute command " + command)
+                logger.error("Failed to execute command %s" % command)
+            elif command == "flush":
+                taskid = None
             dataToStdout("%s\n" % raw)
 
         elif command in ("exit", "bye", "quit", 'q'):
