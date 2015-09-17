@@ -1053,9 +1053,9 @@ class Connect(object):
                 _, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, raise404=raise404, skipRead=(kb.nullConnection == NULLCONNECTION.SKIP_READ))
 
                 if headers:
-                    if kb.nullConnection in (NULLCONNECTION.HEAD, NULLCONNECTION.SKIP_READ) and HTTP_HEADER.CONTENT_LENGTH in headers:
+                    if kb.nullConnection in (NULLCONNECTION.HEAD, NULLCONNECTION.SKIP_READ) and headers.get(HTTP_HEADER.CONTENT_LENGTH):
                         pageLength = int(headers[HTTP_HEADER.CONTENT_LENGTH])
-                    elif kb.nullConnection == NULLCONNECTION.RANGE and HTTP_HEADER.CONTENT_RANGE in headers:
+                    elif kb.nullConnection == NULLCONNECTION.RANGE and headers.get(HTTP_HEADER.CONTENT_RANGE):
                         pageLength = int(headers[HTTP_HEADER.CONTENT_RANGE][headers[HTTP_HEADER.CONTENT_RANGE].find('/') + 1:])
             finally:
                 kb.pageCompress = popValue()
