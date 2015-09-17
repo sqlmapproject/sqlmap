@@ -3871,13 +3871,18 @@ def decloakToTemp(filename):
     """
 
     content = decloak(filename)
-    _ = os.path.split(filename[:-1])[-1]
+
+    _ = utf8encode(os.path.split(filename[:-1])[-1])
+
     prefix, suffix = os.path.splitext(_)
     prefix = prefix.split(os.extsep)[0]
+
     handle, filename = tempfile.mkstemp(prefix=prefix, suffix=suffix)
     os.close(handle)
+
     with open(filename, "w+b") as f:
         f.write(content)
+
     return filename
 
 def prioritySortColumns(columns):
