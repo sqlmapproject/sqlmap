@@ -1180,8 +1180,8 @@ def checkWaf():
                 conf.identifyWaf = True
 
         if conf.timeout == defaults.timeout:
-            logger.warning("dropping timeout to 5 seconds (i.e. '--timeout=5')")
-            conf.timeout = 5
+            logger.warning("dropping timeout to %d seconds (i.e. '--timeout=%d')" % (IDS_WAF_CHECK_TIMEOUT, IDS_WAF_CHECK_TIMEOUT))
+            conf.timeout = IDS_WAF_CHECK_TIMEOUT
 
     return retVal
 
