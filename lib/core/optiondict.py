@@ -231,6 +231,7 @@ optDict = {
                                "cpuThrottle":       "integer",
                                "forceDns":          "boolean",
                                "identifyWaf":       "boolean",
+                               "skipWaf":           "boolean",
                                "ignore401":         "boolean",
                                "smokeTest":         "boolean",
                                "liveTest":          "boolean",

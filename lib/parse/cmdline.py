@@ -713,6 +713,10 @@ def cmdLineParser(argv=None):
                                   action="store_true",
                                   help="Make a thorough testing for a WAF/IPS/IDS protection")
 
+        miscellaneous.add_option("--skip-waf", dest="skipWaf",
+                                  action="store_true",
+                                  help="Skip heuristic detection of WAF/IPS/IDS protection")
+
         miscellaneous.add_option("--mobile", dest="mobile",
                                   action="store_true",
                                   help="Imitate smartphone through HTTP User-Agent header")

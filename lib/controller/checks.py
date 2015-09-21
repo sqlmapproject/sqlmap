@@ -1142,12 +1142,12 @@ def checkWaf():
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
     """
 
-    if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline)):
+    if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline, conf.skipWaf)):
         return None
 
-    dbmMsg = "heuristically checking if the target is protected by "
-    dbmMsg += "some kind of WAF/IPS/IDS"
-    logger.debug(dbmMsg)
+    infoMsg = "checking if the target is protected by "
+    infoMsg += "some kind of WAF/IPS/IDS"
+    logger.info(infoMsg)
 
     retVal = False
     payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
