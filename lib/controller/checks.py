@@ -39,6 +39,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
+from lib.core.defaults import defaults
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -68,6 +69,7 @@ from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IDS_WAF_CHECK_RATIO
+from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression
@@ -1153,12 +1155,16 @@ def checkWaf():
     value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
     value += agent.addPayloadDelimiters("%s=%s" % (randomStr(), payload))
 
+    pushValue(conf.timeout)
+    conf.timeout = IDS_WAF_CHECK_TIMEOUT
+
     try:
         retVal = Request.queryPage(place=PLACE.GET, value=value, getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
     except SqlmapConnectionException:
         retVal = True
     finally:
         kb.matchRatio = None
+        conf.timeout = popValue()
 
     if retVal:
         warnMsg = "heuristics detected that the target "
@@ -1172,6 +1178,10 @@ def checkWaf():
 
             if output and output[0] in ("Y", "y"):
                 conf.identifyWaf = True
+
+        if conf.timeout == defaults.timeout:
+            logger.warning("dropping timeout to 5 seconds (i.e. '--timeout=5')")
+            conf.timeout = 5
 
     return retVal
 
