@@ -336,7 +336,7 @@ class Enumeration(GenericEnumeration):
                             values = [values]
 
                         for foundTbl in values:
-                            foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
+                            foundTbl = safeSQLIdentificatorNaming(unArrayizeValue(foundTbl), True)
 
                             if foundTbl is None:
                                 continue
