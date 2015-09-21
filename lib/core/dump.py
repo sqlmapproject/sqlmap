@@ -636,11 +636,11 @@ class Dump(object):
 
         for column in dbColumnsDict.keys():
             if colConsider == "1":
-                colConsiderStr = "s like '%s' were" % unsafeSQLIdentificatorNaming(column)
+                colConsiderStr = "s LIKE '%s' were" % unsafeSQLIdentificatorNaming(column)
             else:
                 colConsiderStr = " '%s' was" % unsafeSQLIdentificatorNaming(column)
 
-            msg = "Column%s found in the " % colConsiderStr
+            msg = "column%s found in the " % colConsiderStr
             msg += "following databases:"
             self._write(msg)
 
