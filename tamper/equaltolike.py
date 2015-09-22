@@ -35,15 +35,10 @@ def tamper(payload, **kwargs):
     'SELECT * FROM users WHERE id LIKE 1'
     """
 
-    def process(match):
-        word = match.group()
-        word = "%sLIKE%s" % (" " if word[0] != " " else "", " " if word[-1] != " " else "")
-
-        return word
-
     retVal = payload
 
     if payload:
-        retVal = re.sub(r"\s*=\s*", lambda match: process(match), retVal)
+        for regex, subst in ((r"\s+=\s+", " LIKE "), (r"\s+=", " LIKE"), (r"=\s+", "LIKE ")):
+            retVal = re.sub(regex, subst, retVal)
 
     return retVal
