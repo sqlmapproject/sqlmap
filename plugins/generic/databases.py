@@ -509,7 +509,7 @@ class Databases:
                 if len(colList) > 0:
                     if colTuple:
                         _, colCondParam = colTuple
-                        infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
                         colCondParam = "='%s'"
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
@@ -604,7 +604,7 @@ class Databases:
                 if len(colList) > 0:
                     if colTuple:
                         _, colCondParam = colTuple
-                        infoMsg += "like '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
+                        infoMsg += "LIKE '%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
                     else:
                         colCondParam = "='%s'"
                         infoMsg += "'%s' " % ", ".join(unsafeSQLIdentificatorNaming(col) for col in sorted(colList))
