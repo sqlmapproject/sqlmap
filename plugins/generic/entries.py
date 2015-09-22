@@ -103,7 +103,7 @@ class Entries:
 
             if foundData is None:
                 kb.data.cachedColumns = {}
-                self.getColumns(onlyColNames=True)
+                self.getColumns(onlyColNames=True, dumpMode=True)
             else:
                 kb.data.cachedColumns = foundData
 
