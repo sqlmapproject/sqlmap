@@ -73,7 +73,7 @@ class MultipartPostHandler(urllib2.BaseHandler):
             request.add_data(data)
         return request
 
-    def multipart_encode(vars, files, boundary = None, buf = None):
+    def multipart_encode(vars, files, boundary=None, buf=None):
         if boundary is None:
             boundary = mimetools.choose_boundary()
 
@@ -100,7 +100,7 @@ class MultipartPostHandler(urllib2.BaseHandler):
             # buf += 'Content-Length: %s\r\n' % file_size
             fd.seek(0)
 
-            buf = str(buf)
+            buf = str(buf) if not isinstance(buf, unicode) else buf.encode("utf8")
             buf += '\r\n%s\r\n' % fd.read()
 
         buf += '--%s--\r\n\r\n' % boundary
