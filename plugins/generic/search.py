@@ -65,7 +65,7 @@ class Search:
 
             infoMsg = "searching database"
             if dbConsider == "1":
-                infoMsg += "s like"
+                infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(db)
             logger.info(infoMsg)
 
@@ -98,7 +98,7 @@ class Search:
             if not values and isInferenceAvailable() and not conf.direct:
                 infoMsg = "fetching number of database"
                 if dbConsider == "1":
-                    infoMsg += "s like"
+                    infoMsg += "s LIKE"
                 infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(db)
                 logger.info(infoMsg)
 
@@ -113,7 +113,7 @@ class Search:
                 if not isNumPosStrValue(count):
                     warnMsg = "no database"
                     if dbConsider == "1":
-                        warnMsg += "s like"
+                        warnMsg += "s LIKE"
                     warnMsg += " '%s' found" % unsafeSQLIdentificatorNaming(db)
                     logger.warn(warnMsg)
 
@@ -172,7 +172,7 @@ class Search:
 
             infoMsg = "searching table"
             if tblConsider == "1":
-                infoMsg += "s like"
+                infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
 
             if dbCond and conf.db and conf.db != CURRENT_DB:
@@ -225,7 +225,7 @@ class Search:
                     if len(whereDbsQuery) == 0:
                         infoMsg = "fetching number of databases with table"
                         if tblConsider == "1":
-                            infoMsg += "s like"
+                            infoMsg += "s LIKE"
                         infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
                         logger.info(infoMsg)
 
@@ -236,7 +236,7 @@ class Search:
                         if not isNumPosStrValue(count):
                             warnMsg = "no databases have table"
                             if tblConsider == "1":
-                                warnMsg += "s like"
+                                warnMsg += "s LIKE"
                             warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
                             logger.warn(warnMsg)
 
@@ -274,7 +274,7 @@ class Search:
 
                     infoMsg = "fetching number of table"
                     if tblConsider == "1":
-                        infoMsg += "s like"
+                        infoMsg += "s LIKE"
                     infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
@@ -288,7 +288,7 @@ class Search:
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
                         if tblConsider == "1":
-                            warnMsg += "s like"
+                            warnMsg += "s LIKE"
                         warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                         logger.warn(warnMsg)
@@ -390,7 +390,7 @@ class Search:
 
             infoMsg = "searching column"
             if colConsider == "1":
-                infoMsg += "s like"
+                infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
 
             foundCols[column] = {}
@@ -468,7 +468,7 @@ class Search:
                 if not conf.db:
                     infoMsg = "fetching number of databases with tables containing column"
                     if colConsider == "1":
-                        infoMsg += "s like"
+                        infoMsg += "s LIKE"
                     infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
                     logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
@@ -479,7 +479,7 @@ class Search:
                     if not isNumPosStrValue(count):
                         warnMsg = "no databases have tables containing column"
                         if colConsider == "1":
-                            warnMsg += "s like"
+                            warnMsg += "s LIKE"
                         warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
                         logger.warn("%s%s" % (warnMsg, infoMsgTbl))
 
@@ -519,7 +519,7 @@ class Search:
 
                         infoMsg = "fetching number of tables containing column"
                         if colConsider == "1":
-                            infoMsg += "s like"
+                            infoMsg += "s LIKE"
                         infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(column), unsafeSQLIdentificatorNaming(db))
                         logger.info(infoMsg)
 
@@ -533,7 +533,7 @@ class Search:
                         if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"
                             if colConsider == "1":
-                                warnMsg += "s like"
+                                warnMsg += "s LIKE"
                             warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(column)
                             warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                             logger.warn(warnMsg)
