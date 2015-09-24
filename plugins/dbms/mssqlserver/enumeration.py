@@ -152,7 +152,7 @@ class Enumeration(GenericEnumeration):
                     warnMsg += "for database '%s'" % db
                     logger.warn(warnMsg)
 
-        if not kb.data.cachedTables:
+        if not kb.data.cachedTables and not conf.search:
             errMsg = "unable to retrieve the tables for any database"
             raise SqlmapNoneDataException(errMsg)
         else:

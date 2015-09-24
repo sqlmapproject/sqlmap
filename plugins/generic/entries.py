@@ -89,10 +89,12 @@ class Entries:
 
                 if isinstance(tblList[0], (set, tuple, list)):
                     tblList = tblList[0]
-            else:
+            elif not conf.search:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
+            else:
+                return
 
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)

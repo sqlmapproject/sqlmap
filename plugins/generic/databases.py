@@ -358,7 +358,7 @@ class Databases:
             if bruteForce is None:
                 logger.error(errMsg)
                 return self.getTables(bruteForce=True)
-            else:
+            elif not conf.search:
                 raise SqlmapNoneDataException(errMsg)
         else:
             for db, tables in kb.data.cachedTables.items():
@@ -432,10 +432,12 @@ class Databases:
                     tblList = tblList[0]
 
                 tblList = list(tblList)
-            else:
+            elif not conf.search:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
+            else:
+                return kb.data.cachedColumns
 
         tblList = filter(None, (safeSQLIdentificatorNaming(_, True) for _ in tblList))
 
