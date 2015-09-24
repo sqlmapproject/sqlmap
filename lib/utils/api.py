@@ -376,15 +376,12 @@ def task_list(taskid=None):
     """
     List task pull
     """
-    if is_admin(taskid):
-        tasks = list(DataStore.tasks)
-    else:
-        tasks = []
-        for key in DataStore.tasks:
-            if DataStore.tasks[key].remote_addr == request.remote_addr:
-                tasks.append(key)
-    tasks = {x: dejsonize(scan_status(x))['status']
-             for x in list(DataStore.tasks)}
+    tasks = {}
+
+    for key in DataStore.tasks:
+        if is_admin(taskid) or DataStore.tasks[key].remote_addr == request.remote_addr:
+            tasks[key] = dejsonize(scan_status(key))["status"]
+
     logger.debug("[%s] Listed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
     return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
 
