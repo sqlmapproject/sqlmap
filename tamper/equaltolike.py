@@ -38,7 +38,6 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for regex, subst in ((r"\s+=\s+", " LIKE "), (r"\s+=", " LIKE"), (r"=\s+", "LIKE ")):
-            retVal = re.sub(regex, subst, retVal)
+        retVal = re.sub(r"\s*=\s*", " LIKE ", retVal)
 
     return retVal
