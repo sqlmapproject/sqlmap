@@ -664,12 +664,12 @@ class Databases:
                                     columns[safeSQLIdentificatorNaming(value)] = None
                                     index += 1
 
-                    if not columns:
-                        errMsg = "unable to retrieve the %scolumns " % ("number of " if not Backend.isDbms(DBMS.MSSQL) else "")
-                        errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                        logger.error(errMsg)
-                        continue
+                        if not columns:
+                            errMsg = "unable to retrieve the %scolumns " % ("number of " if not Backend.isDbms(DBMS.MSSQL) else "")
+                            errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                            errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                            logger.error(errMsg)
+                            continue
 
                 for index in getLimitRange(count):
                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
