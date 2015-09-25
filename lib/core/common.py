@@ -1623,6 +1623,15 @@ def safeStringFormat(format_, params):
                 index = retVal.find("%s", start)
                 retVal = retVal[:index] + getUnicode(param) + retVal[index + 2:]
         else:
+            if any('%s' in _ for _ in conf.parameters.values()):
+                parts = format_.split(' ')
+                for i in xrange(len(parts)):
+                    if PAYLOAD_DELIMITER in parts[i]:
+                        parts[i] = parts[i].replace(PAYLOAD_DELIMITER, "")
+                        parts[i] = "%s%s" % (parts[i], PAYLOAD_DELIMITER)
+                        break
+                format_ = ' '.join(parts)
+
             count = 0
             while True:
                 match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
