@@ -763,6 +763,9 @@ def cmdLineParser(argv=None):
         parser.add_option("--force-dns", dest="forceDns", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--force-threads", dest="forceThreads", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           help=SUPPRESS_HELP)
 
