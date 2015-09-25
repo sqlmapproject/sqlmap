@@ -27,6 +27,7 @@ import lib.core.common
 import lib.core.threads
 import lib.core.convert
 import lib.request.connect
+import lib.utils.google
 
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -91,6 +92,7 @@ from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
@@ -1084,18 +1086,22 @@ def _setHTTPProxy():
         if hasattr(proxyHandler, "%s_open" % _):
             delattr(proxyHandler, "%s_open" % _)
 
-    if not conf.proxy:
-        if conf.proxyList:
-            conf.proxy = conf.proxyList[0]
-            conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
+    if conf.proxyList is not None:
+        if not conf.proxyList:
+            errMsg = "list of usable proxies is empty"
+            raise SqlmapNoneDataException(errMsg)
 
-            infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
-            logger.info(infoMsg)
-        else:
-            if conf.hostname in ('localhost', '127.0.0.1') or conf.ignoreProxy:
-                proxyHandler.proxies = {}
+        conf.proxy = conf.proxyList[0]
+        conf.proxyList = conf.proxyList[1:]
 
-            return
+        infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
+        logger.info(infoMsg)
+
+    elif not conf.proxy:
+        if conf.hostname in ("localhost", "127.0.0.1") or conf.ignoreProxy:
+            proxyHandler.proxies = {}
+
+        return
 
     debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
     logger.debug(debugMsg)
@@ -1127,7 +1133,7 @@ def _setHTTPProxy():
     if conf.proxyCred:
         _ = re.search("^(.*?):(.*?)$", conf.proxyCred)
         if not _:
-            errMsg = "Proxy authentication credentials "
+            errMsg = "proxy authentication credentials "
             errMsg += "value must be in format username:password"
             raise SqlmapSyntaxException(errMsg)
         else:
@@ -1735,7 +1741,7 @@ def _setConfAttributes():
     conf.parameters = {}
     conf.path = None
     conf.port = None
-    conf.proxyList = []
+    conf.proxyList = None
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
@@ -2413,6 +2419,10 @@ def _basicOptionValidation():
         errMsg = "switch '--tor' is incompatible with option '--proxy'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.proxy and conf.proxyFile:
+        errMsg = "switch '--proxy' is incompatible with option '--proxy-file'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.checkTor and not any((conf.tor, conf.proxy)):
         errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
         raise SqlmapSyntaxException(errMsg)
@@ -2480,6 +2490,7 @@ def _resolveCrossReferences():
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
     lib.request.connect.setHTTPProxy = _setHTTPProxy
+    lib.utils.google.setHTTPProxy = _setHTTPProxy
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):

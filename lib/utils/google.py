@@ -48,7 +48,7 @@ class Google(object):
         self.opener.addheaders = conf.httpHeaders
 
         try:
-            conn = self.opener.open("http://www.google.com/ncr")
+            conn = self.opener.open("https://www.google.com/ncr")
             conn.info()  # retrieve session cookie
         except Exception, ex:
             errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
@@ -66,7 +66,7 @@ class Google(object):
         if not dork:
             return None
 
-        url = "http://www.google.com/search?"
+        url = "https://www.google.com/search?"
         url += "q=%s&" % urlencode(dork, convall=True)
         url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
         url += "&start=%d" % ((gpage - 1) * 100)
@@ -176,3 +176,6 @@ class Google(object):
             retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I | re.S)]
 
         return retVal
+
+def setHTTPProxy():  # Cross-linked function
+    raise NotImplementedError
