@@ -1088,7 +1088,7 @@ def _setHTTPProxy():
 
     if conf.proxyList is not None:
         if not conf.proxyList:
-            errMsg = "list of usable proxies is empty"
+            errMsg = "list of usable proxies is exhausted"
             raise SqlmapNoneDataException(errMsg)
 
         conf.proxy = conf.proxyList[0]
