@@ -223,6 +223,7 @@ DEPRECATED_OPTIONS = {
                         "--replicate": "use '--dump-format=SQLITE' instead",
                         "--no-unescape": "use '--no-escape' instead",
                         "--binary": "use '--binary-fields' instead",
+                        "--auth-private": "use '--auth-file' instead",
                         "--check-payload": None,
                         "--check-waf": None,
                      }

@@ -1264,13 +1264,13 @@ def _setHTTPAuthentication():
 
     global authHandler
 
-    if not conf.authType and not conf.authCred and not conf.authPrivate:
+    if not conf.authType and not conf.authCred and not conf.authFile:
         return
 
-    if conf.authPrivate and not conf.authType:
+    if conf.authFile and not conf.authType:
         conf.authType = AUTH_TYPE.PKI
 
-    elif conf.authType and not conf.authCred and not conf.authPrivate:
+    elif conf.authType and not conf.authCred and not conf.authFile:
         errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise SqlmapSyntaxException(errMsg)
@@ -1285,7 +1285,7 @@ def _setHTTPAuthentication():
         errMsg += "Basic, Digest, NTLM or PKI"
         raise SqlmapSyntaxException(errMsg)
 
-    if not conf.authPrivate:
+    if not conf.authFile:
         debugMsg = "setting the HTTP authentication type and credentials"
         logger.debug(debugMsg)
 
@@ -1336,7 +1336,7 @@ def _setHTTPAuthentication():
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
 
-        _ = safeExpandUser(conf.authPrivate)
+        _ = safeExpandUser(conf.authFile)
         checkFile(_)
         authHandler = HTTPSPKIAuthHandler(_)
 

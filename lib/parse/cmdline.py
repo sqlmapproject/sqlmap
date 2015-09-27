@@ -144,8 +144,8 @@ def cmdLineParser(argv=None):
                            help="HTTP authentication credentials "
                                 "(name:password)")
 
-        request.add_option("--auth-private", dest="authPrivate",
-                           help="HTTP authentication PEM private key file")
+        request.add_option("--auth-file", dest="authFile",
+                           help="HTTP authentication PEM cert/private key file")
 
         request.add_option("--ignore-401", dest="ignore401", action="store_true",
                           help="Ignore HTTP Error 401 (Unauthorized)")
