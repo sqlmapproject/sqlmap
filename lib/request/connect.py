@@ -144,6 +144,7 @@ class Connect(object):
             warnMsg += "(e.g. '--flush-session --technique=BEUS') or try to "
             warnMsg += "lower the value of option '--time-sec' (e.g. '--time-sec=2')"
             singleTimeWarnMessage(warnMsg)
+
         elif kb.originalPage is None:
             if conf.tor:
                 warnMsg = "please make sure that you have "
@@ -160,12 +161,11 @@ class Connect(object):
                 warnMsg += "with the switch '--random-agent' turned on "
                 warnMsg += "and/or proxy switches ('--ignore-proxy', '--proxy',...)"
             singleTimeWarnMessage(warnMsg)
+
         elif conf.threads > 1:
             warnMsg = "if the problem persists please try to lower "
             warnMsg += "the number of used threads (option '--threads')"
             singleTimeWarnMessage(warnMsg)
-
-        time.sleep(1)
 
         kwargs['retrying'] = True
         return Connect._getPageProxy(**kwargs)
