@@ -621,7 +621,11 @@ class Connect(object):
                 return None, None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
                 warnMsg += ". sqlmap is going to retry the request"
-                logger.critical(warnMsg)
+                if not retrying:
+                    warnMsg += "(s)"
+                    logger.critical(warnMsg)
+                else:
+                    logger.debug(warnMsg)
                 return Connect._retryProxy(**kwargs)
             elif kb.testMode:
                 logger.critical(warnMsg)
