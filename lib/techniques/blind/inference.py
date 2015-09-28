@@ -232,8 +232,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # Used for gradual expanding into unicode charspace
                 shiftTable = [2, 2, 3, 3, 5, 4]
 
-            if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
-                charTbl.remove(ord('\n'))
+            if "'%s'" % CHAR_INFERENCE_MARK in payload:
+                for char in ('\n', '\r'):
+                    if ord(char) in charTbl:
+                        charTbl.remove(ord(char))
 
             if not charTbl:
                 return None
