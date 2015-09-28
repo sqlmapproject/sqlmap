@@ -275,7 +275,7 @@ class Entries:
                     else:
                         emptyColumns = []
                         plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
-                        indexRange = getLimitRange(count, dump=True, plusOne=plusOne)
+                        indexRange = getLimitRange(count, plusOne=plusOne)
 
                         if len(colList) < len(indexRange) > CHECK_ZERO_COLUMNS_THRESHOLD:
                             for column in colList:

@@ -1370,7 +1370,7 @@ def expandAsteriskForColumns(expression):
 
     return expression
 
-def getLimitRange(count, dump=False, plusOne=False):
+def getLimitRange(count, plusOne=False):
     """
     Returns range of values used in limit/offset constructs
 
@@ -1382,12 +1382,11 @@ def getLimitRange(count, dump=False, plusOne=False):
     count = int(count)
     limitStart, limitStop = 1, count
 
-    if dump:
-        if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
-            limitStop = conf.limitStop
+    if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
+        limitStop = conf.limitStop
 
-        if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
-            limitStart = conf.limitStart
+    if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
+        limitStart = conf.limitStart
 
     retVal = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
 
