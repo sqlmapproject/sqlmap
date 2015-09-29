@@ -327,8 +327,10 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
 
         return output
 
+    password = password.encode(UNICODE_ENCODING)
+
     cipher = md5(salt)
-    cipher.update(password.encode(UNICODE_ENCODING))
+    cipher.update(password)
     hash_ = cipher.digest()
 
     for i in xrange(count):
