@@ -2809,7 +2809,13 @@ def unArrayizeValue(value):
     """
 
     if isListLike(value):
-        value = value[0] if len(value) > 0 else None
+        if not value:
+            value = None
+        elif len(value) == 1 and not isListLike(value[0]):
+            value = value[0]
+        else:
+            _ = filter(lambda _: _ is not None, (_ for _ in flattenValue(value)))
+            value = _[0] if len(_) > 0 else None
 
     return value
 
