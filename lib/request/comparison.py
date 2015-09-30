@@ -128,9 +128,16 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
                 count += 1
             else:
                 break
+
         if count:
-            seq1 = seq1[count:]
-            seq2 = seq2[count:]
+            try:
+                _seq1 = seq1[count:]
+                _seq2 = seq2[count:]
+            except MemoryError:
+                pass
+            else:
+                seq1 = _seq1
+                seq2 = _seq2
 
         while True:
             try:
