@@ -205,6 +205,7 @@ optDict = {
                                "saveConfig":        "string",
                                "scope":             "string",
                                "testFilter":        "string",
+                               "testSkip":          "string",
                                "updateAll":         "boolean",
                              },
 

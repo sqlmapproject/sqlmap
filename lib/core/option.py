@@ -1634,6 +1634,10 @@ def _cleanupOptions():
         conf.testFilter = conf.testFilter.strip('*+')
         conf.testFilter = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testFilter)
 
+    if conf.testSkip:
+        conf.testSkip = conf.testSkip.strip('*+')
+        conf.testSkip = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testSkip)
+
     if "timeSec" not in kb.explicitSettings:
         if conf.tor:
             conf.timeSec = 2 * conf.timeSec

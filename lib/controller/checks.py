@@ -207,6 +207,16 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
+            # Skip tests if title, vector or DBMS is included by the
+            # given skip filter
+            if conf.testSkip and any(conf.testSkip in str(item) or \
+               re.search(conf.testSkip, str(item), re.I) for item in \
+               (test.title, test.vector, payloadDbms)):
+                    debugMsg = "skipping test '%s' because its " % title
+                    debugMsg += "name/vector/DBMS is included by the given skip filter"
+                    logger.debug(debugMsg)
+                    continue
+
             if payloadDbms is not None:
                 # Skip DBMS-specific test if it does not match the user's
                 # provided DBMS

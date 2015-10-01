@@ -674,6 +674,9 @@ def cmdLineParser(argv=None):
         general.add_option("--test-filter", dest="testFilter",
                            help="Select tests by payloads and/or titles (e.g. ROW)")
 
+        general.add_option("--test-skip", dest="testSkip",
+                           help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
+
         general.add_option("--update", dest="updateAll",
                             action="store_true",
                             help="Update sqlmap")
