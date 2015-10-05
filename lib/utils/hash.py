@@ -709,13 +709,13 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {}]
                     elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
                         item = [(user, hash_), {'username': user}]
-                    elif hash_regex in (HASH.ORACLE):
+                    elif hash_regex in (HASH.ORACLE,):
                         item = [(user, hash_), {'salt': hash_[-20:]}]
                     elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD, HASH.MSSQL_NEW):
                         item = [(user, hash_), {'salt': hash_[6:14]}]
-                    elif hash_regex in (HASH.CRYPT_GENERIC):
+                    elif hash_regex in (HASH.CRYPT_GENERIC,):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
-                    elif hash_regex in (HASH.WORDPRESS):
+                    elif hash_regex in (HASH.WORDPRESS,):
                         item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
 
                     if item and hash_ not in keys:
