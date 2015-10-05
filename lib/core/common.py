@@ -1875,8 +1875,13 @@ def readCachedFileContent(filename, mode='rb'):
         with kb.locks.cache:
             if filename not in kb.cache.content:
                 checkFile(filename)
-                with openFile(filename, mode) as f:
-                    kb.cache.content[filename] = f.read()
+                try:
+	                with openFile(filename, mode) as f:
+	                    kb.cache.content[filename] = f.read()
+                except (IOError, OSError, MemoryError), ex:
+                    errMsg = "something went wrong while trying "
+                    errMsg += "to read the content of file '%s' ('%s')" % (filename, ex)
+                    raise SqlmapSystemException(errMsg)
 
     return kb.cache.content[filename]
 
