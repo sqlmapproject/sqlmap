@@ -716,7 +716,11 @@ def dictionaryAttack(attack_dict):
                     elif hash_regex in (HASH.CRYPT_GENERIC,):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
                     elif hash_regex in (HASH.WORDPRESS,):
-                        item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
+                        if ITOA64.index(hash_[3]) < 32:
+                            item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
+                        else:
+                            warnMsg = "invalid hash '%s'" % hash_
+                            logger.warn(warnMsg)
 
                     if item and hash_ not in keys:
                         resumed = hashDBRetrieve(hash_)
