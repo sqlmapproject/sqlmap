@@ -17,6 +17,7 @@ from optparse import SUPPRESS_HELP
 
 from lib.core.common import checkDeprecatedOptions
 from lib.core.common import checkSystemEncoding
+from lib.core.common import dataToStdout
 from lib.core.common import expandMnemonics
 from lib.core.common import getUnicode
 from lib.core.data import cmdLineOptions
@@ -30,6 +31,7 @@ from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
+from lib.core.settings import NNC5ED_LOGO
 from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.shell import clearHistory
@@ -780,6 +782,9 @@ def cmdLineParser(argv=None):
 
         parser.add_option("--run-case", dest="runCase", help=SUPPRESS_HELP)
 
+        parser.add_option("--nnc5ed", dest="nnc5ed", action="store_true",
+                          help=SUPPRESS_HELP)  # temporary hidden switch :)
+
         parser.add_option_group(target)
         parser.add_option_group(request)
         parser.add_option_group(optimization)
@@ -924,6 +929,10 @@ def cmdLineParser(argv=None):
         for i in xrange(len(argv) - 1):
             if argv[i] == "-z":
                 expandMnemonics(argv[i + 1], parser, args)
+
+        if args.nnc5ed:
+            dataToStdout(NNC5ED_LOGO)
+            raise SystemExit
 
         if args.dummy:
             args.url = args.url or DUMMY_URL
