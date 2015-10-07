@@ -185,7 +185,11 @@ class Connect(object):
                     kb.pageCompress = False
             else:
                 while True:
-                    _ = conn.read(MAX_CONNECTION_CHUNK_SIZE)
+                    if not conn:
+                        break
+                    else:
+                        _ = conn.read(MAX_CONNECTION_CHUNK_SIZE)
+
                     if len(_) == MAX_CONNECTION_CHUNK_SIZE:
                         warnMsg = "large response detected. This could take a while"
                         singleTimeWarnMessage(warnMsg)
