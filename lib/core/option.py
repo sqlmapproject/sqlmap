@@ -779,6 +779,7 @@ def _setMetasploit():
                     kb.oldMsf = True
                 else:
                     msfEnvPathExists = False
+
                 conf.msfPath = path
                 break
 
@@ -809,7 +810,7 @@ def _setMetasploit():
         for envPath in envPaths:
             envPath = envPath.replace(";", "")
 
-            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole")):
+            if any(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfcli", "msfconsole")):
                 msfEnvPathExists = True
                 if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfvenom",)):
                     kb.oldMsf = False
