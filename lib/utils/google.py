@@ -97,9 +97,9 @@ class Google(object):
         except urllib2.HTTPError, e:
             try:
                 page = e.read()
-            except socket.timeout:
-                warnMsg = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % e.code
+            except Exception, ex:
+                warnMsg = "problem occurred while trying to get "
+                warnMsg += "an error page information (%s)" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 return None
         except (urllib2.URLError, httplib.error, socket.error, socket.timeout, socks.ProxyError):
