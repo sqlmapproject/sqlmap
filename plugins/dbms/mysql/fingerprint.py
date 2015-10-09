@@ -177,6 +177,14 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
+            result = inject.checkBooleanExpression("ROUNDMAGIC(NULL) IS NULL")
+
+            if result:
+                warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
+                logger.warn(warnMsg)
+
+                return False
+
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855
 
