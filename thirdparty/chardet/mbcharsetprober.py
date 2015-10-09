@@ -52,7 +52,7 @@ class MultiByteCharSetProber(CharSetProber):
 
     def feed(self, aBuf):
         aLen = len(aBuf)
-        for i in range(0, aLen):
+        for i in xrange(0, aLen):
             codingState = self._mCodingSM.next_state(aBuf[i])
             if codingState == constants.eError:
                 if constants._debug:

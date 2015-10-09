@@ -51,7 +51,7 @@ class EUCJPProber(MultiByteCharSetProber):
 
     def feed(self, aBuf):
         aLen = len(aBuf)
-        for i in range(0, aLen):
+        for i in xrange(0, aLen):
             # PY3K: aBuf is a byte array, so aBuf[i] is an int, not a byte
             codingState = self._mCodingSM.next_state(aBuf[i])
             if codingState == constants.eError:
