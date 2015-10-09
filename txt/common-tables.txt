@@ -3366,3 +3366,6 @@ tuser
 tusers
 userstbl
 usertbl
+
+# WebGoat
+user_data

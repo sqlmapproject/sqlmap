@@ -480,7 +480,7 @@ class Agent(object):
         @rtype: C{str}
         """
 
-        prefixRegex = r"(?:\s+(?:FIRST|SKIP)\s+\d+)*"
+        prefixRegex = r"(?:\s+(?:FIRST|SKIP|LIMIT \d+)\s+\d+)*"
         fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectRownum = re.search(r"\ASELECT\s+([^()]+?),\s*ROWNUM AS LIMIT FROM", query, re.I)
         fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
@@ -508,7 +508,10 @@ class Agent(object):
         elif fieldsSelectRownum:
             fieldsToCastStr = fieldsSelectRownum.groups()[0]
         elif fieldsSelectDistinct:
-            fieldsToCastStr = fieldsSelectDistinct.groups()[0]
+            if Backend.getDbms() in (DBMS.HSQLDB,):
+                fieldsToCastStr = fieldsNoSelect
+            else:
+                fieldsToCastStr = fieldsSelectDistinct.groups()[0]
         elif fieldsSelectCase:
             fieldsToCastStr = fieldsSelectCase.groups()[0]
         elif fieldsSelectFrom:
@@ -886,6 +889,10 @@ class Agent(object):
 
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
+            limitedQuery += " %s" % limitStr
+
+        elif Backend.isDbms(DBMS.HSQLDB):
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
             limitedQuery += " %s" % limitStr
 
         elif Backend.isDbms(DBMS.FIREBIRD):

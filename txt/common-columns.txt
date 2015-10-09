@@ -2596,3 +2596,7 @@ tmp_lahir
 universitas
 urut
 waktu
+
+# WebGoat
+cookie
+login_count
