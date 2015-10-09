@@ -501,7 +501,8 @@ class Agent(object):
         elif fieldsMinMaxstr:
             fieldsToCastStr = fieldsMinMaxstr.groups()[0]
         elif fieldsExists:
-            fieldsToCastStr = fieldsSelect.groups()[0]
+            if fieldsSelect:
+                fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsSelectTop:
             fieldsToCastStr = fieldsSelectTop.groups()[0]
         elif fieldsSelectRownum:
