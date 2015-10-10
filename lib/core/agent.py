@@ -308,8 +308,8 @@ class Agent(object):
         for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
             payload = payload.replace(_, randomStr())
 
-        if origValue is not None:
-            payload = payload.replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
+        if origValue is not None and "[ORIGVALUE]" in payload:
+            payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
 
         if "[INFERENCE]" in payload:
             if Backend.getIdentifiedDbms() is not None:
