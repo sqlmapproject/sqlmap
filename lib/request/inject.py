@@ -39,6 +39,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
@@ -262,9 +263,14 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                     return None
 
                 try:
-                    for num in xrange(startLimit, stopLimit):
-                        output = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
-                        outputs.append(output)
+                    try:
+                        for num in xrange(startLimit, stopLimit):
+                            output = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
+                            outputs.append(output)
+                    except OverflowError:
+                        errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
+                        errMsg += "with switch '--fresh-queries'"
+                        raise SqlmapDataException(errMsg)
 
                 except KeyboardInterrupt:
                     print
