@@ -77,7 +77,7 @@ def main():
             errMsg = "your system does not properly handle non-ASCII paths. "
             errMsg += "Please move the sqlmap's directory to the other location"
             logger.error(errMsg)
-            exit()
+            raise SystemExit
 
         setPaths()
 
@@ -122,7 +122,7 @@ def main():
     except SqlmapBaseException as ex:
         errMsg = getSafeExString(ex)
         logger.critical(errMsg)
-        sys.exit(1)
+        raise SystemExit
 
     except KeyboardInterrupt:
         print
@@ -141,6 +141,11 @@ def main():
         print
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
+
+        if "No space left" in excMsg:
+            errMsg = "no space left on output device"
+            logger.error(errMsg)
+            raise SystemExit
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):
             file_ = match.group(1)
