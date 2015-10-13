@@ -588,7 +588,7 @@ class Agent(object):
         else:
             return query
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+        if Backend.isDbms(DBMS.MYSQL):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += ",'%s')" % kb.chars.stop
@@ -615,6 +615,7 @@ class Agent(object):
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
                 concatenatedQuery = "%s||'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
+                concatenatedQuery = re.sub(r"('%s'\|\|)(.+)(%s)" % (kb.chars.start, re.escape(castedFields)), "\g<2>\g<1>\g<3>", concatenatedQuery)
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -885,15 +886,29 @@ class Agent(object):
         fromIndex = limitedQuery.index(" FROM ")
         untilFrom = limitedQuery[:fromIndex]
         fromFrom = limitedQuery[fromIndex + 1:]
-        orderBy = False
+        orderBy = None
 
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
         elif Backend.isDbms(DBMS.HSQLDB):
-            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
-            limitedQuery += " %s" % limitStr
+            match = re.search(r"ORDER BY [^ ]+", limitedQuery)
+            if match:
+                limitedQuery = re.sub(r"\s*%s\s*" % match.group(0), " ", limitedQuery).strip()
+                limitedQuery += " %s" % match.group(0)
+
+            if query.startswith("SELECT "):
+                limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
+                limitedQuery = limitedQuery.replace("SELECT ", "SELECT %s " % limitStr, 1)
+            else:
+                limitStr = queries[Backend.getIdentifiedDbms()].limit.query2 % (1, num)
+                limitedQuery += " %s" % limitStr
+
+            if not match:
+                match = re.search(r"%s\s+(\w+)" % re.escape(limitStr), limitedQuery)
+                if match:
+                    orderBy = " ORDER BY %s" % match.group(1)
 
         elif Backend.isDbms(DBMS.FIREBIRD):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, num + 1)
