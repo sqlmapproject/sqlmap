@@ -439,6 +439,11 @@ class Connect(object):
 
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
+                if conf.cj:
+                    for cookie in conf.cj:
+                        if cookie.value is None:
+                            cookie.value = ""
+
                 conn = urllib2.urlopen(req)
 
                 if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
