@@ -849,7 +849,7 @@ class Connect(object):
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                         token = page
 
-                if not token and any(_.name == conf.csrfToken for _ in conf.cj):
+                if not token and conf.cj and any(_.name == conf.csrfToken for _ in conf.cj):
                     for _ in conf.cj:
                         if _.name == conf.csrfToken:
                             token = _.value
