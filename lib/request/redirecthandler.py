@@ -30,6 +30,7 @@ from lib.core.settings import MAX_SINGLE_URL_REDIRECTIONS
 from lib.core.settings import MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
+from lib.request.basic import parseResponse
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
     def _get_header_redirect(self, headers):
@@ -118,6 +119,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 result = fp
 
         if redurl and kb.redirectChoice == REDIRECTION.YES:
+            parseResponse(content, headers)
+
             req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)
             if headers and HTTP_HEADER.SET_COOKIE in headers:
                 req.headers[HTTP_HEADER.COOKIE] = headers[HTTP_HEADER.SET_COOKIE].split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)[0]
