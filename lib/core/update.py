@@ -13,6 +13,7 @@ from subprocess import PIPE
 from subprocess import Popen as execute
 
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import pollProcess
 from lib.core.data import conf
 from lib.core.data import logger
@@ -41,10 +42,15 @@ def update():
         logger.debug(debugMsg)
 
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
-        process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
-        pollProcess(process, True)
-        stdout, stderr = process.communicate()
-        success = not process.returncode
+
+        try:
+            process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
+            pollProcess(process, True)
+            stdout, stderr = process.communicate()
+            success = not process.returncode
+        except (IOError, OSError), ex:
+            success = False
+            stderr = getSafeExString(ex)
 
         if success:
             import lib.core.settings
