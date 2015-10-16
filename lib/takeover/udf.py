@@ -258,7 +258,7 @@ class UDF:
             else:
                 logger.warn("invalid value, only digits are allowed")
 
-        for x in range(0, udfCount):
+        for x in xrange(0, udfCount):
             while True:
                 msg = "what is the name of the UDF number %d? " % (x + 1)
                 udfName = readInput(msg)
@@ -293,7 +293,7 @@ class UDF:
                 else:
                     logger.warn("invalid value, only digits >= 0 are allowed")
 
-            for y in range(0, parCount):
+            for y in xrange(0, parCount):
                 msg = "what is the data-type of input parameter "
                 msg += "number %d? (default: %s) " % ((y + 1), defaultType)
 

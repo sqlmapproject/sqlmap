@@ -12,6 +12,7 @@ import socket
 import urllib
 import urllib2
 
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import readInput
 from lib.core.common import urlencode
@@ -30,6 +31,8 @@ from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
 from lib.request.httpshandler import HTTPSHandler
+from thirdparty.socks import socks
+
 
 class Google(object):
     """
@@ -47,10 +50,10 @@ class Google(object):
         self.opener.addheaders = conf.httpHeaders
 
         try:
-            conn = self.opener.open("http://www.google.com/ncr")
+            conn = self.opener.open("https://www.google.com/ncr")
             conn.info()  # retrieve session cookie
         except Exception, ex:
-            errMsg = "unable to connect to Google ('%s')" % ex
+            errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
             raise SqlmapConnectionException(errMsg)
 
     def search(self, dork):
@@ -65,7 +68,7 @@ class Google(object):
         if not dork:
             return None
 
-        url = "http://www.google.com/search?"
+        url = "https://www.google.com/search?"
         url += "q=%s&" % urlencode(dork, convall=True)
         url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
         url += "&start=%d" % ((gpage - 1) * 100)
@@ -94,12 +97,12 @@ class Google(object):
         except urllib2.HTTPError, e:
             try:
                 page = e.read()
-            except socket.timeout:
-                warnMsg = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % e.code
+            except Exception, ex:
+                warnMsg = "problem occurred while trying to get "
+                warnMsg += "an error page information (%s)" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 return None
-        except (urllib2.URLError, httplib.error, socket.error, socket.timeout):
+        except (urllib2.URLError, httplib.error, socket.error, socket.timeout, socks.ProxyError):
             errMsg = "unable to connect to Google"
             raise SqlmapConnectionException(errMsg)
 
@@ -175,3 +178,6 @@ class Google(object):
             retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I | re.S)]
 
         return retVal
+
+def setHTTPProxy():  # Cross-linked function
+    raise NotImplementedError

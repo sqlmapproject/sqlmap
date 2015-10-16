@@ -76,7 +76,7 @@ def main(src, dst):
     # Instantiate an IP packets decoder
     decoder = ImpactDecoder.IPDecoder()
 
-    while 1:
+    while True:
         cmd = ''
 
         # Wait for incoming replies

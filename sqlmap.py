@@ -25,6 +25,7 @@ from lib.controller.controller import start
 from lib.core.common import banner
 from lib.core.common import createGithubIssue
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import maskSensitiveData
 from lib.core.common import setPaths
@@ -76,7 +77,7 @@ def main():
             errMsg = "your system does not properly handle non-ASCII paths. "
             errMsg += "Please move the sqlmap's directory to the other location"
             logger.error(errMsg)
-            exit()
+            raise SystemExit
 
         setPaths()
 
@@ -119,9 +120,9 @@ def main():
         cmdLineOptions.sqlmapShell = False
 
     except SqlmapBaseException as ex:
-        errMsg = getUnicode(ex.message)
+        errMsg = getSafeExString(ex)
         logger.critical(errMsg)
-        sys.exit(1)
+        raise SystemExit
 
     except KeyboardInterrupt:
         print
@@ -140,6 +141,11 @@ def main():
         print
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
+
+        if "No space left" in excMsg:
+            errMsg = "no space left on output device"
+            logger.error(errMsg)
+            raise SystemExit
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):
             file_ = match.group(1)

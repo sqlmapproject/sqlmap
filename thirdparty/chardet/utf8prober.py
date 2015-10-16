@@ -13,25 +13,25 @@
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301  USA
 ######################### END LICENSE BLOCK #########################
 
-import constants, sys
-from constants import eStart, eError, eItsMe
-from charsetprober import CharSetProber
-from codingstatemachine import CodingStateMachine
-from mbcssm import UTF8SMModel
+from . import constants
+from .charsetprober import CharSetProber
+from .codingstatemachine import CodingStateMachine
+from .mbcssm import UTF8SMModel
 
 ONE_CHAR_PROB = 0.5
+
 
 class UTF8Prober(CharSetProber):
     def __init__(self):
@@ -50,13 +50,13 @@ class UTF8Prober(CharSetProber):
     def feed(self, aBuf):
         for c in aBuf:
             codingState = self._mCodingSM.next_state(c)
-            if codingState == eError:
+            if codingState == constants.eError:
                 self._mState = constants.eNotMe
                 break
-            elif codingState == eItsMe:
+            elif codingState == constants.eItsMe:
                 self._mState = constants.eFoundIt
                 break
-            elif codingState == eStart:
+            elif codingState == constants.eStart:
                 if self._mCodingSM.get_current_charlen() >= 2:
                     self._mNumOfMBChar += 1
 

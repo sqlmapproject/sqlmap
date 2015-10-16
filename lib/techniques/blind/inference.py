@@ -146,12 +146,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if showEta:
             progress = ProgressBar(maxValue=length)
 
-        if timeBasedCompare and conf.threads > 1:
+        if timeBasedCompare and conf.threads > 1 and not conf.forceThreads:
             warnMsg = "multi-threading is considered unsafe in time-based data retrieval. Going to switch it off automatically"
             singleTimeWarnMessage(warnMsg)
 
         if numThreads > 1:
-            if not timeBasedCompare:
+            if not timeBasedCompare or conf.forceThreads:
                 debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
                 logger.debug(debugMsg)
             else:
@@ -232,8 +232,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # Used for gradual expanding into unicode charspace
                 shiftTable = [2, 2, 3, 3, 5, 4]
 
-            if CHAR_INFERENCE_MARK in payload and ord('\n') in charTbl:
-                charTbl.remove(ord('\n'))
+            if "'%s'" % CHAR_INFERENCE_MARK in payload:
+                for char in ('\n', '\r'):
+                    if ord(char) in charTbl:
+                        charTbl.remove(ord(char))
 
             if not charTbl:
                 return None
@@ -597,8 +599,9 @@ def queryOutputLength(expression, payload):
     infoMsg = "retrieving the length of query output"
     logger.info(infoMsg)
 
-    lengthExprUnescaped = agent.forgeQueryOutputLength(expression)
     start = time.time()
+
+    lengthExprUnescaped = agent.forgeQueryOutputLength(expression)
     count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
 
     debugMsg = "performed %d queries in %.2f seconds" % (count, calculateDeltaSeconds(start))

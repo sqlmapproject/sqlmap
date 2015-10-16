@@ -9,6 +9,7 @@ import httplib
 import socket
 import urllib2
 
+from lib.core.common import getSafeExString
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
@@ -55,9 +56,9 @@ class HTTPSConnection(httplib.HTTPSConnection):
                         break
                     else:
                         sock.close()
-                except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
+                except (ssl.SSLError, socket.error, httplib.BadStatusLine), ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred ('%s')" % errMsg)
+                    logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
         # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
@@ -75,9 +76,9 @@ class HTTPSConnection(httplib.HTTPSConnection):
                         break
                     else:
                         sock.close()
-                except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
+                except (ssl.SSLError, socket.error, httplib.BadStatusLine), ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred ('%s')" % errMsg)
+                    logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
         if not success:
             raise SqlmapConnectionException("can't establish SSL connection")

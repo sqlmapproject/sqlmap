@@ -27,6 +27,7 @@ import lib.core.common
 import lib.core.threads
 import lib.core.convert
 import lib.request.connect
+import lib.utils.google
 
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -34,6 +35,7 @@ from lib.core.common import boldifyMessage
 from lib.core.common import checkFile
 from lib.core.common import dataToStdout
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import extractRegexResult
 from lib.core.common import filterStringValue
 from lib.core.common import findPageForms
@@ -90,6 +92,7 @@ from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
@@ -638,7 +641,7 @@ def _setBulkMultipleTargets():
     for line in getFileItems(conf.bulkFile):
         if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
             found = True
-            kb.targets.add((line.strip(), None, None, None, None))
+            kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
@@ -776,6 +779,7 @@ def _setMetasploit():
                     kb.oldMsf = True
                 else:
                     msfEnvPathExists = False
+
                 conf.msfPath = path
                 break
 
@@ -806,7 +810,7 @@ def _setMetasploit():
         for envPath in envPaths:
             envPath = envPath.replace(";", "")
 
-            if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("", "msfcli", "msfconsole")):
+            if any(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfcli", "msfconsole")):
                 msfEnvPathExists = True
                 if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfvenom",)):
                     kb.oldMsf = False
@@ -1083,18 +1087,22 @@ def _setHTTPProxy():
         if hasattr(proxyHandler, "%s_open" % _):
             delattr(proxyHandler, "%s_open" % _)
 
-    if not conf.proxy:
-        if conf.proxyList:
-            conf.proxy = conf.proxyList[0]
-            conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
+    if conf.proxyList is not None:
+        if not conf.proxyList:
+            errMsg = "list of usable proxies is exhausted"
+            raise SqlmapNoneDataException(errMsg)
 
-            infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
-            logger.info(infoMsg)
-        else:
-            if conf.hostname in ('localhost', '127.0.0.1') or conf.ignoreProxy:
-                proxyHandler.proxies = {}
+        conf.proxy = conf.proxyList[0]
+        conf.proxyList = conf.proxyList[1:]
 
-            return
+        infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
+        logger.info(infoMsg)
+
+    elif not conf.proxy:
+        if conf.hostname in ("localhost", "127.0.0.1") or conf.ignoreProxy:
+            proxyHandler.proxies = {}
+
+        return
 
     debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
     logger.debug(debugMsg)
@@ -1126,7 +1134,7 @@ def _setHTTPProxy():
     if conf.proxyCred:
         _ = re.search("^(.*?):(.*?)$", conf.proxyCred)
         if not _:
-            errMsg = "Proxy authentication credentials "
+            errMsg = "proxy authentication credentials "
             errMsg += "value must be in format username:password"
             raise SqlmapSyntaxException(errMsg)
         else:
@@ -1257,13 +1265,13 @@ def _setHTTPAuthentication():
 
     global authHandler
 
-    if not conf.authType and not conf.authCred and not conf.authPrivate:
+    if not conf.authType and not conf.authCred and not conf.authFile:
         return
 
-    if conf.authPrivate and not conf.authType:
+    if conf.authFile and not conf.authType:
         conf.authType = AUTH_TYPE.PKI
 
-    elif conf.authType and not conf.authCred and not conf.authPrivate:
+    elif conf.authType and not conf.authCred and not conf.authFile:
         errMsg = "you specified the HTTP authentication type, but "
         errMsg += "did not provide the credentials"
         raise SqlmapSyntaxException(errMsg)
@@ -1278,7 +1286,7 @@ def _setHTTPAuthentication():
         errMsg += "Basic, Digest, NTLM or PKI"
         raise SqlmapSyntaxException(errMsg)
 
-    if not conf.authPrivate:
+    if not conf.authFile:
         debugMsg = "setting the HTTP authentication type and credentials"
         logger.debug(debugMsg)
 
@@ -1329,7 +1337,7 @@ def _setHTTPAuthentication():
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
 
-        _ = safeExpandUser(conf.authPrivate)
+        _ = safeExpandUser(conf.authFile)
         checkFile(_)
         authHandler = HTTPSPKIAuthHandler(_)
 
@@ -1523,7 +1531,7 @@ def _createTemporaryDirectory():
             os.makedirs(tempfile.gettempdir())
     except IOError, ex:
         errMsg = "there has been a problem while accessing "
-        errMsg += "system's temporary directory location(s) ('%s'). Please " % ex.message
+        errMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
         errMsg += "make sure that there is enough disk space left. If problem persists, "
         errMsg += "try to set environment variable 'TEMP' to a location "
         errMsg += "writeable by the current user"
@@ -1626,6 +1634,10 @@ def _cleanupOptions():
     if conf.testFilter:
         conf.testFilter = conf.testFilter.strip('*+')
         conf.testFilter = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testFilter)
+
+    if conf.testSkip:
+        conf.testSkip = conf.testSkip.strip('*+')
+        conf.testSkip = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testSkip)
 
     if "timeSec" not in kb.explicitSettings:
         if conf.tor:
@@ -1734,7 +1746,7 @@ def _setConfAttributes():
     conf.parameters = {}
     conf.path = None
     conf.port = None
-    conf.proxyList = []
+    conf.proxyList = None
     conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
@@ -2071,7 +2083,7 @@ def _mergeOptions(inputOptions, overrideOptions):
             inputOptions = base64unpickle(inputOptions.pickledOptions)
         except Exception, ex:
             errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
-            errMsg += " ('%s')" % ex.message if ex.message else ""
+            errMsg += " ('%s')" % ex if ex.message else ""
             raise SqlmapSyntaxException(errMsg)
 
     if inputOptions.configFile:
@@ -2243,7 +2255,11 @@ def _checkTor():
     infoMsg = "checking Tor connection"
     logger.info(infoMsg)
 
-    page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
+    try:
+        page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
+    except SqlmapConnectionException:
+        page = None
+
     if not page or 'Congratulations' not in page:
         errMsg = "it seems that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
         raise SqlmapConnectionException(errMsg)
@@ -2288,6 +2304,10 @@ def _basicOptionValidation():
 
     if conf.direct and conf.url:
         errMsg = "option '-d' is incompatible with option '-u' ('--url')"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.identifyWaf and conf.skipWaf:
+        errMsg = "switch '--identify-waf' is incompatible with switch '--skip-waf'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.titles and conf.nullConnection:
@@ -2404,6 +2424,10 @@ def _basicOptionValidation():
         errMsg = "switch '--tor' is incompatible with option '--proxy'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.proxy and conf.proxyFile:
+        errMsg = "switch '--proxy' is incompatible with option '--proxy-file'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.checkTor and not any((conf.tor, conf.proxy)):
         errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
         raise SqlmapSyntaxException(errMsg)
@@ -2471,6 +2495,7 @@ def _resolveCrossReferences():
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
     lib.request.connect.setHTTPProxy = _setHTTPProxy
+    lib.utils.google.setHTTPProxy = _setHTTPProxy
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):

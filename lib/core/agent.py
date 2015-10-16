@@ -187,12 +187,12 @@ class Agent(object):
 
             if origValue:
                 regex = r"(\A|\b)%s=%s%s" % (re.escape(parameter), re.escape(origValue), r"(\Z|\b)" if origValue[-1].isalnum() else "")
-                retVal = _(regex, "%s=%s" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = _(regex, "%s=%s" % (parameter, self.addPayloadDelimiters(newValue)), paramString)
             else:
-                retVal = _(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = _(r"(\A|\b)%s=%s(\Z|%s|%s|\s)" % (re.escape(parameter), re.escape(origValue), DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER), "%s=%s\g<2>" % (parameter, self.addPayloadDelimiters(newValue)), paramString)
 
             if retVal == paramString and urlencode(parameter) != parameter:
-                retVal = _(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue.replace("\\", "\\\\"))), paramString)
+                retVal = _(r"(\A|\b)%s=%s" % (re.escape(urlencode(parameter)), re.escape(origValue)), "%s=%s" % (urlencode(parameter), self.addPayloadDelimiters(newValue)), paramString)
 
         if retVal:
             retVal = retVal.replace(BOUNDARY_BACKSLASH_MARKER, '\\')
@@ -308,8 +308,8 @@ class Agent(object):
         for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
             payload = payload.replace(_, randomStr())
 
-        if origValue is not None:
-            payload = payload.replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
+        if origValue is not None and "[ORIGVALUE]" in payload:
+            payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
 
         if "[INFERENCE]" in payload:
             if Backend.getIdentifiedDbms() is not None:
@@ -480,7 +480,7 @@ class Agent(object):
         @rtype: C{str}
         """
 
-        prefixRegex = r"(?:\s+(?:FIRST|SKIP)\s+\d+)*"
+        prefixRegex = r"(?:\s+(?:FIRST|SKIP|LIMIT \d+)\s+\d+)*"
         fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectRownum = re.search(r"\ASELECT\s+([^()]+?),\s*ROWNUM AS LIMIT FROM", query, re.I)
         fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
@@ -501,13 +501,17 @@ class Agent(object):
         elif fieldsMinMaxstr:
             fieldsToCastStr = fieldsMinMaxstr.groups()[0]
         elif fieldsExists:
-            fieldsToCastStr = fieldsSelect.groups()[0]
+            if fieldsSelect:
+                fieldsToCastStr = fieldsSelect.groups()[0]
         elif fieldsSelectTop:
             fieldsToCastStr = fieldsSelectTop.groups()[0]
         elif fieldsSelectRownum:
             fieldsToCastStr = fieldsSelectRownum.groups()[0]
         elif fieldsSelectDistinct:
-            fieldsToCastStr = fieldsSelectDistinct.groups()[0]
+            if Backend.getDbms() in (DBMS.HSQLDB,):
+                fieldsToCastStr = fieldsNoSelect
+            else:
+                fieldsToCastStr = fieldsSelectDistinct.groups()[0]
         elif fieldsSelectCase:
             fieldsToCastStr = fieldsSelectCase.groups()[0]
         elif fieldsSelectFrom:
@@ -584,7 +588,7 @@ class Agent(object):
         else:
             return query
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+        if Backend.isDbms(DBMS.MYSQL):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += ",'%s')" % kb.chars.stop
@@ -611,6 +615,7 @@ class Agent(object):
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
                 concatenatedQuery = "%s||'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
+                concatenatedQuery = re.sub(r"('%s'\|\|)(.+)(%s)" % (kb.chars.start, re.escape(castedFields)), "\g<2>\g<1>\g<3>", concatenatedQuery)
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -881,11 +886,29 @@ class Agent(object):
         fromIndex = limitedQuery.index(" FROM ")
         untilFrom = limitedQuery[:fromIndex]
         fromFrom = limitedQuery[fromIndex + 1:]
-        orderBy = False
+        orderBy = None
 
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
+
+        elif Backend.isDbms(DBMS.HSQLDB):
+            match = re.search(r"ORDER BY [^ ]+", limitedQuery)
+            if match:
+                limitedQuery = re.sub(r"\s*%s\s*" % match.group(0), " ", limitedQuery).strip()
+                limitedQuery += " %s" % match.group(0)
+
+            if query.startswith("SELECT "):
+                limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
+                limitedQuery = limitedQuery.replace("SELECT ", "SELECT %s " % limitStr, 1)
+            else:
+                limitStr = queries[Backend.getIdentifiedDbms()].limit.query2 % (1, num)
+                limitedQuery += " %s" % limitStr
+
+            if not match:
+                match = re.search(r"%s\s+(\w+)" % re.escape(limitStr), limitedQuery)
+                if match:
+                    orderBy = " ORDER BY %s" % match.group(1)
 
         elif Backend.isDbms(DBMS.FIREBIRD):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, num + 1)

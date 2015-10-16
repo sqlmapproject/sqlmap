@@ -15,6 +15,7 @@ import threading
 from lib.core.common import Backend
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import isListLike
 from lib.core.common import normalizeUnicode
@@ -74,7 +75,7 @@ class Dump(object):
         try:
             self._outputFP.write(text)
         except IOError, ex:
-            errMsg = "error occurred while writing to log file ('%s')" % ex.message
+            errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
         if kb.get("multiThreadMode"):
@@ -94,7 +95,7 @@ class Dump(object):
         try:
             self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
         except IOError, ex:
-            errMsg = "error occurred while opening log file ('%s')" % ex.message
+            errMsg = "error occurred while opening log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
     def getOutputFile(self):
@@ -159,7 +160,7 @@ class Dump(object):
     def currentDb(self, data):
         if Backend.isDbms(DBMS.MAXDB):
             self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.HSQLDB):
             self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         else:
             self.string("current database", data, content_type=CONTENT_TYPE.CURRENT_DB)
@@ -635,11 +636,11 @@ class Dump(object):
 
         for column in dbColumnsDict.keys():
             if colConsider == "1":
-                colConsiderStr = "s like '%s' were" % unsafeSQLIdentificatorNaming(column)
+                colConsiderStr = "s LIKE '%s' were" % unsafeSQLIdentificatorNaming(column)
             else:
                 colConsiderStr = " '%s' was" % unsafeSQLIdentificatorNaming(column)
 
-            msg = "Column%s found in the " % colConsiderStr
+            msg = "column%s found in the " % colConsiderStr
             msg += "following databases:"
             self._write(msg)
 

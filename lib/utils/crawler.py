@@ -22,6 +22,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -58,12 +59,15 @@ def crawl(target):
                 try:
                     if current:
                         content = Request.getPage(url=current, crawling=True, raise404=False)[0]
-                except SqlmapConnectionException, e:
-                    errMsg = "connection exception detected (%s). skipping " % e
+                except SqlmapConnectionException, ex:
+                    errMsg = "connection exception detected (%s). skipping " % ex
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
-                except httplib.InvalidURL, e:
-                    errMsg = "invalid URL detected (%s). skipping " % e
+                except SqlmapSyntaxException:
+                    errMsg = "invalid URL detected. skipping '%s'" % current
+                    logger.critical(errMsg)
+                except httplib.InvalidURL, ex:
+                    errMsg = "invalid URL detected (%s). skipping " % ex
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
 

@@ -12,6 +12,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.common import Backend
 from lib.core.common import unArrayizeValue
+from lib.core.settings import HSQLDB_DEFAULT_SCHEMA
 from lib.request import inject
 
 class Enumeration(GenericEnumeration):
@@ -40,3 +41,6 @@ class Enumeration(GenericEnumeration):
     def getHostname(self):
         warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
         logger.warn(warnMsg)
+
+    def getCurrentDb(self):
+        return HSQLDB_DEFAULT_SCHEMA

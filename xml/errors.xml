@@ -104,6 +104,8 @@
     <!-- HSQLDB -->
     <dbms value="HSQLDB">
         <error regexp="org\.hsqldb\.jdbc"/>
+        <error regexp="Unexpected end of command in statement \["/>
+        <error regexp="Unexpected token.*in statement \["/>
     </dbms>
 
 </root>

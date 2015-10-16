@@ -28,9 +28,9 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
-from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
+from lib.core.settings import METADB_SUFFIX
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
@@ -102,7 +102,7 @@ def tableExists(tableFile, regex=None):
                 break
 
             if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
-                fullTableName = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', table)
+                fullTableName = "%s.%s" % (conf.db, table)
             else:
                 fullTableName = table
 

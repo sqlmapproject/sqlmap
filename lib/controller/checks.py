@@ -22,6 +22,7 @@ from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getLastRequestHTTPError
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import getSortedInjectionTests
 from lib.core.common import getUnicode
 from lib.core.common import intersect
@@ -38,6 +39,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
+from lib.core.defaults import defaults
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -67,6 +69,7 @@ from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IDS_WAF_CHECK_RATIO
+from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.inject import checkBooleanExpression
@@ -201,6 +204,16 @@ def checkSqlInjection(place, parameter, value):
                (test.title, test.vector, payloadDbms)):
                     debugMsg = "skipping test '%s' because its " % title
                     debugMsg += "name/vector/DBMS is not included by the given filter"
+                    logger.debug(debugMsg)
+                    continue
+
+            # Skip tests if title, vector or DBMS is included by the
+            # given skip filter
+            if conf.testSkip and any(conf.testSkip in str(item) or \
+               re.search(conf.testSkip, str(item), re.I) for item in \
+               (test.title, test.vector, payloadDbms)):
+                    debugMsg = "skipping test '%s' because its " % title
+                    debugMsg += "name/vector/DBMS is included by the given skip filter"
                     logger.debug(debugMsg)
                     continue
 
@@ -1139,12 +1152,12 @@ def checkWaf():
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
     """
 
-    if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline)):
+    if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline, conf.skipWaf)):
         return None
 
-    dbmMsg = "heuristically checking if the target is protected by "
-    dbmMsg += "some kind of WAF/IPS/IDS"
-    logger.debug(dbmMsg)
+    infoMsg = "checking if the target is protected by "
+    infoMsg += "some kind of WAF/IPS/IDS"
+    logger.info(infoMsg)
 
     retVal = False
     payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
@@ -1152,12 +1165,16 @@ def checkWaf():
     value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
     value += agent.addPayloadDelimiters("%s=%s" % (randomStr(), payload))
 
+    pushValue(conf.timeout)
+    conf.timeout = IDS_WAF_CHECK_TIMEOUT
+
     try:
         retVal = Request.queryPage(place=PLACE.GET, value=value, getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
     except SqlmapConnectionException:
         retVal = True
     finally:
         kb.matchRatio = None
+        conf.timeout = popValue()
 
     if retVal:
         warnMsg = "heuristics detected that the target "
@@ -1171,6 +1188,10 @@ def checkWaf():
 
             if output and output[0] in ("Y", "y"):
                 conf.identifyWaf = True
+
+        if conf.timeout == defaults.timeout:
+            logger.warning("dropping timeout to %d seconds (i.e. '--timeout=%d')" % (IDS_WAF_CHECK_TIMEOUT, IDS_WAF_CHECK_TIMEOUT))
+            conf.timeout = IDS_WAF_CHECK_TIMEOUT
 
     return retVal
 
@@ -1278,8 +1299,8 @@ def checkNullConnection():
                     infoMsg = "NULL connection is supported with 'skip-read' method"
                     logger.info(infoMsg)
 
-    except SqlmapConnectionException, errMsg:
-        errMsg = getUnicode(errMsg)
+    except SqlmapConnectionException, ex:
+        errMsg = getSafeExString(ex)
         raise SqlmapConnectionException(errMsg)
 
     finally:
@@ -1298,7 +1319,7 @@ def checkConnection(suppressOutput=False):
             raise SqlmapConnectionException(errMsg)
         except socket.error, ex:
             errMsg = "problem occurred while "
-            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, ex.message)
+            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput and not conf.dummy and not conf.offline:
@@ -1326,7 +1347,7 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-    except SqlmapConnectionException, errMsg:
+    except SqlmapConnectionException, ex:
         if conf.ipv6:
             warnMsg = "check connection to a provided "
             warnMsg += "IPv6 address with a tool like ping6 "
@@ -1336,7 +1357,7 @@ def checkConnection(suppressOutput=False):
             singleTimeWarnMessage(warnMsg)
 
         if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
-            errMsg = getUnicode(errMsg)
+            errMsg = getSafeExString(ex)
             logger.critical(errMsg)
 
             if conf.multipleTargets:
