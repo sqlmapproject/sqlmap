@@ -33,6 +33,7 @@ from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
@@ -197,7 +198,7 @@ def checkCharEncoding(encoding, warn=True):
     # Reference: http://www.iana.org/assignments/character-sets
     # Reference: http://docs.python.org/library/codecs.html
     try:
-        codecs.lookup(encoding)
+        codecs.lookup(encoding.encode(UNICODE_ENCODING) if isinstance(encoding, unicode) else encoding)
     except LookupError:
         if warn:
             warnMsg = "unknown web page charset '%s'. " % encoding
