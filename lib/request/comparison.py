@@ -160,7 +160,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
     if kb.matchRatio is None:
-        if ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
+        if (count or ratio >= LOWER_RATIO_BOUND) and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
 
