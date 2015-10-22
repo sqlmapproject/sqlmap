@@ -12,7 +12,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[CHAR]</char>
             <columns>[COLSTART]-[COLSTOP]</columns>
         </request>
@@ -31,7 +31,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>NULL</char>
             <columns>[COLSTART]-[COLSTOP]</columns>
         </request>
@@ -50,7 +50,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[RANDNUM]</char>
             <columns>[COLSTART]-[COLSTOP]</columns>
         </request>
@@ -69,7 +69,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[CHAR]</char>
             <columns>1-10</columns>
         </request>
@@ -88,7 +88,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>NULL</char>
             <columns>1-10</columns>
         </request>
@@ -107,7 +107,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[RANDNUM]</char>
             <columns>1-10</columns>
         </request>
@@ -126,7 +126,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[CHAR]</char>
             <columns>11-20</columns>
         </request>
@@ -145,7 +145,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>NULL</char>
             <columns>11-20</columns>
         </request>
@@ -164,7 +164,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[RANDNUM]</char>
             <columns>11-20</columns>
         </request>
@@ -183,7 +183,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[CHAR]</char>
             <columns>21-30</columns>
         </request>
@@ -202,7 +202,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>NULL</char>
             <columns>21-30</columns>
         </request>
@@ -221,7 +221,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[RANDNUM]</char>
             <columns>21-30</columns>
         </request>
@@ -240,7 +240,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[CHAR]</char>
             <columns>31-40</columns>
         </request>
@@ -259,7 +259,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>NULL</char>
             <columns>31-40</columns>
         </request>
@@ -278,7 +278,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[RANDNUM]</char>
             <columns>31-40</columns>
         </request>
@@ -297,7 +297,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[CHAR]</char>
             <columns>41-50</columns>
         </request>
@@ -315,7 +315,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>NULL</char>
             <columns>41-50</columns>
         </request>
@@ -334,7 +334,7 @@
         <vector>[UNION]</vector>
         <request>
             <payload/>
-            <comment>-- </comment>
+            <comment>-- -</comment>
             <char>[RANDNUM]</char>
             <columns>41-50</columns>
         </request>
