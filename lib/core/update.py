@@ -27,9 +27,8 @@ def update():
         return
 
     success = False
-    rootDir = paths.SQLMAP_ROOT_PATH
 
-    if not os.path.exists(os.path.join(rootDir, ".git")):
+    if not os.path.exists(os.path.join(paths.SQLMAP_ROOT_PATH, ".git")):
         errMsg = "not a git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
         errMsg += "from GitHub (e.g. 'git clone https://github.com/sqlmapproject/sqlmap.git sqlmap')"
         logger.error(errMsg)
@@ -44,7 +43,7 @@ def update():
         dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
 
         try:
-            process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE)
+            process = execute("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=PIPE, stderr=PIPE, cwd=paths.SQLMAP_ROOT_PATH)
             pollProcess(process, True)
             stdout, stderr = process.communicate()
             success = not process.returncode
