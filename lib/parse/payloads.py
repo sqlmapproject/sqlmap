@@ -9,6 +9,7 @@ import os
 
 from xml.etree import ElementTree as et
 
+from lib.core.common import getSafeExString
 from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
@@ -74,7 +75,7 @@ def loadBoundaries():
         doc = et.parse(paths.BOUNDARIES_XML)
     except Exception, ex:
         errMsg = "something seems to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (paths.BOUNDARIES_XML, ex)
+        errMsg += "the file '%s' ('%s'). Please make " % (paths.BOUNDARIES_XML, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
 
@@ -92,7 +93,7 @@ def loadPayloads():
             doc = et.parse(payloadFilePath)
         except Exception, ex:
             errMsg = "something seems to be wrong with "
-            errMsg += "the file '%s' ('%s'). Please make " % (payloadFilePath, ex)
+            errMsg += "the file '%s' ('%s'). Please make " % (payloadFilePath, getSafeExString(ex))
             errMsg += "sure that you haven't made any changes to it"
             raise SqlmapInstallationException, errMsg
 
