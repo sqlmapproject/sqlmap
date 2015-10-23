@@ -69,6 +69,7 @@ class HashDB(object):
 
     def retrieve(self, key, unserialize=False):
         retVal = None
+
         if key and (self._write_cache or os.path.isfile(self.filepath)):
             hash_ = HashDB.hashKey(key)
             retVal = self._write_cache.get(hash_)
@@ -86,7 +87,16 @@ class HashDB(object):
                         raise SqlmapDataException, errMsg
                     else:
                         break
-        return retVal if not unserialize else unserializeObject(retVal)
+
+        if unserialize:
+            try:
+                retVal = unserializeObject(retVal)
+            except:
+                warnMsg = "error occurred while unserializing value for session key '%s'. " % key
+                warnMsg += "If the problem persists please rerun with `--flush-session`"
+                logger.warn(warnMsg)
+
+        return retVal
 
     def write(self, key, value, serialize=False):
         if key:
