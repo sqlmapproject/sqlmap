@@ -202,7 +202,7 @@ class Format(object):
         if versions is None and Backend.getVersionList():
             versions = Backend.getVersionList()
 
-        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(v for v in versions))
+        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(filter(None, versions)))
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -471,15 +471,17 @@ class Backend:
 
     @staticmethod
     def getVersion():
-        if len(kb.dbmsVersion) > 0:
-            return kb.dbmsVersion[0]
+        versions = filter(None, flattenValue(kb.dbmsVersion))
+        if not isNoneValue(versions):
+            return versions[0]
         else:
             return None
 
     @staticmethod
     def getVersionList():
-        if len(kb.dbmsVersion) > 0:
-            return kb.dbmsVersion
+        versions = filter(None, flattenValue(kb.dbmsVersion))
+        if not isNoneValue(versions):
+            return versions
         else:
             return None
 
