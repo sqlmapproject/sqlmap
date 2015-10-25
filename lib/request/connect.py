@@ -132,6 +132,8 @@ class Connect(object):
             logger.warn(warnMsg)
 
             conf.proxy = None
+            threadData.retriesCount = 0
+
             setHTTPProxy()
 
         if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
