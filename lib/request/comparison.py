@@ -53,6 +53,8 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if page is None and pageLength is None:
         return None
 
+    count = 0
+
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
@@ -122,7 +124,6 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         seq1 = seq1.replace(REFLECTED_VALUE_MARKER, "")
         seq2 = seq2.replace(REFLECTED_VALUE_MARKER, "")
 
-        count = 0
         while count < min(len(seq1), len(seq2)):
             if seq1[count] == seq2[count]:
                 count += 1
@@ -160,7 +161,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
     if kb.matchRatio is None:
-        if ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
+        if (count or ratio >= LOWER_RATIO_BOUND) and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
 

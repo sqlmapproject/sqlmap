@@ -190,7 +190,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                 countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
                 countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
-                if " ORDER BY " in expression.upper():
+                if " ORDER BY " in countedExpression.upper():
                     _ = countedExpression.upper().rindex(" ORDER BY ")
                     countedExpression = countedExpression[:_]
 

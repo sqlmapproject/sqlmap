@@ -124,11 +124,8 @@ class Agent(object):
                 if header.upper() == HTTP_HEADER.AUTHORIZATION.upper():
                     origValue = origValue.split(' ')[-1].split(':')[-1]
 
-        if conf.prefix:
-            value = origValue
-
         if value is None:
-            if where == PAYLOAD.WHERE.ORIGINAL:
+            if where == PAYLOAD.WHERE.ORIGINAL or conf.prefix:
                 value = origValue
             elif where == PAYLOAD.WHERE.NEGATIVE:
                 if conf.invalidLogical:
