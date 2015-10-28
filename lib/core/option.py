@@ -971,7 +971,7 @@ def _setTamperingFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                module = __import__(filename[:-3])
+                module = __import__(filename[:-3].encode(sys.getfilesystemencoding()))
             except (ImportError, SyntaxError), msg:
                 raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], msg))
 
