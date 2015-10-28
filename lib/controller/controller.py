@@ -316,8 +316,8 @@ def start():
             if conf.multipleTargets:
                 hostCount += 1
 
-                if conf.forms:
-                    message = "[#%d] form:\n%s %s" % (hostCount, conf.method or HTTPMETHOD.GET, targetUrl)
+                if conf.forms and conf.method:
+                    message = "[#%d] form:\n%s %s" % (hostCount, conf.method, targetUrl)
                 else:
                     message = "URL %d:\n%s %s%s" % (hostCount, HTTPMETHOD.GET, targetUrl, " (PageRank: %s)" % get_pagerank(targetUrl) if conf.googleDork and conf.pageRank else "")
 
@@ -327,7 +327,7 @@ def start():
                 if conf.data is not None:
                     message += "\n%s data: %s" % ((conf.method if conf.method != HTTPMETHOD.GET else conf.method) or HTTPMETHOD.POST, urlencode(conf.data) if conf.data else "")
 
-                if conf.forms:
+                if conf.forms and conf.method:
                     if conf.method == HTTPMETHOD.GET and targetUrl.find("?") == -1:
                         continue
 
