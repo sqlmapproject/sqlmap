@@ -17,6 +17,7 @@ from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import singleTimeLogMessage
@@ -205,6 +206,15 @@ def checkCharEncoding(encoding, warn=True):
             warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
             singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
+
+    if encoding:
+        try:
+            unicode(randomStr(), encoding)
+        except:
+            if warn:
+                warnMsg = "invalid web page charset '%s'" % encoding
+                singleTimeLogMessage(warnMsg, logging.WARN, encoding)
+            encoding = None
 
     return encoding
 
