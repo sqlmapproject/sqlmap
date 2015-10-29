@@ -3561,7 +3561,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     try:
         forms = ParseResponse(response, backwards_compat=False)
-    except UnicodeError:
+    except (UnicodeError, ValueError):
         pass
     except ParseError:
         if "<html" in (content or ""):
