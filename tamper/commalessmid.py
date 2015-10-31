@@ -5,8 +5,10 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import os
 import re
 
+from lib.core.common import singleTimeWarnMessage
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGH
@@ -30,7 +32,11 @@ def tamper(payload, **kwargs):
 
     retVal = payload
 
-    match = re.search(r"(?i)MID\(([^,]+?)\s*,\s*(\d+)\s*\,\s*(\d+)\s*\)", payload or "")
+    warnMsg = "you should consider usage of switch '--no-cast' along with "
+    warnMsg += "tamper script '%s'" % os.path.basename(__file__).split(".")[0]
+    singleTimeWarnMessage(warnMsg)
+
+    match = re.search(r"(?i)MID\((.+?)\s*,\s*(\d+)\s*\,\s*(\d+)\s*\)", payload or "")
     if match:
         retVal = retVal.replace(match.group(0), "MID(%s FROM %s FOR %s)" % (match.group(1), match.group(2), match.group(3)))
 
