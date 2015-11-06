@@ -114,7 +114,7 @@ def forgeHeaders(items=None):
                 elif not kb.testMode:
                     headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (conf.cookieDel or DEFAULT_COOKIE_DELIMITER, cookie.name, getUnicode(cookie.value))
 
-        if kb.testMode and not conf.csrfToken:
+        if kb.testMode and not any((conf.csrfToken, conf.safeUrl)):
             resetCookieJar(conf.cj)
 
     return headers
