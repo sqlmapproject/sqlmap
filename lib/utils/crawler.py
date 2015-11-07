@@ -15,6 +15,7 @@ import time
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import findPageForms
+from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.common import readInput
 from lib.core.common import safeCSValue
@@ -127,20 +128,26 @@ def crawl(target):
             message += "site's sitemap(.xml) [y/N] "
             test = readInput(message, default="n")
             if test[0] in ("y", "Y"):
+                found = True
                 items = None
                 url = urlparse.urljoin(target, "/sitemap.xml")
                 try:
                     items = parseSitemap(url)
+                except SqlmapConnectionException, ex:
+                    if "page not found" in getSafeExString(ex):
+                        found = False
+                        logger.warn("'sitemap.xml' not found")
                 except:
                     pass
                 finally:
-                    if items:
-                        for item in items:
-                            if re.search(r"(.*?)\?(.+)", item):
-                                threadData.shared.value.add(item)
-                        if conf.crawlDepth > 1:
-                            threadData.shared.unprocessed.update(items)
-                    logger.info("%s links found" % ("no" if not items else len(items)))
+                    if found:
+                        if items:
+                            for item in items:
+                                if re.search(r"(.*?)\?(.+)", item):
+                                    threadData.shared.value.add(item)
+                            if conf.crawlDepth > 1:
+                                threadData.shared.unprocessed.update(items)
+                        logger.info("%s links found" % ("no" if not items else len(items)))
 
         infoMsg = "starting crawler"
         if conf.bulkFile:
