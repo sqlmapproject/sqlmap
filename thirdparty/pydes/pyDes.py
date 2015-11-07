@@ -4,7 +4,7 @@
 
 # Author:   Todd Whiteman
 # Date:     16th March, 2009
-# Verion:   2.0.0
+# Version:  2.0.1
 # License:  Public Domain - free to do as you wish
 # Homepage: http://twhiteman.netfirms.com/des.html
 #
