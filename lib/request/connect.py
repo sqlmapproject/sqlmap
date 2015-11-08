@@ -134,7 +134,7 @@ class Connect(object):
             conf.proxy = None
             threadData.retriesCount = 0
 
-            setHTTPProxy()
+            setHTTPHandlers()
 
         if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
             # timed based payloads can cause web server unresponsiveness
@@ -1118,5 +1118,5 @@ class Connect(object):
         else:
             return comparison(page, headers, code, getRatioValue, pageLength)
 
-def setHTTPProxy():  # Cross-linked function
+def setHTTPHandlers():  # Cross-linked function
     raise NotImplementedError
