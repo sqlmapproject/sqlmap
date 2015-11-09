@@ -493,6 +493,8 @@ class Agent(object):
         if not _:
             fieldsSelectFrom = None
 
+        fieldsToCastStr = fieldsNoSelect
+
         if fieldsSubstr:
             fieldsToCastStr = query
         elif fieldsMinMaxstr:
@@ -516,8 +518,6 @@ class Agent(object):
             fieldsToCastStr = re.sub(r"\ASELECT%s\s+" % prefixRegex, "", fieldsToCastStr)
         elif fieldsSelect:
             fieldsToCastStr = fieldsSelect.groups()[0]
-        else:
-            fieldsToCastStr = fieldsNoSelect
 
         # Function
         if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:

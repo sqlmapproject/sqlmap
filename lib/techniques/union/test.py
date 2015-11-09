@@ -226,7 +226,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                         if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
                             warnMsg = "output with limited number of rows detected. Switching to partial mode"
                             logger.warn(warnMsg)
-                            vector = (position, count, comment, prefix, suffix, kb.uChar, PAYLOAD.WHERE.NEGATIVE, kb.unionDuplicates, False)
+                            vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True)
 
                 unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
 

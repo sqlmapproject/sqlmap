@@ -73,7 +73,7 @@ PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"
 MAX_CONNECTIONS_REGEX = r"max.+connections"
 
 # Regular expression used for extracting results from Google search
-GOOGLE_REGEX = r"url\?\w+=((?![^>]+webcache\.googleusercontent\.com)http[^>]+)&(sa=U|rct=j)"
+GOOGLE_REGEX = r"webcache\.googleusercontent\.com/search\?q=cache:[^:]+:([^+]+)\+&amp;cd=|url\?\w+=((?![^>]+webcache\.googleusercontent\.com)http[^>]+)&(sa=U|rct=j)"
 
 # Regular expression used for extracting results from DuckDuckGo search
 DUCKDUCKGO_REGEX = r'"u":"([^"]+)'

@@ -17,6 +17,7 @@ from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import singleTimeLogMessage
@@ -113,7 +114,7 @@ def forgeHeaders(items=None):
                 elif not kb.testMode:
                     headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (conf.cookieDel or DEFAULT_COOKIE_DELIMITER, cookie.name, getUnicode(cookie.value))
 
-        if kb.testMode and not conf.csrfToken:
+        if kb.testMode and not any((conf.csrfToken, conf.safeUrl)):
             resetCookieJar(conf.cj)
 
     return headers
@@ -205,6 +206,15 @@ def checkCharEncoding(encoding, warn=True):
             warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
             singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
+
+    if encoding:
+        try:
+            unicode(randomStr(), encoding)
+        except:
+            if warn:
+                warnMsg = "invalid web page charset '%s'" % encoding
+                singleTimeLogMessage(warnMsg, logging.WARN, encoding)
+            encoding = None
 
     return encoding
 

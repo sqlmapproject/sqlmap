@@ -132,7 +132,9 @@ class Connect(object):
             logger.warn(warnMsg)
 
             conf.proxy = None
-            setHTTPProxy()
+            threadData.retriesCount = 0
+
+            setHTTPHandlers()
 
         if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
             # timed based payloads can cause web server unresponsiveness
@@ -369,15 +371,17 @@ class Connect(object):
                     headers[HTTP_HEADER.CONTENT_TYPE] = "%s; boundary=%s" % (headers[HTTP_HEADER.CONTENT_TYPE], boundary)
 
             if auxHeaders:
-                for key, item in auxHeaders.items():
+                for key, value in auxHeaders.items():
                     for _ in headers.keys():
                         if _.upper() == key.upper():
                             del headers[_]
-                    headers[key] = item
+                    headers[key] = value
 
-            for key, item in headers.items():
+            for key, value in headers.items():
                 del headers[key]
-                headers[unicodeencode(key, kb.pageEncoding)] = unicodeencode(item, kb.pageEncoding)
+                headers[unicodeencode(key, kb.pageEncoding)] = unicodeencode(value, kb.pageEncoding)
+                for char in (r"\r", r"\n"):
+                    value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
 
             url = unicodeencode(url)
             post = unicodeencode(post)
@@ -586,7 +590,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException):
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError):
             tbMsg = traceback.format_exc()
 
             if "no host given" in tbMsg:
@@ -1114,5 +1118,5 @@ class Connect(object):
         else:
             return comparison(page, headers, code, getRatioValue, pageLength)
 
-def setHTTPProxy():  # Cross-linked function
+def setHTTPHandlers():  # Cross-linked function
     raise NotImplementedError

@@ -3561,7 +3561,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     try:
         forms = ParseResponse(response, backwards_compat=False)
-    except UnicodeError:
+    except (UnicodeError, ValueError):
         pass
     except ParseError:
         if "<html" in (content or ""):
@@ -3861,7 +3861,7 @@ def resetCookieJar(cookieJar):
                 os.close(handle)
 
                 # Reference: http://www.hashbangcode.com/blog/netscape-http-cooke-file-parser-php-584.html
-                with open(filename, "w+b") as f:
+                with openFile(filename, "w+b") as f:
                     f.write("%s\n" % NETSCAPE_FORMAT_HEADER_COOKIES)
                     for line in lines:
                         _ = line.split("\t")

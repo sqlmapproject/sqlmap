@@ -27,7 +27,7 @@ import lib.core.common
 import lib.core.threads
 import lib.core.convert
 import lib.request.connect
-import lib.utils.google
+import lib.utils.search
 
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
@@ -148,7 +148,7 @@ from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
-from lib.utils.google import Google
+from lib.utils.search import search
 from lib.utils.purge import purge
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.keepalive import keepalive
@@ -162,42 +162,6 @@ keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
-
-def _urllib2Opener():
-    """
-    This function creates the urllib2 OpenerDirector.
-    """
-
-    debugMsg = "creating HTTP requests opener object"
-    logger.debug(debugMsg)
-
-    handlers = [proxyHandler, authHandler, redirectHandler, rangeHandler, httpsHandler]
-
-    if not conf.dropSetCookie:
-        if not conf.loadCookies:
-            conf.cj = cookielib.CookieJar()
-        else:
-            conf.cj = cookielib.MozillaCookieJar()
-            resetCookieJar(conf.cj)
-
-        handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
-
-    # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-    if conf.keepAlive:
-        warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-        warnMsg += "been disabled because of its incompatibility "
-
-        if conf.proxy:
-            warnMsg += "with HTTP(s) proxy"
-            logger.warn(warnMsg)
-        elif conf.authType:
-            warnMsg += "with authentication methods"
-            logger.warn(warnMsg)
-        else:
-            handlers.append(keepAliveHandler)
-
-    opener = urllib2.build_opener(*handlers)
-    urllib2.install_opener(opener)
 
 def _feedTargetsDict(reqFile, addedTargetUrls):
     """
@@ -539,46 +503,23 @@ def _setCrawler():
                 errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, ex)
                 logger.error(errMsg)
 
-def _setGoogleDorking():
+def _doSearch():
     """
-    This function checks if the way to request testable hosts is through
-    Google dorking then requests to Google the search parameter, parses
-    the results and save the testable hosts into the knowledge base.
+    This function performs search dorking, parses results
+    and saves the testable hosts into the knowledge base.
     """
 
     if not conf.googleDork:
         return
 
-    global keepAliveHandler
-    global proxyHandler
-
-    debugMsg = "initializing Google dorking requests"
-    logger.debug(debugMsg)
-
-    infoMsg = "first request to Google to get the session cookie"
-    logger.info(infoMsg)
-
-    handlers = [proxyHandler]
-
-    # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-    if conf.keepAlive:
-        if conf.proxy:
-            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-            warnMsg += "been disabled because of its incompatibility "
-            warnMsg += "with HTTP(s) proxy"
-            logger.warn(warnMsg)
-        else:
-            handlers.append(keepAliveHandler)
-
-    googleObj = Google(handlers)
     kb.data.onlyGETs = None
 
     def retrieve():
-        links = googleObj.search(conf.googleDork)
+        links = search(conf.googleDork)
 
         if not links:
             errMsg = "unable to find results for your "
-            errMsg += "Google dork expression"
+            errMsg += "search dork expression"
             raise SqlmapGenericException(errMsg)
 
         for link in links:
@@ -600,7 +541,7 @@ def _setGoogleDorking():
 
         if kb.targets:
             infoMsg = "sqlmap got %d results for your " % len(links)
-            infoMsg += "Google dork expression, "
+            infoMsg += "search dork expression, "
 
             if len(links) == len(kb.targets):
                 infoMsg += "all "
@@ -613,7 +554,7 @@ def _setGoogleDorking():
 
         else:
             message = "sqlmap got %d results " % len(links)
-            message += "for your Google dork expression, but none of them "
+            message += "for your search dork expression, but none of them "
             message += "have GET parameters to test for SQL injection. "
             message += "Do you want to skip to the next result page? [Y/n]"
             test = readInput(message, default="Y")
@@ -971,7 +912,7 @@ def _setTamperingFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                module = __import__(filename[:-3])
+                module = __import__(filename[:-3].encode(sys.getfilesystemencoding()))
             except (ImportError, SyntaxError), msg:
                 raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], msg))
 
@@ -1077,7 +1018,7 @@ def _setDNSCache():
         socket._getaddrinfo = socket.getaddrinfo
         socket.getaddrinfo = _getaddrinfo
 
-def _setHTTPProxy():
+def _setHTTPHandlers():
     """
     Check and set the HTTP/SOCKS proxy for all HTTP requests.
     """
@@ -1102,63 +1043,93 @@ def _setHTTPProxy():
         if conf.hostname in ("localhost", "127.0.0.1") or conf.ignoreProxy:
             proxyHandler.proxies = {}
 
-        return
+    if conf.proxy:
+        debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
+        logger.debug(debugMsg)
 
-    debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
-    logger.debug(debugMsg)
-
-    try:
-        _ = urlparse.urlsplit(conf.proxy)
-    except Exception, ex:
-        errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, ex)
-        raise SqlmapSyntaxException, errMsg
-
-    hostnamePort = _.netloc.split(":")
-
-    scheme = _.scheme.upper()
-    hostname = hostnamePort[0]
-    port = None
-    username = None
-    password = None
-
-    if len(hostnamePort) == 2:
         try:
-            port = int(hostnamePort[1])
-        except:
-            pass  # drops into the next check block
+            _ = urlparse.urlsplit(conf.proxy)
+        except Exception, ex:
+            errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, ex)
+            raise SqlmapSyntaxException, errMsg
 
-    if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
-        errMsg = "proxy value must be in format '(%s)://address:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
-        raise SqlmapSyntaxException(errMsg)
+        hostnamePort = _.netloc.split(":")
 
-    if conf.proxyCred:
-        _ = re.search("^(.*?):(.*?)$", conf.proxyCred)
-        if not _:
-            errMsg = "proxy authentication credentials "
-            errMsg += "value must be in format username:password"
+        scheme = _.scheme.upper()
+        hostname = hostnamePort[0]
+        port = None
+        username = None
+        password = None
+
+        if len(hostnamePort) == 2:
+            try:
+                port = int(hostnamePort[1])
+            except:
+                pass  # drops into the next check block
+
+        if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
+            errMsg = "proxy value must be in format '(%s)://address:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
             raise SqlmapSyntaxException(errMsg)
-        else:
-            username = _.group(1)
-            password = _.group(2)
-
-    if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
-        proxyHandler.proxies = {}
-
-        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
-        socks.wrapmodule(urllib2)
-    else:
-        socks.unwrapmodule(urllib2)
 
         if conf.proxyCred:
-            # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
-            proxyString = "%s@" % conf.proxyCred
+            _ = re.search("^(.*?):(.*?)$", conf.proxyCred)
+            if not _:
+                errMsg = "proxy authentication credentials "
+                errMsg += "value must be in format username:password"
+                raise SqlmapSyntaxException(errMsg)
+            else:
+                username = _.group(1)
+                password = _.group(2)
+
+        if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
+            proxyHandler.proxies = {}
+
+            socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
+            socks.wrapmodule(urllib2)
         else:
-            proxyString = ""
+            socks.unwrapmodule(urllib2)
 
-        proxyString += "%s:%d" % (hostname, port)
-        proxyHandler.proxies = {"http": proxyString, "https": proxyString}
+            if conf.proxyCred:
+                # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
+                proxyString = "%s@" % conf.proxyCred
+            else:
+                proxyString = ""
 
-    proxyHandler.__init__(proxyHandler.proxies)
+            proxyString += "%s:%d" % (hostname, port)
+            proxyHandler.proxies = {"http": proxyString, "https": proxyString}
+
+        proxyHandler.__init__(proxyHandler.proxies)
+
+    debugMsg = "creating HTTP requests opener object"
+    logger.debug(debugMsg)
+
+    handlers = filter(None, [proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, httpsHandler])
+
+    if not conf.dropSetCookie:
+        if not conf.loadCookies:
+            conf.cj = cookielib.CookieJar()
+        else:
+            conf.cj = cookielib.MozillaCookieJar()
+            resetCookieJar(conf.cj)
+
+        handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
+
+    # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
+    if conf.keepAlive:
+        warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
+        warnMsg += "been disabled because of its incompatibility "
+
+        if conf.proxy:
+            warnMsg += "with HTTP(s) proxy"
+            logger.warn(warnMsg)
+        elif conf.authType:
+            warnMsg += "with authentication methods"
+            logger.warn(warnMsg)
+        else:
+            handlers.append(keepAliveHandler)
+
+    opener = urllib2.build_opener(*handlers)
+    urllib2.install_opener(opener)
 
 def _setSafeVisit():
     """
@@ -2494,8 +2465,8 @@ def _resolveCrossReferences():
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
-    lib.request.connect.setHTTPProxy = _setHTTPProxy
-    lib.utils.google.setHTTPProxy = _setHTTPProxy
+    lib.request.connect.setHTTPHandlers = _setHTTPHandlers
+    lib.utils.search.setHTTPHandlers = _setHTTPHandlers
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
@@ -2544,13 +2515,12 @@ def init():
         _setHTTPHost()
         _setHTTPUserAgent()
         _setHTTPAuthentication()
-        _setHTTPProxy()
+        _setHTTPHandlers()
         _setDNSCache()
         _setSafeVisit()
-        _setGoogleDorking()
+        _doSearch()
         _setBulkMultipleTargets()
         _setSitemapTargets()
-        _urllib2Opener()
         _checkTor()
         _setCrawler()
         _findPageForms()

@@ -8,6 +8,8 @@ See the file 'doc/COPYING' for copying permission
 import logging
 import optparse
 
+from lib.utils import versioncheck  # this has to be the first non-standard import
+
 from sqlmap import modulePath
 from lib.core.common import setPaths
 from lib.core.data import paths
