@@ -120,8 +120,10 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
                     break
 
         if not retVal:
-            ratios.pop(ratios.index(min_))
-            ratios.pop(ratios.index(max_))
+            if min_ in ratios:
+                ratios.pop(ratios.index(min_))
+            if max_ in ratios:
+                ratios.pop(ratios.index(max_))
 
             minItem, maxItem = None, None
 
