@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import atexit
 import os
-import rlcompleter
 
 from lib.core import readlineng as readline
 from lib.core.data import logger
@@ -15,6 +14,29 @@ from lib.core.data import paths
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import OS
 from lib.core.settings import MAX_HISTORY_LENGTH
+
+try:
+    import rlcompleter
+
+    class CompleterNG(rlcompleter.Completer):
+        def global_matches(self, text):
+            """
+            Compute matches when text is a simple name.
+            Return a list of all names currently defined in self.namespace
+            that match.
+            """
+
+            matches = []
+            n = len(text)
+
+            for ns in (self.namespace,):
+                for word in ns:
+                    if word[:n] == text:
+                        matches.append(word)
+
+            return matches
+except:
+    readline._readline = None
 
 def readlineAvailable():
     """
@@ -73,24 +95,6 @@ def loadHistory(completion=None):
         except IOError, msg:
             warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, msg)
             logger.warn(warnMsg)
-
-class CompleterNG(rlcompleter.Completer):
-    def global_matches(self, text):
-        """
-        Compute matches when text is a simple name.
-        Return a list of all names currently defined in self.namespace
-        that match.
-        """
-
-        matches = []
-        n = len(text)
-
-        for ns in (self.namespace,):
-            for word in ns:
-                if word[:n] == text:
-                    matches.append(word)
-
-        return matches
 
 def autoCompletion(completion=None, os=None, commands=None):
     if not readlineAvailable():
