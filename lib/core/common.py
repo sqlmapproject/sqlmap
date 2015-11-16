@@ -2950,7 +2950,7 @@ def decodeIntToUnicode(value):
 
                 if Backend.isDbms(DBMS.MSSQL):
                     retVal = getUnicode(raw, "UTF-16-BE")
-                elif Backend.isDbms(DBMS.PGSQL):
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
                     retVal = unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.charset)
