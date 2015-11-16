@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import binascii
 
 from lib.core.convert import utf8encode
+from lib.core.settings import DEFAULT_MYSQL_CHARACTER_SET
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -26,7 +27,7 @@ class Syntax(GenericSyntax):
             try:
                 retVal = "0x%s" % binascii.hexlify(value)
             except UnicodeEncodeError:
-                retVal = "CONVERT(0x%s USING utf8)" % "".join("%.2x" % ord(_) for _ in utf8encode(value))
+                retVal = "CONVERT(0x%s USING %s)" % ("".join("%.2x" % ord(_) for _ in utf8encode(value)), DEFAULT_MYSQL_CHARACTER_SET)
             return retVal
 
         return Syntax._escape(expression, quote, escaper)

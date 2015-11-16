@@ -37,6 +37,7 @@ from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
+from lib.core.settings import DEFAULT_MYSQL_CHARACTER_SET
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
@@ -400,7 +401,10 @@ class Agent(object):
                 nulledCastedField = field
             else:
                 if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
-                    nulledCastedField = rootQuery.cast.query % field
+                    if Backend.isDbms(DBMS.MYSQL):
+                        nulledCastedField = rootQuery.cast.query.replace(")", " CHARACTER SET %s)") % (field, DEFAULT_MYSQL_CHARACTER_SET)
+                    else:
+                        nulledCastedField = rootQuery.cast.query % field
                 if Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
                     nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
                 else:

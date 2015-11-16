@@ -3,7 +3,7 @@
 <root>
     <!-- MySQL -->
     <dbms value="MySQL">
-        <cast query="CAST(%s AS CHAR CHARACTER SET latin1)"/>
+        <cast query="CAST(%s AS CHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
         <isnull query="IFNULL(%s,' ')"/>
         <delimiter query=","/>

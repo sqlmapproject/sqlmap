@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import threading
 import time
 
+from extra.safe2bin.safe2bin import safechardecode
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
@@ -18,6 +19,7 @@ from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getCounter
+from lib.core.common import getUnicode
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
@@ -35,6 +37,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
 from lib.core.settings import CHAR_INFERENCE_MARK
+from lib.core.settings import DEFAULT_MYSQL_CHARACTER_SET
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
@@ -589,6 +592,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         raise KeyboardInterrupt
 
     _ = finalValue or partialValue
+
+    if Backend.isDbms(DBMS.MYSQL) and safechardecode(_) != _:
+        _ = getUnicode(safechardecode(_).encode(DEFAULT_MYSQL_CHARACTER_SET))
+
     return getCounter(kb.technique), safecharencode(_) if kb.safeCharEncode else _
 
 def queryOutputLength(expression, payload):

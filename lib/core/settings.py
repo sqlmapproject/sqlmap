@@ -224,6 +224,10 @@ HOST_ALIASES = ("host",)
 
 HSQLDB_DEFAULT_SCHEMA = "PUBLIC"
 
+# Default character set used in MySQL
+# Reference: http://pieroxy.net/blog/2013/05/28/mysql_charset_hell.html
+DEFAULT_MYSQL_CHARACTER_SET = "latin1"
+
 # Names that can't be used to name files on Windows OS
 WINDOWS_RESERVED_NAMES = ("CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9")
 
