@@ -587,7 +587,7 @@ EVENTVALIDATION_REGEX = r'(?i)(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<re
 LIMITED_ROWS_TEST_NUMBER = 15
 
 # Format used for representing invalid unicode characters
-INVALID_UNICODE_CHAR_FORMAT = r"\?%02x"
+INVALID_UNICODE_CHAR_FORMAT = r"\x%02x"
 
 # Regular expression for XML POST data
 XML_RECOGNITION_REGEX = r"(?s)\A\s*<[^>]+>(.+>)?\s*\Z"
