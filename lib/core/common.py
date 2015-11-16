@@ -2954,10 +2954,6 @@ def decodeIntToUnicode(value):
                     retVal = unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.charset)
-
-                if Backend.isDbms(DBMS.MYSQL):
-                    import pdb
-                    pdb.set_trace()
             else:
                 retVal = getUnicode(chr(value))
         except:
