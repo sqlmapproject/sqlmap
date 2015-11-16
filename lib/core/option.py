@@ -1031,7 +1031,7 @@ def _setSocketPreConnect():
                     s = socket.socket()
                     s._connect(address)
                     socket._ready[address].append(s._sock)
-            time.sleep(0.001)
+            time.sleep(0.01)
 
     def connect(self, address):
         found = False
