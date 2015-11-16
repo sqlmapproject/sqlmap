@@ -122,6 +122,7 @@ from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import SITE
+from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
 from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
@@ -1014,9 +1015,43 @@ def _setDNSCache():
             kb.cache[args] = socket._getaddrinfo(*args, **kwargs)
             return kb.cache[args]
 
-    if not hasattr(socket, '_getaddrinfo'):
+    if not hasattr(socket, "_getaddrinfo"):
         socket._getaddrinfo = socket.getaddrinfo
         socket.getaddrinfo = _getaddrinfo
+
+def _setSocketPreConnect():
+    """
+    Makes a pre-connect version of socket.connect
+    """
+
+    def _():
+        while kb.threadContinue:
+            for address in socket._ready:
+                if len(socket._ready[address]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
+                    s = socket.socket()
+                    s._connect(address)
+                    socket._ready[address].append(s._sock)
+            time.sleep(0.001)
+
+    def connect(self, address):
+        found = False
+        with kb.locks.socket:
+            if address not in socket._ready:
+                socket._ready[address] = []
+            if len(socket._ready[address]) > 0:
+                self._sock = socket._ready[address].pop(0)
+                found = True
+        if not found:
+            self._connect(address)
+
+    if not hasattr(socket, "_connect"):
+        socket._ready = {}
+        socket.socket._connect = socket.socket.connect
+        socket.socket.connect = connect
+
+        thread = threading.Thread(target=_)
+        thread.daemon = True
+        thread.start()
 
 def _setHTTPHandlers():
     """
@@ -1803,7 +1838,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "count", "index", "io", "limit", "log", "redirect", "request", "value"):
+    for _ in ("cache", "count", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -2517,6 +2552,7 @@ def init():
         _setHTTPAuthentication()
         _setHTTPHandlers()
         _setDNSCache()
+        _setSocketPreConnect()
         _setSafeVisit()
         _doSearch()
         _setBulkMultipleTargets()
