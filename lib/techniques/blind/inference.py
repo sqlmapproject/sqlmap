@@ -37,7 +37,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
 from lib.core.settings import CHAR_INFERENCE_MARK
-from lib.core.settings import DEFAULT_MYSQL_CHARACTER_SET
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
@@ -592,9 +591,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         raise KeyboardInterrupt
 
     _ = finalValue or partialValue
-
-    if Backend.isDbms(DBMS.MYSQL) and safechardecode(_) != _:
-        _ = getUnicode(safechardecode(_).encode(DEFAULT_MYSQL_CHARACTER_SET))
 
     return getCounter(kb.technique), safecharencode(_) if kb.safeCharEncode else _
 
