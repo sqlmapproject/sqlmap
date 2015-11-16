@@ -2944,7 +2944,7 @@ def decodeIntToUnicode(value):
         try:
             if value > 255:
                 if Backend.isDbms(DBMS.MSSQL):
-                    encoding="UTF-16-LE" if isDBMSVersionAtLeast("2012") else "UTF-16-BE"
+                    encoding = "UTF-16-BE"
                 else:
                     encoding = conf.charset
 
