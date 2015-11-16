@@ -2943,10 +2943,16 @@ def decodeIntToUnicode(value):
     if isinstance(value, int):
         try:
             if value > 255:
+                if Backend.isDbms(DBMS.MSSQL):
+                    encoding="UTF-16-LE" if isDBMSVersionAtLeast("2012") else "UTF-16-BE"
+                else:
+                    encoding = conf.charset
+
                 _ = "%x" % value
                 if len(_) % 2 == 1:
                     _ = "0%s" % _
-                retVal = getUnicode(hexdecode(_), encoding="UTF-16" if Backend.isDbms(DBMS.MSSQL) else None)
+
+                retVal = getUnicode(hexdecode(_), encoding)
             else:
                 retVal = getUnicode(chr(value))
         except:
