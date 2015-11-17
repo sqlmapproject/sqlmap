@@ -1031,7 +1031,8 @@ def _setSocketPreConnect():
                     if len(socket._ready[address]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
                         s = socket.socket()
                         s._connect(address)
-                        socket._ready[address].append(s._sock)
+                        with kb.locks.socket:
+                            socket._ready[address].append(s._sock)
             except socket.error:
                 pass
             finally:
