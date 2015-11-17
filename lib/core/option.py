@@ -1050,7 +1050,6 @@ def _setSocketPreConnect():
         socket.socket.connect = connect
 
         thread = threading.Thread(target=_)
-        thread.daemon = True
         thread.start()
 
 def _setHTTPHandlers():
