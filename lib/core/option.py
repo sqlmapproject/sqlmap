@@ -1026,12 +1026,16 @@ def _setSocketPreConnect():
 
     def _():
         while kb.threadContinue:
-            for address in socket._ready:
-                if len(socket._ready[address]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
-                    s = socket.socket()
-                    s._connect(address)
-                    socket._ready[address].append(s._sock)
-            time.sleep(0.01)
+            try:
+                for address in socket._ready:
+                    if len(socket._ready[address]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
+                        s = socket.socket()
+                        s._connect(address)
+                        socket._ready[address].append(s._sock)
+            except socket.error:
+                pass
+            finally:
+                time.sleep(0.01)
 
     def connect(self, address):
         found = False
