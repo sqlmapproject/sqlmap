@@ -122,7 +122,6 @@ from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import SITE
-from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
 from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
@@ -1028,7 +1027,7 @@ def _setSocketPreConnect():
         while kb.threadContinue:
             try:
                 for address in socket._ready:
-                    if len(socket._ready[address]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
+                    if len(socket._ready[address]) < conf.threads:
                         s = socket.socket()
                         s._connect(address)
                         with kb.locks.socket:

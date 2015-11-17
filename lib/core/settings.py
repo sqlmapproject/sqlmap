@@ -466,9 +466,6 @@ ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 # Approximate chunk length (in bytes) used by BigArray objects (only last chunk and cached one are held in memory)
 BIGARRAY_CHUNK_SIZE = 1024 * 1024
 
-# Maximum number of socket pre-connects
-SOCKET_PRE_CONNECT_QUEUE_SIZE = 3
-
 # Only console display last n table rows
 TRIM_STDOUT_DUMP_SIZE = 256
 
