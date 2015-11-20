@@ -1027,12 +1027,13 @@ def _setSocketPreConnect():
     def _():
         while kb.threadContinue:
             try:
-                for address in socket._ready:
-                    if len(socket._ready[address]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
-                        s = socket.socket()
+                for key in socket._ready:
+                    if len(socket._ready[key]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
+                        family, type, proto, address = key
+                        s = socket.socket(family, type, proto)
                         s._connect(address)
                         with kb.locks.socket:
-                            socket._ready[address].append(s._sock)
+                            socket._ready[key].append(s._sock)
             except socket.error:
                 pass
             finally:
@@ -1040,11 +1041,12 @@ def _setSocketPreConnect():
 
     def connect(self, address):
         found = False
+        key = (self.family, self.type, self.proto, address)
         with kb.locks.socket:
-            if address not in socket._ready:
-                socket._ready[address] = []
-            if len(socket._ready[address]) > 0:
-                self._sock = socket._ready[address].pop(0)
+            if key not in socket._ready:
+                socket._ready[key] = []
+            if len(socket._ready[key]) > 0:
+                self._sock = socket._ready[key].pop(0)
                 found = True
         if not found:
             self._connect(address)
