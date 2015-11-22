@@ -1051,7 +1051,7 @@ def _setSocketPreConnect():
         if not found:
             self._connect(address)
 
-    if not hasattr(socket, "_connect"):
+    if not hasattr(socket.socket, "_connect"):
         socket._ready = {}
         socket.socket._connect = socket.socket.connect
         socket.socket.connect = connect
