@@ -11,6 +11,7 @@ import shutil
 import stat
 import string
 
+from lib.core.common import getSafeExString
 from lib.core.data import logger
 
 def purge(directory):
@@ -79,4 +80,4 @@ def purge(directory):
     try:
         shutil.rmtree(directory)
     except OSError, ex:
-        logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, unicode(ex)))
+        logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, getSafeExString(ex)))
