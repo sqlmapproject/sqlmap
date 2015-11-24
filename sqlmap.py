@@ -142,7 +142,7 @@ def main():
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
 
-        if "No space left" in excMsg:
+        if any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
             errMsg = "no space left on output device"
             logger.error(errMsg)
             raise SystemExit
