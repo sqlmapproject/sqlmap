@@ -52,7 +52,12 @@ class Filesystem:
 
             lengthQuery = "SELECT DATALENGTH(%s) FROM %s" % (self.tblField, self.fileTblName)
 
-        localFileSize = os.path.getsize(localFile)
+        try:
+            localFileSize = os.path.getsize(localFile)
+        except OSError:
+            warnMsg = "file '%s' is missing" % localFile
+            logger.warn(warnMsg)
+            localFileSize = 0
 
         if fileRead and Backend.isDbms(DBMS.PGSQL):
             logger.info("length of read file '%s' cannot be checked on PostgreSQL" % remoteFile)

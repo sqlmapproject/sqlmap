@@ -81,7 +81,7 @@ class HTTPMETHOD:
     POST = "POST"
     HEAD = "HEAD"
     PUT = "PUT"
-    DELETE = "DETELE"
+    DELETE = "DELETE"
     TRACE = "TRACE"
     OPTIONS = "OPTIONS"
     CONNECT = "CONNECT"

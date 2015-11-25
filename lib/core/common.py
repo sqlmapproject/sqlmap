@@ -2946,7 +2946,14 @@ def decodeIntToUnicode(value):
                 _ = "%x" % value
                 if len(_) % 2 == 1:
                     _ = "0%s" % _
-                retVal = getUnicode(hexdecode(_), encoding="UTF-16" if Backend.isDbms(DBMS.MSSQL) else None)
+                raw = hexdecode(_)
+
+                if Backend.isDbms(DBMS.MSSQL):
+                    retVal = getUnicode(raw, "UTF-16-BE")
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
+                    retVal = unichr(value)
+                else:
+                    retVal = getUnicode(raw, conf.charset)
             else:
                 retVal = getUnicode(chr(value))
         except:

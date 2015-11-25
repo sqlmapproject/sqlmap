@@ -318,37 +318,44 @@ def _setRequestParams():
 
     # Perform checks on header values
     if conf.httpHeaders:
-        for httpHeader, headerValue in conf.httpHeaders:
+        for httpHeader, headerValue in list(conf.httpHeaders):
             # Url encoding of the header values should be avoided
             # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
 
-            httpHeader = httpHeader.title()
-
-            if httpHeader == HTTP_HEADER.USER_AGENT:
+            if httpHeader.title() == HTTP_HEADER.USER_AGENT:
                 conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
+                condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES, True)))
 
                 if condition:
                     conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
                     testableParameters = True
 
-            elif httpHeader == HTTP_HEADER.REFERER:
+            elif httpHeader.title() == HTTP_HEADER.REFERER:
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
+                condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES, True)))
 
                 if condition:
                     conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
                     testableParameters = True
 
-            elif httpHeader == HTTP_HEADER.HOST:
+            elif httpHeader.title() == HTTP_HEADER.HOST:
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))
+                condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES, True)))
 
                 if condition:
                     conf.paramDict[PLACE.HOST] = {PLACE.HOST: headerValue}
+                    testableParameters = True
+
+            else:
+                condition = intersect(conf.testParameter, [httpHeader], True)
+
+                if condition:
+                    conf.parameters[PLACE.CUSTOM_HEADER] = str(conf.httpHeaders)
+                    conf.paramDict[PLACE.CUSTOM_HEADER] = {httpHeader: "%s,%s%s" % (httpHeader, headerValue, CUSTOM_INJECTION_MARK_CHAR)}
+                    conf.httpHeaders = [(header, value.replace(CUSTOM_INJECTION_MARK_CHAR, "")) for header, value in conf.httpHeaders]
                     testableParameters = True
 
     if not conf.parameters:

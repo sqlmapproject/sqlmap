@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import threading
 import time
 
+from extra.safe2bin.safe2bin import safechardecode
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
@@ -18,6 +19,7 @@ from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getCounter
+from lib.core.common import getUnicode
 from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
@@ -589,6 +591,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         raise KeyboardInterrupt
 
     _ = finalValue or partialValue
+
     return getCounter(kb.technique), safecharencode(_) if kb.safeCharEncode else _
 
 def queryOutputLength(expression, payload):

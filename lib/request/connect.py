@@ -476,7 +476,7 @@ class Connect(object):
                 status = getUnicode(conn.msg)
 
             if extractRegexResult(META_REFRESH_REGEX, page) and not refreshing:
-                url = extractRegexResult(META_REFRESH_REGEX, page)
+                refresh = extractRegexResult(META_REFRESH_REGEX, page)
 
                 debugMsg = "got HTML meta refresh header"
                 logger.debug(debugMsg)
@@ -491,13 +491,14 @@ class Connect(object):
                     kb.alwaysRefresh = choice not in ("n", "N")
 
                 if kb.alwaysRefresh:
-                    if url.lower().startswith('http://'):
-                        kwargs['url'] = url
+                    if re.search(r"\Ahttps?://", refresh, re.I):
+                        url = refresh
                     else:
-                        kwargs['url'] = conf.url[:conf.url.rfind('/') + 1] + url
+                        url = urlparse.urljoin(url, refresh)
 
                     threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                     kwargs['refreshing'] = True
+                    kwargs['url'] = url
                     kwargs['get'] = None
                     kwargs['post'] = None
 
@@ -659,7 +660,7 @@ class Connect(object):
         if conn and getattr(conn, "redurl", None):
             _ = urlparse.urlsplit(conn.redurl)
             _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
-            requestMsg = re.sub("(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % re.escape(getUnicode(_)), requestMsg, 1)
+            requestMsg = re.sub("(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
 
             if kb.resendPostOnRedirect is False:
                 requestMsg = re.sub("(\[#\d+\]:\n)POST ", "\g<1>GET ", requestMsg)

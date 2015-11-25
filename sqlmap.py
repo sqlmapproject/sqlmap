@@ -142,8 +142,15 @@ def main():
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
 
-        if "No space left" in excMsg:
+        if any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
             errMsg = "no space left on output device"
+            logger.error(errMsg)
+            raise SystemExit
+
+        elif "bad marshal data (unknown type code)" in excMsg:
+            match = re.search(r"\s*(.+)\s+ValueError", excMsg)
+            errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
+            errMsg += ". Please delete .pyc files on your system to fix the problem"
             logger.error(errMsg)
             raise SystemExit
 

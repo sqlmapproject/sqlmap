@@ -43,6 +43,7 @@ from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import MAX_BUFFERED_PARTIAL_UNION_LENGTH
 from lib.core.settings import SQL_SCALAR_REGEX
@@ -231,7 +232,14 @@ def unionUse(expression, unpack=True, dump=False):
                 return value
 
             threadData = getCurrentThreadData()
-            threadData.shared.limits = iter(xrange(startLimit, stopLimit))
+
+            try:
+                threadData.shared.limits = iter(xrange(startLimit, stopLimit))
+            except OverflowError:
+                errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
+                errMsg += "with switch '--fresh-queries'"
+                raise SqlmapDataException(errMsg)
+
             numThreads = min(conf.threads, (stopLimit - startLimit))
             threadData.shared.value = BigArray()
             threadData.shared.buffered = []

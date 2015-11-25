@@ -60,7 +60,7 @@ class Takeover(GenericTakeover):
                 else:
                     self.__plugindir = "%s/lib/mysql/plugin" % self.__basedir
 
-                self.__plugindir = ntToPosixSlashes(normalizePath(self.__plugindir))
+            self.__plugindir = ntToPosixSlashes(normalizePath(self.__plugindir))
 
             self.udfRemoteFile = "%s/%s.%s" % (self.__plugindir, self.udfSharedLibName, self.udfSharedLibExt)
 

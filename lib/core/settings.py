@@ -20,7 +20,7 @@ from lib.core.revision import getRevisionNumber
 # sqlmap version and site
 VERSION = "1.0-dev"
 REVISION = getRevisionNumber()
-VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit-%s" % time.strftime("%Y%m%d", time.gmtime(os.path.getctime(__file__))))
+VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit-%s%04x" % (time.strftime("%Y%m%d", time.gmtime(os.path.getmtime(__file__))), os.path.getsize(os.path.join(os.path.dirname(__file__), "common.py")) & 0xffff))
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
@@ -466,6 +466,9 @@ ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 # Approximate chunk length (in bytes) used by BigArray objects (only last chunk and cached one are held in memory)
 BIGARRAY_CHUNK_SIZE = 1024 * 1024
 
+# Maximum number of socket pre-connects
+SOCKET_PRE_CONNECT_QUEUE_SIZE = 3
+
 # Only console display last n table rows
 TRIM_STDOUT_DUMP_SIZE = 256
 
@@ -587,7 +590,7 @@ EVENTVALIDATION_REGEX = r'(?i)(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<re
 LIMITED_ROWS_TEST_NUMBER = 15
 
 # Format used for representing invalid unicode characters
-INVALID_UNICODE_CHAR_FORMAT = r"\?%02x"
+INVALID_UNICODE_CHAR_FORMAT = r"\x%02x"
 
 # Regular expression for XML POST data
 XML_RECOGNITION_REGEX = r"(?s)\A\s*<[^>]+>(.+>)?\s*\Z"
