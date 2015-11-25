@@ -111,6 +111,9 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 warnMsg += "(probably due to its length and/or content): "
                 warnMsg += safecharencode(trimmed)
                 logger.warn(warnMsg)
+    else:
+        vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
+        kb.unionDuplicates = vector[7]
 
     return retVal
 
