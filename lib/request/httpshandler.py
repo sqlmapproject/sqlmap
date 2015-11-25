@@ -43,11 +43,14 @@ class HTTPSConnection(httplib.HTTPSConnection):
 
         success = False
 
-        if not kb.tlsSNI:
-            for protocol in _protocols:
+        # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
+        #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
+        if kb.tlsSNI != False and hasattr(ssl, "SSLContext"):
+            for protocol in filter(lambda _: _ >= ssl.PROTOCOL_TLSv1, _protocols):
                 try:
                     sock = create_sock()
-                    _ = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=protocol)
+                    context = ssl.SSLContext(protocol)
+                    _ = context.wrap_socket(sock, do_handshake_on_connect=False, server_hostname=self.host)
                     if _:
                         success = True
                         self.sock = _
@@ -60,16 +63,16 @@ class HTTPSConnection(httplib.HTTPSConnection):
                     self._tunnel_host = None
                     logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
-        # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
-        #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
-        if not success and hasattr(ssl, "SSLContext"):
-            for protocol in filter(lambda _: _ >= ssl.PROTOCOL_TLSv1, _protocols):
+            if kb.tlsSNI is None:
+                kb.tlsSNI = success
+
+        if not success:
+            for protocol in _protocols:
                 try:
                     sock = create_sock()
-                    context = ssl.SSLContext(protocol)
-                    _ = context.wrap_socket(sock, do_handshake_on_connect=False, server_hostname=self.host)
+                    _ = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=protocol)
                     if _:
-                        kb.tlsSNI = success = True
+                        success = True
                         self.sock = _
                         _protocols.remove(protocol)
                         _protocols.insert(0, protocol)
