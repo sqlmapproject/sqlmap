@@ -257,9 +257,9 @@ class Web:
                     self.webStagerFilePath = posixpath.join(ntToPosixSlashes(directory), stagerName)
 
                     handle, filename = tempfile.mkstemp()
-                    os.fdopen(handle).close()  # close low level handle (causing problems later)
+                    os.close(handle)
 
-                    with open(filename, "w+") as f:
+                    with open(filename, "w+b") as f:
                         _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
                         _ = _.replace("WRITABLE_DIR", utf8encode(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
                         f.write(_)
