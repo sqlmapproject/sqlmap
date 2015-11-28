@@ -9,9 +9,8 @@ import os
 import posixpath
 import re
 import StringIO
+import tempfile
 import urlparse
-
-from tempfile import mkstemp
 
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
@@ -257,7 +256,7 @@ class Web:
                     stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webApi)
                     self.webStagerFilePath = posixpath.join(ntToPosixSlashes(directory), stagerName)
 
-                    handle, filename = mkstemp()
+                    handle, filename = tempfile.mkstemp()
                     os.fdopen(handle).close()  # close low level handle (causing problems later)
 
                     with open(filename, "w+") as f:
