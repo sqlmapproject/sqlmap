@@ -1024,6 +1024,9 @@ def _setSocketPreConnect():
     Makes a pre-connect version of socket.connect
     """
 
+    if conf.disablePrecon:
+        return
+
     def _():
         while kb.threadContinue:
             try:
