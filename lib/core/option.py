@@ -1376,7 +1376,7 @@ def _setHTTPExtraHeaders():
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise SqlmapSyntaxException(errMsg)
 
-    elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
+    elif not conf.requestFile and len(conf.httpHeaders or []) < 2:
         conf.httpHeaders.append((HTTP_HEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
         if not conf.charset:
             conf.httpHeaders.append((HTTP_HEADER.ACCEPT_CHARSET, "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
