@@ -3770,8 +3770,12 @@ def decodeHexValue(value, raw=False):
 
     def _(value):
         retVal = value
-        if value and isinstance(value, basestring) and len(value) % 2 == 0:
-            retVal = hexdecode(retVal)
+        if value and isinstance(value, basestring):
+            if len(value) % 2 != 0:
+                retVal = "%s?" % hexdecode(value[:-1])
+                singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
+            else:
+                retVal = hexdecode(value)
 
             if not kb.binaryField and not raw:
                 if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
