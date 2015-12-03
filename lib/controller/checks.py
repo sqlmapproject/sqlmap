@@ -1034,7 +1034,7 @@ def checkStability():
     delay = max(0, min(1, delay))
     time.sleep(delay)
 
-    secondPage, _ = Request.queryPage(content=True, raise404=False)
+    secondPage, _ = Request.queryPage(content=True, noteResponseTime=False, raise404=False)
 
     if kb.redirectChoice:
         return None
