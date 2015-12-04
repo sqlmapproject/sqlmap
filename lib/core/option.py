@@ -1576,7 +1576,7 @@ def _cleanupOptions():
         conf.progressWidth = width - 46
 
     for key, value in conf.items():
-        if value and any(key.endswith(_) for _ in ("Path", "File")):
+        if value and any(key.endswith(_) for _ in ("Path", "File", "Dir")):
             conf[key] = safeExpandUser(value)
 
     if conf.testParameter:
