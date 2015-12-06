@@ -6,7 +6,7 @@
 
 ## 2014
 
-* Over 1000 [Issues](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) closed.
+* > 1000 [Issues](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) closed.
 
 ## 2013
 
