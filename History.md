@@ -1,7 +1,12 @@
 # History
 
+## 2015
+
+* **Oct 14**, Miroslav presents **sqlmap - why (not how) it works?** ([slides](http://www.slideshare.net/stamparm/sqlmap-why-not-how-it-works-53947145)) at Navaja Negra & ConectaCon 2015 in Albacete, Spain.
+
 ## 2013
 
+* **Sep 19**, Miroslav presents **Heuristic methods used in sqlmap** ([slides](http://www.slideshare.net/stamparm/f-sec-2013miroslavstamparheuristicmethodsusedinsqlmap)) at FSEC 2013 in Varazdin, Croatia.
 * **May 23**, Miroslav [presents](http://phdays.com/program/workshops/) **sqlmap - Under the Hood** ([slides](http://www.slideshare.net/stamparm/ph-days-2013miroslavstamparsqlmapunderthehood)) at PHDays 2013 in Moscow, Russia.
 
 ## 2012
