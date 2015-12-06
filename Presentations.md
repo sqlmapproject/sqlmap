@@ -1,6 +1,6 @@
 # Material presented at conferences
 
-* **sqlmap - why (not how) it works?** ([slides](http://www.slideshare.net/stamparm/sqlmap-why-not-how-it-works-53947145)) presented by Miroslav at [Navaja Negra & ConectaCon](http://navajanegra.com/) in Albacete (Spain) on October 14th, 2015.
+* *sqlmap - why (not how) it works?* ([slides](http://www.slideshare.net/stamparm/sqlmap-why-not-how-it-works-53947145)) presented by Miroslav at [Navaja Negra & ConectaCon](http://navajanegra.com/) in Albacete (Spain) on October 14th, 2015.
 * *Heuristic methods used in sqlmap* [slides](http://www.slideshare.net/stamparm/f-sec-2013miroslavstamparheuristicmethodsusedinsqlmap) presented by Miroslav at [FSec - FOI Security Symposium](http://fsec.foi.hr/) in Varazdin (Croatia) on September 19th, 2013.
 * *sqlmap - Under the Hood* [slides](http://www.slideshare.net/stamparm/ph-days-2013miroslavstamparsqlmapunderthehood) presented by Miroslav at [PHDays 2013](http://www.phdays.com/) in Moscow (Russia) on May 23, 2013.
 * *DNS exfiltration using sqlmap* [slides](http://www.slideshare.net/stamparm/dns-exfiltration-using-sqlmap-13163281) and accompanying [whitepaper](http://www.slideshare.net/stamparm/ph-days-2012miroslavstampardataretrievaloverdnsinsqlinjectionattackspaper) titled *Data Retrieval over DNS in SQL Injection Attacks* presented by Miroslav at [PHDays 2012](http://www.phdays.com/) in Moscow (Russia) on May 31st, 2012.
