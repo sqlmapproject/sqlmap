@@ -10,9 +10,11 @@ import json
 import pickle
 import StringIO
 import sys
+import types
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import PICKLE_REDUCE_WHITELIST
 
 def base64decode(value):
     """
@@ -71,7 +73,7 @@ def base64unpickle(value):
     def _(self):
         if len(self.stack) > 1:
             func = self.stack[-2]
-            if '.' in repr(func) and " 'lib." not in repr(func):
+            if func not in PICKLE_REDUCE_WHITELIST:
                 raise Exception, "abusing reduce() is bad, Mkay!"
         self.load_reduce()
 
