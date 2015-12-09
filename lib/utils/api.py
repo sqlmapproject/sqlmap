@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import shlex
+import socket
 import sqlite3
 import sys
 import tempfile
@@ -654,7 +655,13 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     DataStore.current_db.init()
 
     # Run RESTful API
-    run(host=host, port=port, quiet=True, debug=False)
+    try:
+        run(host=host, port=port, quiet=True, debug=False)
+    except socket.error, ex:
+        if "already in use" in getSafeExString(ex):
+            logger.error("Address already in use ('%s:%s')" % (host, port))
+        else:
+            raise
 
 
 def _client(url, options=None):
