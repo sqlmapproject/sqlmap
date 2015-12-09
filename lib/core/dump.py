@@ -578,7 +578,8 @@ class Dump(object):
                                 if not os.path.isdir(dumpDbPath):
                                     os.makedirs(dumpDbPath, 0755)
 
-                                filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (unsafeSQLIdentificatorNaming(column), randomInt(8)))
+                                _ = re.sub(r"[^\w]", "_", normalizeUnicode(unsafeSQLIdentificatorNaming(column)))
+                                filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))
                                 warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
                                 logger.warn(warnMsg)
 
