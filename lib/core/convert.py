@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import base64
 import json
 import pickle
+import StringIO
 import sys
 
 from lib.core.settings import IS_WIN
@@ -67,10 +68,23 @@ def base64unpickle(value):
 
     retVal = None
 
+    def _(self):
+        if len(self.stack) > 1:
+            func = self.stack[-2]
+            if '.' in repr(func) and " 'lib." not in repr(func):
+                raise Exception, "abusing reduce() is bad, Mkay!"
+        self.load_reduce()
+
+    def loads(str):
+        file = StringIO.StringIO(str)
+        unpickler = pickle.Unpickler(file)
+        unpickler.dispatch[pickle.REDUCE] = _
+        return unpickler.load()
+
     try:
-        retVal = pickle.loads(base64decode(value))
+        retVal = loads(base64decode(value))
     except TypeError: 
-        retVal = pickle.loads(base64decode(bytes(value)))
+        retVal = loads(base64decode(bytes(value)))
 
     return retVal
 
