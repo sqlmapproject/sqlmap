@@ -1738,7 +1738,7 @@ def posixToNtSlashes(filepath):
     'C:\\\\Windows'
     """
 
-    return filepath.replace('/', '\\')
+    return filepath.replace('/', '\\') if filepath else filepath
 
 def ntToPosixSlashes(filepath):
     """
@@ -1749,7 +1749,7 @@ def ntToPosixSlashes(filepath):
     'C:/Windows'
     """
 
-    return filepath.replace('\\', '/')
+    return filepath.replace('\\', '/') if filepath else filepath
 
 def isHexEncodedString(subject):
     """
