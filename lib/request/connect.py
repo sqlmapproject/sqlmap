@@ -456,6 +456,9 @@ class Connect(object):
                     for cookie in conf.cj:
                         if cookie.value is None:
                             cookie.value = ""
+                        else:
+                            for char in (r"\r", r"\n"):
+                                cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
 
                 conn = urllib2.urlopen(req)
 
