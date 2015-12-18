@@ -5,6 +5,7 @@ Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import distutils.version
 import httplib
 import socket
 import urllib2
@@ -13,6 +14,7 @@ from lib.core.common import getSafeExString
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
+from lib.core.settings import PYVERSION
 
 ssl = None
 try:
@@ -84,7 +86,10 @@ class HTTPSConnection(httplib.HTTPSConnection):
                     logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
         if not success:
-            raise SqlmapConnectionException("can't establish SSL connection")
+            errMsg = "can't establish SSL connection"
+            if distutils.version.LooseVersion(PYVERSION) < distutils.version.LooseVersion("2.7.10"):
+                errMsg += " (please retry with Python >= 2.7.10)"
+            raise SqlmapConnectionException(errMsg)
 
 class HTTPSHandler(urllib2.HTTPSHandler):
     def https_open(self, req):
