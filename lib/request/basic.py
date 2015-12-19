@@ -156,6 +156,8 @@ def checkCharEncoding(encoding, warn=True):
         if delimiter in encoding:
             encoding = encoding[:encoding.find(delimiter)].strip()
 
+    encoding = encoding.replace("&quot", "")
+
     # popular typos/errors
     if "8858" in encoding:
         encoding = encoding.replace("8858", "8859")  # iso-8858 -> iso-8859
@@ -189,6 +191,8 @@ def checkCharEncoding(encoding, warn=True):
         encoding = "ascii"
     elif encoding.find("utf8") > 0:
         encoding = "utf8"
+    elif encoding.find("utf-8") > 0:
+        encoding = "utf-8"
 
     # Reference: http://philip.html5.org/data/charsets-2.html
     if encoding in translate:
