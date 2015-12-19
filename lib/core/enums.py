@@ -177,6 +177,7 @@ class HTTP_HEADER:
     TRANSFER_ENCODING = "Transfer-Encoding"
     URI = "URI"
     VIA = "Via"
+    X_POWERED_BY = "X-Powered-By"
 
 class EXPECTED:
     BOOL = "bool"
