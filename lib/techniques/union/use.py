@@ -56,7 +56,7 @@ from lib.utils.progress import ProgressBar
 from thirdparty.odict.odict import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
-    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert, expression), checkConf=True)  # as union data is stored raw unconverted
+    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression), checkConf=True)  # as union data is stored raw unconverted
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -102,7 +102,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             if Backend.isDbms(DBMS.MSSQL) and wasLastResponseDBMSError():
                 retVal = htmlunescape(retVal).replace("<br>", "\n")
 
-            hashDBWrite("%s%s" % (conf.hexConvert, expression), retVal)
+            hashDBWrite("%s%s" % (conf.hexConvert or False, expression), retVal)
         else:
             trimmed = _("%s(?P<result>.*?)<" % (kb.chars.start))
 
@@ -111,6 +111,9 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 warnMsg += "(probably due to its length and/or content): "
                 warnMsg += safecharencode(trimmed)
                 logger.warn(warnMsg)
+    else:
+        vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
+        kb.unionDuplicates = vector[7]
 
     return retVal
 

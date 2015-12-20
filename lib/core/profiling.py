@@ -87,5 +87,4 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     win.connect('destroy', gtk.main_quit)
     win.set_filter("dot")
     win.open_file(dotOutputFile)
-    gobject.timeout_add(1000, win.update, dotOutputFile)
     gtk.main()

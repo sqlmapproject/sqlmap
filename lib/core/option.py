@@ -1024,6 +1024,9 @@ def _setSocketPreConnect():
     Makes a pre-connect version of socket.connect
     """
 
+    if conf.disablePrecon:
+        return
+
     def _():
         while kb.threadContinue:
             try:
@@ -1373,7 +1376,7 @@ def _setHTTPExtraHeaders():
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise SqlmapSyntaxException(errMsg)
 
-    elif not conf.httpHeaders or len(conf.httpHeaders) == 1:
+    elif not conf.requestFile and len(conf.httpHeaders or []) < 2:
         conf.httpHeaders.append((HTTP_HEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
         if not conf.charset:
             conf.httpHeaders.append((HTTP_HEADER.ACCEPT_CHARSET, "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
@@ -1573,7 +1576,7 @@ def _cleanupOptions():
         conf.progressWidth = width - 46
 
     for key, value in conf.items():
-        if value and any(key.endswith(_) for _ in ("Path", "File")):
+        if value and any(key.endswith(_) for _ in ("Path", "File", "Dir")):
             conf[key] = safeExpandUser(value)
 
     if conf.testParameter:
@@ -1894,7 +1897,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.safeReq = AttribDict()
     kb.singleLogFlags = set()
     kb.reduceTests = None
-    kb.tlsSNI = None
+    kb.tlsSNI = {}
     kb.stickyDBMS = False
     kb.stickyLevel = None
     kb.storeCrawlingChoice = None

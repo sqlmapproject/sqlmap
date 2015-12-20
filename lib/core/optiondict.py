@@ -227,6 +227,7 @@ optDict = {
                              },
             "Hidden": {
                                "dummy":             "boolean",
+                               "disablePrecon":     "boolean",
                                "binaryFields":      "string",
                                "profile":           "boolean",
                                "cpuThrottle":       "integer",

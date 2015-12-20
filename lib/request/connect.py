@@ -343,6 +343,9 @@ class Connect(object):
             # Prepare HTTP headers
             headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host})
 
+            if HTTP_HEADER.COOKIE in headers:
+                cookie = headers[HTTP_HEADER.COOKIE]
+
             if kb.authHeader:
                 headers[HTTP_HEADER.AUTHORIZATION] = kb.authHeader
 
@@ -369,6 +372,12 @@ class Connect(object):
                 boundary = findMultipartPostBoundary(conf.data)
                 if boundary:
                     headers[HTTP_HEADER.CONTENT_TYPE] = "%s; boundary=%s" % (headers[HTTP_HEADER.CONTENT_TYPE], boundary)
+
+            # Reset header values to original in case of provided request file
+            if target and conf.requestFile:
+                headers = OrderedDict(conf.httpHeaders)
+                if cookie:
+                    headers[HTTP_HEADER.COOKIE] = cookie
 
             if auxHeaders:
                 for key, value in auxHeaders.items():

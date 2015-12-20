@@ -754,6 +754,9 @@ def cmdLineParser(argv=None):
         parser.add_option("--pickled-options", dest="pickledOptions",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
 
@@ -779,9 +782,6 @@ def cmdLineParser(argv=None):
                           help=SUPPRESS_HELP)
 
         parser.add_option("--run-case", dest="runCase", help=SUPPRESS_HELP)
-
-        parser.add_option("--nnc5ed", dest="nnc5ed", action="store_true",
-                          help=SUPPRESS_HELP)  # temporary hidden switch :)
 
         parser.add_option_group(target)
         parser.add_option_group(request)

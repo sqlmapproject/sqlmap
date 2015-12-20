@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import shlex
+import socket
 import sqlite3
 import sys
 import tempfile
@@ -35,6 +36,8 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import IS_WIN
+from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
+from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.core.subprocessng import Popen
 from lib.parse.cmdline import cmdLineParser
 from thirdparty.bottle.bottle import error as return_error
@@ -44,9 +47,6 @@ from thirdparty.bottle.bottle import post
 from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
-
-RESTAPI_SERVER_HOST = "127.0.0.1"
-RESTAPI_SERVER_PORT = 8775
 
 
 # global settings
@@ -637,7 +637,7 @@ def download(taskid, target, filename):
         return jsonize({"success": False, "message": "File does not exist"})
 
 
-def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
+def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
     """
     REST-JSON API server
     """
@@ -654,7 +654,13 @@ def server(host="0.0.0.0", port=RESTAPI_SERVER_PORT):
     DataStore.current_db.init()
 
     # Run RESTful API
-    run(host=host, port=port, quiet=True, debug=False)
+    try:
+        run(host=host, port=port, quiet=True, debug=False)
+    except socket.error, ex:
+        if "already in use" in getSafeExString(ex):
+            logger.error("Address already in use ('%s:%s')" % (host, port))
+        else:
+            raise
 
 
 def _client(url, options=None):
@@ -673,7 +679,7 @@ def _client(url, options=None):
     return text
 
 
-def client(host=RESTAPI_SERVER_HOST, port=RESTAPI_SERVER_PORT):
+def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
     """
     REST-JSON API client
     """
