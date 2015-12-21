@@ -878,7 +878,7 @@ If user is controlling a machine registered as a DNS domain server (e.g. domain 
 
 Option: `--second-order`
 
-Second-order SQL injection attack is an attack where result(s) of an injected payload in one vulnerable page is shown (reflected) at the other. Usually that's happening because of database storage of user provided input at the original vulnerable page.
+Second-order SQL injection attack is an attack where result(s) of an injected payload in one vulnerable page is shown (reflected) at the other (e.g. frame). Usually that's happening because of database storage of user provided input at the original vulnerable page.
 
 You can manually tell sqlmap to test for this type of SQL injection by using option `--second-order` with the URL address of the web page where results are being shown.
 
