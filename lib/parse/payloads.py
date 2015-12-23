@@ -20,13 +20,13 @@ def cleanupVals(text, tag):
         text = text.split(',')
 
     if isinstance(text, basestring):
-        text = int(text) if text.isdigit() else str(text)
+        text = int(text) if text.isdigit() else text
 
     elif isinstance(text, list):
         count = 0
 
         for _ in text:
-            text[count] = int(_) if _.isdigit() else str(_)
+            text[count] = int(_) if _.isdigit() else _
             count += 1
 
         if len(text) == 1 and tag not in ("clause", "where"):
