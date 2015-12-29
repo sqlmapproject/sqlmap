@@ -801,10 +801,10 @@ def cmdLineParser(argv=None):
 
         # Dirty hack to display longer options without breaking into two lines
         def _(self, *args):
-            _ = parser.formatter._format_option_strings(*args)
-            if len(_) > MAX_HELP_OPTION_LENGTH:
-                _ = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - parser.formatter.indent_increment)) % _
-            return _
+            retVal = parser.formatter._format_option_strings(*args)
+            if len(retVal) > MAX_HELP_OPTION_LENGTH:
+                retVal = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - parser.formatter.indent_increment)) % retVal
+            return retVal
 
         parser.formatter._format_option_strings = parser.formatter.format_option_strings
         parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser, type(parser))
