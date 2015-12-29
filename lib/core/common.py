@@ -86,6 +86,7 @@ from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.exception import SqlmapValueException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BANNER
@@ -1638,7 +1639,9 @@ def safeStringFormat(format_, params):
                 match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
                 if match:
                     if count >= len(params):
-                        raise Exception("wrong number of parameters during string formatting")
+                        warnMsg = "wrong number of parameters during string formatting. "
+                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to 'dev@sqlmap.org'" % (format_, params, retVal)
+                        raise SqlmapValueException(warnMsg)
                     else:
                         retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
                         count += 1
@@ -1738,7 +1741,7 @@ def posixToNtSlashes(filepath):
     'C:\\\\Windows'
     """
 
-    return filepath.replace('/', '\\')
+    return filepath.replace('/', '\\') if filepath else filepath
 
 def ntToPosixSlashes(filepath):
     """
@@ -1749,7 +1752,7 @@ def ntToPosixSlashes(filepath):
     'C:/Windows'
     """
 
-    return filepath.replace('\\', '/')
+    return filepath.replace('\\', '/') if filepath else filepath
 
 def isHexEncodedString(subject):
     """
