@@ -238,7 +238,7 @@ class Databases:
 
                 return kb.data.cachedTables
 
-            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
             test = readInput(message, default="Y" if "Y" in message else "N")
 
             if test[0] in ("n", "N"):
