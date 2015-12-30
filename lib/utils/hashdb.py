@@ -38,6 +38,7 @@ class HashDB(object):
                 connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
                 threadData.hashDBCursor = connection.cursor()
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+                connection.commit()
             except Exception, ex:
                 errMsg = "error occurred while opening a session "
                 errMsg += "file '%s' ('%s')" % (self.filepath, ex)
