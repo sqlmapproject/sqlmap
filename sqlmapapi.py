@@ -19,10 +19,11 @@ from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.utils.api import client
 from lib.utils.api import server
 
-if __name__ == "__main__":
+def main():
     """
     REST-JSON API main function
     """
+
     # Set default logging level to debug
     logger.setLevel(logging.DEBUG)
 
@@ -45,3 +46,6 @@ if __name__ == "__main__":
         client(args.host, args.port)
     else:
         apiparser.print_help()
+
+if __name__ == "__main__":
+    main()
