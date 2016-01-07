@@ -8,8 +8,8 @@ See the file 'doc/COPYING' for copying permission
 __product__ = "Proventia Web Application Security (IBM)"
 
 def detect(get_page):
-    page, headers, code = get_page()
+    page, _, _ = get_page()
     if page is None:
         return False
-    page, headers, code = get_page(url="/Admin_Files/")
+    page, _, _ = get_page(url="/Admin_Files/")
     return page is None

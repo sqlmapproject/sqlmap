@@ -16,7 +16,7 @@ def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
-        page, headers, code = get_page(get=vector)
+        _, headers, _ = get_page(get=vector)
         retval = headers.get("X-Varnish") is not None
         retval |= re.search(r"varnish\Z", headers.get(HTTP_HEADER.VIA, ""), re.I) is not None
         if retval:

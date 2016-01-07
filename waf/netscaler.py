@@ -16,7 +16,7 @@ def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
-        page, headers, code = get_page(get=vector)
+        _, headers, _ = get_page(get=vector)
         retval = re.search(r"\Aclose", headers.get("Cneonction", "") or headers.get("nnCoection", ""), re.I) is not None
         retval = re.search(r"\A(ns_af=|citrix_ns_id|NSC_)", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= re.search(r"\ANS-CACHE", headers.get(HTTP_HEADER.VIA, ""), re.I) is not None
