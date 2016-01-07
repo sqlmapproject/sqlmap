@@ -54,6 +54,8 @@
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
+        <error regexp="SQLSTATE"/>
+        <error regexp="SQLCODE"/>
     </dbms>
 
     <!-- Informix -->
