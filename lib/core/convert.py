@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import base64
 import json
 import pickle
+import re
 import StringIO
 import sys
 import types
@@ -159,6 +160,7 @@ def htmlunescape(value):
     if value and isinstance(value, basestring):
         codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
+        retVal = re.sub(r"&#x([^;]+);", lambda match: chr(int(match.group(1), 16)), retVal)
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function
