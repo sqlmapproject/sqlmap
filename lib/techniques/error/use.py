@@ -197,6 +197,11 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
         _ = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
         retVal = extractRegexResult(_, retVal, re.DOTALL | re.IGNORECASE) or retVal
 
+    try:
+        retVal = re.sub(r"&#x([^;]+);", lambda match: chr(int(match.group(1), 16)), retVal)
+    except ValueError:
+        pass
+
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 
 def _errorFields(expression, expressionFields, expressionFieldsList, num=None, emptyFields=None, suppressOutput=False):
