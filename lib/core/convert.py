@@ -160,7 +160,10 @@ def htmlunescape(value):
     if value and isinstance(value, basestring):
         codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
-        retVal = re.sub(r"&#x([^;]+);", lambda match: chr(int(match.group(1), 16)), retVal)
+        try:
+            retVal = re.sub(r"&#x([^;]+);", lambda match: unichr(int(match.group(1), 16)), retVal)
+        except ValueError:
+            pass
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function
