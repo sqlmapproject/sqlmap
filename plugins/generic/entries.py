@@ -19,7 +19,9 @@ from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
+from lib.core.common import popValue
 from lib.core.common import prioritySortColumns
+from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unArrayizeValue
@@ -234,6 +236,10 @@ class Entries:
 
                     query = whereQuery(query)
 
+                    if conf.dumpWhere:
+                        kb.whereResponseTimes = True
+                        pushValue(kb.responseTimes)
+
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     lengths = {}
@@ -321,6 +327,10 @@ class Entries:
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
                             logger.warn(warnMsg)
+
+                    if conf.dumpWhere:
+                        kb.responseTimes = popValue()
+                        kb.whereResponseTimes = False
 
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))
