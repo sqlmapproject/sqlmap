@@ -74,12 +74,15 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
             testChar = str(current % 10)
             testQuery = "SELECT %s('%s',%d)" % ("REPEAT" if Backend.isDbms(DBMS.MYSQL) else "REPLICATE", testChar, current)
             result = unArrayizeValue(_oneShotErrorUse(testQuery, chunkTest=True))
+
             if result and testChar in result:
                 if result == testChar * current:
                     kb.errorChunkLength = current
                     break
                 else:
-                    current = len(result) - len(kb.chars.stop)
+                    result = re.search(r"\A\w+", result).group(0)
+                    candidate = len(result) - len(kb.chars.stop)
+                    current = candidate if candidate != current else current - 1
             else:
                 current = current / 2
 
