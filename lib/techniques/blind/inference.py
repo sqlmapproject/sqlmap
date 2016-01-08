@@ -5,6 +5,7 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
 import threading
 import time
 
@@ -25,6 +26,7 @@ from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
+from lib.core.common import randomInt
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
@@ -42,6 +44,7 @@ from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
+from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_BISECTION_LENGTH
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
@@ -266,6 +269,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     markingValue = "'%s'" % CHAR_INFERENCE_MARK
                     unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
+
+                if timeBasedCompare and kb.whereCollectTimes:
+                    kb.responseTimes = []
+
+                    warnMsg = "\n[%s] [WARNING] time-based comparison requires " % time.strftime("%X")
+                    warnMsg += "larger statistical model, please wait"
+                    dataToStdout(warnMsg)
+
+                    while len(kb.responseTimes) < MIN_TIME_RESPONSES:
+                        falseWherePayload = re.sub(r"\b%s\b" % posValue, str(randomInt(6)), forgedPayload)
+                        Request.queryPage(falseWherePayload, content=True, raise404=False)
+                        dataToStdout('.')
+
+                    dataToStdout("\n")
+                    kb.whereCollectTimes = False
 
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)

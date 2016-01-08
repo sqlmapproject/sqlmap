@@ -237,7 +237,7 @@ class Entries:
                     query = whereQuery(query)
 
                     if conf.dumpWhere:
-                        kb.whereResponseTimes = True
+                        kb.whereCollectTimes = True
                         pushValue(kb.responseTimes)
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -330,7 +330,7 @@ class Entries:
 
                     if conf.dumpWhere:
                         kb.responseTimes = popValue()
-                        kb.whereResponseTimes = False
+                        kb.whereCollectTimes = False
 
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))
