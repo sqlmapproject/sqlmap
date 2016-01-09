@@ -1891,7 +1891,9 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
     kb.requestCounter = 0
     kb.resendPostOnRedirect = None
-    kb.responseTimes = []
+    kb.responseTimes = {}
+    kb.responseTimeMode = None
+    kb.responseTimePayload = None
     kb.resumeValues = True
     kb.safeCharEncode = False
     kb.safeReq = AttribDict()
@@ -1915,7 +1917,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.timeValidCharsRun = 0
     kb.uChar = NULL
     kb.unionDuplicates = False
-    kb.whereCollectTimes = False
     kb.xpCmdshellAvailable = False
 
     if flushAll:

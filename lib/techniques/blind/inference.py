@@ -47,8 +47,10 @@ from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_BISECTION_LENGTH
 from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
+from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
+from lib.core.settings import RANDOM_INTEGER_MARKER
 from lib.core.settings import VALID_TIME_CHARS_RUN_THRESHOLD
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -261,29 +263,23 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             while len(charTbl) != 1:
                 position = (len(charTbl) >> 1)
                 posValue = charTbl[position]
+                falsePayload = None
 
                 if "'%s'" % CHAR_INFERENCE_MARK not in payload:
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx, posValue))
+                    falsePayload = safeStringFormat(payload, (expressionUnescaped, idx, RANDOM_INTEGER_MARKER))
                 else:
                     # e.g.: ... > '%c' -> ... > ORD(..)
                     markingValue = "'%s'" % CHAR_INFERENCE_MARK
                     unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
                     forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
+                    falsePayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, NULL)
 
-                if timeBasedCompare and kb.whereCollectTimes:
-                    kb.responseTimes = []
-
-                    warnMsg = "\n[%s] [WARNING] time-based comparison requires " % time.strftime("%X")
-                    warnMsg += "larger statistical model, please wait"
-                    dataToStdout(warnMsg)
-
-                    while len(kb.responseTimes) < MIN_TIME_RESPONSES:
-                        falseWherePayload = re.sub(r"\b%s\b" % posValue, str(randomInt(6)), forgedPayload)
-                        Request.queryPage(falseWherePayload, content=True, raise404=False)
-                        dataToStdout('.')
-
-                    dataToStdout("\n")
-                    kb.whereCollectTimes = False
+                if timeBasedCompare:
+                    if kb.responseTimeMode:
+                        kb.responseTimePayload = falsePayload
+                    else:
+                        kb.responseTimePayload = None
 
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)

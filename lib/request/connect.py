@@ -97,6 +97,8 @@ from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PERMISSION_DENIED_REGEX
 from lib.core.settings import PLAIN_TEXT_CONTENT_TYPE
+from lib.core.settings import RANDOM_INTEGER_MARKER
+from lib.core.settings import RANDOM_STRING_MARKER
 from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import TEXT_CONTENT_TYPE_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
@@ -1020,34 +1022,37 @@ class Connect(object):
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
         if timeBasedCompare:
-            if len(kb.responseTimes) < MIN_TIME_RESPONSES:
+            if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:
                 clearConsoleLine()
+
+                kb.responseTimes.setdefault(kb.responseTimeMode, [])
 
                 if conf.tor:
                     warnMsg = "it's highly recommended to avoid usage of switch '--tor' for "
                     warnMsg += "time-based injections because of its high latency time"
                     singleTimeWarnMessage(warnMsg)
 
-                warnMsg = "[%s] [WARNING] time-based comparison requires " % time.strftime("%X")
+                warnMsg = "[%s] [WARNING] %stime-based comparison requires " % (time.strftime("%X"), "(case) " if kb.responseTimeMode else "")
                 warnMsg += "larger statistical model, please wait"
                 dataToStdout(warnMsg)
 
-                while len(kb.responseTimes) < MIN_TIME_RESPONSES:
-                    Connect.queryPage(content=True)
+                while len(kb.responseTimes[kb.responseTimeMode]) < MIN_TIME_RESPONSES:
+                    value = kb.responseTimePayload.replace(RANDOM_INTEGER_MARKER, str(randomInt(6))).replace(RANDOM_STRING_MARKER, randomStr()) if kb.responseTimePayload else kb.responseTimePayload
+                    Connect.queryPage(value=value, content=True, raise404=False)
                     dataToStdout('.')
 
-                dataToStdout("\n")
+                dataToStdout(" (done)\n")
 
             elif not kb.testMode:
-                warnMsg = "it is very important not to stress the network adapter "
+                warnMsg = "it is very important to not stress the network adapter "
                 warnMsg += "during usage of time-based payloads to prevent potential "
-                warnMsg += "errors "
+                warnMsg += "disruptions "
                 singleTimeWarnMessage(warnMsg)
 
             if not kb.laggingChecked:
                 kb.laggingChecked = True
 
-                deviation = stdev(kb.responseTimes)
+                deviation = stdev(kb.responseTimes[kb.responseTimeMode])
 
                 if deviation > WARN_TIME_STDEV:
                     kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
@@ -1115,7 +1120,8 @@ class Connect(object):
         if timeBasedCompare:
             return wasLastResponseDelayed()
         elif noteResponseTime:
-            kb.responseTimes.append(threadData.lastQueryDuration)
+            kb.responseTimes.setdefault(kb.responseTimeMode, [])
+            kb.responseTimes[kb.responseTimeMode].append(threadData.lastQueryDuration)
 
         if not response and removeReflection:
             page = removeReflectiveValues(page, payload)

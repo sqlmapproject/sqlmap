@@ -236,10 +236,6 @@ class Entries:
 
                     query = whereQuery(query)
 
-                    if conf.dumpWhere:
-                        kb.whereCollectTimes = True
-                        pushValue(kb.responseTimes)
-
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     lengths = {}
@@ -327,10 +323,6 @@ class Entries:
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
                             logger.warn(warnMsg)
-
-                    if conf.dumpWhere:
-                        kb.responseTimes = popValue()
-                        kb.whereCollectTimes = False
 
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))

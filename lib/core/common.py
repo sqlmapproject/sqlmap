@@ -2222,16 +2222,16 @@ def wasLastResponseDelayed():
     # response times should be inside +-7*stdev([normal response times])
     # Math reference: http://www.answers.com/topic/standard-deviation
 
-    deviation = stdev(kb.responseTimes)
+    deviation = stdev(kb.responseTimes.get(kb.responseTimeMode, []))
     threadData = getCurrentThreadData()
 
     if deviation and not conf.direct:
-        if len(kb.responseTimes) < MIN_TIME_RESPONSES:
+        if len(kb.responseTimes[kb.responseTimeMode]) < MIN_TIME_RESPONSES:
             warnMsg = "time-based standard deviation method used on a model "
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warn(warnMsg)
 
-        lowerStdLimit = average(kb.responseTimes) + TIME_STDEV_COEFF * deviation
+        lowerStdLimit = average(kb.responseTimes[kb.responseTimeMode]) + TIME_STDEV_COEFF * deviation
         retVal = (threadData.lastQueryDuration >= max(MIN_VALID_DELAYED_RESPONSE, lowerStdLimit))
 
         if not kb.testMode and retVal:
