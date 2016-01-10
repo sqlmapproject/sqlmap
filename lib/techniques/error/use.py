@@ -95,7 +95,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
         try:
             while True:
                 check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-                trimcheck = "%s(?P<result>[^<]*)" % (kb.chars.start)
+                trimcheck = r"%s(?P<result>[^<\n]*)" % (kb.chars.start)
 
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
