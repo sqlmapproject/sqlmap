@@ -984,7 +984,7 @@ class Connect(object):
                 if name != "__builtins__" and originals.get(name, "") != value:
                     if isinstance(value, (basestring, int)):
                         found = False
-                        value = unicode(value)
+                        value = getUnicode(value)
 
                         regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
                         if re.search(regex, (get or "")):
