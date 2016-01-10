@@ -94,7 +94,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
     if retVal is None or partialValue:
         try:
             while True:
-                check = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
+                check = r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
                 trimcheck = r"%s(?P<result>[^<\n]*)" % (kb.chars.start)
 
                 if field:
@@ -153,7 +153,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                             logger.warn(warnMsg)
 
                         if not kb.testMode:
-                            check = "(?P<result>.*?)%s" % kb.chars.stop[:2]
+                            check = r"(?P<result>[^<>\n]*?)%s" % kb.chars.stop[:2]
                             output = extractRegexResult(check, trimmed, re.IGNORECASE)
 
                             if not output:
