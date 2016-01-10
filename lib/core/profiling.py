@@ -26,9 +26,8 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s). " % getUnicode(e, UNICODE_ENCODING)
-        errMsg += "Quick steps:%s" % os.linesep
-        errMsg += "1) sudo apt-get install python-pydot python-pyparsing python-profiler graphviz"
+        errMsg = "profiling requires third-party libraries ('%s') " % getUnicode(e, UNICODE_ENCODING)
+        errMsg += "(Hint: 'sudo apt-get install python-pydot python-pyparsing python-profiler graphviz')"
         logger.error(errMsg)
 
         return
