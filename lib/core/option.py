@@ -1028,7 +1028,7 @@ def _setSocketPreConnect():
         return
 
     def _():
-        while kb.threadContinue:
+        while kb.threadContinue and not conf.disablePrecon:
             try:
                 for key in socket._ready:
                     if len(socket._ready[key]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
@@ -1046,6 +1046,7 @@ def _setSocketPreConnect():
 
     def connect(self, address):
         found = False
+
         key = (self.family, self.type, self.proto, address)
         with kb.locks.socket:
             if key not in socket._ready:
@@ -1053,6 +1054,7 @@ def _setSocketPreConnect():
             if len(socket._ready[key]) > 0:
                 self._sock = socket._ready[key].pop(0)
                 found = True
+
         if not found:
             self._connect(address)
 
