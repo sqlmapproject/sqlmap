@@ -75,7 +75,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
             testQuery = "SELECT %s('%s',%d)" % ("REPEAT" if Backend.isDbms(DBMS.MYSQL) else "REPLICATE", testChar, current)
             result = unArrayizeValue(_oneShotErrorUse(testQuery, chunkTest=True))
 
-            if result and testChar in result:
+            if (result or "").startswith(testChar):
                 if result == testChar * current:
                     kb.errorChunkLength = current
                     break

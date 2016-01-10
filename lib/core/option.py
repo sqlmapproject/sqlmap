@@ -2254,9 +2254,6 @@ def _setTorSocksProxySettings():
     socks.wrapmodule(urllib2)
 
 def _checkWebSocket():
-    infoMsg = "checking for WebSocket"
-    logger.debug(infoMsg)
-
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
             from websocket import ABNF
