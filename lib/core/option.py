@@ -1039,6 +1039,8 @@ def _setSocketPreConnect():
                             socket._ready[key].append(s._sock)
             except socket.error:
                 pass
+            except KeyboardInterrupt:
+                break
             finally:
                 time.sleep(0.01)
 
