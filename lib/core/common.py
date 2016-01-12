@@ -853,7 +853,7 @@ def dataToTrafficFile(data):
         conf.trafficFP.flush()
     except IOError, ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, ex)
+        errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
 def dataToDumpFile(dumpFile, data):
@@ -1276,7 +1276,7 @@ def parseTargetUrl():
     try:
         urlSplit = urlparse.urlsplit(conf.url)
     except ValueError, ex:
-        errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, ex)
+        errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, getSafeExString(ex))
         errMsg += "Please be sure that you don't have any leftover characters (e.g. '[' or ']') "
         errMsg += "in the hostname part"
         raise SqlmapGenericException(errMsg)
@@ -1824,7 +1824,7 @@ def parseXmlFile(xmlFile, handler):
             parse(stream, handler)
     except (SAXParseException, UnicodeError), ex:
         errMsg = "something seems to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, ex)
+        errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
 
@@ -1885,7 +1885,7 @@ def readCachedFileContent(filename, mode='rb'):
 	                    kb.cache.content[filename] = f.read()
                 except (IOError, OSError, MemoryError), ex:
                     errMsg = "something went wrong while trying "
-                    errMsg += "to read the content of file '%s' ('%s')" % (filename, ex)
+                    errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
                     raise SqlmapSystemException(errMsg)
 
     return kb.cache.content[filename]
@@ -2004,7 +2004,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
                         retVal.append(line)
     except (IOError, OSError, MemoryError), ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to read the content of file '%s' ('%s')" % (filename, ex)
+        errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
     return retVal if not unique else retVal.keys()

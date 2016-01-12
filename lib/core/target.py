@@ -14,6 +14,7 @@ import time
 import urlparse
 
 from lib.core.common import Backend
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
@@ -658,7 +659,7 @@ def _createTargetDirs():
             errMsg = "you don't have enough permissions "
         else:
             errMsg = "something went wrong while trying "
-        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, ex)
+        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, getSafeExString(ex))
 
         raise SqlmapMissingPrivileges(errMsg)
 

@@ -8,6 +8,7 @@ See the file 'doc/COPYING' for copying permission
 import os
 import zipfile
 
+from lib.core.common import getSafeExString
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapInstallationException
 from lib.core.settings import UNICODE_ENCODING
@@ -45,7 +46,7 @@ class Wordlist(object):
                     _ = zipfile.ZipFile(self.current, 'r')
                 except zipfile.error, ex:
                     errMsg = "something seems to be wrong with "
-                    errMsg += "the file '%s' ('%s'). Please make " % (self.current, ex)
+                    errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                     errMsg += "sure that you haven't made any changes to it"
                     raise SqlmapInstallationException, errMsg
                 if len(_.namelist()) == 0:
@@ -71,7 +72,7 @@ class Wordlist(object):
                 retVal = self.iter.next().rstrip()
             except zipfile.error, ex:
                 errMsg = "something seems to be wrong with "
-                errMsg += "the file '%s' ('%s'). Please make " % (self.current, ex)
+                errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                 errMsg += "sure that you haven't made any changes to it"
                 raise SqlmapInstallationException, errMsg
             except StopIteration:

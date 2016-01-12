@@ -41,7 +41,7 @@ class HashDB(object):
                 connection.commit()
             except Exception, ex:
                 errMsg = "error occurred while opening a session "
-                errMsg += "file '%s' ('%s')" % (self.filepath, ex)
+                errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
                 raise SqlmapDataException(errMsg)
 
         return threadData.hashDBCursor
@@ -83,7 +83,7 @@ class HashDB(object):
                         if not "locked" in getSafeExString(ex):
                             raise
                     except sqlite3.DatabaseError, ex:
-                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, ex)
+                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"
                         raise SqlmapDataException, errMsg
                     else:
