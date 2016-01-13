@@ -108,7 +108,7 @@ def checkSqlInjection(place, parameter, value):
                 # then attempt to identify with a simple DBMS specific boolean-based
                 # test what the DBMS may be
                 if not injection.dbms and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
-                    if not Backend.getIdentifiedDbms() and kb.heuristicDbms is False:
+                    if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None:
                         kb.heuristicDbms = heuristicCheckDbms(injection)
 
                 # If the DBMS has already been fingerprinted (via DBMS-specific
