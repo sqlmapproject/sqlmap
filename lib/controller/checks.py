@@ -711,9 +711,6 @@ def heuristicCheckDbms(injection):
     kb.injection = injection
 
     for dbms in getPublicTypeMembers(DBMS, True):
-        if not FROM_DUMMY_TABLE.get(dbms, ""):
-            continue
-
         randStr1, randStr2 = randomStr(), randomStr()
         Backend.forceDbms(dbms)
 
