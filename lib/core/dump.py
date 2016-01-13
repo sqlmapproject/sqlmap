@@ -398,11 +398,11 @@ class Dump(object):
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
+        dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
+
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
-            dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
-
             if not os.path.isdir(dumpDbPath):
                 try:
                     os.makedirs(dumpDbPath, 0755)
