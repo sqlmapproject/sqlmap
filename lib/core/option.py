@@ -1686,7 +1686,7 @@ def _cleanupOptions():
         conf.torType = conf.torType.upper()
 
     if conf.outputDir:
-        paths.SQLMAP_OUTPUT_PATH = os.path.abspath(os.path.expanduser(conf.outputDir))
+        paths.SQLMAP_OUTPUT_PATH = os.path.realpath(os.path.expanduser(conf.outputDir))
         setPaths()
 
     if conf.string:
