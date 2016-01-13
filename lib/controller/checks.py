@@ -714,6 +714,9 @@ def heuristicCheckDbms(injection):
         randStr1, randStr2 = randomStr(), randomStr()
         Backend.forceDbms(dbms)
 
+        if conf.noEscape and dbms not in FROM_DUMMY_TABLE:
+            continue
+
         if checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr1)):
             if not checkBooleanExpression("(SELECT '%s'%s)='%s'" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), randStr2)):
                 retVal = dbms
