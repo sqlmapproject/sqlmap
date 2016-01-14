@@ -287,7 +287,7 @@ class Enumeration(GenericEnumeration):
                     columns = {}
 
                     for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr])):
-                        columns[name] = SYBASE_TYPES.get(type_, type_)
+                        columns[name] = SYBASE_TYPES.get(int(type_) if isinstance(type_, basestring) and type_.isdigit() else type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl)] = columns
                     kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
