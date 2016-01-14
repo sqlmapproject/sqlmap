@@ -582,7 +582,7 @@ class Databases:
                                     columns[name] = None
                                 else:
                                     if Backend.isDbms(DBMS.FIREBIRD):
-                                        columnData[1] = FIREBIRD_TYPES.get(columnData[1], columnData[1])
+                                        columnData[1] = FIREBIRD_TYPES.get(int(columnData[1]) if isinstance(columnData[1], basestring) and columnData[1].isdigit() else columnData[1], columnData[1])
 
                                     columns[name] = columnData[1]
 

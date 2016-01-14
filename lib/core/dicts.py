@@ -23,20 +23,20 @@ from lib.core.settings import DB2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
 
 FIREBIRD_TYPES = {
-                    "261": "BLOB",
-                    "14": "CHAR",
-                    "40": "CSTRING",
-                    "11": "D_FLOAT",
-                    "27": "DOUBLE",
-                    "10": "FLOAT",
-                    "16": "INT64",
-                    "8": "INTEGER",
-                    "9": "QUAD",
-                    "7": "SMALLINT",
-                    "12": "DATE",
-                    "13": "TIME",
-                    "35": "TIMESTAMP",
-                    "37": "VARCHAR",
+                    261: "BLOB",
+                    14: "CHAR",
+                    40: "CSTRING",
+                    11: "D_FLOAT",
+                    27: "DOUBLE",
+                    10: "FLOAT",
+                    16: "INT64",
+                    8: "INTEGER",
+                    9: "QUAD",
+                    7: "SMALLINT",
+                    12: "DATE",
+                    13: "TIME",
+                    35: "TIMESTAMP",
+                    37: "VARCHAR",
                 }
 
 SYBASE_TYPES = {
