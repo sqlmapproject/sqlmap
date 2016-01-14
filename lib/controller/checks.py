@@ -782,6 +782,10 @@ def checkFalsePositives(injection):
                 retVal = None
                 break
 
+            elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):
+                retVal = None
+                break
+
         if retVal is None:
             warnMsg = "false positive or unexploitable injection point detected"
             logger.warn(warnMsg)
