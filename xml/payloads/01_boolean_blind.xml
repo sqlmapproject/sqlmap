@@ -187,6 +187,22 @@ Tag: <test>
     </test>
 
     <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (NOT)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR NOT [INFERENCE]</vector>
+        <request>
+            <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <test>
         <title>AND boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
         <stype>1</stype>
         <level>2</level>
@@ -217,6 +233,23 @@ Tag: <test>
         </request>
         <response>
             <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (Generic comment) (NOT)</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR NOT [INFERENCE]</vector>
+        <request>
+            <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
+            <comment>-- -</comment>
+        </request>
+        <response>
+            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
     </test>
 
@@ -254,6 +287,26 @@ Tag: <test>
         </request>
         <response>
             <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (MySQL comment) (NOT)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR NOT [INFERENCE]</vector>
+        <request>
+            <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
