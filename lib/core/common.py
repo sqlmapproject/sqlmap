@@ -916,8 +916,7 @@ def readInput(message, default=None, checkBatch=True):
                 retVal = "%s,%s" % (retVal, getUnicode(item, UNICODE_ENCODING))
 
     if retVal:
-        infoMsg = "%s%s" % (message, retVal)
-        logger.info(infoMsg)
+        dataToStdout("\r%s%s\n" % (message, retVal), forceOutput=True, bold=True)
 
         debugMsg = "used the given answer"
         logger.debug(debugMsg)
