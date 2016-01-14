@@ -548,8 +548,8 @@ DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.ascii_letters)
 # Alphabet used for heuristic checks
 HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', ',', '.')
 
-# String used for dummy XSS check of a tested parameter value
-DUMMY_XSS_CHECK_APPENDIX = "<'\">"
+# String used for dummy non-SQLi (e.g. XSS) check of a tested parameter value
+DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
 
 # Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024

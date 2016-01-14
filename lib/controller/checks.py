@@ -63,7 +63,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import DUMMY_XSS_CHECK_APPENDIX
+from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
@@ -919,7 +919,8 @@ def heuristicCheckSqlInjection(place, parameter):
 
     kb.heuristicMode = True
 
-    value = "%s%s%s" % (randomStr(), DUMMY_XSS_CHECK_APPENDIX, randomStr())
+    randStr1, randStr2 = randomStr(), randomStr()
+    value = "%s%s%s" % (randStr1, DUMMY_NON_SQLI_CHECK_APPENDIX, randStr2)
     payload = "%s%s%s" % (prefix, "'%s" % value, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
@@ -928,7 +929,12 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if value in (page or ""):
         infoMsg = "heuristic (XSS) test shows that %s parameter " % paramType
-        infoMsg += "'%s' might be vulnerable to XSS attacks" % parameter
+        infoMsg += "'%s' might be vulnerable to cross-site scripting attacks" % parameter
+        logger.info(infoMsg)
+
+    if re.search(r"(?i)Failed opening[^\n]+%s" % randStr1, page or ""):
+        infoMsg = "heuristic (FI) test shows that %s parameter " % paramType
+        infoMsg += "'%s' might be vulnerable to file inclusion attacks" % parameter
         logger.info(infoMsg)
 
     kb.heuristicMode = False
