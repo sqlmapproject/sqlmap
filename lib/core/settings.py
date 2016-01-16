@@ -567,7 +567,7 @@ MAX_BISECTION_LENGTH = 50 * 1024 * 1024
 LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
 
 # Generic SQL comment formation
-GENERIC_SQL_COMMENT = "-- "
+GENERIC_SQL_COMMENT = "-- -"
 
 # Threshold value for turning back on time auto-adjustment mechanism
 VALID_TIME_CHARS_RUN_THRESHOLD = 100
