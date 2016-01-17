@@ -38,6 +38,7 @@
         <error regexp="Microsoft Access (\d+ )?Driver"/>
         <error regexp="JET Database Engine"/>
         <error regexp="Access Database Engine"/>
+        <error regexp="ODBC Microsoft Access"/>
     </dbms>
 
     <!-- Oracle -->
