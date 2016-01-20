@@ -163,6 +163,11 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif all(_ in excMsg for _ in ("pymysql", "configparser")):
+                errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "bad marshal data (unknown type code)" in excMsg:
                 match = re.search(r"\s*(.+)\s+ValueError", excMsg)
                 errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
