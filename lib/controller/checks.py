@@ -62,6 +62,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import CLOUDFLARE_SERVER_HEADER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
@@ -1363,7 +1364,7 @@ def checkConnection(suppressOutput=False):
 
     try:
         kb.originalPageTime = time.time()
-        page, _ = Request.queryPage(content=True, noteResponseTime=False)
+        page, headers = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
 
         kb.errorIsNone = False
@@ -1381,6 +1382,10 @@ def checkConnection(suppressOutput=False):
             logger.warn(warnMsg)
         else:
             kb.errorIsNone = True
+
+        if headers and headers.get("Server", "") == CLOUDFLARE_SERVER_HEADER:
+            warnMsg = "CloudFlare response detected"
+            logger.warn(warnMsg)
 
     except SqlmapConnectionException, ex:
         if conf.ipv6:
