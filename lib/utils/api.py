@@ -637,7 +637,7 @@ def download(taskid, target, filename):
         return jsonize({"success": False, "message": "File does not exist"})
 
 
-def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
+def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, server_name='wsgiref'):
     """
     REST-JSON API server
     """
@@ -655,7 +655,14 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
 
     # Run RESTful API
     try:
-        run(host=host, port=port, quiet=True, debug=False)
+        if server_name == 'gevent':
+            from gevent import monkey
+            monkey.patch_all()
+        elif server_name == 'eventlet':
+            import eventlet
+            eventlet.monkey_patch()
+        logger.debug('use {0} adapter run bottle'.format(server_name))
+        run(host=host, port=port, quiet=True, debug=False, server=server_name)
     except socket.error, ex:
         if "already in use" in getSafeExString(ex):
             logger.error("Address already in use ('%s:%s')" % (host, port))
