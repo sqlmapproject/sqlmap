@@ -1037,10 +1037,10 @@ def _setSocketPreConnect():
                         s._connect(address)
                         with kb.locks.socket:
                             socket._ready[key].append(s._sock)
-            except socket.error:
-                pass
             except KeyboardInterrupt:
                 break
+            except:
+                pass
             finally:
                 time.sleep(0.01)
 
