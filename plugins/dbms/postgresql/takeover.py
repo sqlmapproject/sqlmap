@@ -48,7 +48,13 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if banVer >= "9.1":
+        if banVer >= "9.4":
+            majorVer = "9.4"
+        elif banVer >= "9.3":
+            majorVer = "9.3"
+        elif banVer >= "9.2":
+            majorVer = "9.2"
+        elif banVer >= "9.1":
             majorVer = "9.1"
         elif banVer >= "9.0":
             majorVer = "9.0"
