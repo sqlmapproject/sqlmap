@@ -781,19 +781,19 @@ def checkFalsePositives(injection):
             if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
                 checkBooleanExpression("%d=%d" % (randInt1, randInt2))
 
-            if checkBooleanExpression("%d=%d" % (randInt1, randInt3)):
+            if checkBooleanExpression("%d=%d" % (randInt1, randInt3)):          # this must not be evaluated to True
                 retVal = None
                 break
 
-            elif checkBooleanExpression("%d=%d" % (randInt3, randInt2)):
+            elif checkBooleanExpression("%d=%d" % (randInt3, randInt2)):        # this must not be evaluated to True
                 retVal = None
                 break
 
-            elif not checkBooleanExpression("%d=%d" % (randInt2, randInt2)):
+            elif not checkBooleanExpression("%d=%d" % (randInt2, randInt2)):    # this must be evaluated to True
                 retVal = None
                 break
 
-            elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):
+            elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):        # this must not be evaluated to True (invalid statement)
                 retVal = None
                 break
 
