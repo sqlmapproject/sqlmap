@@ -793,7 +793,7 @@ def checkFalsePositives(injection):
                 retVal = None
                 break
 
-            elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):
+            elif not checkBooleanExpression("%d %d" % (randInt3, randInt2)):
                 retVal = None
                 break
 
