@@ -37,11 +37,12 @@ def main():
     apiparser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_DEFAULT_PORT, action="store_true")
     apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server", default=RESTAPI_DEFAULT_ADDRESS, action="store")
     apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_DEFAULT_PORT, type="int", action="store")
+    apiparser.add_option("", "--adapter", help="bottle Server adapter to use default is wsgiref, see bottle document ", default='wsgiref', action="store")
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
     if args.server is True:
-        server(args.host, args.port)
+        server(args.host, args.port, adapter=args.adapter)
     elif args.client is True:
         client(args.host, args.port)
     else:
