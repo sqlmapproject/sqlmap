@@ -35,6 +35,7 @@ from lib.core.enums import PART_RUN_CONTENT_TYPES
 from lib.core.exception import SqlmapConnectionException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
+from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import IS_WIN
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
@@ -637,7 +638,7 @@ def download(taskid, target, filename):
         return jsonize({"success": False, "message": "File does not exist"})
 
 
-def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter='wsgiref'):
+def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER):
     """
     REST-JSON API server
     """
@@ -655,20 +656,24 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter='wsg
 
     # Run RESTful API
     try:
-        if adapter == 'gevent':
+        if adapter == "gevent":
             from gevent import monkey
             monkey.patch_all()
-        elif adapter == 'eventlet':
+        elif adapter == "eventlet":
             import eventlet
             eventlet.monkey_patch()
-        logger.debug('use {0} adapter run bottle'.format(adapter))
+        logger.debug("Using adapter '%s' to run bottle" % adapter)
         run(host=host, port=port, quiet=True, debug=False, server=adapter)
     except socket.error, ex:
         if "already in use" in getSafeExString(ex):
             logger.error("Address already in use ('%s:%s')" % (host, port))
         else:
             raise
-
+    except ImportError:
+        errMsg = "Adapter '%s' is not available on this system" % adapter
+        if adapter in ("gevent", "eventlet"):
+            errMsg += " (e.g.: 'sudo apt-get install python-%s')" % adapter
+        logger.critical(errMsg)
 
 def _client(url, options=None):
     logger.debug("Calling %s" % url)
@@ -697,7 +702,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
         _client(addr)
     except Exception, ex:
         if not isinstance(ex, urllib2.HTTPError):
-            errMsg = "there has been a problem while connecting to the "
+            errMsg = "There has been a problem while connecting to the "
             errMsg += "REST-JSON API server at '%s' " % addr
             errMsg += "(%s)" % ex
             logger.critical(errMsg)

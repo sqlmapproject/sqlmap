@@ -14,6 +14,7 @@ from sqlmap import modulePath
 from lib.core.common import setPaths
 from lib.core.data import paths
 from lib.core.data import logger
+from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.utils.api import client
@@ -37,7 +38,7 @@ def main():
     apiparser.add_option("-c", "--client", help="Act as a REST-JSON API client", default=RESTAPI_DEFAULT_PORT, action="store_true")
     apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server", default=RESTAPI_DEFAULT_ADDRESS, action="store")
     apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server", default=RESTAPI_DEFAULT_PORT, type="int", action="store")
-    apiparser.add_option("", "--adapter", help="bottle Server adapter to use default is wsgiref, see bottle document ", default='wsgiref', action="store")
+    apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default %s)" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
