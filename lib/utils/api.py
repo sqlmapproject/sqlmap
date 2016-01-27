@@ -177,10 +177,10 @@ class Task(object):
 
     def engine_kill(self):
         if self.process:
-            self.process.kill()
-            return self.process.wait()
-        else:
-            return None
+            try:
+                self.process.kill()
+            except:
+                pass
 
     def engine_get_id(self):
         if self.process:
@@ -391,12 +391,11 @@ def task_flush(taskid):
     """
     Flush task spool (delete all tasks)
     """
-    if is_admin(taskid):
-        DataStore.tasks = dict()
-    else:
-        for key in list(DataStore.tasks):
-            if DataStore.tasks[key].remote_addr == request.remote_addr:
-                del DataStore.tasks[key]
+
+    for key in list(DataStore.tasks):
+        if is_admin(taskid) or DataStore.tasks[key].remote_addr == request.remote_addr:
+            DataStore.tasks[key].engine_kill()
+            del DataStore.tasks[key]
 
     logger.debug("[%s] Flushed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
     return jsonize({"success": True})
