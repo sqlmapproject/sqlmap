@@ -179,8 +179,10 @@ class Task(object):
         if self.process:
             try:
                 self.process.kill()
+                return self.process.wait()
             except:
                 pass
+        return None
 
     def engine_get_id(self):
         if self.process:
