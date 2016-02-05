@@ -125,7 +125,7 @@ class Agent(object):
                     origValue = origValue.split(' ')[-1].split(':')[-1]
 
         if value is None:
-            if where == PAYLOAD.WHERE.ORIGINAL or conf.prefix:
+            if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue
             elif where == PAYLOAD.WHERE.NEGATIVE:
                 if conf.invalidLogical:
@@ -228,7 +228,7 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
-        if where == PAYLOAD.WHERE.REPLACE and not conf.prefix:
+        if where == PAYLOAD.WHERE.REPLACE:
             query = ""
 
         # If the technique is stacked queries (<stype>) do not put a space
