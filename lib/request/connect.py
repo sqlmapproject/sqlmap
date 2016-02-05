@@ -80,6 +80,7 @@ from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapTokenException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
+from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
@@ -765,7 +766,7 @@ class Connect(object):
 
                 value = agent.replacePayload(value, payload)
 
-            logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload))
+            logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload.replace('\\', BOUNDARY_BACKSLASH_MARKER)).replace(BOUNDARY_BACKSLASH_MARKER, '\\'))
 
             if place == PLACE.CUSTOM_POST and kb.postHint:
                 if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
