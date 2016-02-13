@@ -7,6 +7,9 @@ See the file 'doc/COPYING' for copying permission
 
 import logging
 import optparse
+import sys
+
+sys.dont_write_bytecode = True
 
 from lib.utils import versioncheck  # this has to be the first non-standard import
 

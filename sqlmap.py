@@ -16,6 +16,8 @@ import time
 import traceback
 import warnings
 
+sys.dont_write_bytecode = True
+
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
