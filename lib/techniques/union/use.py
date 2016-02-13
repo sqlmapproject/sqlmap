@@ -56,7 +56,7 @@ from lib.utils.progress import ProgressBar
 from thirdparty.odict.odict import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
-    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression), checkConf=True)  # as union data is stored raw unconverted
+    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression), checkConf=True)  # as UNION data is stored raw unconverted
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -65,7 +65,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         # Prepare expression with delimiters
         injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
 
-        # Forge the union SQL injection request
+        # Forge the UNION SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
         kb.forcePartialUnion = vector[8]
@@ -78,7 +78,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
-        # Parse the returned page to get the exact union-based
+        # Parse the returned page to get the exact UNION-based
         # SQL injection output
         def _(regex):
             return reduce(lambda x, y: x if x is not None else y, (\
@@ -98,7 +98,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
 
-            # Special case when DBMS is Microsoft SQL Server and error message is used as a result of union injection
+            # Special case when DBMS is Microsoft SQL Server and error message is used as a result of UNION injection
             if Backend.isDbms(DBMS.MSSQL) and wasLastResponseDBMSError():
                 retVal = htmlunescape(retVal).replace("<br>", "\n")
 
@@ -152,9 +152,9 @@ def configUnion(char=None, columns=None):
 
 def unionUse(expression, unpack=True, dump=False):
     """
-    This function tests for an union SQL injection on the target
+    This function tests for an UNION SQL injection on the target
     URL then call its subsidiary function to effectively perform an
-    union SQL injection on the affected URL
+    UNION SQL injection on the affected URL
     """
 
     initTechnique(PAYLOAD.TECHNIQUE.UNION)
