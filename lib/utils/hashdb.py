@@ -80,8 +80,11 @@ class HashDB(object):
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not "locked" in getSafeExString(ex):
+                        if not any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
                             raise
+                        else:
+                            debugMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+                            logger.debug(debugMsg)
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"
