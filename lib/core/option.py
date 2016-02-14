@@ -2234,11 +2234,6 @@ def _setTorHttpProxySettings():
         errMsg += "Polipo bundle installed for you to be able to "
         errMsg += "successfully use switch '--tor' "
 
-        if IS_WIN:
-            errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
-        else:
-            errMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
-
         raise SqlmapConnectionException(errMsg)
 
     if not conf.checkTor:
