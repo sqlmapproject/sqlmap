@@ -2091,6 +2091,43 @@ def setVerbosity():
     elif conf.verbose >= 5:
         logger.setLevel(CUSTOM_LOGGING.TRAFFIC_IN)
 
+def _normalizeOptions(inputOptions):
+    """
+    Sets proper option types
+    """
+
+    types_ = {}
+    for group in optDict.keys():
+        types_.update(optDict[group])
+
+    for key in inputOptions:
+        if key in types_:
+            value = inputOptions[key]
+            if value is None:
+                continue
+
+            type_ = types_[key]
+            if type_ and isinstance(type_, tuple):
+                type_ = type_[0]
+
+            if type_ == OPTION_TYPE.BOOLEAN:
+                try:
+                    value = bool(value)
+                except (TypeError, ValueError):
+                    value = False
+            elif type_ == OPTION_TYPE.INTEGER:
+                try:
+                    value = int(value)
+                except (TypeError, ValueError):
+                    value = 0
+            elif type_ == OPTION_TYPE.FLOAT:
+                try:
+                    value = float(value)
+                except (TypeError, ValueError):
+                    value = 0.0
+
+            inputOptions[key] = value
+
 def _mergeOptions(inputOptions, overrideOptions):
     """
     Merge command line options with configuration file and default options.
@@ -2102,6 +2139,7 @@ def _mergeOptions(inputOptions, overrideOptions):
     if inputOptions.pickledOptions:
         try:
             inputOptions = base64unpickle(inputOptions.pickledOptions)
+            _normalizeOptions(inputOptions)
         except Exception, ex:
             errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
             errMsg += " ('%s')" % ex if ex.message else ""
@@ -2127,35 +2165,21 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
-    _ = {}
+
+    lut = {}
+    for group in optDict.keys():
+        lut.update((_.upper(), _) for _ in optDict[group])
+
+    envOptions = {}
     for key, value in os.environ.items():
         if key.upper().startswith(SQLMAP_ENVIRONMENT_PREFIX):
-            _[key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()] = value
+            _ = key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()
+            if _ in lut:
+                envOptions[lut[_]] = value
 
-    types_ = {}
-    for group in optDict.keys():
-        types_.update(optDict[group])
-
-    for key in conf:
-        if key.upper() in _ and key in types_:
-            value = _[key.upper()]
-
-            if types_[key] == OPTION_TYPE.BOOLEAN:
-                try:
-                    value = bool(value)
-                except ValueError:
-                    value = False
-            elif types_[key] == OPTION_TYPE.INTEGER:
-                try:
-                    value = int(value)
-                except ValueError:
-                    value = 0
-            elif types_[key] == OPTION_TYPE.FLOAT:
-                try:
-                    value = float(value)
-                except ValueError:
-                    value = 0.0
-
+    if envOptions:
+        _normalizeOptions(envOptions)
+        for key, value in envOptions.items():
             conf[key] = value
 
     mergedOptions.update(conf)
