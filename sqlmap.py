@@ -195,10 +195,14 @@ def main():
             errMsg = maskSensitiveData(errMsg)
             excMsg = maskSensitiveData(excMsg)
 
-            logger.critical(errMsg)
-            kb.stickyLevel = logging.CRITICAL
-            dataToStdout(excMsg)
-            createGithubIssue(errMsg, excMsg)
+            if hasattr(conf, "api"):
+                logger.critical("%s\n%s" % (errMsg, excMsg))
+            else:
+                logger.critical(errMsg)
+                kb.stickyLevel = logging.CRITICAL
+                dataToStdout(excMsg)
+                createGithubIssue(errMsg, excMsg)
+
         except KeyboardInterrupt:
             pass
 
