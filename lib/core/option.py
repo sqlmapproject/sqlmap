@@ -332,7 +332,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     if not kb.targets or url not in addedTargetUrls:
-                        kb.targets.add((url, method, data, cookie, tuple(headers)))
+                        kb.targets.add((url, conf.method or method, data, cookie, tuple(headers)))
                         addedTargetUrls.add(url)
 
     checkFile(reqFile)
