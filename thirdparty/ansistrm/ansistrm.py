@@ -4,8 +4,21 @@
 import logging
 import os
 import re
+import subprocess
+import sys
 
 from lib.core.convert import stdoutencode
+
+if subprocess.mswindows:
+    import ctypes
+    import ctypes.wintypes
+
+    # Reference: https://gist.github.com/vsajip/758430
+    #            https://github.com/ipython/ipython/issues/4252
+    #            https://msdn.microsoft.com/en-us/library/windows/desktop/ms686047%28v=vs.85%29.aspx
+    ctypes.windll.kernel32.SetConsoleTextAttribute.argtypes = [ctypes.wintypes.HANDLE, ctypes.wintypes.WORD]
+    ctypes.windll.kernel32.SetConsoleTextAttribute.restype = ctypes.wintypes.BOOL
+
 
 class ColorizingStreamHandler(logging.StreamHandler):
     # color names to indices
@@ -21,22 +34,13 @@ class ColorizingStreamHandler(logging.StreamHandler):
     }
 
     # levels to (background, foreground, bold/intense)
-    if os.name == 'nt':
-        level_map = {
-            logging.DEBUG: (None, 'blue', False),
-            logging.INFO: (None, 'green', False),
-            logging.WARNING: (None, 'yellow', False),
-            logging.ERROR: (None, 'red', False),
-            logging.CRITICAL: ('red', 'white', False)
-        }
-    else:
-        level_map = {
-            logging.DEBUG: (None, 'blue', False),
-            logging.INFO: (None, 'green', False),
-            logging.WARNING: (None, 'yellow', False),
-            logging.ERROR: (None, 'red', False),
-            logging.CRITICAL: ('red', 'white', False)
-        }
+    level_map = {
+        logging.DEBUG: (None, 'blue', False),
+        logging.INFO: (None, 'green', False),
+        logging.WARNING: (None, 'yellow', False),
+        logging.ERROR: (None, 'red', False),
+        logging.CRITICAL: ('red', 'white', False)
+    }
     csi = '\x1b['
     reset = '\x1b[0m'
     disable_coloring = False
@@ -67,7 +71,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
         except:
             self.handleError(record)
 
-    if os.name != 'nt':
+    if not subprocess.mswindows:
         def output_colorized(self, message):
             self.stream.write(message)
     else:
@@ -85,8 +89,6 @@ class ColorizingStreamHandler(logging.StreamHandler):
         }
 
         def output_colorized(self, message):
-            import ctypes
-
             parts = self.ansi_esc.split(message)
             write = self.stream.write
             h = None

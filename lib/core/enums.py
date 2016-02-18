@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -164,8 +164,10 @@ class HTTP_HEADER:
     CONTENT_RANGE = "Content-Range"
     CONTENT_TYPE = "Content-Type"
     COOKIE = "Cookie"
-    SET_COOKIE = "Set-Cookie"
+    EXPIRES = "Expires"
     HOST = "Host"
+    IF_MODIFIED_SINCE = "If-Modified-Since"
+    LAST_MODIFIED = "Last-Modified"
     LOCATION = "Location"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"
@@ -173,9 +175,10 @@ class HTTP_HEADER:
     RANGE = "Range"
     REFERER = "Referer"
     SERVER = "Server"
-    USER_AGENT = "User-Agent"
+    SET_COOKIE = "Set-Cookie"
     TRANSFER_ENCODING = "Transfer-Encoding"
     URI = "URI"
+    USER_AGENT = "User-Agent"
     VIA = "Via"
     X_POWERED_BY = "X-Powered-By"
 
@@ -191,6 +194,7 @@ class OPTION_TYPE:
 
 class HASHDB_KEYS:
     DBMS = "DBMS"
+    CHECK_WAF_RESULT = "CHECK_WAF_RESULT"
     CONF_TMP_PATH = "CONF_TMP_PATH"
     KB_ABS_FILE_PATHS = "KB_ABS_FILE_PATHS"
     KB_BRUTE_COLUMNS = "KB_BRUTE_COLUMNS"

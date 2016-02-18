@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -22,7 +22,7 @@ from lib.core.revision import getRevisionNumber
 # sqlmap version and site
 VERSION = "1.0-dev"
 REVISION = getRevisionNumber()
-VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit-%s%04x" % (time.strftime("%Y%m%d", time.gmtime(os.path.getmtime(__file__))), os.path.getsize(os.path.join(os.path.dirname(__file__), "common.py")) & 0xffff))
+VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit-%s-%04x" % (time.strftime("%Y%m%d", time.gmtime(os.path.getmtime(__file__))), os.path.getsize(os.path.join(os.path.dirname(__file__), "common.py")) & 0xffff))
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
@@ -60,6 +60,9 @@ PARTIAL_HEX_VALUE_MARKER = "__PARTIAL_HEX_VALUE__"
 URI_QUESTION_MARKER = "__QUESTION_MARK__"
 ASTERISK_MARKER = "__ASTERISK_MARK__"
 REPLACEMENT_MARKER = "__REPLACEMENT_MARK__"
+
+RANDOM_INTEGER_MARKER = "[RANDINT]"
+RANDOM_STRING_MARKER = "[RANDSTR]"
 
 PAYLOAD_DELIMITER = "__PAYLOAD_DELIMITER__"
 CHAR_INFERENCE_MARK = "%c"
@@ -306,6 +309,9 @@ BURP_REQUEST_REGEX = r"={10,}\s+[^=]+={10,}\s(.+?)\s={10,}"
 # Regex used for parsing XML Burp saved history items
 BURP_XML_HISTORY_REGEX = r'<port>(\d+)</port>.+?<request base64="true"><!\[CDATA\[([^]]+)'
 
+# Server header in CloudFlare responses
+CLOUDFLARE_SERVER_HEADER = "cloudflare-nginx"
+
 # Encoding used for Unicode data
 UNICODE_ENCODING = "utf8"
 
@@ -545,8 +551,11 @@ DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.ascii_letters)
 # Alphabet used for heuristic checks
 HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', ',', '.')
 
-# String used for dummy XSS check of a tested parameter value
-DUMMY_XSS_CHECK_APPENDIX = "<'\">"
+# String used for dummy non-SQLi (e.g. XSS) heuristic checks of a tested parameter value
+DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
+
+# Length of prefix and suffix used in non-SQLI heuristic checks
+NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6
 
 # Connection chunk size (processing large responses in chunks to avoid MemoryError crashes - e.g. large table dump in full UNION injections)
 MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
@@ -561,7 +570,7 @@ MAX_BISECTION_LENGTH = 50 * 1024 * 1024
 LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
 
 # Generic SQL comment formation
-GENERIC_SQL_COMMENT = "-- "
+GENERIC_SQL_COMMENT = "-- -"
 
 # Threshold value for turning back on time auto-adjustment mechanism
 VALID_TIME_CHARS_RUN_THRESHOLD = 100
@@ -570,7 +579,7 @@ VALID_TIME_CHARS_RUN_THRESHOLD = 100
 CHECK_ZERO_COLUMNS_THRESHOLD = 10
 
 # Boldify all logger messages containing these "patterns"
-BOLD_PATTERNS = ("' injectable", "provided empty", "leftover chars", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "test shows that", "the back-end DBMS is", "created Github", "blocked by the target server", "protection is involved")
+BOLD_PATTERNS = ("' injectable", "provided empty", "leftover chars", "might be injectable", "' is vulnerable", "is not injectable", "test failed", "test passed", "live test final result", "test shows that", "the back-end DBMS is", "created Github", "blocked by the target server", "protection is involved", "CloudFlare")
 
 # Generic www root directory names
 GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "httpdocs", "public", "wwwroot", "www")
@@ -592,6 +601,9 @@ EVENTVALIDATION_REGEX = r'(?i)(?P<name>__EVENTVALIDATION[^"]*)[^>]+value="(?P<re
 
 # Number of rows to generate inside the full union test for limited output (mustn't be too large to prevent payload length problems)
 LIMITED_ROWS_TEST_NUMBER = 15
+
+# Default adapter to use for bottle server
+RESTAPI_DEFAULT_ADAPTER = "wsgiref"
 
 # Default REST-JSON API server listen address
 RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"

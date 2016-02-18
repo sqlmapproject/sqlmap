@@ -12,6 +12,7 @@
 #
 #  Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
+import sys
 import urllib
 
 def get_pagerank(url):
@@ -77,3 +78,9 @@ def check_hash(hash_int):
             check_byte >>= 1
 
     return '7' + str(check_byte) + hash_str
+
+def main():
+    print get_pagerank(sys.argv[1]) if len(sys.argv) > 1 else "[x] missing hostname"
+
+if __name__ == "__main__":
+    main()

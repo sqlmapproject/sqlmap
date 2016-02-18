@@ -5,7 +5,10 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import base64
+
 from lib.core.enums import PRIORITY
+from lib.core.settings import UNICODE_ENCODING
 
 __priority__ = PRIORITY.LOWEST
 
@@ -14,10 +17,10 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces apostrophe character with its illegal double unicode counterpart
+    Slash escape quotes (' and ")
 
-    >>> tamper("1 AND '1'='1")
-    '1 AND %00%271%00%27=%00%271'
+    >>> tamper("1' AND SLEEP(5)#")
+    '1\' AND SLEEP(5)#'
     """
 
-    return payload.replace('\'', "%00%27") if payload else payload
+    return payload.replace("'", "\\'").replace('"', '\\"')

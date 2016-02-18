@@ -28,9 +28,9 @@
 * Added switch `--check-waf` for checking of existence of WAF/IPS/IDS protection.
 * Added switch `--schema` to enumerate DBMS schema: shows all columns of all databases' tables.
 * Added switch `--count` to count the number of entries for a specific table or all database(s) tables.
-* Major improvements to switches --tables and --columns.
-* Takeover switch --os-pwn improved: stealthier, faster and AV-proof.
-* Added switch --mobile to imitate a mobile device through HTTP User-Agent header.
+* Major improvements to switches `--tables` and `--columns`.
+* Takeover switch `--os-pwn` improved: stealthier, faster and AV-proof.
+* Added switch `--mobile` to imitate a mobile device through HTTP User-Agent header.
 
 # Version 0.9 (2011-04-10)
 
@@ -43,7 +43,7 @@
 * Extended old `--dump -C` functionality to be able to search for specific database(s), table(s) and column(s), option `--search`.
 * Added support to tamper injection data with option `--tamper`.
 * Added automatic recognition of password hashes format and support to crack them with a dictionary-based attack.
-* Added support to enumerate roles on Oracle, --roles switch.
+* Added support to enumerate roles on Oracle, `--roles` switch.
 * Added support for SOAP based web services requests.
 * Added support to fetch unicode data.
 * Added support to use persistent HTTP(s) connection for speed improvement, switch `--keep-alive`.
@@ -94,12 +94,12 @@
 
 # Version 0.8 release candidate (2009-09-21)
 
-* Major enhancement to the Microsoft SQL Server stored procedure heap-based buffer overflow exploit (--os-bof) to automatically bypass DEP memory protection.
+* Major enhancement to the Microsoft SQL Server stored procedure heap-based buffer overflow exploit (`--os-bof`) to automatically bypass DEP memory protection.
 * Added support for MySQL and PostgreSQL to execute Metasploit shellcode via UDF 'sys_bineval' (in-memory, anti-forensics technique) as an option instead of uploading the standalone payload stager executable.
 * Added options for MySQL, PostgreSQL and Microsoft SQL Server to read/add/delete Windows registry keys.
 * Added options for MySQL and PostgreSQL to inject custom user-defined functions.
-* Added support for --first and --last so the user now has even more granularity in what to enumerate in the query output.
-* Minor enhancement to save the session by default in 'output/hostname/session' file if -s option is not specified.
+* Added support for `--first` and `--last` so the user now has even more granularity in what to enumerate in the query output.
+* Minor enhancement to save the session by default in 'output/hostname/session' file if `-s` option is not specified.
 * Minor improvement to automatically remove sqlmap created temporary files from the DBMS underlying file system.
 * Minor bugs fixed.
 * Major code refactoring.
@@ -108,13 +108,13 @@
 
 * Adapted Metasploit wrapping functions to work with latest 3.3 development version too.
 * Adjusted code to make sqlmap 0.7 to work again on Mac OSX too.
-* Reset takeover OOB features (if any of --os-pwn, --os-smbrelay or --os-bof is selected) when running under Windows because msfconsole and msfcli are not supported on the native Windows Ruby interpreter. This make sqlmap 0.7 to work again on Windows too.
+* Reset takeover OOB features (if any of `--os-pwn`, `--os-smbrelay` or `--os-bof` is selected) when running under Windows because msfconsole and msfcli are not supported on the native Windows Ruby interpreter. This make sqlmap 0.7 to work again on Windows too.
 * Minor improvement so that sqlmap tests also all parameters with no value (eg. par=).
 * HTTPS requests over HTTP proxy now work on either Python 2.4, 2.5 and 2.6+.
 * Major bug fix to sql-query/sql-shell features.
-* Major bug fix in --read-file option.
+* Major bug fix in `--read-file` option.
 * Major silent bug fix to multi-threading functionality.
-* Fixed the web backdoor functionality (for MySQL) when (usually) stacked queries are not supported and --os-shell is provided.
+* Fixed the web backdoor functionality (for MySQL) when (usually) stacked queries are not supported and `--os-shell` is provided.
 * Fixed MySQL 'comment injection' version fingerprint.
 * Fixed basic Microsoft SQL Server 2000 fingerprint.
 * Many minor bug fixes and code refactoring.
@@ -136,32 +136,32 @@
 * Major enhancement to make the comparison algorithm work properly also on url not stables automatically by using the difflib Sequence Matcher object;
 * Major enhancement to support SQL data definition statements, SQL data manipulation statements, etc from user in SQL query and SQL shell if stacked queries are supported by the web application technology;
 * Major speed increase in DBMS basic fingerprint;
-* Minor enhancement to support an option (--is-dba) to show if the current user is a database management system administrator;
-* Minor enhancement to support an option (--union-tech) to specify the technique to use to detect the number of columns used in the web application SELECT statement: NULL bruteforcing (default) or ORDER BY clause bruteforcing;
-* Added internal support to forge CASE statements, used only by --is-dba query at the moment;
-* Minor layout adjustment to the --update output;
+* Minor enhancement to support an option (`--is-dba`) to show if the current user is a database management system administrator;
+* Minor enhancement to support an option (`--union-tech`) to specify the technique to use to detect the number of columns used in the web application SELECT statement: NULL bruteforcing (default) or ORDER BY clause bruteforcing;
+* Added internal support to forge CASE statements, used only by `--is-dba` query at the moment;
+* Minor layout adjustment to the `--update` output;
 * Increased default timeout to 30 seconds;
 * Major bug fix to correctly handle custom SQL "limited" queries on Microsoft SQL Server and Oracle;
 * Major bug fix to avoid tracebacks when multiple targets are specified and one of them is not reachable;
 * Minor bug fix to make the Partial UNION query SQL injection technique work properly also on Oracle and Microsoft SQL Server;
-* Minor bug fix to make the --postfix work even if --prefix is not provided;
+* Minor bug fix to make the `--postfix` work even if `--prefix` is not provided;
 * Updated documentation.
 
 # Version 0.6.3 (2008-12-18)
 
 * Major enhancement to get list of targets to test from Burp proxy (http://portswigger.net/suite/) requests log file path or WebScarab proxy (http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project) 'conversations/' folder path by providing option -l <filepath>;
 * Major enhancement to support Partial UNION query SQL injection technique too;
-* Major enhancement to test if the web application technology supports stacked queries (multiple statements) by providing option --stacked-test which will be then used someday also by takeover functionality;
-* Major enhancement to test if the injectable parameter is affected by a time based blind SQL injection technique by providing option --time-test;
+* Major enhancement to test if the web application technology supports stacked queries (multiple statements) by providing option `--stacked-test` which will be then used someday also by takeover functionality;
+* Major enhancement to test if the injectable parameter is affected by a time based blind SQL injection technique by providing option `--time-test`;
 * Minor enhancement to fingerprint the web server operating system and the web application technology by parsing some HTTP response headers;
 * Minor enhancement to fingerprint the back-end DBMS operating system by parsing the DBMS banner value when -b option is provided;
-* Minor enhancement to be able to specify the number of seconds before timeout the connection by providing option --timeout #, default is set to 10 seconds and must be 3 or higher;
-* Minor enhancement to be able to specify the number of seconds to wait between each HTTP request by providing option --delay #;
-* Minor enhancement to be able to get the injection payload --prefix and --postfix from user;
+* Minor enhancement to be able to specify the number of seconds before timeout the connection by providing option `--timeout #`, default is set to 10 seconds and must be 3 or higher;
+* Minor enhancement to be able to specify the number of seconds to wait between each HTTP request by providing option `--delay #`;
+* Minor enhancement to be able to get the injection payload `--prefix` and `--postfix` from user;
 * Minor enhancement to be able to enumerate table columns and dump table entries, also when the database name is not provided, by using the current database on MySQL and Microsoft SQL Server, the 'public' scheme on PostgreSQL and the 'USERS' TABLESPACE_NAME on Oracle;
-* Minor enhancemet to support also --regexp, --excl-str and --excl-reg options rather than only --string when comparing HTTP responses page content;
-* Minor enhancement to be able to specify extra HTTP headers by providing option --headers. By default Accept, Accept-Language and Accept-Charset headers are set;
-* Minor improvement to be able to provide CU (as current user) as user value (-U) when enumerating users privileges or users passwords;
+* Minor enhancemet to support also `--regexp`, `--excl-str` and `--excl-reg` options rather than only `--string` when comparing HTTP responses page content;
+* Minor enhancement to be able to specify extra HTTP headers by providing option `--headers`. By default Accept, Accept-Language and Accept-Charset headers are set;
+* Minor improvement to be able to provide CU (as current user) as user value (`-U`) when enumerating users privileges or users passwords;
 * Minor improvements to sqlmap Debian package files;
 * Minor improvement to use Python psyco (http://psyco.sourceforge.net/) library if available to speed up the sqlmap algorithmic operations;
 * Minor improvement to retry the HTTP request up to three times in case an exception is raised during the connection to the target url;
@@ -175,10 +175,10 @@
 
 # Version 0.6.2 (2008-11-02)
 
-* Major bug fix to correctly dump tables entries when --stop is not specified;
+* Major bug fix to correctly dump tables entries when `--stop` is not specified;
 * Major bug fix so that the users' privileges enumeration now works properly also on both MySQL < 5.0 and MySQL >= 5.0;
 * Major bug fix when the request is POST to also send the GET parameters if any have been provided;
-* Major bug fix to correctly update sqlmap to the latest stable release with command line --update;
+* Major bug fix to correctly update sqlmap to the latest stable release with command line `--update`;
 * Major bug fix so that when the expected value of a query (count variable) is an integer and, for some reasons, its resumed value from the session file is a string or a binary file, the query is executed again and its new output saved to the session file;
 * Minor bug fix in MySQL comment injection fingerprint technique;
 * Minor improvement to correctly enumerate tables, columns and dump tables entries on Oracle and on PostgreSQL when the database name is not 'public' schema or a system database;
@@ -191,20 +191,20 @@
 * Major bug fix to blind SQL injection bisection algorithm to handle an exception;
 * Added a Metasploit Framework 3 auxiliary module to run sqlmap;
 * Implemented possibility to test for and inject also on LIKE statements;
-* Implemented --start and --stop options to set the first and the last table entry to dump;
-* Added non-interactive/batch-mode (--batch) option to make it easy to wrap sqlmap in Metasploit and any other tool;
+* Implemented `--start` and `--stop` options to set the first and the last table entry to dump;
+* Added non-interactive/batch-mode (`--batch`) option to make it easy to wrap sqlmap in Metasploit and any other tool;
 * Minor enhancement to save also the length of query output in the session file when retrieving the query output length for ETA or for resume purposes;
 * Changed the order sqlmap dump table entries from column by column to row by row. Now it also dumps entries as they are stored in the tables, not forcing the entries' order alphabetically anymore;
-* Minor bug fix to correctly handle parameters' value with % character.
+* Minor bug fix to correctly handle parameters' value with `%` character.
 
 # Version 0.6 (2008-09-01)
 
 * Complete code refactor and many bugs fixed;
 * Added multithreading support to set the maximum number of concurrent HTTP requests;
-* Implemented SQL shell (--sql-shell) functionality and fixed SQL query (--sql-query, before called -e) to be able to run whatever SELECT statement and get its output in both inband and blind SQL injection attack;
-* Added an option (--privileges) to retrieve DBMS users privileges, it also notifies if the user is a DBMS administrator;
-* Added support (-c) to read options from configuration file, an example of valid INI file is sqlmap.conf and support (--save) to save command line options on a configuration file;
-* Created a function that updates the whole sqlmap to the latest stable version available by running sqlmap with --update option;
+* Implemented SQL shell (`--sql-shell`) functionality and fixed SQL query (`--sql-query`, before called `-e`) to be able to run whatever SELECT statement and get its output in both inband and blind SQL injection attack;
+* Added an option (`--privileges`) to retrieve DBMS users privileges, it also notifies if the user is a DBMS administrator;
+* Added support (`-c`) to read options from configuration file, an example of valid INI file is sqlmap.conf and support (`--save`) to save command line options on a configuration file;
+* Created a function that updates the whole sqlmap to the latest stable version available by running sqlmap with `--update` option;
 * Created sqlmap .deb (Debian, Ubuntu, etc.) and .rpm (Fedora, etc.) installation binary packages;
 * Created sqlmap .exe (Windows) portable executable;
 * Save a lot of more information to the session file, useful when resuming injection on the same target to not loose time on identifying injection, UNION fields and back-end DBMS twice or more times;
@@ -216,8 +216,8 @@
 * Improved XML files structure;
 * Implemented the possibility to change the HTTP Referer header;
 * Added support to resume from session file also when running with inband SQL injection attack;
-* Added an option (--os-shell) to execute operating system commands if the back-end DBMS is MySQL, the web server has the PHP engine active and permits write access on a directory within the document root;
-* Added a check to assure that the provided string to match (--string) is within the page content;
+* Added an option (`--os-shell`) to execute operating system commands if the back-end DBMS is MySQL, the web server has the PHP engine active and permits write access on a directory within the document root;
+* Added a check to assure that the provided string to match (`--string`) is within the page content;
 * Fixed various queries in XML file;
 * Added LIMIT, ORDER BY and COUNT queries to the XML file and adapted the library to parse it;
 * Fixed password fetching function, mainly for Microsoft SQL Server and reviewed the password hashes parsing function;
@@ -225,7 +225,7 @@
 * Enhanced logging system: added three more levels of verbosity to show also HTTP sent and received traffic;
 * Enhancement to handle Set-Cookie from target url and automatically re-establish the Session when it expires;
 * Added support to inject also on Set-Cookie parameters;
-* Implemented TAB completion and command history on both --sql-shell and --os-shell;
+* Implemented TAB completion and command history on both `--sql-shell` and `--os-shell`;
 * Renamed some command line options;
 * Added a conversion library;
 * Added code schema and reminders for future developments;
@@ -237,19 +237,19 @@
 # Version 0.5 (2007-11-04)
 
 * Added support for Oracle database management system
-* Extended inband SQL injection functionality (--union-use) to all other possible queries since it only worked with -e and --file on all DMBS plugins;
+* Extended inband SQL injection functionality (`--union-use`) to all other possible queries since it only worked with `-e` and `--file` on all DMBS plugins;
 * Added support to extract database users password hash on Microsoft SQL Server;
 * Added a fuzzer function with the aim to parse HTML page looking for standard database error messages consequently improving database fingerprinting;
 * Added support for SQL injection on HTTP Cookie and User-Agent headers;
 * Reviewed HTTP request library (lib/request.py) to support the extended inband SQL injection functionality. Splitted getValue() into getInband() and getBlind();
 * Major enhancements in common library and added checkForBrackets() method to check if the bracket(s) are needed to perform a UNION query SQL injection attack;
-* Implemented --dump-all functionality to dump entire DBMS data from all databases tables;
-* Added support to exclude DBMS system databases' when enumeration tables and dumping their entries (--exclude-sysdbs);
+* Implemented `--dump-all` functionality to dump entire DBMS data from all databases tables;
+* Added support to exclude DBMS system databases' when enumeration tables and dumping their entries (`--exclude-sysdbs`);
 * Implemented in Dump.dbTableValues() method the CSV file dumped data automatic saving in csv/ folder by default;
 * Added DB2, Informix and Sybase DBMS error messages and minor improvements in xml/errors.xml;
 * Major improvement in all three DBMS plugins so now sqlmap does not get entire databases' tables structure when all of database/table/ column are specified to be dumped;
 * Important fixes in lib/option.py to make sqlmap properly work also with python 2.5 and handle the CSV dump files creation work also under Windows operating system, function __setCSVDir() and fixed also in lib/dump.py;
-* Minor enhancement in lib/injection.py to randomize the number requested to test the presence of a SQL injection affected parameter and implemented the possibilities to break (q) the for cycle when using the google dork option (-g);
+* Minor enhancement in lib/injection.py to randomize the number requested to test the presence of a SQL injection affected parameter and implemented the possibilities to break (q) the for cycle when using the google dork option (`-g`);
 * Minor fix in lib/request.py to properly encode the url to request in case the "fixed" part of the url has blank spaces;
 * More minor layout enhancements in some libraries;
 * Renamed DMBS plugins;
@@ -260,18 +260,18 @@
 
 * Added DBMS fingerprint based also upon HTML error messages parsing defined in lib/parser.py which reads an XML file defining default error messages for each supported DBMS;
 * Added Microsoft SQL Server extensive DBMS fingerprint checks based upon accurate '@@version' parsing matching on an XML file to get also the exact patching level of the DBMS;
-* Added support for query ETA (Estimated Time of Arrival) real time calculation (--eta);
-* Added support to extract database management system users password hash on MySQL and PostgreSQL (--passwords);
+* Added support for query ETA (Estimated Time of Arrival) real time calculation (`--eta`);
+* Added support to extract database management system users password hash on MySQL and PostgreSQL (`--passwords`);
 * Added docstrings to all functions, classes and methods, consequently released the sqlmap development documentation <http://sqlmap.org/dev/>;
-* Implemented Google dorking feature (-g) to take advantage of Google results affected by SQL injection to perform other command line argument on their DBMS;
+* Implemented Google dorking feature (`-g`) to take advantage of Google results affected by SQL injection to perform other command line argument on their DBMS;
 * Improved logging functionality: passed from banal 'print' to Python native logging library;
-* Added support for more than one parameter in '-p' command line option;
-* Added support for HTTP Basic and Digest authentication methods (--basic-auth and --digest-auth);
-* Added the command line option '--remote-dbms' to manually specify the remote DBMS;
-* Major improvements in union.UnionCheck() and union.UnionUse() functions to make it possible to exploit inband SQL injection also with database comment characters ('--' and '#') in UNION query statements;
-* Added the possibility to save the output into a file while performing the queries (-o OUTPUTFILE) so it is possible to stop and resume the same query output retrieving in a second time (--resume);
-* Added support to specify the database table column to enumerate (-C COL);
-* Added inband SQL injection (UNION query) support (--union-use);
+* Added support for more than one parameter in `-p` command line option;
+* Added support for HTTP Basic and Digest authentication methods (`--basic-auth` and `--digest-auth`);
+* Added the command line option `--remote-dbms` to manually specify the remote DBMS;
+* Major improvements in union.UnionCheck() and union.UnionUse() functions to make it possible to exploit inband SQL injection also with database comment characters (`--` and `#`) in UNION query statements;
+* Added the possibility to save the output into a file while performing the queries (`-o OUTPUTFILE`) so it is possible to stop and resume the same query output retrieving in a second time (`--resume`);
+* Added support to specify the database table column to enumerate (`-C COL`);
+* Added inband SQL injection (UNION query) support (`--union-use`);
 * Complete code refactoring, a lot of minor and some major fixes in libraries, many minor improvements;
 * Reviewed the directory tree structure;
 * Splitted lib/common.py: inband injection functionalities now are moved to lib/union.py;
@@ -282,10 +282,10 @@
 * Added module for MS SQL Server;
 * Strongly improved MySQL dbms active fingerprint and added MySQL comment injection check;
 * Added PostgreSQL dbms active fingerprint;
-* Added support for string match (--string);
-* Added support for UNION check (--union-check);
+* Added support for string match (`--string`);
+* Added support for UNION check (`--union-check`);
 * Removed duplicated code, delegated most of features to the engine in common.py and option.py;
-* Added support for --data command line argument to pass the string for POST requests;
+* Added support for `--data` command line argument to pass the string for POST requests;
 * Added encodeParams() method to encode url parameters before making http request;
 * Many bug fixes;
 * Rewritten documentation files;

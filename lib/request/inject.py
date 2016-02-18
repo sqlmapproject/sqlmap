@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -432,6 +432,8 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
+                kb.responseTimeMode = re.sub(r"(?i)[^a-z]", "", re.sub(r"'[^']+'", "", expression)) if re.search(r"(?i)SELECT.+FROM", expression) else None
+
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
                     kb.technique = PAYLOAD.TECHNIQUE.TIME
                 else:
@@ -441,7 +443,6 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     value = _goBooleanProxy(booleanExpression)
                 else:
                     value = _goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
-
         else:
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
@@ -449,6 +450,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     finally:
         kb.resumeValues = True
+        kb.responseTimeMode = None
 
         conf.tbl = popValue()
         conf.db = popValue()

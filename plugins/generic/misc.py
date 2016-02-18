@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -70,7 +70,7 @@ class Miscellaneous:
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
 
-        singleTimeDebugMessage("going to use %s as temporary files directory" % conf.tmpPath)
+        singleTimeDebugMessage("going to use '%s' as temporary files directory" % conf.tmpPath)
 
         hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 

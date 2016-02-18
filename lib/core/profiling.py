@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -26,9 +26,8 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s). " % getUnicode(e, UNICODE_ENCODING)
-        errMsg += "Quick steps:%s" % os.linesep
-        errMsg += "1) sudo apt-get install python-pydot python-pyparsing python-profiler graphviz"
+        errMsg = "profiling requires third-party libraries ('%s') " % getUnicode(e, UNICODE_ENCODING)
+        errMsg += "(Hint: 'sudo apt-get install python-pydot python-pyparsing python-profiler graphviz')"
         logger.error(errMsg)
 
         return

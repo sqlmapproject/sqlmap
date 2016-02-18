@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -332,7 +332,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     if not kb.targets or url not in addedTargetUrls:
-                        kb.targets.add((url, method, data, cookie, tuple(headers)))
+                        kb.targets.add((url, conf.method or method, data, cookie, tuple(headers)))
                         addedTargetUrls.add(url)
 
     checkFile(reqFile)
@@ -341,7 +341,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             content = f.read()
     except (IOError, OSError, MemoryError), ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to read the content of file '%s' ('%s')" % (reqFile, ex)
+        errMsg += "to read the content of file '%s' ('%s')" % (reqFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
     if conf.scope:
@@ -386,7 +386,7 @@ def _loadQueries():
         tree.parse(paths.QUERIES_XML)
     except Exception, ex:
         errMsg = "something seems to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, ex)
+        errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
 
@@ -501,7 +501,7 @@ def _setCrawler():
                     status = "%d/%d links visited (%d%%)" % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except Exception, ex:
-                errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, ex)
+                errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, getSafeExString(ex))
                 logger.error(errMsg)
 
 def _doSearch():
@@ -639,7 +639,7 @@ def _findPageForms():
             except KeyboardInterrupt:
                 break
             except Exception, ex:
-                errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, ex)
+                errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, getSafeExString(ex))
                 logger.error(errMsg)
 
 def _setDBMSAuthentication():
@@ -1028,7 +1028,7 @@ def _setSocketPreConnect():
         return
 
     def _():
-        while kb.threadContinue:
+        while kb.threadContinue and not conf.disablePrecon:
             try:
                 for key in socket._ready:
                     if len(socket._ready[key]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
@@ -1037,13 +1037,16 @@ def _setSocketPreConnect():
                         s._connect(address)
                         with kb.locks.socket:
                             socket._ready[key].append(s._sock)
-            except socket.error:
+            except KeyboardInterrupt:
+                break
+            except:
                 pass
             finally:
                 time.sleep(0.01)
 
     def connect(self, address):
         found = False
+
         key = (self.family, self.type, self.proto, address)
         with kb.locks.socket:
             if key not in socket._ready:
@@ -1051,6 +1054,7 @@ def _setSocketPreConnect():
             if len(socket._ready[key]) > 0:
                 self._sock = socket._ready[key].pop(0)
                 found = True
+
         if not found:
             self._connect(address)
 
@@ -1094,7 +1098,7 @@ def _setHTTPHandlers():
         try:
             _ = urlparse.urlsplit(conf.proxy)
         except Exception, ex:
-            errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, ex)
+            errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
             raise SqlmapSyntaxException, errMsg
 
         hostnamePort = _.netloc.split(":")
@@ -1682,7 +1686,7 @@ def _cleanupOptions():
         conf.torType = conf.torType.upper()
 
     if conf.outputDir:
-        paths.SQLMAP_OUTPUT_PATH = conf.outputDir
+        paths.SQLMAP_OUTPUT_PATH = os.path.realpath(os.path.expanduser(conf.outputDir))
         setPaths()
 
     if conf.string:
@@ -1891,7 +1895,9 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
     kb.requestCounter = 0
     kb.resendPostOnRedirect = None
-    kb.responseTimes = []
+    kb.responseTimes = {}
+    kb.responseTimeMode = None
+    kb.responseTimePayload = None
     kb.resumeValues = True
     kb.safeCharEncode = False
     kb.safeReq = AttribDict()
@@ -2053,7 +2059,7 @@ def _saveConfig():
         config.write(confFP)
     except IOError, ex:
         errMsg = "something went wrong while trying "
-        errMsg += "to write to the configuration file '%s' ('%s')" % (conf.saveConfig, ex)
+        errMsg += "to write to the configuration file '%s' ('%s')" % (conf.saveConfig, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
     infoMsg = "saved command line options to the configuration file '%s'" % conf.saveConfig
@@ -2085,6 +2091,43 @@ def setVerbosity():
     elif conf.verbose >= 5:
         logger.setLevel(CUSTOM_LOGGING.TRAFFIC_IN)
 
+def _normalizeOptions(inputOptions):
+    """
+    Sets proper option types
+    """
+
+    types_ = {}
+    for group in optDict.keys():
+        types_.update(optDict[group])
+
+    for key in inputOptions:
+        if key in types_:
+            value = inputOptions[key]
+            if value is None:
+                continue
+
+            type_ = types_[key]
+            if type_ and isinstance(type_, tuple):
+                type_ = type_[0]
+
+            if type_ == OPTION_TYPE.BOOLEAN:
+                try:
+                    value = bool(value)
+                except (TypeError, ValueError):
+                    value = False
+            elif type_ == OPTION_TYPE.INTEGER:
+                try:
+                    value = int(value)
+                except (TypeError, ValueError):
+                    value = 0
+            elif type_ == OPTION_TYPE.FLOAT:
+                try:
+                    value = float(value)
+                except (TypeError, ValueError):
+                    value = 0.0
+
+            inputOptions[key] = value
+
 def _mergeOptions(inputOptions, overrideOptions):
     """
     Merge command line options with configuration file and default options.
@@ -2096,6 +2139,7 @@ def _mergeOptions(inputOptions, overrideOptions):
     if inputOptions.pickledOptions:
         try:
             inputOptions = base64unpickle(inputOptions.pickledOptions)
+            _normalizeOptions(inputOptions)
         except Exception, ex:
             errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
             errMsg += " ('%s')" % ex if ex.message else ""
@@ -2121,35 +2165,21 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
-    _ = {}
+
+    lut = {}
+    for group in optDict.keys():
+        lut.update((_.upper(), _) for _ in optDict[group])
+
+    envOptions = {}
     for key, value in os.environ.items():
         if key.upper().startswith(SQLMAP_ENVIRONMENT_PREFIX):
-            _[key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()] = value
+            _ = key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()
+            if _ in lut:
+                envOptions[lut[_]] = value
 
-    types_ = {}
-    for group in optDict.keys():
-        types_.update(optDict[group])
-
-    for key in conf:
-        if key.upper() in _ and key in types_:
-            value = _[key.upper()]
-
-            if types_[key] == OPTION_TYPE.BOOLEAN:
-                try:
-                    value = bool(value)
-                except ValueError:
-                    value = False
-            elif types_[key] == OPTION_TYPE.INTEGER:
-                try:
-                    value = int(value)
-                except ValueError:
-                    value = 0
-            elif types_[key] == OPTION_TYPE.FLOAT:
-                try:
-                    value = float(value)
-                except ValueError:
-                    value = 0.0
-
+    if envOptions:
+        _normalizeOptions(envOptions)
+        for key, value in envOptions.items():
             conf[key] = value
 
     mergedOptions.update(conf)
@@ -2228,11 +2258,6 @@ def _setTorHttpProxySettings():
         errMsg += "Polipo bundle installed for you to be able to "
         errMsg += "successfully use switch '--tor' "
 
-        if IS_WIN:
-            errMsg += "(e.g. https://www.torproject.org/projects/vidalia.html.en)"
-        else:
-            errMsg += "(e.g. http://www.coresec.org/2011/04/24/sqlmap-with-tor/)"
-
         raise SqlmapConnectionException(errMsg)
 
     if not conf.checkTor:
@@ -2252,9 +2277,6 @@ def _setTorSocksProxySettings():
     socks.wrapmodule(urllib2)
 
 def _checkWebSocket():
-    infoMsg = "checking for WebSocket"
-    logger.debug(infoMsg)
-
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
             from websocket import ABNF
@@ -2365,14 +2387,14 @@ def _basicOptionValidation():
         try:
             re.compile(conf.regexp)
         except re.error, ex:
-            errMsg = "invalid regular expression '%s' ('%s')" % (conf.regexp, ex)
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.regexp, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
     if conf.crawlExclude:
         try:
             re.compile(conf.crawlExclude)
         except re.error, ex:
-            errMsg = "invalid regular expression '%s' ('%s')" % (conf.crawlExclude, ex)
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.crawlExclude, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
     if conf.dumpTable and conf.dumpAll:

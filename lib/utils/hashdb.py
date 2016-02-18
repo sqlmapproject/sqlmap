@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -38,9 +38,10 @@ class HashDB(object):
                 connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
                 threadData.hashDBCursor = connection.cursor()
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+                connection.commit()
             except Exception, ex:
                 errMsg = "error occurred while opening a session "
-                errMsg += "file '%s' ('%s')" % (self.filepath, ex)
+                errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
                 raise SqlmapDataException(errMsg)
 
         return threadData.hashDBCursor
@@ -79,10 +80,13 @@ class HashDB(object):
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not "locked" in getSafeExString(ex):
+                        if not any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
                             raise
+                        else:
+                            debugMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+                            logger.debug(debugMsg)
                     except sqlite3.DatabaseError, ex:
-                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, ex)
+                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"
                         raise SqlmapDataException, errMsg
                     else:

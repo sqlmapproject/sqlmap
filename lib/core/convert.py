@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import base64
 import json
 import pickle
+import re
 import StringIO
 import sys
 import types
@@ -159,6 +160,10 @@ def htmlunescape(value):
     if value and isinstance(value, basestring):
         codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
+        try:
+            retVal = re.sub(r"&#x([^;]+);", lambda match: unichr(int(match.group(1), 16)), retVal)
+        except ValueError:
+            pass
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function

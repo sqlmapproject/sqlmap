@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -123,6 +123,13 @@ def postgres_passwd(password, username, uppercase=False):
     'md599e5ea7a6f7c3269995cba3927fd0093'
     """
 
+
+    if isinstance(username, unicode):
+        username = unicode.encode(username, UNICODE_ENCODING)
+
+    if isinstance(password, unicode):
+        password = unicode.encode(password, UNICODE_ENCODING)
+
     retVal = "md5%s" % md5(password + username).hexdigest()
 
     return retVal.upper() if uppercase else retVal.lower()
@@ -207,7 +214,7 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
     IV, pad = "\0" * 8, "\0"
 
     if isinstance(username, unicode):
-        username = unicode.encode(username, UNICODE_ENCODING)  # pyDes has issues with unicode strings
+        username = unicode.encode(username, UNICODE_ENCODING)
 
     if isinstance(password, unicode):
         password = unicode.encode(password, UNICODE_ENCODING)
