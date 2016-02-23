@@ -2145,9 +2145,6 @@ def _mergeOptions(inputOptions, overrideOptions):
             errMsg += " ('%s')" % ex if ex.message else ""
             raise SqlmapSyntaxException(errMsg)
 
-    if inputOptions.configFile:
-        configFileParser(inputOptions.configFile)
-
     if hasattr(inputOptions, "items"):
         inputOptionsItems = inputOptions.items()
     else:
@@ -2156,6 +2153,9 @@ def _mergeOptions(inputOptions, overrideOptions):
     for key, value in inputOptionsItems:
         if key not in conf or value not in (None, False) or overrideOptions:
             conf[key] = value
+
+    if inputOptions.configFile:
+        configFileParser(inputOptions.configFile)
 
     for key, value in conf.items():
         if value is not None:

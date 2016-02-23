@@ -75,14 +75,14 @@ def configFileParser(configFile):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    condition = not config.has_option("Target", "direct")
-    condition &= not config.has_option("Target", "url")
-    condition &= not config.has_option("Target", "logFile")
-    condition &= not config.has_option("Target", "bulkFile")
-    condition &= not config.has_option("Target", "googleDork")
-    condition &= not config.has_option("Target", "requestFile")
-    condition &= not config.has_option("Target", "sitemapUrl")
-    condition &= not config.has_option("Target", "wizard")
+    condition = conf["direct"] == None and not config.has_option("Target", "direct")
+    condition &= conf["url"] == None and not config.has_option("Target", "url")
+    condition &= conf["logFile"] == None and not config.has_option("Target", "logFile")
+    condition &= conf["bulkFile"] == None and not config.has_option("Target", "bulkFile")
+    condition &= conf["googleDork"] == None and not config.has_option("Target", "googleDork")
+    condition &= conf["requestFile"] == None and not config.has_option("Target", "requestFile")
+    condition &= conf["sitemapUrl"] == None and not config.has_option("Target", "sitemapUrl")
+    condition &= conf["wizard"] == None and not config.has_option("Target", "wizard")
 
     if condition:
         errMsg = "missing a mandatory option in the configuration file "
