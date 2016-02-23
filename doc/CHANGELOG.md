@@ -1,14 +1,12 @@
-# Version 1.0 (upcoming)
+# Version 1.0 (2016-02-2X)
 
 * Implemented support for automatic decoding of page content through detected charset.
 * Implemented mechanism for proper data dumping on DBMSes not supporting `LIMIT/OFFSET` like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.).
 * Major improvements to program stabilization based on user reports.
 * Added new tampering scripts avoiding popular WAF/IPS/IDS mechanisms.
-* Added support for setting Tor proxy type together with port.
 * Fixed major bug with DNS leaking in Tor mode.
 * Added wordlist compilation made of the most popular cracking dictionaries.
-* Added support for mnemonics substantially helping user with program setup.
-* Implemented multi-processor hash cracking routine(s) on Linux OS.
+* Implemented multi-processor hash cracking routine(s).
 * Implemented advanced detection techniques for inband and time-based injections by usage of standard deviation method.
 * Old resume files are now deprecated and replaced by faster SQLite based session mechanism.
 * Substantial code optimization and smaller memory footprint.
@@ -31,6 +29,69 @@
 * Major improvements to switches `--tables` and `--columns`.
 * Takeover switch `--os-pwn` improved: stealthier, faster and AV-proof.
 * Added switch `--mobile` to imitate a mobile device through HTTP User-Agent header.
+* Added switch `-a` to enumerate all DBMS data.
+* Added option `--alert` to run host OS command(s) when SQL injection is found.
+* Added option `--answers` to set user answers to asked questions during sqlmap run.
+* Added option `--auth-file` to set HTTP authentication PEM cert/private key file.
+* Added option `--charset` to force character encoding used during data retrieval.
+* Added switch `--check-tor` to force checking of proper usage of Tor.
+* Added option `--code` to set HTTP code to match when query is evaluated to True.
+* Added option `--cookie-del` to set character to be used while splitting cookie values.
+* Added option `--crawl` to set the crawling depth for the website starting from the target URL.
+* Added option `--crawl-exclude` for setting regular expression for excluding pages from crawling (e.g. `"logout"`).
+* Added option `--csrf-token` to set the parameter name that is holding the anti-CSRF token.
+* Added option `--csrf-url` for setting the URL address for extracting the anti-CSRF token.
+* Added option `--csv-del` for setting the delimiting character that will be used in CSV output (default `,`).
+* Added option `--dbms-cred` to set the DBMS authentication credentials (user:password).
+* Added switch `--dependencies` for turning on the checking of missing (non-core) sqlmap dependencies.
+* Added switch `--disable-coloring` to disable console output coloring.
+* Added option `--dns-domain` to set the domain name for usage in DNS exfiltration attack(s).
+* Added option `--dump-format` to set the format of dumped data (`CSV` (default), `HTML` or `SQLITE`).
+* Added option `--eval` for setting the Python code that will be evaluated before the request.
+* Added switch `--force-ssl` to force usage of SSL/HTTPS.
+* Added switch `--hex` to force usage of DBMS hex function(s) for data retrieval.
+* Added option `-H` to set extra HTTP header (e.g. `"X-Forwarded-For: 127.0.0.1"`).
+* Added switch `-hh` for showing advanced help message.
+* Added option `--host` to set the HTTP Host header value.
+* Added switch `--hostname` to turn on retrieval of DBMS server hostname.
+* Added switch `--hpp` to turn on the usage of HTTP parameter pollution WAF bypass method.
+* Added switch `--identify-waf` for turning on the thorough testing of WAF/IPS/IDS protection.
+* Added switch `--ignore-401` to ignore HTTP Error Code 401 (Unauthorized).
+* Added switch `--invalid-bignum` for usage of big numbers while invalidating values.
+* Added switch `--invalid-logical` for usage of logical operations while invalidating values.
+* Added switch `--invalid-string` for usage of random strings while invalidating values.
+* Added option `--load-cookies` to set the file containing cookies in Netscape/wget format.
+* Added option `-m` to set the textual file holding multiple targets for scanning purposes.
+* Added option `--method` to force usage of provided HTTP method (e.g. `PUT`).
+* Added switch `--no-cast` for turning off payload casting mechanism.
+* Added switch `--no-escape` for turning off string escaping mechanism.
+* Added option `--not-string` for setting string to be matched when query is evaluated to False.
+* Added switch `--offline` to force work in offline mode (i.e. only use session data).
+* Added option `--output-dir` to set custom output directory path.
+* Added option `--param-del` to set character used for splitting parameter values.
+* Added option `--pivot-column` to set column name that will be used while dumping tables by usage of pivot(ing).
+* Added option `--proxy-file` to set file holding proxy list.
+* Added switch `--purge-output` to turn on safe removal of all content(s) from output directory.
+* Added option `--randomize` to set parameter name(s) that will be randomly changed during sqlmap run.
+* Added option `--safe-post` to set POST data for sending to safe URL.
+* Added option `--safe-req` for loading HTTP request from a file that will be used during sending to safe URL.
+* Added option `--skip` to skip testing of given parameter(s).
+* Added switch `--skip-static` to skip testing parameters that not appear dynamic.
+* Added switch `--skip-urlencode` to skip URL encoding of payload data.
+* Added switch `--skip-waf` to skip heuristic detection of WAF/IPS/IDS protection.
+* Added switch `--smart` to conduct thorough tests only if positive heuristic(s).
+* Added option `--sql-file` for setting file(s) holding SQL statements to be executed (in case of stacked SQLi).
+* Added switch `--sqlmap-shell` to turn on interactive sqlmap shell prompt.
+* Added option `--test-filter` for test filtration by payloads and/or titles (e.g. `ROW`).
+* Added option `--test-skip` for skiping tests by payloads and/or titles (e.g. `BENCHMARK`).
+* Added switch `--titles` to turn on comparison of pages based only on their titles.
+* Added option `--tor-port` to explicitly set Tor proxy port.
+* Added option `--tor-type` to set Tor proxy type (`HTTP` (default), `SOCKS4` or `SOCKS5`).
+* Added option `--union-from` to set table to be used in `FROM` part of UNION query SQL injection.
+* Added option `--where` to set `WHERE` condition to be used during the table dumping.
+* Added option `-X` to exclude DBMS database table column(s) from enumeration.
+* Added option `-x` to set URL of sitemap(.xml) for target(s) parsing.
+* Added option `-z` for usage of short mnemonics (e.g. `"flu,bat,ban,tec=EU"`).
 
 # Version 0.9 (2011-04-10)
 
