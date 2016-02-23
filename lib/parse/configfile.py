@@ -11,6 +11,7 @@ from lib.core.common import getUnicode
 from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
+from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapMissingMandatoryOptionException
@@ -75,16 +76,14 @@ def configFileParser(configFile):
         errMsg = "missing a mandatory section 'Target' in the configuration file"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    condition = not config.has_option("Target", "direct")
-    condition &= not config.has_option("Target", "url")
-    condition &= not config.has_option("Target", "logFile")
-    condition &= not config.has_option("Target", "bulkFile")
-    condition &= not config.has_option("Target", "googleDork")
-    condition &= not config.has_option("Target", "requestFile")
-    condition &= not config.has_option("Target", "sitemapUrl")
-    condition &= not config.has_option("Target", "wizard")
+    mandatory = False
 
-    if condition:
+    for option in ("direct", "url", "logFile", "bulkFile", "googleDork", "requestFile", "sitemapUrl", "wizard"):
+        if config.has_option("Target", option) and config.get("Target", option) or cmdLineOptions.get(option):
+            mandatory = True
+            break
+
+    if not mandatory:
         errMsg = "missing a mandatory option in the configuration file "
         errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile, sitemapUrl or wizard)"
         raise SqlmapMissingMandatoryOptionException(errMsg)
