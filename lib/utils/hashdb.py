@@ -14,6 +14,7 @@ import time
 from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import serializeObject
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unserializeObject
 from lib.core.data import logger
 from lib.core.exception import SqlmapDataException
@@ -83,8 +84,8 @@ class HashDB(object):
                         if not any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
                             raise
                         else:
-                            debugMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
-                            logger.debug(debugMsg)
+                            warnMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+                            singleTimeWarnMessage(warnMsg)
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"
