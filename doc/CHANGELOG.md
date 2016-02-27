@@ -1,4 +1,4 @@
-# Version 1.0 (2016-02-2X)
+# Version 1.0 (2016-02-27)
 
 * Implemented support for automatic decoding of page content through detected charset.
 * Implemented mechanism for proper data dumping on DBMSes not supporting `LIMIT/OFFSET` like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.).
