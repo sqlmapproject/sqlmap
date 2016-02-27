@@ -19,8 +19,8 @@ def tamper(payload, **kwargs):
     """
     Slash escape quotes (' and ")
 
-    >>> tamper("1' AND SLEEP(5)#")
-    '1\' AND SLEEP(5)#'
+    >>> tamper('1" AND SLEEP(5)#')
+    '1\\\\" AND SLEEP(5)#'
     """
 
     return payload.replace("'", "\\'").replace('"', '\\"')
