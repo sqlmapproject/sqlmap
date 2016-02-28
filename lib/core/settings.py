@@ -20,9 +20,10 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
-VERSION = "1.0-stable"
+VERSION = "1.0.0"
 REVISION = getRevisionNumber()
-VERSION_STRING = "sqlmap/%s" % VERSION
+COMMIT_AUTOINCREMENT = 2
+VERSION_STRING = "sqlmap/%s.%d" % (VERSION, COMMIT_AUTOINCREMENT)
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"

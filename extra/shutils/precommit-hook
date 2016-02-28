@@ -1,0 +1,22 @@
+#!/bin/bash
+
+SETTINGS="../../lib/core/settings.py"
+
+declare -x SCRIPTPATH="${0}"
+
+FULLPATH=${SCRIPTPATH%/*}/$SETTINGS
+
+if [ -f $FULLPATH ]
+then
+    LINE=$(grep -o ${FULLPATH} -e 'VERSION = "[0-9.]*"');
+    declare -a LINE;
+    INCREMENTED=$(python -c "import re, sys; version = re.search('\"([0-9.]*)\"', sys.argv[1]).group(1); _ = version.split('.'); _.append(0) if len(_) < 3 else _; _[-1] = str(int(_[-1]) + 1); print sys.argv[1].replace(version, '.'.join(_))" "$LINE")
+    if [ -n "$INCREMENTED" ]
+    then
+        sed "s/${LINE}/${INCREMENTED}/" $FULLPATH > $FULLPATH.tmp && mv $FULLPATH.tmp $FULLPATH
+        echo "Updated ${INCREMENTED} in ${FULLPATH}";
+    else
+        echo "Something went wrong in VERSION increment"
+        exit 1
+    fi
+fi;
