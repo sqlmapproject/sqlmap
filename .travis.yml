@@ -1,0 +1,6 @@
+language: python
+python:
+    - "2.6"
+    - "2.7"
+script:
+    - python -c "import sqlmap; import sqlmapapi"
