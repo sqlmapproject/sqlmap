@@ -861,7 +861,7 @@ def cmdLineParser(argv=None):
                 if not command:
                     continue
                 elif command.lower() == "clear":
-                    clearHistory()                    
+                    clearHistory()
                     print "[i] history cleared"
                     saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                 elif command.lower() in ("x", "q", "exit", "quit"):

@@ -622,14 +622,13 @@ def download(taskid, target, filename):
         logger.warning("[%s] Invalid task ID provided to download()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    # Prevent file path traversal - the lame way
-    if ".." in target:
+    path = os.path.abspath(os.path.join(paths.SQLMAP_OUTPUT_PATH, target, filename))
+    # Prevent file path traversal
+    if not path.startswith(paths.SQLMAP_OUTPUT_PATH):
         logger.warning("[%s] Forbidden path (%s)" % (taskid, target))
         return jsonize({"success": False, "message": "Forbidden path"})
 
-    path = os.path.join(paths.SQLMAP_OUTPUT_PATH, target)
-
-    if os.path.exists(path):
+    if os.path.isfile(path):
         logger.debug("[%s] Retrieved content of file %s" % (taskid, target))
         with open(path, 'rb') as inf:
             file_content = inf.read()

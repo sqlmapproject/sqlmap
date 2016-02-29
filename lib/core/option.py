@@ -2165,7 +2165,6 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
-
     lut = {}
     for group in optDict.keys():
         lut.update((_.upper(), _) for _ in optDict[group])

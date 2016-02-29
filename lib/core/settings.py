@@ -20,9 +20,10 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
-VERSION = "1.0-dev"
+VERSION = "1.0.0.8"
 REVISION = getRevisionNumber()
-VERSION_STRING = "sqlmap/%s%s" % (VERSION, "-%s" % REVISION if REVISION else "-nongit-%s-%04x" % (time.strftime("%Y%m%d", time.gmtime(os.path.getmtime(__file__))), os.path.getsize(os.path.join(os.path.dirname(__file__), "common.py")) & 0xffff))
+STABLE = VERSION.count('.') <= 2
+VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
@@ -35,7 +36,7 @@ BANNER = """\033[01;33m         _
 |_ -| . | |     | .'| . |
 |___|_  |_|_|_|_|__,|  _|
       |_|           |_|   \033[0m\033[4;37m%s\033[0m\n
-""" % ((31 + hash(REVISION) % 6) if REVISION else 30, VERSION_STRING.split('/')[-1], SITE)
+""" % ((31 + hash(VERSION) % 6) if not STABLE else 30, VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True
 DIFF_TOLERANCE = 0.05
