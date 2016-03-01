@@ -90,6 +90,7 @@
         <error regexp="(?i)Warning.*sybase.*"/>
         <error regexp="Sybase message"/>
         <error regexp="Sybase.*Server message.*"/>
+        <error regexp=".*SybSQLException*."/>
     </dbms>
 
     <!-- Ingres -->
