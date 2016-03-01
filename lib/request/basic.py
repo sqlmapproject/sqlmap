@@ -204,7 +204,7 @@ def checkCharEncoding(encoding, warn=True):
     # Reference: http://docs.python.org/library/codecs.html
     try:
         codecs.lookup(encoding.encode(UNICODE_ENCODING) if isinstance(encoding, unicode) else encoding)
-    except LookupError:
+    except (LookupError, ValueError):
         if warn:
             warnMsg = "unknown web page charset '%s'. " % encoding
             warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
