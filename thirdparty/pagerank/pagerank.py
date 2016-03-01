@@ -16,14 +16,12 @@ import sys
 import urllib
 import urllib2
 
-TIMEOUT = 10
-
-def get_pagerank(url):
+def get_pagerank(url, timeout=10):
     url = url.encode('utf8') if isinstance(url, unicode) else url
     _ = 'http://toolbarqueries.google.com/tbr?client=navclient-auto&features=Rank&ch=%s&q=info:%s' % (check_hash(hash_url(url)), urllib.quote(url))
     try:
         req = urllib2.Request(_)
-        rank = urllib2.urlopen(req, timeout=TIMEOUT).read().strip()[9:]
+        rank = urllib2.urlopen(req, timeout=timeout).read().strip()[9:]
     except:
         rank = 'N/A'
     else:
