@@ -391,9 +391,10 @@ class Connect(object):
 
             for key, value in headers.items():
                 del headers[key]
-                headers[unicodeencode(key, kb.pageEncoding)] = unicodeencode(value, kb.pageEncoding)
+                value = unicodeencode(value, kb.pageEncoding)
                 for char in (r"\r", r"\n"):
                     value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
+                headers[unicodeencode(key, kb.pageEncoding)] = value.strip("\r\n")
 
             url = unicodeencode(url)
             post = unicodeencode(post)
