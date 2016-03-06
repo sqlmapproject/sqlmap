@@ -3142,59 +3142,65 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
     retVal = content
 
-    if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism and not kb.heuristicMode:
-        def _(value):
-            while 2 * REFLECTED_REPLACEMENT_REGEX in value:
-                value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
-            return value
+    try:
+        if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism and not kb.heuristicMode:
+            def _(value):
+                while 2 * REFLECTED_REPLACEMENT_REGEX in value:
+                    value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
+                return value
 
-        payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ''), convall=True))
-        regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
+            payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ''), convall=True))
+            regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
-        if regex != payload:
-            if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
-                parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
-                retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
+            if regex != payload:
+                if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
+                    parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
+                    retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
 
-                if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                    regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
+                    if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
+                        regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
 
-                parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
+                    parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
 
-                if regex.startswith(REFLECTED_REPLACEMENT_REGEX):
-                    regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex[len(REFLECTED_REPLACEMENT_REGEX):])
-                else:
-                    regex = r"\b%s" % regex
+                    if regex.startswith(REFLECTED_REPLACEMENT_REGEX):
+                        regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex[len(REFLECTED_REPLACEMENT_REGEX):])
+                    else:
+                        regex = r"\b%s" % regex
 
-                if regex.endswith(REFLECTED_REPLACEMENT_REGEX):
-                    regex = r"%s%s" % (regex[:-len(REFLECTED_REPLACEMENT_REGEX)], REFLECTED_BORDER_REGEX)
-                else:
-                    regex = r"%s\b" % regex
+                    if regex.endswith(REFLECTED_REPLACEMENT_REGEX):
+                        regex = r"%s%s" % (regex[:-len(REFLECTED_REPLACEMENT_REGEX)], REFLECTED_BORDER_REGEX)
+                    else:
+                        regex = r"%s\b" % regex
 
-                retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, retVal)
+                    retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, retVal)
 
-                if len(parts) > 2:
-                    regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
-                    retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
+                    if len(parts) > 2:
+                        regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
+                        retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
 
-            if retVal != content:
-                kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
-                if not suppressWarning:
-                    warnMsg = "reflective value(s) found and filtering out"
-                    singleTimeWarnMessage(warnMsg)
-
-                if re.search(r"FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal, re.I):
-                    warnMsg = "frames detected containing attacked parameter values. Please be sure to "
-                    warnMsg += "test those separately in case that attack on this page fails"
-                    singleTimeWarnMessage(warnMsg)
-
-            elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
-                kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
-                if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
-                    kb.reflectiveMechanism = False
+                if retVal != content:
+                    kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
                     if not suppressWarning:
-                        debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
-                        logger.debug(debugMsg)
+                        warnMsg = "reflective value(s) found and filtering out"
+                        singleTimeWarnMessage(warnMsg)
+
+                    if re.search(r"FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal, re.I):
+                        warnMsg = "frames detected containing attacked parameter values. Please be sure to "
+                        warnMsg += "test those separately in case that attack on this page fails"
+                        singleTimeWarnMessage(warnMsg)
+
+                elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
+                    kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
+                    if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
+                        kb.reflectiveMechanism = False
+                        if not suppressWarning:
+                            debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
+                            logger.debug(debugMsg)
+    except MemoryError:
+        kb.reflectiveMechanism = False
+        if not suppressWarning:
+            debugMsg = "turning off reflection removal mechanism (because of low memory issues)"
+            logger.debug(debugMsg)
 
     return retVal
 
