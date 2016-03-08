@@ -17,6 +17,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import splitFields
 from lib.core.common import unArrayizeValue
@@ -923,7 +924,7 @@ class Agent(object):
             else:
                 limitedQuery = "%s FROM (SELECT %s,%s" % (untilFrom, ','.join(f for f in field), limitStr)
 
-            limitedQuery = limitedQuery % fromFrom
+            limitedQuery = safeStringFormat(limitedQuery, (fromFrom,))
             limitedQuery += "=%d" % (num + 1)
 
         elif Backend.isDbms(DBMS.MSSQL):
