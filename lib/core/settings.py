@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version and site
-VERSION = "1.0.0.15"
+VERSION = "1.0.0.16"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -482,6 +482,10 @@ SOCKET_PRE_CONNECT_QUEUE_SIZE = 3
 
 # Only console display last n table rows
 TRIM_STDOUT_DUMP_SIZE = 256
+
+# Reference: http://stackoverflow.com/a/3168436
+# Reference: https://support.microsoft.com/en-us/kb/899149
+DUMP_FILE_BUFFER_SIZE = 1024
 
 # Parse response headers only first couple of times
 PARSE_HEADERS_LIMIT = 3
