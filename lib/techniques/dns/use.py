@@ -60,10 +60,11 @@ def dnsUse(payload, expression):
                 prefix, suffix = ("%s" % randomStr(length=3, alphabet=DNS_BOUNDARIES_ALPHABET) for _ in xrange(2))
                 chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
+                nulledCastedField = agent.nullAndCastField(fieldToCastStr)
                 extendedField = re.search(r"[^ ,]*%s[^ ,]*" % re.escape(fieldToCastStr), expression).group(0)
                 if extendedField != fieldToCastStr:  # e.g. MIN(surname)
+                    nulledCastedField = extendedField.replace(fieldToCastStr, nulledCastedField)
                     fieldToCastStr = extendedField
-                nulledCastedField = agent.nullAndCastField(fieldToCastStr)
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
                 nulledCastedField = agent.hexConvertField(nulledCastedField)
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
