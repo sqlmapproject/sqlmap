@@ -19,8 +19,8 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
-# sqlmap version and site
-VERSION = "1.0.3.1"
+# sqlmap version (<major>.<minor>.<month>.<monthly commit>)
+VERSION = "1.0.3.2"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
