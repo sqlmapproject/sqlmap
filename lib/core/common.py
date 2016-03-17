@@ -128,6 +128,7 @@ from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PLATFORM
 from lib.core.settings import PRINTABLE_CHAR_REGEX
+from lib.core.settings import PUSH_VALUE_EXCEPTION_RETRY_COUNT
 from lib.core.settings import PYVERSION
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import REFLECTED_BORDER_REGEX
@@ -2183,7 +2184,22 @@ def pushValue(value):
     Push value to the stack (thread dependent)
     """
 
-    getCurrentThreadData().valueStack.append(copy.deepcopy(value))
+    _ = None
+    success = False
+
+    for i in xrange(PUSH_VALUE_EXCEPTION_RETRY_COUNT):
+        try:
+            getCurrentThreadData().valueStack.append(copy.deepcopy(value))
+            success = True
+            break
+        except Exception, ex:
+            _ = ex
+
+    if not success:
+        getCurrentThreadData().valueStack.append(None)
+
+        if _:
+            raise _
 
 def popValue():
     """
