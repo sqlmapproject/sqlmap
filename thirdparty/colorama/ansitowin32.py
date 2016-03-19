@@ -6,7 +6,7 @@ from .ansi import AnsiFore, AnsiBack, AnsiStyle, Style
 from .winterm import WinTerm, WinColor, WinStyle
 from .win32 import windll
 
-
+winterm = None
 if windll is not None:
     winterm = WinTerm()
 
