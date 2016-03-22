@@ -200,7 +200,10 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
         for lock in kb.locks.values():
             if lock.locked_lock():
-                lock.release()
+                try:
+                    lock.release()
+                except thread.error:
+                    pass
 
         if conf.get("hashDB"):
             conf.hashDB.flush(True)
