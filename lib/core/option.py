@@ -1821,6 +1821,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.dnsTest = None
     kb.docRoot = None
     kb.dumpTable = None
+    kb.dumpKeyboardInterrupt = False
     kb.dynamicMarkings = []
     kb.dynamicParameter = False
     kb.endDetection = False

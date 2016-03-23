@@ -192,6 +192,9 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "valueStack.pop" in excMsg and kb.get("dumpKeyboardInterrupt"):
+                raise SystemExit
+
             for match in re.finditer(r'File "(.+?)", line', excMsg):
                 file_ = match.group(1)
                 file_ = os.path.relpath(file_, os.path.dirname(__file__))

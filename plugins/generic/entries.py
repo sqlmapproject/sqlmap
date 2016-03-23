@@ -173,6 +173,7 @@ class Entries:
                                 retVal = pivotDumpTable(table, colList, blind=False)
                             except KeyboardInterrupt:
                                 retVal = None
+                                kb.dumpKeyboardInterrupt = True
                                 clearConsoleLine()
                                 warnMsg = "Ctrl+C detected in dumping phase"
                                 logger.warn(warnMsg)
@@ -279,6 +280,7 @@ class Entries:
                             retVal = pivotDumpTable(table, colList, count, blind=True)
                         except KeyboardInterrupt:
                             retVal = None
+                            kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
                             logger.warn(warnMsg)
@@ -332,6 +334,7 @@ class Entries:
                                     entries[column].append(value)
 
                         except KeyboardInterrupt:
+                            kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
                             logger.warn(warnMsg)
