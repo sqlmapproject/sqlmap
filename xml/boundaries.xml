@@ -529,6 +529,24 @@ Formats:
         <prefix>) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
         <suffix>-- </suffix>
     </boundary>
+
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1</where>
+        <ptype>1</ptype>
+        <prefix>` WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1</where>
+        <ptype>1</ptype>
+        <prefix>`) WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>-- </suffix>
+    </boundary>
     <!-- End of pre-WHERE derived table boundaries -->
 
     <!-- INSERT/UPDATE generic boundaries (e.g. "INSERT INTO table VALUES ('$_REQUEST["name"]',...)"-->
