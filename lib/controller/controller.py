@@ -209,9 +209,8 @@ def _saveToHashDB():
             _[key].data.update(injection.data)
     hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, _.values(), True)
 
-    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
-    _.update(kb.absFilePaths)
-    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
+    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True)
+    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, kb.absFilePaths | (_ if isinstance(_, set) else set()), True)
 
     if not hashDBRetrieve(HASHDB_KEYS.KB_CHARS):
         hashDBWrite(HASHDB_KEYS.KB_CHARS, kb.chars, True)

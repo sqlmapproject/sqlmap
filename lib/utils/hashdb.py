@@ -97,6 +97,7 @@ class HashDB(object):
             try:
                 retVal = unserializeObject(retVal)
             except:
+                retVal = None
                 warnMsg = "error occurred while unserializing value for session key '%s'. " % key
                 warnMsg += "If the problem persists please rerun with `--flush-session`"
                 logger.warn(warnMsg)
