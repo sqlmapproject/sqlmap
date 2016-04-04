@@ -1023,14 +1023,17 @@ def getHeader(headers, key):
             break
     return retVal
 
-def checkFile(filename):
+def checkFile(filename, raiseOnError=True):
     """
     Checks for file existence and readability
     """
 
     valid = True
 
-    if filename is None or not os.path.isfile(filename):
+    try:
+        if filename is None or not os.path.isfile(filename):
+            valid = False
+    except UnicodeError:
         valid = False
 
     if valid:
@@ -1040,8 +1043,10 @@ def checkFile(filename):
         except:
             valid = False
 
-    if not valid:
+    if not valid and raiseOnError:
         raise SqlmapSystemException("unable to read file '%s'" % filename)
+
+    return valid
 
 def banner():
     """

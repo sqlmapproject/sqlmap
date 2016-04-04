@@ -13,6 +13,7 @@ import tempfile
 import threading
 
 from lib.core.common import Backend
+from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
@@ -434,7 +435,7 @@ class Dump(object):
                             dumpDbPath = tempDir
 
             dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower()))
-            if not os.path.isfile(dumpFileName):
+            if not checkFile(dumpFileName, False):
                 try:
                     openFile(dumpFileName, "w+b").close()
                 except SqlmapSystemException:
@@ -449,7 +450,7 @@ class Dump(object):
                     else:
                         dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (_, conf.dumpFormat.lower()))
 
-            appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
+            appendToFile = any((conf.limitStart, conf.limitStop)) and checkFile(dumpFileName, False)
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab", buffering=DUMP_FILE_BUFFER_SIZE)
 
         count = int(tableValues["__infos__"]["count"])
