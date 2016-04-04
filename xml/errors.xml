@@ -31,6 +31,7 @@
         <error regexp="\bSQL Server.*[0-9a-fA-F]{8}"/>
         <error regexp="(?s)Exception.*\WSystem\.Data\.SqlClient\."/>
         <error regexp="(?s)Exception.*\WRoadhouse\.Cms\."/>
+        <error regexp="Microsoft SQL Native Client.*[0-9a-fA-F]{8}"/>
     </dbms>
 
     <!-- Microsoft Access -->
