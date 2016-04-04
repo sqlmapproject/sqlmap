@@ -39,6 +39,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
+from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.unescaper import unescaper
@@ -746,6 +747,9 @@ class Agent(object):
         if intoRegExp:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
+
+            position = 0
+            char = NULL
 
         for element in xrange(0, count):
             if element > 0:
