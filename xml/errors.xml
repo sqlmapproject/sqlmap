@@ -56,7 +56,7 @@
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
-        <error regexp="(?i)SQLSTATE.+SQLCODE"/>
+        <error regexp="SQLSTATE.+SQLCODE"/>
     </dbms>
 
     <!-- Informix -->
@@ -88,7 +88,7 @@
 
     <!-- Sybase -->
     <dbms value="Sybase">
-        <error regexp="(?i)Warning.*sybase.*"/>
+        <error regexp="Warning.*sybase.*"/>
         <error regexp="Sybase message"/>
         <error regexp="Sybase.*Server message.*"/>
         <error regexp="SybSQLException"/>
