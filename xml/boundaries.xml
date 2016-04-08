@@ -89,7 +89,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -98,7 +98,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>'</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -107,7 +107,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>"</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
     <!-- End of generic boundaries -->
 
@@ -406,7 +406,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix></prefix>
-        <suffix>-- [RANDSTR]</suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -426,7 +426,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>') WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -435,7 +435,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>") WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -444,7 +444,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>) WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -453,7 +453,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -462,7 +462,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>" WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -471,7 +471,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix> WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
@@ -482,7 +482,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -491,7 +491,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>")) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -500,7 +500,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>)) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -509,7 +509,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>') AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -518,7 +518,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>") AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -527,7 +527,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -536,7 +536,7 @@ Formats:
         <where>1</where>
         <ptype>1</ptype>
         <prefix>` WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -545,7 +545,7 @@ Formats:
         <where>1</where>
         <ptype>1</ptype>
         <prefix>`) WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
     <!-- End of pre-WHERE derived table boundaries -->
 

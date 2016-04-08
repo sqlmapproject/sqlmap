@@ -212,7 +212,7 @@ Tag: <test>
         <vector>AND [INFERENCE]</vector>
         <request>
             <payload>AND [RANDNUM]=[RANDNUM]</payload>
-            <comment>-- -</comment>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
         </request>
         <response>
             <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
@@ -229,7 +229,7 @@ Tag: <test>
         <vector>OR [INFERENCE]</vector>
         <request>
             <payload>OR [RANDNUM]=[RANDNUM]</payload>
-            <comment>-- -</comment>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
         </request>
         <response>
             <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
@@ -246,7 +246,7 @@ Tag: <test>
         <vector>OR NOT [INFERENCE]</vector>
         <request>
             <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
-            <comment>-- -</comment>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
         </request>
         <response>
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
