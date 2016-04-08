@@ -968,7 +968,12 @@ def randomRange(start=0, stop=1000, seed=None):
     423
     """
 
-    randint = random.WichmannHill(seed).randint if seed is not None else random.randint
+    if seed is not None:
+        _ = getCurrentThreadData().random
+        _.seed(seed)
+        randint = _.randint
+    else:
+        randint = random.randint
 
     return int(randint(start, stop))
 
@@ -981,7 +986,12 @@ def randomInt(length=4, seed=None):
     874254
     """
 
-    choice = random.WichmannHill(seed).choice if seed is not None else random.choice
+    if seed is not None:
+        _ = getCurrentThreadData().random
+        _.seed(seed)
+        choice = _.choice
+    else:
+        choice = random.choice
 
     return int("".join(choice(string.digits if _ != 0 else string.digits.replace('0', '')) for _ in xrange(0, length)))
 
@@ -994,7 +1004,12 @@ def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
     'RNvnAv'
     """
 
-    choice = random.WichmannHill(seed).choice if seed is not None else random.choice
+    if seed is not None:
+        _ = getCurrentThreadData().random
+        _.seed(seed)
+        choice = _.choice
+    else:
+        choice = random.choice
 
     if alphabet:
         retVal = "".join(choice(alphabet) for _ in xrange(0, length))
@@ -3146,14 +3161,6 @@ def intersect(valueA, valueB, lowerCase=False):
         retVal = [val for val in valueA if val in valueB]
 
     return retVal
-
-def cpuThrottle(value):
-    """
-    Does a CPU throttling for lesser CPU consumption
-    """
-
-    delay = 0.00001 * (value ** 2)
-    time.sleep(delay)
 
 def removeReflectiveValues(content, payload, suppressWarning=False):
     """

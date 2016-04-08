@@ -230,7 +230,6 @@ optDict = {
                                "disablePrecon":     "boolean",
                                "binaryFields":      "string",
                                "profile":           "boolean",
-                               "cpuThrottle":       "integer",
                                "forceDns":          "boolean",
                                "identifyWaf":       "boolean",
                                "skipWaf":           "boolean",

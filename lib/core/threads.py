@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import difflib
+import random
 import threading
 import time
 import traceback
@@ -51,6 +52,7 @@ class _ThreadData(threading.local):
         self.lastRequestMsg = None
         self.lastRequestUID = 0
         self.lastRedirectURL = None
+        self.random = random.WichmannHill()
         self.resumed = False
         self.retriesCount = 0
         self.seqMatcher = difflib.SequenceMatcher(None)

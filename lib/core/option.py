@@ -2331,10 +2331,6 @@ def _basicOptionValidation():
         errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
         raise SqlmapSyntaxException(errMsg)
 
-    if isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
-        errMsg = "value for option '--cpu-throttle' (cpuThrottle) must be in range [0,100]"
-        raise SqlmapSyntaxException(errMsg)
-
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)

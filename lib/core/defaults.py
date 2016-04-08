@@ -11,7 +11,6 @@ _defaults = {
    "csvDel":       ",",
    "timeSec":      5,
    "googlePage":   1,
-   "cpuThrottle":  5,
    "verbose":      1,
    "delay":        0,
    "timeout":      30,

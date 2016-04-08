@@ -32,7 +32,6 @@ from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
-from lib.core.common import cpuThrottle
 from lib.core.common import dataToStdout
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
@@ -220,8 +219,6 @@ class Connect(object):
 
         if isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
-        elif conf.cpuThrottle:
-            cpuThrottle(conf.cpuThrottle)
 
         if conf.offline:
             return None, None, None
