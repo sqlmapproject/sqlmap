@@ -44,7 +44,7 @@
 
     <!-- Oracle -->
     <dbms value="Oracle">
-        <error regexp="\bORA-[0-9][0-9][0-9][0-9]"/>
+        <error regexp="\bORA-\d{5}"/>
         <error regexp="Oracle error"/>
         <error regexp="Oracle.*Driver"/>
         <error regexp="Warning.*\Woci_.*"/>
