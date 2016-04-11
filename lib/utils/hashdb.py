@@ -66,7 +66,7 @@ class HashDB(object):
     @staticmethod
     def hashKey(key):
         key = key.encode(UNICODE_ENCODING) if isinstance(key, unicode) else repr(key)
-        retVal = int(hashlib.md5(key).hexdigest()[:12], 16)
+        retVal = int(hashlib.md5(key).hexdigest(), 16) & 0x7fffffffffffffff  # Reference: http://stackoverflow.com/a/4448400
         return retVal
 
     def retrieve(self, key, unserialize=False):
