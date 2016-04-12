@@ -45,6 +45,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
+from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import normalizeUnicode
@@ -490,7 +491,7 @@ def attackDumpedTable():
 
             for (_, hash_, password) in results:
                 if hash_:
-                    lut[hash_.lower()] = password
+                    lut[hash_.lower()] = getUnicode(password)
 
             infoMsg = "postprocessing table dump"
             logger.info(infoMsg)
