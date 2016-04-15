@@ -521,7 +521,7 @@ def start():
                                 injection = checkSqlInjection(place, parameter, value)
                                 proceed = not kb.endDetection
 
-                                if injection is not None and injection.place is not None:
+                                if getattr(injection, "place", None) is not None:
                                     kb.injections.append(injection)
 
                                     # In case when user wants to end detection phase (Ctrl+C)
