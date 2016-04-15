@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import copy
 import httplib
+import random
 import re
 import socket
 import time
@@ -906,7 +907,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
         if not result:
             randStr = randomStr()
-            payload = "%s%s%s" % (prefix, "%s%s" % (origValue, randStr), suffix)
+            payload = "%s%s%s" % (prefix, "%s.%d%s" % (origValue, random.randint(1, 9), randStr), suffix)
             payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
             casting = Request.queryPage(payload, place, raise404=False)
 
