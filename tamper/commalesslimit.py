@@ -5,10 +5,8 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import os
 import re
 
-from lib.core.common import singleTimeWarnMessage
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGH

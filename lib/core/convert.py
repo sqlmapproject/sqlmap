@@ -11,7 +11,6 @@ import pickle
 import re
 import StringIO
 import sys
-import types
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING

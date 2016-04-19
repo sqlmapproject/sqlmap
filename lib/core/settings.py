@@ -10,7 +10,6 @@ import re
 import subprocess
 import string
 import sys
-import time
 import types
 
 from lib.core.datatype import AttribDict
@@ -20,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.4.19"
+VERSION = "1.0.4.20"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")

@@ -5,7 +5,6 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import cookielib
 import httplib
 import re
 import socket
@@ -26,7 +25,6 @@ from lib.core.enums import HTTP_HEADER
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapConnectionException
-from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import DUMMY_SEARCH_USER_AGENT
 from lib.core.settings import DUCKDUCKGO_REGEX
@@ -35,7 +33,6 @@ from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
-from lib.request.httpshandler import HTTPSHandler
 from thirdparty.socks import socks
 
 
