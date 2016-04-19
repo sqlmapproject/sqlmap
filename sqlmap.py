@@ -85,6 +85,7 @@ def main():
             raise SystemExit
 
         setPaths()
+        banner()
 
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
@@ -96,8 +97,6 @@ def main():
             sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
             sys.stderr = StdDbOut(conf.taskid, messagetype="stderr")
             setRestAPILog()
-
-        banner()
 
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)

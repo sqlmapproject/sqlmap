@@ -1068,10 +1068,12 @@ def banner():
     This function prints sqlmap banner with its version
     """
 
-    _ = BANNER
-    if not getattr(LOGGER_HANDLER, "is_tty", False):
-        _ = re.sub("\033.+?m", "", _)
-    dataToStdout(_, forceOutput=True)
+
+    if not any(_ in sys.argv for _ in ("--version", "--pickled-options")):
+        _ = BANNER
+        if not getattr(LOGGER_HANDLER, "is_tty", False):
+            _ = re.sub("\033.+?m", "", _)
+        dataToStdout(_, forceOutput=True)
 
 def parsePasswordHash(password):
     """
