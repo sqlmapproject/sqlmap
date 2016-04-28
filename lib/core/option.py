@@ -151,7 +151,6 @@ from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.search import search
 from lib.utils.purge import purge
-from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.keepalive import keepalive
 from thirdparty.oset.pyoset import oset
 from thirdparty.socks import socks
@@ -2532,9 +2531,6 @@ def _resolveCrossReferences():
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
-    if IS_WIN:
-        coloramainit()
-
     _setConfAttributes()
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)

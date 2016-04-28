@@ -21,12 +21,14 @@ def reset_all():
 
 
 def init(autoreset=False, convert=None, strip=None, wrap=True):
+    global wrapped_stdout, wrapped_stderr
+    global orig_stdout, orig_stderr
+
+    if orig_stdout is not None:
+        return
 
     if not wrap and any([autoreset, convert, strip]):
         raise ValueError('wrap=False conflicts with any other arg=True')
-
-    global wrapped_stdout, wrapped_stderr
-    global orig_stdout, orig_stderr
 
     orig_stdout = sys.stdout
     orig_stderr = sys.stderr
@@ -49,10 +51,15 @@ def init(autoreset=False, convert=None, strip=None, wrap=True):
 
 
 def deinit():
+    global orig_stdout
+    global orig_stderr
+
     if orig_stdout is not None:
         sys.stdout = orig_stdout
+        orig_stdout = None
     if orig_stderr is not None:
         sys.stderr = orig_stderr
+        orig_stderr = None
 
 
 @contextlib.contextmanager

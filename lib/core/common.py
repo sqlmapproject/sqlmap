@@ -151,6 +151,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.utils.sqlalchemy import _sqlalchemy
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
+from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict.odict import OrderedDict
 from thirdparty.termcolor.termcolor import colored
@@ -1068,11 +1069,14 @@ def banner():
     This function prints sqlmap banner with its version
     """
 
-
     if not any(_ in sys.argv for _ in ("--version", "--pickled-options")):
         _ = BANNER
-        if not getattr(LOGGER_HANDLER, "is_tty", False):
+
+        if not getattr(LOGGER_HANDLER, "is_tty", False) or "--disable-coloring" in sys.argv:
             _ = re.sub("\033.+?m", "", _)
+        elif IS_WIN:
+            coloramainit()
+
         dataToStdout(_, forceOutput=True)
 
 def parsePasswordHash(password):
