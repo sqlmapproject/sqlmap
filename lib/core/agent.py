@@ -35,6 +35,7 @@ from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
+from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -96,9 +97,12 @@ class Agent(object):
         paramDict = conf.paramDict[place]
         origValue = getUnicode(paramDict[parameter])
 
-        if place == PLACE.URI:
+        if place == PLACE.URI or BOUNDED_INJECTION_MARKER in origValue:
             paramString = origValue
-            origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            if place == PLACE.URI:
+                origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            else:
+                origValue = re.search(r"\w+\Z", origValue.split(BOUNDED_INJECTION_MARKER)[0]).group(0)
             origValue = origValue[origValue.rfind('/') + 1:]
             for char in ('?', '=', ':'):
                 if char in origValue:
@@ -162,6 +166,9 @@ class Agent(object):
             newValue = newValue.replace(CUSTOM_INJECTION_MARK_CHAR, REPLACEMENT_MARKER)
             retVal = paramString.replace(_, self.addPayloadDelimiters(newValue))
             retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(REPLACEMENT_MARKER, CUSTOM_INJECTION_MARK_CHAR)
+        elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
+            _ = "%s%s" % (origValue, BOUNDED_INJECTION_MARKER)
+            retVal = "%s=%s" % (parameter, paramString.replace(_, self.addPayloadDelimiters(newValue)))
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:

@@ -91,6 +91,7 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BANNER
 from lib.core.settings import BOLD_PATTERNS
+from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_TARGET_MARK
@@ -598,6 +599,17 @@ def paramToDict(place, parameters=None):
                         warnMsg += "Please, always use only valid parameter values "
                         warnMsg += "so sqlmap could be able to run properly"
                         logger.warn(warnMsg)
+
+                if place in (PLACE.POST, PLACE.GET):
+                    regex = r"\A([^\w]+.*\w+)([^\w]+)\Z"
+                    match = re.search(regex, testableParameters[parameter])
+                    if match:
+                        _ = re.sub(regex, "\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, testableParameters[parameter])
+                        message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                        message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
+                        test = readInput(message, default="N")
+                        if test[0] in ("y", "Y"):
+                            testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
