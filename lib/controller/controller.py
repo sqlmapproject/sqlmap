@@ -463,7 +463,7 @@ def start():
                             infoMsg = "skipping randomizing %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
-                        elif parameter in conf.skip:
+                        elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
