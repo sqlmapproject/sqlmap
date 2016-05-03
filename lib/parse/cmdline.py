@@ -464,9 +464,6 @@ def cmdLineParser(argv=None):
                                help="Exclude DBMS system databases when "
                                     "enumerating tables")
 
-        enumeration.add_option("--binary-fields", dest="binaryFields",
-                          help="Result fields having binary values (e.g. \"digest\")")
-
         enumeration.add_option("--pivot-column", dest="pivotColumn",
                                help="Pivot column name")
 
@@ -622,6 +619,9 @@ def cmdLineParser(argv=None):
         general.add_option("--batch", dest="batch",
                             action="store_true",
                             help="Never ask for user input, use the default behaviour")
+
+        general.add_option("--binary-fields", dest="binaryFields",
+                          help="Result fields having binary values (e.g. \"digest\")")
 
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
