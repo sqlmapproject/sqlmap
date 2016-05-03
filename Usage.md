@@ -1789,11 +1789,11 @@ Switch: `--batch`
 
 If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using switch `--batch`. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
 
-### Mark result fields containing binary values
+### Binary content retrieval
 
 Option `--binary-fields`
 
-In cases of table content retrieval containing column(s) with binary values (e.g. column `password` with binary stored password hash values) it is possible to use option `--binary-fields` for proper handling. All those fields (i.e. table columns) are then retrieved and represented in their hexadecimal representation, so afterwards they could be properly processed with other tools (e.g. `john`).
+In case of binary content retrieval, like in example of tables having column(s) with stored binary values (e.g. column `password` with binary stored password hash values), it is possible to use option `--binary-fields` for (extra) proper handling by sqlmap. All those fields (i.e. table columns) are then retrieved and represented in their hexadecimal representation, so afterwards they could be properly processed with other tools (e.g. `john`).
 
 ### Force character encoding used for data retrieval
 
