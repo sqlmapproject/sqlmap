@@ -151,6 +151,7 @@ Options:
     -X EXCLUDECOL       DBMS database table column(s) to not enumerate
     -U USER             DBMS user to enumerate
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
+    --pivot-column=P..  Pivot column name
     --where=DUMPWHERE   Use WHERE condition while table dumping
     --start=LIMITSTART  First query output entry to retrieve
     --stop=LIMITSTOP    Last query output entry to retrieve
@@ -211,6 +212,7 @@ Options:
     -s SESSIONFILE      Load session from a stored (.sqlite) file
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
     --batch             Never ask for user input, use the default behaviour
+    --binary-fields=..  Result fields having binary values (e.g. "digest")
     --charset=CHARSET   Force character encoding used for data retrieval
     --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
     --crawl-exclude=..  Regexp to exclude pages from crawling (e.g. "logout")
@@ -223,7 +225,6 @@ Options:
     --hex               Use DBMS hex function(s) for data retrieval
     --output-dir=OUT..  Custom output directory path
     --parse-errors      Parse and display DBMS error messages from responses
-    --pivot-column=P..  Pivot column name
     --save=SAVECONFIG   Save options to a configuration INI file
     --scope=SCOPE       Regexp to filter targets from provided proxy log
     --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
@@ -1279,7 +1280,7 @@ Database: testdb
 
 ### Dump database table entries
 
-Switch and options: `--dump`, `-C`, `-T`, `-D`, `--start`, `--stop`, `--first`, `--last` and `--where`
+Switch and options: `--dump`, `-C`, `-T`, `-D`, `--start`, `--stop`, `--first`, `--last`, `--pivot-column` and `--where`
 
 When the session user has read access to a specific database's table it is possible to dump the table entries.
 
@@ -1313,6 +1314,8 @@ sqlmap also generates for each table dumped the entries in a CSV format textual 
 If you want to dump only a range of entries, then you can provide options `--start` and/or `--stop` to respectively start to dump from a certain entry and stop the dump at a certain entry. For instance, if you want to dump only the first entry, provide `--stop 1` in your command line. Vice versa if, for instance, you want to dump only the second and third entry, provide `--start 1` `--stop 3`.
 
 It is also possible to specify which single character or range of characters to dump with options `--first` and `--last`. For instance, if you want to dump columns' entries from the third to the fifth character, provide `--first 3` `--last 5`. This feature only applies to the blind SQL injection techniques because for error-based and UNION query SQL injection techniques the number of requests is exactly the same, regardless of the length of the column's entry output to dump.
+
+Sometimes (e.g. for Microsoft SQL Server, Sybase and SAP MaxDB) it is not possible to dump the table rows straightforward by using `OFFSET m, n` mechanism because of lack of similar. In such cases sqlmap dumps the content by determining the most suitable `pivot` column (the one with most unique values) whose values are used later on for retrieval of other column values. If it is necessary to enforce the usage of particular `pivot` column because the automatically chosen one is not suitable (e.g. because of lack of table dump results) you can use option `--pivot-column` (e.g. `--pivot-column=id`).
 
 In case that you want to constraint the dump to specific column values (or ranges) you can use option `--where`. Provided logical operation will be automatically used inside the `WHERE` clause. For example, if you use `--where="id>3"` only table rows having value of column `id` greater than 3 will be retrieved (by appending `WHERE id>3` to used dumping queries).
 
@@ -1786,6 +1789,12 @@ Switch: `--batch`
 
 If you want sqlmap to run as a batch tool, without any user's interaction  when sqlmap requires it, you can force that by using switch `--batch`. This will leave sqlmap to go with a default behaviour whenever user's input would be required. 
 
+### Mark result fields containing binary values
+
+Option `--binary-fields`
+
+In cases of table content retrieval containing column(s) with binary values (e.g. column `password` with binary stored password hash values) it is possible to use option `--binary-fields` for proper handling. All those fields (i.e. table columns) are then retrieved and represented in their hexadecimal representation, so afterwards they could be properly processed with other tools (e.g. `john`).
+
 ### Force character encoding used for data retrieval
 
 Option: `--charset`
@@ -1962,14 +1971,6 @@ ers (0x80040E14)
 [xx:xx:17] [INFO] target URL appears to have 3 columns in query
 [...]
 ```
-
-### Pivot column
-
-Option: `--pivot-column`
-
-Sometimes (e.g. for Microsoft SQL Server, Sybase and SAP MaxDB) it is not possible to dump the table rows straightforward by using `OFFSET m, n` mechanism because of lack of similar. In such cases sqlmap dumps the content by determining the most suitable `pivot` column (the one with most unique values) whose values are used later on for retrieval of other column values.
-
-Sometimes it is necessary to enforce the usage of particular `pivot` column (e.g. `--pivot-column=id`) if the automatically chosen one is not suitable (e.g. because of lack of table dump results).
 
 ### Save options in a configuration INI file
 
