@@ -203,8 +203,6 @@ int main(int argc, char **argv)
 	PROCESS_INFORMATION pi;
 	int status;
 	unsigned int max_data_size;
-	struct hostent *he;
-
 
 	// set defaults
 	target = 0;
