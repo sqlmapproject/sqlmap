@@ -11,7 +11,6 @@ import zipfile
 from lib.core.common import getSafeExString
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapInstallationException
-from lib.core.settings import UNICODE_ENCODING
 
 class Wordlist(object):
     """

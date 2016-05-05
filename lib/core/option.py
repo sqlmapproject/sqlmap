@@ -151,7 +151,6 @@ from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.search import search
 from lib.utils.purge import purge
-from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.keepalive import keepalive
 from thirdparty.oset.pyoset import oset
 from thirdparty.socks import socks
@@ -1654,9 +1653,19 @@ def _cleanupOptions():
         conf.testFilter = conf.testFilter.strip('*+')
         conf.testFilter = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testFilter)
 
+        try:
+            re.compile(conf.testFilter)
+        except re.error:
+            conf.testFilter = re.escape(conf.testFilter)
+
     if conf.testSkip:
         conf.testSkip = conf.testSkip.strip('*+')
         conf.testSkip = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testSkip)
+
+        try:
+            re.compile(conf.testSkip)
+        except re.error:
+            conf.testSkip = re.escape(conf.testSkip)
 
     if "timeSec" not in kb.explicitSettings:
         if conf.tor:
@@ -1821,6 +1830,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.dnsTest = None
     kb.docRoot = None
     kb.dumpTable = None
+    kb.dumpKeyboardInterrupt = False
     kb.dynamicMarkings = []
     kb.dynamicParameter = False
     kb.endDetection = False
@@ -2330,10 +2340,6 @@ def _basicOptionValidation():
         errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
         raise SqlmapSyntaxException(errMsg)
 
-    if isinstance(conf.cpuThrottle, int) and (conf.cpuThrottle > 100 or conf.cpuThrottle < 0):
-        errMsg = "value for option '--cpu-throttle' (cpuThrottle) must be in range [0,100]"
-        raise SqlmapSyntaxException(errMsg)
-
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
@@ -2535,9 +2541,6 @@ def _resolveCrossReferences():
     lib.controller.checks.setVerbosity = setVerbosity
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
-    if IS_WIN:
-        coloramainit()
-
     _setConfAttributes()
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)

@@ -5,6 +5,12 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import sys
+
+sys.dont_write_bytecode = True
+
+from lib.utils import versioncheck  # this has to be the first non-standard import
+
 import bdb
 import inspect
 import logging
@@ -17,12 +23,8 @@ import time
 import traceback
 import warnings
 
-sys.dont_write_bytecode = True
-
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
-
-from lib.utils import versioncheck  # this has to be the first non-standard import
 
 from lib.controller.controller import start
 from lib.core.common import banner
@@ -83,6 +85,7 @@ def main():
             raise SystemExit
 
         setPaths()
+        banner()
 
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
@@ -94,8 +97,6 @@ def main():
             sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
             sys.stderr = StdDbOut(conf.taskid, messagetype="stderr")
             setRestAPILog()
-
-        banner()
 
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
@@ -173,6 +174,11 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "_mkstemp_inner" in excMsg:
+                errMsg = "there has been a problem while accessing temporary files"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif all(_ in excMsg for _ in ("pymysql", "configparser")):
                 errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
                 logger.error(errMsg)
@@ -183,6 +189,9 @@ def main():
                 errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
                 errMsg += ". Please delete .pyc files on your system to fix the problem"
                 logger.error(errMsg)
+                raise SystemExit
+
+            elif "valueStack.pop" in excMsg and kb.get("dumpKeyboardInterrupt"):
                 raise SystemExit
 
             for match in re.finditer(r'File "(.+?)", line', excMsg):

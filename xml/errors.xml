@@ -7,6 +7,7 @@
         <error regexp="Warning.*mysql_.*"/>
         <error regexp="MySqlException \(0x"/>
         <error regexp="valid MySQL result"/>
+        <error regexp="check the manual that corresponds to your MySQL server version"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc\.exceptions"/>
     </dbms>
@@ -31,6 +32,7 @@
         <error regexp="\bSQL Server.*[0-9a-fA-F]{8}"/>
         <error regexp="(?s)Exception.*\WSystem\.Data\.SqlClient\."/>
         <error regexp="(?s)Exception.*\WRoadhouse\.Cms\."/>
+        <error regexp="Microsoft SQL Native Client.*[0-9a-fA-F]{8}"/>
     </dbms>
 
     <!-- Microsoft Access -->
@@ -43,7 +45,7 @@
 
     <!-- Oracle -->
     <dbms value="Oracle">
-        <error regexp="\bORA-[0-9][0-9][0-9][0-9]"/>
+        <error regexp="\bORA-\d{5}"/>
         <error regexp="Oracle error"/>
         <error regexp="Oracle.*Driver"/>
         <error regexp="Warning.*\Woci_.*"/>
@@ -55,7 +57,7 @@
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
-        <error regexp="(?i)SQLSTATE.+SQLCODE"/>
+        <error regexp="SQLSTATE.+SQLCODE"/>
     </dbms>
 
     <!-- Informix -->
@@ -87,9 +89,11 @@
 
     <!-- Sybase -->
     <dbms value="Sybase">
-        <error regexp="(?i)Warning.*sybase.*"/>
+        <error regexp="Warning.*sybase.*"/>
         <error regexp="Sybase message"/>
         <error regexp="Sybase.*Server message.*"/>
+        <error regexp="SybSQLException"/>
+        <error regexp="com\.sybase\.jdbc"/>
     </dbms>
 
     <!-- Ingres -->

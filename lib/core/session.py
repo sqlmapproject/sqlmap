@@ -26,7 +26,7 @@ def setDbms(dbms):
     hashDBWrite(HASHDB_KEYS.DBMS, dbms)
 
     _ = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
-    _ = re.search("^%s" % _, dbms, re.I)
+    _ = re.search(r"\A%s( |\Z)" % _, dbms, re.I)
 
     if _:
         dbms = _.group(1)

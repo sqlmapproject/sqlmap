@@ -32,7 +32,6 @@ from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
-from lib.core.common import cpuThrottle
 from lib.core.common import dataToStdout
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
@@ -220,8 +219,6 @@ class Connect(object):
 
         if isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
-        elif conf.cpuThrottle:
-            cpuThrottle(conf.cpuThrottle)
 
         if conf.offline:
             return None, None, None
@@ -391,9 +388,10 @@ class Connect(object):
 
             for key, value in headers.items():
                 del headers[key]
-                headers[unicodeencode(key, kb.pageEncoding)] = unicodeencode(value, kb.pageEncoding)
+                value = unicodeencode(value, kb.pageEncoding)
                 for char in (r"\r", r"\n"):
                     value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
+                headers[unicodeencode(key, kb.pageEncoding)] = value.strip("\r\n")
 
             url = unicodeencode(url)
             post = unicodeencode(post)
@@ -615,8 +613,12 @@ class Connect(object):
             elif "forcibly closed" in tbMsg or "Connection is already closed" in tbMsg:
                 warnMsg = "connection was forcibly closed by the target URL"
             elif "timed out" in tbMsg:
-                singleTimeWarnMessage("turning off pre-connect mechanism because of connection time out(s)")
-                conf.disablePrecon = True
+                if not conf.disablePrecon:
+                    singleTimeWarnMessage("turning off pre-connect mechanism because of connection time out(s)")
+                    conf.disablePrecon = True
+
+                    if kb.testMode and kb.testType not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
+                        kb.responseTimes.clear()
 
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
                     singleTimeWarnMessage("there is a possibility that the target (or WAF) is dropping 'suspicious' requests")

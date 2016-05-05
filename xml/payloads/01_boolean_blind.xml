@@ -53,6 +53,7 @@ Tag: <test>
             6: TOP
             7: Table name
             8: Column name
+            9: Pre-WHERE (non-query)
 
         A comma separated list of these values is also possible.
 
@@ -159,7 +160,7 @@ Tag: <test>
         <stype>1</stype>
         <level>1</level>
         <risk>1</risk>
-        <clause>1</clause>
+        <clause>1,9</clause>
         <where>1</where>
         <vector>AND [INFERENCE]</vector>
         <request>
@@ -175,7 +176,7 @@ Tag: <test>
         <stype>1</stype>
         <level>1</level>
         <risk>3</risk>
-        <clause>1</clause>
+        <clause>1,9</clause>
         <where>2</where>
         <vector>OR [INFERENCE]</vector>
         <request>
@@ -191,7 +192,7 @@ Tag: <test>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
-        <clause>1</clause>
+        <clause>1,9</clause>
         <where>1</where>
         <vector>OR NOT [INFERENCE]</vector>
         <request>
@@ -212,7 +213,7 @@ Tag: <test>
         <vector>AND [INFERENCE]</vector>
         <request>
             <payload>AND [RANDNUM]=[RANDNUM]</payload>
-            <comment>-- -</comment>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
         </request>
         <response>
             <comparison>AND [RANDNUM]=[RANDNUM1]</comparison>
@@ -229,7 +230,7 @@ Tag: <test>
         <vector>OR [INFERENCE]</vector>
         <request>
             <payload>OR [RANDNUM]=[RANDNUM]</payload>
-            <comment>-- -</comment>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
         </request>
         <response>
             <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
@@ -246,7 +247,7 @@ Tag: <test>
         <vector>OR NOT [INFERENCE]</vector>
         <request>
             <payload>OR NOT [RANDNUM]=[RANDNUM]</payload>
-            <comment>-- -</comment>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
         </request>
         <response>
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>

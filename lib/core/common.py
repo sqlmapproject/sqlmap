@@ -91,6 +91,7 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BANNER
 from lib.core.settings import BOLD_PATTERNS
+from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_TARGET_MARK
@@ -128,6 +129,7 @@ from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import PLATFORM
 from lib.core.settings import PRINTABLE_CHAR_REGEX
+from lib.core.settings import PUSH_VALUE_EXCEPTION_RETRY_COUNT
 from lib.core.settings import PYVERSION
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import REFLECTED_BORDER_REGEX
@@ -150,6 +152,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.utils.sqlalchemy import _sqlalchemy
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
+from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict.odict import OrderedDict
 from thirdparty.termcolor.termcolor import colored
@@ -597,6 +600,17 @@ def paramToDict(place, parameters=None):
                         warnMsg += "so sqlmap could be able to run properly"
                         logger.warn(warnMsg)
 
+                if place in (PLACE.POST, PLACE.GET):
+                    regex = r"\A([^\w]+.*\w+)([^\w]+)\Z"
+                    match = re.search(regex, testableParameters[parameter])
+                    if match:
+                        _ = re.sub(regex, "\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, testableParameters[parameter])
+                        message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                        message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
+                        test = readInput(message, default="N")
+                        if test[0] in ("y", "Y"):
+                            testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
+
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
 
@@ -967,7 +981,12 @@ def randomRange(start=0, stop=1000, seed=None):
     423
     """
 
-    randint = random.WichmannHill(seed).randint if seed is not None else random.randint
+    if seed is not None:
+        _ = getCurrentThreadData().random
+        _.seed(seed)
+        randint = _.randint
+    else:
+        randint = random.randint
 
     return int(randint(start, stop))
 
@@ -980,7 +999,12 @@ def randomInt(length=4, seed=None):
     874254
     """
 
-    choice = random.WichmannHill(seed).choice if seed is not None else random.choice
+    if seed is not None:
+        _ = getCurrentThreadData().random
+        _.seed(seed)
+        choice = _.choice
+    else:
+        choice = random.choice
 
     return int("".join(choice(string.digits if _ != 0 else string.digits.replace('0', '')) for _ in xrange(0, length)))
 
@@ -993,7 +1017,12 @@ def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
     'RNvnAv'
     """
 
-    choice = random.WichmannHill(seed).choice if seed is not None else random.choice
+    if seed is not None:
+        _ = getCurrentThreadData().random
+        _.seed(seed)
+        choice = _.choice
+    else:
+        choice = random.choice
 
     if alphabet:
         retVal = "".join(choice(alphabet) for _ in xrange(0, length))
@@ -1022,14 +1051,17 @@ def getHeader(headers, key):
             break
     return retVal
 
-def checkFile(filename):
+def checkFile(filename, raiseOnError=True):
     """
     Checks for file existence and readability
     """
 
     valid = True
 
-    if filename is None or not os.path.isfile(filename):
+    try:
+        if filename is None or not os.path.isfile(filename):
+            valid = False
+    except UnicodeError:
         valid = False
 
     if valid:
@@ -1039,18 +1071,25 @@ def checkFile(filename):
         except:
             valid = False
 
-    if not valid:
+    if not valid and raiseOnError:
         raise SqlmapSystemException("unable to read file '%s'" % filename)
+
+    return valid
 
 def banner():
     """
     This function prints sqlmap banner with its version
     """
 
-    _ = BANNER
-    if not getattr(LOGGER_HANDLER, "is_tty", False):
-        _ = re.sub("\033.+?m", "", _)
-    dataToStdout(_, forceOutput=True)
+    if not any(_ in sys.argv for _ in ("--version", "--pickled-options")):
+        _ = BANNER
+
+        if not getattr(LOGGER_HANDLER, "is_tty", False) or "--disable-coloring" in sys.argv:
+            _ = re.sub("\033.+?m", "", _)
+        elif IS_WIN:
+            coloramainit()
+
+        dataToStdout(_, forceOutput=True)
 
 def parsePasswordHash(password):
     """
@@ -2183,7 +2222,22 @@ def pushValue(value):
     Push value to the stack (thread dependent)
     """
 
-    getCurrentThreadData().valueStack.append(copy.deepcopy(value))
+    _ = None
+    success = False
+
+    for i in xrange(PUSH_VALUE_EXCEPTION_RETRY_COUNT):
+        try:
+            getCurrentThreadData().valueStack.append(copy.deepcopy(value))
+            success = True
+            break
+        except Exception, ex:
+            _ = ex
+
+    if not success:
+        getCurrentThreadData().valueStack.append(None)
+
+        if _:
+            raise _
 
 def popValue():
     """
@@ -2917,7 +2971,7 @@ def showHttpErrorCodes():
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.debug(msg)
 
-def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", buffering=1):
+def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
     """
     Returns file handle of a given filename
     """
@@ -3126,14 +3180,6 @@ def intersect(valueA, valueB, lowerCase=False):
 
     return retVal
 
-def cpuThrottle(value):
-    """
-    Does a CPU throttling for lesser CPU consumption
-    """
-
-    delay = 0.00001 * (value ** 2)
-    time.sleep(delay)
-
 def removeReflectiveValues(content, payload, suppressWarning=False):
     """
     Neutralizes reflective values in a given content based on a payload
@@ -3142,59 +3188,65 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
     retVal = content
 
-    if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism and not kb.heuristicMode:
-        def _(value):
-            while 2 * REFLECTED_REPLACEMENT_REGEX in value:
-                value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
-            return value
+    try:
+        if all([content, payload]) and isinstance(content, unicode) and kb.reflectiveMechanism and not kb.heuristicMode:
+            def _(value):
+                while 2 * REFLECTED_REPLACEMENT_REGEX in value:
+                    value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
+                return value
 
-        payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ''), convall=True))
-        regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
+            payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ''), convall=True))
+            regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
-        if regex != payload:
-            if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
-                parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
-                retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
+            if regex != payload:
+                if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
+                    parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
+                    retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
 
-                if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                    regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
+                    if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
+                        regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
 
-                parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
+                    parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
 
-                if regex.startswith(REFLECTED_REPLACEMENT_REGEX):
-                    regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex[len(REFLECTED_REPLACEMENT_REGEX):])
-                else:
-                    regex = r"\b%s" % regex
+                    if regex.startswith(REFLECTED_REPLACEMENT_REGEX):
+                        regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex[len(REFLECTED_REPLACEMENT_REGEX):])
+                    else:
+                        regex = r"\b%s" % regex
 
-                if regex.endswith(REFLECTED_REPLACEMENT_REGEX):
-                    regex = r"%s%s" % (regex[:-len(REFLECTED_REPLACEMENT_REGEX)], REFLECTED_BORDER_REGEX)
-                else:
-                    regex = r"%s\b" % regex
+                    if regex.endswith(REFLECTED_REPLACEMENT_REGEX):
+                        regex = r"%s%s" % (regex[:-len(REFLECTED_REPLACEMENT_REGEX)], REFLECTED_BORDER_REGEX)
+                    else:
+                        regex = r"%s\b" % regex
 
-                retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, retVal)
+                    retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, retVal)
 
-                if len(parts) > 2:
-                    regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
-                    retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
+                    if len(parts) > 2:
+                        regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
+                        retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
 
-            if retVal != content:
-                kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
-                if not suppressWarning:
-                    warnMsg = "reflective value(s) found and filtering out"
-                    singleTimeWarnMessage(warnMsg)
-
-                if re.search(r"FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal, re.I):
-                    warnMsg = "frames detected containing attacked parameter values. Please be sure to "
-                    warnMsg += "test those separately in case that attack on this page fails"
-                    singleTimeWarnMessage(warnMsg)
-
-            elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
-                kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
-                if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
-                    kb.reflectiveMechanism = False
+                if retVal != content:
+                    kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
                     if not suppressWarning:
-                        debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
-                        logger.debug(debugMsg)
+                        warnMsg = "reflective value(s) found and filtering out"
+                        singleTimeWarnMessage(warnMsg)
+
+                    if re.search(r"FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal, re.I):
+                        warnMsg = "frames detected containing attacked parameter values. Please be sure to "
+                        warnMsg += "test those separately in case that attack on this page fails"
+                        singleTimeWarnMessage(warnMsg)
+
+                elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
+                    kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] += 1
+                    if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
+                        kb.reflectiveMechanism = False
+                        if not suppressWarning:
+                            debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
+                            logger.debug(debugMsg)
+    except MemoryError:
+        kb.reflectiveMechanism = False
+        if not suppressWarning:
+            debugMsg = "turning off reflection removal mechanism (because of low memory issues)"
+            logger.debug(debugMsg)
 
     return retVal
 

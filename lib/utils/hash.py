@@ -30,6 +30,7 @@ import os
 import re
 import tempfile
 import time
+import zipfile
 
 from hashlib import md5
 from hashlib import sha1
@@ -45,6 +46,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
+from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import normalizeUnicode
@@ -60,6 +62,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
+from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
@@ -490,7 +493,7 @@ def attackDumpedTable():
 
             for (_, hash_, password) in results:
                 if hash_:
-                    lut[hash_.lower()] = password
+                    lut[hash_.lower()] = getUnicode(password)
 
             infoMsg = "postprocessing table dump"
             logger.info(infoMsg)
@@ -784,6 +787,14 @@ def dictionaryAttack(attack_dict):
 
                     for dictPath in dictPaths:
                         checkFile(dictPath)
+
+                        if os.path.splitext(dictPath)[1].lower() == ".zip":
+                            _ = zipfile.ZipFile(dictPath, 'r')
+                            if len(_.namelist()) == 0:
+                                errMsg = "no file(s) inside '%s'" % dictPath
+                                raise SqlmapDataException(errMsg)
+                            else:
+                                _.open(_.namelist()[0])
 
                     kb.wordlists = dictPaths
 

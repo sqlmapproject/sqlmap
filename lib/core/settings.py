@@ -10,7 +10,6 @@ import re
 import subprocess
 import string
 import sys
-import time
 import types
 
 from lib.core.datatype import AttribDict
@@ -19,8 +18,8 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
-# sqlmap version and site
-VERSION = "1.0.0.8"
+# sqlmap version (<major>.<minor>.<month>.<monthly commit>)
+VERSION = "1.0.5.11"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -61,6 +60,7 @@ PARTIAL_HEX_VALUE_MARKER = "__PARTIAL_HEX_VALUE__"
 URI_QUESTION_MARKER = "__QUESTION_MARK__"
 ASTERISK_MARKER = "__ASTERISK_MARK__"
 REPLACEMENT_MARKER = "__REPLACEMENT_MARK__"
+BOUNDED_INJECTION_MARKER = "__BOUNDED_INJECTION_MARK__"
 
 RANDOM_INTEGER_MARKER = "[RANDINT]"
 RANDOM_STRING_MARKER = "[RANDSTR]"
@@ -138,6 +138,9 @@ MAX_BUFFERED_PARTIAL_UNION_LENGTH = 1024
 
 # Suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX = "_masterdb"
+
+# Number of times to retry the pushValue during the exceptions (e.g. KeyboardInterrupt)
+PUSH_VALUE_EXCEPTION_RETRY_COUNT = 3
 
 # Minimum time response set needed for time-comparison based on standard deviation
 MIN_TIME_RESPONSES = 30
@@ -310,9 +313,6 @@ BURP_REQUEST_REGEX = r"={10,}\s+[^=]+={10,}\s(.+?)\s={10,}"
 # Regex used for parsing XML Burp saved history items
 BURP_XML_HISTORY_REGEX = r'<port>(\d+)</port>.+?<request base64="true"><!\[CDATA\[([^]]+)'
 
-# Server header in CloudFlare responses
-CLOUDFLARE_SERVER_HEADER = "cloudflare-nginx"
-
 # Encoding used for Unicode data
 UNICODE_ENCODING = "utf8"
 
@@ -445,7 +445,7 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]|\bUNION\b.+\bSELECT\b|\bSELECT\b.+\bFROM\b|\b(CONCAT|information_schema|SLEEP|DELAY)\b"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = ("gif", "jpg", "jpeg", "image", "jar", "tif", "bmp", "war", "ear", "mpg", "mpeg", "wmv", "mpeg", "scm", "iso", "dmp", "dll", "cab", "so", "avi", "mkv", "bin", "iso", "tar", "png", "pdf", "ps", "wav", "mp3", "mp4", "au", "aiff", "aac", "zip", "rar", "7z", "gz", "flv", "mov", "doc", "docx", "xls", "dot", "dotx", "xlt", "xlsx", "ppt", "pps", "pptx")
+CRAWL_EXCLUDE_EXTENSIONS = ('3ds', '3g2', '3gp', '7z', 'DS_Store', 'a', 'aac', 'adp', 'ai', 'aif', 'aiff', 'apk', 'ar', 'asf', 'au', 'avi', 'bak', 'bin', 'bk', 'bmp', 'btif', 'bz2', 'cab', 'caf', 'cgm', 'cmx', 'cpio', 'cr2', 'dat', 'deb', 'djvu', 'dll', 'dmg', 'dmp', 'dng', 'doc', 'docx', 'dot', 'dotx', 'dra', 'dsk', 'dts', 'dtshd', 'dvb', 'dwg', 'dxf', 'ear', 'ecelp4800', 'ecelp7470', 'ecelp9600', 'egg', 'eol', 'eot', 'epub', 'exe', 'f4v', 'fbs', 'fh', 'fla', 'flac', 'fli', 'flv', 'fpx', 'fst', 'fvt', 'g3', 'gif', 'gz', 'h261', 'h263', 'h264', 'ico', 'ief', 'image', 'img', 'ipa', 'iso', 'jar', 'jpeg', 'jpg', 'jpgv', 'jpm', 'jxr', 'ktx', 'lvp', 'lz', 'lzma', 'lzo', 'm3u', 'm4a', 'm4v', 'mar', 'mdi', 'mid', 'mj2', 'mka', 'mkv', 'mmr', 'mng', 'mov', 'movie', 'mp3', 'mp4', 'mp4a', 'mpeg', 'mpg', 'mpga', 'mxu', 'nef', 'npx', 'o', 'oga', 'ogg', 'ogv', 'otf', 'pbm', 'pcx', 'pdf', 'pea', 'pgm', 'pic', 'png', 'pnm', 'ppm', 'pps', 'ppt', 'pptx', 'ps', 'psd', 'pya', 'pyc', 'pyo', 'pyv', 'qt', 'rar', 'ras', 'raw', 'rgb', 'rip', 'rlc', 'rz', 's3m', 's7z', 'scm', 'scpt', 'sgi', 'shar', 'sil', 'smv', 'so', 'sub', 'swf', 'tar', 'tbz2', 'tga', 'tgz', 'tif', 'tiff', 'tlz', 'ts', 'ttf', 'uvh', 'uvi', 'uvm', 'uvp', 'uvs', 'uvu', 'viv', 'vob', 'war', 'wav', 'wax', 'wbmp', 'wdp', 'weba', 'webm', 'webp', 'whl', 'wm', 'wma', 'wmv', 'wmx', 'woff', 'woff2', 'wvx', 'xbm', 'xif', 'xls', 'xlsx', 'xlt', 'xm', 'xpi', 'xpm', 'xwd', 'xz', 'z', 'zip', 'zipx')
 
 # Patterns often seen in HTTP headers containing custom injection marking character
 PROBLEMATIC_CUSTOM_INJECTION_PATTERNS = r"(;q=[^;']+)|(\*/\*)"
@@ -457,7 +457,7 @@ BRUTE_TABLE_EXISTS_TEMPLATE = "EXISTS(SELECT %d FROM %s)"
 BRUTE_COLUMN_EXISTS_TEMPLATE = "EXISTS(SELECT %s FROM %s)"
 
 # Payload used for checking of existence of IDS/WAF (dummier the better)
-IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1-- ../../../etc/passwd"
+IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,2,'<script>',table_name FROM information_schema.tables WHERE 2>1-- ../../../etc/passwd"
 
 # Data inside shellcodeexec to be filled with random string
 SHELLCODEEXEC_RANDOM_STRING_MARKER = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -482,6 +482,10 @@ SOCKET_PRE_CONNECT_QUEUE_SIZE = 3
 
 # Only console display last n table rows
 TRIM_STDOUT_DUMP_SIZE = 256
+
+# Reference: http://stackoverflow.com/a/3168436
+# Reference: https://support.microsoft.com/en-us/kb/899149
+DUMP_FILE_BUFFER_SIZE = 1024
 
 # Parse response headers only first couple of times
 PARSE_HEADERS_LIMIT = 3
@@ -526,7 +530,7 @@ HASHDB_FLUSH_RETRIES = 3
 HASHDB_END_TRANSACTION_RETRIES = 3
 
 # Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
-HASHDB_MILESTONE_VALUE = "JHjrBugdDA"  # "".join(random.sample(string.ascii_letters, 10))
+HASHDB_MILESTONE_VALUE = "WVMqopmuzX"  # "".join(random.sample(string.ascii_letters, 10))
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024 ** 2
@@ -571,7 +575,7 @@ MAX_BISECTION_LENGTH = 50 * 1024 * 1024
 LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
 
 # Generic SQL comment formation
-GENERIC_SQL_COMMENT = "-- -"
+GENERIC_SQL_COMMENT = "-- [RANDSTR]"
 
 # Threshold value for turning back on time auto-adjustment mechanism
 VALID_TIME_CHARS_RUN_THRESHOLD = 100
@@ -592,7 +596,7 @@ MAX_HELP_OPTION_LENGTH = 18
 MAX_CONNECT_RETRIES = 100
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal")
+FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal")
 
 # Regular expression used for extracting ASP.NET view state values
 VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'

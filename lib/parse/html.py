@@ -24,7 +24,8 @@ class HTMLHandler(ContentHandler):
         ContentHandler.__init__(self)
 
         self._dbms = None
-        self._page = page
+        self._page = (page or "")
+        self._lower_page = self._page.lower()
 
         self.dbms = None
 
@@ -33,11 +34,20 @@ class HTMLHandler(ContentHandler):
         threadData.lastErrorPage = (threadData.lastRequestUID, self._page)
 
     def startElement(self, name, attrs):
+        if self.dbms:
+            return
+
         if name == "dbms":
             self._dbms = attrs.get("value")
 
         elif name == "error":
-            if re.search(attrs.get("regexp"), self._page, re.I):
+            regexp = attrs.get("regexp")
+            if regexp not in kb.cache.regex:
+                keywords = re.findall("\w+", re.sub(r"\\.", " ", regexp))
+                keywords = sorted(keywords, key=len)
+                kb.cache.regex[regexp] = keywords[-1].lower()
+
+            if kb.cache.regex[regexp] in self._lower_page and re.search(regexp, self._page, re.I):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
 

@@ -99,7 +99,7 @@ void usage(char *path)
 	printf("  -h                 this screen\n");
 	printf("  -b num             maximal number of blanks (unanswered icmp requests)\n");
     printf("                     before quitting\n");
-	printf("  -s bytes           maximal data buffer size in bytes (default is 64 bytes)\n\n", DEFAULT_MAX_DATA_SIZE);
+	printf("  -s bytes           maximal data buffer size in bytes (default is %u bytes)\n\n", DEFAULT_MAX_DATA_SIZE);
 	printf("In order to improve the speed, lower the delay (-d) between requests or\n");
     printf("increase the size (-s) of the data buffer\n");
 }
@@ -203,8 +203,6 @@ int main(int argc, char **argv)
 	PROCESS_INFORMATION pi;
 	int status;
 	unsigned int max_data_size;
-	struct hostent *he;
-
 
 	// set defaults
 	target = 0;

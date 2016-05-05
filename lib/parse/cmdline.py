@@ -464,6 +464,9 @@ def cmdLineParser(argv=None):
                                help="Exclude DBMS system databases when "
                                     "enumerating tables")
 
+        enumeration.add_option("--pivot-column", dest="pivotColumn",
+                               help="Pivot column name")
+
         enumeration.add_option("--where", dest="dumpWhere",
                                help="Use WHERE condition while table dumping")
 
@@ -617,6 +620,9 @@ def cmdLineParser(argv=None):
                             action="store_true",
                             help="Never ask for user input, use the default behaviour")
 
+        general.add_option("--binary-fields", dest="binaryFields",
+                          help="Result fields having binary values (e.g. \"digest\")")
+
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
@@ -661,9 +667,6 @@ def cmdLineParser(argv=None):
         general.add_option("--parse-errors", dest="parseErrors",
                                   action="store_true",
                                   help="Parse and display DBMS error messages from responses")
-
-        general.add_option("--pivot-column", dest="pivotColumn",
-                               help="Pivot column name")
 
         general.add_option("--save", dest="saveConfig",
                             help="Save options to a configuration INI file")
@@ -758,12 +761,6 @@ def cmdLineParser(argv=None):
                           help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--binary-fields", dest="binaryFields",
-                          help=SUPPRESS_HELP)
-
-        parser.add_option("--cpu-throttle", dest="cpuThrottle", type="int",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--force-dns", dest="forceDns", action="store_true",

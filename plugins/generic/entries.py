@@ -169,7 +169,14 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            retVal = pivotDumpTable(table, colList, blind=False)
+                            try:
+                                retVal = pivotDumpTable(table, colList, blind=False)
+                            except KeyboardInterrupt:
+                                retVal = None
+                                kb.dumpKeyboardInterrupt = True
+                                clearConsoleLine()
+                                warnMsg = "Ctrl+C detected in dumping phase"
+                                logger.warn(warnMsg)
 
                             if retVal:
                                 entries, _ = retVal
@@ -269,7 +276,14 @@ class Entries:
                         elif Backend.isDbms(DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
 
-                        retVal = pivotDumpTable(table, colList, count, blind=True)
+                        try:
+                            retVal = pivotDumpTable(table, colList, count, blind=True)
+                        except KeyboardInterrupt:
+                            retVal = None
+                            kb.dumpKeyboardInterrupt = True
+                            clearConsoleLine()
+                            warnMsg = "Ctrl+C detected in dumping phase"
+                            logger.warn(warnMsg)
 
                         if retVal:
                             entries, lengths = retVal
@@ -320,6 +334,7 @@ class Entries:
                                     entries[column].append(value)
 
                         except KeyboardInterrupt:
+                            kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
                             logger.warn(warnMsg)

@@ -13,6 +13,7 @@ import tempfile
 import threading
 
 from lib.core.common import Backend
+from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
@@ -37,6 +38,7 @@ from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapSystemException
 from lib.core.replication import Replication
+from lib.core.settings import DUMP_FILE_BUFFER_SIZE
 from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import IS_WIN
 from lib.core.settings import METADB_SUFFIX
@@ -433,7 +435,7 @@ class Dump(object):
                             dumpDbPath = tempDir
 
             dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower()))
-            if not os.path.isfile(dumpFileName):
+            if not checkFile(dumpFileName, False):
                 try:
                     openFile(dumpFileName, "w+b").close()
                 except SqlmapSystemException:
@@ -448,8 +450,8 @@ class Dump(object):
                     else:
                         dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (_, conf.dumpFormat.lower()))
 
-            appendToFile = os.path.isfile(dumpFileName) and any((conf.limitStart, conf.limitStop))
-            dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab")
+            appendToFile = any((conf.limitStart, conf.limitStop)) and checkFile(dumpFileName, False)
+            dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab", buffering=DUMP_FILE_BUFFER_SIZE)
 
         count = int(tableValues["__infos__"]["count"])
         separator = str()

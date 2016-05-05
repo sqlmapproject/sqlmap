@@ -209,9 +209,8 @@ def _saveToHashDB():
             _[key].data.update(injection.data)
     hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, _.values(), True)
 
-    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or set()
-    _.update(kb.absFilePaths)
-    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, _, True)
+    _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True)
+    hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, kb.absFilePaths | (_ if isinstance(_, set) else set()), True)
 
     if not hashDBRetrieve(HASHDB_KEYS.KB_CHARS):
         hashDBWrite(HASHDB_KEYS.KB_CHARS, kb.chars, True)
@@ -464,7 +463,7 @@ def start():
                             infoMsg = "skipping randomizing %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
-                        elif parameter in conf.skip:
+                        elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
@@ -522,7 +521,7 @@ def start():
                                 injection = checkSqlInjection(place, parameter, value)
                                 proceed = not kb.endDetection
 
-                                if injection is not None and injection.place is not None:
+                                if getattr(injection, "place", None) is not None:
                                     kb.injections.append(injection)
 
                                     # In case when user wants to end detection phase (Ctrl+C)

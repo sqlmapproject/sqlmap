@@ -17,6 +17,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import splitFields
 from lib.core.common import unArrayizeValue
@@ -34,10 +35,12 @@ from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
+from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
+from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.unescaper import unescaper
@@ -94,9 +97,12 @@ class Agent(object):
         paramDict = conf.paramDict[place]
         origValue = getUnicode(paramDict[parameter])
 
-        if place == PLACE.URI:
+        if place == PLACE.URI or BOUNDED_INJECTION_MARKER in origValue:
             paramString = origValue
-            origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            if place == PLACE.URI:
+                origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            else:
+                origValue = re.search(r"\w+\Z", origValue.split(BOUNDED_INJECTION_MARKER)[0]).group(0)
             origValue = origValue[origValue.rfind('/') + 1:]
             for char in ('?', '=', ':'):
                 if char in origValue:
@@ -160,6 +166,9 @@ class Agent(object):
             newValue = newValue.replace(CUSTOM_INJECTION_MARK_CHAR, REPLACEMENT_MARKER)
             retVal = paramString.replace(_, self.addPayloadDelimiters(newValue))
             retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(REPLACEMENT_MARKER, CUSTOM_INJECTION_MARK_CHAR)
+        elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
+            _ = "%s%s" % (origValue, BOUNDED_INJECTION_MARKER)
+            retVal = "%s=%s" % (parameter, paramString.replace(_, self.addPayloadDelimiters(newValue)))
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
@@ -272,7 +281,7 @@ class Agent(object):
             where = kb.injection.data[kb.technique].where if where is None else where
             comment = kb.injection.data[kb.technique].comment if comment is None else comment
 
-        if Backend.getIdentifiedDbms() == DBMS.ACCESS and comment == GENERIC_SQL_COMMENT:
+        if Backend.getIdentifiedDbms() == DBMS.ACCESS and "--" in (comment or ""):
             comment = queries[DBMS.ACCESS].comment.query
 
         if comment is not None:
@@ -295,7 +304,7 @@ class Agent(object):
         _ = (
                 ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
                 ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
-                ("[HASH_REPLACE]", kb.chars.hash_),
+                ("[HASH_REPLACE]", kb.chars.hash_), ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT)
             )
         payload = reduce(lambda x, y: x.replace(y[0], y[1]), _, payload)
 
@@ -746,6 +755,9 @@ class Agent(object):
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
 
+            position = 0
+            char = NULL
+
         for element in xrange(0, count):
             if element > 0:
                 unionQuery += ','
@@ -923,7 +935,7 @@ class Agent(object):
             else:
                 limitedQuery = "%s FROM (SELECT %s,%s" % (untilFrom, ','.join(f for f in field), limitStr)
 
-            limitedQuery = limitedQuery % fromFrom
+            limitedQuery = safeStringFormat(limitedQuery, (fromFrom,))
             limitedQuery += "=%d" % (num + 1)
 
         elif Backend.isDbms(DBMS.MSSQL):
