@@ -45,6 +45,7 @@ from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import NOTE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapBaseException
@@ -225,23 +226,23 @@ def _saveToResultsFile():
     results = {}
     techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
 
-    for inj in kb.injections:
+    for inj in kb.injections + kb.falsePositives:
         if inj.place is None or inj.parameter is None:
             continue
 
-        key = (inj.place, inj.parameter)
+        key = (inj.place, inj.parameter, ';'.join(inj.notes))
         if key not in results:
             results[key] = []
 
         results[key].extend(inj.data.keys())
 
     for key, value in results.items():
-        place, parameter = key
-        line = "%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), os.linesep)
+        place, parameter, notes = key
+        line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), notes, os.linesep)
         conf.resultsFP.writelines(line)
 
     if not results:
-        line = "%s,,,%s" % (conf.url, os.linesep)
+        line = "%s,,,,%s" % (conf.url, os.linesep)
         conf.resultsFP.writelines(line)
 
 def start():
@@ -522,7 +523,10 @@ def start():
                                 proceed = not kb.endDetection
 
                                 if getattr(injection, "place", None) is not None:
-                                    kb.injections.append(injection)
+                                    if NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE in injection.notes:
+                                        kb.falsePositives.append(injection)
+                                    else:
+                                        kb.injections.append(injection)
 
                                     # In case when user wants to end detection phase (Ctrl+C)
                                     if not proceed:
@@ -651,6 +655,8 @@ def start():
             errMsg = getSafeExString(ex)
 
             if conf.multipleTargets:
+                _saveToResultsFile()
+
                 errMsg += ", skipping to the next %s" % ("form" if conf.forms else "URL")
                 logger.error(errMsg)
             else:
@@ -669,9 +675,10 @@ def start():
     if kb.dataOutputFlag and not conf.multipleTargets:
         logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
 
-    if conf.multipleTargets and conf.resultsFilename:
-        infoMsg = "you can find results of scanning in multiple targets "
-        infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
-        logger.info(infoMsg)
+    if conf.multipleTargets:
+        if conf.resultsFilename:
+            infoMsg = "you can find results of scanning in multiple targets "
+            infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
+            logger.info(infoMsg)
 
     return True

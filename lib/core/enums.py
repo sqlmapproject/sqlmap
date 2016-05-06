@@ -351,3 +351,6 @@ class AUTOCOMPLETE_TYPE:
     SQL = 0
     OS = 1
     SQLMAP = 2
+
+class NOTE:
+    FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"
