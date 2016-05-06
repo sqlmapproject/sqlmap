@@ -12,6 +12,7 @@ sys.dont_write_bytecode = True
 from lib.utils import versioncheck  # this has to be the first non-standard import
 
 import bdb
+import distutils
 import inspect
 import logging
 import os
@@ -49,6 +50,7 @@ from lib.core.option import initOptions
 from lib.core.option import init
 from lib.core.profiling import profile
 from lib.core.settings import LEGAL_DISCLAIMER
+from lib.core.settings import VERSION
 from lib.core.testing import smokeTest
 from lib.core.testing import liveTest
 from lib.parse.cmdline import cmdLineParser
@@ -68,21 +70,33 @@ def modulePath():
 
     return getUnicode(os.path.dirname(os.path.realpath(_)), encoding=sys.getfilesystemencoding())
 
+def checkEnvironment():
+    paths.SQLMAP_ROOT_PATH = modulePath()
+
+    try:
+        os.path.isdir(paths.SQLMAP_ROOT_PATH)
+    except UnicodeEncodeError:
+        errMsg = "your system does not properly handle non-ASCII paths. "
+        errMsg += "Please move the sqlmap's directory to the other location"
+        logger.critical(errMsg)
+        raise SystemExit
+
+    #if distutils.version.LooseVersion(VERSION) < distutils.version.LooseVersion("1.0"):
+    if True:
+        errMsg = "your runtime environment (e.g. PYTHONPATH) is "
+        errMsg += "broken. Please make sure that you are not running "
+        errMsg += "newer versions of sqlmap with runtime scripts for older "
+        errMsg += "versions"
+        logger.critical(errMsg)
+        raise SystemExit
+
 def main():
     """
     Main function of sqlmap when running from command line.
     """
 
     try:
-        paths.SQLMAP_ROOT_PATH = modulePath()
-
-        try:
-            os.path.isdir(paths.SQLMAP_ROOT_PATH)
-        except UnicodeEncodeError:
-            errMsg = "your system does not properly handle non-ASCII paths. "
-            errMsg += "Please move the sqlmap's directory to the other location"
-            logger.error(errMsg)
-            raise SystemExit
+        checkEnvironment()
 
         setPaths()
         banner()
