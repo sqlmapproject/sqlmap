@@ -81,8 +81,7 @@ def checkEnvironment():
         logger.critical(errMsg)
         raise SystemExit
 
-    #if distutils.version.LooseVersion(VERSION) < distutils.version.LooseVersion("1.0"):
-    if True:
+    if distutils.version.LooseVersion(VERSION) < distutils.version.LooseVersion("1.0"):
         errMsg = "your runtime environment (e.g. PYTHONPATH) is "
         errMsg += "broken. Please make sure that you are not running "
         errMsg += "newer versions of sqlmap with runtime scripts for older "
