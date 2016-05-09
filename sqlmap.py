@@ -49,6 +49,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import initOptions
 from lib.core.option import init
 from lib.core.profiling import profile
+from lib.core.settings import IS_WIN
 from lib.core.settings import LEGAL_DISCLAIMER
 from lib.core.settings import VERSION
 from lib.core.testing import smokeTest
@@ -189,6 +190,14 @@ def main():
 
             elif "_mkstemp_inner" in excMsg:
                 errMsg = "there has been a problem while accessing temporary files"
+                logger.error(errMsg)
+                raise SystemExit
+
+            elif "can't start new thread" in excMsg:
+                errMsg = "there has been a problem while creating new thread instance. "
+                errMsg += "Please make sure that you are not running too many processes"
+                if not IS_WIN:
+                    errMsg += " (or increase the 'ulimit -u' value)"
                 logger.error(errMsg)
                 raise SystemExit
 
