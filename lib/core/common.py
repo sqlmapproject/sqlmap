@@ -1350,11 +1350,14 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
-    if urlSplit.query:
-        conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
-
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
+
+    if urlSplit.query:
+        if '=' not in urlSplit.query:
+            conf.url = "%s?%s" % (conf.url, getUnicode(urlSplit.query))
+        else:
+            conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
     if not conf.referer and (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3):
         debugMsg = "setting the HTTP Referer header to the target URL"
