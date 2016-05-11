@@ -32,7 +32,6 @@ def setDbms(dbms):
         dbms = _.group(1)
 
     Backend.setDbms(dbms)
-
     logger.info("the back-end DBMS is %s" % Backend.getDbms())
 
 def setOs():

@@ -103,6 +103,9 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
         actVer = Format.getDbms()
 
+        if inject.checkBooleanExpression("@@USERSTAT LIKE @@USERSTAT"):
+            actVer += " (MariaDB fork)"
+
         if not conf.extensiveFp:
             value += actVer
             return value
