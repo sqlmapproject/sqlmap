@@ -26,6 +26,15 @@ template: '<strong><a href="http://twitter.com/%user_screen_name%/statuses/%id_s
 <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 
+<!-- little playground for web scanners :)
+SQL error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+Warning: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated in /var/www/index.php on line 33 ORA-01756: quoted string not properly terminated
+Warning: pg_query() [function.pg-query]: Query failed: ERROR: unterminated quoted string at or near "' OFFSET 0 LIMIT 1 ^ in /var/www/index.php on line 35
+Error Type: Microsoft OLE DB Provider for ODBC Drivers (0x80040E14) [Microsoft][ODBC SQL Server Driver][SQL Server]Unclosed quotation mark after the character string ''. /index.asp, line 27
+Description: [Microsoft][ODBC SQL Server Driver][SQL Server]Line 1: Incorrect syntax near ''. Number: -2147217900 (0x80040E14)
+Warning: SQLite3::exec(): near "": syntax error in index.php on line 19
+-->
+
 <title>sqlmap: automatic SQL injection and database takeover tool</title>
 </head>
 
