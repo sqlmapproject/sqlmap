@@ -601,15 +601,16 @@ def paramToDict(place, parameters=None):
                         logger.warn(warnMsg)
 
                 if place in (PLACE.POST, PLACE.GET):
-                    regex = r"\A([^\w]+.*\w+)([^\w]+)\Z"
-                    match = re.search(regex, testableParameters[parameter])
-                    if match:
-                        _ = re.sub(regex, "\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, testableParameters[parameter])
-                        message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
-                        message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
-                        test = readInput(message, default="N")
-                        if test[0] in ("y", "Y"):
-                            testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
+                    for regex in (r"\A((?:<[^>]+>)+\w+)((?:<[^>]+>)+)\Z", r"\A([^\w]+.*\w+)([^\w]+)\Z"):
+                        match = re.search(regex, testableParameters[parameter])
+                        if match:
+                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (CUSTOM_INJECTION_MARK_CHAR, len(match.groups())), testableParameters[parameter])
+                            message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                            message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
+                            test = readInput(message, default="N")
+                            if test[0] in ("y", "Y"):
+                                testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
+                            break
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
