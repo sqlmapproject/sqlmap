@@ -521,26 +521,30 @@ def start():
 
                                 injection = checkSqlInjection(place, parameter, value)
                                 proceed = not kb.endDetection
+                                injectable = False
 
                                 if getattr(injection, "place", None) is not None:
                                     if NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE in injection.notes:
                                         kb.falsePositives.append(injection)
                                     else:
+                                        injectable = True
+
                                         kb.injections.append(injection)
 
-                                    # In case when user wants to end detection phase (Ctrl+C)
-                                    if not proceed:
-                                        break
+                                        # In case when user wants to end detection phase (Ctrl+C)
+                                        if not proceed:
+                                            break
 
-                                    msg = "%s parameter '%s' " % (injection.place, injection.parameter)
-                                    msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
-                                    test = readInput(msg, default="N")
+                                        msg = "%s parameter '%s' " % (injection.place, injection.parameter)
+                                        msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
+                                        test = readInput(msg, default="N")
 
-                                    if test[0] not in ("y", "Y"):
-                                        proceed = False
-                                        paramKey = (conf.hostname, conf.path, None, None)
-                                        kb.testedParams.add(paramKey)
-                                else:
+                                        if test[0] not in ("y", "Y"):
+                                            proceed = False
+                                            paramKey = (conf.hostname, conf.path, None, None)
+                                            kb.testedParams.add(paramKey)
+
+                                if not injectable:
                                     warnMsg = "%s parameter '%s' is not " % (paramType, parameter)
                                     warnMsg += "injectable"
                                     logger.warn(warnMsg)
