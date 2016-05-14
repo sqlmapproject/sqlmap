@@ -10,10 +10,13 @@ import re
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import getUnicode
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
@@ -103,8 +106,9 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
         actVer = Format.getDbms()
 
-        if inject.checkBooleanExpression("@@USERSTAT LIKE @@USERSTAT"):
-            actVer += " (MariaDB fork)"
+        _ = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
+        if _:
+            actVer += " (%s fork)" % _
 
         if not conf.extensiveFp:
             value += actVer
@@ -179,6 +183,9 @@ class Fingerprint(GenericFingerprint):
                 logger.warn(warnMsg)
 
                 return False
+
+            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) is None:
+                hashDBWrite(HASHDB_KEYS.DBMS_FORK, inject.checkBooleanExpression("@@USERSTAT LIKE @@USERSTAT") and "MariaDB" or "")
 
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855
