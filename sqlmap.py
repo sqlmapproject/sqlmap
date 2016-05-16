@@ -278,7 +278,10 @@ def main():
 
         if threading.activeCount() > 1:
             logger.debug("short delay for thread finalization")
-            time.sleep(0.5)
+            try:
+                time.sleep(0.5)
+            except KeyboardInterrupt:
+                pass
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if conf.get("threads", 0) > 1 or conf.get("dnsServer"):
