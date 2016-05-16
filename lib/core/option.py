@@ -133,6 +133,7 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
+from lib.core.threads import setDaemon
 from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadBoundaries
@@ -1063,6 +1064,7 @@ def _setSocketPreConnect():
         socket.socket.connect = connect
 
         thread = threading.Thread(target=_)
+        setDaemon(thread)
         thread.start()
 
 def _setHTTPHandlers():
