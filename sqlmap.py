@@ -54,6 +54,7 @@ try:
     from lib.core.profiling import profile
     from lib.core.settings import IS_WIN
     from lib.core.settings import LEGAL_DISCLAIMER
+    from lib.core.settings import THREAD_FINALIZATION_TIMEOUT
     from lib.core.settings import VERSION
     from lib.core.testing import smokeTest
     from lib.core.testing import liveTest
@@ -276,15 +277,16 @@ def main():
         if conf.get("dumper"):
             conf.dumper.flush()
 
-        if threading.activeCount() > 1:
-            logger.debug("short delay for thread finalization")
-            try:
-                time.sleep(0.5)
-            except KeyboardInterrupt:
-                pass
+        # short delay for thread finalization
+        try:
+            _ = time.time()
+            while threading.activeCount() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
+                time.sleep(0.01)
+        except KeyboardInterrupt:
+            pass
 
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
-        if conf.get("threads", 0) > 1 or conf.get("dnsServer"):
+        if threading.activeCount() > 1:
             os._exit(0)
 
 if __name__ == "__main__":

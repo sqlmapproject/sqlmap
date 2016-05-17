@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.5.34"
+VERSION = "1.0.5.35"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -129,6 +129,9 @@ HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip,deflate"
 
 # Default timeout for running commands over backdoor
 BACKDOOR_RUN_CMD_TIMEOUT = 5
+
+# Number of seconds to wait for thread finalization at program end
+THREAD_FINALIZATION_TIMEOUT = 1
 
 # Maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
