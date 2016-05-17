@@ -623,7 +623,7 @@ def paramToDict(place, parameters=None):
                                                     current[key] = "%s%s" % (str(value).lower(), BOUNDED_INJECTION_MARKER)
                                                 else:
                                                     current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
-                                                candidates["%s #%d%s" % (parameter, len(candidates) + 1, CUSTOM_INJECTION_MARK_CHAR)] = json.dumps(deserialized)
+                                                candidates["%s (%s)" % (parameter, key)] = json.dumps(deserialized)
                                                 current[key] = original
 
                                 deserialized = json.loads(testableParameters[parameter])
