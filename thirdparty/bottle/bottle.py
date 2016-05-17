@@ -95,7 +95,7 @@ try:
         return (args, varargs, keywords, tuple(defaults) or None)
 except ImportError:
     from inspect import getargspec
-    
+
 try:
     from simplejson import dumps as json_dumps, loads as json_lds
 except ImportError:  # pragma: no cover
