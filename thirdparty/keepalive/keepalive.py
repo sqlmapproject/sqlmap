@@ -1,30 +1,40 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#   This library is free software; you can redistribute it and/or
+#   modify it under the terms of the GNU Lesser General Public
+#   License as published by the Free Software Foundation; either
+#   version 2.1 of the License, or (at your option) any later version.
 #
-# Copyright 2002-2003 Michael D. Stenner
+#   This library is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#   Lesser General Public License for more details.
 #
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+#   You should have received a copy of the GNU Lesser General Public
+#   License along with this library; if not, write to the 
+#      Free Software Foundation, Inc., 
+#      59 Temple Place, Suite 330, 
+#      Boston, MA  02111-1307  USA
+
+# This file was part of urlgrabber, a high-level cross-protocol url-grabber
+# Copyright 2002-2004 Michael D. Stenner, Ryan Tomayko
+# Copyright 2015 Sergio Fernández
 
 """An HTTP handler for urllib2 that supports HTTP 1.1 and keepalive.
 
-  import urllib2
-  from keepalive import HTTPHandler
-  keepalive_handler = HTTPHandler()
-  opener = urllib2.build_opener(keepalive_handler)
-  urllib2.install_opener(opener)
+>>> import urllib2
+>>> from keepalive import HTTPHandler
+>>> keepalive_handler = HTTPHandler()
+>>> opener = urllib2.build_opener(keepalive_handler)
+>>> urllib2.install_opener(opener)
+>>> 
+>>> fo = urllib2.urlopen('http://www.python.org')
 
-  fo = urllib2.urlopen('http://www.python.org')
+If a connection to a given host is requested, and all of the existing
+connections are still in use, another connection will be opened.  If
+the handler tries to use an existing connection but it fails in some
+way, it will be closed and removed from the pool.
 
 To remove the handler, simply re-run build_opener with no arguments, and
 install that opener.
@@ -37,9 +47,13 @@ use the handler methods:
   close_all()
   open_connections()
 
-Example:
+NOTE: using the close_connection and close_all methods of the handler
+should be done with care when using multiple threads.
+  * there is nothing that prevents another thread from creating new
+    connections immediately after connections are closed
+  * no checks are done to prevent in-use connections from being closed
 
-  keepalive_handler.close_all()
+>>> keepalive_handler.close_all()
 
 EXTRA ATTRIBUTES AND METHODS
 
@@ -55,162 +69,307 @@ EXTRA ATTRIBUTES AND METHODS
   If you want the best of both worlds, use this inside an
   AttributeError-catching try:
 
-    try: status = fo.status
-    except AttributeError: status = None
+  >>> try: status = fo.status
+  >>> except AttributeError: status = None
 
   Unfortunately, these are ONLY there if status == 200, so it's not
   easy to distinguish between non-200 responses.  The reason is that
   urllib2 tries to do clever things with error codes 301, 302, 401,
   and 407, and it wraps the object upon return.
 
-  You can optionally set the module-level global HANDLE_ERRORS to 0,
-  in which case the handler will always return the object directly.
-  If you like the fancy handling of errors, don't do this.  If you
-  prefer to see your error codes, then do.
+  For python versions earlier than 2.4, you can avoid this fancy error
+  handling by setting the module-level global HANDLE_ERRORS to zero.
+  You see, prior to 2.4, it's the HTTP Handler's job to determine what
+  to handle specially, and what to just pass up.  HANDLE_ERRORS == 0
+  means "pass everything up".  In python 2.4, however, this job no
+  longer belongs to the HTTP Handler and is now done by a NEW handler,
+  HTTPErrorProcessor.  Here's the bottom line:
+
+    python version < 2.4
+        HANDLE_ERRORS == 1  (default) pass up 200, treat the rest as
+                            errors
+        HANDLE_ERRORS == 0  pass everything up, error processing is
+                            left to the calling code
+    python version >= 2.4
+        HANDLE_ERRORS == 1  pass up 200, treat the rest as errors
+        HANDLE_ERRORS == 0  (default) pass everything up, let the
+                            other handlers (specifically,
+                            HTTPErrorProcessor) decide what to do
+
+  In practice, setting the variable either way makes little difference
+  in python 2.4, so for the most consistent behavior across versions,
+  you probably just want to use the defaults, which will give you
+  exceptions on errors.
 
 """
-from httplib import _CS_REQ_STARTED, _CS_REQ_SENT, _CS_IDLE, CannotSendHeader
 
-from lib.core.convert import unicodeencode
-from lib.core.data import kb
+# $Id: keepalive.py,v 1.17 2006/12/08 00:14:16 mstenner Exp $
 
-import threading
 import urllib2
 import httplib
 import socket
+import thread
 
-VERSION = (0, 1)
-#STRING_VERSION = '.'.join(map(str, VERSION))
-DEBUG = 0
-HANDLE_ERRORS = 1
+DEBUG = None
 
-class HTTPHandler(urllib2.HTTPHandler):
+import sys
+if sys.version_info < (2, 4): HANDLE_ERRORS = 1
+else: HANDLE_ERRORS = 0
+
+class ConnectionManager:
+    """
+    The connection manager must be able to:
+      * keep track of all existing
+      """
     def __init__(self):
-        self._connections = {}
+        self._lock = thread.allocate_lock()
+        self._hostmap = {} # map hosts to a list of connections
+        self._connmap = {} # map connections to host
+        self._readymap = {} # map connection to ready state
+
+    def add(self, host, connection, ready):
+        self._lock.acquire()
+        try:
+            if not self._hostmap.has_key(host): self._hostmap[host] = []
+            self._hostmap[host].append(connection)
+            self._connmap[connection] = host
+            self._readymap[connection] = ready
+        finally:
+            self._lock.release()
+
+    def remove(self, connection):
+        self._lock.acquire()
+        try:
+            try:
+                host = self._connmap[connection]
+            except KeyError:
+                pass
+            else:
+                del self._connmap[connection]
+                del self._readymap[connection]
+                self._hostmap[host].remove(connection)
+                if not self._hostmap[host]: del self._hostmap[host]
+        finally:
+            self._lock.release()
+
+    def set_ready(self, connection, ready):
+        try: self._readymap[connection] = ready
+        except KeyError: pass
+
+    def get_ready_conn(self, host):
+        conn = None
+        self._lock.acquire()
+        try:
+            if self._hostmap.has_key(host):
+                for c in self._hostmap[host]:
+                    if self._readymap[c]:
+                        self._readymap[c] = 0
+                        conn = c
+                        break
+        finally:
+            self._lock.release()
+        return conn
+
+    def get_all(self, host=None):
+        if host:
+            return list(self._hostmap.get(host, []))
+        else:
+            return dict(self._hostmap)
+
+class KeepAliveHandler:
+    def __init__(self):
+        self._cm = ConnectionManager()
+
+    #### Connection Management
+    def open_connections(self):
+        """return a list of connected hosts and the number of connections
+        to each.  [('foo.com:80', 2), ('bar.org', 1)]"""
+        return [(host, len(li)) for (host, li) in self._cm.get_all().items()]
 
     def close_connection(self, host):
-        """close connection to <host>
+        """close connection(s) to <host>
         host is the host:port spec, as in 'www.cnn.com:8080' as passed in.
         no error occurs if there is no connection to that host."""
-        self._remove_connection(host, close=1)
-
-    def open_connections(self):
-        """return a list of connected hosts"""
-        retVal = []
-        currentThread = threading.currentThread()
-        for name, host in self._connections.keys():
-            if name == currentThread.getName():
-                retVal.append(host)
-        return retVal
+        for h in self._cm.get_all(host):
+            self._cm.remove(h)
+            h.close()
 
     def close_all(self):
         """close all open connections"""
-        for _, conn in self._connections.items():
-            conn.close()
-        self._connections = {}
+        for host, conns in self._cm.get_all().items():
+            for h in conns:
+                self._cm.remove(h)
+                h.close()
 
-    def _remove_connection(self, host, close=0):
-        key = self._get_connection_key(host)
-        if self._connections.has_key(key):
-            if close: self._connections[key].close()
-            del self._connections[key]
+    def _request_closed(self, request, host, connection):
+        """tells us that this request is now closed and the the
+        connection is ready for another request"""
+        self._cm.set_ready(connection, 1)
 
-    def _get_connection_key(self, host):
-        return (threading.currentThread().getName(), host)
+    def _remove_connection(self, host, connection, close=0):
+        if close: connection.close()
+        self._cm.remove(connection)
 
-    def _start_connection(self, h, req):
-        h.clearheaders()
-        try:
-            if req.has_data():
-                data = req.get_data()
-                h.putrequest('POST', req.get_selector())
-                if not req.headers.has_key('Content-type'):
-                    req.headers['Content-type'] = 'application/x-www-form-urlencoded'
-                if not req.headers.has_key('Content-length'):
-                    req.headers['Content-length'] = '%d' % len(data)
-            else:
-                h.putrequest(req.get_method() or 'GET', req.get_selector())
-
-            if not req.headers.has_key('Connection'):
-                req.headers['Connection'] = 'keep-alive'
-
-            for args in self.parent.addheaders:
-                h.putheader(*args)
-            for k, v in req.headers.items():
-                h.putheader(k, v)
-            h.endheaders()
-            if req.has_data():
-                h.send(data)
-        except socket.error, err:
-            h.close()
-            raise urllib2.URLError(err)
-
-    def do_open(self, http_class, req):
-        h = None
-        host = req.get_host()
+    #### Transaction Execution
+    def do_open(self, req):
+        host = req.host
         if not host:
             raise urllib2.URLError('no host given')
 
         try:
-            need_new_connection = 1
-            key = self._get_connection_key(host)
-            h = self._connections.get(key)
-            if not h is None:
-                try:
-                    self._start_connection(h, req)
-                except:
-                    r = None
-                else:
-                    try: r = h.getresponse()
-                    except httplib.ResponseNotReady, e: r = None
-                    except httplib.BadStatusLine, e: r = None
+            h = self._cm.get_ready_conn(host)
+            while h:
+                r = self._reuse_connection(h, req, host)
 
-                if r is None or r.version == 9:
-                    # httplib falls back to assuming HTTP 0.9 if it gets a
-                    # bad header back.  This is most likely to happen if
-                    # the socket has been closed by the server since we
-                    # last used the connection.
-                    if DEBUG: print "failed to re-use connection to %s" % host
-                    h.close()
-                else:
-                    if DEBUG: print "re-using connection to %s" % host
-                    need_new_connection = 0
-            if need_new_connection:
-                if DEBUG: print "creating new connection to %s" % host
-                h = http_class(host)
-                self._connections[key] = h
-                self._start_connection(h, req)
+                # if this response is non-None, then it worked and we're
+                # done.  Break out, skipping the else block.
+                if r: break
+
+                # connection is bad - possibly closed by server
+                # discard it and ask for the next free connection
+                h.close()
+                self._cm.remove(h)
+                h = self._cm.get_ready_conn(host)
+            else:
+                # no (working) free connections were found.  Create a new one.
+                h = self._get_connection(host)
+                if DEBUG: DEBUG.info("creating new connection to %s (%d)",
+                                     host, id(h))
+                self._cm.add(host, h, 0)
+                self._start_transaction(h, req)
                 r = h.getresponse()
-        except socket.error, err:
-            if h: h.close()
+        except (socket.error, httplib.HTTPException), err:
             raise urllib2.URLError(err)
 
-        # if not a persistent connection, don't try to reuse it
-        if r.will_close: self._remove_connection(host)
+        if DEBUG: DEBUG.info("STATUS: %s, %s", r.status, r.reason)
 
-        if DEBUG:
-            print "STATUS: %s, %s" % (r.status, r.reason)
+        # if not a persistent connection, don't try to reuse it
+        if r.will_close:
+            if DEBUG: DEBUG.info('server will close connection, discarding')
+            self._cm.remove(h)
+
         r._handler = self
         r._host = host
         r._url = req.get_full_url()
+        r._connection = h
+        r.code = r.status
+        r.headers = r.msg
+        r.msg = r.reason
 
-        #if r.status == 200 or not HANDLE_ERRORS:
-            #return r
         if r.status == 200 or not HANDLE_ERRORS:
-            # [speedplane] Must return an adinfourl object
-            resp = urllib2.addinfourl(r, r.msg, req.get_full_url())
-            resp.code = r.status
-            resp.msg = r.reason
-            return resp;
+            return r
         else:
-            r.code = r.status
-            return self.parent.error('http', req, r, r.status, r.reason, r.msg)
+            return self.parent.error('http', req, r,
+                                     r.status, r.msg, r.headers)
+
+    def _reuse_connection(self, h, req, host):
+        """start the transaction with a re-used connection
+        return a response object (r) upon success or None on failure.
+        This DOES not close or remove bad connections in cases where
+        it returns.  However, if an unexpected exception occurs, it
+        will close and remove the connection before re-raising.
+        """
+        try:
+            self._start_transaction(h, req)
+            r = h.getresponse()
+            # note: just because we got something back doesn't mean it
+            # worked.  We'll check the version below, too.
+        except (socket.error, httplib.HTTPException):
+            r = None
+        except:
+            # adding this block just in case we've missed
+            # something we will still raise the exception, but
+            # lets try and close the connection and remove it
+            # first.  We previously got into a nasty loop
+            # where an exception was uncaught, and so the
+            # connection stayed open.  On the next try, the
+            # same exception was raised, etc.  The tradeoff is
+            # that it's now possible this call will raise
+            # a DIFFERENT exception
+            if DEBUG: DEBUG.error("unexpected exception - closing " + \
+                                  "connection to %s (%d)", host, id(h))
+            self._cm.remove(h)
+            h.close()
+            raise
+
+        if r is None or r.version == 9:
+            # httplib falls back to assuming HTTP 0.9 if it gets a
+            # bad header back.  This is most likely to happen if
+            # the socket has been closed by the server since we
+            # last used the connection.
+            if DEBUG: DEBUG.info("failed to re-use connection to %s (%d)",
+                                 host, id(h))
+            r = None
+        else:
+            if DEBUG: DEBUG.info("re-using connection to %s (%d)", host, id(h))
+
+        return r
+
+    def _start_transaction(self, h, req):
+        try:
+            if req.has_data():
+                data = req.data
+                if hasattr(req, 'selector'):
+                    h.putrequest(req.get_method() or 'POST', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                else:
+                    h.putrequest(req.get_method() or 'POST', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                if not req.headers.has_key('Content-type'):
+                    h.putheader('Content-type',
+                                'application/x-www-form-urlencoded')
+                if not req.headers.has_key('Content-length'):
+                    h.putheader('Content-length', '%d' % len(data))
+            else:
+                if hasattr(req, 'selector'):
+                    h.putrequest(req.get_method() or 'GET', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                else:
+                    h.putrequest(req.get_method() or 'GET', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+        except (socket.error, httplib.HTTPException), err:
+            raise urllib2.URLError(err)
+
+        if not req.headers.has_key('Connection'):
+            req.headers['Connection'] = 'keep-alive'
+
+        for args in self.parent.addheaders:
+            if not req.headers.has_key(args[0]):
+                h.putheader(*args)
+        for k, v in req.headers.items():
+            h.putheader(k, v)
+        h.endheaders()
+        if req.has_data():
+            h.send(data)
+
+    def _get_connection(self, host):
+        return NotImplementedError
+
+class HTTPHandler(KeepAliveHandler, urllib2.HTTPHandler):
+    def __init__(self):
+        KeepAliveHandler.__init__(self)
 
     def http_open(self, req):
-        return self.do_open(HTTPConnection, req)
+        return self.do_open(req)
+
+    def _get_connection(self, host):
+        return HTTPConnection(host)
+
+class HTTPSHandler(KeepAliveHandler, urllib2.HTTPSHandler):
+    def __init__(self, ssl_factory=None):
+        KeepAliveHandler.__init__(self)
+        if not ssl_factory:
+            try:
+                import sslfactory
+                ssl_factory = sslfactory.get_factory()
+            except ImportError:
+                pass
+        self._ssl_factory = ssl_factory
+
+    def https_open(self, req):
+        return self.do_open(req)
+
+    def _get_connection(self, host):
+        try: return self._ssl_factory.get_https_connection(host)
+        except AttributeError: return HTTPSConnection(host)
 
 class HTTPResponse(httplib.HTTPResponse):
-
     # we need to subclass HTTPResponse in order to
     # 1) add readline() and readlines() methods
     # 2) add close_connection() methods
@@ -236,21 +395,31 @@ class HTTPResponse(httplib.HTTPResponse):
         else: # 2.2 doesn't
             httplib.HTTPResponse.__init__(self, sock, debuglevel)
         self.fileno = sock.fileno
+        self.code = None
         self._method = method
-        self._rbuf = ''
+        self._rbuf = b""
         self._rbufsize = 8096
         self._handler = None # inserted by the handler later
         self._host = None    # (same)
         self._url = None     # (same)
+        self._connection = None # (same)
 
     _raw_read = httplib.HTTPResponse.read
 
+    def close(self):
+        if self.fp:
+            self.fp.close()
+            self.fp = None
+            if self._handler:
+                self._handler._request_closed(self, self._host,
+                                              self._connection)
+
     def close_connection(self):
+        self._handler._remove_connection(self._host, self._connection, close=1)
         self.close()
-        self._handler._remove_connection(self._host, close=1)
 
     def info(self):
-        return self.msg
+        return self.headers
 
     def geturl(self):
         return self._url
@@ -268,11 +437,11 @@ class HTTPResponse(httplib.HTTPResponse):
                 return s
 
         s = self._rbuf + self._raw_read(amt)
-        self._rbuf = ''
+        self._rbuf = b""
         return s
 
     def readline(self, limit=-1):
-        data = ""
+        data = b""
         i = self._rbuf.find('\n')
         while i < 0 and not (0 < limit <= len(self._rbuf)):
             new = self._raw_read(self._rbufsize)
@@ -302,43 +471,9 @@ class HTTPResponse(httplib.HTTPResponse):
 class HTTPConnection(httplib.HTTPConnection):
     # use the modified response class
     response_class = HTTPResponse
-    _headers = None
 
-    def clearheaders(self):
-        self._headers = {}
-
-    def putheader(self, header, value):
-        """Send a request header line to the server.
-
-        For example: h.putheader('Accept', 'text/html')
-        """
-        if self.__state != _CS_REQ_STARTED:
-            raise CannotSendHeader()
-
-        self._headers[header] = value
-
-    def endheaders(self):
-        """Indicate that the last header line has been sent to the server."""
-
-        if self.__state == _CS_REQ_STARTED:
-            self.__state = _CS_REQ_SENT
-        else:
-            raise CannotSendHeader()
-
-        for header in ('Host', 'Accept-Encoding'):
-            if header in self._headers:
-                str = '%s: %s' % (header, self._headers[header])
-                self._output(str)
-                del self._headers[header]
-
-        for header, value in self._headers.items():
-            str = '%s: %s' % (header, value)
-            self._output(str)
-
-        self._send_output()
-
-    def send(self, str):
-        httplib.HTTPConnection.send(self, unicodeencode(str, kb.pageEncoding))
+class HTTPSConnection(httplib.HTTPSConnection):
+    response_class = HTTPResponse
 
 #########################################################################
 #####   TEST FUNCTIONS
@@ -367,7 +502,7 @@ def error_handler(url):
             print "  status = %s, reason = %s" % (status, reason)
     HANDLE_ERRORS = orig
     hosts = keepalive_handler.open_connections()
-    print "open connections:", ' '.join(hosts)
+    print "open connections:", hosts
     keepalive_handler.close_all()
 
 def continuity(url):
@@ -422,9 +557,10 @@ def comp(N, url):
     print '  improvement factor: %.2f' % (t1/t2, )
 
 def fetch(N, url, delay=0):
+    import time
     lens = []
     starttime = time.time()
-    for i in xrange(N):
+    for i in range(N):
         if delay and i > 0: time.sleep(delay)
         fo = urllib2.urlopen(url)
         foo = fo.read()
@@ -440,6 +576,40 @@ def fetch(N, url, delay=0):
 
     return diff
 
+def test_timeout(url):
+    global DEBUG
+    dbbackup = DEBUG
+    class FakeLogger:
+        def debug(self, msg, *args): print msg % args
+        info = warning = error = debug
+    DEBUG = FakeLogger()
+    print "  fetching the file to establish a connection"
+    fo = urllib2.urlopen(url)
+    data1 = fo.read()
+    fo.close()
+
+    i = 20
+    print "  waiting %i seconds for the server to close the connection" % i
+    while i > 0:
+        sys.stdout.write('\r  %2i' % i)
+        sys.stdout.flush()
+        time.sleep(1)
+        i -= 1
+    sys.stderr.write('\r')
+
+    print "  fetching the file a second time"
+    fo = urllib2.urlopen(url)
+    data2 = fo.read()
+    fo.close()
+
+    if data1 == data2:
+        print '  data are identical'
+    else:
+        print '  ERROR: DATA DIFFER'
+
+    DEBUG = dbbackup
+
+
 def test(url, N=10):
     print "checking error hander (do this on a non-200)"
     try: error_handler(url)
@@ -452,6 +622,9 @@ def test(url, N=10):
     print
     print "performing speed comparison"
     comp(N, url)
+    print
+    print "performing dropped-connection check"
+    test_timeout(url)
 
 if __name__ == '__main__':
     import time
