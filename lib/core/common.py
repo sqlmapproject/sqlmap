@@ -604,6 +604,44 @@ def paramToDict(place, parameters=None):
                     for regex in (r"\A((?:<[^>]+>)+\w+)((?:<[^>]+>)+)\Z", r"\A([^\w]+.*\w+)([^\w]+)\Z"):
                         match = re.search(regex, testableParameters[parameter])
                         if match:
+                            try:
+                                candidates = OrderedDict()
+
+                                def walk(head, current=None):
+                                    current = current or head
+                                    if isListLike(current):
+                                        for _ in current:
+                                            walk(head, _)
+                                    elif isinstance(current, dict):
+                                        for key in current.keys():
+                                            value = current[key]
+                                            if isinstance(value, (list, tuple, set, dict)):
+                                                walk(head, value)
+                                            elif isinstance(value, (bool, int, float, basestring)):
+                                                original = current[key]
+                                                if isinstance(value, bool):
+                                                    current[key] = "%s%s" % (str(value).lower(), BOUNDED_INJECTION_MARKER)
+                                                else:
+                                                    current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
+                                                candidates["%s #%d%s" % (parameter, len(candidates) + 1, CUSTOM_INJECTION_MARK_CHAR)] = json.dumps(deserialized)
+                                                current[key] = original
+
+                                deserialized = json.loads(testableParameters[parameter])
+                                walk(deserialized)
+
+                                if candidates:
+                                    message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                                    message += "is JSON deserializable. Do you want to inject inside? [y/N] "
+                                    test = readInput(message, default="N")
+                                    if test[0] in ("y", "Y"):
+                                        del testableParameters[parameter]
+                                        testableParameters.update(candidates)
+                                    break
+                            except (KeyboardInterrupt, SqlmapUserQuitException):
+                                raise
+                            except Exception:
+                                pass
+
                             _ = re.sub(regex, "\g<1>%s\g<%d>" % (CUSTOM_INJECTION_MARK_CHAR, len(match.groups())), testableParameters[parameter])
                             message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
