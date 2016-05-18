@@ -55,6 +55,7 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import NOTE
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
@@ -696,10 +697,10 @@ def checkSqlInjection(place, parameter, value):
             warnMsg += "problems during data retrieval"
             logger.warn(warnMsg)
 
-        injection = checkFalsePositives(injection)
-
-        if not injection:
+        if not checkFalsePositives(injection):
             kb.vulnHosts.remove(conf.hostname)
+            injection.notes.add(NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE)
+
     else:
         injection = None
 
@@ -748,7 +749,7 @@ def checkFalsePositives(injection):
     Checks for false positives (only in single special cases)
     """
 
-    retVal = injection
+    retVal = True
 
     if all(_ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in injection.data) or\
       (len(injection.data) == 1 and PAYLOAD.TECHNIQUE.UNION in injection.data and "Generic" in injection.data[PAYLOAD.TECHNIQUE.UNION].title):
@@ -774,7 +775,7 @@ def checkFalsePositives(injection):
                     break
 
             if not checkBooleanExpression("%d=%d" % (randInt1, randInt1)):
-                retVal = None
+                retVal = False
                 break
 
             # Just in case if DBMS hasn't properly recovered from previous delayed request
@@ -782,22 +783,22 @@ def checkFalsePositives(injection):
                 checkBooleanExpression("%d=%d" % (randInt1, randInt2))
 
             if checkBooleanExpression("%d=%d" % (randInt1, randInt3)):          # this must not be evaluated to True
-                retVal = None
+                retVal = False
                 break
 
             elif checkBooleanExpression("%d=%d" % (randInt3, randInt2)):        # this must not be evaluated to True
-                retVal = None
+                retVal = False
                 break
 
             elif not checkBooleanExpression("%d=%d" % (randInt2, randInt2)):    # this must be evaluated to True
-                retVal = None
+                retVal = False
                 break
 
             elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):        # this must not be evaluated to True (invalid statement)
-                retVal = None
+                retVal = False
                 break
 
-        if retVal is None:
+        if not retVal:
             warnMsg = "false positive or unexploitable injection point detected"
             logger.warn(warnMsg)
 

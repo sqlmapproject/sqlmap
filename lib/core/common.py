@@ -601,15 +601,54 @@ def paramToDict(place, parameters=None):
                         logger.warn(warnMsg)
 
                 if place in (PLACE.POST, PLACE.GET):
-                    regex = r"\A([^\w]+.*\w+)([^\w]+)\Z"
-                    match = re.search(regex, testableParameters[parameter])
-                    if match:
-                        _ = re.sub(regex, "\g<1>%s\g<2>" % CUSTOM_INJECTION_MARK_CHAR, testableParameters[parameter])
-                        message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
-                        message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
-                        test = readInput(message, default="N")
-                        if test[0] in ("y", "Y"):
-                            testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
+                    for regex in (r"\A((?:<[^>]+>)+\w+)((?:<[^>]+>)+)\Z", r"\A([^\w]+.*\w+)([^\w]+)\Z"):
+                        match = re.search(regex, testableParameters[parameter])
+                        if match:
+                            try:
+                                candidates = OrderedDict()
+
+                                def walk(head, current=None):
+                                    current = current or head
+                                    if isListLike(current):
+                                        for _ in current:
+                                            walk(head, _)
+                                    elif isinstance(current, dict):
+                                        for key in current.keys():
+                                            value = current[key]
+                                            if isinstance(value, (list, tuple, set, dict)):
+                                                walk(head, value)
+                                            elif isinstance(value, (bool, int, float, basestring)):
+                                                original = current[key]
+                                                if isinstance(value, bool):
+                                                    current[key] = "%s%s" % (str(value).lower(), BOUNDED_INJECTION_MARKER)
+                                                else:
+                                                    current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
+                                                candidates["%s (%s)" % (parameter, key)] = json.dumps(deserialized)
+                                                current[key] = original
+
+                                deserialized = json.loads(testableParameters[parameter])
+                                walk(deserialized)
+
+                                if candidates:
+                                    message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                                    message += "is JSON deserializable. Do you want to inject inside? [y/N] "
+                                    test = readInput(message, default="N")
+                                    if test[0] in ("y", "Y"):
+                                        del testableParameters[parameter]
+                                        testableParameters.update(candidates)
+                                    break
+                            except (KeyboardInterrupt, SqlmapUserQuitException):
+                                raise
+                            except Exception:
+                                pass
+
+                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (CUSTOM_INJECTION_MARK_CHAR, len(match.groups())), testableParameters[parameter])
+                            message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                            message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
+                            test = readInput(message, default="N")
+                            if test[0] in ("y", "Y"):
+                                testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
+                            break
 
     if conf.testParameter and not testableParameters:
         paramStr = ", ".join(test for test in conf.testParameter)
@@ -1350,11 +1389,14 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
-    if urlSplit.query:
-        conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
-
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
+
+    if urlSplit.query:
+        if '=' not in urlSplit.query:
+            conf.url = "%s?%s" % (conf.url, getUnicode(urlSplit.query))
+        else:
+            conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
     if not conf.referer and (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3):
         debugMsg = "setting the HTTP Referer header to the target URL"

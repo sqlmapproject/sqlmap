@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 import re
+import select
 import sys
 import tempfile
 import time
@@ -47,8 +48,6 @@ from lib.core.subprocessng import recv_some
 
 if IS_WIN:
     import msvcrt
-else:
-    from select import select
 
 class Metasploit:
     """
@@ -550,7 +549,7 @@ class Metasploit:
                             # Probably the child has exited
                             pass
                 else:
-                    ready_fds = select([stdin_fd], [], [], 1)
+                    ready_fds = select.select([stdin_fd], [], [], 1)
 
                     if stdin_fd in ready_fds[0]:
                         try:
@@ -598,7 +597,7 @@ class Metasploit:
                     else:
                         proc.kill()
 
-            except (EOFError, IOError):
+            except (EOFError, IOError, select.error):
                 return proc.returncode
 
     def createMsfShellcode(self, exitfunc, format, extra, encode):

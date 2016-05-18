@@ -373,6 +373,9 @@ class Connect(object):
                 if boundary:
                     headers[HTTP_HEADER.CONTENT_TYPE] = "%s; boundary=%s" % (headers[HTTP_HEADER.CONTENT_TYPE], boundary)
 
+            if conf.keepAlive:
+                headers[HTTP_HEADER.CONNECTION] = "keep-alive"
+
             # Reset header values to original in case of provided request file
             if target and conf.requestFile:
                 headers = OrderedDict(conf.httpHeaders)

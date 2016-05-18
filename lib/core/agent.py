@@ -168,7 +168,7 @@ class Agent(object):
             retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(REPLACEMENT_MARKER, CUSTOM_INJECTION_MARK_CHAR)
         elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
             _ = "%s%s" % (origValue, BOUNDED_INJECTION_MARKER)
-            retVal = "%s=%s" % (parameter, paramString.replace(_, self.addPayloadDelimiters(newValue)))
+            retVal = "%s=%s" % (re.sub(r" (\#\d\*|\(.+\))\Z", "", parameter), paramString.replace(_, self.addPayloadDelimiters(newValue)))
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:

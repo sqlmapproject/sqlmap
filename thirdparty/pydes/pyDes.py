@@ -59,7 +59,7 @@ pad     -> Optional argument. Only when using padmode of PAD_NORMAL. For
 	   bytes of the unencrypted data block.
 padmode -> Optional argument, set the padding mode, must be one of PAD_NORMAL
 	   or PAD_PKCS5). Defaults to PAD_NORMAL.
-	  
+
 
 Example
 -------
@@ -153,7 +153,7 @@ class _baseDes(object):
 	def getPadMode(self):
 		"""getPadMode() -> pyDes.PAD_NORMAL or pyDes.PAD_PKCS5"""
 		return self._padmode
-		
+
 	def setPadMode(self, mode):
 		"""Sets the type of padding mode, pyDes.PAD_NORMAL or pyDes.PAD_PKCS5"""
 		self._padmode = mode
@@ -188,7 +188,7 @@ class _baseDes(object):
 			if not pad:
 				raise ValueError("Data must be a multiple of " + str(self.block_size) + " bytes in length. Use padmode=PAD_PKCS5 or set the pad character.")
 			data += (self.block_size - (len(data) % self.block_size)) * pad
-		
+
 		elif padmode == PAD_PKCS5:
 			pad_len = 8 - (len(data) % self.block_size)
 			if _pythonMajorVersion < 3:
@@ -454,7 +454,7 @@ class des(_baseDes):
 	def __permutate(self, table, block):
 		"""Permutate this block with the specified table"""
 		return list(map(lambda x: block[x], table))
-	
+
 	# Transform the secret key, so that it is ready for data processing
 	# Create the 16 subkeys, K[1] - K[16]
 	def __create_sub_keys(self):
@@ -554,7 +554,7 @@ class des(_baseDes):
 
 			i += 1
 			iteration += iteration_adjustment
-		
+
 		# Final permutation of R[16]L[16]
 		self.final = self.__permutate(des.__fp, self.R + self.L)
 		return self.final
@@ -597,7 +597,7 @@ class des(_baseDes):
 			#	result.append(dict[data[i:i+8]])
 			#	i += 8
 			#	continue
-				
+
 			block = self.__String_to_BitList(data[i:i+8])
 
 			# Xor with IV if using CBC mode

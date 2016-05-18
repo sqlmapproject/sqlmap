@@ -194,6 +194,7 @@ class OPTION_TYPE:
 
 class HASHDB_KEYS:
     DBMS = "DBMS"
+    DBMS_FORK = "DBMS_FORK"
     CHECK_WAF_RESULT = "CHECK_WAF_RESULT"
     CONF_TMP_PATH = "CONF_TMP_PATH"
     KB_ABS_FILE_PATHS = "KB_ABS_FILE_PATHS"
@@ -351,3 +352,6 @@ class AUTOCOMPLETE_TYPE:
     SQL = 0
     OS = 1
     SQLMAP = 2
+
+class NOTE:
+    FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"

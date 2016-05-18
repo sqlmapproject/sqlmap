@@ -294,8 +294,11 @@ class Entries:
                         indexRange = getLimitRange(count, plusOne=plusOne)
 
                         if len(colList) < len(indexRange) > CHECK_ZERO_COLUMNS_THRESHOLD:
+                            debugMsg = "checking for empty columns"
+                            logger.debug(infoMsg)
+
                             for column in colList:
-                                if inject.getValue("SELECT COUNT(%s) FROM %s" % (column, kb.dumpTable), union=False, error=False) == '0':
+                                if not inject.checkBooleanExpression("(SELECT COUNT(%s) FROM %s)>0" % (column, kb.dumpTable)):
                                     emptyColumns.append(column)
                                     debugMsg = "column '%s' of table '%s' will not be " % (column, kb.dumpTable)
                                     debugMsg += "dumped as it appears to be empty"
