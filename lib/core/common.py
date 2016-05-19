@@ -581,7 +581,7 @@ def paramToDict(place, parameters=None):
                 if not conf.multipleTargets and not (conf.csrfToken and parameter == conf.csrfToken):
                     _ = urldecode(testableParameters[parameter], convall=True)
                     if (_.endswith("'") and _.count("'") == 1
-                      or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _))\
+                      or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _))\
                       and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most probably leftover " % element
