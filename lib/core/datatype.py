@@ -8,8 +8,6 @@ See the file 'doc/COPYING' for copying permission
 import copy
 import types
 
-from lib.core.exception import SqlmapDataException
-
 class AttribDict(dict):
     """
     This class defines the sqlmap object, inheriting from Python data
@@ -43,7 +41,7 @@ class AttribDict(dict):
         try:
             return self.__getitem__(item)
         except KeyError:
-            raise SqlmapDataException("unable to access item '%s'" % item)
+            raise AttributeError("unable to access item '%s'" % item)
 
     def __setattr__(self, item, value):
         """
