@@ -98,6 +98,9 @@ def checkSqlInjection(place, parameter, value):
     tests = getSortedInjectionTests()
     seenPayload = set()
 
+    kb.data.setdefault("randomInt", str(randomInt(10)))
+    kb.data.setdefault("randomStr", str(randomStr(10)))
+
     while tests:
         test = tests.pop(0)
 
@@ -381,8 +384,6 @@ def checkSqlInjection(place, parameter, value):
                         # Use different page template than the original
                         # one as we are changing parameters value, which
                         # will likely result in a different content
-                        kb.data.setdefault("randomInt", str(randomInt(10)))
-                        kb.data.setdefault("randomStr", str(randomStr(10)))
 
                         if conf.invalidLogical:
                             _ = int(kb.data.randomInt[:2])
