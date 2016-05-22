@@ -41,7 +41,7 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user, password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
-        except (pymssql.ProgrammingError, pymssql.OperationalError, _mssql.MssqlDatabaseException), msg:
+        except (pymssql.Error, _mssql.MssqlDatabaseException), msg:
             raise SqlmapConnectionException(msg)
 
         self.initCursor()
@@ -50,7 +50,7 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except (pymssql.ProgrammingError, pymssql.OperationalError, _mssql.MssqlDatabaseException), msg:
+        except (pymssql.Error, _mssql.MssqlDatabaseException), msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % str(msg).replace("\n", " "))
             return None
 
