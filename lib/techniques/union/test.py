@@ -56,7 +56,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             return not re.search(r"(warning|error|order by|failed)", page or "", re.I) and comparison(page, headers) or re.search(r"data types cannot be compared or sorted", page or "", re.I)
 
         if _orderByTest(1) and not _orderByTest(randomInt()):
-            infoMsg = "ORDER BY technique seems to be usable. "
+            infoMsg = "ORDER BY technique appears to be usable. "
             infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
             infoMsg += "of query columns. Automatically extending the "

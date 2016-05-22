@@ -44,7 +44,7 @@ class Wordlist(object):
                 try:
                     _ = zipfile.ZipFile(self.current, 'r')
                 except zipfile.error, ex:
-                    errMsg = "something seems to be wrong with "
+                    errMsg = "something appears to be wrong with "
                     errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                     errMsg += "sure that you haven't made any changes to it"
                     raise SqlmapInstallationException, errMsg
@@ -70,7 +70,7 @@ class Wordlist(object):
             try:
                 retVal = self.iter.next().rstrip()
             except zipfile.error, ex:
-                errMsg = "something seems to be wrong with "
+                errMsg = "something appears to be wrong with "
                 errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                 errMsg += "sure that you haven't made any changes to it"
                 raise SqlmapInstallationException, errMsg

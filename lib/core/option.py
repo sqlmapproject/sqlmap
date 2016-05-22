@@ -385,7 +385,7 @@ def _loadQueries():
     try:
         tree.parse(paths.QUERIES_XML)
     except Exception, ex:
-        errMsg = "something seems to be wrong with "
+        errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
@@ -926,7 +926,7 @@ def _setTamperingFunctions():
                     function.func_name = module.__name__
 
                     if check_priority and priority > last_priority:
-                        message = "it seems that you might have mixed "
+                        message = "it appears that you might have mixed "
                         message += "the order of tamper scripts. "
                         message += "Do you want to auto resolve this? [Y/n/q] "
                         test = readInput(message, default="Y")
@@ -2310,7 +2310,7 @@ def _checkTor():
         page = None
 
     if not page or 'Congratulations' not in page:
-        errMsg = "it seems that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
+        errMsg = "it appears that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
         raise SqlmapConnectionException(errMsg)
     else:
         infoMsg = "Tor is properly being used"

@@ -304,7 +304,7 @@ class Backend:
 
         # Little precaution, in theory this condition should always be false
         elif kb.dbms is not None and kb.dbms != dbms:
-            warnMsg = "there seems to be a high probability that "
+            warnMsg = "there appears to be a high probability that "
             warnMsg += "this could be a false positive case"
             logger.warn(warnMsg)
 
@@ -680,7 +680,7 @@ def paramToDict(place, parameters=None):
                         decoded = value.decode(encoding)
                         if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in string.printable for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
-                            warnMsg += "seems to be '%s' encoded" % encoding
+                            warnMsg += "appears to be '%s' encoded" % encoding
                             logger.warn(warnMsg)
                             break
                     except:
@@ -1903,7 +1903,7 @@ def parseXmlFile(xmlFile, handler):
         with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
             parse(stream, handler)
     except (SAXParseException, UnicodeError), ex:
-        errMsg = "something seems to be wrong with "
+        errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
