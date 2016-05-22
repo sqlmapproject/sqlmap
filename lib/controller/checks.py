@@ -177,10 +177,11 @@ def checkSqlInjection(place, parameter, value):
                     lower, upper = int(match.group(1)), int(match.group(2))
                     for _ in (lower, upper):
                         if _ > 1:
+                            __ = 2 * (_ - 1) + 1 if _ == lower else 2 * _
                             unionExtended = True
-                            test.request.columns = re.sub(r"\b%d\b" % _, str(2 * _), test.request.columns)
-                            title = re.sub(r"\b%d\b" % _, str(2 * _), title)
-                            test.title = re.sub(r"\b%d\b" % _, str(2 * _), test.title)
+                            test.request.columns = re.sub(r"\b%d\b" % _, str(__), test.request.columns)
+                            title = re.sub(r"\b%d\b" % _, str(__), title)
+                            test.title = re.sub(r"\b%d\b" % _, str(__), test.title)
 
             # Skip test if the user's wants to test only for a specific
             # technique
