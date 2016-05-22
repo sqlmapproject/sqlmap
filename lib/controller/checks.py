@@ -471,11 +471,20 @@ def checkSqlInjection(place, parameter, value):
 
                             if not injectable and not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
                                 trueSet = set(extractTextTagContent(truePage))
+                                trueSet = trueSet.union(__ for _ in trueSet for __ in _.split())
+
                                 falseSet = set(extractTextTagContent(falsePage))
+                                falseSet = falseSet.union(__ for _ in falseSet for __ in _.split())
+
                                 candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage and _.strip() not in threadData.lastComparisonHeaders else None for _ in (trueSet - falseSet)))
 
                                 if candidates:
-                                    conf.string = candidates[0]
+                                    candidates = sorted(candidates, key=lambda _: len(_))
+                                    for candidate in candidates:
+                                        if re.match(r"\A\w+\Z", candidate):
+                                            break
+                                    conf.string = candidate
+
                                     infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (paramType, parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                     logger.info(infoMsg)
 
