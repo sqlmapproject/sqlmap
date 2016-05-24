@@ -102,7 +102,7 @@ class Agent(object):
             if place == PLACE.URI:
                 origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
             else:
-                origValue = re.search(r"\w+\Z", origValue.split(BOUNDED_INJECTION_MARKER)[0]).group(0)
+                origValue = filter(None, (re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z")))[0].group(0)
             origValue = origValue[origValue.rfind('/') + 1:]
             for char in ('?', '=', ':'):
                 if char in origValue:
