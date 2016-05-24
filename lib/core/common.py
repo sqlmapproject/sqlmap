@@ -650,27 +650,28 @@ def paramToDict(place, parameters=None):
                                 testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
                             break
 
-    if conf.testParameter and not testableParameters:
-        paramStr = ", ".join(test for test in conf.testParameter)
+    if conf.testParameter:
+        if not testableParameters:
+            paramStr = ", ".join(test for test in conf.testParameter)
 
-        if len(conf.testParameter) > 1:
-            warnMsg = "provided parameters '%s' " % paramStr
-            warnMsg += "are not inside the %s" % place
-            logger.warn(warnMsg)
-        else:
-            parameter = conf.testParameter[0]
+            if len(conf.testParameter) > 1:
+                warnMsg = "provided parameters '%s' " % paramStr
+                warnMsg += "are not inside the %s" % place
+                logger.warn(warnMsg)
+            else:
+                parameter = conf.testParameter[0]
 
-            if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
-                debugMsg = "provided parameter '%s' " % paramStr
-                debugMsg += "is not inside the %s" % place
-                logger.debug(debugMsg)
+                if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
+                    debugMsg = "provided parameter '%s' " % paramStr
+                    debugMsg += "is not inside the %s" % place
+                    logger.debug(debugMsg)
 
-    elif len(conf.testParameter) != len(testableParameters.keys()):
-        for parameter in conf.testParameter:
-            if parameter not in testableParameters:
-                debugMsg = "provided parameter '%s' " % parameter
-                debugMsg += "is not inside the %s" % place
-                logger.debug(debugMsg)
+        elif len(conf.testParameter) != len(testableParameters.keys()):
+            for parameter in conf.testParameter:
+                if parameter not in testableParameters:
+                    debugMsg = "provided parameter '%s' " % parameter
+                    debugMsg += "is not inside the %s" % place
+                    logger.debug(debugMsg)
 
     if testableParameters:
         for parameter, value in testableParameters.items():
