@@ -2863,7 +2863,7 @@ def setOptimize():
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 
     if not conf.nullConnection:
-        debugMsg = "turning off --null-connection switch used indirectly by switch -o"
+        debugMsg = "turning off switch '--null-connection' used indirectly by switch '-o'"
         logger.debug(debugMsg)
 
 def initTechnique(technique=None):

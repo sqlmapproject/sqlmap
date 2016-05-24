@@ -806,12 +806,12 @@ def cmdLineParser(argv=None):
         parser.formatter._format_option_strings = parser.formatter.format_option_strings
         parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser, type(parser))
 
-        # Dirty hack for making a short option -hh
+        # Dirty hack for making a short option '-hh'
         option = parser.get_option("--hh")
         option._short_opts = ["-hh"]
         option._long_opts = []
 
-        # Dirty hack for inherent help message of switch -h
+        # Dirty hack for inherent help message of switch '-h'
         option = parser.get_option("-h")
         option.help = option.help.capitalize().replace("this help", "basic help")
 
