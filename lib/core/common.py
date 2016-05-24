@@ -1379,8 +1379,8 @@ def parseTargetUrl():
     except UnicodeError:
         _ = None
 
-    if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'))):
-        errMsg = "invalid target URL"
+    if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
+        errMsg = "invalid target URL ('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
     if len(hostnamePort) == 2:
