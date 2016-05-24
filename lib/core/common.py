@@ -767,9 +767,14 @@ def getManualDirectories():
 
                 for suffix in BRUTE_DOC_ROOT_SUFFIXES:
                     for target in targets:
-                        item = "%s/%s" % (prefix, suffix)
+                        if not prefix.endswith("/%s" % suffix):
+                            item = "%s/%s" % (prefix, suffix)
+                        else:
+                            item = prefix
+
                         item = item.replace(BRUTE_DOC_ROOT_TARGET_MARK, target).replace("//", '/').rstrip('/')
-                        directories.append(item)
+                        if item not in directories:
+                            directories.append(item)
 
                         if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
                             break
