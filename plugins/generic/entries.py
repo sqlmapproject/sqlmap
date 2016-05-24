@@ -19,9 +19,7 @@ from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
-from lib.core.common import popValue
 from lib.core.common import prioritySortColumns
-from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unArrayizeValue
