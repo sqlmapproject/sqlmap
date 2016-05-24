@@ -91,7 +91,7 @@ class InjectionDict(AttribDict):
         self.prefix = None
         self.suffix = None
         self.clause = None
-        self.notes = set()
+        self.notes = []  # Note: https://github.com/sqlmapproject/sqlmap/issues/1888
 
         # data is a dict with various stype, each which is a dict with
         # all the information specific for that stype
