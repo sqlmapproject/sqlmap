@@ -226,7 +226,7 @@ def _saveToResultsFile():
     results = {}
     techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
 
-    for injection in kb.injectionections + kb.falsePositives:
+    for injection in kb.injections + kb.falsePositives:
         if injection.place is None or injection.parameter is None:
             continue
 
