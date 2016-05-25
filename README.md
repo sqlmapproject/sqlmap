@@ -33,7 +33,7 @@ To get a list of all options and switches use:
 
     python sqlmap.py -hh
 
-You can find a sample run [here](https://gist.github.com/stamparm/5335217).
+You can find a sample run [here](https://asciinema.org/a/46601).
 To get an overview of sqlmap capabilities, list of supported features and description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki).
 
 Links

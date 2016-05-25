@@ -98,6 +98,9 @@ def checkSqlInjection(place, parameter, value):
     tests = getSortedInjectionTests()
     seenPayload = set()
 
+    kb.data.setdefault("randomInt", str(randomInt(10)))
+    kb.data.setdefault("randomStr", str(randomStr(10)))
+
     while tests:
         test = tests.pop(0)
 
@@ -174,10 +177,11 @@ def checkSqlInjection(place, parameter, value):
                     lower, upper = int(match.group(1)), int(match.group(2))
                     for _ in (lower, upper):
                         if _ > 1:
+                            __ = 2 * (_ - 1) + 1 if _ == lower else 2 * _
                             unionExtended = True
-                            test.request.columns = re.sub(r"\b%d\b" % _, str(2 * _), test.request.columns)
-                            title = re.sub(r"\b%d\b" % _, str(2 * _), title)
-                            test.title = re.sub(r"\b%d\b" % _, str(2 * _), test.title)
+                            test.request.columns = re.sub(r"\b%d\b" % _, str(__), test.request.columns)
+                            title = re.sub(r"\b%d\b" % _, str(__), title)
+                            test.title = re.sub(r"\b%d\b" % _, str(__), test.title)
 
             # Skip test if the user's wants to test only for a specific
             # technique
@@ -381,8 +385,6 @@ def checkSqlInjection(place, parameter, value):
                         # Use different page template than the original
                         # one as we are changing parameters value, which
                         # will likely result in a different content
-                        kb.data.setdefault("randomInt", str(randomInt(10)))
-                        kb.data.setdefault("randomStr", str(randomStr(10)))
 
                         if conf.invalidLogical:
                             _ = int(kb.data.randomInt[:2])
@@ -462,19 +464,28 @@ def checkSqlInjection(place, parameter, value):
                                         if errorResult:
                                             continue
 
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (paramType, parameter, title)
+                                    infoMsg = "%s parameter '%s' appears to be '%s' injectable " % (paramType, parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
 
                             if not injectable and not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
                                 trueSet = set(extractTextTagContent(truePage))
+                                trueSet = trueSet.union(__ for _ in trueSet for __ in _.split())
+
                                 falseSet = set(extractTextTagContent(falsePage))
+                                falseSet = falseSet.union(__ for _ in falseSet for __ in _.split())
+
                                 candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage and _.strip() not in threadData.lastComparisonHeaders else None for _ in (trueSet - falseSet)))
 
                                 if candidates:
-                                    conf.string = candidates[0]
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable (with --string=\"%s\")" % (paramType, parameter, title, repr(conf.string).lstrip('u').strip("'"))
+                                    candidates = sorted(candidates, key=lambda _: len(_))
+                                    for candidate in candidates:
+                                        if re.match(r"\A\w+\Z", candidate):
+                                            break
+                                    conf.string = candidate
+
+                                    infoMsg = "%s parameter '%s' appears to be '%s' injectable (with --string=\"%s\")" % (paramType, parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -519,7 +530,7 @@ def checkSqlInjection(place, parameter, value):
                                 trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                                 if trueResult:
-                                    infoMsg = "%s parameter '%s' seems to be '%s' injectable " % (paramType, parameter, title)
+                                    infoMsg = "%s parameter '%s' appears to be '%s' injectable " % (paramType, parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -692,14 +703,15 @@ def checkSqlInjection(place, parameter, value):
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
         if not conf.dropSetCookie and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data and injection.data[PAYLOAD.TECHNIQUE.BOOLEAN].vector.startswith('OR'):
-            warnMsg = "in OR boolean-based injections, please consider usage "
+            warnMsg = "in OR boolean-based injection cases, please consider usage "
             warnMsg += "of switch '--drop-set-cookie' if you experience any "
             warnMsg += "problems during data retrieval"
             logger.warn(warnMsg)
 
         if not checkFalsePositives(injection):
             kb.vulnHosts.remove(conf.hostname)
-            injection.notes.add(NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE)
+            if NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE not in injection.notes:
+                injection.notes.append(NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE)
 
     else:
         injection = None
@@ -1288,7 +1300,7 @@ def identifyWaf():
         if output and output[0] not in ("Y", "y"):
             raise SqlmapUserQuitException
     else:
-        warnMsg = "no WAF/IDS/IPS product has been identified (this doesn't mean that there is none)"
+        warnMsg = "WAF/IDS/IPS product hasn't been identified (generic protection response)"
         logger.warn(warnMsg)
 
     kb.testType = None

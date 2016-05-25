@@ -37,7 +37,7 @@ Bütün seçenekleri gösterir
 
     python sqlmap.py -hh
 
-Program ile ilgili örnekleri [burada](https://gist.github.com/stamparm/5335217) bulabilirsiniz. Daha fazlası içinsqlmap'in bütün açıklamaları ile birlikte bütün özelliklerinin, örnekleri ile bulunduğu  [manuel sayfamıza](https://github.com/sqlmapproject/sqlmap/wiki) bakmanızı tavsiye ediyoruz
+Program ile ilgili örnekleri [burada](https://asciinema.org/a/46601) bulabilirsiniz. Daha fazlası içinsqlmap'in bütün açıklamaları ile birlikte bütün özelliklerinin, örnekleri ile bulunduğu  [manuel sayfamıza](https://github.com/sqlmapproject/sqlmap/wiki) bakmanızı tavsiye ediyoruz
 
 Links
 ----

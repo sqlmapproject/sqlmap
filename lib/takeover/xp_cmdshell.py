@@ -111,8 +111,8 @@ class Xp_cmdshell:
             errMsg += "storing console output within the back-end file system "
             errMsg += "does not have writing permissions for the DBMS process. "
             errMsg += "You are advised to manually adjust it with option "
-            errMsg += "--tmp-path switch or you will not be able to retrieve "
-            errMsg += "the commands output"
+            errMsg += "'--tmp-path' or you won't be able to retrieve "
+            errMsg += "the command(s) output"
             logger.error(errMsg)
         elif isNoneValue(output):
             logger.error("unable to retrieve xp_cmdshell output")

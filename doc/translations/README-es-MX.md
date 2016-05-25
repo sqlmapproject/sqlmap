@@ -32,7 +32,7 @@ Para obtener una lista de todas las opciones:
 
     python sqlmap.py -hh
 
-Se puede encontrar una muestra de su funcionamiento [aquí](https://gist.github.com/stamparm/5335217).
+Se puede encontrar una muestra de su funcionamiento [aquí](https://asciinema.org/a/46601).
 Para obtener una visión general de las capacidades de sqlmap, así como un listado funciones soportadas y descripción de todas las opciones y modificadores, junto con ejemplos, se recomienda consultar el [manual de usuario](https://github.com/sqlmapproject/sqlmap/wiki).
 
 Enlaces

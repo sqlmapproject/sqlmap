@@ -34,7 +34,7 @@ Para obter a lista completa de opções faça:
 
     python sqlmap.py -hh
 
-Você pode encontrar alguns exemplos [aqui](https://gist.github.com/stamparm/5335217).
+Você pode encontrar alguns exemplos [aqui](https://asciinema.org/a/46601).
 Para ter uma visão geral dos recursos do sqlmap, lista de recursos suportados e a descrição de todas as opções, juntamente com exemplos, aconselhamos que você consulte o [manual do usuário](https://github.com/sqlmapproject/sqlmap/wiki).
 
 Links

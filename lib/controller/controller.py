@@ -226,15 +226,15 @@ def _saveToResultsFile():
     results = {}
     techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
 
-    for inj in kb.injections + kb.falsePositives:
-        if inj.place is None or inj.parameter is None:
+    for injection in kb.injections + kb.falsePositives:
+        if injection.place is None or injection.parameter is None:
             continue
 
-        key = (inj.place, inj.parameter, ';'.join(inj.notes))
+        key = (injection.place, injection.parameter, ';'.join(injection.notes))
         if key not in results:
             results[key] = []
 
-        results[key].extend(inj.data.keys())
+        results[key].extend(injection.data.keys())
 
     for key, value in results.items():
         place, parameter, notes = key

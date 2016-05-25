@@ -134,10 +134,13 @@ def pivotDumpTable(table, colList, count=None, blind=True):
                 value = _(column, pivotValue)
                 if column == colList[0]:
                     if isNoneValue(value):
-                        for pivotValue in filter(None, ("  " if pivotValue == " " else None, "%s%s" % (pivotValue[0], unichr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None, unichr(ord(pivotValue[0]) + 1))):
-                            value = _(column, pivotValue)
-                            if not isNoneValue(value):
-                                break
+                        try:
+                            for pivotValue in filter(None, ("  " if pivotValue == " " else None, "%s%s" % (pivotValue[0], unichr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None, unichr(ord(pivotValue[0]) + 1))):
+                                value = _(column, pivotValue)
+                                if not isNoneValue(value):
+                                    break
+                        except ValueError:
+                            pass
 
                     if isNoneValue(value):
                         breakRetrieval = True

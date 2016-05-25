@@ -33,7 +33,7 @@ Kako biste dobili listu svih opcija i prekidača koristite:
 
     python sqlmap.py -hh
 
-Možete pronaći primjer izvršavanja [ovdje](https://gist.github.com/stamparm/5335217).
+Možete pronaći primjer izvršavanja [ovdje](https://asciinema.org/a/46601).
 Kako biste dobili pregled mogućnosti sqlmap-a, liste podržanih značajki te opis svih opcija i prekidača, zajedno s primjerima, preporučen je uvid u [korisnički priručnik](https://github.com/sqlmapproject/sqlmap/wiki).
 
 Poveznice

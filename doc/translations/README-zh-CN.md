@@ -33,7 +33,7 @@ sqlmap 可以运行在 [Python](http://www.python.org/download/)  **2.6.x**  和
 
     python sqlmap.py -hh
 
-你可以从 [这里](https://gist.github.com/stamparm/5335217) 看到一个sqlmap 的使用样例。除此以外，你还可以查看 [使用手册](https://github.com/sqlmapproject/sqlmap/wiki)。获取sqlmap所有支持的特性、参数、命令行选项开关及说明的使用帮助。
+你可以从 [这里](https://asciinema.org/a/46601) 看到一个sqlmap 的使用样例。除此以外，你还可以查看 [使用手册](https://github.com/sqlmapproject/sqlmap/wiki)。获取sqlmap所有支持的特性、参数、命令行选项开关及说明的使用帮助。
 
 链接
 ----

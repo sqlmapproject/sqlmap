@@ -87,7 +87,7 @@ class Filesystem:
             else:
                 sameFile = False
                 warnMsg = "it looks like the file has not been written (usually "
-                warnMsg += "occurs if the DBMS process' user has no write "
+                warnMsg += "occurs if the DBMS process user has no write "
                 warnMsg += "privileges in the destination path)"
                 logger.warn(warnMsg)
 

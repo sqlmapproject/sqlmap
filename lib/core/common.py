@@ -304,7 +304,7 @@ class Backend:
 
         # Little precaution, in theory this condition should always be false
         elif kb.dbms is not None and kb.dbms != dbms:
-            warnMsg = "there seems to be a high probability that "
+            warnMsg = "there appears to be a high probability that "
             warnMsg += "this could be a false positive case"
             logger.warn(warnMsg)
 
@@ -581,7 +581,7 @@ def paramToDict(place, parameters=None):
                 if not conf.multipleTargets and not (conf.csrfToken and parameter == conf.csrfToken):
                     _ = urldecode(testableParameters[parameter], convall=True)
                     if (_.endswith("'") and _.count("'") == 1
-                      or re.search(r'\A9{3,}', _) or re.search(DUMMY_USER_INJECTION, _))\
+                      or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _))\
                       and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most probably leftover " % element
@@ -650,27 +650,28 @@ def paramToDict(place, parameters=None):
                                 testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
                             break
 
-    if conf.testParameter and not testableParameters:
-        paramStr = ", ".join(test for test in conf.testParameter)
+    if conf.testParameter:
+        if not testableParameters:
+            paramStr = ", ".join(test for test in conf.testParameter)
 
-        if len(conf.testParameter) > 1:
-            warnMsg = "provided parameters '%s' " % paramStr
-            warnMsg += "are not inside the %s" % place
-            logger.warn(warnMsg)
-        else:
-            parameter = conf.testParameter[0]
+            if len(conf.testParameter) > 1:
+                warnMsg = "provided parameters '%s' " % paramStr
+                warnMsg += "are not inside the %s" % place
+                logger.warn(warnMsg)
+            else:
+                parameter = conf.testParameter[0]
 
-            if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
-                debugMsg = "provided parameter '%s' " % paramStr
-                debugMsg += "is not inside the %s" % place
-                logger.debug(debugMsg)
+                if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
+                    debugMsg = "provided parameter '%s' " % paramStr
+                    debugMsg += "is not inside the %s" % place
+                    logger.debug(debugMsg)
 
-    elif len(conf.testParameter) != len(testableParameters.keys()):
-        for parameter in conf.testParameter:
-            if parameter not in testableParameters:
-                debugMsg = "provided parameter '%s' " % parameter
-                debugMsg += "is not inside the %s" % place
-                logger.debug(debugMsg)
+        elif len(conf.testParameter) != len(testableParameters.keys()):
+            for parameter in conf.testParameter:
+                if parameter not in testableParameters:
+                    debugMsg = "provided parameter '%s' " % parameter
+                    debugMsg += "is not inside the %s" % place
+                    logger.debug(debugMsg)
 
     if testableParameters:
         for parameter, value in testableParameters.items():
@@ -680,7 +681,7 @@ def paramToDict(place, parameters=None):
                         decoded = value.decode(encoding)
                         if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in string.printable for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
-                            warnMsg += "seems to be '%s' encoded" % encoding
+                            warnMsg += "appears to be '%s' encoded" % encoding
                             logger.warn(warnMsg)
                             break
                     except:
@@ -767,9 +768,14 @@ def getManualDirectories():
 
                 for suffix in BRUTE_DOC_ROOT_SUFFIXES:
                     for target in targets:
-                        item = "%s/%s" % (prefix, suffix)
+                        if not prefix.endswith("/%s" % suffix):
+                            item = "%s/%s" % (prefix, suffix)
+                        else:
+                            item = prefix
+
                         item = item.replace(BRUTE_DOC_ROOT_TARGET_MARK, target).replace("//", '/').rstrip('/')
-                        directories.append(item)
+                        if item not in directories:
+                            directories.append(item)
 
                         if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
                             break
@@ -1374,8 +1380,8 @@ def parseTargetUrl():
     except UnicodeError:
         _ = None
 
-    if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'))):
-        errMsg = "invalid target URL"
+    if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
+        errMsg = "invalid target URL ('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
     if len(hostnamePort) == 2:
@@ -1903,7 +1909,7 @@ def parseXmlFile(xmlFile, handler):
         with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
             parse(stream, handler)
     except (SAXParseException, UnicodeError), ex:
-        errMsg = "something seems to be wrong with "
+        errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException, errMsg
@@ -2858,7 +2864,7 @@ def setOptimize():
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 
     if not conf.nullConnection:
-        debugMsg = "turning off --null-connection switch used indirectly by switch -o"
+        debugMsg = "turning off switch '--null-connection' used indirectly by switch '-o'"
         logger.debug(debugMsg)
 
 def initTechnique(technique=None):
@@ -3046,7 +3052,10 @@ def decodeIntToUnicode(value):
                     _ = "0%s" % _
                 raw = hexdecode(_)
 
-                if Backend.isDbms(DBMS.MSSQL):
+                if Backend.isDbms(DBMS.MYSQL):
+                    # https://github.com/sqlmapproject/sqlmap/issues/1531
+                    retVal = getUnicode(raw, conf.charset or UNICODE_ENCODING)
+                elif Backend.isDbms(DBMS.MSSQL):
                     retVal = getUnicode(raw, "UTF-16-BE")
                 elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
                     retVal = unichr(value)
