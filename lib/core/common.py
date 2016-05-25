@@ -103,6 +103,7 @@ from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
+from lib.core.settings import FILE_PATH_REGEXES
 from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
@@ -1533,7 +1534,7 @@ def parseFilePaths(page):
     """
 
     if page:
-        for regex in (r" in <b>(?P<result>.*?)</b> on line", r"(?:>|\s)(?P<result>[A-Za-z]:[\\/][\w.\\/]*)", r"(?:>|\s)(?P<result>/\w[/\w.]+)"):
+        for regex in FILE_PATH_REGEXES:
             for match in re.finditer(regex, page):
                 absFilePath = match.group("result").strip()
                 page = page.replace(absFilePath, "")
