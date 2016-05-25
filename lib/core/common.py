@@ -730,7 +730,7 @@ def getManualDirectories():
         infoMsg = "retrieved the web server document root: '%s'" % directories
         logger.info(infoMsg)
     else:
-        warnMsg = "unable to retrieve automatically the web server "
+        warnMsg = "unable to automatically retrieve the web server "
         warnMsg += "document root"
         logger.warn(warnMsg)
 
