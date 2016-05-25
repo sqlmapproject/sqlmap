@@ -44,6 +44,7 @@ from lib.core.settings import MIN_ERROR_CHUNK_LENGTH
 from lib.core.settings import MAX_ERROR_CHUNK_LENGTH
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_VALUE_MARKER
+from lib.core.settings import ROTATING_CHARS
 from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
@@ -55,6 +56,7 @@ from lib.utils.progress import ProgressBar
 
 def _oneShotErrorUse(expression, field=None, chunkTest=False):
     offset = 1
+    rotator = 0
     partialValue = None
     threadData = getCurrentThreadData()
     retVal = hashDBRetrieve(expression, checkConf=True)
@@ -174,8 +176,16 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                     else:
                         break
 
-                    if kb.fileReadMode and output:
-                        dataToStdout(_formatPartialContent(output).replace(r"\n", "\n").replace(r"\t", "\t"))
+                    if output:
+                        if kb.fileReadMode:
+                            dataToStdout(_formatPartialContent(output).replace(r"\n", "\n").replace(r"\t", "\t"))
+                        elif offset > 1:
+                            rotator += 1
+
+                            if rotator >= len(ROTATING_CHARS):
+                                rotator = 0
+
+                            dataToStdout("\r%s\r" % ROTATING_CHARS[rotator])
                 else:
                     retVal = output
                     break
