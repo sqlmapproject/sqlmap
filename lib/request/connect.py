@@ -863,9 +863,13 @@ class Connect(object):
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
                 retVal = paramString
-                match = re.search("%s=(?P<value>[^&]*)" % re.escape(parameter), paramString)
+                match = re.search("%s=[^&]*" % re.escape(parameter), paramString)
                 if match:
-                    retVal = re.sub("%s=[^&]*" % re.escape(parameter), "%s=%s" % (parameter, newValue), paramString)
+                    retVal = re.sub(match.group(0), "%s=%s" % (parameter, newValue), paramString)
+                else:
+                    match = re.search("(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString)
+                    if match:
+                        retVal = re.sub(match.group(0), "%s%s" % (match.group(1), newValue), paramString)
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
