@@ -873,6 +873,10 @@ class Connect(object):
             token = (match.group(2) or match.group(3) or match.group(4)) if match else None
 
             if not token:
+                match = re.search(r"%s[\"']:[\"']([^\"']+)" % re.escape(conf.csrfToken), page or "")
+                token = match.group(1) if match else None
+
+            if not token:
                 if conf.csrfUrl != conf.url and code == httplib.OK:
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                         token = page
