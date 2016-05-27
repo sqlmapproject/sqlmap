@@ -832,9 +832,13 @@ class Connect(object):
 
         if PLACE.GET in conf.parameters:
             get = conf.parameters[PLACE.GET] if place != PLACE.GET or not value else value
+        elif place == PLACE.GET:  # Note: for (e.g.) checkWaf() when there are no GET parameters
+            get = value
 
         if PLACE.POST in conf.parameters:
             post = conf.parameters[PLACE.POST] if place != PLACE.POST or not value else value
+        elif place == PLACE.POST:
+            post = value
 
         if PLACE.CUSTOM_POST in conf.parameters:
             post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR, "") if place != PLACE.CUSTOM_POST or not value else value
