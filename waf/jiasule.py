@@ -16,10 +16,12 @@ def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
-        page, headers, _ = get_page(get=vector)
+        page, headers, code = get_page(get=vector)
         retval = re.search(r"jiasule-WAF", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= re.search(r"__jsluid=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
+        retval |= re.search(r"jsl_tracking", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= re.search(r"static\.jiasule\.com/static/js/http_error\.js", page, re.I) is not None
+        retval |= code == 403 and "notice-jiasule" in (page or "")
         if retval:
             break
 
