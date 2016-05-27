@@ -13,12 +13,12 @@ from lib.core.settings import WAF_ATTACK_VECTORS
 __product__ = "Sucuri WebSite Firewall"
 
 def detect(get_page):
-    retVal = False
+    retval = False
 
     for vector in WAF_ATTACK_VECTORS:
         _, headers, code = get_page(get=vector)
-        retVal = code == 403 and re.search(r"Sucuri/Cloudproxy", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
-        if retVal:
+        retval = code == 403 and re.search(r"Sucuri/Cloudproxy", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        if retval:
             break
 
-    return retVal
+    return retval

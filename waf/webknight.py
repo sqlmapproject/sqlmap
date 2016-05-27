@@ -17,9 +17,9 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         _, headers, code = get_page(get=vector)
-        retVal = code == 999
+        retval = code == 999
         retval |= re.search(r"WebKnight", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
-        if retVal:
+        if retval:
             break
 
     return retval
