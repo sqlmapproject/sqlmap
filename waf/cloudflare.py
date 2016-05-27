@@ -19,6 +19,7 @@ def detect(get_page):
         _, headers, _ = get_page(get=vector)
         retval = re.search(r"cloudflare-nginx", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= re.search(r"\A__cfduid=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
+        retval |= headers.get("cf-ray") is not None
         if retval:
             break
 
