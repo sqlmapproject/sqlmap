@@ -258,15 +258,16 @@ def decodePage(page, contentEncoding, contentType):
 
             page = data.read()
         except Exception, msg:
-            errMsg = "detected invalid data for declared content "
-            errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)
-            singleTimeLogMessage(errMsg, logging.ERROR)
+            if "<html" not in page:  # in some cases, invalid "Content-Encoding" appears for plain HTML (should be ignored)
+                errMsg = "detected invalid data for declared content "
+                errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)
+                singleTimeLogMessage(errMsg, logging.ERROR)
 
-            warnMsg = "turning off page compression"
-            singleTimeWarnMessage(warnMsg)
+                warnMsg = "turning off page compression"
+                singleTimeWarnMessage(warnMsg)
 
-            kb.pageCompress = False
-            raise SqlmapCompressionException
+                kb.pageCompress = False
+                raise SqlmapCompressionException
 
     if not conf.charset:
         httpCharset, metaCharset = None, None
