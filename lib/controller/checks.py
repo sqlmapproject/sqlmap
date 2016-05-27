@@ -1300,7 +1300,7 @@ def identifyWaf():
         if output and output[0] not in ("Y", "y"):
             raise SqlmapUserQuitException
     else:
-        warnMsg = "WAF/IDS/IPS product hasn't been identified (generic protection response)"
+        warnMsg = "WAF/IDS/IPS product hasn't been identified"
         logger.warn(warnMsg)
 
     kb.testType = None
