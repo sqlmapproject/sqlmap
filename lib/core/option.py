@@ -998,6 +998,8 @@ def _setWafFunctions():
             else:
                 kb.wafFunctions.append((_["detect"], _.get("__product__", filename[:-3])))
 
+        kb.wafFunctions = sorted(kb.wafFunctions, key=lambda _: "generic" in _[1].lower())
+
 def _setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
         conf.threads = 1

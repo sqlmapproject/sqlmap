@@ -1292,7 +1292,7 @@ def identifyWaf():
             break
 
     if retVal:
-        errMsg = "WAF/IDS/IPS identified '%s'. Please " % retVal
+        errMsg = "WAF/IDS/IPS identified as '%s'. Please " % retVal
         errMsg += "consider usage of tamper scripts (option '--tamper')"
         logger.critical(errMsg)
 
