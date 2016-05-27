@@ -16,10 +16,11 @@ def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
-        _, headers, _ = get_page(get=vector)
+        page, headers, code = get_page(get=vector)
         retval = re.search(r"cloudflare-nginx", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= re.search(r"\A__cfduid=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= headers.get("cf-ray") is not None
+        retval |= code == 403 and re.search(r"CloudFlare Ray ID:|var CloudFlare=", page or "") is not None
         if retval:
             break
 

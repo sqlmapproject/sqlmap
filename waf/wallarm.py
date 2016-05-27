@@ -7,17 +7,17 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
+from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "Anquanbao Web Application Firewall (Anquanbao)"
+__product__ = "Wallarm Web Application Firewall (Wallarm)"
 
 def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
-        page, headers, code = get_page(get=vector)
-        retval = re.search(r"MISS", headers.get("X-Powered-By-Anquanbao", ""), re.I) is not None
-        retval |= code == 405 and "/aqb_cc/error/" in (page or "")
+        _, headers, _ = get_page(get=vector)
+        retval = re.search(r"nginx-wallarm", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         if retval:
             break
 
