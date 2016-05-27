@@ -20,7 +20,7 @@ def detect(get_page):
         retval = re.search(r"jiasule-WAF", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= re.search(r"__jsluid=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= re.search(r"jsl_tracking", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
-        retval |= re.search(r"static\.jiasule\.com/static/js/http_error\.js", page, re.I) is not None
+        retval |= re.search(r"static\.jiasule\.com/static/js/http_error\.js", page or "", re.I) is not None
         retval |= code == 403 and "notice-jiasule" in (page or "")
         if retval:
             break

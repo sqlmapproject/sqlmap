@@ -16,7 +16,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = re.search(r"Access[^<]+has been blocked in accordance with company policy", page, re.I) is not None
+        retval = re.search(r"Access[^<]+has been blocked in accordance with company policy", page or "", re.I) is not None
         if retval:
             break
 

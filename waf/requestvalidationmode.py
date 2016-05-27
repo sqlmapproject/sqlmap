@@ -14,8 +14,8 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "ASP.NET has detected data in the request that is potentially dangerous" in page
-        retval |= "Request Validation has detected a potentially dangerous client input value" in page
+        retval = "ASP.NET has detected data in the request that is potentially dangerous" in (page or "")
+        retval |= "Request Validation has detected a potentially dangerous client input value" in (page or "")
         if retval:
             break
 

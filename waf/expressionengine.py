@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "Invalid GET Data" in page
+        retval = "Invalid GET Data" in (page or "")
         if retval:
             break
 
