@@ -1248,6 +1248,9 @@ def identifyWaf():
     if not conf.identifyWaf:
         return None
 
+    if not kb.wafFunctions:
+        setWafFunctions()
+
     kb.testMode = True
 
     infoMsg = "using WAF scripts to detect "
@@ -1423,4 +1426,7 @@ def checkConnection(suppressOutput=False):
     return True
 
 def setVerbosity():  # Cross-linked function
+    raise NotImplementedError
+
+def setWafFunctions():  # Cross-linked function
     raise NotImplementedError

@@ -2545,6 +2545,7 @@ def _resolveCrossReferences():
     lib.request.connect.setHTTPHandlers = _setHTTPHandlers
     lib.utils.search.setHTTPHandlers = _setHTTPHandlers
     lib.controller.checks.setVerbosity = setVerbosity
+    lib.controller.checks.setWafFunctions = _setWafFunctions
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     _setConfAttributes()
