@@ -45,7 +45,7 @@ class Xp_cmdshell:
     def _xpCmdshellCreate(self):
         cmd = ""
 
-        if Backend.isVersionWithin(("2005", "2008", "2012")):
+        if not Backend.isVersionWithin(("2000",)):
             logger.debug("activating sp_OACreate")
 
             cmd = getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
@@ -56,7 +56,7 @@ class Xp_cmdshell:
 
         cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr)
 
-        if Backend.isVersionWithin(("2005", "2008")):
+        if not Backend.isVersionWithin(("2000",)):
             cmd += ";RECONFIGURE WITH OVERRIDE"
 
         inject.goStacked(agent.runAsDBMSUser(cmd))
@@ -83,10 +83,10 @@ class Xp_cmdshell:
         return cmd
 
     def _xpCmdshellConfigure(self, mode):
-        if Backend.isVersionWithin(("2005", "2008")):
-            cmd = self._xpCmdshellConfigure2005(mode)
-        else:
+        if Backend.isVersionWithin(("2000",)):
             cmd = self._xpCmdshellConfigure2000(mode)
+        else:
+            cmd = self._xpCmdshellConfigure2005(mode)
 
         inject.goStacked(agent.runAsDBMSUser(cmd))
 
