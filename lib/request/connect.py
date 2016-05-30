@@ -144,7 +144,7 @@ class Connect(object):
             warnMsg = "most probably web server instance hasn't recovered yet "
             warnMsg += "from previous timed based payload. If the problem "
             warnMsg += "persists please wait for few minutes and rerun "
-            warnMsg += "without flag T in option '--technique' "
+            warnMsg += "without flag 'T' in option '--technique' "
             warnMsg += "(e.g. '--flush-session --technique=BEUS') or try to "
             warnMsg += "lower the value of option '--time-sec' (e.g. '--time-sec=2')"
             singleTimeWarnMessage(warnMsg)
