@@ -1855,6 +1855,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicMode = False
+    kb.heuristicPage = False
     kb.heuristicTest = None
     kb.hintValue = None
     kb.htmlFp = []

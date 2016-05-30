@@ -593,24 +593,24 @@ def start():
                     if not conf.string and not conf.notString and not conf.regexp:
                         errMsg += " Also, you can try to rerun by providing "
                         errMsg += "either a valid value for option '--string' "
-                        errMsg += "(or '--regexp')"
+                        errMsg += "(or '--regexp')."
                     elif conf.string:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--string' as perhaps the string you "
                         errMsg += "have chosen does not match "
-                        errMsg += "exclusively True responses"
+                        errMsg += "exclusively True responses."
                     elif conf.regexp:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--regexp' as perhaps the regular "
                         errMsg += "expression that you have chosen "
-                        errMsg += "does not match exclusively True responses"
+                        errMsg += "does not match exclusively True responses."
 
                     if not conf.tamper:
                         errMsg += " If you suspect that there is some kind of protection mechanism "
                         errMsg += "involved (e.g. WAF) maybe you could retry "
                         errMsg += "with an option '--tamper' (e.g. '--tamper=space2comment')"
 
-                    raise SqlmapNotVulnerableException(errMsg)
+                    raise SqlmapNotVulnerableException(errMsg.rstrip('.'))
             else:
                 # Flush the flag
                 kb.testMode = False

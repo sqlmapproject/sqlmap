@@ -79,6 +79,7 @@ from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
+from lib.request.comparison import comparison
 from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
@@ -464,6 +465,11 @@ def checkSqlInjection(place, parameter, value):
                                         errorResult = Request.queryPage(errorPayload, place, raise404=False)
                                         if errorResult:
                                             continue
+                                    elif not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
+                                        _ = comparison(kb.heuristicPage, None, getRatioValue=True)
+                                        if _ > kb.matchRatio:
+                                            kb.matchRatio = _
+                                            logger.debug("adjusting match ratio for current parameter to %.3f" % kb.matchRatio)
 
                                     infoMsg = "%s parameter '%s' appears to be '%s' injectable " % (paramType, parameter, title)
                                     logger.info(infoMsg)
@@ -899,6 +905,7 @@ def heuristicCheckSqlInjection(place, parameter):
     payload = agent.payload(place, parameter, newValue=payload)
     page, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
+    kb.heuristicPage = page
     kb.heuristicMode = False
 
     parseFilePaths(page)
