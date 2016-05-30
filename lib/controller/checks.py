@@ -716,7 +716,7 @@ def checkSqlInjection(place, parameter, value):
     else:
         injection = None
 
-    if injection:
+    if injection and NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE not in injection.notes:
         checkSuhosinPatch(injection)
         checkFilteredChars(injection)
 
