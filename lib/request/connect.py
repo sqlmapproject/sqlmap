@@ -794,8 +794,19 @@ class Connect(object):
             else:
                 # GET, POST, URI and Cookie payload needs to be thoroughly URL encoded
                 if (place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) or place == PLACE.CUSTOM_HEADER and value.split(',')[0] == HTTP_HEADER.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST, PLACE.CUSTOM_POST) and kb.postUrlEncode:
-                    payload = urlencode(payload, '%', False, place != PLACE.URI)  # spaceplus is handled down below
-                    value = agent.replacePayload(value, payload)
+                    skip = False
+
+                    if place == PLACE.COOKIE or place == PLACE.CUSTOM_HEADER and value.split(',')[0] == HTTP_HEADER.COOKIE:
+                        if kb.cookieEncodeChoice is None:
+                            msg = "do you want to URL encode cookie values (implementation specific)? %s" % ("[Y/n]" if not conf.url.endswith(".aspx") else "[y/N]")  # Reference: https://support.microsoft.com/en-us/kb/313282
+                            choice = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N')
+                            kb.cookieEncodeChoice = choice.upper().strip() == "Y"
+                        if not kb.cookieEncodeChoice:
+                            skip = True
+
+                    if not skip:
+                        payload = urlencode(payload, '%', False, place != PLACE.URI)  # spaceplus is handled down below
+                        value = agent.replacePayload(value, payload)
 
             if conf.hpp:
                 if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_API.ASP, WEB_API.ASPX)):

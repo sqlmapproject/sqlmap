@@ -1823,6 +1823,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.columnExistsChoice = None
     kb.commonOutputs = None
+    kb.cookieEncodeChoice = None
     kb.counters = {}
     kb.data = AttribDict()
     kb.dataOutputFlag = False
