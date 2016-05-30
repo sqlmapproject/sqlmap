@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.common import Backend
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
@@ -101,7 +102,10 @@ def setHandler():
                 conf.dbmsConnector.connect()
 
         if handler.checkDbms():
-            conf.dbmsHandler = handler
+            if kb.resolutionDbms:
+                conf.dbmsHandler = max(_ for _ in items if _[0] == kb.resolutionDbms)[2]()
+            else:
+                conf.dbmsHandler = handler
             break
         else:
             conf.dbmsConnector = None

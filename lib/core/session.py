@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
+from lib.core.common import aliasToDbmsEnum
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import hashDBWrite
@@ -32,6 +33,9 @@ def setDbms(dbms):
         dbms = _.group(1)
 
     Backend.setDbms(dbms)
+    if kb.resolutionDbms:
+        hashDBWrite(HASHDB_KEYS.DBMS, kb.resolutionDbms)
+
     logger.info("the back-end DBMS is %s" % Backend.getDbms())
 
 def setOs():

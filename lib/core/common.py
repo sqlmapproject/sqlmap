@@ -319,6 +319,8 @@ class Backend:
                 _ = readInput(msg, default=kb.dbms)
 
                 if aliasToDbmsEnum(_) == kb.dbms:
+                    kb.dbmsVersion = []
+                    kb.resolutionDbms = kb.dbms
                     break
                 elif aliasToDbmsEnum(_) == dbms:
                     kb.dbms = aliasToDbmsEnum(_)
@@ -1968,8 +1970,8 @@ def readCachedFileContent(filename, mode='rb'):
             if filename not in kb.cache.content:
                 checkFile(filename)
                 try:
-	                with openFile(filename, mode) as f:
-	                    kb.cache.content[filename] = f.read()
+                    with openFile(filename, mode) as f:
+                        kb.cache.content[filename] = f.read()
                 except (IOError, OSError, MemoryError), ex:
                     errMsg = "something went wrong while trying "
                     errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
