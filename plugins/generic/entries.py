@@ -212,8 +212,7 @@ class Entries:
                                 else:
                                     colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
 
-                                _ = len(DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry)))
-                                maxLen = max(len(column), _)
+                                maxLen = max(len(column), len(DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry))))
 
                                 if maxLen > kb.data.dumpedTable[column]["length"]:
                                     kb.data.dumpedTable[column]["length"] = maxLen
@@ -330,8 +329,7 @@ class Entries:
                                     value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
                                     value = '' if value is None else value
 
-                                    _ = DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))
-                                    lengths[column] = max(lengths[column], len(_))
+                                    lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
                                     entries[column].append(value)
 
                         except KeyboardInterrupt:
