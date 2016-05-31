@@ -256,11 +256,14 @@ def main():
             dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
         if kb.get("tempDir"):
-            for prefix in (MKSTEMP_PREFIX.IPC, MKSTEMP_PREFIX.TESTING, MKSTEMP_PREFIX.COOKIE_JAR, MKSTEMP_PREFIX.BIG_ARRAY):
-                for filepath in glob.glob(os.path.join(kb.tempDir, "%s*" % prefix)):
-                    os.remove(filepath)
-            if not glob.glob(os.path.join(kb.tempDir, '*')):
-                shutil.rmtree(kb.tempDir, ignore_errors=True)
+                for prefix in (MKSTEMP_PREFIX.IPC, MKSTEMP_PREFIX.TESTING, MKSTEMP_PREFIX.COOKIE_JAR, MKSTEMP_PREFIX.BIG_ARRAY):
+                    for filepath in glob.glob(os.path.join(kb.tempDir, "%s*" % prefix)):
+                        try:
+                            os.remove(filepath)
+                        except OSError:
+                            pass
+                if not filter(None, (filepath for filepath in glob.glob(os.path.join(kb.tempDir, '*')) if not any(filepath.endswith(_) for _ in ('.lock', '.exe', '_')))):
+                    shutil.rmtree(kb.tempDir, ignore_errors=True)
 
         if conf.get("hashDB"):
             try:
