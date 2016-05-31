@@ -335,7 +335,7 @@ def processResponse(page, responseHeaders):
         msg = extractErrorMessage(page)
 
         if msg:
-            logger.warning("parsed DBMS error message: '%s'" % msg)
+            logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
 
     if kb.originalPage is None:
         for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):

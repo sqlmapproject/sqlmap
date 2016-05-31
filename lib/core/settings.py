@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.5.119"
+VERSION = "1.0.5.120"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -290,9 +290,10 @@ FILE_PATH_REGEXES = (r" in (file )?<b>(?P<result>.*?)</b> on line", r"(?:[>(\[\s
 # Regular expressions used for parsing error messages (--parse-errors)
 ERROR_PARSING_REGEXES = (
                           r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
-                          r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>.+?)$",
+                          r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>[^\n]+?)$",
                           r"<li>Error Type:<br>(?P<result>.+?)</li>",
                           r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
+                          r"(?m)^\s*\[[^\n]+(ODBC|JDBC)[^\n]+\](?P<result>[^\]]+in query expression[^\n]+)$"
                         )
 
 # Regular expression used for parsing charset info from meta html headers
