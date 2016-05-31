@@ -62,6 +62,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
@@ -387,7 +388,7 @@ def storeHashesToFile(attack_dict):
     if not kb.storeHashesChoice:
         return
 
-    handle, filename = tempfile.mkstemp(prefix="sqlmaphashes-", suffix=".txt")
+    handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
     os.close(handle)
 
     infoMsg = "writing hashes to a temporary file '%s' " % filename

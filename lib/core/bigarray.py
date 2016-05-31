@@ -15,6 +15,7 @@ import os
 import sys
 import tempfile
 
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_SIZE
 
@@ -91,7 +92,7 @@ class BigArray(list):
 
     def _dump(self, chunk):
         try:
-            handle, filename = tempfile.mkstemp()
+            handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
             self.filenames.add(filename)
             os.close(handle)
             with open(filename, "w+b") as fp:

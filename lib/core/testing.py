@@ -25,6 +25,7 @@ from lib.core.common import readXmlFile
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.log import LOGGER_HANDLER
@@ -235,7 +236,7 @@ def initCase(switches, count):
     Failures.failedParseOn = None
     Failures.failedTraceBack = None
 
-    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="sqlmaptest-%d-" % count)
+    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="%s%d-" % (MKSTEMP_PREFIX.TESTING, count))
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 

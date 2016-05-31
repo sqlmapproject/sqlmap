@@ -355,3 +355,12 @@ class AUTOCOMPLETE_TYPE:
 
 class NOTE:
     FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"
+
+class MKSTEMP_PREFIX:
+    HASHES = "sqlmaphashes-"
+    CRAWLER = "sqlmapcrawler-"
+    IPC = "sqlmapipc-"
+    TESTING = "sqlmaptesting-"
+    RESULTS = "sqlmapresults-"
+    COOKIE_JAR = "sqlmapcookiejar-"
+    BIG_ARRAY = "sqlmapbigarray-"

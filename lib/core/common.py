@@ -72,6 +72,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
@@ -3976,7 +3977,7 @@ def resetCookieJar(cookieJar):
 
                 content = readCachedFileContent(conf.loadCookies)
                 lines = filter(None, (line.strip() for line in content.split("\n") if not line.startswith('#')))
-                handle, filename = tempfile.mkstemp(prefix="sqlmapcj-")
+                handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.COOKIE_JAR)
                 os.close(handle)
 
                 # Reference: http://www.hashbangcode.com/blog/netscape-http-cooke-file-parser-php-584.html

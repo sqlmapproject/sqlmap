@@ -22,6 +22,7 @@ from lib.core.common import safeCSValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
@@ -198,7 +199,7 @@ def storeResultsToFile(results):
         kb.storeCrawlingChoice = test[0] in ("y", "Y")
 
     if kb.storeCrawlingChoice:
-        handle, filename = tempfile.mkstemp(prefix="sqlmapcrawling-", suffix=".csv" if conf.forms else ".txt")
+        handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CRAWLER, suffix=".csv" if conf.forms else ".txt")
         os.close(handle)
 
         infoMsg = "writing crawling results to a temporary file '%s' " % filename

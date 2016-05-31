@@ -31,6 +31,7 @@ from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.defaults import _defaults
 from lib.core.enums import CONTENT_STATUS
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.enums import PART_RUN_CONTENT_TYPES
 from lib.core.exception import SqlmapConnectionException
 from lib.core.log import LOGGER_HANDLER
@@ -643,7 +644,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     REST-JSON API server
     """
     DataStore.admin_id = hexencode(os.urandom(16))
-    Database.filepath = tempfile.mkstemp(prefix="sqlmapipc-", text=False)[1]
+    Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)[1]
 
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("Admin ID: %s" % DataStore.admin_id)
