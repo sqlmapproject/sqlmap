@@ -1930,6 +1930,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.storeCrawlingChoice = None
     kb.storeHashesChoice = None
     kb.suppressResumeInfo = False
+    kb.tableFrom = None
     kb.technique = None
     kb.tempDir = None
     kb.testMode = False

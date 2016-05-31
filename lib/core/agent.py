@@ -721,6 +721,8 @@ class Agent(object):
 
         if conf.uFrom:
             fromTable = " FROM %s" % conf.uFrom
+        elif kb.tableFrom:
+            fromTable = " FROM %s" % kb.tableFrom
         else:
             fromTable = fromTable or FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")
 

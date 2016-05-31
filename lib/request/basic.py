@@ -13,6 +13,7 @@ import StringIO
 import struct
 import zlib
 
+from lib.core.common import Backend
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getPublicTypeMembers
@@ -25,6 +26,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import DBMS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapCompressionException
@@ -34,6 +36,7 @@ from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
+from lib.core.settings import SELECT_FROM_TABLE_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
@@ -330,6 +333,9 @@ def processResponse(page, responseHeaders):
     page = page or ""
 
     parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None)
+
+    if not kb.tableFrom and Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
+        kb.tableFrom = extractRegexResult(SELECT_FROM_TABLE_REGEX, page)
 
     if conf.parseErrors:
         msg = extractErrorMessage(page)
