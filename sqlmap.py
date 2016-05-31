@@ -13,6 +13,7 @@ from lib.utils import versioncheck  # this has to be the first non-standard impo
 
 import bdb
 import distutils
+import glob
 import inspect
 import logging
 import os
@@ -45,6 +46,7 @@ try:
     from lib.core.data import kb
     from lib.core.data import paths
     from lib.core.common import unhandledExceptionMessage
+    from lib.core.common import MKSTEMP_PREFIX
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
     from lib.core.exception import SqlmapSilentQuitException
@@ -254,7 +256,11 @@ def main():
             dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
         if kb.get("tempDir"):
-            shutil.rmtree(kb.tempDir, ignore_errors=True)
+            for prefix in (MKSTEMP_PREFIX.IPC, MKSTEMP_PREFIX.TESTING, MKSTEMP_PREFIX.COOKIE_JAR, MKSTEMP_PREFIX.BIG_ARRAY):
+                for filepath in glob.glob(os.path.join(kb.tempDir, "%s*" % prefix)):
+                    os.remove(filepath)
+            if not glob.glob(os.path.join(kb.tempDir, '*')):
+                shutil.rmtree(kb.tempDir, ignore_errors=True)
 
         if conf.get("hashDB"):
             try:
