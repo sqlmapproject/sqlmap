@@ -450,7 +450,7 @@ class Databases:
 
             elif Backend.isDbms(DBMS.ACCESS):
                 errMsg = "cannot retrieve column names, "
-                errMsg += "back-end DBMS is Access"
+                errMsg += "back-end DBMS is %s" % DBMS.ACCESS
                 logger.error(errMsg)
                 bruteForce = True
 
