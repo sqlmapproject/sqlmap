@@ -21,6 +21,7 @@ from lib.core.common import intersect
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import paramToDict
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import urldecode
@@ -604,28 +605,33 @@ def _createTargetDirs():
     Create the output directory.
     """
 
-    if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-        try:
-            if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-                os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+    try:
+        if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+            os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+
+        _ = os.path.join(paths.SQLMAP_OUTPUT_PATH, randomStr())
+        open(_, "w+b").close()
+        os.remove(_)
+
+        if conf.outputDir:
             warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
             logger.warn(warnMsg)
-        except (OSError, IOError), ex:
-            try:
-                tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-            except Exception, _:
-                errMsg = "unable to write to the temporary directory ('%s'). " % _
-                errMsg += "Please make sure that your disk is not full and "
-                errMsg += "that you have sufficient write permissions to "
-                errMsg += "create temporary files and/or directories"
-                raise SqlmapSystemException(errMsg)
+    except (OSError, IOError), ex:
+        try:
+            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+        except Exception, _:
+            errMsg = "unable to write to the temporary directory ('%s'). " % _
+            errMsg += "Please make sure that your disk is not full and "
+            errMsg += "that you have sufficient write permissions to "
+            errMsg += "create temporary files and/or directories"
+            raise SqlmapSystemException(errMsg)
 
-            warnMsg = "unable to create regular output directory "
-            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
+        warnMsg = "unable to %s output directory " % ("create" if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH) else "write to the")
+        warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
+        warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
+        logger.warn(warnMsg)
 
-            paths.SQLMAP_OUTPUT_PATH = tempDir
+        paths.SQLMAP_OUTPUT_PATH = tempDir
 
     conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), normalizeUnicode(getUnicode(conf.hostname)))
 
