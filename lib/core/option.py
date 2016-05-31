@@ -1548,18 +1548,36 @@ def _createTemporaryDirectory():
     Creates temporary directory for this run.
     """
 
-    try:
-        if not os.path.isdir(tempfile.gettempdir()):
-            os.makedirs(tempfile.gettempdir())
-    except IOError, ex:
-        errMsg = "there has been a problem while accessing "
-        errMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
-        errMsg += "make sure that there is enough disk space left. If problem persists, "
-        errMsg += "try to set environment variable 'TEMP' to a location "
-        errMsg += "writeable by the current user"
-        raise SqlmapSystemException, errMsg
+    if conf.tmpDir:
+        try:
+            if not os.path.isdir(conf.tmpDir):
+                os.makedirs(conf.tmpDir)
 
-    if "sqlmap" not in (tempfile.tempdir or ""):
+            _ = os.path.join(conf.tmpDir, randomStr())
+            open(_, "w+b").close()
+            os.remove(_)
+
+            tempfile.tempdir = conf.tmpDir
+
+            warnMsg = "using '%s' as the temporary directory" % conf.tmpDir
+            logger.warn(warnMsg)
+        except (OSError, IOError), ex:
+            errMsg = "there has been a problem while accessing "
+            errMsg += "temporary directory location(s) ('%s')" % getSafeExString(ex)
+            raise SqlmapSystemException, errMsg
+    else:
+        try:
+            if not os.path.isdir(tempfile.gettempdir()):
+                os.makedirs(tempfile.gettempdir())
+        except IOError, ex:
+            errMsg = "there has been a problem while accessing "
+            errMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
+            errMsg += "make sure that there is enough disk space left. If problem persists, "
+            errMsg += "try to set environment variable 'TEMP' to a location "
+            errMsg += "writeable by the current user"
+            raise SqlmapSystemException, errMsg
+
+    if "sqlmap" not in (tempfile.tempdir or "") or conf.tmpDir and tempfile.tempdir == conf.tmpDir:
         tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
 
     kb.tempDir = tempfile.tempdir

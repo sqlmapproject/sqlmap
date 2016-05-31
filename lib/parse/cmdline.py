@@ -719,10 +719,6 @@ def cmdLineParser(argv=None):
                                   action="store_true",
                                   help="Make a thorough testing for a WAF/IPS/IDS protection")
 
-        miscellaneous.add_option("--skip-waf", dest="skipWaf",
-                                  action="store_true",
-                                  help="Skip heuristic detection of WAF/IPS/IDS protection")
-
         miscellaneous.add_option("--mobile", dest="mobile",
                                   action="store_true",
                                   help="Imitate smartphone through HTTP User-Agent header")
@@ -739,12 +735,19 @@ def cmdLineParser(argv=None):
                                   action="store_true",
                                   help="Safely remove all content from output directory")
 
+        miscellaneous.add_option("--skip-waf", dest="skipWaf",
+                                  action="store_true",
+                                  help="Skip heuristic detection of WAF/IPS/IDS protection")
+
         miscellaneous.add_option("--smart", dest="smart",
                                   action="store_true",
                                   help="Conduct thorough tests only if positive heuristic(s)")
 
         miscellaneous.add_option("--sqlmap-shell", dest="sqlmapShell", action="store_true",
-                            help="Prompt for an interactive sqlmap shell")
+                                  help="Prompt for an interactive sqlmap shell")
+
+        miscellaneous.add_option("--tmp-dir", dest="tmpDir",
+                                  help="Local directory for storing temporary files")
 
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
