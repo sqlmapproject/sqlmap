@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.5.129"
+VERSION = "1.0.5.130"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -609,7 +609,7 @@ MAX_HELP_OPTION_LENGTH = 18
 MAX_CONNECT_RETRIES = 100
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal", "DataTypeMismatchException")
+FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "unable to interpret text value", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal", "DataTypeMismatchException")
 
 # Regular expression used for extracting ASP.NET view state values
 VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'
