@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
+from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "Generic (Unknown)"
@@ -21,7 +22,7 @@ def detect(get_page):
     for vector in WAF_ATTACK_VECTORS:
         page, _, code = get_page(get=vector)
 
-        if code >= 400:
+        if code >= 400 or IDS_WAF_CHECK_PAYLOAD in vector and code is None:
             retval = True
             break
 
