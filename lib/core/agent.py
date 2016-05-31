@@ -281,7 +281,7 @@ class Agent(object):
             where = kb.injection.data[kb.technique].where if where is None else where
             comment = kb.injection.data[kb.technique].comment if comment is None else comment
 
-        if Backend.getIdentifiedDbms() == DBMS.ACCESS and any(_ in comment or "" for _ in ("--", GENERIC_SQL_COMMENT)):
+        if Backend.getIdentifiedDbms() == DBMS.ACCESS and any((comment or "").startswith(_) for _ in ("--", "[GENERIC_SQL_COMMENT]")):
             comment = queries[DBMS.ACCESS].comment.query
 
         if comment is not None:
