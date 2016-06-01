@@ -1833,6 +1833,8 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.regex = {}
     kb.cache.stdev = {}
 
+    kb.captchaDetected = None
+
     kb.chars = AttribDict()
     kb.chars.delimiter = randomStr(length=6, lowercase=True)
     kb.chars.start = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
