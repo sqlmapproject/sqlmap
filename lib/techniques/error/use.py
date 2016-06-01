@@ -246,7 +246,7 @@ def _errorFields(expression, expressionFields, expressionFieldsList, num=None, e
                 if len(status) > width:
                     status = "%s..." % status[:width - 3]
 
-                dataToStdout("%s\n" % status, True)
+                dataToStdout("%s\n" % status)
 
         if isinstance(num, int):
             expression = origExpr
