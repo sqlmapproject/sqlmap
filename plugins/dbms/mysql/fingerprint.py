@@ -152,12 +152,6 @@ class Fingerprint(GenericFingerprint):
         if not conf.extensiveFp and (Backend.isDbmsWithin(MYSQL_ALIASES) \
            or (conf.dbms or "").lower() in MYSQL_ALIASES) and Backend.getVersion() and \
            Backend.getVersion() != UNKNOWN_DBMS_VERSION:
-            v = Backend.getVersion().replace(">", "")
-            v = v.replace("=", "")
-            v = v.replace(" ", "")
-
-            Backend.setVersion(v)
-
             setDbms("%s %s" % (DBMS.MYSQL, Backend.getVersion()))
 
             if Backend.isVersionGreaterOrEqualThan("5"):
