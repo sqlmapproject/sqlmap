@@ -9,6 +9,10 @@
 <root>
     <!-- Microsoft IIS -->
 
+    <regexp value="Microsoft-IIS/(10\.0)">
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2016|10"/>
+    </regexp>
+
     <regexp value="Microsoft-IIS/(8\.5)">
         <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2012 R2|8.1"/>
     </regexp>
@@ -82,7 +86,7 @@
     </regexp>
 
     <regexp value="Apache/2\.2\.15 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="6.5"/>
+        <info type="Linux" distrib="CentOS" release="6.8"/>
     </regexp>
 
     <!-- Apache: Debian -->
@@ -145,6 +149,14 @@
 
     <regexp value="Apache/2\.2\.22 \(Debian\)">
         <info type="Linux" distrib="Debian" release="7.0" codename="wheezy"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.10 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="8.0" codename="jessie"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.18 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="9.0" codename="jessie (testing)"/>
     </regexp>
 
     <!-- Apache: Fedora -->
@@ -249,6 +261,18 @@
         <info type="Linux" distrib="Fedora" release="20" codename="Heisenbug"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.10 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="21"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.12 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="22"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.16 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="23"/>
+    </regexp>
+
     <!-- Apache: FreeBSD -->
 
     <regexp value="Apache/2\.0\.16 \(FreeBSD\)">
@@ -345,6 +369,14 @@
 
     <regexp value="Apache/2\.4\.6 \(FreeBSD\)">
         <info type="FreeBSD" release="9.2"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.9 \(FreeBSD\)">
+        <info type="FreeBSD" release="9.3"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.16 \(FreeBSD\)">
+        <info type="FreeBSD" release="10.3"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
@@ -642,6 +674,10 @@
         <info type="Linux" distrib="SuSE" release="13.1"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.10 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="13.2"/>
+    </regexp>
+
     <!-- Apache: Ubuntu -->
 
     <regexp value="Apache/2\.0\.50 \(Ubuntu\)">
@@ -706,6 +742,18 @@
 
     <regexp value="Apache/2\.4\.6 \(Ubuntu\)">
         <info type="Linux" distrib="Ubuntu" release="13.10" codename="Saucy Salamander"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.10 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="14.10|15.04" codename="utopic|vivid"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.12 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="15.10" codename="willy"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.18 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="16.04" codename="xenial"/>
     </regexp>
 
     <!-- Nginx -->

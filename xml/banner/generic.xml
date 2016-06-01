@@ -27,23 +27,26 @@
         <info sp="4"/>
     </regexp>
 
-    <regexp value="Windows.*7\.5">
-        <info type="Windows" distrib="2008"/>
+    <!-- Reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx -->
+
+    <regexp value="Windows.*10\.0">
+        <info type="Windows" distrib="2016|10"/>
     </regexp>
 
-    <regexp value="Windows.*7\.0">
-        <info type="Windows" distrib="Vista"/>
+    <regexp value="Windows.*6\.3">
+        <info type="Windows" distrib="2012 R2|8.1"/>
+    </regexp>
+
+    <regexp value="Windows.*6\.2">
+        <info type="Windows" distrib="2012|8"/>
     </regexp>
 
     <regexp value="Windows.*6\.1">
-        <info type="Windows" distrib="7"/>
+        <info type="Windows" distrib="2008 R2|7"/>
     </regexp>
 
     <regexp value="Windows.*6\.0">
-        <!-- TODO: verify this
-        <info type="Windows" distrib="Vista"/>
-        -->
-        <info type="Windows" distrib="2003"/>
+        <info type="Windows" distrib="2008|Vista"/>
     </regexp>
 
     <regexp value="Windows.*5\.2">
