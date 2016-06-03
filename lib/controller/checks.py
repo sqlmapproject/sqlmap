@@ -478,7 +478,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                            if not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
+                            if not any((conf.string, conf.notString, conf.regexp, conf.code)) and kb.pageStable and injectable:
                                 trueSet = set(extractTextTagContent(trueRawResponse))
                                 trueSet = trueSet.union(__ for _ in trueSet for __ in _.split())
 

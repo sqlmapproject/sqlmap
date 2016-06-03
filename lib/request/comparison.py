@@ -49,6 +49,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if kb.testMode:
         threadData.lastComparisonHeaders = listToStrValue(headers.headers) if headers else ""
         threadData.lastComparisonPage = page
+        threadData.lastComparisonCode = code
 
     if page is None and pageLength is None:
         return None
