@@ -102,7 +102,8 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.ORACLE
             logger.info(infoMsg)
 
-            for version in ("11i", "10g", "9i", "8i"):
+            # Reference: https://en.wikipedia.org/wiki/Oracle_Database
+            for version in ("12c", "11g", "10g", "9i", "8i"):
                 number = int(re.search("([\d]+)", version).group(1))
                 output = inject.checkBooleanExpression("%d=(SELECT SUBSTR((VERSION),1,%d) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % (number, 1 if number < 10 else 2))
 
