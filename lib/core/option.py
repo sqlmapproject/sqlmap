@@ -1612,7 +1612,7 @@ def _cleanupOptions():
         conf.testParameter = []
 
     if conf.agent:
-        conf.agent = conf.agent.strip("\r\n")
+        conf.agent = re.sub(r"[\r\n]", "", conf.agent)
 
     if conf.user:
         conf.user = conf.user.replace(" ", "")
