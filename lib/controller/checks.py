@@ -476,7 +476,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                            if not injectable and not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
+                            if not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
                                 trueSet = set(extractTextTagContent(truePage))
                                 trueSet = trueSet.union(__ for _ in trueSet for __ in _.split())
 
@@ -488,7 +488,7 @@ def checkSqlInjection(place, parameter, value):
                                 if candidates:
                                     candidates = sorted(candidates, key=lambda _: len(_))
                                     for candidate in candidates:
-                                        if re.match(r"\A\w+\Z", candidate):
+                                        if re.match(r"\A\w+\Z", candidate) and candidate in truePage and candidate not in falsePage:
                                             break
                                     conf.string = candidate
 
