@@ -48,9 +48,6 @@ def action():
         elif kb.nullConnection:
             errMsg += ". You can try to rerun without using optimization "
             errMsg += "switch '%s'" % ("-o" if conf.optimize else "--null-connection")
-        else:
-            errMsg += ". Support for this DBMS will be implemented at "
-            errMsg += "some point"
 
         raise SqlmapUnsupportedDBMSException(errMsg)
 
