@@ -933,7 +933,6 @@ def dataToDumpFile(dumpFile, data):
         else:
             raise
 
-
 def dataToOutFile(filename, data):
     retVal = None
 
@@ -941,7 +940,7 @@ def dataToOutFile(filename, data):
         retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
         try:
-            with open(retVal, "w+b") as f:
+            with openFile(retVal, "w+b") as f:
                 f.write(data)
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
