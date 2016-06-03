@@ -446,11 +446,13 @@ def checkSqlInjection(place, parameter, value):
                             kb.matchRatio = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             Request.queryPage(genCmpPayload(), place, raise404=False)
-                            falsePage = threadData.lastComparisonPage or ""
+                            falsePage, falseHeaders = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders
+                            falseRawResponse = "%s%s" % (falseHeaders, falsePage)
 
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
-                            truePage = threadData.lastComparisonPage or ""
+                            truePage, trueHeaders = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders
+                            trueRawResponse = "%s%s" % (trueHeaders, truePage)
 
                             if trueResult and not(truePage == falsePage and not kb.nullConnection):
                                 # Perform the test's False request
@@ -477,18 +479,18 @@ def checkSqlInjection(place, parameter, value):
                                     injectable = True
 
                             if not any((conf.string, conf.notString, conf.regexp)) and kb.pageStable:
-                                trueSet = set(extractTextTagContent(truePage))
+                                trueSet = set(extractTextTagContent(trueRawResponse))
                                 trueSet = trueSet.union(__ for _ in trueSet for __ in _.split())
 
-                                falseSet = set(extractTextTagContent(falsePage))
+                                falseSet = set(extractTextTagContent(falseRawResponse))
                                 falseSet = falseSet.union(__ for _ in falseSet for __ in _.split())
 
-                                candidates = filter(None, (_.strip() if _.strip() in (kb.pageTemplate or "") and _.strip() not in falsePage and _.strip() not in threadData.lastComparisonHeaders else None for _ in (trueSet - falseSet)))
+                                candidates = filter(None, (_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet)))
 
                                 if candidates:
                                     candidates = sorted(candidates, key=lambda _: len(_))
                                     for candidate in candidates:
-                                        if re.match(r"\A\w+\Z", candidate) and candidate in truePage and candidate not in falsePage:
+                                        if re.match(r"\A\w+\Z", candidate):
                                             break
                                     conf.string = candidate
 
