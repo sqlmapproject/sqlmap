@@ -18,6 +18,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import DUMP_REPLACEMENTS
@@ -165,6 +166,8 @@ def pivotDumpTable(table, colList, count=None, blind=True):
                 entries[column].append(value)
 
     except KeyboardInterrupt:
+        kb.dumpKeyboardInterrupt = True
+
         warnMsg = "user aborted during enumeration. sqlmap "
         warnMsg += "will display partial output"
         logger.warn(warnMsg)
