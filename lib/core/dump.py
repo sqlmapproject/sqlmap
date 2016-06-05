@@ -449,8 +449,9 @@ class Dump(object):
                         dumpFileName = os.path.join(dumpDbPath, "%s-%s.%s" % (_, hashlib.md5(unicodeencode(table)).hexdigest()[:8], conf.dumpFormat.lower()))
                     else:
                         dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (_, conf.dumpFormat.lower()))
+            else:
+                appendToFile = any((conf.limitStart, conf.limitStop))
 
-            appendToFile = any((conf.limitStart, conf.limitStop)) and checkFile(dumpFileName, False)
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab", buffering=DUMP_FILE_BUFFER_SIZE)
 
         count = int(tableValues["__infos__"]["count"])
