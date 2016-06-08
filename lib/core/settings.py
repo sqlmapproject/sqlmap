@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.6.27"
+VERSION = "1.0.6.28"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
