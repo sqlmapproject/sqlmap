@@ -940,8 +940,8 @@ def dataToOutFile(filename, data):
         retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
         try:
-            with openFile(retVal, "w+b") as f:
-                f.write(data)
+            with open(retVal, "w+b") as f:  # has to stay as non-codecs because data is raw ASCII encoded data
+                f.write(unicodeencode(data))
         except IOError, ex:
             errMsg = "something went wrong while trying to write "
             errMsg += "to the output file ('%s')" % getSafeExString(ex)
