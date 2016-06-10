@@ -94,7 +94,7 @@ def forgeHeaders(items=None):
                 if cookie.domain_specified and not conf.hostname.endswith(cookie.domain):
                     continue
 
-                if ("%s=" % cookie.name) in headers[HTTP_HEADER.COOKIE]:
+                if ("%s=" % getUnicode(cookie.name)) in headers[HTTP_HEADER.COOKIE]:
                     if conf.loadCookies:
                         conf.httpHeaders = filter(None, ((item if item[0] != HTTP_HEADER.COOKIE else None) for item in conf.httpHeaders))
                     elif kb.mergeCookies is None:
@@ -106,7 +106,7 @@ def forgeHeaders(items=None):
                         kb.mergeCookies = not _ or _[0] in ("y", "Y")
 
                     if kb.mergeCookies and kb.injection.place != PLACE.COOKIE:
-                        _ = lambda x: re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(cookie.name), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (cookie.name, getUnicode(cookie.value))).replace('\\', r'\\'), x)
+                        _ = lambda x: re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(getUnicode(cookie.name)), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value))).replace('\\', r'\\'), x)
                         headers[HTTP_HEADER.COOKIE] = _(headers[HTTP_HEADER.COOKIE])
 
                         if PLACE.COOKIE in conf.parameters:
@@ -115,7 +115,7 @@ def forgeHeaders(items=None):
                         conf.httpHeaders = [(item[0], item[1] if item[0] != HTTP_HEADER.COOKIE else _(item[1])) for item in conf.httpHeaders]
 
                 elif not kb.testMode:
-                    headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (conf.cookieDel or DEFAULT_COOKIE_DELIMITER, cookie.name, getUnicode(cookie.value))
+                    headers[HTTP_HEADER.COOKIE] += "%s %s=%s" % (conf.cookieDel or DEFAULT_COOKIE_DELIMITER, getUnicode(cookie.name), getUnicode(cookie.value))
 
         if kb.testMode and not any((conf.csrfToken, conf.safeUrl)):
             resetCookieJar(conf.cj)
