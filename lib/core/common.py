@@ -1398,6 +1398,10 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
+    if conf.port < 0 or conf.port > 65535:
+        errMsg = "invalid target URL's port (%d)" % conf.port
+        raise SqlmapSyntaxException(errMsg)
+
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
