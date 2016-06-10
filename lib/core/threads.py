@@ -202,7 +202,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadException = False
 
         for lock in kb.locks.values():
-            if lock.locked_lock():
+            if lock.locked():
                 try:
                     lock.release()
                 except thread.error:
