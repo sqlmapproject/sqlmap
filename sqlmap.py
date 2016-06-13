@@ -199,6 +199,11 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "Read-only file system" in excMsg:
+                errMsg = "output device is mounted as read-only"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "_mkstemp_inner" in excMsg:
                 errMsg = "there has been a problem while accessing temporary files"
                 logger.error(errMsg)
