@@ -284,7 +284,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
     outputs = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
 
-    return ", ".join(output for output in outputs) if not isNoneValue(outputs) else None
+    return ", ".join(output or "" for output in outputs) if not isNoneValue(outputs) else None
 
 def _goBooleanProxy(expression):
     """
