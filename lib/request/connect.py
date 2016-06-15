@@ -649,7 +649,7 @@ class Connect(object):
             else:
                 warnMsg = "unable to connect to the target URL"
 
-            if "BadStatusLine" not in tbMsg:
+            if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
                 warnMsg += " or proxy"
 
             if silent:
