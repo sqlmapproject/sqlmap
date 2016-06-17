@@ -54,6 +54,7 @@ try:
     from lib.core.option import initOptions
     from lib.core.option import init
     from lib.core.profiling import profile
+    from lib.core.settings import GIT_PAGE
     from lib.core.settings import IS_WIN
     from lib.core.settings import LEGAL_DISCLAIMER
     from lib.core.settings import THREAD_FINALIZATION_TIMEOUT
@@ -196,6 +197,13 @@ def main():
         try:
             if any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
                 errMsg = "no space left on output device"
+                logger.error(errMsg)
+                raise SystemExit
+
+            elif all(_ in excMsg for _ in ("No such file", "_'")):
+                errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
+                errMsg += "You should retrieve the latest development version from official GitHub "
+                errMsg += "repository at '%s'" % GIT_PAGE
                 logger.error(errMsg)
                 raise SystemExit
 
