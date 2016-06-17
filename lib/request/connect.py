@@ -122,7 +122,10 @@ class Connect(object):
 
     @staticmethod
     def _getPageProxy(**kwargs):
-        return Connect.getPage(**kwargs)
+        try:
+            return Connect.getPage(**kwargs)
+        except RuntimeError:
+            return None, None, None
 
     @staticmethod
     def _retryProxy(**kwargs):
