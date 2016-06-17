@@ -494,7 +494,7 @@ def attackDumpedTable():
 
             for (_, hash_, password) in results:
                 if hash_:
-                    lut[hash_.lower()] = getUnicode(password)
+                    lut[hash_.lower()] = password
 
             infoMsg = "postprocessing table dump"
             logger.info(infoMsg)
@@ -505,7 +505,7 @@ def attackDumpedTable():
                         value = table[column]['values'][i]
 
                         if value and value.lower() in lut:
-                            table[column]['values'][i] += " (%s)" % lut[value.lower()]
+                            table[column]['values'][i] = "%s (%s)" % (getUnicode(table[column]['values'][i]), getUnicode(lut[value.lower()]))
                             table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):
