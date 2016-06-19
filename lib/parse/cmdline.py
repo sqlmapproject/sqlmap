@@ -31,6 +31,7 @@ from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.shell import clearHistory
@@ -47,7 +48,7 @@ def cmdLineParser(argv=None):
 
     checkSystemEncoding()
 
-    _ = getUnicode(os.path.basename(argv[0]), encoding=sys.getfilesystemencoding())
+    _ = getUnicode(os.path.basename(argv[0]), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % _ if " " in _ else _)
@@ -825,7 +826,7 @@ def cmdLineParser(argv=None):
         extraHeaders = []
 
         for arg in argv:
-            _.append(getUnicode(arg, encoding=sys.getfilesystemencoding()))
+            _.append(getUnicode(arg, encoding=sys.getfilesystemencoding() or UNICODE_ENCODING))
 
         argv = _
         checkDeprecatedOptions(argv)

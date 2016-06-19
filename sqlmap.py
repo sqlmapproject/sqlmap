@@ -58,6 +58,7 @@ try:
     from lib.core.settings import IS_WIN
     from lib.core.settings import LEGAL_DISCLAIMER
     from lib.core.settings import THREAD_FINALIZATION_TIMEOUT
+    from lib.core.settings import UNICODE_ENCODING
     from lib.core.settings import VERSION
     from lib.core.testing import smokeTest
     from lib.core.testing import liveTest
@@ -81,7 +82,7 @@ def modulePath():
     except NameError:
         _ = inspect.getsourcefile(modulePath)
 
-    return getUnicode(os.path.dirname(os.path.realpath(_)), encoding=sys.getfilesystemencoding())
+    return getUnicode(os.path.dirname(os.path.realpath(_)), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
 
 def checkEnvironment():
     paths.SQLMAP_ROOT_PATH = modulePath()
