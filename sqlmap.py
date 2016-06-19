@@ -263,10 +263,11 @@ def main():
 
     finally:
         kb.threadContinue = False
-        kb.threadException = True
 
         if conf.get("showTime"):
             dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
+
+        kb.threadException = True
 
         if kb.get("tempDir"):
                 for prefix in (MKSTEMP_PREFIX.IPC, MKSTEMP_PREFIX.TESTING, MKSTEMP_PREFIX.COOKIE_JAR, MKSTEMP_PREFIX.BIG_ARRAY):
