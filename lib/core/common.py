@@ -1011,7 +1011,10 @@ def readInput(message, default=None, checkBatch=True):
                 retVal = raw_input() or default
                 retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
             except:
-                time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
+                try:
+                    time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
+                except:
+                    pass
                 kb.prependFlag = True
                 raise SqlmapUserQuitException
 
