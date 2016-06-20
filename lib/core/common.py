@@ -1015,8 +1015,9 @@ def readInput(message, default=None, checkBatch=True):
                     time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
                 except:
                     pass
-                kb.prependFlag = True
-                raise SqlmapUserQuitException
+                finally:
+                    kb.prependFlag = True
+                    raise SqlmapUserQuitException
 
             finally:
                 logging._releaseLock()
