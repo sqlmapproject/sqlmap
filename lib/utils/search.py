@@ -35,6 +35,25 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
 from thirdparty.socks import socks
 
+# a couple of packages used for baidu hacking
+from bs4 import BeautifulSoup
+import requests
+
+
+def _remove_duplicate(links):
+    if not links:
+        return []
+
+    tmplinks = map(lambda url: url[:url.find("?")], links)
+    tmplinks = set(tmplinks)
+    ret = []
+    for link in links:
+        for tmplink in tmplinks:
+            if link.lower().find(tmplink.lower()) == 0:
+                ret.append(link)
+                tmplinks.remove(tmplink)
+                break
+    return ret
 
 def _search(dork):
     """
@@ -50,20 +69,34 @@ def _search(dork):
     headers[HTTP_HEADER.USER_AGENT] = dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT)
     headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
 
-    try:
-        req = urllib2.Request("https://www.google.com/ncr", headers=headers)
-        conn = urllib2.urlopen(req)
-    except Exception, ex:
-        errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
-        raise SqlmapConnectionException(errMsg)
+    if conf.baidu:
+        try:
+            req = urllib2.Request("http://www.baidu.com/", headers=headers)
+            conn = urllib2.urlopen(req)
+        except Exception, ex:
+            errMsg = "unable to connect to Baidu ('%s')" % getSafeExString(ex)
+            raise SqlmapConnectionException(errMsg)
+    else:
+        try:
+            req = urllib2.Request("https://www.google.com/ncr", headers=headers)
+            conn = urllib2.urlopen(req)
+        except Exception, ex:
+            errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
+            raise SqlmapConnectionException(errMsg)
 
     gpage = conf.googlePage if conf.googlePage > 1 else 1
     logger.info("using search result page #%d" % gpage)
 
-    url = "https://www.google.com/search?"
-    url += "q=%s&" % urlencode(dork, convall=True)
-    url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
-    url += "&start=%d" % ((gpage - 1) * 100)
+    if conf.baidu:
+        url = "http://www.baidu.com"
+        url += "/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu"
+        url += "&wd=%s" % urlencode(dork, convall=True)
+        url += "&pn=%d" % ((gpage - 1) * 10)
+    else:
+        url = "https://www.google.com/search?"
+        url += "q=%s&" % urlencode(dork, convall=True)
+        url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
+        url += "&start=%d" % ((gpage - 1) * 100)
 
     try:
         req = urllib2.Request(url, headers=headers)
@@ -96,10 +129,26 @@ def _search(dork):
             logger.critical(warnMsg)
             return None
     except (urllib2.URLError, httplib.error, socket.error, socket.timeout, socks.ProxyError):
-        errMsg = "unable to connect to Google"
+        errMsg = "unable to connect to {}".format("Google" if not conf.baidu else "Baidu")
         raise SqlmapConnectionException(errMsg)
+    retVal = []
 
-    retVal = [urllib.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
+    if conf.baidu:
+        # baidu special processing
+        content = BeautifulSoup(page, 'html.parser')
+        results = content.find_all('div', class_='result c-container ')
+        for result in results:
+            baidu_link = result.find('a').attrs['href'];
+            try:
+                r = requests.get(baidu_link, timeout=10)
+                if r and r.status_code == 200:
+                    logger.info(r.url)
+                    retVal.append(r.url)
+            except Exception, e:
+                logger.debug(e.message)
+        retVal = _remove_duplicate(retVal)
+    else:
+        retVal = [urllib.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
 
     if not retVal and "detected unusual traffic" in page:
         warnMsg = "Google has detected 'unusual' traffic from "

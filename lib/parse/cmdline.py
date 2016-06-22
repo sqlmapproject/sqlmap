@@ -90,6 +90,9 @@ def cmdLineParser(argv=None):
         target.add_option("-g", dest="googleDork",
                           help="Process Google dork results as target URLs")
 
+        target.add_option("--use-baidu", dest="baidu", action="store_true",
+                          help="Use baidu as search engine when processing Google dork results as target URLs")
+
         target.add_option("-c", dest="configFile",
                           help="Load options from a configuration INI file")
 
