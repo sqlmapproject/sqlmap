@@ -89,7 +89,7 @@ def _search(dork):
 
     if conf.baidu:
         url = "http://www.baidu.com"
-        url += "/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu"
+        url += "/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&rn=50"
         url += "&wd=%s" % urlencode(dork, convall=True)
         url += "&pn=%d" % ((gpage - 1) * 10)
     else:
