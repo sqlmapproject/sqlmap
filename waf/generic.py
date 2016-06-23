@@ -5,8 +5,6 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
-
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import WAF_ATTACK_VECTORS
 
