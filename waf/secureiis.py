@@ -18,7 +18,7 @@ def detect(get_page):
         page, _, _ = get_page(get=vector)
         retval = re.search(r"SecureIIS[^<]+Web Server Protection", page or "") is not None
         retval |= "http://www.eeye.com/SecureIIS/" in (page or "")
-        retval |= "?subject=SecureIIS Error" in (page or "")
+        retval |= re.search(r"\?subject=[^>]*SecureIIS Error", page or "") is not None
         if retval:
             break
 
