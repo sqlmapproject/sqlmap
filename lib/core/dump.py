@@ -458,8 +458,12 @@ class Dump(object):
                     while True:
                         candidate = "%s.%d" % (dumpFileName, count)
                         if not checkFile(candidate, False):
-                            shutil.copyfile(dumpFileName, candidate)
-                            break
+                            try:
+                                shutil.copyfile(dumpFileName, candidate)
+                            except IOError:
+                                pass
+                            finally:
+                                break
                         else:
                             count += 1
 
