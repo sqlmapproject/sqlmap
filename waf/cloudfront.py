@@ -20,7 +20,6 @@ def detect(get_page):
 
         retval |= re.search(r"cloudfront", headers.get("X-Cache", ""), re.I) is not None
         retval |= headers.get("X-Amz-Cf-Id") is not None
-        retval |= re.search(r"AmazonS3", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
 
         if retval:
             break
