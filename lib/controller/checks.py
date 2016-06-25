@@ -939,7 +939,7 @@ def heuristicCheckSqlInjection(place, parameter):
     infoMsg += "'%s' might " % parameter
 
     def _(page):
-        return re.search("(?i)sql", page or "") is None and any(_ in (page or "") for _ in FORMAT_EXCEPTION_STRINGS)
+        return any(_ in (page or "") for _ in FORMAT_EXCEPTION_STRINGS)
 
     casting = _(page) and not _(kb.originalPage)
 
