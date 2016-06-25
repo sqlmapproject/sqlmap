@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import re
 
-from lib.core.common import aliasToDbmsEnum
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import hashDBWrite

@@ -358,10 +358,10 @@ def processResponse(page, responseHeaders):
         for match in re.finditer(r"(?si)<form.+?</form>", page):
             if re.search(r"(?i)captcha", match.group(0)):
                 kb.captchaDetected = True
-                errMsg = "potential CAPTCHA protection mechanism detected"
-                singleTimeLogMessage(errMsg, logging.ERROR)
+                warnMsg = "potential CAPTCHA protection mechanism detected"
+                singleTimeWarnMessage(warnMsg)
                 break
 
     if re.search(BLOCKED_IP_REGEX, page):
-        errMsg = "it appears that you have been blocked by the target server"
-        singleTimeLogMessage(errMsg, logging.ERROR)
+        warnMsg = "it appears that you have been blocked by the target server"
+        singleTimeWarnMessage(warnMsg)
