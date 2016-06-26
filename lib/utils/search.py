@@ -142,8 +142,16 @@ def _search(dork):
             try:
                 r = requests.get(baidu_link, timeout=10)
                 if r and r.status_code == 200:
-                    logger.info(r.url)
-                    retVal.append(r.url)
+                    # baidu will just use Javascript to redirect the page rather than responding a 302 HTTP code.
+                    if r.history:
+                        logger.info(r.url)
+                        retVal.append(r.url)
+                    else:
+                        m = re.search('<script>window\.location\.replace\("(?P<url>.+?)"\)', r.content, re.I)
+                        if m:
+                            url = m.group('url')
+                            logger.info(url)
+                            retVal.append(url)
             except Exception, e:
                 logger.debug(e.message)
         retVal = _remove_duplicate(retVal)
