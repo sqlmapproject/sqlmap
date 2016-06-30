@@ -72,6 +72,7 @@ from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IDS_WAF_CHECK_RATIO
 from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
+from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
@@ -1058,12 +1059,22 @@ def checkDynamicContent(firstPage, secondPage):
         logger.critical(warnMsg)
         return
 
-    seqMatcher = getCurrentThreadData().seqMatcher
-    seqMatcher.set_seq1(firstPage)
-    seqMatcher.set_seq2(secondPage)
+    if firstPage and secondPage and any(len(_) > MAX_DIFFLIB_SEQUENCE_LENGTH for _ in (firstPage, secondPage)):
+        ratio = None
+    else:
+        try:
+            seqMatcher = getCurrentThreadData().seqMatcher
+            seqMatcher.set_seq1(firstPage)
+            seqMatcher.set_seq2(secondPage)
+            ratio = seqMatcher.quick_ratio()
+        except MemoryError:
+            ratio = None
+
+    if ratio is None:
+        kb.skipSeqMatcher = True
 
     # In case of an intolerable difference turn on dynamicity removal engine
-    if seqMatcher.quick_ratio() <= UPPER_RATIO_BOUND:
+    elif ratio <= UPPER_RATIO_BOUND:
         findDynamicContent(firstPage, secondPage)
 
         count = 0

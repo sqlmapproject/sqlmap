@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.6.65"
+VERSION = "1.0.6.66"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -580,6 +580,9 @@ MAX_CONNECTION_CHUNK_SIZE = 10 * 1024 * 1024
 
 # Maximum response total page size (trimmed if larger)
 MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
+
+# For preventing MemoryError exceptions (caused when using large sequences in difflib.SequenceMatcher)
+MAX_DIFFLIB_SEQUENCE_LENGTH = 10 * 1024 * 1024
 
 # Maximum (multi-threaded) length of entry in bisection algorithm
 MAX_BISECTION_LENGTH = 50 * 1024 * 1024

@@ -1944,6 +1944,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.safeCharEncode = False
     kb.safeReq = AttribDict()
     kb.singleLogFlags = set()
+    kb.skipSeqMatcher = False
     kb.reduceTests = None
     kb.tlsSNI = {}
     kb.stickyDBMS = False
