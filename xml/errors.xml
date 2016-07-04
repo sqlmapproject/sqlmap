@@ -35,6 +35,9 @@
         <error regexp="Microsoft SQL Native Client.*[0-9a-fA-F]{8}"/>
         <error regexp="com\.microsoft\.sqlserver\.jdbc\.SQLServerException"/>
         <error regexp="ODBC SQL Server Driver"/>
+        <error regexp="SQLServer JDBC Driver"/>
+        <error regexp="macromedia\.jdbc\.sqlserverbase"/>
+        <error regexp="com\.jnetdirect\.jsql"/>
     </dbms>
 
     <!-- Microsoft Access -->
@@ -52,6 +55,7 @@
         <error regexp="Oracle.*Driver"/>
         <error regexp="Warning.*\Woci_.*"/>
         <error regexp="Warning.*\Wora_.*"/>
+        <error regexp="oracle\.jdbc\.driver"/>
     </dbms>
 
     <!-- IBM DB2 -->
