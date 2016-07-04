@@ -65,6 +65,7 @@
     <!-- Informix -->
     <dbms value="Informix">
         <error regexp="Exception.*Informix"/>
+        <error regexp="Informix ODBC Driver"/>
     </dbms>
 
     <!-- Interbase/Firebird -->
