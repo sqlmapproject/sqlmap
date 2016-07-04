@@ -201,7 +201,7 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
-            elif all(_ in excMsg for _ in ("No such file", "_'")):
+            elif all(_ in excMsg for _ in ("No such file", "_'", "self.get_prog_name()")):
                 errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
                 errMsg += "You should retrieve the latest development version from official GitHub "
                 errMsg += "repository at '%s'" % GIT_PAGE
