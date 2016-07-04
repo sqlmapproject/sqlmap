@@ -66,6 +66,8 @@
     <dbms value="Informix">
         <error regexp="Exception.*Informix"/>
         <error regexp="Informix ODBC Driver"/>
+        <error regexp="com\.informix\.jdbc"/>
+        <error regexp="weblogic\.jdbc\.informix"/>
     </dbms>
 
     <!-- Interbase/Firebird -->
@@ -77,8 +79,8 @@
     <!-- SQLite -->
     <dbms value="SQLite">
         <error regexp="SQLite/JDBCDriver"/>
-        <error regexp="SQLite.Exception"/>
-        <error regexp="System.Data.SQLite.SQLiteException"/>
+        <error regexp="SQLite\.Exception"/>
+        <error regexp="System\.Data\.SQLite\.SQLiteException"/>
         <error regexp="Warning.*sqlite_.*"/>
         <error regexp="Warning.*SQLite3::"/>
         <error regexp="\[SQLITE_ERROR\]"/>
