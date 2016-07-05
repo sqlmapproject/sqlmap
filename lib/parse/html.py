@@ -42,8 +42,6 @@ class HTMLHandler(ContentHandler):
 
         elif name == "error":
             regexp = attrs.get("regexp")
-            if "SQL" in regexp:
-                print regexp
             if regexp not in kb.cache.regex:
                 keywords = re.findall("\w+", re.sub(r"\\.", " ", regexp))
                 keywords = sorted(keywords, key=len)
