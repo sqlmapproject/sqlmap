@@ -57,6 +57,7 @@
         <error regexp="Warning.*\Woci_.*"/>
         <error regexp="Warning.*\Wora_.*"/>
         <error regexp="oracle\.jdbc\.driver"/>
+        <error regexp="quoted string not properly terminated"/>
     </dbms>
 
     <!-- IBM DB2 -->
