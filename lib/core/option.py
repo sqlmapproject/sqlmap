@@ -2296,7 +2296,7 @@ def _setTorHttpProxySettings():
     if found:
         conf.proxy = "http://%s:%d" % (LOCALHOST, found)
     else:
-        errMsg = "can't establish connection with the Tor proxy. "
+        errMsg = "can't establish connection with the Tor HTTP proxy. "
         errMsg += "Please make sure that you have Vidalia, Privoxy or "
         errMsg += "Polipo bundle installed for you to be able to "
         errMsg += "successfully use switch '--tor' "

@@ -21,7 +21,7 @@ _defaults = {
    "risk":         1,
    "dumpFormat":   "CSV",
    "tech":         "BEUSTQ",
-   "torType":      "HTTP",
+   "torType":      "SOCKS5",
 }
 
 defaults = AttribDict(_defaults)

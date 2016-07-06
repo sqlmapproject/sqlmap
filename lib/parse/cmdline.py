@@ -173,7 +173,7 @@ def cmdLineParser(argv=None):
                                   help="Set Tor proxy port other than default")
 
         request.add_option("--tor-type", dest="torType",
-                                  help="Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)")
+                                  help="Set Tor proxy type (HTTP, SOCKS4 or SOCKS5 (default))")
 
         request.add_option("--check-tor", dest="checkTor",
                                   action="store_true",
