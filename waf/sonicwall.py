@@ -18,6 +18,7 @@ def detect(get_page):
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
         retval = "This request is blocked by the SonicWALL" in (page or "")
+        retval |= re.search(r"Web Site Blocked.+\bnsa_banner", page or "", re.I) is not None
         retval |= re.search(r"SonicWALL", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         if retval:
             break
