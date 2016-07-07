@@ -32,7 +32,7 @@ Pour afficher une liste complète des options et des commutateurs (switches), ta
 
     python sqlmap.py -hh
 
-Vous pouvez visiter ce [liens](https://asciinema.org/a/46601) pour plus d'exemples.
+Vous pouvez regarder un mini-clip [ici](https://asciinema.org/a/46601) pour plus d'exemples.
 Pour obtenir un aperçu des ressources de __sqlmap__, une liste des fonctionnalités prises en charge et la description de toutes les options, ainsi que des exemples , nous vous recommandons de consulter  [le mode d'emploi](https://github.com/sqlmapproject/sqlmap/wiki).
 
 Liens
