@@ -28,7 +28,7 @@ Pour afficher une liste des fonctions de bases et des commutateurs (switches), t
 
     python sqlmap.py -h
 
-Pour afficher une liste de toutes les options et des commutateurs (switches), tapez:
+Pour afficher une liste complète des options et des commutateurs (switches), tapez:
 
     python sqlmap.py -hh
 
