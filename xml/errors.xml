@@ -36,7 +36,7 @@
         <error regexp="com\.microsoft\.sqlserver\.jdbc\.SQLServerException"/>
         <error regexp="ODBC SQL Server Driver"/>
         <error regexp="SQLServer JDBC Driver"/>
-        <error regexp="macromedia\.jdbc\.sqlserverbase"/>
+        <error regexp="macromedia\.jdbc\.sqlserver"/>
         <error regexp="com\.jnetdirect\.jsql"/>
     </dbms>
 
