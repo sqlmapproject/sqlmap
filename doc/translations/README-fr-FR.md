@@ -8,12 +8,12 @@
 
 ![Les Captures d'écran](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
-Vous pouvez vous rendre [Les collections d'images](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) qui démontre des fonctionnalité de sqlmap.
+Vous pouvez vous rendre [Les collections d'images](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) qui démontre des fonctionnalité de __sqlmap__.
 
 Installation
 ----
 
-Vous pouvez télécharger le plus récent tarball en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master) ou le plus récent archive zip [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Vous pouvez télécharger le plus récent fichier tarball en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master) ou le plus récent archive zip [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
 De préférence, vous pouver télécharger sqlmap en le clonant  [ici](https://github.com/sqlmapproject/sqlmap) le répertoire:
 
