@@ -19,7 +19,7 @@ De préférence, télécharger __sqlmap__ en le [clonant](https://github.com/sql
 
     git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap fonctionne avec [Python](http://www.python.org/download/) la version **2.6.x** et **2.7.x** sur n'importe quel système d'exploitation.
+sqlmap fonctionne sur n'importe quel système d'exploitation avec la version **2.6.x** et **2.7.x** de [Python](http://www.python.org/download/)  
 
 Usage
 ----
