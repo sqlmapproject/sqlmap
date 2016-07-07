@@ -13,9 +13,9 @@ Vous pouvez vous rendre [Les collections d'images](https://github.com/sqlmapproj
 Installation
 ----
 
-Vous pouvez télécharger le plus récent fichier tarball en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master) ou le plus récent archive zip [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Vous pouvez télécharger le plus récent fichier tarball en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master). Vous pouvez aussi télécharger le plus récent archive zip [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
-De préférence, vous pouver télécharger sqlmap en le clonant  [ici](https://github.com/sqlmapproject/sqlmap) le répertoire:
+De préférence, télécharger __sqlmap__ en le [clonant](https://github.com/sqlmapproject/sqlmap):
 
     git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
