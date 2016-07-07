@@ -2,61 +2,61 @@
 
 [![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
-sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.
+sqlmap est un outil de test d'intrusion Open Source qui automatise le processus de détection et d'exploitation des failles d'injection de SQL afin de prendre le contrôle des serveurs de base de données. sqlmap dispose d'un puissant moteur de détection utilisant les techniques les plus récentes et les plus dévastatrices de tests d'intrusion comme les Injection SQL, qui permet d'accéder à la base de données, le système de fichiers sous-jacent et l'exécution des commandes sur le système d'exploitation.
 
-Screenshots
 ----
 
-![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
+![Les Captures d'écran](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
-You can visit the [collection of screenshots](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) demonstrating some of features on the wiki.
+Vous pouvez vous rendre [Les collections d'images](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) qui démontre des fonctionnalité de sqlmap.
 
 Installation
 ----
 
-You can download the latest tarball by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master) or latest zipball by clicking  [here](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Vous pouvez télécharger le plus récent tarball en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master) ou le plus récent archive zip [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
-Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
+De préférence, vous pouver télécharger sqlmap en le clonant  [ici](https://github.com/sqlmapproject/sqlmap) le répertoire:
 
     git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap works out of the box with [Python](http://www.python.org/download/) version **2.6.x** and **2.7.x** on any platform.
+sqlmap fonctionne avec [Python](http://www.python.org/download/) la version **2.6.x** et **2.7.x** sur n'importe quel système d'exploitation.
 
 Usage
 ----
 
-To get a list of basic options and switches use:
+Pour afficher une liste des fonctions de bases et des commutateurs (switches), tapez:
 
     python sqlmap.py -h
 
-To get a list of all options and switches use:
+Pour afficher une liste de toutes les options et des commutateurs (switches), tapez:
 
     python sqlmap.py -hh
 
-You can find a sample run [here](https://asciinema.org/a/46601).
-To get an overview of sqlmap capabilities, list of supported features and description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki).
+Vous pouvez visiter ce [liens](https://asciinema.org/a/46601) pour plus d'exemples.
+Si vous voulez obtenir une vue générale des fonctionnalité de sqlmap, une listed des s.... et une description de toutes les options et des commutateurs (switches), ainsi que leurs exemples, vous pouvez consulter [le manuel d'utilisateur](https://github.com/sqlmapproject/sqlmap/wiki).
 
-Links
+Liens
 ----
 
-* Homepage: http://sqlmap.org
-* Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* Page d'acceuil: http://sqlmap.org
+* Téléchargement: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) ou [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
-* User's manual: https://github.com/sqlmapproject/sqlmap/wiki
-* Frequently Asked Questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
+* Manuel de l'utilisateur: https://github.com/sqlmapproject/sqlmap/wiki
+* Foire aux questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Mailing list subscription: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
 * Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
 * Mailing list archive: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
-* Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+* Les démos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Les captures d'écran: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
-Translations
+Traduction
 ----
 
 * [Chinese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-zh-CN.md)
 * [Croatian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-hr-HR.md)
+* [French](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fr-FR.md)
 * [Greek](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-gr-GR.md)
 * [Indonesian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)
 * [Japanese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ja-JP.md)
