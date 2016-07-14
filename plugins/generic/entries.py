@@ -137,6 +137,7 @@ class Entries:
                     logger.warn(warnMsg)
                     continue
 
+                kb.dumpColumns = colList
                 colNames = colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
@@ -370,6 +371,7 @@ class Entries:
                 logger.critical(errMsg)
 
             finally:
+                kb.dumpColumns = None
                 kb.dumpTable = None
 
     def dumpAll(self):

