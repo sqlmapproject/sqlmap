@@ -120,6 +120,7 @@ from lib.core.settings import MAX_CONNECT_RETRIES
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
+from lib.core.settings import PRECONNECT_CANDIDATE_TIMEOUT
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import SITE
 from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
@@ -1039,7 +1040,7 @@ def _setSocketPreConnect():
                         s = socket.socket(family, type, proto)
                         s._connect(address)
                         with kb.locks.socket:
-                            socket._ready[key].append(s._sock)
+                            socket._ready[key].append((s._sock, time.time()))
             except KeyboardInterrupt:
                 break
             except:
@@ -1054,9 +1055,17 @@ def _setSocketPreConnect():
         with kb.locks.socket:
             if key not in socket._ready:
                 socket._ready[key] = []
-            if len(socket._ready[key]) > 0:
-                self._sock = socket._ready[key].pop(0)
-                found = True
+            while len(socket._ready[key]) > 0:
+                candidate, created = socket._ready[key].pop(0)
+                if (time.time() - created) < PRECONNECT_CANDIDATE_TIMEOUT:
+                    self._sock = candidate
+                    found = True
+                    break
+                else:
+                    try:
+                        candidate.close()
+                    except socket.error:
+                        pass
 
         if not found:
             self._connect(address)
@@ -2282,6 +2291,7 @@ def _setTorHttpProxySettings():
     infoMsg = "setting Tor HTTP proxy settings"
     logger.info(infoMsg)
 
+    s = None
     found = None
 
     for port in (DEFAULT_TOR_HTTP_PORTS if not conf.torPort else (conf.torPort,)):
@@ -2293,7 +2303,8 @@ def _setTorHttpProxySettings():
         except socket.error:
             pass
 
-    s.close()
+    if s:
+        s.close()
 
     if found:
         conf.proxy = "http://%s:%d" % (LOCALHOST, found)
