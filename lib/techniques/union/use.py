@@ -109,7 +109,6 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 for column in kb.dumpColumns:
                     base64 = True
                     for child in root:
-                        child.attrib[column] = child.attrib.get(column, "").encode("base64")
                         try:
                             child.attrib.get(column, "").decode("base64")
                         except binascii.Error:
