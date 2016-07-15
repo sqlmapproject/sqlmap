@@ -695,8 +695,6 @@ def paramToDict(place, parameters=None):
 
 def getManualDirectories():
     directories = None
-    pagePath = directoryPath(conf.path)
-
     defaultDocRoot = DEFAULT_DOC_ROOTS.get(Backend.getOs(), DEFAULT_DOC_ROOTS[OS.LINUX])
 
     if kb.absFilePaths:
@@ -714,18 +712,18 @@ def getManualDirectories():
                 windowsDriveLetter, absFilePath = absFilePath[:2], absFilePath[2:]
                 absFilePath = ntToPosixSlashes(posixToNtSlashes(absFilePath))
 
-            if any("/%s/" % _ in absFilePath for _ in GENERIC_DOC_ROOT_DIRECTORY_NAMES):
-                for _ in GENERIC_DOC_ROOT_DIRECTORY_NAMES:
-                    _ = "/%s/" % _
+            for _ in list(GENERIC_DOC_ROOT_DIRECTORY_NAMES) + [conf.hostname]:
+                _ = "/%s/" % _
 
-                    if _ in absFilePath:
-                        directories = "%s%s" % (absFilePath.split(_)[0], _)
-                        break
+                if _ in absFilePath:
+                    directories = "%s%s" % (absFilePath.split(_)[0], _)
+                    break
 
-            if pagePath and pagePath in absFilePath:
-                directories = absFilePath.split(pagePath)[0]
-                if windowsDriveLetter:
-                    directories = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(directories))
+            if not directories and conf.path.strip('/') and conf.path in absFilePath:
+                directories = absFilePath.split(conf.path)[0]
+
+            if directories and windowsDriveLetter:
+                directories = "%s/%s" % (windowsDriveLetter, ntToPosixSlashes(directories))
 
     directories = normalizePath(directories)
 

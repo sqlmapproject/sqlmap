@@ -217,8 +217,6 @@ class Web:
 
             if not isWindowsDriveLetterPath(directory) and not directory.startswith('/'):
                 directory = "/%s" % directory
-            else:
-                directory = directory[2:] if isWindowsDriveLetterPath(directory) else directory
 
             if not directory.endswith('/'):
                 directory += '/'
