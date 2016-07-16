@@ -14,6 +14,7 @@ from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
 from lib.core.exception import SqlmapInstallationException
+from lib.core.settings import PAYLOAD_XML_FILES
 
 def cleanupVals(text, tag):
     if tag in ("clause", "where"):
@@ -83,10 +84,7 @@ def loadBoundaries():
     parseXmlNode(root)
 
 def loadPayloads():
-    payloadFiles = os.listdir(paths.SQLMAP_XML_PAYLOADS_PATH)
-    payloadFiles.sort()
-
-    for payloadFile in payloadFiles:
+    for payloadFile in PAYLOAD_XML_FILES:
         payloadFilePath = os.path.join(paths.SQLMAP_XML_PAYLOADS_PATH, payloadFile)
 
         try:

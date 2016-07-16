@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.7.32"
+VERSION = "1.0.7.33"
 REVISION = getRevisionNumber()
 STABLE = VERSION.count('.') <= 2
 VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
@@ -664,6 +664,9 @@ SUHOSIN_MAX_VALUE_LENGTH = 512
 
 # Minimum size of an (binary) entry before it can be considered for dumping to disk
 MIN_BINARY_DISK_DUMP_SIZE = 100
+
+# Filenames of payloads xml files (in order of loading)
+PAYLOAD_XML_FILES = ("boolean_blind.xml", "error_based.xml", "inline_query.xml", "stacked_queries.xml", "time_blind.xml", "union_query.xml")
 
 # Regular expression used for extracting form tags
 FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"

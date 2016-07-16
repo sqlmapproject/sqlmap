@@ -78,12 +78,12 @@ ad3d022d4591aee80f7391248d722413  thirdparty/colorama/win32.py
 ed4d76c08741d34ac79f6488663345f7  thirdparty/colorama/initialise.py
 cb2e1fe7c404dff41a2ae9132828f532  thirdparty/beautifulsoup/__init__.py
 a53a7a876b401aaaa3535376676692ae  thirdparty/beautifulsoup/beautifulsoup.py
-06b1a210b190d52477a9d492443725b5  xml/payloads/03_inline_query.xml
-103a4c9b12c582b24a3fac8147a9c8d4  xml/payloads/02_error_based.xml
-96adb9bfbab867d221974d3ddb303cb6  xml/payloads/04_stacked_queries.xml
-c8b152ecebf04ec997e52c6c78cbd488  xml/payloads/05_time_blind.xml
-18b2c7e5738a3be72d759af96a9aaddf  xml/payloads/01_boolean_blind.xml
-033b39025e8ee0f302935f6db3a39e77  xml/payloads/06_union_query.xml
+c8b152ecebf04ec997e52c6c78cbd488  xml/payloads/time_blind.xml
+06b1a210b190d52477a9d492443725b5  xml/payloads/inline_query.xml
+103a4c9b12c582b24a3fac8147a9c8d4  xml/payloads/error_based.xml
+033b39025e8ee0f302935f6db3a39e77  xml/payloads/union_query.xml
+18b2c7e5738a3be72d759af96a9aaddf  xml/payloads/boolean_blind.xml
+96adb9bfbab867d221974d3ddb303cb6  xml/payloads/stacked_queries.xml
 535d625cff8418bdc086ab4e1bbf5135  xml/errors.xml
 2e13b9e0a51768969d4ccc02cf62ea70  xml/livetests.xml
 9b262a617b06af56b1267987d694bf6f  xml/banner/oracle.xml
@@ -294,7 +294,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/utils/__init__.py
 2dfc03a7322c46deb2e5353a7fd4be5e  lib/utils/api.py
 8cdc8c1e663c3b92a756fb7b02cc3c02  lib/utils/crawler.py
 da08a0b58c08ff452c7d1da4857d6680  lib/utils/progress.py
-9cedf0b3c12c925605dfbb417f8f28c5  lib/parse/payloads.py
+af6b8e1c6eb074b56bbd9cd80aebcd97  lib/parse/payloads.py
 fe4e2152292587928edb94c9a4d311ff  lib/parse/handler.py
 c1288bc4ce5651dbdd82d4a9435fdc03  lib/parse/banner.py
 bf7fbfb04d6150d19ecfd9b25ee5618a  lib/parse/cmdline.py
@@ -311,7 +311,7 @@ e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 2689f320908964b2c88a3eb8265fd2dd  lib/core/agent.py
 8485a3cd94c0a5af2718bad60c5f1ae5  lib/core/wordlist.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-49aa486301af9fac995ef4da820e08b4  lib/core/settings.py
+e20095cb62253bf112162e1300dbba14  lib/core/settings.py
 34a45b9bc68a6381247a620ddf30de1c  lib/core/enums.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 4a16002c5d9cd047c2e89ddc5db63737  lib/core/dicts.py
