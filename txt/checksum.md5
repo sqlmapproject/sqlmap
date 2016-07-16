@@ -109,7 +109,7 @@ b04db3e861edde1f9dd0a3850d5b96c8  ./shell/backdoor.asp_
 ff90cb0366f7cefbdd6e573e27e6238c  ./shell/runcmd.exe_
 01e3505e796edf19aad6a996101c81c9  ./shell/stager.php_
 1f7f125f30e0e800beb21e2ebbab18e1  ./shell/stager.jsp_
-28bdeba99aa04e10f00530eb88fef301  ./sqlmap.py
+af69c5e3d20bd472ba386056e9cf2fd6  ./sqlmap.py
 07eb9ee33a3e31bfc74763bea8026a2b  ./waf/knownsec.py
 d50415b49d9df72cb9d193d05630ab8a  ./waf/fortiweb.py
 8d5609a37127782fb35af4f67b5787ee  ./waf/proventia.py
@@ -311,7 +311,7 @@ e77cca1cb063016f71f6e6bdebf4ec73  ./lib/core/data.py
 2689f320908964b2c88a3eb8265fd2dd  ./lib/core/agent.py
 8485a3cd94c0a5af2718bad60c5f1ae5  ./lib/core/wordlist.py
 eb0bd28b0bd9fbf67dcc3119116df377  ./lib/core/bigarray.py
-86f543debcb2011d983fac4482f1e544  ./lib/core/settings.py
+662c04d988a5308b98ea74df68f50392  ./lib/core/settings.py
 34a45b9bc68a6381247a620ddf30de1c  ./lib/core/enums.py
 99a2b496b9d5b546b335653ca801153f  ./lib/core/revision.py
 4a16002c5d9cd047c2e89ddc5db63737  ./lib/core/dicts.py
@@ -333,7 +333,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  ./lib/core/__init__.py
 67f206cf2658145992cc1d7020138325  ./lib/core/defaults.py
 7af83e4f18cab6dff5e67840eb65be80  ./lib/core/shell.py
 1d042f0bc0557d3fd564ea5a46deb77e  ./lib/core/datatype.py
-b1e8297aa42eec379936b4ce7f2934b2  ./lib/core/common.py
+25fcb4a9fd187cb587847852df4ac784  ./lib/core/common.py
 1d064463302b85b2241263ea48a83837  ./lib/takeover/metasploit.py
 7083825564c051a7265cfdd1a5e6629c  ./lib/takeover/registry.py
 7d6cd7bdfc8f4bc4e8aed60c84cdf87f  ./lib/takeover/udf.py

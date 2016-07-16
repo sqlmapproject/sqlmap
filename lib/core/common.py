@@ -1207,6 +1207,7 @@ def setPaths():
     paths.SQL_SHELL_HISTORY = os.path.join(_, "sql.hst")
     paths.SQLMAP_SHELL_HISTORY = os.path.join(_, "sqlmap.hst")
     paths.GITHUB_HISTORY = os.path.join(_, "github.hst")
+    paths.CHECKSUM_MD5 = os.path.join(paths.SQLMAP_TXT_PATH, "checksum.md5")
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
@@ -3075,6 +3076,22 @@ def decodeIntToUnicode(value):
         except:
             retVal = INFERENCE_UNKNOWN_CHAR
 
+    return retVal
+
+def checkIntegrity():
+    """
+    Checks integrity of code files during the unhandled exceptions
+    """
+
+    retVal = True
+    for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
+        path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
+        if not os.path.isfile(path):
+            logger.error("missing file detected '%s'" % path)
+            retVal = False
+        elif hashlib.md5(open(path, 'rb').read()).hexdigest() != checksum:
+            logger.error("wrong checksum of file '%s' detected" % path)
+            retVal = False
     return retVal
 
 def unhandledExceptionMessage():

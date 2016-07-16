@@ -34,6 +34,7 @@ from lib.core.data import logger
 try:
     from lib.controller.controller import start
     from lib.core.common import banner
+    from lib.core.common import checkIntegrity
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
     from lib.core.common import getSafeExString
@@ -196,7 +197,15 @@ def main():
         excMsg = traceback.format_exc()
 
         try:
-            if any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
+            if not checkIntegrity():
+                errMsg = "code integrity check failed. "
+                errMsg += "You should retrieve the latest development version from official GitHub "
+                errMsg += "repository at '%s'" % GIT_PAGE
+                logger.critical(errMsg)
+                print
+                print excMsg.strip()
+                raise SystemExit
+            elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
                 errMsg = "no space left on output device"
                 logger.error(errMsg)
                 raise SystemExit
@@ -210,11 +219,6 @@ def main():
 
             elif "Read-only file system" in excMsg:
                 errMsg = "output device is mounted as read-only"
-                logger.error(errMsg)
-                raise SystemExit
-
-            elif "in _loadQueries" in excMsg:
-                errMsg = "invalid structure of 'xml/queries.xml' file"
                 logger.error(errMsg)
                 raise SystemExit
 
