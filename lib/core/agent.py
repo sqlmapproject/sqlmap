@@ -120,7 +120,7 @@ class Agent(object):
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
             origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
-            origValue = origValue[origValue.index(',') + 1:]
+            origValue = origValue[origValue.find(',') + 1:]
             match = re.search(r"([^;]+)=(?P<value>[^;]+);?\Z", origValue)
             if match:
                 origValue = match.group("value")
