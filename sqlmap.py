@@ -213,6 +213,11 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "in _loadQueries" in excMsg:
+                errMsg = "invalid structure of 'xml/queries.xml' file"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "_mkstemp_inner" in excMsg:
                 errMsg = "there has been a problem while accessing temporary files"
                 logger.error(errMsg)
