@@ -3083,6 +3083,8 @@ def checkIntegrity():
     Checks integrity of code files during the unhandled exceptions
     """
 
+    logger.debug("running code integrity check")
+
     retVal = True
     for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
         path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
