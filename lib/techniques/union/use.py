@@ -102,28 +102,32 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
             retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
         else:
-            output = extractRegexResult(r"(?P<result>(<row[^>]+>)+)", page)
+            output = extractRegexResult(r"(?P<result>(<row.+?/>)+)", page)
             if output:
-                retVal = ""
-                root = xml.etree.ElementTree.fromstring("<root>%s</root>" % output)
-                for column in kb.dumpColumns:
-                    base64 = True
-                    for child in root:
-                        try:
-                            child.attrib.get(column, "").decode("base64")
-                        except binascii.Error:
-                            base64 = False
-                            break
-
-                    if base64:
-                        for child in root:
-                            child.attrib[column] = child.attrib.get(column, "").decode("base64") or NULL
-
-                for child in root:
-                    row = []
+                try:
+                    root = xml.etree.ElementTree.fromstring("<root>%s</root>" % output)
+                    retVal = ""
                     for column in kb.dumpColumns:
-                        row.append(child.attrib.get(column, NULL))
-                    retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(row), kb.chars.stop)
+                        base64 = True
+                        for child in root:
+                            try:
+                                child.attrib.get(column, "").decode("base64")
+                            except binascii.Error:
+                                base64 = False
+                                break
+
+                        if base64:
+                            for child in root:
+                                child.attrib[column] = child.attrib.get(column, "").decode("base64") or NULL
+
+                    for child in root:
+                        row = []
+                        for column in kb.dumpColumns:
+                            row.append(child.attrib.get(column, NULL))
+                        retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(row), kb.chars.stop)
+
+                except xml.etree.ElementTree.ParseError:
+                    pass
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
