@@ -1142,7 +1142,7 @@ def _ParseFileEx(file, base_uri,
         try:
             form.fixup()
         except AttributeError, ex:
-            if "item is disabled" not in str(ex):
+            if not any(_ in str(ex) for _ in ("item is disabled", "is readonly")):
                 raise
     return forms
 
