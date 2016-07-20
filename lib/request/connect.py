@@ -446,7 +446,7 @@ class Connect(object):
                         requestHeaders += "\n%s: %d" % (string.capwords(HTTP_HEADER.CONTENT_LENGTH), len(post))
 
                 if not getRequestHeader(req, HTTP_HEADER.CONNECTION):
-                    requestHeaders += "\n%s: close" % HTTP_HEADER.CONNECTION
+                    requestHeaders += "\n%s: %s" % (HTTP_HEADER.CONNECTION, "close" if not conf.keepAlive else "keep-alive")
 
                 requestMsg += "\n%s" % requestHeaders
 
