@@ -111,8 +111,13 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                     for column in kb.dumpColumns:
                         base64 = True
                         for child in root:
+                            value = child.attrib.get(column, "").strip()
+                            if value and not re.match(r"\A[a-zA-Z0-9+/]+={0,2}\Z", value):
+                                base64 = False
+                                break
+
                             try:
-                                child.attrib.get(column, "").decode("base64")
+                                value.decode("base64")
                             except binascii.Error:
                                 base64 = False
                                 break
