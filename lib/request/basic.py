@@ -359,6 +359,8 @@ def processResponse(page, responseHeaders):
             if re.search(r"(?i)captcha", match.group(0)):
                 kb.captchaDetected = True
                 warnMsg = "potential CAPTCHA protection mechanism detected"
+                if re.search(r"(?i)<title>[^<]*CloudFlare", page):
+                    warnMsg += " (CloudFlare)"
                 singleTimeWarnMessage(warnMsg)
                 break
 
