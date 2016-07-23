@@ -132,7 +132,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                             row.append(child.attrib.get(column, NULL))
                         retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(row), kb.chars.stop)
 
-                except xml.etree.ElementTree.ParseError:
+                except:
                     pass
                 else:
                     retVal = getUnicode(retVal)
