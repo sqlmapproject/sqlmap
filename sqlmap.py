@@ -203,7 +203,7 @@ def main():
                 errMsg += "repository at '%s'" % GIT_PAGE
                 logger.critical(errMsg)
                 print
-                print excMsg.strip()
+                dataToStdout(excMsg)
                 raise SystemExit
             elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
                 errMsg = "no space left on output device"
