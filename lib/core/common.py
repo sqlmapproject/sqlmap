@@ -1180,10 +1180,12 @@ def cleanQuery(query):
 
     return retVal
 
-def setPaths():
+def setPaths(rootPath):
     """
     Sets absolute paths for project directories and files
     """
+
+    paths.SQLMAP_ROOT_PATH = rootPath
 
     # sqlmap paths
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")

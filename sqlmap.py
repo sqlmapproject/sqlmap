@@ -45,7 +45,6 @@ try:
     from lib.core.data import cmdLineOptions
     from lib.core.data import conf
     from lib.core.data import kb
-    from lib.core.data import paths
     from lib.core.common import unhandledExceptionMessage
     from lib.core.common import MKSTEMP_PREFIX
     from lib.core.exception import SqlmapBaseException
@@ -86,10 +85,8 @@ def modulePath():
     return getUnicode(os.path.dirname(os.path.realpath(_)), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
 
 def checkEnvironment():
-    paths.SQLMAP_ROOT_PATH = modulePath()
-
     try:
-        os.path.isdir(paths.SQLMAP_ROOT_PATH)
+        os.path.isdir(modulePath())
     except UnicodeEncodeError:
         errMsg = "your system does not properly handle non-ASCII paths. "
         errMsg += "Please move the sqlmap's directory to the other location"
@@ -112,7 +109,7 @@ def main():
     try:
         checkEnvironment()
 
-        setPaths()
+        setPaths(modulePath())
         banner()
 
         # Store original command line options for possible later restoration

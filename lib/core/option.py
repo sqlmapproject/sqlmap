@@ -1731,7 +1731,7 @@ def _cleanupOptions():
 
     if conf.outputDir:
         paths.SQLMAP_OUTPUT_PATH = os.path.realpath(os.path.expanduser(conf.outputDir))
-        setPaths()
+        setPaths(paths.SQLMAP_ROOT_PATH)
 
     if conf.string:
         try:

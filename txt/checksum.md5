@@ -26,7 +26,7 @@ d1451b43f3ac80bfbea8657e288865f8  lib/controller/checks.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 2689f320908964b2c88a3eb8265fd2dd  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-0b4ddb7846b9b5469eaa4a51755d1ae0  lib/core/common.py
+1dd298ac06c961037bb76a675bb4b322  lib/core/common.py
 5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 b9779615206791e6ebbaa84947842b49  lib/core/optiondict.py
-987f82b5e004fb47a1ae76d763b3c57f  lib/core/option.py
+85b144015724e1961e6c9ea1a42b329a  lib/core/option.py
 1e8948dddbd12def5c2af52530738059  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-302ae9311a57db18ea8552c55eb339ba  lib/core/settings.py
+7818f4d503649d92e5239be5f6790501  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -217,8 +217,8 @@ ff90cb0366f7cefbdd6e573e27e6238c  shell/runcmd.exe_
 c3cc8b7727161e64ab59f312c33b541a  shell/stager.aspx_
 1f7f125f30e0e800beb21e2ebbab18e1  shell/stager.jsp_
 01e3505e796edf19aad6a996101c81c9  shell/stager.php_
-99cb675e2c353f03a23e0f7a97f1a8ef  sqlmapapi.py
-28ff1c7f8b7da2f3c236ac0f8a21d545  sqlmap.py
+56702e95555adee718b6a11ee7098fd4  sqlmapapi.py
+7e80fcefc56426ed780c48556b70a1f0  sqlmap.py
 1316deb997418507e76221c84ec99946  tamper/apostrophemask.py
 a6efe8f914c769c52afec703bd73609f  tamper/apostrophenullencode.py
 b1c56983919b69f4f6f0e7929c881e7a  tamper/appendnullbyte.py

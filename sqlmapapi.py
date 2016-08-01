@@ -15,7 +15,6 @@ from lib.utils import versioncheck  # this has to be the first non-standard impo
 
 from sqlmap import modulePath
 from lib.core.common import setPaths
-from lib.core.data import paths
 from lib.core.data import logger
 from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
@@ -31,9 +30,8 @@ def main():
     # Set default logging level to debug
     logger.setLevel(logging.DEBUG)
 
-    # Initialize path variable
-    paths.SQLMAP_ROOT_PATH = modulePath()
-    setPaths()
+    # Initialize paths
+    setPaths(modulePath())
 
     # Parse command line options
     apiparser = optparse.OptionParser()
