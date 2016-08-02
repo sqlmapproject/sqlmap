@@ -21,3 +21,6 @@ then
         /bin/bash ${SCRIPTPATH%/*}/pypi.sh
     fi
 fi
+
+echo "Going to push PyPI package"
+/bin/bash ${SCRIPTPATH%/*}/pypi.sh
