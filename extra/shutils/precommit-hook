@@ -10,9 +10,6 @@ PROJECT_FULLPATH=${SCRIPTPATH%/*}/$PROJECT
 SETTINGS_FULLPATH=${SCRIPTPATH%/*}/$SETTINGS
 CHECKSUM_FULLPATH=${SCRIPTPATH%/*}/$CHECKSUM
 
-truncate -s 0 "$CHECKSUM_FULLPATH"
-cd $PROJECT_FULLPATH && for i in $(find . -name "*.py" -o -name "*.xml" -o -iname "*_" | sort); do git ls-files $i --error-unmatch &>/dev/null && md5sum $i | sed 's/\.\///' >> "$CHECKSUM_FULLPATH"; git add "$CHECKSUM_FULLPATH"; done
-
 if [ -f $SETTINGS_FULLPATH ]
 then
     LINE=$(grep -o ${SETTINGS_FULLPATH} -e 'VERSION = "[0-9.]*"');
@@ -26,4 +23,8 @@ then
         echo "Something went wrong in VERSION increment"
         exit 1
     fi
+    git add "$SETTINGS_FULLPATH"
 fi;
+
+truncate -s 0 "$CHECKSUM_FULLPATH"
+cd $PROJECT_FULLPATH && for i in $(find . -name "*.py" -o -name "*.xml" -o -iname "*_" | sort); do git ls-files $i --error-unmatch &>/dev/null && md5sum $i | sed 's/\.\///' >> "$CHECKSUM_FULLPATH"; git add "$CHECKSUM_FULLPATH"; done

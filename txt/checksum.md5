@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-7818f4d503649d92e5239be5f6790501  lib/core/settings.py
+e9ab1f38b3653ca51519b62929b52492  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -57,7 +57,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 354ecc0c6d3e0ac9c06ed897c4d52edf  lib/core/xmldump.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/__init__.py
 c1288bc4ce5651dbdd82d4a9435fdc03  lib/parse/banner.py
-bf7fbfb04d6150d19ecfd9b25ee5618a  lib/parse/cmdline.py
+daea32290b63c43f7d1c0e14c66d4826  lib/parse/cmdline.py
 8ec4d4f02634834701f8258726f2e511  lib/parse/configfile.py
 fe4e2152292587928edb94c9a4d311ff  lib/parse/handler.py
 8e6bfb13e5a34b2610f3ff23467a34cf  lib/parse/headers.py

@@ -19,10 +19,11 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.8.1"
+VERSION = "1.0.8.8"
 REVISION = getRevisionNumber()
-STABLE = VERSION.count('.') <= 2
-VERSION_STRING = "sqlmap/%s#%s" % (VERSION, "stable" if STABLE else "dev")
+TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
+TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
+VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[::-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
 DESCRIPTION = "automatic SQL injection and database takeover tool"
 SITE = "http://sqlmap.org"
 ISSUES_PAGE = "https://github.com/sqlmapproject/sqlmap/issues/new"
@@ -35,7 +36,7 @@ BANNER = """\033[01;33m         _
 |_ -| . | |     | .'| . |
 |___|_  |_|_|_|_|__,|  _|
       |_|           |_|   \033[0m\033[4;37m%s\033[0m\n
-""" % ((31 + hash(VERSION) % 6) if not STABLE else 30, VERSION_STRING.split('/')[-1], SITE)
+""" % (TYPE_COLORS.get(TYPE, 31), VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True
 DIFF_TOLERANCE = 0.05

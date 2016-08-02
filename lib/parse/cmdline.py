@@ -938,7 +938,7 @@ def cmdLineParser(argv=None):
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
             args.purgeOutput, args.pickledOptions, args.sitemapUrl)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
-            errMsg += "use -h for basic or -hh for advanced help"
+            errMsg += "use -h for basic or -hh for advanced help\n"
             parser.error(errMsg)
 
         return args
