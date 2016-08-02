@@ -87,8 +87,9 @@ class HTTPSConnection(httplib.HTTPSConnection):
 
         if not success:
             errMsg = "can't establish SSL connection"
-            if distutils.version.LooseVersion(PYVERSION) < distutils.version.LooseVersion("2.7.10"):
-                errMsg += " (please retry with Python >= 2.7.10)"
+            # Reference: https://docs.python.org/2/library/ssl.html
+            if distutils.version.LooseVersion(PYVERSION) < distutils.version.LooseVersion("2.7.9"):
+                errMsg += " (please retry with Python >= 2.7.9)"
             raise SqlmapConnectionException(errMsg)
 
 class HTTPSHandler(urllib2.HTTPSHandler):
