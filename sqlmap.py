@@ -300,7 +300,7 @@ def main():
 
         if hasattr(conf, "api"):
             try:
-                conf.database_cursor.disconnect()
+                conf.databaseCursor.disconnect()
             except KeyboardInterrupt:
                 pass
 
@@ -314,10 +314,10 @@ def main():
                 time.sleep(0.01)
         except KeyboardInterrupt:
             pass
-
-        # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
-        if threading.activeCount() > 1:
-            os._exit(0)
+        finally:
+            # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
+            if threading.activeCount() > 1:
+                os._exit(0)
 
 if __name__ == "__main__":
     main()
