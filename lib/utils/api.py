@@ -723,6 +723,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
     while True:
         try:
             command = raw_input("api%s> " % (" (%s)" % taskid if taskid else "")).strip()
+            command = re.sub(r"\A(\w+)", lambda match: match.group(1).lower(), command)
         except (EOFError, KeyboardInterrupt):
             print
             break
