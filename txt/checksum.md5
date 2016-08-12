@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-c857eea31beebb5aac5719c2329bbaf3  lib/core/settings.py
+636be763d8ddac748b6455f732b711ce  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -426,6 +426,7 @@ b5ea5375df444e0240f1ee0e2a8e52fb  waf/trafficshield.py
 7a723ce2f1b82d7297a2ab025d5ca0be  waf/webappsecure.py
 75e51fea7f206e8faa2f743e44e58383  waf/webknight.py
 3bcac085dcd9ed26b50a2320e418e9f3  waf/yundun.py
+2a57f322f0b6e7b11b8df0909816a34f  waf/yunsuo.py
 2d53fdaca0d7b42edad5192661248d76  xml/banner/cookie.xml
 37603bc0905af0c65480a2ca959990ec  xml/banner/generic.xml
 d8925c034263bf1b83e7d8e1c78eec57  xml/banner/mssql.xml
