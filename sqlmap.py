@@ -202,6 +202,7 @@ def main():
                 print
                 dataToStdout(excMsg)
                 raise SystemExit
+
             elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
                 errMsg = "no space left on output device"
                 logger.error(errMsg)
@@ -216,6 +217,11 @@ def main():
 
             elif "Read-only file system" in excMsg:
                 errMsg = "output device is mounted as read-only"
+                logger.error(errMsg)
+                raise SystemExit
+
+            elif "OperationalError: disk I/O error" in excMsg:
+                errMsg = "I/O error on output device"
                 logger.error(errMsg)
                 raise SystemExit
 
