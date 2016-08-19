@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-40f4a8db45e22c380fcbc9c93d1f4749  lib/core/settings.py
+6432d4a9a990e1ebc1d1adb15cfba8e9  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -311,7 +311,7 @@ ee25f2a03587e2c283eab0b36c9e5783  thirdparty/chardet/sbcsgroupprober.py
 c9349824f2647962175d321cc0c52134  thirdparty/chardet/sjisprober.py
 bcae4c645a737d3f0e7c96a66528ca4a  thirdparty/chardet/universaldetector.py
 6f8b3e25472c02fb45a75215a175991f  thirdparty/chardet/utf8prober.py
-b678dcd25ecb1533ffe2493b6e711bb1  thirdparty/clientform/clientform.py
+658da0466b798cc70f48f35fe49b7813  thirdparty/clientform/clientform.py
 722281d87fb13ec22555480f8f4c715b  thirdparty/clientform/__init__.py
 0b625ccefa6b066f79d3cbb3639267e6  thirdparty/colorama/ansi.py
 e52252bb81ce1a14b7245b53af33e75f  thirdparty/colorama/ansitowin32.py
