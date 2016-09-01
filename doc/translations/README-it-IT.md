@@ -39,15 +39,15 @@ Per una panoramica delle capacità di sqlmap, una lista delle sue funzionalità 
 Link
 ----
 
-* Homepage: http://sqlmap.org
+* Sito: http://sqlmap.org
 * Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * RSS feed dei commit: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
-* User's manual: https://github.com/sqlmapproject/sqlmap/wiki
-* Frequently Asked Questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
+* Manuale dell'utente: https://github.com/sqlmapproject/sqlmap/wiki
+* Domande più frequenti (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Iscrizione alla Mailing list: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
 * Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
 * Archivio della Mailing list: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demo: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Dimostrazioni: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Screenshot: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
