@@ -203,6 +203,11 @@ def main():
                 dataToStdout(excMsg)
                 raise SystemExit
 
+            elif "MemoryError" in excMsg:
+                errMsg = "memory exhaustion detected"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
                 errMsg = "no space left on output device"
                 logger.error(errMsg)
