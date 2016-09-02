@@ -110,7 +110,6 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
-from thirdparty.multipart import multipartpost
 from thirdparty.odict.odict import OrderedDict
 from thirdparty.socks.socks import ProxyError
 
@@ -242,7 +241,7 @@ class Connect(object):
         referer = kwargs.get("referer",             None) or conf.referer
         host = kwargs.get("host",                   None) or conf.host
         direct_ = kwargs.get("direct",              False)
-        multipart = kwargs.get("multipart",         False)
+        multipart = kwargs.get("multipart",         None)
         silent = kwargs.get("silent",               False)
         raise404 = kwargs.get("raise404",           True)
         timeout = kwargs.get("timeout",             None) or conf.timeout
@@ -253,6 +252,9 @@ class Connect(object):
         retrying = kwargs.get("retrying",           False)
         crawling = kwargs.get("crawling",           False)
         skipRead = kwargs.get("skipRead",           False)
+
+        if multipart:
+            post = multipart
 
         websocket_ = url.lower().startswith("ws")
 
@@ -297,20 +299,6 @@ class Connect(object):
                     url, params = url.split('?', 1)
                     params = urlencode(params)
                     url = "%s?%s" % (url, params)
-
-            elif multipart:
-                # Needed in this form because of potential circle dependency
-                # problem (option -> update -> connect -> option)
-                from lib.core.option import proxyHandler
-
-                multipartOpener = urllib2.build_opener(proxyHandler, multipartpost.MultipartPostHandler)
-                conn = multipartOpener.open(unicodeencode(url), multipart)
-                page = Connect._connReadProxy(conn) if not skipRead else None
-                responseHeaders = conn.info()
-                responseHeaders[URI_HTTP_HEADER] = conn.geturl()
-                page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
-
-                return page
 
             elif any((refreshing, crawling)):
                 pass
@@ -364,7 +352,7 @@ class Connect(object):
             if not getHeader(headers, HTTP_HEADER.ACCEPT_ENCODING):
                 headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE if kb.pageCompress else "identity"
 
-            if post is not None and not getHeader(headers, HTTP_HEADER.CONTENT_TYPE):
+            if post is not None and not multipart and not getHeader(headers, HTTP_HEADER.CONTENT_TYPE):
                 headers[HTTP_HEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
 
             if headers.get(HTTP_HEADER.CONTENT_TYPE) == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
@@ -455,9 +443,10 @@ class Connect(object):
 
                 requestMsg += "\n"
 
-                threadData.lastRequestMsg = requestMsg
+                if not multipart:
+                    threadData.lastRequestMsg = requestMsg
 
-                logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
+                    logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
                 if conf.cj:
                     for cookie in conf.cj:
@@ -578,7 +567,8 @@ class Connect(object):
             elif conf.verbose > 5:
                 responseMsg += "%s\n\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
-            logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
+            if not multipart:
+                logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
             if ex.code == httplib.UNAUTHORIZED and not conf.ignore401:
                 errMsg = "not authorized, try to provide right HTTP "
@@ -711,7 +701,8 @@ class Connect(object):
         elif conf.verbose > 5:
             responseMsg += "%s\n\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
-        logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
+        if not multipart:
+            logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
         return page, responseHeaders, code
 

@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 b9779615206791e6ebbaa84947842b49  lib/core/optiondict.py
-85b144015724e1961e6c9ea1a42b329a  lib/core/option.py
+57109386dcff87507201f14a5821fd41  lib/core/option.py
 1e8948dddbd12def5c2af52530738059  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-c523de8745fb88545bbbbd7cee1d0b2f  lib/core/settings.py
+dd9d9aa60d7b2ba844189b90285c45cd  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -68,7 +68,7 @@ b40a4c5d91770d347df36d3065b63798  lib/parse/sitemap.py
 9299f21804033f099681525bb9bf51c0  lib/request/basicauthhandler.py
 a3e83cfe7e6825fb1b70951ad290d2ae  lib/request/basic.py
 97fb6323bfb5f941b27cbdb00f9078e1  lib/request/comparison.py
-72a0e7bb1010bb39c6538dbc77eae180  lib/request/connect.py
+8bc040159a145a1dfdf8a3fe76a0adbc  lib/request/connect.py
 49b4c583af68689de5f9acb162de2939  lib/request/direct.py
 1a46f7bb26b23ec0c0d9d9c95828241b  lib/request/dns.py
 70ceefe39980611494d4f99afb96f652  lib/request/httpshandler.py
@@ -329,7 +329,7 @@ e0c6a936506bffeed53ce106ec15942d  thirdparty/keepalive/keepalive.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/magic/__init__.py
 49f0d123e044dd32a452e2fe51f1a9c3  thirdparty/magic/magic.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/multipart/__init__.py
-fd52df5770ee286a7c186fdd2ccc4e0c  thirdparty/multipart/multipartpost.py
+03c8abc17b228e59bcfda1f11a9137e0  thirdparty/multipart/multipartpost.py
 3e502b04f3849afbb7f0e13b5fd2b5c1  thirdparty/odict/__init__.py
 127fe54fdb9b13fdac93c8fc9c9cad5e  thirdparty/odict/odict.py
 08801ea0ba9ae22885275ef65d3ee9dc  thirdparty/oset/_abc.py

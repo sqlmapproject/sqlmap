@@ -155,6 +155,7 @@ from lib.utils.deps import checkDependencies
 from lib.utils.search import search
 from lib.utils.purge import purge
 from thirdparty.keepalive import keepalive
+from thirdparty.multipart import multipartpost
 from thirdparty.oset.pyoset import oset
 from thirdparty.socks import socks
 from xml.etree.ElementTree import ElementTree
@@ -165,6 +166,7 @@ keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
+multipartPostHandler = multipartpost.MultipartPostHandler()
 
 def _feedTargetsDict(reqFile, addedTargetUrls):
     """
@@ -1164,7 +1166,7 @@ def _setHTTPHandlers():
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
 
-    handlers = filter(None, [proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, httpsHandler])
+    handlers = filter(None, [multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, httpsHandler])
 
     if not conf.dropSetCookie:
         if not conf.loadCookies:
