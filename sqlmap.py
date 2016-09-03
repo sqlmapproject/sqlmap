@@ -85,6 +85,9 @@ def modulePath():
     return getUnicode(os.path.dirname(os.path.realpath(_)), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
 
 def checkEnvironment():
+    global conf
+    global kb
+
     try:
         os.path.isdir(modulePath())
     except UnicodeEncodeError:
@@ -100,6 +103,11 @@ def checkEnvironment():
         errMsg += "versions"
         logger.critical(errMsg)
         raise SystemExit
+
+    # Patch for pip environment
+    if "sqlmap.sqlmap" in sys.modules:
+        kb = sys.modules["lib.core.data"].kb
+        conf = sys.modules["lib.core.data"].conf
 
 def main():
     """
