@@ -883,32 +883,32 @@ def _setTamperingFunctions():
         resolve_priorities = False
         priorities = []
 
-        for tfile in re.split(PARAMETER_SPLITTING_REGEX, conf.tamper):
+        for script in re.split(PARAMETER_SPLITTING_REGEX, conf.tamper):
             found = False
 
-            tfile = tfile.strip()
+            script = script.strip().encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
 
-            if not tfile:
+            if not script:
                 continue
 
-            elif os.path.exists(os.path.join(paths.SQLMAP_TAMPER_PATH, tfile if tfile.endswith('.py') else "%s.py" % tfile)):
-                tfile = os.path.join(paths.SQLMAP_TAMPER_PATH, tfile if tfile.endswith('.py') else "%s.py" % tfile)
+            elif os.path.exists(os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)):
+                script = os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)
 
-            elif not os.path.exists(tfile):
-                errMsg = "tamper script '%s' does not exist" % tfile
+            elif not os.path.exists(script):
+                errMsg = "tamper script '%s' does not exist" % script
                 raise SqlmapFilePathException(errMsg)
 
-            elif not tfile.endswith('.py'):
-                errMsg = "tamper script '%s' should have an extension '.py'" % tfile
+            elif not script.endswith(".py"):
+                errMsg = "tamper script '%s' should have an extension '.py'" % script
                 raise SqlmapSyntaxException(errMsg)
 
-            dirname, filename = os.path.split(tfile)
+            dirname, filename = os.path.split(script)
             dirname = os.path.abspath(dirname)
 
             infoMsg = "loading tamper script '%s'" % filename[:-3]
             logger.info(infoMsg)
 
-            if not os.path.exists(os.path.join(dirname, '__init__.py')):
+            if not os.path.exists(os.path.join(dirname, "__init__.py")):
                 errMsg = "make sure that there is an empty file '__init__.py' "
                 errMsg += "inside of tamper scripts directory '%s'" % dirname
                 raise SqlmapGenericException(errMsg)
@@ -917,11 +917,11 @@ def _setTamperingFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
+                module = __import__(filename[:-3])
             except (ImportError, SyntaxError), ex:
                 raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
-            priority = PRIORITY.NORMAL if not hasattr(module, '__priority__') else module.__priority__
+            priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "tamper" and inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs":
@@ -953,7 +953,7 @@ def _setTamperingFunctions():
 
             if not found:
                 errMsg = "missing function 'tamper(payload, **kwargs)' "
-                errMsg += "in tamper script '%s'" % tfile
+                errMsg += "in tamper script '%s'" % script
                 raise SqlmapGenericException(errMsg)
 
         if kb.tamperFunctions and len(kb.tamperFunctions) > 3:
