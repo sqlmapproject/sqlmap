@@ -351,7 +351,11 @@ def processResponse(page, responseHeaders):
                 if PLACE.POST in conf.paramDict and name in conf.paramDict[PLACE.POST]:
                     if conf.paramDict[PLACE.POST][name] in page:
                         continue
-                    conf.paramDict[PLACE.POST][name] = value
+                    else:
+                        msg = "do you want to automatically adjust the value of '%s'? [y/N]" % name
+                        if readInput(msg, default='N').strip().upper() != 'Y':
+                            continue
+                        conf.paramDict[PLACE.POST][name] = value
                 conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
 
     if not kb.captchaDetected and re.search(r"(?i)captcha", page or ""):
