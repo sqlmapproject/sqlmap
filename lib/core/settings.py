@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.9.8"
+VERSION = "1.0.9.9"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -532,7 +532,7 @@ DEFAULT_COOKIE_DELIMITER = ';'
 FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 
 # Github OAuth token used for creating an automatic Issue for unhandled exceptions
-GITHUB_REPORT_OAUTH_TOKEN = "YzNkYTgyMTdjYzdjNjZjMjFjMWE5ODI5OGQyNzk2ODM1M2M0MzUyOA=="
+GITHUB_REPORT_OAUTH_TOKEN = "NTMyNWNkMmZkMzRlMDZmY2JkMmY0MGI4NWI0MzVlM2Q5YmFjYWNhYQ=="
 
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32
