@@ -53,16 +53,17 @@ def smokeTest():
         if any(_ in root for _ in ("thirdparty", "extra")):
             continue
 
-        for ifile in files:
-            length += 1
+        for filename in files:
+            if os.path.splitext(filename)[1].lower() == ".py" and filename != "__init__.py":
+                length += 1
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         if any(_ in root for _ in ("thirdparty", "extra")):
             continue
 
-        for ifile in files:
-            if os.path.splitext(ifile)[1].lower() == ".py" and ifile != "__init__.py":
-                path = os.path.join(root, os.path.splitext(ifile)[0])
+        for filename in files:
+            if os.path.splitext(filename)[1].lower() == ".py" and filename != "__init__.py":
+                path = os.path.join(root, os.path.splitext(filename)[0])
                 path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
                 path = path.replace(os.sep, '.').lstrip('.')
                 try:
@@ -71,7 +72,7 @@ def smokeTest():
                 except Exception, msg:
                     retVal = False
                     dataToStdout("\r")
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, ifile), msg)
+                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), msg)
                     logger.error(errMsg)
                 else:
                     # Run doc tests
@@ -80,9 +81,9 @@ def smokeTest():
                     if failure_count > 0:
                         retVal = False
 
-            count += 1
-            status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
-            dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+                count += 1
+                status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
+                dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
     clearConsoleLine()
     if retVal:
