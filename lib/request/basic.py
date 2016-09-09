@@ -26,6 +26,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import cachedmethod
 from lib.core.enums import DBMS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
@@ -136,6 +137,7 @@ def parseResponse(page, headers):
     if page:
         htmlParser(page)
 
+@cachedmethod
 def checkCharEncoding(encoding, warn=True):
     """
     Checks encoding name, repairs common misspellings and adjusts to
@@ -230,7 +232,10 @@ def getHeuristicCharEncoding(page):
     Returns page encoding charset detected by usage of heuristics
     Reference: http://chardet.feedparser.org/docs/
     """
-    retVal = detect(page)["encoding"]
+
+    key = hash(page)
+    retVal = kb.cache.encoding.get(key) or detect(page)["encoding"]
+    kb.cache.encoding[key] = retVal
 
     if retVal:
         infoMsg = "heuristics detected web page charset '%s'" % retVal

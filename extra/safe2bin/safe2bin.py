@@ -23,7 +23,7 @@ HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
 SAFE_ENCODE_SLASH_REPLACEMENTS = "\t\n\r\x0b\x0c"
 
 # Characters that don't need to be safe encoded
-SAFE_CHARS = "".join(filter(lambda x: x not in SAFE_ENCODE_SLASH_REPLACEMENTS, string.printable.replace('\\', '')))
+SAFE_CHARS = "".join(filter(lambda _: _ not in SAFE_ENCODE_SLASH_REPLACEMENTS, string.printable.replace('\\', '')))
 
 # Prefix used for hex encoded values
 HEX_ENCODED_PREFIX = r"\x"
@@ -47,7 +47,7 @@ def safecharencode(value):
     retVal = value
 
     if isinstance(value, basestring):
-        if any(_ not in SAFE_CHARS for _ in value):
+        if any([_ not in SAFE_CHARS for _ in value]):
             retVal = retVal.replace(HEX_ENCODED_PREFIX, HEX_ENCODED_PREFIX_MARKER)
             retVal = retVal.replace('\\', SLASH_MARKER)
 

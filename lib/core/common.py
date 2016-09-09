@@ -2227,10 +2227,6 @@ def getUnicode(value, encoding=None, noneToNull=False):
     if noneToNull and value is None:
         return NULL
 
-    if isListLike(value):
-        value = list(getUnicode(_, encoding, noneToNull) for _ in value)
-        return value
-
     if isinstance(value, unicode):
         return value
     elif isinstance(value, basestring):
@@ -2242,6 +2238,9 @@ def getUnicode(value, encoding=None, noneToNull=False):
                     return unicode(value, UNICODE_ENCODING)
                 except:
                     value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
+    elif isListLike(value):
+        value = list(getUnicode(_, encoding, noneToNull) for _ in value)
+        return value
     else:
         try:
             return unicode(value)
@@ -2559,6 +2558,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
 def getPageTemplate(payload, place):  # Cross-linked function
     raise NotImplementedError
 
+@cachedmethod
 def getPublicTypeMembers(type_, onlyValues=False):
     """
     Useful for getting members from types (e.g. in enums)
@@ -2567,12 +2567,16 @@ def getPublicTypeMembers(type_, onlyValues=False):
     ['Linux', 'Windows']
     """
 
+    retVal = []
+
     for name, value in inspect.getmembers(type_):
         if not name.startswith('__'):
             if not onlyValues:
-                yield (name, value)
+                retVal.append((name, value))
             else:
-                yield value
+                retVal.append(value)
+
+    return retVal
 
 def enumValueToNameLookup(type_, value_):
     """
@@ -3581,6 +3585,7 @@ def randomizeParameterValue(value):
 
     return retVal
 
+@cachedmethod
 def asciifyUrl(url, forceQuote=False):
     """
     Attempts to make a unicode URL usuable with ``urllib/urllib2``.
@@ -4075,8 +4080,11 @@ def getRequestHeader(request, name):
     """
 
     retVal = None
+
     if request and name:
-        retVal = max(value if name.upper() == key.upper() else None for key, value in request.header_items())
+        _ = name.upper()
+        retVal = max([value if _ == key.upper() else None for key, value in request.header_items()])
+
     return retVal
 
 def isNumber(value):
