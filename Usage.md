@@ -349,9 +349,9 @@ Note that if the request is over HTTPS, you can use this in conjunction with swi
 
 Option: `-g`
 
-It is also possible to test and inject on `GET` parameters based on results of your Google dork.
+It is also possible to test and inject on GET parameters based on results of your Google dork.
 
-This option makes sqlmap negotiate with the search engine its session cookie to be able to perform a search, then sqlmap will retrieve Google first 100 results for the Google dork expression with `GET` parameters asking you if you want to test and inject on each possible affected URL.
+This option makes sqlmap negotiate with the search engine its session cookie to be able to perform a search, then sqlmap will retrieve Google first 100 results for the Google dork expression with GET parameters asking you if you want to test and inject on each possible affected URL.
 
 For example:
 
@@ -381,7 +381,7 @@ sqlmap automatically detects the proper HTTP method to be used in HTTP requests.
 
 Option: `--data`
 
-By default the HTTP method used to perform HTTP requests is `GET`, but you can implicitly change it to `POST` by providing the data to be sent in the `POST` requests. Such data, being those parameters, are tested for SQL injection as well as any provided `GET` parameters.
+By default the HTTP method used to perform HTTP requests is GET, but you can implicitly change it to POST by providing the data to be sent in the POST requests. Such data, being those parameters, are tested for SQL injection as well as any provided GET parameters.
 
 For example:
 
@@ -716,7 +716,7 @@ These options can be used to specify which parameters to test for, provide custo
 
 Options: `-p` and `--skip`
 
-By default sqlmap tests all `GET` parameters and `POST` parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on value of `--level` too. 
+By default sqlmap tests all GET parameters and POST parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on value of `--level` too. 
 
 For instance, to test for GET parameter `id` and for HTTP `User-Agent` only, provide `-p "id,user-agent"`.
 
@@ -734,6 +734,16 @@ An example of valid command line would be:
 
 ```
 $ python sqlmap.py -u "http://targeturl/param1/value1*/param2/value2/"
+```
+
+#### Arbitrary injection point
+
+Similar to URI injection point, asterisk (`*`) can also be used to point to the arbitrary injection point inside GET, POST or HTTP headers. Injection point can be specified by marking it inside the GET parameter value(s) provided with option `-u`, POST parameter value(s) provided with option `--data`, HTTP header value(s) provided with options `-H`, `--headers`, `--user-agent`, `--referer` and/or `--cookie`, or at generic place inside HTTP request loaded from file with option `-r`.
+
+An example of valid command line would be:
+
+```
+$ python sqlmap.py -u "http://targeturl" --cookie="param1=value1*;param2=value2"
 ```
 
 ### Force the DBMS
