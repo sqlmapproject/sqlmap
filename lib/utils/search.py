@@ -30,10 +30,57 @@ from lib.core.settings import DUMMY_SEARCH_USER_AGENT
 from lib.core.settings import DUCKDUCKGO_REGEX
 from lib.core.settings import DISCONNECT_SEARCH_REGEX
 from lib.core.settings import GOOGLE_REGEX
+from lib.core.settings import BAIDU_SEARCH_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
 from thirdparty.socks import socks
+
+
+def _remove_duplicate(links):
+    if not links:
+        return []
+
+    tmplinks = map(lambda url: url[:url.find("?")], links)
+    tmplinks = set(tmplinks)
+    ret = []
+    for link in links:
+        for tmplink in tmplinks:
+            if link.lower().find(tmplink.lower()) == 0:
+                ret.append(link)
+                tmplinks.remove(tmplink)
+                break
+    return ret
+
+
+def _locate_real_url_from_baidu_results(links):
+    retVal = []
+
+    for link in links:
+        try:
+            req = urllib2.Request(link)
+            conn = urllib2.urlopen(req, timeout=conf.timeout)
+            page = conn.read()
+            responseHeaders = conn.info()
+            page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+
+            if page:
+                url = conn.geturl()
+                if link != url:
+                    logger.info(url)
+                    retVal.append(url)
+                else:
+                    # baidu sometimes will just use Javascript to redirect the page
+                    # rather than responding a 302 HTTP code.
+                    m = re.search('<script>window\.location\.replace\("(?P<url>.+?)"\)', page, re.I)
+                    if m:
+                        url = m.group('url')
+                        logger.info(url)
+                        retVal.append(url)
+        except Exception, e:
+            logger.debug(e.message)
+    # remove duplicate links to make the scan more efficient, because baidu often has similar links in its results.
+    return _remove_duplicate(retVal)
 
 
 def _search(dork):
@@ -46,71 +93,76 @@ def _search(dork):
         return None
 
     headers = {}
+    retVal = []
+    failed = False
 
     headers[HTTP_HEADER.USER_AGENT] = dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT)
     headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
 
     try:
         req = urllib2.Request("https://www.google.com/ncr", headers=headers)
-        conn = urllib2.urlopen(req)
+        conn = urllib2.urlopen(req, timeout=conf.timeout)
     except Exception, ex:
         errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
-        raise SqlmapConnectionException(errMsg)
+        logger.warn(errMsg)
+        failed = True
 
     gpage = conf.googlePage if conf.googlePage > 1 else 1
     logger.info("using search result page #%d" % gpage)
 
-    url = "https://www.google.com/search?"
-    url += "q=%s&" % urlencode(dork, convall=True)
-    url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
-    url += "&start=%d" % ((gpage - 1) * 100)
+    if not failed:
+        url = "https://www.google.com/search?"
+        url += "q=%s&" % urlencode(dork, convall=True)
+        url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
+        url += "&start=%d" % ((gpage - 1) * 100)
 
-    try:
-        req = urllib2.Request(url, headers=headers)
-        conn = urllib2.urlopen(req)
-
-        requestMsg = "HTTP request:\nGET %s" % url
-        requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
-        logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
-
-        page = conn.read()
-        code = conn.code
-        status = conn.msg
-        responseHeaders = conn.info()
-        page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
-
-        responseMsg = "HTTP response (%s - %d):\n" % (status, code)
-
-        if conf.verbose <= 4:
-            responseMsg += getUnicode(responseHeaders, UNICODE_ENCODING)
-        elif conf.verbose > 4:
-            responseMsg += "%s\n%s\n" % (responseHeaders, page)
-
-        logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-    except urllib2.HTTPError, e:
         try:
-            page = e.read()
-        except Exception, ex:
-            warnMsg = "problem occurred while trying to get "
-            warnMsg += "an error page information (%s)" % getSafeExString(ex)
-            logger.critical(warnMsg)
-            return None
-    except (urllib2.URLError, httplib.error, socket.error, socket.timeout, socks.ProxyError):
-        errMsg = "unable to connect to Google"
-        raise SqlmapConnectionException(errMsg)
+            req = urllib2.Request(url, headers=headers)
+            conn = urllib2.urlopen(req)
 
-    retVal = [urllib.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
+            requestMsg = "HTTP request:\nGET %s" % url
+            requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
+            logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
-    if not retVal and "detected unusual traffic" in page:
-        warnMsg = "Google has detected 'unusual' traffic from "
-        warnMsg += "used IP address disabling further searches"
-        logger.warn(warnMsg)
+            page = conn.read()
+            code = conn.code
+            status = conn.msg
+            responseHeaders = conn.info()
+            page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
+
+            responseMsg = "HTTP response (%s - %d):\n" % (status, code)
+
+            if conf.verbose <= 4:
+                responseMsg += getUnicode(responseHeaders, UNICODE_ENCODING)
+            elif conf.verbose > 4:
+                responseMsg += "%s\n%s\n" % (responseHeaders, page)
+
+            logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
+        except urllib2.HTTPError, e:
+            try:
+                page = e.read()
+            except Exception, ex:
+                warnMsg = "problem occurred while trying to get "
+                warnMsg += "an error page information (%s)" % getSafeExString(ex)
+                logger.critical(warnMsg)
+                return None
+        except (urllib2.URLError, httplib.error, socket.error, socket.timeout, socks.ProxyError):
+            errMsg = "unable to connect to Google"
+            raise SqlmapConnectionException(errMsg)
+
+        retVal = [urllib.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
+
+        if not retVal and "detected unusual traffic" in page:
+            warnMsg = "Google has detected 'unusual' traffic from "
+            warnMsg += "used IP address disabling further searches"
+            logger.warn(warnMsg)
 
     if not retVal:
         message = "no usable links found. What do you want to do?"
         message += "\n[1] (re)try with DuckDuckGo (default)"
         message += "\n[2] (re)try with Disconnect Search"
-        message += "\n[3] quit"
+        message += "\n[3] (re)try with Baidu Search"
+        message += "\n[Q] quit"
         choice = readInput(message, default="1").strip().upper()
 
         if choice == "Q":
@@ -123,6 +175,12 @@ def _search(dork):
             url += "&nextDDG=%s" % urlencode("/search?q=%s&setmkt=en-US&setplang=en-us&setlang=en-us&first=%d&FORM=PORE" % (urlencode(dork, convall=True), (gpage - 1) * 10), convall=True)
             url += "&sa=N&showIcons=false&filterIcons=none&js_enabled=1"
             regex = DISCONNECT_SEARCH_REGEX
+        elif choice == "3":
+            url = "http://www.baidu.com"
+            url += "/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&rn=50"
+            url += "&wd=%s" % urlencode(dork, convall=True)
+            url += "&pn=%d" % ((gpage - 1) * 10)
+            regex = BAIDU_SEARCH_REGEX
         else:
             url = "https://duckduckgo.com/d.js?"
             url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
@@ -162,7 +220,11 @@ def _search(dork):
             errMsg = "unable to connect"
             raise SqlmapConnectionException(errMsg)
 
-        retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I | re.S)]
+        if choice == "3":
+            retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I)]
+            retVal = _locate_real_url_from_baidu_results(retVal)
+        else:
+            retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I | re.S)]
 
     return retVal
 
