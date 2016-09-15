@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-7bf39beeda908ad06081385433db8567  lib/core/settings.py
+32b9841850e40a039b5ae467197ce9e1  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -235,6 +235,7 @@ e2aca0ea57afc24dd154472034dc9c8c  tamper/commalessmid.py
 11bb0652668bb6624494567fd92933b3  tamper/escapequotes.py
 731c25dd33fca28514930d4409daaaa3  tamper/greatest.py
 1becabc90d81c70fd24b54cae03a3702  tamper/halfversionedmorekeywords.py
+61add9dce3c0c9035901db87fa969c89  tamper/htmlencode.py
 17313c5a68aa44325616e0e38869b98e  tamper/ifnull2ifisnull.py
 dd71bbc7f76ef55a2c9c16645347ead8  tamper/informationschemacomment.py
 cc9c82cfffd8ee9b25ba3af6284f057e  tamper/__init__.py
