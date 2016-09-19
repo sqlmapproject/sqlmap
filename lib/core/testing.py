@@ -41,6 +41,8 @@ class Failures(object):
     failedParseOn = None
     failedTraceBack = None
 
+_failures = Failures()
+
 def smokeTest():
     """
     Runs the basic smoke testing of a program
@@ -193,11 +195,11 @@ def liveTest():
         else:
             errMsg = "test failed"
 
-            if Failures.failedItems:
-                errMsg += " at parsing items: %s" % ", ".join(i for i in Failures.failedItems)
+            if _failures.failedItems:
+                errMsg += " at parsing items: %s" % ", ".join(i for i in _failures.failedItems)
 
             errMsg += " - scan folder: %s" % paths.SQLMAP_OUTPUT_PATH
-            errMsg += " - traceback: %s" % bool(Failures.failedTraceBack)
+            errMsg += " - traceback: %s" % bool(_failures.failedTraceBack)
 
             if not vulnerable:
                 errMsg += " - SQL injection not detected"
@@ -205,14 +207,14 @@ def liveTest():
             logger.error(errMsg)
             test_case_fd.write("%s\n" % errMsg)
 
-            if Failures.failedParseOn:
+            if _failures.failedParseOn:
                 console_output_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "console_output"), "wb", UNICODE_ENCODING)
-                console_output_fd.write(Failures.failedParseOn)
+                console_output_fd.write(_failures.failedParseOn)
                 console_output_fd.close()
 
-            if Failures.failedTraceBack:
+            if _failures.failedTraceBack:
                 traceback_fd = codecs.open(os.path.join(paths.SQLMAP_OUTPUT_PATH, "traceback"), "wb", UNICODE_ENCODING)
-                traceback_fd.write(Failures.failedTraceBack)
+                traceback_fd.write(_failures.failedTraceBack)
                 traceback_fd.close()
 
             beep()
@@ -233,9 +235,9 @@ def liveTest():
     return retVal
 
 def initCase(switches, count):
-    Failures.failedItems = []
-    Failures.failedParseOn = None
-    Failures.failedTraceBack = None
+    _failures.failedItems = []
+    _failures.failedParseOn = None
+    _failures.failedTraceBack = None
 
     paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="%s%d-" % (MKSTEMP_PREFIX.TESTING, count))
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
@@ -279,10 +281,10 @@ def runCase(parse):
         LOGGER_HANDLER.stream = sys.stdout = sys.__stdout__
 
     if unhandled_exception:
-        Failures.failedTraceBack = "unhandled exception: %s" % str(traceback.format_exc())
+        _failures.failedTraceBack = "unhandled exception: %s" % str(traceback.format_exc())
         retVal = None
     elif handled_exception:
-        Failures.failedTraceBack = "handled exception: %s" % str(traceback.format_exc())
+        _failures.failedTraceBack = "handled exception: %s" % str(traceback.format_exc())
         retVal = None
     elif result is False:  # this means no SQL injection has been detected - if None, ignore
         retVal = False
@@ -299,17 +301,17 @@ def runCase(parse):
             if item.startswith("r'") and item.endswith("'"):
                 if not re.search(item[2:-1], parse_on, re.DOTALL):
                     retVal = None
-                    Failures.failedItems.append(item)
+                    _failures.failedItems.append(item)
 
             elif item not in parse_on:
                 retVal = None
-                Failures.failedItems.append(item)
+                _failures.failedItems.append(item)
 
-        if Failures.failedItems:
-            Failures.failedParseOn = console
+        if _failures.failedItems:
+            _failures.failedParseOn = console
 
     elif retVal is False:
-        Failures.failedParseOn = console
+        _failures.failedParseOn = console
 
     return retVal
 
