@@ -97,8 +97,16 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            if inject.checkBooleanExpression("REVERSE('sqlmap')='pamlqs'"):
-                Backend.setVersion(">= 9.1.0")
+            if inject.checkBooleanExpression("TO_JSONB(1) IS NOT NULL"):
+                Backend.setVersion(">= 9.5.0")
+            elif inject.checkBooleanExpression("JSON_TYPEOF(NULL) IS NULL"):
+                Backend.setVersionList([">= 9.4.0", "< 9.5.0"])
+            elif inject.checkBooleanExpression("ARRAY_REPLACE(NULL,1,1) IS NULL"):
+                Backend.setVersionList([">= 9.3.0", "< 9.4.0"])
+            elif inject.checkBooleanExpression("ROW_TO_JSON(NULL) IS NULL"):
+                Backend.setVersionList([">= 9.2.0", "< 9.3.0"])
+            elif inject.checkBooleanExpression("REVERSE('sqlmap')='pamlqs'"):
+                Backend.setVersionList([">= 9.1.0", "< 9.2.0"])
             elif inject.checkBooleanExpression("LENGTH(TO_CHAR(1,'EEEE'))>0"):
                 Backend.setVersionList([">= 9.0.0", "< 9.1.0"])
             elif inject.checkBooleanExpression("2=(SELECT DIV(6,3))"):
