@@ -96,7 +96,8 @@ def checkSqlInjection(place, parameter, value):
 
     # Favoring non-string specific boundaries in case of digit-like parameter values
     if value.isdigit():
-        boundaries = sorted(copy.deepcopy(conf.boundaries), key=lambda boundary: any(_ in (boundary.prefix or "") or _ in (boundary.suffix or "") for _ in ('"', '\'')))
+        kb.cache.intBoundaries = kb.cache.intBoundaries or sorted(copy.deepcopy(conf.boundaries), key=lambda boundary: any(_ in (boundary.prefix or "") or _ in (boundary.suffix or "") for _ in ('"', '\'')))
+        boundaries = kb.cache.intBoundaries
     else:
         boundaries = conf.boundaries
 

@@ -1844,6 +1844,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.addrinfo = {}
     kb.cache.content = {}
     kb.cache.encoding = {}
+    kb.cache.intBoundaries = None
     kb.cache.parsedDbms = {}
     kb.cache.regex = {}
     kb.cache.stdev = {}
