@@ -94,6 +94,12 @@ def checkSqlInjection(place, parameter, value):
     # Localized thread data needed for some methods
     threadData = getCurrentThreadData()
 
+    # Favoring non-string specific boundaries in case of digit-like parameter values
+    if value.isdigit():
+        boundaries = sorted(copy.deepcopy(conf.boundaries), key=lambda boundary: any(_ in (boundary.prefix or "") or _ in (boundary.suffix or "") for _ in ('"', '\'')))
+    else:
+        boundaries = conf.boundaries
+
     # Set the flag for SQL injection test mode
     kb.testMode = True
 
@@ -310,12 +316,6 @@ def checkSqlInjection(place, parameter, value):
             # Parse test's <request>
             comment = agent.getComment(test.request) if len(conf.boundaries) > 1 else None
             fstPayload = agent.cleanupPayload(test.request.payload, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) else None)
-
-            # Favoring non-string specific boundaries in case of digit-like parameter values
-            if value.isdigit():
-                boundaries = sorted(copy.deepcopy(conf.boundaries), key=lambda x: any(_ in (x.prefix or "") or _ in (x.suffix or "") for _ in ('"', '\'')))
-            else:
-                boundaries = conf.boundaries
 
             for boundary in boundaries:
                 injectable = False
