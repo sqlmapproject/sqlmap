@@ -66,6 +66,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finalValue = None
     retrievedLength = 0
     asciiTbl = getCharset(charsetType)
+    threadData = getCurrentThreadData()
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
     retVal = hashDBRetrieve(expression, checkConf=True)
 
@@ -254,9 +255,43 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             maxChar = maxValue = charTbl[-1]
             minChar = minValue = charTbl[0]
+            firstCheck = False
+            lastCheck = False
 
             while len(charTbl) != 1:
-                position = (len(charTbl) >> 1)
+                position = None
+
+                if charsetType is None:
+                    if not firstCheck:
+                        try:
+                            try:
+                                lastChar = [_ for _ in threadData.shared.value if _ is not None][-1]
+                            except IndexError:
+                                lastChar = None
+                            if 'a' <= lastChar <= 'z':
+                                position = charTbl.index(ord('a') - 1)  # 96
+                            elif 'A' <= lastChar <= 'Z':
+                                position = charTbl.index(ord('A') - 1)  # 64
+                            elif '0' <= lastChar <= '9':
+                                position = charTbl.index(ord('0') - 1)  # 47
+                        except ValueError:
+                            pass
+                        finally:
+                            firstCheck = True
+
+                    elif not lastCheck:
+                        if charTbl[(len(charTbl) >> 1)] < ord(' '):
+                            try:
+                                # favorize last char check if current value inclines toward 0
+                                position = charTbl.index(1)
+                            except ValueError:
+                                pass
+                            finally:
+                                lastCheck = True
+
+                if position is None:
+                    position = (len(charTbl) >> 1)
+
                 posValue = charTbl[position]
                 falsePayload = None
 
@@ -376,8 +411,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         # Go multi-threading (--threads > 1)
         if conf.threads > 1 and isinstance(length, int) and length > 1:
-            threadData = getCurrentThreadData()
-
             threadData.shared.value = [None] * length
             threadData.shared.index = [firstChar]    # As list for python nested function scoping
             threadData.shared.start = firstChar
@@ -476,6 +509,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # No multi-threading (--threads = 1)
         else:
             index = firstChar
+            threadData.shared.value = ""
 
             while True:
                 index += 1
@@ -551,7 +585,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if kb.data.processChar:
                     val = kb.data.processChar(val)
 
-                partialValue += val
+                threadData.shared.value = partialValue = partialValue + val
 
                 if showEta:
                     progress.progress(time.time() - charStart, index)

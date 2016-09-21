@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-b160ccb31688ecf1c91d62ed0de26a9f  lib/core/settings.py
+95276012feeed6d7d2dc6f22724c70cc  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -87,7 +87,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/takeover/__init__.py
 7d6cd7bdfc8f4bc4e8aed60c84cdf87f  lib/takeover/udf.py
 f6e3084abd506925a8be3d1c0a6d058c  lib/takeover/web.py
 9af83a62de360184f1c14e69b8a95cfe  lib/takeover/xp_cmdshell.py
-927092550c89f8c3c5caad2b14af0830  lib/techniques/blind/inference.py
+f9fccc94cb9d5c15f84b5feb579ab0de  lib/techniques/blind/inference.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/blind/__init__.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/brute/__init__.py
 d36effffe64e63ef9b3be490f850e2cc  lib/techniques/brute/use.py
