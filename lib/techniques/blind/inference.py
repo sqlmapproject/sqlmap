@@ -144,7 +144,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             length = None
 
         showEta = conf.eta and isinstance(length, int)
-        numThreads = min(conf.threads, length)
+        numThreads = min(conf.threads, length) or 1
 
         if showEta:
             progress = ProgressBar(maxValue=length)
@@ -279,7 +279,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         finally:
                             firstCheck = True
 
-                    elif not lastCheck:
+                    elif not lastCheck and numThreads == 1:  # not usable in multi-threading environment
                         if charTbl[(len(charTbl) >> 1)] < ord(' '):
                             try:
                                 # favorize last char check if current value inclines toward 0
