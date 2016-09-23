@@ -26,7 +26,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 ed9303846f0bc63a9c518a7164301f80  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-d11993cd69f919216a9e4d54c77bb020  lib/core/common.py
+33b28a65ab1a9467203f63d798fd9ddf  lib/core/common.py
 5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 b9779615206791e6ebbaa84947842b49  lib/core/optiondict.py
-1c6b49baa9aaac11b9e85be274ce2ecc  lib/core/option.py
+fc390372373b5471b75145f6af4f11bd  lib/core/option.py
 1e8948dddbd12def5c2af52530738059  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-3808e1bfe1652f1b7579660e1f71262f  lib/core/settings.py
+cd9b01d243acb9c70401c7456ad29567  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py

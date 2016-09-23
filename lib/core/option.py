@@ -1566,6 +1566,7 @@ def _createTemporaryDirectory():
                 os.makedirs(conf.tmpDir)
 
             _ = os.path.join(conf.tmpDir, randomStr())
+
             open(_, "w+b").close()
             os.remove(_)
 
@@ -1581,16 +1582,19 @@ def _createTemporaryDirectory():
         try:
             if not os.path.isdir(tempfile.gettempdir()):
                 os.makedirs(tempfile.gettempdir())
-        except IOError, ex:
-            errMsg = "there has been a problem while accessing "
-            errMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
-            errMsg += "make sure that there is enough disk space left. If problem persists, "
-            errMsg += "try to set environment variable 'TEMP' to a location "
-            errMsg += "writeable by the current user"
-            raise SqlmapSystemException, errMsg
+        except (OSError, IOError), ex:
+            warnMsg = "there has been a problem while accessing "
+            warnMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
+            warnMsg += "make sure that there is enough disk space left. If problem persists, "
+            warnMsg += "try to set environment variable 'TEMP' to a location "
+            warnMsg += "writeable by the current user"
+            logger.warn(warnMsg)
 
     if "sqlmap" not in (tempfile.tempdir or "") or conf.tmpDir and tempfile.tempdir == conf.tmpDir:
-        tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
+        try:
+            tempfile.tempdir = tempfile.mkdtemp(prefix="sqlmap", suffix=str(os.getpid()))
+        except (OSError, IOError), ex:
+            tempfile.tempdir = os.path.join(paths.SQLMAP_HOME_PATH, "tmp", "sqlmap%s%d" % (randomStr(6), os.getpid()))
 
     kb.tempDir = tempfile.tempdir
 
