@@ -22,9 +22,9 @@ cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 2daa39e4d59526acb4772b6c47eb315f  lib/controller/action.py
 44bb5bdf83e0c2dba13c07018b3766c8  lib/controller/checks.py
 7c5ba631796f12d6de9b667e4cc7812b  lib/controller/controller.py
-5ae8f657fd4e8026fcc9624f5b5533fe  lib/controller/handler.py
+0a64305c3b3a01a2fc3a5e6204f442f1  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
-2689f320908964b2c88a3eb8265fd2dd  lib/core/agent.py
+f03e2036a55c96623fec1b2fd795cb19  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
 d11993cd69f919216a9e4d54c77bb020  lib/core/common.py
 5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
@@ -32,9 +32,9 @@ e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
 e4ca0fd47f20cf7ba6a5f5cbf980073c  lib/core/decorators.py
 67f206cf2658145992cc1d7020138325  lib/core/defaults.py
-4a16002c5d9cd047c2e89ddc5db63737  lib/core/dicts.py
+94b45065827001fcd25f5c61eec74a33  lib/core/dicts.py
 1f98d3f57ce21d625fd67adb26cfd13c  lib/core/dump.py
-34a45b9bc68a6381247a620ddf30de1c  lib/core/enums.py
+1128705f593013359497b3959078b650  lib/core/enums.py
 e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-64150b622fb8fc638de6aa98bcee6ff5  lib/core/settings.py
+603f6a62397f96fd9253146b4625473e  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -102,7 +102,7 @@ f5d6884cdeed28281187c111d3e49e3b  lib/techniques/union/test.py
 12ce1bb7ee5f1f23f58be12fe9fa8472  lib/techniques/union/use.py
 26c1babc6289fac9056f8b21d10f3bb1  lib/utils/api.py
 8cdc8c1e663c3b92a756fb7b02cc3c02  lib/utils/crawler.py
-393f8fd1684308213e1d2e6a9d4258c2  lib/utils/deps.py
+e30011943692aa2fe7c1185974112bc0  lib/utils/deps.py
 4dfd3a95e73e806f62372d63bc82511f  lib/utils/getch.py
 b1e83fc549334fae8f60552dcdad28cb  lib/utils/hashdb.py
 0330607242d4f704ae6d7bba5f52ccae  lib/utils/hash.py
@@ -196,8 +196,8 @@ d0c7cc8ec2aa716b2e5cd3b5ab805c3a  plugins/dbms/sybase/__init__.py
 7a1c6cb238b5b464e1e9641469e6e503  plugins/dbms/sybase/takeover.py
 62faa58e5aace4b6a6d562788685186f  plugins/generic/connector.py
 cdbf6eec4a94f830deb7dbab1c1a2935  plugins/generic/custom.py
-977bbd1bced67c2c4aa74d12c77ac165  plugins/generic/databases.py
-f2394baa3746188184be2144025eeffc  plugins/generic/entries.py
+5a472f7f8688e0310259c5caeb5038ef  plugins/generic/databases.py
+32f29017314012e7af5bfbfde61dc154  plugins/generic/entries.py
 e335b868f5fb1154c9f72143d602915d  plugins/generic/enumeration.py
 3e673ef4e6592f52a11d88e61fe4dc2b  plugins/generic/filesystem.py
 5637c508ca6348f29c2b100a3e80dddc  plugins/generic/fingerprint.py
@@ -448,4 +448,4 @@ a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 96adb9bfbab867d221974d3ddb303cb6  xml/payloads/stacked_queries.xml
 c8b152ecebf04ec997e52c6c78cbd488  xml/payloads/time_blind.xml
 033b39025e8ee0f302935f6db3a39e77  xml/payloads/union_query.xml
-313c0e1cc42de27a29c0e0ac67fee71d  xml/queries.xml
+b5cd576c6aa7344fabbe86d89fa36b73  xml/queries.xml

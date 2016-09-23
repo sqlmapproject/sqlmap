@@ -1615,6 +1615,7 @@ SPACE
 geo_Sea
 DATA_ORG
 Contributor
+flag
 
 # Various Joomla tables
 jos_vm_product_download
