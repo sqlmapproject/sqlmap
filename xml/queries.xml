@@ -771,7 +771,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s:%s"/>
-            <blind query="SELECT SKIP %d LIMIT 1 %s FROM %s:%s" count="SELECT COUNT(*) FROM %s:%s"/>
+            <blind query="SELECT SKIP %d LIMIT 1 %s FROM %s:%s ORDER BY %s" count="SELECT COUNT(*) FROM %s:%s"/>
         </dump_table>
         <search_db/>
         <search_table/>

@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-cd9b01d243acb9c70401c7456ad29567  lib/core/settings.py
+ff390f8d2d8653658a8a39dba2ddab2c  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -204,7 +204,7 @@ d0c7cc8ec2aa716b2e5cd3b5ab805c3a  plugins/dbms/sybase/__init__.py
 62faa58e5aace4b6a6d562788685186f  plugins/generic/connector.py
 cdbf6eec4a94f830deb7dbab1c1a2935  plugins/generic/custom.py
 5a472f7f8688e0310259c5caeb5038ef  plugins/generic/databases.py
-32f29017314012e7af5bfbfde61dc154  plugins/generic/entries.py
+1177bbad4e77a2ca85e0054569e03d38  plugins/generic/entries.py
 e335b868f5fb1154c9f72143d602915d  plugins/generic/enumeration.py
 3e673ef4e6592f52a11d88e61fe4dc2b  plugins/generic/filesystem.py
 5637c508ca6348f29c2b100a3e80dddc  plugins/generic/fingerprint.py
@@ -455,4 +455,4 @@ a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 96adb9bfbab867d221974d3ddb303cb6  xml/payloads/stacked_queries.xml
 c8b152ecebf04ec997e52c6c78cbd488  xml/payloads/time_blind.xml
 033b39025e8ee0f302935f6db3a39e77  xml/payloads/union_query.xml
-b5cd576c6aa7344fabbe86d89fa36b73  xml/queries.xml
+b788ef9f0198fa0bbb56644c206b688e  xml/queries.xml
