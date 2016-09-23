@@ -34,6 +34,7 @@ class DBMS:
     SQLITE = "SQLite"
     SYBASE = "Sybase"
     HSQLDB = "HSQLDB"
+    INFORMIX = "Informix"
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
@@ -47,6 +48,7 @@ class DBMS_DIRECTORY_NAME:
     SQLITE = "sqlite"
     SYBASE = "sybase"
     HSQLDB = "hsqldb"
+    INFORMIX = "informix"
 
 class CUSTOM_LOGGING:
     PAYLOAD = 9

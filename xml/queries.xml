@@ -714,4 +714,67 @@
             <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
         </search_column>
     </dbms>
+
+    <!-- Informix -->
+    <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_11.70.0/com.ibm.sqlr.doc/ids_sqr_072.htm -->
+    <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_12.1.0/com.ibm.sec.doc/ids_am_041.htm -->
+    <dbms value="Informix">
+        <cast query="RTRIM(TO_CHAR(%s))"/>
+        <length query="CHAR_LENGTH(RTRIM(%s))"/>
+        <isnull query="NVL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="SELECT SKIP %d LIMIT 1"/>
+        <limitregexp query="\s+SKIP\s+([\d]+)\s*LIMIT\s*([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSMASTER:SYSDUAL"/>
+        <hex query="HEX(%s)"/>
+        <!-- http://www.dbforums.com/showthread.php?1660588-select-first-and-union&p=6478613#post6478613 -->
+        <inference query="ASCII(SUBSTR((SELECT * FROM (%s)),%d,1))>%d"/>
+        <banner query="SELECT DBINFO('VERSION','FULL') FROM SYSMASTER:SYSDUAL"/>
+        <current_user query="SELECT USER FROM SYSMASTER:SYSDUAL"/>
+        <current_db query="SELECT DBINFO('DBNAME') FROM SYSMASTER:SYSDUAL"/>
+        <hostname query="SELECT DBINFO('DBHOSTNAME') FROM SYSMASTER:SYSDUAL"/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="(SELECT USERTYPE FROM SYSUSERS WHERE USERNAME=USER)='D'"/>
+        <users>
+            <inband query="SELECT USERNAME FROM SYSUSERS"/>
+            <blind query="SELECT SKIP %d LIMIT 1 USERNAME FROM SYSUSERS ORDER BY USERNAME" count="SELECT COUNT(USERNAME) FROM SYSUSERS"/>
+        </users>
+        <passwords>
+            <inband query="SELECT USERNAME,HASHED_PASSWORD,SALT FROM SYSUSER:SYSINTAUTHUSERS" condition="USERNAME"/>
+            <blind query="SELECT HASHED_PASSWORD FROM SYSUSER:SYSINTAUTHUSERS WHERE USERNAME='%s'" query2="SELECT SALT FROM SYSUSER:SYSINTAUTHUSERS WHERE USERNAME='%s'"/>
+        </passwords>
+        <privileges/>
+        <roles>
+            <inband query="SELECT USERNAME,USERTYPE FROM SYSUSERS" condition="name"/>
+            <blind query="SELECT GRANTED_ROLE FROM SYSUSERS WHERE USERNAME='s'"/>
+        </roles>
+        <dbs>
+            <inband query="SELECT NAME FROM SYSMASTER:SYSDATABASES"/>
+            <blind query="SELECT SKIP %d LIMIT 1 NAME FROM SYSMASTER:SYSDATABASES ORDER BY NAME" count="SELECT COUNT(NAME) FROM SYSMASTER:SYSDATABASES"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT TABNAME FROM %s:SYSTABLES WHERE TABTYPE='T' AND TABID>99"/>
+            <blind query="SELECT SKIP %d LIMIT 1 TABNAME FROM %s:SYSTABLES WHERE TABTYPE='T' AND TABID>99 ORDER BY TABNAME" count="SELECT COUNT(TABNAME) FROM %s:SYSTABLES WHERE TABTYPE='T' AND TABID>99"/>
+        </tables>
+        <columns>
+            <inband query="SELECT COLNAME,COLTYPE FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s'" condition="COLNAME"/>
+            <blind query="SELECT SKIP %d LIMIT 1 COLNAME FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s' ORDER BY COLNAME" query2="SELECT COLTYPE FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s' AND COLNAME='%s'" count="SELECT COUNT(COLNAME) FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s'"  condition="COLNAME"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s:%s"/>
+            <blind query="SELECT SKIP %d LIMIT 1 %s FROM %s:%s" count="SELECT COUNT(*) FROM %s:%s"/>
+        </dump_table>
+        <search_db/>
+        <search_table/>
+        <search_column/>
+    </dbms>
 </root>

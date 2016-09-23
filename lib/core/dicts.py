@@ -21,6 +21,7 @@ from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
+from lib.core.settings import INFORMIX_ALIASES
 
 FIREBIRD_TYPES = {
                     261: "BLOB",
@@ -146,8 +147,9 @@ DBMS_DICT = {
                 DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/", "firebird"),
                 DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
                 DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "sybase"),
-                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "http://code.google.com/p/ibm-db/", "ibm_db_sa"),
+                DBMS.DB2: (DB2_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
                 DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
+                DBMS.INFORMIX: (INFORMIX_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
             }
 
 FROM_DUMMY_TABLE = {
@@ -156,7 +158,8 @@ FROM_DUMMY_TABLE = {
                         DBMS.FIREBIRD: " FROM RDB$DATABASE",
                         DBMS.MAXDB: " FROM VERSIONS",
                         DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
-                        DBMS.HSQLDB: " FROM INFORMATION_SCHEMA.SYSTEM_USERS"
+                        DBMS.HSQLDB: " FROM INFORMATION_SCHEMA.SYSTEM_USERS",
+                        DBMS.INFORMIX: " FROM SYSMASTER:SYSDUAL"
                    }
 
 SQL_STATEMENTS = {

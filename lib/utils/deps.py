@@ -44,6 +44,8 @@ def checkDependencies():
             elif dbmsName == DBMS.HSQLDB:
                 import jaydebeapi
                 import jpype
+            elif dbmsName == DBMS.INFORMIX:
+                import ibm_db_dbi
         except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "

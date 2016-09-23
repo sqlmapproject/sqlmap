@@ -335,7 +335,7 @@ class Databases:
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
-                    elif Backend.isDbms(DBMS.HSQLDB):
+                    elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX):
                         query = rootQuery.blind.query % (index, unsafeSQLIdentificatorNaming(db))
                     else:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
@@ -656,6 +656,10 @@ class Databases:
                     query = rootQuery.blind.count % (tbl)
                     query += condQuery
 
+                elif Backend.isDbms(DBMS.INFORMIX):
+                    query = rootQuery.blind.count % (conf.db, conf.db, conf.db, conf.db, conf.db, tbl)
+                    query += condQuery
+
                 elif Backend.isDbms(DBMS.SQLITE):
                     query = rootQuery.blind.query % tbl
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
@@ -712,6 +716,10 @@ class Databases:
                         query = rootQuery.blind.query % (tbl)
                         query += condQuery
                         field = None
+                    elif Backend.isDbms(DBMS.INFORMIX):
+                        query = rootQuery.blind.query % (index, conf.db, conf.db, conf.db, conf.db, conf.db, tbl)
+                        query += condQuery
+                        field = condition
 
                     query = agent.limitQuery(index, query, field, field)
                     column = unArrayizeValue(inject.getValue(query, union=False, error=False))

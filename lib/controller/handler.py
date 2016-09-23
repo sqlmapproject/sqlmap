@@ -22,6 +22,7 @@ from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
+from lib.core.settings import INFORMIX_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
@@ -46,6 +47,8 @@ from plugins.dbms.db2 import DB2Map
 from plugins.dbms.db2.connector import Connector as DB2Conn
 from plugins.dbms.hsqldb import HSQLDBMap
 from plugins.dbms.hsqldb.connector import Connector as HSQLDBConn
+from plugins.dbms.informix import InformixMap
+from plugins.dbms.informix.connector import Connector as InformixConn
 
 def setHandler():
     """
@@ -65,6 +68,7 @@ def setHandler():
                   (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
                   (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
                   (DBMS.HSQLDB, HSQLDB_ALIASES, HSQLDBMap, HSQLDBConn),
+                  (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
             ]
 
     _ = max(_ if (Backend.getIdentifiedDbms() or "").lower() in _[1] else None for _ in items)
