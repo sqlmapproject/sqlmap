@@ -85,3 +85,9 @@ class xrange(object):
 
     def _index(self, i):
         return self.start + self.step * i
+
+    def index(self, i):
+        if self.start <= i < self.stop:
+            return i - self.start
+        else:
+            raise ValueError("%d is not in list" % i)
