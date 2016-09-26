@@ -252,22 +252,25 @@ class Users:
                     if user in retrievedUsers:
                         continue
 
-                    infoMsg = "fetching number of password hashes "
-                    infoMsg += "for user '%s'" % user
-                    logger.info(infoMsg)
-
-                    if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
-                        query = rootQuery.blind.count2 % user
+                    if Backend.isDbms(DBMS.INFORMIX):
+                        count = 1
                     else:
-                        query = rootQuery.blind.count % user
+                        infoMsg = "fetching number of password hashes "
+                        infoMsg += "for user '%s'" % user
+                        logger.info(infoMsg)
 
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                        if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
+                            query = rootQuery.blind.count2 % user
+                        else:
+                            query = rootQuery.blind.count % user
 
-                    if not isNumPosStrValue(count):
-                        warnMsg = "unable to retrieve the number of password "
-                        warnMsg += "hashes for user '%s'" % user
-                        logger.warn(warnMsg)
-                        continue
+                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
+                        if not isNumPosStrValue(count):
+                            warnMsg = "unable to retrieve the number of password "
+                            warnMsg += "hashes for user '%s'" % user
+                            logger.warn(warnMsg)
+                            continue
 
                     infoMsg = "fetching password hashes for user '%s'" % user
                     logger.info(infoMsg)
@@ -283,11 +286,14 @@ class Users:
                                 query = rootQuery.blind.query2 % (user, index, user)
                             else:
                                 query = rootQuery.blind.query % (user, index, user)
+                        elif Backend.isDbms(DBMS.INFORMIX):
+                            query = rootQuery.blind.query % (user,)
                         else:
                             query = rootQuery.blind.query % (user, index)
 
                         password = unArrayizeValue(inject.getValue(query, union=False, error=False))
                         password = parsePasswordHash(password)
+
                         passwords.append(password)
 
                     if passwords:
