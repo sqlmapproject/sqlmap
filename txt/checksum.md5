@@ -20,7 +20,7 @@ b46521e29ea3d813bab5aeb16cac6498  extra/shutils/duplicates.py
 cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 4f2f817596540d82f9fcc0c5b2228beb  extra/sqlharvest/sqlharvest.py
 2daa39e4d59526acb4772b6c47eb315f  lib/controller/action.py
-44bb5bdf83e0c2dba13c07018b3766c8  lib/controller/checks.py
+0b7074043c7ea07002e0ab4803811c9f  lib/controller/checks.py
 7c5ba631796f12d6de9b667e4cc7812b  lib/controller/controller.py
 0a64305c3b3a01a2fc3a5e6204f442f1  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-2d29c71e80997841c3acb700de58f331  lib/core/settings.py
+434f63a6f4943d675125459d54616653  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
