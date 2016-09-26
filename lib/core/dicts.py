@@ -159,6 +159,17 @@ FIREBIRD_PRIVS = {
     "B": "SUBSCRIBE",
 }
 
+# Reference(s): https://www.ibm.com/support/knowledgecenter/SSGU8G_12.1.0/com.ibm.sqls.doc/ids_sqs_0147.htm
+#               https://www.ibm.com/support/knowledgecenter/SSGU8G_11.70.0/com.ibm.sqlr.doc/ids_sqr_077.htm
+
+INFORMIX_PRIVS = {
+    "D": "DBA (all privileges)",
+    "R": "RESOURCE (create UDRs, UDTs, permanent tables and indexes)",
+    "C": "CONNECT (work with existing tables)",
+    "G": "ROLE",
+    "U": "DEFAULT (implicit connection)",
+}
+
 DB2_PRIVS = {
     1: "CONTROLAUTH",
     2: "ALTERAUTH",

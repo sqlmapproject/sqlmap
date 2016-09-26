@@ -27,10 +27,11 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.dicts import DB2_PRIVS
+from lib.core.dicts import FIREBIRD_PRIVS
+from lib.core.dicts import INFORMIX_PRIVS
 from lib.core.dicts import MYSQL_PRIVS
 from lib.core.dicts import PGSQL_PRIVS
-from lib.core.dicts import FIREBIRD_PRIVS
-from lib.core.dicts import DB2_PRIVS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -470,32 +471,35 @@ class Users:
                 if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
                     user = "%%%s%%" % user
 
-                infoMsg = "fetching number of privileges "
-                infoMsg += "for user '%s'" % outuser
-                logger.info(infoMsg)
-
-                if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-                    query = rootQuery.blind.count2 % user
-                elif Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                    query = rootQuery.blind.count % (conditionChar, user)
-                elif Backend.isDbms(DBMS.ORACLE) and query2:
-                    query = rootQuery.blind.count2 % user
+                if Backend.isDbms(DBMS.INFORMIX):
+                    count = 1
                 else:
-                    query = rootQuery.blind.count % user
+                    infoMsg = "fetching number of privileges "
+                    infoMsg += "for user '%s'" % outuser
+                    logger.info(infoMsg)
 
-                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
+                        query = rootQuery.blind.count2 % user
+                    elif Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
+                        query = rootQuery.blind.count % (conditionChar, user)
+                    elif Backend.isDbms(DBMS.ORACLE) and query2:
+                        query = rootQuery.blind.count2 % user
+                    else:
+                        query = rootQuery.blind.count % user
 
-                if not isNumPosStrValue(count):
-                    if not retrievedUsers and Backend.isDbms(DBMS.ORACLE) and not query2:
-                        infoMsg = "trying with table USER_SYS_PRIVS"
-                        logger.info(infoMsg)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-                        return self.getPrivileges(query2=True)
+                    if not isNumPosStrValue(count):
+                        if not retrievedUsers and Backend.isDbms(DBMS.ORACLE) and not query2:
+                            infoMsg = "trying with table USER_SYS_PRIVS"
+                            logger.info(infoMsg)
 
-                    warnMsg = "unable to retrieve the number of "
-                    warnMsg += "privileges for user '%s'" % outuser
-                    logger.warn(warnMsg)
-                    continue
+                            return self.getPrivileges(query2=True)
+
+                        warnMsg = "unable to retrieve the number of "
+                        warnMsg += "privileges for user '%s'" % outuser
+                        logger.warn(warnMsg)
+                        continue
 
                 infoMsg = "fetching privileges for user '%s'" % outuser
                 logger.info(infoMsg)
@@ -514,6 +518,8 @@ class Users:
                         query = rootQuery.blind.query2 % (user, index)
                     elif Backend.isDbms(DBMS.FIREBIRD):
                         query = rootQuery.blind.query % (index, user)
+                    elif Backend.isDbms(DBMS.INFORMIX):
+                        query = rootQuery.blind.query % (user,)
                     else:
                         query = rootQuery.blind.query % (user, index)
 
@@ -560,6 +566,10 @@ class Users:
                     # In Firebird we get one letter for each privilege
                     elif Backend.isDbms(DBMS.FIREBIRD):
                         privileges.add(FIREBIRD_PRIVS[privilege.strip()])
+
+                    # In Informix we get one letter for the highest privilege
+                    elif Backend.isDbms(DBMS.INFORMIX):
+                        privileges.add(INFORMIX_PRIVS[privilege.strip()])
 
                     # In DB2 we get Y or G if the privilege is
                     # True, N otherwise
