@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-db111838c5ffb6dfc66a260733952460  lib/core/settings.py
+25daaeb7b15df46b1d9abccc49719654  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 0bc2fae1dec18cdd11954b22358293f2  lib/core/target.py
@@ -145,9 +145,9 @@ d278ad5f1c13fea871ed1120942244d5  plugins/dbms/hsqldb/__init__.py
 d781720e15c23b662bae3098ed470756  plugins/dbms/hsqldb/syntax.py
 2f957281cfe80396f73a3dccc0cb6d45  plugins/dbms/hsqldb/takeover.py
 78917f19ea0750a665094d7dd7778d0c  plugins/dbms/informix/connector.py
-7c6b1ac474274d0edaef377d3aa49bc9  plugins/dbms/informix/enumeration.py
+d251aecff7544f79f78385386bb7fa35  plugins/dbms/informix/enumeration.py
 e8f0f28da98020dce27970a50e10a23b  plugins/dbms/informix/filesystem.py
-6644eea7451bc26dcff598b59c0fa000  plugins/dbms/informix/fingerprint.py
+89540595a6011b47629c68d11a5e4533  plugins/dbms/informix/fingerprint.py
 99a77ad7aa7ca4a4b5981f2fa0d9c616  plugins/dbms/informix/__init__.py
 e96b4721cfc65271a2de948c47474aaa  plugins/dbms/informix/syntax.py
 5f130772d2295ae61140acba894eaceb  plugins/dbms/informix/takeover.py

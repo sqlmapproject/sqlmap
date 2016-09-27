@@ -5,8 +5,6 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
-
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.data import conf
