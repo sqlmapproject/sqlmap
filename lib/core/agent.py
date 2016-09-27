@@ -43,6 +43,7 @@ from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
+from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.unescaper import unescaper
 
 class Agent(object):
@@ -343,7 +344,7 @@ class Agent(object):
         """
 
         if payload:
-            payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+            payload = payload.replace(SLEEP_TIME_MARKER, str(conf.timeSec))
 
         return payload
 

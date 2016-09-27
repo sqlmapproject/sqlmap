@@ -74,6 +74,7 @@ from lib.core.settings import IDS_WAF_CHECK_RATIO
 from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
+from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import URI_HTTP_HEADER
@@ -560,6 +561,12 @@ def checkSqlInjection(place, parameter, value):
                             trueCode = threadData.lastCode
 
                             if trueResult:
+                                # Just extra validation step (e.g. to check for dropping protection mechanisms)
+                                if SLEEP_TIME_MARKER in reqPayload:
+                                    falseResult = Request.queryPage(reqPayload.replace(SLEEP_TIME_MARKER, "0"), place, timeBasedCompare=True, raise404=False)
+                                    if falseResult:
+                                        continue
+
                                 # Confirm test's results
                                 trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
