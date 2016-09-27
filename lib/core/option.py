@@ -1983,7 +1983,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.threadContinue = True
     kb.threadException = False
     kb.tableExistsChoice = None
-    kb.timeValidCharsRun = 0
     kb.uChar = NULL
     kb.unionDuplicates = False
     kb.xpCmdshellAvailable = False

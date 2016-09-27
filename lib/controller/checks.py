@@ -157,7 +157,7 @@ def checkSqlInjection(place, parameter, value):
             kb.testType = stype = test.stype
             clause = test.clause
             unionExtended = False
-            trueCode = None
+            trueCode, falseCode = None, None
 
             if stype == PAYLOAD.TECHNIQUE.UNION:
                 configUnion(test.request.char)
@@ -561,7 +561,7 @@ def checkSqlInjection(place, parameter, value):
                             trueCode = threadData.lastCode
 
                             if trueResult:
-                                # Just extra validation step (e.g. to check for dropping protection mechanisms)
+                                # Extra validation step (e.g. to check for DROP protection mechanisms)
                                 if SLEEP_TIME_MARKER in reqPayload:
                                     falseResult = Request.queryPage(reqPayload.replace(SLEEP_TIME_MARKER, "0"), place, timeBasedCompare=True, raise404=False)
                                     if falseResult:
@@ -678,6 +678,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].templatePayload = templatePayload
                         injection.data[stype].matchRatio = kb.matchRatio
                         injection.data[stype].trueCode = trueCode
+                        injection.data[stype].falseCode = falseCode
 
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles

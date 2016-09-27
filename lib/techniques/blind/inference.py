@@ -41,7 +41,7 @@ from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MAX_BISECTION_LENGTH
-from lib.core.settings import MAX_TIME_REVALIDATION_STEPS
+from lib.core.settings import MAX_REVALIDATION_STEPS
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
@@ -198,8 +198,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         def validateChar(idx, value):
             """
-            Used in time-based inference (in case that original and retrieved
-            value are not equal there will be a deliberate delay).
+            Used in inference - in time-based SQLi if original and retrieved value are not equal there will be a deliberate delay
             """
 
             if "'%s'" % CHAR_INFERENCE_MARK not in payload:
@@ -264,6 +263,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             minChar = minValue = charTbl[0]
             firstCheck = False
             lastCheck = False
+            unexpectedCode = False
 
             while len(charTbl) != 1:
                 position = None
@@ -321,6 +321,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)
 
+                if not timeBasedCompare:
+                    unexpectedCode |= threadData.lastCode not in (kb.injection.data[kb.technique].falseCode, kb.injection.data[kb.technique].trueCode)
+                    if unexpectedCode:
+                        warnMsg = "unexpected HTTP code '%d' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
+                        singleTimeWarnMessage(warnMsg)
+
                 if result:
                     minValue = posValue
 
@@ -360,24 +366,25 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             retVal = minValue + 1
 
                             if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                                if timeBasedCompare and not validateChar(idx, retVal):
+                                if (timeBasedCompare or unexpectedCode) and not validateChar(idx, retVal):
                                     if not kb.originalTimeDelay:
                                         kb.originalTimeDelay = conf.timeSec
 
-                                    kb.timeValidCharsRun = 0
-                                    if retried < MAX_TIME_REVALIDATION_STEPS:
+                                    threadData.validationRun = 0
+                                    if retried < MAX_REVALIDATION_STEPS:
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
-                                        if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
-                                            conf.timeSec += 1
-                                            warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                            logger.warn(warnMsg)
+                                        if timeBasedCompare:
+                                            if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
+                                                conf.timeSec += 1
+                                                warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                                logger.warn(warnMsg)
 
-                                        if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
-                                            dbgMsg = "turning off time auto-adjustment mechanism"
-                                            logger.debug(dbgMsg)
-                                            kb.adjustTimeDelay = ADJUST_TIME_DELAY.NO
+                                            if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
+                                                dbgMsg = "turning off time auto-adjustment mechanism"
+                                                logger.debug(dbgMsg)
+                                                kb.adjustTimeDelay = ADJUST_TIME_DELAY.NO
 
                                         return getChar(idx, originalTbl, continuousOrder, expand, shiftTable, (retried or 0) + 1)
                                     else:
@@ -387,8 +394,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         return decodeIntToUnicode(retVal)
                                 else:
                                     if timeBasedCompare:
-                                        kb.timeValidCharsRun += 1
-                                        if kb.adjustTimeDelay is ADJUST_TIME_DELAY.NO and kb.timeValidCharsRun > VALID_TIME_CHARS_RUN_THRESHOLD:
+                                        threadData.validationRun += 1
+                                        if kb.adjustTimeDelay is ADJUST_TIME_DELAY.NO and threadData.validationRun > VALID_TIME_CHARS_RUN_THRESHOLD:
                                             dbgMsg = "turning back on time auto-adjustment mechanism"
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = ADJUST_TIME_DELAY.YES

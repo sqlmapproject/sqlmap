@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.9.37"
+VERSION = "1.0.9.38"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -510,8 +510,8 @@ PARSE_HEADERS_LIMIT = 3
 # Step used in ORDER BY technique used for finding the right number of columns in UNION query injections
 ORDER_BY_STEP = 10
 
-# Maximum number of times for revalidation of a character in time-based injections
-MAX_TIME_REVALIDATION_STEPS = 5
+# Maximum number of times for revalidation of a character in inference (as required)
+MAX_REVALIDATION_STEPS = 5
 
 # Characters that can be used to split parameter values in provided command line (e.g. in --tamper)
 PARAMETER_SPLITTING_REGEX = r'[,|;]'
@@ -547,7 +547,7 @@ HASHDB_FLUSH_RETRIES = 3
 HASHDB_END_TRANSACTION_RETRIES = 3
 
 # Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
-HASHDB_MILESTONE_VALUE = "QWdDkLzhxH"  # python -c 'import random, string; print "".join(random.sample(string.ascii_letters, 10))'
+HASHDB_MILESTONE_VALUE = "BkfRWrtCYK"  # python -c 'import random, string; print "".join(random.sample(string.ascii_letters, 10))'
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024 ** 2
