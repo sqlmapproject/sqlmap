@@ -156,6 +156,7 @@ def checkSqlInjection(place, parameter, value):
             kb.testType = stype = test.stype
             clause = test.clause
             unionExtended = False
+            trueCode = None
 
             if stype == PAYLOAD.TECHNIQUE.UNION:
                 configUnion(test.request.char)
@@ -556,6 +557,7 @@ def checkSqlInjection(place, parameter, value):
                         elif method == PAYLOAD.METHOD.TIME:
                             # Perform the test's request
                             trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
+                            trueCode = threadData.lastCode
 
                             if trueResult:
                                 # Confirm test's results
@@ -668,6 +670,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].comment = comment
                         injection.data[stype].templatePayload = templatePayload
                         injection.data[stype].matchRatio = kb.matchRatio
+                        injection.data[stype].trueCode = trueCode
 
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles

@@ -1140,6 +1140,7 @@ class Connect(object):
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
         threadData.lastPage = page
+        threadData.lastCode = code
 
         kb.originalCode = kb.originalCode or code
 

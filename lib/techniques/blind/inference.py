@@ -210,10 +210,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(value))
                 forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
-            result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+            result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+
+            if result and timeBasedCompare:
+                result = threadData.lastCode == kb.injection.data[kb.technique].trueCode
+                if not result:
+                    warnMsg = "detected HTTP code '%d' in validation phase is differing from expected '%d'" % (threadData.lastCode, kb.injection.data[kb.technique].trueCode)
+                    singleTimeWarnMessage(warnMsg)
+
             incrementCounter(kb.technique)
 
-            return not result
+            return result
 
         def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None, retried=None):
             """
