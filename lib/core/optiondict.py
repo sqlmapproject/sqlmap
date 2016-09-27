@@ -235,6 +235,7 @@ optDict = {
                                "profile":           "boolean",
                                "forceDns":          "boolean",
                                "ignore401":         "boolean",
+                               "murphyRate":        "integer",
                                "smokeTest":         "boolean",
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",

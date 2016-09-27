@@ -759,6 +759,9 @@ def cmdLineParser(argv=None):
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--murphy-rate", dest="murphyRate", type="int",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--pickled-options", dest="pickledOptions",
                           help=SUPPRESS_HELP)
 

@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.9.40"
+VERSION = "1.0.9.41"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -85,6 +85,9 @@ MAX_CONNECTIONS_REGEX = r"max.+connections"
 
 # Timeout before the pre-connection candidate is being disposed (because of high probability that the web server will reset it)
 PRECONNECT_CANDIDATE_TIMEOUT = 10
+
+# Maximum sleep time in "Murphy" (testing) mode
+MAX_MURPHY_SLEEP_TIME = 3
 
 # Regular expression used for extracting results from Google search
 GOOGLE_REGEX = r"webcache\.googleusercontent\.com/search\?q=cache:[^:]+:([^+]+)\+&amp;cd=|url\?\w+=((?![^>]+webcache\.googleusercontent\.com)http[^>]+)&(sa=U|rct=j)"

@@ -90,6 +90,7 @@ from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
+from lib.core.settings import MAX_MURPHY_SLEEP_TIME
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import IS_WIN
@@ -224,8 +225,10 @@ class Connect(object):
 
         if conf.offline:
             return None, None, None
-        elif conf.dummy:
-            return getUnicode(randomStr(int(randomInt()), alphabet=[chr(_) for _ in xrange(256)]), {}, int(randomInt())), None, None
+        elif conf.dummy or conf.murphyRate and randomInt() % conf.murphyRate == 0:
+            if conf.murphyRate:
+                time.sleep(randomInt() % (MAX_MURPHY_SLEEP_TIME + 1))
+            return getUnicode(randomStr(int(randomInt()), alphabet=[chr(_) for _ in xrange(256)]), {}, int(randomInt())), None, None if not conf.murphyRate else randomInt(3)
 
         threadData = getCurrentThreadData()
         with kb.locks.request:

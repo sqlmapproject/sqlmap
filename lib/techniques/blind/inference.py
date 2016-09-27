@@ -324,7 +324,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if not timeBasedCompare:
                     unexpectedCode |= threadData.lastCode not in (kb.injection.data[kb.technique].falseCode, kb.injection.data[kb.technique].trueCode)
                     if unexpectedCode:
-                        warnMsg = "unexpected HTTP code '%d' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
+                        warnMsg = "unexpected HTTP code '%s' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
                         singleTimeWarnMessage(warnMsg)
 
                 if result:

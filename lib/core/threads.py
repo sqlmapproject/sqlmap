@@ -59,6 +59,7 @@ class _ThreadData(threading.local):
         self.retriesCount = 0
         self.seqMatcher = difflib.SequenceMatcher(None)
         self.shared = shared
+        self.validationRun = 0
         self.valueStack = []
 
 ThreadData = _ThreadData()
