@@ -1329,7 +1329,7 @@ def identifyWaf():
             kb.redirectChoice = popValue()
         return page or "", headers or {}, code
 
-    retVal = False
+    retVal = []
 
     for function, product in kb.wafFunctions:
         try:
@@ -1343,17 +1343,19 @@ def identifyWaf():
             found = False
 
         if found:
-            retVal = product
-            break
+            errMsg = "WAF/IDS/IPS identified as '%s'" % product
+            logger.critical(errMsg)
+
+            retVal.append(product)
 
     if retVal:
-        errMsg = "WAF/IDS/IPS identified as '%s'. Please " % retVal
-        errMsg += "consider usage of tamper scripts (option '--tamper')"
-        logger.critical(errMsg)
-
         message = "are you sure that you want to "
         message += "continue with further target testing? [y/N] "
         output = readInput(message, default="N")
+
+        if not conf.tamper:
+            warnMsg = "please consider usage of tamper scripts (option '--tamper')"
+            singleTimeWarnMessage(warnMsg)
 
         if output and output[0] not in ("Y", "y"):
             raise SqlmapUserQuitException
