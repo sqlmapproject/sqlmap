@@ -63,8 +63,6 @@ try:
     from lib.core.testing import smokeTest
     from lib.core.testing import liveTest
     from lib.parse.cmdline import cmdLineParser
-    from lib.utils.api import setRestAPILog
-    from lib.utils.api import StdDbOut
 except KeyboardInterrupt:
     errMsg = "user aborted"
     logger.error(errMsg)
@@ -126,6 +124,10 @@ def main():
         initOptions(cmdLineOptions)
 
         if hasattr(conf, "api"):
+            # heavy imports
+            from lib.utils.api import StdDbOut
+            from lib.utils.api import setRestAPILog
+
             # Overwrite system standard output and standard error to write
             # to an IPC database
             sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
