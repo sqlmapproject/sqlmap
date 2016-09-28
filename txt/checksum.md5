@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-93027b08974d19287bac33be0cb19515  lib/core/settings.py
+d9678d7975815c56e3ec2e526e9ed7d7  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -81,7 +81,7 @@ b2ffd261947994f4a4af555d468b4970  lib/request/rangehandler.py
 937b7e276f25ccac5a2ac0bf9b1ef434  lib/takeover/abstraction.py
 3ecf028d8d93025d2a12c6f6fc13adb2  lib/takeover/icmpsh.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/takeover/__init__.py
-1d064463302b85b2241263ea48a83837  lib/takeover/metasploit.py
+2d39688ec1b871005b520b6f1ed97ba6  lib/takeover/metasploit.py
 7083825564c051a7265cfdd1a5e6629c  lib/takeover/registry.py
 7d6cd7bdfc8f4bc4e8aed60c84cdf87f  lib/takeover/udf.py
 6836c641c554bd26fd57f28868ffa245  lib/takeover/web.py

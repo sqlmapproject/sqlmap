@@ -429,10 +429,12 @@ class Metasploit:
                 self._payloadCmd += " X > \"%s\"" % outFile
         else:
             if extra == "BufferRegister=EAX":
-                self._payloadCmd += " -a x86 -e %s -f %s > \"%s\"" % (self.encoderStr, format, outFile)
+                self._payloadCmd += " -a x86 -e %s -f %s" % (self.encoderStr, format)
 
                 if extra is not None:
                     self._payloadCmd += " %s" % extra
+
+                self._payloadCmd += " > \"%s\"" % outFile
             else:
                 self._payloadCmd += " -f exe > \"%s\"" % outFile
 
