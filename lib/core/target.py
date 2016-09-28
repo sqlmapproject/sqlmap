@@ -68,7 +68,6 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.utils.hashdb import HashDB
-from lib.core.xmldump import dumper as xmldumper
 from thirdparty.odict.odict import OrderedDict
 
 def _setRequestParams():
@@ -593,11 +592,7 @@ def _createDumpDir():
             conf.dumpPath = tempDir
 
 def _configureDumper():
-    if hasattr(conf, 'xmlFile') and conf.xmlFile:
-        conf.dumper = xmldumper
-    else:
-        conf.dumper = dumper
-
+    conf.dumper = dumper
     conf.dumper.setOutputFile()
 
 def _createTargetDirs():
