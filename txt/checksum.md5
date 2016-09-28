@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-2fc7f7fc1754a396b950236aa5290ed4  lib/core/settings.py
+93027b08974d19287bac33be0cb19515  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -84,7 +84,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/takeover/__init__.py
 1d064463302b85b2241263ea48a83837  lib/takeover/metasploit.py
 7083825564c051a7265cfdd1a5e6629c  lib/takeover/registry.py
 7d6cd7bdfc8f4bc4e8aed60c84cdf87f  lib/takeover/udf.py
-f6e3084abd506925a8be3d1c0a6d058c  lib/takeover/web.py
+6836c641c554bd26fd57f28868ffa245  lib/takeover/web.py
 9af83a62de360184f1c14e69b8a95cfe  lib/takeover/xp_cmdshell.py
 27d41f38de7348600309e1cb6741fb2e  lib/techniques/blind/inference.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/blind/__init__.py
