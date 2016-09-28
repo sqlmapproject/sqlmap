@@ -214,7 +214,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if result and timeBasedCompare:
                 result = threadData.lastCode == kb.injection.data[kb.technique].trueCode
                 if not result:
-                    warnMsg = "detected HTTP code '%d' in validation phase is differing from expected '%d'" % (threadData.lastCode, kb.injection.data[kb.technique].trueCode)
+                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, kb.injection.data[kb.technique].trueCode)
                     singleTimeWarnMessage(warnMsg)
 
             incrementCounter(kb.technique)
