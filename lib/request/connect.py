@@ -1076,7 +1076,7 @@ class Connect(object):
                 dataToStdout(" (done)\n")
 
             elif not kb.testMode:
-                warnMsg = "it is very important to not stress the network adapter "
+                warnMsg = "it is very important to not stress the network connection "
                 warnMsg += "during usage of time-based payloads to prevent potential "
                 warnMsg += "disruptions "
                 singleTimeWarnMessage(warnMsg)

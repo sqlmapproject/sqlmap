@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-5af773a92542c35f54a09cc42dbc5cec  lib/core/settings.py
+78c774326b071664844cc2deaf845bd9  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -67,7 +67,7 @@ b40a4c5d91770d347df36d3065b63798  lib/parse/sitemap.py
 9299f21804033f099681525bb9bf51c0  lib/request/basicauthhandler.py
 ca9879ea9277810c5fce0f0d8d2f8e03  lib/request/basic.py
 c48285682a61d49982cb508351013cb4  lib/request/comparison.py
-c8aeed55d933b4944da038fdee4cdbc6  lib/request/connect.py
+3b35467cd761ed53dfb35a85d8d6590d  lib/request/connect.py
 49b4c583af68689de5f9acb162de2939  lib/request/direct.py
 1a46f7bb26b23ec0c0d9d9c95828241b  lib/request/dns.py
 70ceefe39980611494d4f99afb96f652  lib/request/httpshandler.py
