@@ -668,24 +668,23 @@ class Agent(object):
                 concatenatedQuery = "'%s'&%s&'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
         else:
-            warnMsg = "applying generic concatenation with double pipes ('||')"
+            warnMsg = "applying generic concatenation (CONCAT)"
             singleTimeWarnMessage(warnMsg)
 
             if fieldsExists:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
-                concatenatedQuery += "||'%s'" % kb.chars.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
+                concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsSelectCase:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||(SELECT " % kb.chars.start, 1)
-                concatenatedQuery += ")||'%s'" % kb.chars.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
+                concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsSelectFrom:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
-                concatenatedQuery = "%s||'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
+                concatenatedQuery = "%s),'%s')%s" % (concatenatedQuery[:_].replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1), kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
-                concatenatedQuery += "||'%s'" % kb.chars.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
+                concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsNoSelect:
-                concatenatedQuery = "'%s'||%s||'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
+                concatenatedQuery = "CONCAT(CONCAT('%s',%s),'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
         return concatenatedQuery
 
