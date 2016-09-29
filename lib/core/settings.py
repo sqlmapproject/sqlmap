@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import random
 import re
 import subprocess
 import string
@@ -19,7 +20,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.9.57"
+VERSION = "1.0.9.58"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -31,11 +32,13 @@ GIT_REPOSITORY = "git://github.com/sqlmapproject/sqlmap.git"
 GIT_PAGE = "https://github.com/sqlmapproject/sqlmap"
 
 # colorful banner
-BANNER = """\033[01;33m         _
- ___ ___| |_____ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
-|_ -| . | |     | .'| . |
-|___|_  |_|_|_|_|__,|  _|
-      |_|           |_|   \033[0m\033[4;37m%s\033[0m\n
+BANNER = """\033[01;33m\
+        ___
+       __H__
+ ___ ___[.]_____ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
+|_ -| . [.]     | .'| . |
+|___|_  [.]_|_|_|__,|  _|
+      |_|V          |_|   \033[0m\033[4;37m%s\033[0m\n
 """ % (TYPE_COLORS.get(TYPE, 31), VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True
@@ -575,6 +578,9 @@ DNS_BOUNDARIES_ALPHABET = re.sub("[a-fA-F]", "", string.ascii_letters)
 
 # Alphabet used for heuristic checks
 HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', ',', '.')
+
+# Minor artistic touch
+BANNER = re.sub(r"\[.\]", lambda _: "[\033[01;41m%s\033[01;49m]" % random.sample(HEURISTIC_CHECK_ALPHABET, 1)[0], BANNER)
 
 # String used for dummy non-SQLi (e.g. XSS) heuristic checks of a tested parameter value
 DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
