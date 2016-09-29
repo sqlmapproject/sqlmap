@@ -341,6 +341,8 @@ def processResponse(page, responseHeaders):
 
     if not kb.tableFrom and Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
         kb.tableFrom = extractRegexResult(SELECT_FROM_TABLE_REGEX, page)
+    else:
+        kb.tableFrom = None
 
     if conf.parseErrors:
         msg = extractErrorMessage(page)
