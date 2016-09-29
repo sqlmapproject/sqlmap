@@ -200,6 +200,15 @@ class Web:
         directories.extend(getAutoDirectories())
         directories = list(oset(directories))
 
+        path = urlparse.urlparse(conf.url).path or '/'
+        if path != '/':
+            _ = []
+            for directory in directories:
+                _.append(directory)
+                if not directory.endswith(path):
+                    _.append("%s/%s" % (directory.rstrip('/'), path.strip('/')))
+            directories = _
+
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
         backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi))
 

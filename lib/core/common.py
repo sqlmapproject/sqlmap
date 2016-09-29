@@ -813,11 +813,6 @@ def getAutoDirectories():
         warnMsg = "unable to automatically parse any web server path"
         logger.warn(warnMsg)
 
-    _ = extractRegexResult(r"//[^/]+?(?P<result>/.*)/", conf.url)  # web directory
-
-    if _:
-        retVal.add(_)
-
     return list(retVal)
 
 def filePathToSafeString(filePath):
