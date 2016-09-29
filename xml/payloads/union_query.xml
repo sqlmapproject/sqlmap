@@ -346,7 +346,7 @@
     <test>
         <title>MySQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>6</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
         <where>1</where>
@@ -368,7 +368,7 @@
     <test>
         <title>MySQL UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>6</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
         <where>1</where>
@@ -412,7 +412,7 @@
     <test>
         <title>MySQL UNION query ([CHAR]) - 1 to 10 columns</title>
         <stype>6</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
         <where>1</where>
@@ -434,7 +434,7 @@
     <test>
         <title>MySQL UNION query (NULL) - 1 to 10 columns</title>
         <stype>6</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,4,5</clause>
         <where>1</where>
