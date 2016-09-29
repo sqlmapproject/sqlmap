@@ -885,7 +885,6 @@ def cmdLineParser(argv=None):
             except ValueError, ex:
                 raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex.message
 
-        # Hide non-basic options in basic help case
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
@@ -912,6 +911,14 @@ def cmdLineParser(argv=None):
                             found = True
                     if not found:
                         parser.option_groups.remove(group)
+
+        for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
+            try:
+                if argv.index(verbosity) == len(argv) - 1 or not argv[argv.index(verbosity) + 1].isdigit():
+                    conf.verbose = verbosity.count('v') + 1
+                    del argv[argv.index(verbosity)]
+            except (IndexError, ValueError):
+                pass
 
         try:
             (args, _) = parser.parse_args(argv)
