@@ -545,7 +545,7 @@ def start():
                                             kb.testedParams.add(paramKey)
 
                                 if not injectable:
-                                    warnMsg = "%s parameter '%s' is not " % (paramType, parameter)
+                                    warnMsg = "%s parameter '%s' does not seem to be " % (paramType, parameter)
                                     warnMsg += "injectable"
                                     logger.warn(warnMsg)
 
