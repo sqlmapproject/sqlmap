@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 5b079749c50240602ea92637e268ed31  lib/core/optiondict.py
-74d826338a2cd66a4724d8486a648d93  lib/core/option.py
+c3bcfb12b2dc7f6eb23f46d020faf580  lib/core/option.py
 1e8948dddbd12def5c2af52530738059  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-d9678d7975815c56e3ec2e526e9ed7d7  lib/core/settings.py
+9652b7cb6777148034310c0e66b2e85a  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py

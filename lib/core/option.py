@@ -1396,16 +1396,12 @@ def _setHTTPExtraHeaders():
                 raise SqlmapSyntaxException(errMsg)
 
     elif not conf.requestFile and len(conf.httpHeaders or []) < 2:
-        conf.httpHeaders.append((HTTP_HEADER.ACCEPT_LANGUAGE, "en-us,en;q=0.5"))
-        if not conf.charset:
-            conf.httpHeaders.append((HTTP_HEADER.ACCEPT_CHARSET, "ISO-8859-15,utf-8;q=0.7,*;q=0.7"))
-        else:
+        if conf.charset:
             conf.httpHeaders.append((HTTP_HEADER.ACCEPT_CHARSET, "%s;q=0.7,*;q=0.1" % conf.charset))
 
         # Invalidating any caching mechanism in between
-        # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-        conf.httpHeaders.append((HTTP_HEADER.CACHE_CONTROL, "no-cache,no-store"))
-        conf.httpHeaders.append((HTTP_HEADER.PRAGMA, "no-cache"))
+        # Reference: http://stackoverflow.com/a/1383359
+        conf.httpHeaders.append((HTTP_HEADER.CACHE_CONTROL, "no-cache"))
 
 def _defaultHTTPUserAgent():
     """
@@ -1414,13 +1410,6 @@ def _defaultHTTPUserAgent():
     """
 
     return "%s (%s)" % (VERSION_STRING, SITE)
-
-    # Firefox 3 running on Ubuntu 9.04 updated at April 2009
-    #return "Mozilla/5.0 (X11; U; Linux i686; en-GB; rv:1.9.0.9) Gecko/2009042113 Ubuntu/9.04 (jaunty) Firefox/3.0.9"
-
-    # Internet Explorer 7.0 running on Windows 2003 Service Pack 2 english
-    # updated at March 2009
-    #return "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)"
 
 def _setHTTPUserAgent():
     """

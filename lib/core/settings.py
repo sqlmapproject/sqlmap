@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.9.50"
+VERSION = "1.0.9.51"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -133,7 +133,7 @@ UNION_STDEV_COEFF = 7
 TIME_DELAY_CANDIDATES = 3
 
 # Default value for HTTP Accept header
-HTTP_ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+HTTP_ACCEPT_HEADER_VALUE = "*/*"
 
 # Default value for HTTP Accept-Encoding header
 HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip,deflate"
