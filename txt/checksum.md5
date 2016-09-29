@@ -26,7 +26,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 04f16204c899438dc7599a9a8426bfee  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-33b28a65ab1a9467203f63d798fd9ddf  lib/core/common.py
+b1e2ccdeea8bf12feb839d403dc05796  lib/core/common.py
 5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-b7d25f8ebe638d5e6acf38391d689f68  lib/core/settings.py
+301f39ba100694664d23d315551e12fd  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -84,7 +84,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/takeover/__init__.py
 2d39688ec1b871005b520b6f1ed97ba6  lib/takeover/metasploit.py
 7083825564c051a7265cfdd1a5e6629c  lib/takeover/registry.py
 7d6cd7bdfc8f4bc4e8aed60c84cdf87f  lib/takeover/udf.py
-6836c641c554bd26fd57f28868ffa245  lib/takeover/web.py
+d9bdcc17091374c53ad2eea7fd72a909  lib/takeover/web.py
 9af83a62de360184f1c14e69b8a95cfe  lib/takeover/xp_cmdshell.py
 27d41f38de7348600309e1cb6741fb2e  lib/techniques/blind/inference.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/blind/__init__.py
