@@ -5,9 +5,6 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
-
-from lib.core.common import randomStr
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -24,14 +21,4 @@ class Syntax(GenericSyntax):
         def escaper(value):
             return "||".join("CHR(%d)" % ord(_) for _ in value)
 
-        excluded = {}
-        for _ in re.findall(r"DBINFO\([^)]+\)", expression):
-            excluded[_] = randomStr()
-            expression = expression.replace(_, excluded[_])
-
-        retVal = Syntax._escape(expression, quote, escaper)
-
-        for _ in excluded.items():
-            retVal = retVal.replace(_[1], _[0])
-
-        return retVal
+        return Syntax._escape(expression, quote, escaper)
