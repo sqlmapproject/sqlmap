@@ -662,7 +662,7 @@ def start():
                 _saveToResultsFile()
 
                 errMsg += ", skipping to the next %s" % ("form" if conf.forms else "URL")
-                logger.error(errMsg)
+                logger.error(errMsg.lstrip(", "))
             else:
                 logger.critical(errMsg)
                 return False

@@ -1857,6 +1857,8 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.columnExistsChoice = None
     kb.commonOutputs = None
+    kb.connErrorChoice = None
+    kb.connErrorCounter = 0
     kb.cookieEncodeChoice = None
     kb.counters = {}
     kb.data = AttribDict()
@@ -1906,7 +1908,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "count", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
+    for _ in ("cache", "connError", "count", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None

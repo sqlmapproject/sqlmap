@@ -90,6 +90,7 @@ from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
+from lib.core.settings import MAX_CONSECUTIVE_CONNECTION_ERRORS
 from lib.core.settings import MAX_MURPHY_SLEEP_TIME
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -486,6 +487,8 @@ class Connect(object):
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
                 status = getUnicode(conn.msg)
 
+            kb.connErrorCounter = 0
+
             if extractRegexResult(META_REFRESH_REGEX, page) and not refreshing:
                 refresh = extractRegexResult(META_REFRESH_REGEX, page)
 
@@ -647,6 +650,18 @@ class Connect(object):
 
             if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
                 warnMsg += " or proxy"
+
+            with kb.locks.connError:
+                kb.connErrorCounter += 1
+
+                if kb.connErrorCounter >= MAX_CONSECUTIVE_CONNECTION_ERRORS and kb.connErrorChoice is None:
+                    message = "there seems to be a continuous problem with connection to the target. "
+                    message += "Are you sure that you want to continue "
+                    message += "with further target testing? [y/N] "
+                    kb.connErrorChoice = readInput(message, default="N") in ("Y", "y")
+
+                if kb.connErrorChoice is False:
+                    raise SqlmapConnectionException(warnMsg)
 
             if silent:
                 return None, None, None

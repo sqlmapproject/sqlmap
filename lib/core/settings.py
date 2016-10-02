@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.9.61"
+VERSION = "1.0.10.2"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -85,6 +85,9 @@ PERMISSION_DENIED_REGEX = r"(command|permission|access)\s*(was|is)?\s*denied"
 
 # Regular expression used for recognition of generic maximum connection messages
 MAX_CONNECTIONS_REGEX = r"max.+connections"
+
+# Maximum consecutive connection errors before asking the user if he wants to continue
+MAX_CONSECUTIVE_CONNECTION_ERRORS = 15
 
 # Timeout before the pre-connection candidate is being disposed (because of high probability that the web server will reset it)
 PRECONNECT_CANDIDATE_TIMEOUT = 10
