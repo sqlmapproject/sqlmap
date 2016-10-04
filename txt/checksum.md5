@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-6c366747f3b7c95915502fda96e81778  lib/core/settings.py
+6c2cbf215cb4b996af4f30bb3d741baa  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -448,7 +448,7 @@ d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 fb93505ef0ab3b4a20900f3e5625260d  xml/boundaries.xml
 535d625cff8418bdc086ab4e1bbf5135  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
-fc176dfccf83673b89bcbb784b72ab70  xml/payloads/boolean_blind.xml
+14a2abeb88b00ab489359d0dd7a3017f  xml/payloads/boolean_blind.xml
 103a4c9b12c582b24a3fac8147a9c8d4  xml/payloads/error_based.xml
 06b1a210b190d52477a9d492443725b5  xml/payloads/inline_query.xml
 3194e2688a7576e1f877d5b137f7c260  xml/payloads/stacked_queries.xml
