@@ -168,6 +168,12 @@ redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
 multipartPostHandler = multipartpost.MultipartPostHandler()
 
+# Reference: https://mail.python.org/pipermail/python-list/2009-November/558615.html
+try:
+    WindowsError
+except NameError:
+    WindowsError = None
+
 def _feedTargetsDict(reqFile, addedTargetUrls):
     """
     Parses web scarab and burp logs and adds results to the target URL list
