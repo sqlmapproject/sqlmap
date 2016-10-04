@@ -1330,7 +1330,7 @@ def parseTargetDirect():
                 else:
                     errMsg = "sqlmap requires '%s' third-party library " % data[1]
                     errMsg += "in order to directly connect to the DBMS "
-                    errMsg += "%s. You can download it from '%s'" % (dbmsName, data[2])
+                    errMsg += "'%s'. You can download it from '%s'" % (dbmsName, data[2])
                     errMsg += ". Alternative is to use a package 'python-sqlalchemy' "
                     errMsg += "with support for dialect '%s' installed" % data[3]
                     raise SqlmapMissingDependence(errMsg)
