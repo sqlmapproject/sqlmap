@@ -933,7 +933,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     randStr = ""
 
-    while '\'' not in randStr:
+    while randStr.count('\'') != 1 or randStr.count('\"') != 1:
         randStr = randomStr(length=10, alphabet=HEURISTIC_CHECK_ALPHABET)
 
     kb.heuristicMode = True
