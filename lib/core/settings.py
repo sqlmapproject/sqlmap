@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.10.11"
+VERSION = "1.0.10.12"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -210,7 +210,7 @@ PYVERSION = sys.version.split()[0]
 
 # DBMS system databases
 MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb")
-MYSQL_SYSTEM_DBS = ("information_schema", "mysql")                   # Before MySQL 5.0 only "mysql"
+MYSQL_SYSTEM_DBS = ("information_schema", "mysql", "performance_schema")
 PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast")
 ORACLE_SYSTEM_DBS = ("CTXSYS", "DBSNMP", "DMSYS", "EXFSYS", "MDSYS", "OLAPSYS", "ORDSYS", "OUTLN", "SYS", "SYSAUX", "SYSMAN", "SYSTEM", "TSMSYS", "WMSYS", "XDB")                      # These are TABLESPACE_NAME
 SQLITE_SYSTEM_DBS = ("sqlite_master", "sqlite_temp_master")
