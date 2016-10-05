@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from lib.core.revision import getRevisionNumber
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.10.14"
+VERSION = "1.0.10.15"
 REVISION = getRevisionNumber()
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
@@ -211,21 +211,14 @@ PYVERSION = sys.version.split()[0]
 # DBMS system databases
 MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb")
 MYSQL_SYSTEM_DBS = ("information_schema", "mysql", "performance_schema")
-PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast")
-ORACLE_SYSTEM_DBS = ("CTXSYS", "DBSNMP", "DMSYS", "EXFSYS", "MDSYS", "OLAPSYS", "ORDSYS", "OUTLN", "SYS", "SYSAUX", "SYSMAN", "SYSTEM", "TSMSYS", "WMSYS", "XDB")                      # These are TABLESPACE_NAME
+PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast", "pgagent")
+ORACLE_SYSTEM_DBS = ("ANONYMOUS", "APEX_PUBLIC_USER", "CTXSYS", "DBSNMP", "DIP", "EXFSYS", "FLOWS_%", "FLOWS_FILES", "LBACSYS", "MDDATA", "MDSYS", "MGMT_VIEW", "OLAPSYS", "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OUTLN", "OWBSYS", "SI_INFORMTN_SCHEMA", "SPATIAL_CSW_ADMIN_USR", "SPATIAL_WFS_ADMIN_USR", "SYS", "SYSMAN", "SYSTEM", "WKPROXY", "WKSYS", "WK_TEST", "WMSYS", "XDB", "XS$NULL")  # Reference: https://blog.vishalgupta.com/2011/06/19/predefined-oracle-system-schemas/ 
 SQLITE_SYSTEM_DBS = ("sqlite_master", "sqlite_temp_master")
-ACCESS_SYSTEM_DBS = ("MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage",\
-                        "MSysAccessXML", "MSysModules", "MSysModules2")
-FIREBIRD_SYSTEM_DBS = ("RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE",\
-                        "RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS",\
-                        "RDB$FORMATS", "RDB$FUNCTIONS", "RDB$FUNCTION_ARGUMENTS", "RDB$GENERATORS", "RDB$INDEX_SEGMENTS", "RDB$INDICES",\
-                        "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS",\
-                        "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS",\
-                        "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS")
+ACCESS_SYSTEM_DBS = ("MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage", "MSysAccessXML", "MSysModules", "MSysModules2")
+FIREBIRD_SYSTEM_DBS = ("RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE", "RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS", "RDB$FORMATS", "RDB$FUNCTIONS", "RDB$FUNCTION_ARGUMENTS", "RDB$GENERATORS", "RDB$INDEX_SEGMENTS", "RDB$INDICES", "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS", "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS", "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS")
 MAXDB_SYSTEM_DBS = ("SYSINFO", "DOMAIN")
 SYBASE_SYSTEM_DBS = ("master", "model", "sybsystemdb", "sybsystemprocs")
-DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS",\
-                   "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS")
+DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS", "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS")
 HSQLDB_SYSTEM_DBS = ("INFORMATION_SCHEMA", "SYSTEM_LOB")
 INFORMIX_SYSTEM_DBS = ("sysmaster", "sysutils", "sysuser", "sysadmin")
 
