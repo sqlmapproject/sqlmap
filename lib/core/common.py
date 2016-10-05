@@ -885,12 +885,12 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             else:
                 message = data
 
-            if hasattr(conf, "api"):
-                sys.stdout.write(message, status, content_type)
-            else:
-                sys.stdout.write(setColor(message, bold))
-
             try:
+                if hasattr(conf, "api"):
+                    sys.stdout.write(message, status, content_type)
+                else:
+                    sys.stdout.write(setColor(message, bold))
+
                 sys.stdout.flush()
             except IOError:
                 pass

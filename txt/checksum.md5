@@ -26,7 +26,7 @@ f15544a4c9c365ae8f2f8fa2e3a69aa5  lib/controller/checks.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 04f16204c899438dc7599a9a8426bfee  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-e8f1325ebcd7c7c823c53fead7c02b1d  lib/core/common.py
+c5aebf5a8a28af6290c45d403f4a1ac8  lib/core/common.py
 5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-3905165d1e329ecf816e73ab278317e7  lib/core/settings.py
+a3a07da9c74b3aa25aca23b00abfbe71  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
