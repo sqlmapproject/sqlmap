@@ -900,7 +900,7 @@ def cmdLineParser(argv=None):
             elif argv[i] == "--version":
                 print VERSION_STRING.split('/')[-1]
                 raise SystemExit
-            elif argv[i] == "-h":
+            elif argv[i] in ("-h", "--help"):
                 advancedHelp = False
                 for group in parser.option_groups[:]:
                     found = False
