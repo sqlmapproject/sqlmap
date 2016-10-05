@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-fd73e93782c532b43a024a6f54a1919a  lib/core/settings.py
+89486e64a33f2870decc414fc92ea45c  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -159,7 +159,7 @@ c24f2512f13dbaff9543fe6d96cbe53b  plugins/dbms/maxdb/__init__.py
 df0766e0f322505dcbfca2fc792fe62f  plugins/dbms/maxdb/syntax.py
 aeec4f12950e20c46da405d23ea08dbb  plugins/dbms/maxdb/takeover.py
 579d582f3716c310689b4aa7317b57df  plugins/dbms/mssqlserver/connector.py
-98737656b0285f3495d31f26bd1f518d  plugins/dbms/mssqlserver/enumeration.py
+7003c3c82ca56b40c7c90aea6c20cd53  plugins/dbms/mssqlserver/enumeration.py
 6c249bcdef486803686a8b2f11566637  plugins/dbms/mssqlserver/filesystem.py
 d01229e7161a5071934fc26b48a11e8c  plugins/dbms/mssqlserver/fingerprint.py
 2fbe5e485bcd05511cd1d7cb8cbdbde4  plugins/dbms/mssqlserver/__init__.py
@@ -209,7 +209,7 @@ e335b868f5fb1154c9f72143d602915d  plugins/generic/enumeration.py
 5637c508ca6348f29c2b100a3e80dddc  plugins/generic/fingerprint.py
 cc9c82cfffd8ee9b25ba3af6284f057e  plugins/generic/__init__.py
 7ffeee6d232ff6b342f362a2a4d226c0  plugins/generic/misc.py
-d509459f7662231a00ef116123c0ba5f  plugins/generic/search.py
+27d700d0c4414400ac2cf68bbbed3408  plugins/generic/search.py
 73f8d047dbbcff307d62357836e382e6  plugins/generic/syntax.py
 da3ebc20998af02e3d952d0417a67792  plugins/generic/takeover.py
 d35f994664fb7a7fcee656633dfb31ed  plugins/generic/users.py

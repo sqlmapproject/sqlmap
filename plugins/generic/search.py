@@ -175,7 +175,10 @@ class Search:
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
 
-            if dbCond and conf.db and conf.db != CURRENT_DB:
+            if conf.db == CURRENT_DB:
+                conf.db = self.getCurrentDb()
+
+            if dbCond and conf.db:
                 _ = conf.db.split(",")
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
                 infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
@@ -400,7 +403,10 @@ class Search:
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in _))
 
-            if conf.db and conf.db != CURRENT_DB:
+            if conf.db == CURRENT_DB:
+                conf.db = self.getCurrentDb()
+
+            if conf.db:
                 _ = conf.db.split(",")
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
                 infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))

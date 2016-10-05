@@ -168,7 +168,10 @@ class Enumeration(GenericEnumeration):
         tblCond = rootQuery.inband.condition
         tblConsider, tblCondParam = self.likeOrExact("table")
 
-        if conf.db and conf.db != CURRENT_DB:
+        if conf.db == CURRENT_DB:
+            conf.db = self.getCurrentDb()
+
+        if conf.db:
             enumDbs = conf.db.split(",")
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
@@ -277,7 +280,10 @@ class Enumeration(GenericEnumeration):
         tblCond = rootQuery.inband.condition2
         colConsider, colCondParam = self.likeOrExact("column")
 
-        if conf.db and conf.db != CURRENT_DB:
+        if conf.db == CURRENT_DB:
+            conf.db = self.getCurrentDb()
+
+        if conf.db:
             enumDbs = conf.db.split(",")
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
@@ -305,7 +311,10 @@ class Enumeration(GenericEnumeration):
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
 
-            if conf.db and conf.db != CURRENT_DB:
+            if conf.db == CURRENT_DB:
+                conf.db = self.getCurrentDb()
+
+            if conf.db:
                 _ = conf.db.split(",")
                 infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
