@@ -53,9 +53,7 @@ def update():
             stderr = getSafeExString(ex)
 
         if success:
-            import lib.core.settings
-            _ = lib.core.settings.REVISION = getRevisionNumber()
-            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", _))
+            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", getRevisionNumber()))
         else:
             if "Not a git repository" in stderr:
                 errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "

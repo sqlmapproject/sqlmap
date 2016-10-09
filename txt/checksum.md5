@@ -16,7 +16,7 @@ d229479d02d21b29f209143cb0547780  extra/shellcodeexec/linux/shellcodeexec.x32_
 c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.exe_
 b46521e29ea3d813bab5aeb16cac6498  extra/shutils/duplicates.py
 4bf52b3fd5e906b9bbe104dda769f5c5  extra/shutils/pylint.py
-05615626222060120450518136b14ba9  extra/shutils/regressiontest.py
+a8dd1f5799ed863a80b94c36b5428528  extra/shutils/regressiontest.py
 cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 4f2f817596540d82f9fcc0c5b2228beb  extra/sqlharvest/sqlharvest.py
 2daa39e4d59526acb4772b6c47eb315f  lib/controller/action.py
@@ -45,14 +45,14 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-5a6d84960ff31279407075c65fc09d7f  lib/core/settings.py
+a9bda44aa2a28b50254faadb508a6539  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
 d43f059747ffd48952922c94152e2a07  lib/core/testing.py
 2cafee22d9f8018e7efff0a5e3178596  lib/core/threads.py
 53c15b78e0288274f52410db25406432  lib/core/unescaper.py
-6bdc53e2ca152ff8cd35ad671e48a96b  lib/core/update.py
+60100cb265ae8bb903b760c7b7a3a7f3  lib/core/update.py
 8485a3cd94c0a5af2718bad60c5f1ae5  lib/core/wordlist.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/__init__.py
 c1288bc4ce5651dbdd82d4a9435fdc03  lib/parse/banner.py

@@ -22,7 +22,6 @@ from lib.core.revision import getRevisionNumber
 
 START_TIME = time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime())
 SQLMAP_HOME = "/opt/sqlmap"
-REVISION = getRevisionNumber()
 
 SMTP_SERVER = "127.0.0.1"
 SMTP_PORT = 25
@@ -30,7 +29,7 @@ SMTP_TIMEOUT = 30
 FROM = "regressiontest@sqlmap.org"
 #TO = "dev@sqlmap.org"
 TO = ["bernardo.damele@gmail.com", "miroslav.stampar@gmail.com"]
-SUBJECT = "regression test started on %s using revision %s" % (START_TIME, REVISION)
+SUBJECT = "regression test started on %s using revision %s" % (START_TIME, getRevisionNumber())
 TARGET = "debian"
 
 def prepare_email(content):
