@@ -1769,6 +1769,9 @@ def _cleanupOptions():
     if conf.binaryFields:
         conf.binaryFields = re.sub(r"\s*,\s*", ",", conf.binaryFields)
 
+    if any((conf.proxy, conf.proxyFile, conf.tor)):
+        conf.disablePrecon = True
+
     threadData = getCurrentThreadData()
     threadData.reset()
 
