@@ -75,6 +75,11 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     # Create graph image (png) by using pydot (python-pydot)
     # http://code.google.com/p/pydot/
     pydotGraph = pydot.graph_from_dot_file(dotOutputFile)
+
+    # Reference: http://stackoverflow.com/questions/38176472/graph-write-pdfiris-pdf-attributeerror-list-object-has-no-attribute-writ
+    if isinstance(pydotGraph, list):
+        pydotGraph = pydotGraph[0]
+
     pydotGraph.write_png(imageOutputFile)
 
     infoMsg = "displaying interactive graph with xdot library"
