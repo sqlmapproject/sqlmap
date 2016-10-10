@@ -119,6 +119,7 @@ from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
+from lib.core.settings import LOCALHOST
 from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MIN_VALID_DELAYED_RESPONSE
@@ -2397,6 +2398,29 @@ def extractErrorMessage(page):
             if match:
                 retVal = htmlunescape(match.group("result")).replace("<br>", "\n").strip()
                 break
+
+    return retVal
+
+def findLocalPort(ports):
+    """
+    Find the first opened localhost port from a given list of ports (e.g. for Tor port checks)
+    """
+
+    retVal = None
+
+    for port in ports:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((LOCALHOST, port))
+            retVal = port
+            break
+        except socket.error:
+            pass
+        finally:
+            try:
+                s.close()
+            except socket.error:
+                pass
 
     return retVal
 

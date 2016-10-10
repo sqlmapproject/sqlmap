@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.10.23"
+VERSION = "1.0.10.24"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -430,10 +430,10 @@ IGNORE_SAVE_OPTIONS = ("saveConfig",)
 # IP address of the localhost
 LOCALHOST = "127.0.0.1"
 
-# Default port used by Tor
-DEFAULT_TOR_SOCKS_PORT = 9050
+# Default SOCKS ports used by Tor
+DEFAULT_TOR_SOCKS_PORTS = (9050, 9150)
 
-# Default ports used in Tor proxy bundles
+# Default HTTP ports used by Tor
 DEFAULT_TOR_HTTP_PORTS = (8123, 8118)
 
 # Percentage below which comparison engine could have problems
