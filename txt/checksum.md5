@@ -20,7 +20,7 @@ a8dd1f5799ed863a80b94c36b5428528  extra/shutils/regressiontest.py
 cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 4f2f817596540d82f9fcc0c5b2228beb  extra/sqlharvest/sqlharvest.py
 2daa39e4d59526acb4772b6c47eb315f  lib/controller/action.py
-f15544a4c9c365ae8f2f8fa2e3a69aa5  lib/controller/checks.py
+33299308c821d04c2caf35d4c7a415ff  lib/controller/checks.py
 5df6cb90ffec56876e444aec8cf89c34  lib/controller/controller.py
 0a64305c3b3a01a2fc3a5e6204f442f1  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 5b079749c50240602ea92637e268ed31  lib/core/optiondict.py
-b6f8d72812531ae010fc5b9ce4faba51  lib/core/option.py
+d63e7749935f8ab323baaf5b425977ef  lib/core/option.py
 7af487340c138f7b5dbd443161cbb428  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-b6d53fd8d8dc437c358366789ddeb935  lib/core/settings.py
+1b4a3f7d043a8ff800a42e2b5d926303  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -67,7 +67,7 @@ b40a4c5d91770d347df36d3065b63798  lib/parse/sitemap.py
 9299f21804033f099681525bb9bf51c0  lib/request/basicauthhandler.py
 083e7f446909b12009e72ae8e5e5737c  lib/request/basic.py
 c48285682a61d49982cb508351013cb4  lib/request/comparison.py
-a00056d73c56b240bb15ebc32fe5440f  lib/request/connect.py
+9a8aebced1304fb9d590dd252b253416  lib/request/connect.py
 49b4c583af68689de5f9acb162de2939  lib/request/direct.py
 1a46f7bb26b23ec0c0d9d9c95828241b  lib/request/dns.py
 70ceefe39980611494d4f99afb96f652  lib/request/httpshandler.py

@@ -1150,7 +1150,7 @@ class Connect(object):
                 warnMsg = "site returned insanely large response"
                 if kb.testMode:
                     warnMsg += " in testing phase. This is a common "
-                    warnMsg += "behavior in custom WAF/IDS/IPS solutions"
+                    warnMsg += "behavior in custom WAF/IPS/IDS solutions"
                 singleTimeWarnMessage(warnMsg)
 
         if conf.secondOrder:

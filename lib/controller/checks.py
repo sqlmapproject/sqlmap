@@ -1333,7 +1333,7 @@ def identifyWaf():
 
     for function, product in kb.wafFunctions:
         try:
-            logger.debug("checking for WAF/IDS/IPS product '%s'" % product)
+            logger.debug("checking for WAF/IPS/IDS product '%s'" % product)
             found = function(_)
         except Exception, ex:
             errMsg = "exception occurred while running "
@@ -1343,7 +1343,7 @@ def identifyWaf():
             found = False
 
         if found:
-            errMsg = "WAF/IDS/IPS identified as '%s'" % product
+            errMsg = "WAF/IPS/IDS identified as '%s'" % product
             logger.critical(errMsg)
 
             retVal.append(product)
@@ -1360,7 +1360,7 @@ def identifyWaf():
         if output and output[0] not in ("Y", "y"):
             raise SqlmapUserQuitException
     else:
-        warnMsg = "WAF/IDS/IPS product hasn't been identified"
+        warnMsg = "WAF/IPS/IDS product hasn't been identified"
         logger.warn(warnMsg)
 
     kb.testType = None
