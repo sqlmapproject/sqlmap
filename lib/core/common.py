@@ -3178,13 +3178,28 @@ def createGithubIssue(errMsg, excMsg):
         ex = None
         errMsg = errMsg[errMsg.find("\n"):]
 
+        req = urllib2.Request(url="https://api.github.com/search/issues?q=%s" % urllib.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key))
+
+        try:
+            content = urllib2.urlopen(req).read()
+            _ = json.loads(content)
+            duplicate = _["total_count"] > 0
+            closed = duplicate and _["items"][0]["state"] == "closed"
+            if duplicate:
+                warnMsg = "issue seems to be already reported"
+                if closed:
+                    warnMsg += " and resolved. Please update to the latest "
+                    warnMsg += "development version from official GitHub repository at '%s'" % GIT_PAGE
+                logger.warn(warnMsg)
+                return
+        except:
+            pass
 
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
         req = urllib2.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN.decode("base64")})
 
         try:
-            f = urllib2.urlopen(req)
-            content = f.read()
+            content = urllib2.urlopen(req).read()
         except Exception, ex:
             content = None
 
