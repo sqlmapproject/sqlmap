@@ -888,6 +888,9 @@ def cmdLineParser(argv=None):
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
+            elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in (argv[i][0], argv[i][-1])):
+                dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is, well, illegal (%s)\n" % argv[i])
+                raise SystemExit
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
                 raise SystemExit
