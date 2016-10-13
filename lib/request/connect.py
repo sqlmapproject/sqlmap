@@ -251,7 +251,7 @@ class Connect(object):
         timeout = kwargs.get("timeout",             None) or conf.timeout
         auxHeaders = kwargs.get("auxHeaders",       None)
         response = kwargs.get("response",           False)
-        ignoreTimeout = kwargs.get("ignoreTimeout", False) or kb.ignoreTimeout
+        ignoreTimeout = kwargs.get("ignoreTimeout", False) or kb.ignoreTimeout or conf.ignoreTimeouts
         refreshing = kwargs.get("refreshing",       False)
         retrying = kwargs.get("retrying",           False)
         crawling = kwargs.get("crawling",           False)
