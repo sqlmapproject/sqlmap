@@ -590,7 +590,7 @@ class Connect(object):
                     processResponse(page, responseHeaders)
             elif ex.code == httplib.GATEWAY_TIMEOUT:
                 if ignoreTimeout:
-                    return None, None, None
+                    return None if not conf.ignoreTimeouts else "", None, None
                 else:
                     warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, httplib.responses[ex.code])
                     if threadData.retriesCount < conf.retries and not kb.threadException:
@@ -669,7 +669,7 @@ class Connect(object):
                 logger.critical(warnMsg)
                 return None, None, None
             elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead")):
-                return None, None, None
+                return None if not conf.ignoreTimeouts else "", None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
                 warnMsg += ". sqlmap is going to retry the request"
                 if not retrying:
