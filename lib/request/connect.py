@@ -623,7 +623,7 @@ class Connect(object):
                         kb.responseTimes.clear()
 
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
-                    singleTimeWarnMessage("there is a possibility that the target (or WAF) is dropping 'suspicious' requests")
+                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS/IDS) is dropping 'suspicious' requests")
                 warnMsg = "connection timed out to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target URL"
