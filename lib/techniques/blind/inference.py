@@ -5,6 +5,7 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
 import threading
 import time
 
@@ -45,6 +46,7 @@ from lib.core.settings import MAX_REVALIDATION_STEPS
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
+from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import RANDOM_INTEGER_MARKER
 from lib.core.settings import VALID_TIME_CHARS_RUN_THRESHOLD
 from lib.core.threads import getCurrentThreadData
@@ -201,13 +203,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             Used in inference - in time-based SQLi if original and retrieved value are not equal there will be a deliberate delay
             """
 
+            validationPayload = re.sub(r"(%s.*?)%s(.*?%s)" % (PAYLOAD_DELIMITER, INFERENCE_GREATER_CHAR, PAYLOAD_DELIMITER), r"\g<1>%s\g<2>" % INFERENCE_NOT_EQUALS_CHAR, payload)
+
             if "'%s'" % CHAR_INFERENCE_MARK not in payload:
-                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx, value))
+                forgedPayload = safeStringFormat(validationPayload, (expressionUnescaped, idx, value))
             else:
                 # e.g.: ... > '%c' -> ... > ORD(..)
                 markingValue = "'%s'" % CHAR_INFERENCE_MARK
                 unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(value))
-                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_NOT_EQUALS_CHAR), (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
+                forgedPayload = safeStringFormat(validationPayload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
 
             result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
