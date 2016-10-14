@@ -21,6 +21,7 @@ from lib.core.exception import SqlmapDataException
 from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
+from lib.core.settings import HASHDB_RETRIEVE_RETRIES
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
@@ -76,16 +77,18 @@ class HashDB(object):
             hash_ = HashDB.hashKey(key)
             retVal = self._write_cache.get(hash_)
             if not retVal:
-                while True:
+                for _ in xrange(HASHDB_RETRIEVE_RETRIES):
                     try:
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
                     except sqlite3.OperationalError, ex:
-                        if not any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
-                            raise
-                        else:
+                        if any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
                             warnMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
                             singleTimeWarnMessage(warnMsg)
+                        elif "Could not decode" in getSafeExString(ex):
+                            break
+                        else:
+                            raise
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"

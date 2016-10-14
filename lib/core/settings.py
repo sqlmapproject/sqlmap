@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.10.35"
+VERSION = "1.0.10.36"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -543,6 +543,9 @@ HASHDB_FLUSH_THRESHOLD = 32
 
 # Number of retries for unsuccessful HashDB flush attempts
 HASHDB_FLUSH_RETRIES = 3
+
+# Number of retries for unsuccessful HashDB retrieve attempts
+HASHDB_RETRIEVE_RETRIES = 3
 
 # Number of retries for unsuccessful HashDB end transaction attempts
 HASHDB_END_TRANSACTION_RETRIES = 3
