@@ -70,6 +70,7 @@ PROXY_TYPES = {"SOCKS4": SOCKS4, "SOCKS5": SOCKS5, "HTTP": HTTP}
 PRINTABLE_PROXY_TYPES = dict(zip(PROXY_TYPES.values(), PROXY_TYPES.keys()))
 
 _orgsocket = _orig_socket = socket.socket
+_orgcreateconnection = socket.create_connection
 
 class ProxyError(IOError):
     """
@@ -145,7 +146,12 @@ def wrap_module(module):
     else:
         raise GeneralProxyError("No default proxy specified")
 
+def unwrap_module(module):
+    module.socket.socket = _orgsocket
+    module.socket.create_connection = _orgcreateconnection
+
 wrapmodule = wrap_module
+unwrapmodule = unwrap_module
 
 def create_connection(dest_pair, proxy_type=None, proxy_addr=None,
                       proxy_port=None, proxy_rdns=True,

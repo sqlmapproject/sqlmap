@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-ecc7bdb84caadf1435a3f21b4cf19ef3  lib/core/settings.py
+d4200890061c99da6b976755b4aebd83  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -349,7 +349,7 @@ ff80a22ee858f5331b0c088efa98b3ff  thirdparty/prettyprint/prettyprint.py
 5c70f8e5f7353aedc6d8d21d4fb72b37  thirdparty/pydes/__init__.py
 a7f735641c5b695f3d6220fe7c91b030  thirdparty/pydes/pyDes.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/socks/__init__.py
-7cb5df774288a8d835494c8a72435cc0  thirdparty/socks/socks.py
+a2f0ee74ccc895150f310ef8d680edca  thirdparty/socks/socks.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/termcolor/__init__.py
 ea649aae139d8551af513769dd913dbf  thirdparty/termcolor/termcolor.py
 855372c870a23d46683f8aa39d75f6a1  thirdparty/xdot/__init__.py
