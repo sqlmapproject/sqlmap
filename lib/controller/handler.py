@@ -86,9 +86,6 @@ def setHandler():
         conf.dbmsConnector = Connector()
 
         if conf.direct:
-            logger.debug("forcing timeout to 10 seconds")
-            conf.timeout = 10
-
             dialect = DBMS_DICT[dbms][3]
 
             if dialect:
