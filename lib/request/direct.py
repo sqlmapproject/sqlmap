@@ -24,6 +24,7 @@ from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import TIMEOUT_STATE
 from lib.core.settings import UNICODE_ENCODING
 from lib.utils.timeout import timeout
 
@@ -51,10 +52,14 @@ def direct(query, content=True):
     start = time.time()
 
     if not select and "EXEC " not in query.upper():
-        _ = timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
+        timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif not (output and "sqlmapoutput" not in query and "sqlmapfile" not in query):
-        output = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
-        hashDBWrite(query, output, True)
+        output, state = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
+        if state == TIMEOUT_STATE.NORMAL:
+            hashDBWrite(query, output, True)
+        elif state == TIMEOUT_STATE.TIMEOUT:
+            conf.dbmsConnector.close()
+            conf.dbmsConnector.connect()
     elif output:
         infoMsg = "resumed: %s..." % getUnicode(output, UNICODE_ENCODING)[:20]
         logger.info(infoMsg)
