@@ -1205,7 +1205,7 @@ def _setSafeVisit():
     """
     Check and set the safe visit options.
     """
-    if not any ((conf.safeUrl, conf.safeReqFile)):
+    if not any((conf.safeUrl, conf.safeReqFile)):
         return
 
     if conf.safeReqFile:
