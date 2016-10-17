@@ -1041,7 +1041,7 @@ def _setSocketPreConnect():
         return
 
     def _():
-        while kb.threadContinue and not conf.disablePrecon:
+        while kb.get("threadContinue") and not conf.get("disablePrecon"):
             try:
                 for key in socket._ready:
                     if len(socket._ready[key]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
@@ -1775,6 +1775,17 @@ def _cleanupOptions():
 
     threadData = getCurrentThreadData()
     threadData.reset()
+
+def _cleanupEnvironment():
+    """
+    Cleanup environment (e.g. from leftovers after --sqlmap-shell).
+    """
+
+    if issubclass(urllib2.socket.socket, socks.socksocket):
+        socks.unwrapmodule(urllib2)
+
+    if hasattr(socket, "_ready"):
+        socket._ready.clear()
 
 def _dirtyPatches():
     """
@@ -2620,6 +2631,7 @@ def init():
     _saveConfig()
     _setRequestFromFile()
     _cleanupOptions()
+    _cleanupEnvironment()
     _dirtyPatches()
     _purgeOutput()
     _checkDependencies()
