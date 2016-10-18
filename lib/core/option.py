@@ -1794,6 +1794,8 @@ def _dirtyPatches():
 
     httplib._MAXLINE = 1 * 1024 * 1024  # to accept overly long result lines (e.g. SQLi results in HTTP header responses)
 
+    from thirdparty.wininetpton import win_inet_pton
+
 def _purgeOutput():
     """
     Safely removes (purges) output directory.

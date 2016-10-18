@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 468ca9a68a5a40a1cb8395602083ba32  lib/core/optiondict.py
-bf17e2bc2dc356105a159d8c093bd952  lib/core/option.py
+6d3e00fe69fd2fe9a794cae18b48b56c  lib/core/option.py
 7af487340c138f7b5dbd443161cbb428  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-469c00ca02a5d91ca058cfc54cfa7e94  lib/core/settings.py
+c2d650ebf3d2c270c8ba082bf1ae249b  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -352,6 +352,8 @@ d41d8cd98f00b204e9800998ecf8427e  thirdparty/socks/__init__.py
 a2f0ee74ccc895150f310ef8d680edca  thirdparty/socks/socks.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/termcolor/__init__.py
 ea649aae139d8551af513769dd913dbf  thirdparty/termcolor/termcolor.py
+bf55909ad163b58236e44b86e8441b26  thirdparty/wininetpton/__init__.py
+a44e7cf30f2189b2fbdb635b310cdc0c  thirdparty/wininetpton/win_inet_pton.py
 855372c870a23d46683f8aa39d75f6a1  thirdparty/xdot/__init__.py
 593473084228b63a12318d812e50f1e2  thirdparty/xdot/xdot.py
 08c706478fad0acba049d0e32cbb6411  udf/mysql/linux/32/lib_mysqludf_sys.so_
