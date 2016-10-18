@@ -45,12 +45,12 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-49b872986ac8a016a5ec7e378eaac419  lib/core/settings.py
+469c00ca02a5d91ca058cfc54cfa7e94  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
 d43f059747ffd48952922c94152e2a07  lib/core/testing.py
-2cafee22d9f8018e7efff0a5e3178596  lib/core/threads.py
+95997f8d0b23fed9289b04b85d0e9b64  lib/core/threads.py
 53c15b78e0288274f52410db25406432  lib/core/unescaper.py
 60100cb265ae8bb903b760c7b7a3a7f3  lib/core/update.py
 8485a3cd94c0a5af2718bad60c5f1ae5  lib/core/wordlist.py

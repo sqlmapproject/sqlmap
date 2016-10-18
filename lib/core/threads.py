@@ -20,6 +20,7 @@ from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapThreadException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PYVERSION
@@ -166,13 +167,13 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                     alive = True
                     time.sleep(0.1)
 
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SqlmapUserQuitException), ex:
         print
         kb.threadContinue = False
         kb.threadException = True
 
         if numThreads > 1:
-            logger.info("waiting for threads to finish (Ctrl+C was pressed)")
+            logger.info("waiting for threads to finish%s" % (" (Ctrl+C was pressed)" if isinstance(ex, KeyboardInterrupt) else ""))
         try:
             while (threading.activeCount() > 1):
                 pass
