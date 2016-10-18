@@ -29,6 +29,7 @@ from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
+from lib.core.defaults import _defaults
 from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.enums import PART_RUN_CONTENT_TYPES
@@ -132,7 +133,7 @@ class Task(object):
         for _ in optDict:
             for name, type_ in optDict[_].items():
                 type_ = unArrayizeValue(type_)
-                self.options[name] = datatype[type_]  # don't use _defaults here (breaking kb.explicitSettings logic)
+                self.options[name] = _defaults.get(name, datatype[type_])
 
         # Let sqlmap engine knows it is getting called by the API,
         # the task ID and the file path of the IPC database
