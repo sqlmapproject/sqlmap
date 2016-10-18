@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-e29f050364158cf2093dc24e281b351b  lib/core/settings.py
+94590a9ec85ca3c9f9bb04ee910db4e0  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -99,7 +99,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/__init__.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/union/__init__.py
 f5d6884cdeed28281187c111d3e49e3b  lib/techniques/union/test.py
 12ce1bb7ee5f1f23f58be12fe9fa8472  lib/techniques/union/use.py
-26c1babc6289fac9056f8b21d10f3bb1  lib/utils/api.py
+f48873f749b53a9e475292590ba7ed2e  lib/utils/api.py
 8cdc8c1e663c3b92a756fb7b02cc3c02  lib/utils/crawler.py
 84604ae4cf0f31602b412036b51f5dae  lib/utils/deps.py
 4dfd3a95e73e806f62372d63bc82511f  lib/utils/getch.py
