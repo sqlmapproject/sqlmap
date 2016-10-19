@@ -888,7 +888,10 @@ class Connect(object):
             uri = conf.url
 
         if value and place == PLACE.CUSTOM_HEADER:
-            auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
+            if value.split(',')[0].capitalize() == PLACE.COOKIE:
+                cookie = value.split(',', 1)[1]
+            else:
+                auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
 
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
