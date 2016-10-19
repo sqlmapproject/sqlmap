@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.10.47"
+VERSION = "1.0.10.48"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -401,7 +401,7 @@ MAX_INT = sys.maxint
 RESTORE_MERGED_OPTIONS = ("col", "db", "dnsName", "privEsc", "tbl", "regexp", "string", "textOnly", "threads", "timeSec", "tmpPath", "uChar", "user")
 
 # Parameters to be ignored in detection phase (upper case)
-IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
+IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__VIEWSTATEGENERATOR", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
 
 # Regular expression used for recognition of ASP.NET control parameters
 ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
