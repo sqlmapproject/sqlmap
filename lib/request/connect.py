@@ -396,6 +396,7 @@ class Connect(object):
 
             if websocket_:
                 ws = websocket.WebSocket()
+                ws.settimeout(timeout)
                 ws.connect(url, header=("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",)), cookie=cookie)  # WebSocket will add Host field of headers automatically
                 ws.send(urldecode(post or ""))
                 page = ws.recv()
