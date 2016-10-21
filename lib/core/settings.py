@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.0.10.51"
+VERSION = "1.0.10.52"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -103,7 +103,7 @@ DUCKDUCKGO_REGEX = r'"u":"([^"]+)'
 DISCONNECT_SEARCH_REGEX = r'<p class="url wrapword">([^<]+)</p>'
 
 # Dummy user agent for search (if default one returns different results)
-DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0"
+DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0"
 
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
@@ -251,39 +251,39 @@ WINDOWS_RESERVED_NAMES = ("CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "C
 
 # Items displayed in basic help (-h) output
 BASIC_HELP_ITEMS = (
-                        "url",
-                        "googleDork",
-                        "data",
-                        "cookie",
-                        "randomAgent",
-                        "proxy",
-                        "testParameter",
-                        "dbms",
-                        "level",
-                        "risk",
-                        "tech",
-                        "getAll",
-                        "getBanner",
-                        "getCurrentUser",
-                        "getCurrentDb",
-                        "getPasswordHashes",
-                        "getTables",
-                        "getColumns",
-                        "getSchema",
-                        "dumpTable",
-                        "dumpAll",
-                        "db",
-                        "tbl",
-                        "col",
-                        "osShell",
-                        "osPwn",
-                        "batch",
-                        "checkTor",
-                        "flushSession",
-                        "tor",
-                        "sqlmapShell",
-                        "wizard",
-                   )
+    "url",
+    "googleDork",
+    "data",
+    "cookie",
+    "randomAgent",
+    "proxy",
+    "testParameter",
+    "dbms",
+    "level",
+    "risk",
+    "tech",
+    "getAll",
+    "getBanner",
+    "getCurrentUser",
+    "getCurrentDb",
+    "getPasswordHashes",
+    "getTables",
+    "getColumns",
+    "getSchema",
+    "dumpTable",
+    "dumpAll",
+    "db",
+    "tbl",
+    "col",
+    "osShell",
+    "osPwn",
+    "batch",
+    "checkTor",
+    "flushSession",
+    "tor",
+    "sqlmapShell",
+    "wizard",
+)
 
 # String representation for NULL value
 NULL = "NULL"
@@ -299,13 +299,13 @@ FILE_PATH_REGEXES = (r" in (file )?<b>(?P<result>.*?)</b> on line \d+", r"in (?P
 
 # Regular expressions used for parsing error messages (--parse-errors)
 ERROR_PARSING_REGEXES = (
-                          r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
-                          r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>[^\n]+?)$",
-                          r"(?P<result>[^\n>]*SQL Syntax[^\n<]+)",
-                          r"<li>Error Type:<br>(?P<result>.+?)</li>",
-                          r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
-                          r"\[[^\n\]]+(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)"
-                        )
+    r"<b>[^<]*(fatal|error|warning|exception)[^<]*</b>:?\s*(?P<result>.+?)<br\s*/?\s*>",
+    r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>[^\n]+?)$",
+    r"(?P<result>[^\n>]*SQL Syntax[^\n<]+)",
+    r"<li>Error Type:<br>(?P<result>.+?)</li>",
+    r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
+    r"\[[^\n\]]+(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)"
+)
 
 # Regular expression used for parsing charset info from meta html headers
 META_CHARSET_REGEX = r'(?si)<head>.*<meta[^>]+charset="?(?P<result>[^"> ]+).*</head>'
@@ -482,12 +482,12 @@ SHELLCODEEXEC_RANDOM_STRING_MARKER = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # Vectors used for provoking specific WAF/IPS/IDS behavior(s)
 WAF_ATTACK_VECTORS = (
-                        "",  # NIL
-                        "search=<script>alert(1)</script>",
-                        "file=../../../../etc/passwd",
-                        "q=<invalid>foobar",
-                        "id=1 %s" % IDS_WAF_CHECK_PAYLOAD
-                     )
+    "",  # NIL
+    "search=<script>alert(1)</script>",
+    "file=../../../../etc/passwd",
+    "q=<invalid>foobar",
+    "id=1 %s" % IDS_WAF_CHECK_PAYLOAD
+)
 
 # Used for status representation in dictionary attack phase
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
