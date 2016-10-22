@@ -2410,7 +2410,10 @@ def findLocalPort(ports):
 
     for port in ports:
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            try:
+                s = socket._orig_socket(socket.AF_INET, socket.SOCK_STREAM)
+            except AttributeError:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((LOCALHOST, port))
             retVal = port
             break
