@@ -106,7 +106,7 @@ optDict = {
                                "uCols":             "string",
                                "uChar":             "string",
                                "uFrom":             "string",
-                               "dnsName":           "string",
+                               "dnsDomain":         "string",
                                "secondOrder":       "string",
                              },
 

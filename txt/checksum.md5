@@ -26,7 +26,7 @@ ec007a1424da78cfdae90da6ae49ed9b  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 04f16204c899438dc7599a9a8426bfee  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-01c42757ab2928edcf62789e94397d1c  lib/core/common.py
+7e424aadf807efa352733fb95a6ab431  lib/core/common.py
 5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -38,14 +38,14 @@ b218e03ef7426fb0414881b05add1092  lib/core/enums.py
 e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
-468ca9a68a5a40a1cb8395602083ba32  lib/core/optiondict.py
-470577bfa701af901b29fbc837c5d537  lib/core/option.py
+d027df65e7cbb99758daf77aaa6ab61c  lib/core/optiondict.py
+814b261b06f12d54a9e6c5b62a2402f8  lib/core/option.py
 7af487340c138f7b5dbd443161cbb428  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-e39defdec6e34d32ab82541c88d64880  lib/core/settings.py
+c211b7b7ed1f4d628961e9e9457899da  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -56,7 +56,7 @@ d43f059747ffd48952922c94152e2a07  lib/core/testing.py
 8485a3cd94c0a5af2718bad60c5f1ae5  lib/core/wordlist.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/__init__.py
 c1288bc4ce5651dbdd82d4a9435fdc03  lib/parse/banner.py
-cbca40e76a5a6e93c9fb523f69a99d88  lib/parse/cmdline.py
+344781507a052d4d37157c5017f670ba  lib/parse/cmdline.py
 8ec4d4f02634834701f8258726f2e511  lib/parse/configfile.py
 fe4e2152292587928edb94c9a4d311ff  lib/parse/handler.py
 8e6bfb13e5a34b2610f3ff23467a34cf  lib/parse/headers.py
@@ -72,7 +72,7 @@ d4d52c1073c75a6eecd2ebb98b670b96  lib/request/direct.py
 1a46f7bb26b23ec0c0d9d9c95828241b  lib/request/dns.py
 70ceefe39980611494d4f99afb96f652  lib/request/httpshandler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/request/__init__.py
-aa155f8b27d56485d3ff15efa5e1b07a  lib/request/inject.py
+62aff2a7bdd43f6e4d33385f57ec3e4c  lib/request/inject.py
 3fc323d525beddd14cd4d4dca4934fa8  lib/request/methodrequest.py
 585a6705cfac79f795b835affb80c901  lib/request/pkihandler.py
 b2ffd261947994f4a4af555d468b4970  lib/request/rangehandler.py
@@ -91,8 +91,8 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/blind/__init__.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/brute/__init__.py
 d36effffe64e63ef9b3be490f850e2cc  lib/techniques/brute/use.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/dns/__init__.py
-b658a1df33fd967c0b6d82911383abda  lib/techniques/dns/test.py
-4033bdb9e6973ee814fb68d3cf9e710c  lib/techniques/dns/use.py
+99484ca6f1c12dac031e6a0ebef33ef1  lib/techniques/dns/test.py
+77b414d35fd13c8ba6aa171d5d420dc9  lib/techniques/dns/use.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/error/__init__.py
 4a1fb475f4a193e2cac48c8c038f5677  lib/techniques/error/use.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/__init__.py

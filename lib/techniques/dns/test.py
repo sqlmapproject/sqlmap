@@ -24,7 +24,7 @@ def dnsTest(payload):
     if not kb.dnsTest:
         errMsg = "data retrieval through DNS channel failed"
         if not conf.forceDns:
-            conf.dnsName = None
+            conf.dnsDomain = None
             errMsg += ". Turning off DNS exfiltration support"
             logger.error(errMsg)
         else:

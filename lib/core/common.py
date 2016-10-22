@@ -3228,7 +3228,7 @@ def maskSensitiveData(msg):
 
     retVal = getUnicode(msg)
 
-    for item in filter(None, map(lambda x: conf.get(x), ("hostname", "data", "googleDork", "authCred", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy", "rFile", "wFile", "dFile"))):
+    for item in filter(None, map(lambda x: conf.get(x), ("hostname", "data", "dnsDomain", "googleDork", "authCred", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy", "rFile", "wFile", "dFile"))):
         regex = SENSITIVE_DATA_REGEX % re.sub("(\W)", r"\\\1", getUnicode(item))
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)

@@ -57,7 +57,7 @@ from lib.techniques.union.use import unionUse
 def _goDns(payload, expression):
     value = None
 
-    if conf.dnsName and kb.dnsTest is not False and not kb.testMode and Backend.getDbms() is not None:
+    if conf.dnsDomain and kb.dnsTest is not False and not kb.testMode and Backend.getDbms() is not None:
         if kb.dnsTest is None:
             dnsTest(payload)
 
@@ -293,7 +293,7 @@ def _goBooleanProxy(expression):
 
     initTechnique(kb.technique)
 
-    if conf.dnsName:
+    if conf.dnsDomain:
         query = agent.prefixQuery(kb.injection.data[kb.technique].vector)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
@@ -413,7 +413,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-                if found and conf.dnsName:
+                if found and conf.dnsDomain:
                     _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E": PAYLOAD.TECHNIQUE.ERROR, "Q": PAYLOAD.TECHNIQUE.QUERY, "U": PAYLOAD.TECHNIQUE.UNION}.items())))
                     warnMsg = "option '--dns-domain' will be ignored "
                     warnMsg += "as faster techniques are usable "
