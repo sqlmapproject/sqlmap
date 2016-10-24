@@ -931,15 +931,26 @@ def dataToOutFile(filename, data):
     retVal = None
 
     if data:
-        retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
+        while True:
+            retVal = os.path.join(conf.filePath, filePathToSafeString(filename))
 
-        try:
-            with open(retVal, "w+b") as f:  # has to stay as non-codecs because data is raw ASCII encoded data
-                f.write(unicodeencode(data))
-        except IOError, ex:
-            errMsg = "something went wrong while trying to write "
-            errMsg += "to the output file ('%s')" % getSafeExString(ex)
-            raise SqlmapGenericException(errMsg)
+            try:
+                with open(retVal, "w+b") as f:  # has to stay as non-codecs because data is raw ASCII encoded data
+                    f.write(unicodeencode(data))
+            except UnicodeEncodeError, ex:
+                _ = normalizeUnicode(filename)
+                if filename != _:
+                    filename = _
+                else:
+                    errMsg = "couldn't write to the "
+                    errMsg += "output file ('%s')" % getSafeExString(ex)
+                    raise SqlmapGenericException(errMsg)
+            except IOError, ex:
+                errMsg = "something went wrong while trying to write "
+                errMsg += "to the output file ('%s')" % getSafeExString(ex)
+                raise SqlmapGenericException(errMsg)
+            else:
+                break
 
     return retVal
 
