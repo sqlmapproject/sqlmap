@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-58de4e84eac67c1c845970f9211dd6c9  lib/core/settings.py
+af794f90e9c1a317e3a2873b0e10a40f  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -334,7 +334,7 @@ d41d8cd98f00b204e9800998ecf8427e  thirdparty/__init__.py
 e3b18f925d125bd17c7e7a7ec0b4b85f  thirdparty/keepalive/__init__.py
 e0c6a936506bffeed53ce106ec15942d  thirdparty/keepalive/keepalive.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/magic/__init__.py
-49f0d123e044dd32a452e2fe51f1a9c3  thirdparty/magic/magic.py
+bf318e0abbe6b2e1a167a233db7f744f  thirdparty/magic/magic.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/multipart/__init__.py
 03c8abc17b228e59bcfda1f11a9137e0  thirdparty/multipart/multipartpost.py
 3e502b04f3849afbb7f0e13b5fd2b5c1  thirdparty/odict/__init__.py
