@@ -76,7 +76,7 @@
 * Added option `--safe-post` to set POST data for sending to safe URL.
 * Added option `--safe-req` for loading HTTP request from a file that will be used during sending to safe URL.
 * Added option `--skip` to skip testing of given parameter(s).
-* Added switch `--skip-static` to skip testing parameters that not appear dynamic.
+* Added switch `--skip-static` to skip testing parameters that not appear to be dynamic.
 * Added switch `--skip-urlencode` to skip URL encoding of payload data.
 * Added switch `--skip-waf` to skip heuristic detection of WAF/IPS/IDS protection.
 * Added switch `--smart` to conduct thorough tests only if positive heuristic(s).

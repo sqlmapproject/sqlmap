@@ -264,7 +264,7 @@ def cmdLineParser(argv=None):
                              help="Skip testing for given parameter(s)")
 
         injection.add_option("--skip-static", dest="skipStatic", action="store_true",
-                             help="Skip testing parameters that not appear dynamic")
+                             help="Skip testing parameters that not appear to be dynamic")
 
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
