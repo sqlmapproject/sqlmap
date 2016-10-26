@@ -21,13 +21,13 @@ cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 4f2f817596540d82f9fcc0c5b2228beb  extra/sqlharvest/sqlharvest.py
 2daa39e4d59526acb4772b6c47eb315f  lib/controller/action.py
 33299308c821d04c2caf35d4c7a415ff  lib/controller/checks.py
-5df6cb90ffec56876e444aec8cf89c34  lib/controller/controller.py
+35029bd013e74ca45749aa57e585aac9  lib/controller/controller.py
 ec007a1424da78cfdae90da6ae49ed9b  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 04f16204c899438dc7599a9a8426bfee  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
 136246c879e7a15309ed892ea4c1c3eb  lib/core/common.py
-5680d0c446a3bed5c0f2a0402d031557  lib/core/convert.py
+7793cad97d18e482345bdc0b12315d96  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
 e4ca0fd47f20cf7ba6a5f5cbf980073c  lib/core/decorators.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-a26c40b76c7ec1f18b004790c31bdbeb  lib/core/settings.py
+e78be7882591863c78b2ad408ad2cfee  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -56,7 +56,7 @@ d43f059747ffd48952922c94152e2a07  lib/core/testing.py
 8485a3cd94c0a5af2718bad60c5f1ae5  lib/core/wordlist.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/__init__.py
 c1288bc4ce5651dbdd82d4a9435fdc03  lib/parse/banner.py
-344781507a052d4d37157c5017f670ba  lib/parse/cmdline.py
+81c02216ed37b40bb98eb78fe038344c  lib/parse/cmdline.py
 8ec4d4f02634834701f8258726f2e511  lib/parse/configfile.py
 fe4e2152292587928edb94c9a4d311ff  lib/parse/handler.py
 8e6bfb13e5a34b2610f3ff23467a34cf  lib/parse/headers.py
@@ -165,7 +165,7 @@ d01229e7161a5071934fc26b48a11e8c  plugins/dbms/mssqlserver/fingerprint.py
 2fbe5e485bcd05511cd1d7cb8cbdbde4  plugins/dbms/mssqlserver/__init__.py
 a727b3cac910622d22b2ed92815716ef  plugins/dbms/mssqlserver/syntax.py
 f3da9f5298dac5d1f468828c07c81f70  plugins/dbms/mssqlserver/takeover.py
-d8cd212ba7be09483af3f32256b71f05  plugins/dbms/mysql/connector.py
+c44c561dd9df1dc844a81be500ea02e7  plugins/dbms/mysql/connector.py
 d251aecff7544f79f78385386bb7fa35  plugins/dbms/mysql/enumeration.py
 a970f90c91ebd3a7e22955424fe5414e  plugins/dbms/mysql/filesystem.py
 edc62bbf269d053ccc68b4cdfebdf12b  plugins/dbms/mysql/fingerprint.py

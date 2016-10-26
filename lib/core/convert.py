@@ -5,9 +5,13 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+try:
+   import cPickle as pickle
+except:
+   import pickle
+
 import base64
 import json
-import pickle
 import re
 import StringIO
 import sys
