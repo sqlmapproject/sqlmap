@@ -2222,7 +2222,7 @@ def _mergeOptions(inputOptions, overrideOptions):
 
     if inputOptions.pickledOptions:
         try:
-            inputOptions = base64unpickle(inputOptions.pickledOptions)
+            inputOptions = base64unpickle(inputOptions.pickledOptions, unsafe=True)
             if type(inputOptions) == dict:
                 inputOptions = AttribDict(inputOptions)
             _normalizeOptions(inputOptions)
