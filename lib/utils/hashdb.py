@@ -98,7 +98,7 @@ class HashDB(object):
 
                     time.sleep(1)
 
-        if unserialize:
+        if retVal and unserialize:
             try:
                 retVal = unserializeObject(retVal)
             except:
