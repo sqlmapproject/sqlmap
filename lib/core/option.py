@@ -5,6 +5,7 @@ Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import binascii
 import cookielib
 import glob
 import inspect
@@ -218,7 +219,10 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 reqResList = []
                 for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
                     port, request = match.groups()
-                    request = request.decode("base64")
+                    try:
+                        request = request.decode("base64")
+                    except binascii.Error:
+                        continue
                     _ = re.search(r"%s:.+" % re.escape(HTTP_HEADER.HOST), request)
                     if _:
                         host = _.group(0).strip()
