@@ -87,7 +87,7 @@ def base64unpickle(value, unsafe=False):
         f = StringIO.StringIO(str)
         if unsafe:
             unpickler = picklePy.Unpickler(f)
-            unpickler.dispatch[pickle.REDUCE] = _
+            unpickler.dispatch[picklePy.REDUCE] = _
         else:
             unpickler = pickle.Unpickler(f)
         return unpickler.load()
