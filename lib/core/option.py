@@ -2232,7 +2232,7 @@ def _mergeOptions(inputOptions, overrideOptions):
             _normalizeOptions(inputOptions)
         except Exception, ex:
             errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
-            errMsg += " ('%s')" % ex if ex.message else ""
+            errMsg += " (%s)" % repr(ex)
             raise SqlmapSyntaxException(errMsg)
 
     if inputOptions.configFile:
