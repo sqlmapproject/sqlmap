@@ -214,7 +214,7 @@ def main():
                 dataToStdout(excMsg)
                 raise SystemExit
 
-            elif "/tamper/" in excMsg:
+            elif "tamper/" in excMsg:
                 logger.critical(errMsg)
                 print
                 dataToStdout(excMsg)
