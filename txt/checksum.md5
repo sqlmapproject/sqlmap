@@ -15,7 +15,7 @@ d229479d02d21b29f209143cb0547780  extra/shellcodeexec/linux/shellcodeexec.x32_
 2fe2f94eebc62f7614f0391a8a90104f  extra/shellcodeexec/linux/shellcodeexec.x64_
 c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.exe_
 b46521e29ea3d813bab5aeb16cac6498  extra/shutils/duplicates.py
-4bf52b3fd5e906b9bbe104dda769f5c5  extra/shutils/pylint.py
+8cd064eea3506e5dd913e03171bc418f  extra/shutils/pylint.py
 a8dd1f5799ed863a80b94c36b5428528  extra/shutils/regressiontest.py
 cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 4f2f817596540d82f9fcc0c5b2228beb  extra/sqlharvest/sqlharvest.py
@@ -42,10 +42,10 @@ d027df65e7cbb99758daf77aaa6ab61c  lib/core/optiondict.py
 eb5e96b4baef52ad172e0359c1783d83  lib/core/option.py
 7af487340c138f7b5dbd443161cbb428  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
-5ef56abb8671c2ca6ceecb208258e360  lib/core/replication.py
+4502017bfdabd9d29bba10fed1b54e35  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-766f2beb17bc407c8b7a55527d9c089d  lib/core/settings.py
+e9e85d7705eb178f10e1205d8b3a2a00  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -103,7 +103,7 @@ f5d6884cdeed28281187c111d3e49e3b  lib/techniques/union/test.py
 8cdc8c1e663c3b92a756fb7b02cc3c02  lib/utils/crawler.py
 84604ae4cf0f31602b412036b51f5dae  lib/utils/deps.py
 4dfd3a95e73e806f62372d63bc82511f  lib/utils/getch.py
-b3f589e6e634b1d57f6bc6f1709c8ab1  lib/utils/hashdb.py
+f20b306a3895e9585834c3491dcfc8d5  lib/utils/hashdb.py
 0330607242d4f704ae6d7bba5f52ccae  lib/utils/hash.py
 a3e885f7d4c6ff05db1156244bb84158  lib/utils/htmlentities.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/utils/__init__.py
