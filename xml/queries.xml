@@ -463,6 +463,10 @@
         <length query="LENGTH(%s)"/>
         <isnull query="VALUE(%s,' ')" query2="IFNULL(%s,' ')"/>
         <delimiter query=","/>
+        <limit query="LIMIT %d,%d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
         <!-- No real cast on SAP MaxDB -->
         <cast query="REPLACE(CHR(%s),' ','_')"/>
         <order query="ORDER BY %s ASC"/>
@@ -647,6 +651,7 @@
         </search_column>
     </dbms>
 
+    <!-- Hyper SQL Database -->
     <dbms value="HSQLDB">
         <cast query="CAST(%s AS LONGVARCHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
