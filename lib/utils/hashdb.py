@@ -17,7 +17,7 @@ from lib.core.common import serializeObject
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unserializeObject
 from lib.core.data import logger
-from lib.core.exception import SqlmapDataException
+from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
@@ -44,7 +44,7 @@ class HashDB(object):
             except Exception, ex:
                 errMsg = "error occurred while opening a session "
                 errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
-                raise SqlmapDataException(errMsg)
+                raise SqlmapConnectionException(errMsg)
 
         return threadData.hashDBCursor
 
@@ -92,7 +92,7 @@ class HashDB(object):
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"
-                        raise SqlmapDataException, errMsg
+                        raise SqlmapConnectionException, errMsg
                     else:
                         break
 
