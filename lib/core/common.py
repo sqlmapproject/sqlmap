@@ -3707,7 +3707,7 @@ def asciifyUrl(url, forceQuote=False):
 
 def isAdminFromPrivileges(privileges):
     """
-    Inspects privileges to see if those are comming from an admin user
+    Inspects privileges to see if those are coming from an admin user
     """
 
     # In PostgreSQL the usesuper privilege means that the
