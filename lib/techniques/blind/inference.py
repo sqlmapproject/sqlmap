@@ -94,8 +94,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             return 0, retVal
 
     try:
-        # Set kb.partRun in case "common prediction" feature (a.k.a. "good
-        # samaritan") is used or the engine is called from the API
+        # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used or the engine is called from the API
         if conf.predictOutput:
             kb.partRun = getPartRun()
         elif hasattr(conf, "api"):
@@ -107,8 +106,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             firstChar = len(partialValue)
         elif "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
             firstChar = 0
-        elif dump and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
+        elif (kb.fileReadMode or dump) and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
+            if kb.fileReadMode:
+                firstChar *= 2
         elif isinstance(firstChar, basestring) and firstChar.isdigit() or isinstance(firstChar, int):
             firstChar = int(firstChar) - 1
         else:
