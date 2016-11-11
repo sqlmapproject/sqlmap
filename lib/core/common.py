@@ -3786,6 +3786,11 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                                     item.selected = True
                                 break
 
+                if conf.crawlExclude and re.search(conf.crawlExclude, form.action or ""):
+                    dbgMsg = "skipping '%s'" % form.action
+                    logger.debug(dbgMsg)
+                    continue
+
                 request = form.click()
             except (ValueError, TypeError), ex:
                 errMsg = "there has been a problem while "
