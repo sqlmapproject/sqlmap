@@ -38,14 +38,14 @@ b218e03ef7426fb0414881b05add1092  lib/core/enums.py
 e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
-d027df65e7cbb99758daf77aaa6ab61c  lib/core/optiondict.py
+86c86d2ee9e0eb74b13c16797b7dfc51  lib/core/optiondict.py
 eb5e96b4baef52ad172e0359c1783d83  lib/core/option.py
 7af487340c138f7b5dbd443161cbb428  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-d318ccb3fe404d6cf646e0cfe6d90f6d  lib/core/settings.py
+7f04f7e55179f45470b137dbb15657c6  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -56,7 +56,7 @@ d43f059747ffd48952922c94152e2a07  lib/core/testing.py
 8485a3cd94c0a5af2718bad60c5f1ae5  lib/core/wordlist.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/__init__.py
 c1288bc4ce5651dbdd82d4a9435fdc03  lib/parse/banner.py
-39c07b707916d99a75a2c7622785dc13  lib/parse/cmdline.py
+ba4c9a57e87f54c647ca29a14fa82f9c  lib/parse/cmdline.py
 8ec4d4f02634834701f8258726f2e511  lib/parse/configfile.py
 fe4e2152292587928edb94c9a4d311ff  lib/parse/handler.py
 8e6bfb13e5a34b2610f3ff23467a34cf  lib/parse/headers.py
@@ -76,7 +76,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/request/__init__.py
 3fc323d525beddd14cd4d4dca4934fa8  lib/request/methodrequest.py
 585a6705cfac79f795b835affb80c901  lib/request/pkihandler.py
 b2ffd261947994f4a4af555d468b4970  lib/request/rangehandler.py
-53eede2efbfabc7315ea99756a03f49d  lib/request/redirecthandler.py
+30eda640dc427585c3dbf4762a30bd38  lib/request/redirecthandler.py
 4d838b086f128a94a91aa293ca1e0719  lib/request/templates.py
 937b7e276f25ccac5a2ac0bf9b1ef434  lib/takeover/abstraction.py
 3ecf028d8d93025d2a12c6f6fc13adb2  lib/takeover/icmpsh.py

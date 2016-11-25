@@ -40,6 +40,7 @@ optDict = {
                                "authFile":          "string",
                                "ignore401":         "boolean",
                                "ignoreProxy":       "boolean",
+                               "ignoreRedirects":   "boolean",
                                "ignoreTimeouts":    "boolean",
                                "proxy":             "string",
                                "proxyCred":         "string",

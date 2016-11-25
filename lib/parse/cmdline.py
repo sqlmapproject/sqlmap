@@ -155,6 +155,9 @@ def cmdLineParser(argv=None):
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            help="Ignore system default proxy settings")
 
+        request.add_option("--ignore-redirects", dest="ignoreRedirects", action="store_true",
+                          help="Ignore redirection attempts")
+
         request.add_option("--ignore-timeouts", dest="ignoreTimeouts", action="store_true",
                           help="Ignore connection timeouts")
 

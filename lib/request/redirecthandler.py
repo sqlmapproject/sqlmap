@@ -71,7 +71,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
     def http_error_302(self, req, fp, code, msg, headers):
         content = None
-        redurl = self._get_header_redirect(headers)
+        redurl = self._get_header_redirect(headers) if not conf.ignoreRedirects else None
 
         try:
             content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
