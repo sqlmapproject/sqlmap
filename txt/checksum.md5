@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-7f04f7e55179f45470b137dbb15657c6  lib/core/settings.py
+079c062fb2fa5b45e2dbbf25323bc48a  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -252,6 +252,7 @@ c16c3ed0ce302034d99ee0b8f34fbd0b  tamper/modsecurityzeroversioned.py
 e65ff0680df2fc89444ec5953bb2f161  tamper/nonrecursivereplacement.py
 6780d738236ac200d230c4cb497bd1a2  tamper/overlongutf8.py
 3f05d5218b22280adcd91fe53830bcb4  tamper/percentage.py
+9741ad2359382dc8673189224995a5f7  tamper/plus2concat.py
 7a93f510f231278897650da1c7d13b23  tamper/randomcase.py
 34c255f3bca6d5fee2dfb18ed86d406f  tamper/randomcomments.py
 f5e9eb84d4c5e9a19fe7154a8aebe13d  tamper/securesphere.py
