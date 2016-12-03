@@ -53,8 +53,10 @@ class SQLAlchemy(GenericConnector):
                 if self.dialect:
                     conf.direct = conf.direct.replace(conf.dbms, self.dialect, 1)
 
-                engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False} if self.dialect == "sqlite" else {})
+                engine = _sqlalchemy.create_engine(conf.direct, connect_args={"check_same_thread": False} if self.dialect == "sqlite" else {})
                 self.connector = engine.connect()
+            except (TypeError, ValueError):
+                raise
             except SqlmapFilePathException:
                 raise
             except Exception, msg:
