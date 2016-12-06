@@ -9,6 +9,7 @@ import imp
 import logging
 import os
 import sys
+import traceback
 import warnings
 
 _sqlalchemy = None
@@ -56,6 +57,13 @@ class SQLAlchemy(GenericConnector):
                 engine = _sqlalchemy.create_engine(conf.direct, connect_args={"check_same_thread": False} if self.dialect == "sqlite" else {})
                 self.connector = engine.connect()
             except (TypeError, ValueError):
+                if "_get_server_version_info" in traceback.format_exc():
+                    try:
+                        import pymssql
+                        if int(pymssql.__version__[0]) < 2:
+                            raise SqlmapConnectionException("SQLAlchemy connection issue (obsolete version of pymssql ('%s') is causing problems)" % pymssql.__version__)
+                    except ImportError:
+                        pass
                 raise
             except SqlmapFilePathException:
                 raise

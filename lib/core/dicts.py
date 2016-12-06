@@ -184,15 +184,15 @@ DB2_PRIVS = {
 DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
 
 DBMS_DICT = {
-    DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "mssql+pymssql"),
+    DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", "mssql+pymssql"),
     DBMS.MYSQL: (MYSQL_ALIASES, "python-pymysql", "https://github.com/petehunt/PyMySQL/", "mysql"),
     DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
     DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/", "oracle"),
     DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "http://packages.ubuntu.com/quantal/python-sqlite", "sqlite"),
-    DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "http://pyodbc.googlecode.com/", "access"),
+    DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "https://github.com/mkleehammer/pyodbc", "access"),
     DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/", "firebird"),
     DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
-    DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "http://pymssql.sourceforge.net/", "sybase"),
+    DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", "sybase"),
     DBMS.DB2: (DB2_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
     DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
     DBMS.INFORMIX: (INFORMIX_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
