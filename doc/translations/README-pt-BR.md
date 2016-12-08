@@ -19,7 +19,7 @@ Você pode baixar o arquivo tar mais recente clicando [aqui]
 
 De preferência, você pode baixar o sqlmap clonando o repositório [Git](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap funciona em [Python](http://www.python.org/download/) nas versões **2.6.x** e **2.7.x** em todas as plataformas.
 

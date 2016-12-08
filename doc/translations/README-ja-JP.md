@@ -19,7 +19,7 @@ wikiに載っているいくつかの機能のデモをスクリーンショッ�
 
 [Git](https://github.com/sqlmapproject/sqlmap) レポジトリをクローンして、sqlmapをダウンロードすることも可能です。:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmapは、 [Python](http://www.python.org/download/) バージョン **2.6.x** または **2.7.x** がインストールされていれば、全てのプラットフォームですぐに使用できます。
 

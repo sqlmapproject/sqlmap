@@ -18,7 +18,7 @@ sqlmap 是一个开源的渗透测试工具，可以用来自动化的检测，�
 
 推荐你从 [Git](https://github.com/sqlmapproject/sqlmap) 仓库获取最新的源代码:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap 可以运行在 [Python](http://www.python.org/download/)  **2.6.x**  和  **2.7.x** 版本的任何平台上
 

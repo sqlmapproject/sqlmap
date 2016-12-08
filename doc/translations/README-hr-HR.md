@@ -18,7 +18,7 @@ Možete preuzeti zadnji tarball klikom [ovdje](https://github.com/sqlmapproject/
 
 Po mogućnosti, možete preuzeti sqlmap kloniranjem [Git](https://github.com/sqlmapproject/sqlmap) repozitorija:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap radi bez posebnih zahtjeva korištenjem [Python](http://www.python.org/download/) verzije **2.6.x** i/ili **2.7.x** na bilo kojoj platformi.
 

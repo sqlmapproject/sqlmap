@@ -19,7 +19,7 @@ Anda dapat mengunduh tarball versi terbaru [di sini]
 
 Sebagai alternatif, Anda dapat mengunduh sqlmap dengan men-_clone_ repositori [Git](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap berfungsi langsung pada [Python](http://www.python.org/download/) versi **2.6.x** dan **2.7.x** pada platform apapun.
 

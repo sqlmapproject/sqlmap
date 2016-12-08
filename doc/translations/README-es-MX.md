@@ -17,7 +17,7 @@ Se puede descargar el "tarball" más actual haciendo clic [aquí](https://github
 
 Preferentemente, se puede descargar sqlmap clonando el repositorio [Git](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap funciona con las siguientes versiones de [Python](http://www.python.org/download/) ** 2.6.x** y ** 2.7.x** en cualquier plataforma.
 
@@ -26,7 +26,7 @@ Uso
 
 Para obtener una lista de opciones básicas: 
 
-    python sqlmap.py -h 
+    python sqlmap.py -h
 
 Para obtener una lista de todas las opciones:
 

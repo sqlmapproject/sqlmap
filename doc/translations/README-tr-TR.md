@@ -21,7 +21,7 @@ Kurulum
 
 Veya tercihen, [Git](https://github.com/sqlmapproject/sqlmap) reposunu klonlayarak indirebilirsiniz
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap [Python](http://www.python.org/download/) sitesinde bulunan **2.6.x** and **2.7.x** versiyonları ile bütün platformlarda çalışabilmektedir.
 

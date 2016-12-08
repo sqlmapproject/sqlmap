@@ -18,7 +18,7 @@
 
 Κατά προτίμηση, μπορείτε να κατεβάσετε το sqlmap κάνοντας κλώνο το [Git](https://github.com/sqlmapproject/sqlmap) αποθετήριο:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 Το sqlmap λειτουργεί χωρίς περαιτέρω κόπο με την [Python](http://www.python.org/download/) έκδοσης **2.6.x** και **2.7.x** σε όποια πλατφόρμα.
 
