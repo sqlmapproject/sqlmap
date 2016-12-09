@@ -150,7 +150,6 @@ FIREBIRD_PRIVS = {
     "U": "UPDATE",
     "D": "DELETE",
     "R": "REFERENCE",
-    "E": "EXECUTE",
     "X": "EXECUTE",
     "A": "ALL",
     "M": "MEMBER",

@@ -32,7 +32,7 @@ e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
 e4ca0fd47f20cf7ba6a5f5cbf980073c  lib/core/decorators.py
 67f206cf2658145992cc1d7020138325  lib/core/defaults.py
-6e2eb57c90a30635ee3516978dd87f34  lib/core/dicts.py
+6df6a6d6af44910d4c62b55ac934bcb6  lib/core/dicts.py
 1f98d3f57ce21d625fd67adb26cfd13c  lib/core/dump.py
 b218e03ef7426fb0414881b05add1092  lib/core/enums.py
 e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-93f88f50fc17b9df82d97b35f0b110b5  lib/core/settings.py
+2941eff566f8a42de4ff1e748385df12  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -144,7 +144,7 @@ d278ad5f1c13fea871ed1120942244d5  plugins/dbms/hsqldb/__init__.py
 d781720e15c23b662bae3098ed470756  plugins/dbms/hsqldb/syntax.py
 2f957281cfe80396f73a3dccc0cb6d45  plugins/dbms/hsqldb/takeover.py
 78917f19ea0750a665094d7dd7778d0c  plugins/dbms/informix/connector.py
-cbada3ff47bc259a4876317fd5b20024  plugins/dbms/informix/enumeration.py
+fbebc449bea948d8c9062dd6626589cb  plugins/dbms/informix/enumeration.py
 e8f0f28da98020dce27970a50e10a23b  plugins/dbms/informix/filesystem.py
 89540595a6011b47629c68d11a5e4533  plugins/dbms/informix/fingerprint.py
 99a77ad7aa7ca4a4b5981f2fa0d9c616  plugins/dbms/informix/__init__.py
