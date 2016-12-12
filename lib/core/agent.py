@@ -529,6 +529,8 @@ class Agent(object):
         elif fieldsSelect:
             fieldsToCastStr = fieldsSelect.group(1)
 
+        fieldsToCastStr = fieldsToCastStr or ""
+
         # Function
         if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]

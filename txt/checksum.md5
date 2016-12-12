@@ -24,7 +24,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 35029bd013e74ca45749aa57e585aac9  lib/controller/controller.py
 ec007a1424da78cfdae90da6ae49ed9b  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
-04f16204c899438dc7599a9a8426bfee  lib/core/agent.py
+cdffff6260c40ccb4e4092fc21d9d63f  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
 aef64655185ac789696de9ba73d65ec9  lib/core/common.py
 ab5ef8fe4e4beaef4016d458d0fdefe3  lib/core/convert.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 99a2b496b9d5b546b335653ca801153f  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-2941eff566f8a42de4ff1e748385df12  lib/core/settings.py
+3112bd43b07ac2ca9c7c50bbb1575e4c  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
