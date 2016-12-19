@@ -23,6 +23,7 @@ import random
 import re
 import socket
 import string
+import subprocess
 import sys
 import tempfile
 import time
@@ -37,8 +38,6 @@ from StringIO import StringIO
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
-from subprocess import PIPE
-from subprocess import Popen as execute
 from xml.dom import minidom
 from xml.sax import parse
 from xml.sax import SAXParseException
@@ -1889,7 +1888,7 @@ def getConsoleWidth(default=80):
                 FNULL = open(os.devnull, 'w')
             except IOError:
                 FNULL = None
-            process = execute("stty size", shell=True, stdout=PIPE, stderr=FNULL or PIPE)
+            process = subprocess.Popen("stty size", shell=True, stdout=subprocess.PIPE, stderr=FNULL or subprocess.PIPE)
             stdout, _ = process.communicate()
             items = stdout.split()
 

@@ -19,33 +19,33 @@ def checkDependencies():
 
         try:
             if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
-                import _mssql
-                import pymssql
+                __import__("_mssql")
 
+                import pymssql
                 if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
                     warnMsg = "'%s' third-party library must be " % data[1]
                     warnMsg += "version >= 1.0.2 to work properly. "
                     warnMsg += "Download from %s" % data[2]
                     logger.warn(warnMsg)
             elif dbmsName == DBMS.MYSQL:
-                import pymysql
+                __import__("pymysql")
             elif dbmsName == DBMS.PGSQL:
-                import psycopg2
+                __import__("psycopg2")
             elif dbmsName == DBMS.ORACLE:
-                import cx_Oracle
+                __import__("cx_Oracle")
             elif dbmsName == DBMS.SQLITE:
-                import sqlite3
+                __import__("sqlite3")
             elif dbmsName == DBMS.ACCESS:
-                import pyodbc
+                __import__("pyodbc")
             elif dbmsName == DBMS.FIREBIRD:
-                import kinterbasdb
+                __import__("kinterbasdb")
             elif dbmsName == DBMS.DB2:
-                import ibm_db_dbi
+                __import__("ibm_db_dbi")
             elif dbmsName == DBMS.HSQLDB:
-                import jaydebeapi
-                import jpype
+                __import__("jaydebeapi")
+                __import__("jpype")
             elif dbmsName == DBMS.INFORMIX:
-                import ibm_db_dbi
+                __import__("ibm_db_dbi")
         except ImportError:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
@@ -59,7 +59,7 @@ def checkDependencies():
         logger.debug(debugMsg)
 
     try:
-        import impacket
+        __import__("impacket")
         debugMsg = "'python-impacket' third-party library is found"
         logger.debug(debugMsg)
     except ImportError:
@@ -70,7 +70,7 @@ def checkDependencies():
         missing_libraries.add('python-impacket')
 
     try:
-        import ntlm
+        __import__("ntlm")
         debugMsg = "'python-ntlm' third-party library is found"
         logger.debug(debugMsg)
     except ImportError:
@@ -81,7 +81,7 @@ def checkDependencies():
         missing_libraries.add('python-ntlm')
 
     try:
-        from websocket import ABNF
+        __import__("websocket.ABNF")
         debugMsg = "'python websocket-client' library is found"
         logger.debug(debugMsg)
     except ImportError:
@@ -93,7 +93,7 @@ def checkDependencies():
 
     if IS_WIN:
         try:
-            import pyreadline
+            __import__("pyreadline")
             debugMsg = "'python-pyreadline' third-party library is found"
             logger.debug(debugMsg)
         except ImportError:

@@ -364,7 +364,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         if conf.direct:
             value = direct(forgeCaseExpression if expected == EXPECTED.BOOL else expression)
 
-        elif any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
+        elif any(isTechniqueAvailable(_) for _ in getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True)):
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
             value = None

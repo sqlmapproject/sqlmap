@@ -63,6 +63,7 @@ def direct(query, content=True):
     elif output:
         infoMsg = "resumed: %s..." % getUnicode(output, UNICODE_ENCODING)[:20]
         logger.info(infoMsg)
+
     threadData.lastQueryDuration = calculateDeltaSeconds(start)
 
     if not output:

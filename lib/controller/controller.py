@@ -165,7 +165,7 @@ def _showInjections():
     if hasattr(conf, "api"):
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
     else:
-        data = "".join(set(map(lambda x: _formatInjection(x), kb.injections))).rstrip("\n")
+        data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")
         conf.dumper.string(header, data)
 
     if conf.tamper:
@@ -224,7 +224,7 @@ def _saveToResultsFile():
         return
 
     results = {}
-    techniques = dict(map(lambda x: (x[1], x[0]), getPublicTypeMembers(PAYLOAD.TECHNIQUE)))
+    techniques = dict((_[1], _[0]) for _ in getPublicTypeMembers(PAYLOAD.TECHNIQUE))
 
     for injection in kb.injections + kb.falsePositives:
         if injection.place is None or injection.parameter is None:
@@ -238,7 +238,7 @@ def _saveToResultsFile():
 
     for key, value in results.items():
         place, parameter, notes = key
-        line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(map(lambda x: techniques[x][0].upper(), sorted(value))), notes, os.linesep)
+        line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
         conf.resultsFP.writelines(line)
 
     if not results:

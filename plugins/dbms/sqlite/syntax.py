@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import binascii
 
-from lib.core.common import Backend
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.settings import UNICODE_ENCODING
 from plugins.generic.syntax import Syntax as GenericSyntax
@@ -19,6 +18,7 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         """
+        >>> from lib.core.common import Backend
         >>> Backend.setVersion('2')
         ['2']
         >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")

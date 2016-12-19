@@ -10,9 +10,8 @@ import httplib
 import random
 import re
 import socket
+import subprocess
 import time
-
-from subprocess import Popen as execute
 
 from extra.beep.beep import beep
 from lib.core.agent import agent
@@ -200,7 +199,7 @@ def checkSqlInjection(place, parameter, value):
             if conf.tech and isinstance(conf.tech, list) and stype not in conf.tech:
                 debugMsg = "skipping test '%s' because the user " % title
                 debugMsg += "specified to test only for "
-                debugMsg += "%s techniques" % " & ".join(map(lambda x: PAYLOAD.SQLINJECTION[x], conf.tech))
+                debugMsg += "%s techniques" % " & ".join(PAYLOAD.SQLINJECTION[_] for _ in conf.tech)
                 logger.debug(debugMsg)
                 continue
 
@@ -651,20 +650,20 @@ def checkSqlInjection(place, parameter, value):
 
                         # Feed with test details every time a test is successful
                         if hasattr(test, "details"):
-                            for dKey, dValue in test.details.items():
-                                if dKey == "dbms":
-                                    injection.dbms = dValue
+                            for key, value in test.details.items():
+                                if key == "dbms":
+                                    injection.dbms = value
 
-                                    if not isinstance(dValue, list):
-                                        Backend.setDbms(dValue)
+                                    if not isinstance(value, list):
+                                        Backend.setDbms(value)
                                     else:
-                                        Backend.forceDbms(dValue[0], True)
+                                        Backend.forceDbms(value[0], True)
 
-                                elif dKey == "dbms_version" and injection.dbms_version is None and not conf.testFilter:
-                                    injection.dbms_version = Backend.setVersion(dValue)
+                                elif key == "dbms_version" and injection.dbms_version is None and not conf.testFilter:
+                                    injection.dbms_version = Backend.setVersion(value)
 
-                                elif dKey == "os" and injection.os is None:
-                                    injection.os = Backend.setOs(dValue)
+                                elif key == "os" and injection.os is None:
+                                    injection.os = Backend.setOs(value)
 
                         if vector is None and "vector" in test and test.vector is not None:
                             vector = test.vector
@@ -696,7 +695,7 @@ def checkSqlInjection(place, parameter, value):
                                 infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
                                 logger.info(infoMsg)
 
-                                process = execute(conf.alert, shell=True)
+                                process = subprocess.Popen(conf.alert, shell=True)
                                 process.wait()
 
                             kb.alerted = True
@@ -921,8 +920,10 @@ def heuristicCheckSqlInjection(place, parameter):
 
     origValue = conf.paramDict[place][parameter]
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
+
     prefix = ""
     suffix = ""
+    randStr = ""
 
     if conf.prefix or conf.suffix:
         if conf.prefix:
@@ -930,8 +931,6 @@ def heuristicCheckSqlInjection(place, parameter):
 
         if conf.suffix:
             suffix = conf.suffix
-
-    randStr = ""
 
     while randStr.count('\'') != 1 or randStr.count('\"') != 1:
         randStr = randomStr(length=10, alphabet=HEURISTIC_CHECK_ALPHABET)

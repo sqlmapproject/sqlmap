@@ -25,13 +25,13 @@ from lib.core.shell import autoCompletion
 from lib.request import inject
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web
-from lib.takeover.xp_cmdshell import Xp_cmdshell
+from lib.takeover.xp_cmdshell import XP_cmdshell
 
 
-class Abstraction(Web, UDF, Xp_cmdshell):
+class Abstraction(Web, UDF, XP_cmdshell):
     """
     This class defines an abstraction layer for OS takeover functionalities
-    to UDF / Xp_cmdshell objects
+    to UDF / XP_cmdshell objects
     """
 
     def __init__(self):
@@ -40,7 +40,7 @@ class Abstraction(Web, UDF, Xp_cmdshell):
 
         UDF.__init__(self)
         Web.__init__(self)
-        Xp_cmdshell.__init__(self)
+        XP_cmdshell.__init__(self)
 
     def execCmd(self, cmd, silent=False):
         if self.webBackdoorUrl and not isStackingAvailable():

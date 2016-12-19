@@ -119,13 +119,13 @@ class Custom:
         infoMsg = "executing SQL statements from given file(s)"
         logger.info(infoMsg)
 
-        for sfile in re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):
-            sfile = sfile.strip()
+        for filename in re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):
+            filename = filename.strip()
 
-            if not sfile:
+            if not filename:
                 continue
 
-            snippet = getSQLSnippet(Backend.getDbms(), sfile)
+            snippet = getSQLSnippet(Backend.getDbms(), filename)
 
             if snippet and all(query.strip().upper().startswith("SELECT") for query in filter(None, snippet.split(';' if ';' in snippet else '\n'))):
                 for query in filter(None, snippet.split(';' if ';' in snippet else '\n')):

@@ -337,7 +337,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                         if output:
                             with kb.locks.value:
-                                if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
+                                if all(_ in output for _ in (kb.chars.start, kb.chars.stop)):
                                     items = parseUnionPage(output)
 
                                     if threadData.shared.showEta:

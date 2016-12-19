@@ -114,9 +114,9 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
         if not isNullValue(kb.uChar):
             for regex in (kb.uChar, r'>\s*%s\s*<' % kb.uChar):
-                contains = [(count, re.search(regex, page or "", re.IGNORECASE) is not None) for count, page in pages.items()]
-                if len(filter(lambda x: x[1], contains)) == 1:
-                    retVal = filter(lambda x: x[1], contains)[0][0]
+                contains = [(count, re.search(regex, _ or "", re.IGNORECASE) is not None) for count, _ in pages.items()]
+                if len(filter(lambda _: _[1], contains)) == 1:
+                    retVal = filter(lambda _: _[1], contains)[0][0]
                     break
 
         if not retVal:
@@ -133,10 +133,10 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
                 elif item[1] == max_:
                     maxItem = item
 
-            if all(map(lambda x: x == min_ and x != max_, ratios)):
+            if all(_ == min_ and _ != max_ for _ in ratios):
                 retVal = maxItem[0]
 
-            elif all(map(lambda x: x != min_ and x == max_, ratios)):
+            elif all(_ != min_ and _ == max_ for _ in ratios):
                 retVal = minItem[0]
 
             elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
