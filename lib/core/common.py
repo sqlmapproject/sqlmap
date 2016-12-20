@@ -3842,7 +3842,12 @@ def checkSameHost(*urls):
     False
     """
 
-    return all(urlparse.urlparse(url or "").netloc.split(':')[0] == urlparse.urlparse(urls[0] or "").netloc.split(':')[0] for url in urls)
+    if not urls:
+        return None
+    elif len(urls) == 1:
+        return True
+    else:
+        return all(urlparse.urlparse(url or "").netloc.split(':')[0] == urlparse.urlparse(urls[0] or "").netloc.split(':')[0] for url in urls[1:])
 
 def getHostHeader(url):
     """
