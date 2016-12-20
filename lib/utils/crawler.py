@@ -12,6 +12,7 @@ import urlparse
 import tempfile
 import time
 
+from lib.core.common import checkSameHost
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import findPageForms
@@ -97,7 +98,7 @@ def crawl(target):
                                 url = urlparse.urljoin(current, href)
 
                                 # flag to know if we are dealing with the same target host
-                                _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (url, target)))
+                                _ = checkSameHost(url, target)
 
                                 if conf.scope:
                                     if not re.search(conf.scope, url, re.I):

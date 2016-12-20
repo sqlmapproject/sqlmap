@@ -26,7 +26,7 @@ ec007a1424da78cfdae90da6ae49ed9b  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 cdffff6260c40ccb4e4092fc21d9d63f  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-35f2579af5793e3c8299f05190eec734  lib/core/common.py
+88578e4e2dd5f01cf0098dcd276ca598  lib/core/common.py
 ab5ef8fe4e4beaef4016d458d0fdefe3  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 dfb664b223ac3585d51e58839b777d9b  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-e892660b4e7981a575dde143ca06754b  lib/core/settings.py
+0e55924e1cd0e5ecdf0173e16ebefd5b  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -67,7 +67,7 @@ b40a4c5d91770d347df36d3065b63798  lib/parse/sitemap.py
 9299f21804033f099681525bb9bf51c0  lib/request/basicauthhandler.py
 083e7f446909b12009e72ae8e5e5737c  lib/request/basic.py
 c48285682a61d49982cb508351013cb4  lib/request/comparison.py
-de812e1f9e88659adc4d904014260ea9  lib/request/connect.py
+80e962cf22d340226856f362ed8c5192  lib/request/connect.py
 3d4416fb6802e7e29cf727aefa29355d  lib/request/direct.py
 4ae7f4570fb859045f0487cc0b055a8e  lib/request/dns.py
 58f63132eb56ad41ae6af4fe61933a2d  lib/request/httpshandler.py
@@ -100,7 +100,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  lib/techniques/union/__init__.py
 8c00374e60a7699d4d34337da951d64b  lib/techniques/union/test.py
 afd4d2e3896853299a9b449fe6db626a  lib/techniques/union/use.py
 26c1babc6289fac9056f8b21d10f3bb1  lib/utils/api.py
-7c94b6c3088b68975d468c86d47b1b03  lib/utils/crawler.py
+a450944bcd92eededbd5d640c5c2165b  lib/utils/crawler.py
 2f76b2667244d849cf8401446f571258  lib/utils/deps.py
 4dfd3a95e73e806f62372d63bc82511f  lib/utils/getch.py
 f71a7b0aec145ba77edd3c4543621fb9  lib/utils/hashdb.py
@@ -223,8 +223,8 @@ ff90cb0366f7cefbdd6e573e27e6238c  shell/runcmd.exe_
 c3cc8b7727161e64ab59f312c33b541a  shell/stager.aspx_
 1f7f125f30e0e800beb21e2ebbab18e1  shell/stager.jsp_
 01e3505e796edf19aad6a996101c81c9  shell/stager.php_
-c3ee3d5e5eab01436d4d5e1dab0f32db  sqlmapapi.py
-c6c088ca8df6e60c63ef64767472bbcb  sqlmap.py
+f45056e2c5588acfecab92d70575fd05  sqlmapapi.py
+034f6214e740191167d7100de9a4983b  sqlmap.py
 1316deb997418507e76221c84ec99946  tamper/apostrophemask.py
 a6efe8f914c769c52afec703bd73609f  tamper/apostrophenullencode.py
 b1c56983919b69f4f6f0e7929c881e7a  tamper/appendnullbyte.py

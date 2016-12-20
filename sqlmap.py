@@ -9,7 +9,7 @@ import sys
 
 sys.dont_write_bytecode = True
 
-from lib.utils import versioncheck  # this has to be the first non-standard import
+__import__("lib.utils.versioncheck")  # this has to be the first non-standard import
 
 import bdb
 import distutils

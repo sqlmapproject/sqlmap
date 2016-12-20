@@ -31,6 +31,7 @@ from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import checkSameHost
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import evaluateCode
@@ -266,7 +267,7 @@ class Connect(object):
             url = urlparse.urljoin(conf.url, url)
 
         # flag to know if we are dealing with the same target host
-        target = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, conf.url or ""]))
+        target = checkSameHost(url, conf.url)
 
         if not retrying:
             # Reset the number of connection retries

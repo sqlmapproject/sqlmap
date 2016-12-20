@@ -3727,7 +3727,6 @@ def isAdminFromPrivileges(privileges):
 
     # In Firebird there is no specific privilege that means
     # that the user is DBA
-    # TODO: confirm
     retVal |= (Backend.isDbms(DBMS.FIREBIRD) and all(_ in privileges for _ in ("SELECT", "INSERT", "UPDATE", "DELETE", "REFERENCES", "EXECUTE")))
 
     return retVal
@@ -3810,7 +3809,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                     continue
 
                 # flag to know if we are dealing with the same target host
-                _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (response.geturl(), url)))
+                _ = checkSameHost(response.geturl(), url)
 
                 if conf.scope:
                     if not re.search(conf.scope, url, re.I):
@@ -3832,6 +3831,18 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             kb.targets.add(target)
 
     return retVal
+
+def checkSameHost(*urls):
+    """
+    Returns True if all provided urls share that same host
+
+    >>> checkSameHost('http://www.target.com/page1.php?id=1', 'http://www.target.com/images/page2.php')
+    True
+    >>> checkSameHost('http://www.target.com/page1.php?id=1', 'http://www.target2.com/images/page2.php')
+    False
+    """
+
+    return all(urlparse.urlparse(url or "").netloc.split(':')[0] == urlparse.urlparse(urls[0] or "").netloc.split(':')[0] for url in urls)
 
 def getHostHeader(url):
     """
@@ -3902,6 +3913,13 @@ def evaluateCode(code, variables=None):
 def serializeObject(object_):
     """
     Serializes given object
+
+    >>> serializeObject([1, 2, 3, ('a', 'b')])
+    'gAJdcQEoSwFLAksDVQFhVQFihnECZS4='
+    >>> serializeObject(None)
+    'gAJOLg=='
+    >>> serializeObject('foobar')
+    'gAJVBmZvb2JhcnEBLg=='
     """
 
     return base64pickle(object_)
@@ -3912,6 +3930,8 @@ def unserializeObject(value):
 
     >>> unserializeObject(serializeObject([1, 2, 3])) == [1, 2, 3]
     True
+    >>> unserializeObject('gAJVBmZvb2JhcnEBLg==')
+    'foobar'
     """
 
     return base64unpickle(value) if value else None
@@ -3958,6 +3978,8 @@ def decodeHexValue(value, raw=False):
 
     >>> decodeHexValue('3132332031')
     u'123 1'
+    >>> decodeHexValue(['0x31', '0x32'])
+    [u'1', u'2']
     """
 
     retVal = value
