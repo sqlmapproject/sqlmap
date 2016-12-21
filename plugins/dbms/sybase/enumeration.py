@@ -19,6 +19,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.dicts import SYBASE_TYPES
+from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
@@ -36,7 +37,7 @@ class Enumeration(GenericEnumeration):
         infoMsg = "fetching database users"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].users
+        rootQuery = queries[DBMS.SYBASE].users
 
         randStr = randomStr()
         query = rootQuery.inband.query
@@ -93,7 +94,7 @@ class Enumeration(GenericEnumeration):
         infoMsg = "fetching database names"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].dbs
+        rootQuery = queries[DBMS.SYBASE].dbs
         randStr = randomStr()
         query = rootQuery.inband.query
 
@@ -142,7 +143,7 @@ class Enumeration(GenericEnumeration):
         else:
             blinds = [True]
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+        rootQuery = queries[DBMS.SYBASE].tables
 
         for db in dbs:
             for blind in blinds:
@@ -249,7 +250,7 @@ class Enumeration(GenericEnumeration):
             else:
                 return columnExists(paths.COMMON_COLUMNS)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].columns
+        rootQuery = queries[DBMS.SYBASE].columns
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             blinds = [False, True]

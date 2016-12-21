@@ -15,6 +15,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
@@ -42,7 +43,7 @@ class Enumeration(GenericEnumeration):
         infoMsg = "fetching database names"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].dbs
+        rootQuery = queries[DBMS.MAXDB].dbs
         randStr = randomStr()
         query = rootQuery.inband.query
         retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.schemaname' % randStr], blind=True)
@@ -76,7 +77,7 @@ class Enumeration(GenericEnumeration):
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+        rootQuery = queries[DBMS.MAXDB].tables
 
         for db in dbs:
             randStr = randomStr()
@@ -181,7 +182,7 @@ class Enumeration(GenericEnumeration):
             else:
                 return columnExists(paths.COMMON_COLUMNS)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].columns
+        rootQuery = queries[DBMS.MAXDB].columns
 
         for tbl in tblList:
             if conf.db is not None and len(kb.data.cachedColumns) > 0 \

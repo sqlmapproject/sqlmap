@@ -22,6 +22,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
@@ -88,7 +89,7 @@ class Enumeration(GenericEnumeration):
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+        rootQuery = queries[DBMS.MSSQL].tables
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             for db in dbs:
@@ -164,7 +165,7 @@ class Enumeration(GenericEnumeration):
     def searchTable(self):
         foundTbls = {}
         tblList = conf.tbl.split(",")
-        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
+        rootQuery = queries[DBMS.MSSQL].search_table
         tblCond = rootQuery.inband.condition
         tblConsider, tblCondParam = self.likeOrExact("table")
 
@@ -263,7 +264,7 @@ class Enumeration(GenericEnumeration):
         self.dumpFoundTables(foundTbls)
 
     def searchColumn(self):
-        rootQuery = queries[Backend.getIdentifiedDbms()].search_column
+        rootQuery = queries[DBMS.MSSQL].search_column
         foundCols = {}
         dbs = {}
         whereTblsQuery = ""

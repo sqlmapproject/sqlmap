@@ -3154,7 +3154,16 @@ def unhandledExceptionMessage():
     errMsg += "Operating system: %s\n" % PLATFORM
     errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else ("DIRECT" if conf.get("direct") else None))
-    errMsg += "Back-end DBMS: %s" % ("%s (fingerprinted)" % Backend.getDbms() if Backend.getDbms() is not None else "%s (identified)" % Backend.getIdentifiedDbms())
+    errMsg += "Back-end DBMS:"
+
+    if Backend.getDbms() is not None:
+        errMsg += " %s (fingerprinted)" % Backend.getDbms()
+
+    if Backend.getIdentifiedDbms() is not None and (Backend.getDbms() is None or Backend.getIdentifiedDbms() != Backend.getDbms()):
+        errMsg += " %s (identified)" % Backend.getIdentifiedDbms()
+
+    if not errMsg.endswith(')'):
+        errMsg += " None"
 
     return errMsg
 

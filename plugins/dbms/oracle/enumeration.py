@@ -17,6 +17,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
@@ -30,7 +31,7 @@ class Enumeration(GenericEnumeration):
     def getRoles(self, query2=False):
         infoMsg = "fetching database users roles"
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].roles
+        rootQuery = queries[DBMS.ORACLE].roles
 
         if conf.user == "CU":
             infoMsg += " for current user"

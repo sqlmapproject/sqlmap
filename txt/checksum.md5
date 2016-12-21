@@ -26,7 +26,7 @@ ec007a1424da78cfdae90da6ae49ed9b  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 cdffff6260c40ccb4e4092fc21d9d63f  lib/core/agent.py
 eb0bd28b0bd9fbf67dcc3119116df377  lib/core/bigarray.py
-55f6745ac8157ba1b6b0ba1b4ce78d78  lib/core/common.py
+0858265d173bf1aecc9cd468ac7d43fe  lib/core/common.py
 ab5ef8fe4e4beaef4016d458d0fdefe3  lib/core/convert.py
 e77cca1cb063016f71f6e6bdebf4ec73  lib/core/data.py
 1d042f0bc0557d3fd564ea5a46deb77e  lib/core/datatype.py
@@ -45,7 +45,7 @@ e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 dfb664b223ac3585d51e58839b777d9b  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-731e3372164a2d0283444f90bbbb150b  lib/core/settings.py
+f6750f9990821025ee93de4561b534bc  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py
@@ -137,7 +137,7 @@ b95216204096179fd50004c489ba5c6e  plugins/dbms/db2/fingerprint.py
 0d257a96a54ec2f25798d1c2d8b92227  plugins/dbms/firebird/syntax.py
 80496d64b22c10ed4893b4149a162365  plugins/dbms/firebird/takeover.py
 e125fb5d8d75861532a01828d829d85e  plugins/dbms/hsqldb/connector.py
-8fbc4653d0c880ca78278c8ae6823136  plugins/dbms/hsqldb/enumeration.py
+a6ae46720f32136613a6b44174a1086d  plugins/dbms/hsqldb/enumeration.py
 b763ce42f66f7b81d05130bbd3e383a9  plugins/dbms/hsqldb/filesystem.py
 c9d59b7c60aa0f0b23f920f932547e40  plugins/dbms/hsqldb/fingerprint.py
 d278ad5f1c13fea871ed1120942244d5  plugins/dbms/hsqldb/__init__.py
@@ -152,14 +152,14 @@ e96b4721cfc65271a2de948c47474aaa  plugins/dbms/informix/syntax.py
 5f130772d2295ae61140acba894eaceb  plugins/dbms/informix/takeover.py
 cc9c82cfffd8ee9b25ba3af6284f057e  plugins/dbms/__init__.py
 4c8667e8af763ddf82ee314c6681d4e1  plugins/dbms/maxdb/connector.py
-075fd66b8bbabed18aeb304c6c0ef2a2  plugins/dbms/maxdb/enumeration.py
+85a3d319af815c1d86341bdef4b03b2b  plugins/dbms/maxdb/enumeration.py
 aa46f115a06c66b1e011aba98ec284bd  plugins/dbms/maxdb/filesystem.py
 535b389c7bac381c06ca34b0fe48c8ae  plugins/dbms/maxdb/fingerprint.py
 c24f2512f13dbaff9543fe6d96cbe53b  plugins/dbms/maxdb/__init__.py
 df0766e0f322505dcbfca2fc792fe62f  plugins/dbms/maxdb/syntax.py
 aeec4f12950e20c46da405d23ea08dbb  plugins/dbms/maxdb/takeover.py
 579d582f3716c310689b4aa7317b57df  plugins/dbms/mssqlserver/connector.py
-7003c3c82ca56b40c7c90aea6c20cd53  plugins/dbms/mssqlserver/enumeration.py
+4a83d1a8e16c07212e8aa339457858d0  plugins/dbms/mssqlserver/enumeration.py
 6c249bcdef486803686a8b2f11566637  plugins/dbms/mssqlserver/filesystem.py
 d01229e7161a5071934fc26b48a11e8c  plugins/dbms/mssqlserver/fingerprint.py
 2fbe5e485bcd05511cd1d7cb8cbdbde4  plugins/dbms/mssqlserver/__init__.py
@@ -173,7 +173,7 @@ a4535cb3873ada344e6e61dbe1a546d3  plugins/dbms/mysql/__init__.py
 4ad721acc40a964fc67154dd4683870e  plugins/dbms/mysql/syntax.py
 aa88b5d6198cd31d9ab2be664da9a265  plugins/dbms/mysql/takeover.py
 2f2b7b1f08a8e6bfbe2fd0467d477667  plugins/dbms/oracle/connector.py
-061b5f0a2cf2e61c8a03ef73ee43a869  plugins/dbms/oracle/enumeration.py
+51ad1f46aec55c0e06db755c4ced05ee  plugins/dbms/oracle/enumeration.py
 97579ede42f5fa64397792a65d6c0781  plugins/dbms/oracle/filesystem.py
 82b3e501ebae93c5dc0ef2abccb10177  plugins/dbms/oracle/fingerprint.py
 ecfc3b8b1e97e41cad6681fc68f93998  plugins/dbms/oracle/__init__.py
@@ -194,7 +194,7 @@ f3318e79b1130e052242db8299eb1968  plugins/dbms/sqlite/filesystem.py
 cfd9cad568949aa8728b7ddcc5f5828e  plugins/dbms/sqlite/syntax.py
 53b0be0cb6599d042bf6772e62b25ca5  plugins/dbms/sqlite/takeover.py
 579d582f3716c310689b4aa7317b57df  plugins/dbms/sybase/connector.py
-7d58cbb4527d7a48ca05037f0b2ffe0a  plugins/dbms/sybase/enumeration.py
+cd1e3f7d6487eb25d72507e693282c6e  plugins/dbms/sybase/enumeration.py
 ca107f3d1b4854ce84386109d476d494  plugins/dbms/sybase/filesystem.py
 e095022426f2b986d069748ee2289af1  plugins/dbms/sybase/fingerprint.py
 d0c7cc8ec2aa716b2e5cd3b5ab805c3a  plugins/dbms/sybase/__init__.py

@@ -12,6 +12,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.common import Backend
 from lib.core.common import unArrayizeValue
+from lib.core.enums import DBMS
 from lib.core.settings import HSQLDB_DEFAULT_SCHEMA
 from lib.request import inject
 
@@ -27,7 +28,7 @@ class Enumeration(GenericEnumeration):
             infoMsg = "fetching banner"
             logger.info(infoMsg)
 
-            query = queries[Backend.getIdentifiedDbms()].banner.query
+            query = queries[DBMS.HSQLDB].banner.query
             kb.data.banner = unArrayizeValue(inject.getValue(query, safeCharEncode=True))
 
         return kb.data.banner
