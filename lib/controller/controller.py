@@ -470,6 +470,12 @@ def start():
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
+                        elif re.search(conf.paramExclude or "", parameter, re.I) or kb.postHint and re.search(conf.paramExclude or "", parameter.split(' ')[-1], re.I):
+                            testSqlInj = False
+
+                            infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
+                            logger.info(infoMsg)
+
                         elif parameter == conf.csrfToken:
                             testSqlInj = False
 
