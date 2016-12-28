@@ -81,7 +81,8 @@ Options:
 
     -p TESTPARAMETER    Testable parameter(s)
     --skip=SKIP         Skip testing for given parameter(s)
-    --skip-static       Skip testing parameters that not appear dynamic
+    --skip-static       Skip testing parameters that not appear to be dynamic
+    --param-exclude=..  Regexp to exclude parameters from testing (e.g. "ses")
     --dbms=DBMS         Force back-end DBMS to this value
     --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
     --os=OS             Force back-end DBMS operating system to this value
@@ -714,7 +715,7 @@ These options can be used to specify which parameters to test for, provide custo
 
 ### Testable parameter(s)
 
-Options: `-p` and `--skip`
+Options: `-p`, `--skip` and `--param-exclude`
 
 By default sqlmap tests all GET parameters and POST parameters. When the value of `--level` is >= **2** it tests also HTTP `Cookie` header values. When this value is >= **3** it tests also HTTP `User-Agent` and HTTP `Referer` header value for SQL injections. It is however possible to manually specify a comma-separated list of parameter(s) that you want sqlmap to test. This will bypass the dependence on value of `--level` too. 
 
@@ -723,6 +724,10 @@ For instance, to test for GET parameter `id` and for HTTP `User-Agent` only, pro
 In case that user wants to exclude certain parameters from testing, he can use option `--skip`. That is especially useful in cases when you want to use higher value for `--level` and test all available parameters excluding some of HTTP headers normally being tested.
 
 For instance, to skip testing for HTTP header `User-Agent` and HTTP header `Referer` at `--level=5`, provide `--skip="user-agent,referer"`.
+
+There is also a possibility to exclude certain parameters from testing based on a regular expression run on their names. In those kind of cases user can use option `--param-exclude`.
+
+For instance, to skip testing for parameters which contain string `token` or `session` in their names, provide `--param-exclude="token|session"`.
 
 #### URI injection point
 
