@@ -470,7 +470,7 @@ def start():
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
-                        elif re.search(conf.paramExclude or "", parameter, re.I) or kb.postHint and re.search(conf.paramExclude or "", parameter.split(' ')[-1], re.I):
+                        elif conf.paramExclude and (re.search(conf.paramExclude, parameter, re.I) or kb.postHint and re.search(conf.paramExclude, parameter.split(' ')[-1], re.I)):
                             testSqlInj = False
 
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
