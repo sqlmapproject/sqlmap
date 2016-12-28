@@ -21,7 +21,7 @@ cc9c82cfffd8ee9b25ba3af6284f057e  extra/sqlharvest/__init__.py
 4f2f817596540d82f9fcc0c5b2228beb  extra/sqlharvest/sqlharvest.py
 2daa39e4d59526acb4772b6c47eb315f  lib/controller/action.py
 eb36e67d0f698384978486d9b16591c5  lib/controller/checks.py
-531365e625d740ffed1fe97d8318979c  lib/controller/controller.py
+921349d423cd7288ec16d2700e85da14  lib/controller/controller.py
 ec007a1424da78cfdae90da6ae49ed9b  lib/controller/handler.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/controller/__init__.py
 cdffff6260c40ccb4e4092fc21d9d63f  lib/core/agent.py
@@ -39,13 +39,13 @@ e4aec2b11c1ad6039d0c3dbbfbc5eb1a  lib/core/exception.py
 cc9c82cfffd8ee9b25ba3af6284f057e  lib/core/__init__.py
 91c514013daa796e2cdd940389354eac  lib/core/log.py
 ea5b08cac48cf538fb4bce31438b387b  lib/core/optiondict.py
-5d530c06c9720626ef6bf9e0a3decd2a  lib/core/option.py
+3f1a2c9d978df38c112d3534440dda9f  lib/core/option.py
 7af487340c138f7b5dbd443161cbb428  lib/core/profiling.py
 e60456db5380840a586654344003d4e6  lib/core/readlineng.py
 b3a62d41a5af6cd7fa733b6227febb0c  lib/core/replication.py
 dfb664b223ac3585d51e58839b777d9b  lib/core/revision.py
 7c15dd2777af4dac2c89cab6df17462e  lib/core/session.py
-d686c45c24eaa2519bc7e942fa8a2743  lib/core/settings.py
+e639cc2dee56c9e8d9bb6deb6da63cb8  lib/core/settings.py
 7af83e4f18cab6dff5e67840eb65be80  lib/core/shell.py
 23657cd7d924e3c6d225719865855827  lib/core/subprocessng.py
 c3ace7874a536d801f308cf1fd03df99  lib/core/target.py

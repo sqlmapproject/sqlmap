@@ -2226,10 +2226,19 @@ def _mergeOptions(inputOptions, overrideOptions):
 
     if inputOptions.pickledOptions:
         try:
-            inputOptions = base64unpickle(inputOptions.pickledOptions, unsafe=True)
-            if type(inputOptions) == dict:
-                inputOptions = AttribDict(inputOptions)
-            _normalizeOptions(inputOptions)
+            unpickledOptions = base64unpickle(inputOptions.pickledOptions, unsafe=True)
+
+            if type(unpickledOptions) == dict:
+                unpickledOptions = AttribDict(unpickledOptions)
+
+            _normalizeOptions(unpickledOptions)
+
+            unpickledOptions["pickledOptions"] = None
+            for key in inputOptions:
+                if key not in unpickledOptions:
+                    unpickledOptions[key] = inputOptions[key]
+
+            inputOptions = unpickledOptions
         except Exception, ex:
             errMsg = "provided invalid value '%s' for option '--pickled-options'" % inputOptions.pickledOptions
             errMsg += " (%s)" % repr(ex)
