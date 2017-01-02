@@ -107,7 +107,7 @@ If you prefer fetching daily updates, you can download sqlmap by cloning the
 
 ::
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap works out of the box with
 `Python <http://www.python.org/download/>`__ version **2.6.x** and
