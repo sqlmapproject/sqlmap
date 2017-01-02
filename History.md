@@ -1,5 +1,9 @@
 # History
 
+## 2017
+
+* **Jan 2**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release stable version of sqlmap **1.1**.
+
 ## 2016
 
 * **Feb 27**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release stable version of sqlmap **1.0**.
