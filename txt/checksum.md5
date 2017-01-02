@@ -24,7 +24,7 @@ c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.
 10edc8d1057e89c145218d4c5ccaaa31  lib/controller/controller.py
 b3eec7f44bcc5d784d171a187b7fe8cb  lib/controller/handler.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
-178066b5737f0e719cbf9271051559a2  lib/core/agent.py
+19905ecb4437b94512cf21d5f1720091  lib/core/agent.py
 6cc95a117fbd34ef31b9aa25520f0e31  lib/core/bigarray.py
 445bd2c2fe0dcca0dd3aab87eb3839d3  lib/core/common.py
 5065a4242a8cccf72f91e22e1007ae63  lib/core/convert.py
@@ -45,7 +45,7 @@ e544108e2238d756c94a240e8a1ce061  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-f2357b8338b164d624446ddd8d6f2cbd  lib/core/settings.py
+779a77140ccd74d4cdad70f28a48130b  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -107,7 +107,7 @@ ccfdad414ce2ec0c394c3deaa39a82bf  lib/utils/hashdb.py
 aff7355d582fc6c00a675eeee2a5217a  lib/utils/hash.py
 e76a08237ee6a4cd6855af79610ea8a5  lib/utils/htmlentities.py
 310efc965c862cfbd7b0da5150a5ad36  lib/utils/__init__.py
-8e4ecc5e5bd8a5c7e2ad0a940cb1a5b1  lib/utils/pivotdumptable.py
+9d8c858417d356e49e1959ba253aede4  lib/utils/pivotdumptable.py
 8520a745c9b4db3814fe46f4c34c6fbc  lib/utils/progress.py
 2c3638d499f3c01c34187e531f77d004  lib/utils/purge.py
 2da1b35339667646e51101adaa1dfc32  lib/utils/search.py
@@ -203,7 +203,7 @@ a7f4d3a194f52fbb4fb4488be41273b1  plugins/dbms/sybase/enumeration.py
 1f46f2eac95cfdc3fa150ec5b0500eba  plugins/generic/connector.py
 a8f9d0516509e9e4226516ab4f13036a  plugins/generic/custom.py
 3b54fd65feb9f70c551d315e82653384  plugins/generic/databases.py
-085f839221138aa7931bd94c33a32768  plugins/generic/entries.py
+45c32855126546a0d9936ecdc943ab3f  plugins/generic/entries.py
 55802d1d5d65938414c77ccc27731cab  plugins/generic/enumeration.py
 b6666109aa6882ca9c526d615c1bcde3  plugins/generic/filesystem.py
 feca57a968c528a2fe3ccafbc83a17f8  plugins/generic/fingerprint.py

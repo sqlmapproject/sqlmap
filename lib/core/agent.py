@@ -1079,5 +1079,20 @@ class Agent(object):
 
         return query
 
+    def whereQuery(self, query):
+        if conf.dumpWhere and query:
+            prefix, suffix = query.split(" ORDER BY ") if " ORDER BY " in query else (query, "")
+
+            if "%s)" % conf.tbl.upper() in prefix.upper():
+                prefix = re.sub(r"(?i)%s\)" % re.escape(conf.tbl), "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)
+            elif re.search(r"(?i)\bWHERE\b", prefix):
+                prefix += " AND %s" % conf.dumpWhere
+            else:
+                prefix += " WHERE %s" % conf.dumpWhere
+
+            query = "%s ORDER BY %s" % (prefix, suffix) if suffix else prefix
+
+        return query
+
 # SQL agent
 agent = Agent()
