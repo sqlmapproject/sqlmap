@@ -363,7 +363,7 @@ def processResponse(page, responseHeaders):
                         if readInput(msg, default='N').strip().upper() != 'Y':
                             continue
                         conf.paramDict[PLACE.POST][name] = value
-                conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % name, r"\g<1>%s" % value, conf.parameters[PLACE.POST])
+                conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % re.escape(name), r"\g<1>%s" % re.escape(value), conf.parameters[PLACE.POST])
 
     if not kb.captchaDetected and re.search(r"(?i)captcha", page or ""):
         for match in re.finditer(r"(?si)<form.+?</form>", page):
