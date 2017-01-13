@@ -45,7 +45,7 @@ e544108e2238d756c94a240e8a1ce061  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-1c232d93b0109a56f3af1c02cf454455  lib/core/settings.py
+c0f283aee64a229f44dc3a525a7f86fa  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -65,7 +65,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 0b010b7cdb2e42b5aa0caa59607279ad  lib/parse/payloads.py
 a0444cc351cd6d29015ad16d9eb46ff4  lib/parse/sitemap.py
 403d873f1d2fd0c7f73d83f104e41850  lib/request/basicauthhandler.py
-f67a2dddbe397758dae143f97639e728  lib/request/basic.py
+6d04ee525e75bf0082e9f1f6d8506546  lib/request/basic.py
 4e89d0e13de2eb3576f5412b21e9b648  lib/request/comparison.py
 30d7b0df341762c5aa7aab537878ce05  lib/request/connect.py
 fb6b788d0016ab4ec5e5f661f0f702ad  lib/request/direct.py
