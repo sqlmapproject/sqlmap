@@ -176,6 +176,7 @@ class HTTP_HEADER:
     PROXY_CONNECTION = "Proxy-Connection"
     RANGE = "Range"
     REFERER = "Referer"
+    REFRESH = "Refresh"  # Reference: http://stackoverflow.com/a/283794
     SERVER = "Server"
     SET_COOKIE = "Set-Cookie"
     TRANSFER_ENCODING = "Transfer-Encoding"

@@ -475,7 +475,7 @@ class Connect(object):
                     return conn, None, None
 
                 # Get HTTP response
-                if hasattr(conn, 'redurl'):
+                if hasattr(conn, "redurl"):
                     page = (threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
                     else Connect._connReadProxy(conn)) if not skipRead else None
                     skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
@@ -491,37 +491,41 @@ class Connect(object):
 
             kb.connErrorCounter = 0
 
-            if extractRegexResult(META_REFRESH_REGEX, page) and not refreshing:
-                refresh = extractRegexResult(META_REFRESH_REGEX, page)
+            if not refreshing:
+                refresh = headers.get(HTTP_HEADER.REFRESH)
 
-                debugMsg = "got HTML meta refresh header"
-                logger.debug(debugMsg)
+                if extractRegexResult(META_REFRESH_REGEX, page):
+                    refresh = extractRegexResult(META_REFRESH_REGEX, page)
 
-                if kb.alwaysRefresh is None:
-                    msg = "sqlmap got a refresh request "
-                    msg += "(redirect like response common to login pages). "
-                    msg += "Do you want to apply the refresh "
-                    msg += "from now on (or stay on the original page)? [Y/n]"
-                    choice = readInput(msg, default="Y")
+                    debugMsg = "got HTML meta refresh header"
+                    logger.debug(debugMsg)
 
-                    kb.alwaysRefresh = choice not in ("n", "N")
+                if refresh:
+                    if kb.alwaysRefresh is None:
+                        msg = "sqlmap got a refresh request "
+                        msg += "(redirect like response common to login pages). "
+                        msg += "Do you want to apply the refresh "
+                        msg += "from now on (or stay on the original page)? [Y/n]"
+                        choice = readInput(msg, default="Y")
 
-                if kb.alwaysRefresh:
-                    if re.search(r"\Ahttps?://", refresh, re.I):
-                        url = refresh
-                    else:
-                        url = urlparse.urljoin(url, refresh)
+                        kb.alwaysRefresh = choice not in ("n", "N")
 
-                    threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
-                    kwargs['refreshing'] = True
-                    kwargs['url'] = url
-                    kwargs['get'] = None
-                    kwargs['post'] = None
+                    if kb.alwaysRefresh:
+                        if re.search(r"\Ahttps?://", refresh, re.I):
+                            url = refresh
+                        else:
+                            url = urlparse.urljoin(url, refresh)
 
-                    try:
-                        return Connect._getPageProxy(**kwargs)
-                    except SqlmapSyntaxException:
-                        pass
+                        threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
+                        kwargs["refreshing"] = True
+                        kwargs["url"] = url
+                        kwargs["get"] = None
+                        kwargs["post"] = None
+
+                        try:
+                            return Connect._getPageProxy(**kwargs)
+                        except SqlmapSyntaxException:
+                            pass
 
             # Explicit closing of connection object
             if conn and not conf.keepAlive:
