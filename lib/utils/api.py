@@ -163,6 +163,8 @@ class Task(object):
     def engine_start(self):
         if os.path.exists("sqlmap.py"):
             self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
+        elif os.path.exists(os.path.join(os.getcwd(), "sqlmap.py")):
+            self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)], shell=False, cwd=os.getcwd(), close_fds=not IS_WIN)
         else:
             self.process = Popen(["sqlmap", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
 
