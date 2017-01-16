@@ -492,7 +492,7 @@ class Connect(object):
             kb.connErrorCounter = 0
 
             if not refreshing:
-                refresh = headers.get(HTTP_HEADER.REFRESH)
+                refresh = responseHeaders.get(HTTP_HEADER.REFRESH, "").split("url=")[-1].strip()
 
                 if extractRegexResult(META_REFRESH_REGEX, page):
                     refresh = extractRegexResult(META_REFRESH_REGEX, page)
