@@ -140,6 +140,7 @@ class Task(object):
         self.options.api = True
         self.options.taskid = taskid
         self.options.database = Database.filepath
+        self.cwd = os.getcwd()
 
         # Enforce batch mode and disable coloring and ETA
         self.options.batch = True
@@ -161,8 +162,8 @@ class Task(object):
         self.options = AttribDict(self._original_options)
 
     def engine_start(self):
-        if os.path.exists("sqlmap.py"):
-            self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
+        if os.path.exists("%s/sqlmap.py" % (self.cwd)):
+            self.process = Popen(["python", "%s/sqlmap.py" % (self.cwd), "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
         else:
             self.process = Popen(["sqlmap", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
 
