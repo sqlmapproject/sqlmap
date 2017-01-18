@@ -45,7 +45,7 @@ e544108e2238d756c94a240e8a1ce061  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-a6fe19b2988fd79b94155d2da1823c5e  lib/core/settings.py
+172de5efdd8ec5d63e409af708f06b22  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -428,6 +428,7 @@ d4fbb2af37ad3ade3118668f2b516693  waf/requestvalidationmode.py
 c1062e5c165cdaeca51113e60973afb2  waf/sophos.py
 e909c359a9181e64271e6c7c8347fe15  waf/stingray.py
 33f3bdac403519a1f96fb9015680c575  waf/sucuri.py
+507f7c1019afd1c45c76bbcd179ddfe9  waf/tencent.py
 3de96df7edeae2f21ba7b9d77c90f4d6  waf/teros.py
 d428df1e83a6fac9d8dbc90d6b5dab20  waf/trafficshield.py
 385c84908b482c7f0fe93262ab5320fa  waf/urlscan.py
