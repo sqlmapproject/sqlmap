@@ -6,6 +6,7 @@ Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import contextlib
 import logging
 import os
 import re
@@ -647,6 +648,11 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     """
     DataStore.admin_id = hexencode(os.urandom(16))
     Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)[1]
+
+    if port == 0:  # random
+        with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+            s.bind((host, 0))
+            port = s.getsockname()[1]
 
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("Admin ID: %s" % DataStore.admin_id)
