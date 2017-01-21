@@ -899,18 +899,22 @@ def _setTamperingFunctions():
 
             script = script.strip().encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
 
-            if not script:
-                continue
+            try:
+                if not script:
+                    continue
 
-            elif os.path.exists(os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)):
-                script = os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)
+                elif os.path.exists(os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)):
+                    script = os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)
 
-            elif not os.path.exists(script):
-                errMsg = "tamper script '%s' does not exist" % script
-                raise SqlmapFilePathException(errMsg)
+                elif not os.path.exists(script):
+                    errMsg = "tamper script '%s' does not exist" % script
+                    raise SqlmapFilePathException(errMsg)
 
-            elif not script.endswith(".py"):
-                errMsg = "tamper script '%s' should have an extension '.py'" % script
+                elif not script.endswith(".py"):
+                    errMsg = "tamper script '%s' should have an extension '.py'" % script
+                    raise SqlmapSyntaxException(errMsg)
+            except UnicodeDecodeError:
+                errMsg = "invalid character provided in option '--tamper'"
                 raise SqlmapSyntaxException(errMsg)
 
             dirname, filename = os.path.split(script)
