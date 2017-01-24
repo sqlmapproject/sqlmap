@@ -897,14 +897,15 @@ def _setTamperingFunctions():
         for script in re.split(PARAMETER_SPLITTING_REGEX, conf.tamper):
             found = False
 
+            path = paths.SQLMAP_TAMPER_PATH.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
             script = script.strip().encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
 
             try:
                 if not script:
                     continue
 
-                elif os.path.exists(os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)):
-                    script = os.path.join(paths.SQLMAP_TAMPER_PATH, script if script.endswith(".py") else "%s.py" % script)
+                elif os.path.exists(os.path.join(path, script if script.endswith(".py") else "%s.py" % script)):
+                    script = os.path.join(path, script if script.endswith(".py") else "%s.py" % script)
 
                 elif not os.path.exists(script):
                     errMsg = "tamper script '%s' does not exist" % script
@@ -932,7 +933,7 @@ def _setTamperingFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                module = __import__(filename[:-3])
+                module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
             except (ImportError, SyntaxError), ex:
                 raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
@@ -1005,7 +1006,7 @@ def _setWafFunctions():
             try:
                 if filename[:-3] in sys.modules:
                     del sys.modules[filename[:-3]]
-                module = __import__(filename[:-3])
+                module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
             except ImportError, msg:
                 raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], msg))
 
