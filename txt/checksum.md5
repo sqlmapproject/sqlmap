@@ -45,7 +45,7 @@ e544108e2238d756c94a240e8a1ce061  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-c6fe88942db3da0b352bc29f97b49b29  lib/core/settings.py
+5c36c7197efe8e7aeaa5ce5a3056401c  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -259,6 +259,7 @@ a3a0e76922b4f40f422a0daca4e71af3  tamper/htmlencode.py
 a8a0e2150de7c7dc473f74474db857ad  tamper/space2comment.py
 8728a16a1ae0603c6d835162cc03ab96  tamper/space2dash.py
 6cc1afaeb47723886e492454e75d7b7f  tamper/space2hash.py
+b2331640743170f82be9a8c27f65b206  tamper/space2morecomment.py
 507a174c64345df8df003ddba93c8cd1  tamper/space2morehash.py
 0ce89b0d602abbd64344ab038be8acbc  tamper/space2mssqlblank.py
 fa66af20648b5538289748abe7a08fe6  tamper/space2mssqlhash.py
