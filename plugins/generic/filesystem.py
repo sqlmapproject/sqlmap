@@ -120,6 +120,8 @@ class Filesystem:
         back-end DBMS underlying file system
         """
 
+        checkFile(fileName)
+
         with open(fileName, "rb") as f:
             content = f.read()
 
