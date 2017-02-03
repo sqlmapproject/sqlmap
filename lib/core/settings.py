@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.1.1.20"
+VERSION = "1.1.2.0"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -303,7 +303,7 @@ ERROR_PARSING_REGEXES = (
     r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>[^\n]+?)$",
     r"(?P<result>[^\n>]*SQL Syntax[^\n<]+)",
     r"<li>Error Type:<br>(?P<result>.+?)</li>",
-    r"(?P<result>CDbCommand.*SQL.+?)<",
+    r"CDbCommand (?P<result>[^<>\n]*SQL[^<>\n]+)",
     r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
     r"\[[^\n\]]+(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)"
 )
