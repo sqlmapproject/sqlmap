@@ -303,6 +303,7 @@ ERROR_PARSING_REGEXES = (
     r"(?m)^(fatal|error|warning|exception):?\s*(?P<result>[^\n]+?)$",
     r"(?P<result>[^\n>]*SQL Syntax[^\n<]+)",
     r"<li>Error Type:<br>(?P<result>.+?)</li>",
+    r"(?P<result>CDbCommand.*SQL.+?)</div>",
     r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
     r"\[[^\n\]]+(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)"
 )
