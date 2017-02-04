@@ -481,6 +481,49 @@ def scan_start(taskid):
     return jsonize({"success": True, "engineid": DataStore.tasks[taskid].engine_get_id()})
 
 
+@post("/scan/<taskid>/startcmd")
+def scan_start_cmd(taskid):
+    """
+    Launch a scan
+    """
+    if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_start()" % taskid)
+        return jsonize({"success": False, "message": "Invalid task ID"})
+
+    try:
+        argv = ["sqlmap.py"] + shlex.split(request.json["command"])
+        cmdLineOptions = cmdLineParser(argv, interactive=False).__dict__
+    except:
+        logger.debug("[%s] Bad command: %s" % (taskid, request.json["command"]))
+        return jsonize({"success": False, "message": "bad command"})
+
+    # Initialize sqlmap engine's options with user's provided options
+    userOptions = dict((k,v) for k,v in cmdLineOptions.items() if v is not None)
+    for key in userOptions:
+        DataStore.tasks[taskid].set_option(key, userOptions[key])
+
+    # Launch sqlmap engine in a separate process
+    DataStore.tasks[taskid].engine_start()
+
+    logger.debug("[%s] Started scan" % taskid)
+    return jsonize({"success": True,
+                    "engineid": DataStore.tasks[taskid].engine_get_id(),
+                    "options": userOptions})
+
+
+@get("/scan/<taskid>/options")
+def scan_options(taskid):
+    """
+    Retrieve the options
+    """
+
+    if taskid not in DataStore.tasks:
+        logger.warning("[%s] Invalid task ID provided to scan_log()" % taskid)
+        return jsonize({"success": False, "message": "Invalid task ID"})
+
+    return jsonize({"success": True, "options": DataStore.tasks[taskid].get_options()})
+
+
 @get("/scan/<taskid>/stop")
 def scan_stop(taskid):
     """
@@ -736,7 +779,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             print
             break
 
-        if command in ("data", "log", "status", "stop", "kill"):
+        if command in ("data", "log", "status", "options", "stop", "kill"):
             if not taskid:
                 logger.error("No task ID in use")
                 continue
@@ -746,7 +789,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
                 logger.error("Failed to execute command %s" % command)
             dataToStdout("%s\n" % raw)
 
-        elif command.startswith("new"):
+        elif command.startswith("new "):
             if ' ' not in command:
                 logger.error("Program arguments are missing")
                 continue
@@ -778,6 +821,30 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
                 continue
             logger.info("Scanning started")
 
+        elif command.startswith("newcmd "):
+            if ' ' not in command:
+                logger.error("Program arguments are missing")
+                continue
+
+            cmd = {}
+            cmd["command"] = command[7:]
+
+            raw = _client("%s/task/new" % addr)
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to create new task")
+                continue
+            taskid = res["taskid"]
+            logger.info("New task ID is '%s'" % taskid)
+
+            raw = _client("%s/scan/%s/startcmd" % (addr, taskid), cmd)
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to start scan: %s" % res["message"])
+                continue
+            logger.info("Scanning started")
+            dataToStdout("%s\n" % jsonize(res["options"]))
+
         elif command.startswith("use"):
             taskid = (command.split()[1] if ' ' in command else "").strip("'\"")
             if not taskid:
@@ -805,10 +872,12 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
         elif command in ("help", "?"):
             msg =  "help        Show this help message\n"
             msg += "new ARGS    Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "newcmd ARGS Same as 'new' but the arguments are processed on the server\n"
             msg += "use TASKID  Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
             msg += "data        Retrieve and show data for current task\n"
             msg += "log         Retrieve and show log for current task\n"
             msg += "status      Retrieve and show status for current task\n"
+            msg += "options     Retrieve and show options for current task\n"
             msg += "stop        Stop current task\n"
             msg += "kill        Kill current task\n"
             msg += "list        Display all tasks\n"

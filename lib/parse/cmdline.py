@@ -38,7 +38,7 @@ from lib.core.shell import clearHistory
 from lib.core.shell import loadHistory
 from lib.core.shell import saveHistory
 
-def cmdLineParser(argv=None):
+def cmdLineParser(argv=None, interactive=True):
     """
     This function parses the command line parameters and arguments
     """
@@ -973,7 +973,7 @@ def cmdLineParser(argv=None):
 
     except SystemExit:
         # Protection against Windows dummy double clicking
-        if IS_WIN:
+        if IS_WIN and interactive:
             dataToStdout("\nPress Enter to continue...")
             raw_input()
         raise
