@@ -1040,6 +1040,11 @@ class Connect(object):
                         found = False
                         value = getUnicode(value)
 
+                        regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
+                        if kb.postHint and re.search(regex, (post or "")):
+                            found = True
+                            post = re.sub(regex, "\g<1>\g<2>%s" % value, post)
+
                         regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
                         if re.search(regex, (get or "")):
                             found = True
