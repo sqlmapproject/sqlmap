@@ -163,6 +163,7 @@ def _showInjections():
         header = "sqlmap resumed the following injection point(s) from stored session"
 
     if hasattr(conf, "api"):
+        conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
     else:
         data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")

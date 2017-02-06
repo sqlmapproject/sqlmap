@@ -287,31 +287,32 @@ class WEB_API:
     JSP = "jsp"
 
 class CONTENT_TYPE:
-    TECHNIQUES = 0
-    DBMS_FINGERPRINT = 1
-    BANNER = 2
-    CURRENT_USER = 3
-    CURRENT_DB = 4
-    HOSTNAME = 5
-    IS_DBA = 6
-    USERS = 7
-    PASSWORDS = 8
-    PRIVILEGES = 9
-    ROLES = 10
-    DBS = 11
-    TABLES = 12
-    COLUMNS = 13
-    SCHEMA = 14
-    COUNT = 15
-    DUMP_TABLE = 16
-    SEARCH = 17
-    SQL_QUERY = 18
-    COMMON_TABLES = 19
-    COMMON_COLUMNS = 20
-    FILE_READ = 21
-    FILE_WRITE = 22
-    OS_CMD = 23
-    REG_READ = 24
+    TARGET = 0
+    TECHNIQUES = 1
+    DBMS_FINGERPRINT = 2
+    BANNER = 3
+    CURRENT_USER = 4
+    CURRENT_DB = 5
+    HOSTNAME = 6
+    IS_DBA = 7
+    USERS = 8
+    PASSWORDS = 9
+    PRIVILEGES = 10
+    ROLES = 11
+    DBS = 12
+    TABLES = 13
+    COLUMNS = 14
+    SCHEMA = 15
+    COUNT = 16
+    DUMP_TABLE = 17
+    SEARCH = 18
+    SQL_QUERY = 19
+    COMMON_TABLES = 20
+    COMMON_COLUMNS = 21
+    FILE_READ = 22
+    FILE_WRITE = 23
+    OS_CMD = 24
+    REG_READ = 25
 
 PART_RUN_CONTENT_TYPES = {
     "checkDbms": CONTENT_TYPE.TECHNIQUES,
