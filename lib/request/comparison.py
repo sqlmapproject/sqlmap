@@ -144,6 +144,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
 
+    if kb.testMode:
+        threadData.lastComparisonRatio = ratio
+
     # If it has been requested to return the ratio and not a comparison
     # response
     if getRatioValue:

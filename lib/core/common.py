@@ -1755,7 +1755,7 @@ def safeStringFormat(format_, params):
                     break
     return retVal
 
-def getFilteredPageContent(page, onlyText=True):
+def getFilteredPageContent(page, onlyText=True, split=" "):
     """
     Returns filtered page content without script, style and/or comments
     or all HTML tags
@@ -1768,10 +1768,10 @@ def getFilteredPageContent(page, onlyText=True):
 
     # only if the page's charset has been successfully identified
     if isinstance(page, unicode):
-        retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), " ", page)
-        while retVal.find("  ") != -1:
-            retVal = retVal.replace("  ", " ")
-        retVal = htmlunescape(retVal.strip())
+        retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), split, page)
+        while retVal.find(2 * split) != -1:
+            retVal = retVal.replace(2 * split, split)
+        retVal = htmlunescape(retVal.strip().strip(split))
 
     return retVal
 

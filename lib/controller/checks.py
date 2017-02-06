@@ -20,6 +20,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
+from lib.core.common import getFilteredPageContent
 from lib.core.common import getLastRequestHTTPError
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
@@ -63,6 +64,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import CANDIDATE_SENTENCE_MIN_LENGTH
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
@@ -477,6 +479,26 @@ def checkSqlInjection(place, parameter, value):
                                             logger.debug("adjusting match ratio for current parameter to %.3f" % kb.matchRatio)
 
                                     injectable = True
+
+                                elif threadData.lastComparisonRatio > UPPER_RATIO_BOUND and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
+                                    originalSet = set(getFilteredPageContent(kb.pageTemplate, True, "\n").split("\n"))
+                                    trueSet = set(getFilteredPageContent(truePage, True, "\n").split("\n"))
+                                    falseSet = set(getFilteredPageContent(falsePage, True, "\n").split("\n"))
+
+                                    if originalSet == trueSet != falseSet:
+                                        candidates = trueSet - falseSet
+
+                                        if candidates:
+                                            candidates = sorted(candidates, key=lambda _: len(_))
+                                            for candidate in candidates:
+                                                if re.match(r"\A[\w.,! ]+\Z", candidate) and ' ' in candidate and len(candidate) > CANDIDATE_SENTENCE_MIN_LENGTH:
+                                                    conf.string = candidate
+                                                    injectable = True
+
+                                                    infoMsg = "%s parameter '%s' appears to be '%s' injectable (with --string=\"%s\")" % (paramType, parameter, title, repr(conf.string).lstrip('u').strip("'"))
+                                                    logger.info(infoMsg)
+
+                                                    break
 
                             if injectable:
                                 if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):

@@ -46,6 +46,7 @@ class _ThreadData(threading.local):
         self.lastComparisonPage = None
         self.lastComparisonHeaders = None
         self.lastComparisonCode = None
+        self.lastComparisonRatio = None
         self.lastErrorPage = None
         self.lastHTTPError = None
         self.lastRedirectMsg = None
