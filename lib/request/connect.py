@@ -374,9 +374,7 @@ class Connect(object):
 
             # Reset header values to original in case of provided request file
             if target and conf.requestFile:
-                headers = forgeHeaders()
-                if cookie:
-                    headers[HTTP_HEADER.COOKIE] = cookie
+                headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie})
 
             if auxHeaders:
                 for key, value in auxHeaders.items():
