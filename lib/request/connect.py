@@ -374,7 +374,7 @@ class Connect(object):
 
             # Reset header values to original in case of provided request file
             if target and conf.requestFile:
-                headers = OrderedDict(conf.httpHeaders)
+                headers = forgeHeaders()
                 if cookie:
                     headers[HTTP_HEADER.COOKIE] = cookie
 
