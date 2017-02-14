@@ -777,6 +777,9 @@ def cmdLineParser(argv=None):
         parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--disable-stats", dest="disableStats", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--profile", dest="profile", action="store_true",
                           help=SUPPRESS_HELP)
 

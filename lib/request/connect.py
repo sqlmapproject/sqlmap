@@ -1080,7 +1080,7 @@ class Connect(object):
             elif kb.postUrlEncode:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
-        if timeBasedCompare:
+        if timeBasedCompare and not conf.disableStats:
             if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:
                 clearConsoleLine()
 
