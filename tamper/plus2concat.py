@@ -5,6 +5,8 @@ Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import re
+
 from lib.core.common import zeroDepthSearch
 from lib.core.enums import PRIORITY
 
@@ -35,6 +37,7 @@ def tamper(payload, **kwargs):
     if payload:
         while True:
             indexes = zeroDepthSearch(retVal, '+')
+
             if indexes:
                 first, last = 0, 0
                 for i in xrange(1, len(indexes)):
@@ -52,6 +55,19 @@ def tamper(payload, **kwargs):
 
                 retVal = "%sCONCAT(%s)%s" % (retVal[:start], ''.join(chars)[start:end], retVal[end:])
             else:
-                break
+                match = re.search(r"\((CHAR\(\d+.+CHAR\(\d+\))\)", retVal)
+                if match:
+                    part = match.group(0)
+                    indexes = set(zeroDepthSearch(match.group(1), '+'))
+                    if not indexes:
+                        break
+                    chars = [char for char in part]
+                    for i in xrange(1, len(chars)):
+                        if i - 1 in indexes:
+                            chars[i] = ','
+                    replacement = "CONCAT%s" % "".join(chars)
+                    retVal = retVal.replace(part, replacement)
+                else:
+                    break
 
     return retVal
