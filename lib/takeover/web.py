@@ -196,7 +196,13 @@ class Web:
                 self.webApi = choices[int(choice) - 1]
                 break
 
-        directories = list(arrayizeValue(getManualDirectories()))
+        # If specified in the conf file/cmd line then use those, else ask/use defaults for them
+        if conf.rwDirs:
+            logger.info("Trying to upload to user supplied dirs: %s" % conf.rwDirs)
+            directories = conf.rwDirs.split(',')
+        else:
+            directories = list(arrayizeValue(getManualDirectories()))
+
         directories.extend(getAutoDirectories())
         directories = list(oset(directories))
 
