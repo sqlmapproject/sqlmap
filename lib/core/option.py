@@ -2324,7 +2324,7 @@ def _setProxyList():
         return
 
     conf.proxyList = []
-    for match in re.finditer(r"(?i)((http[^:]*|socks[^:]*)://)?([\w.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
+    for match in re.finditer(r"(?i)((http[^:]*|socks[^:]*)://)?([\w\-.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
         _, type_, address, port = match.groups()
         conf.proxyList.append("%s://%s:%s" % (type_ or "http", address, port))
 
