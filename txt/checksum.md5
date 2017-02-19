@@ -39,13 +39,13 @@ a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 310efc965c862cfbd7b0da5150a5ad36  lib/core/__init__.py
 9ba39bf66e9ecd469446bdbbeda906c3  lib/core/log.py
 e544108e2238d756c94a240e8a1ce061  lib/core/optiondict.py
-42b491edce8822786c32f77a9b7fe5be  lib/core/option.py
+0324fce84ef88ed0416123f73c54a6d7  lib/core/option.py
 5f2f56e6c5f274408df61943f1e080c0  lib/core/profiling.py
 40be71cd774662a7b420caeb7051e7d5  lib/core/readlineng.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-001e41795dfa7fe8c8cea3dfba9f7d60  lib/core/settings.py
+8783597f92774bfffe77e0047f76d2a6  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -123,7 +123,7 @@ a71f7c8ffcb9b250cc785cad830e8980  plugins/dbms/access/enumeration.py
 c12f4f266830636462eac98e35ebb73e  plugins/dbms/access/syntax.py
 3fc75c350a30597962bc692c973eeeb3  plugins/dbms/access/takeover.py
 a763887d6e6e99c5a73d9cf450cd84fe  plugins/dbms/db2/connector.py
-c1f6eeb6fccbcb75b53566568c582e9c  plugins/dbms/db2/enumeration.py
+9d54e01e1576a423159f0e47aeb2837a  plugins/dbms/db2/enumeration.py
 667e50aa06883f0f194bef335015d694  plugins/dbms/db2/filesystem.py
 d82e641f156d7c0fe015510a2f593b16  plugins/dbms/db2/fingerprint.py
 35ed6e262cf68d4ab2c6111dd5fb0414  plugins/dbms/db2/__init__.py

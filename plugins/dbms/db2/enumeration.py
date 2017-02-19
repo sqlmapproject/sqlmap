@@ -18,4 +18,3 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return {}
-
