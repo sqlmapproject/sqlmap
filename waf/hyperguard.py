@@ -10,7 +10,7 @@ import re
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "Hyperguard Web Application Firewall (art of defence Inc.)"
+__product__ = "Hyperguard Web Application Firewall (art of defence)"
 
 def detect(get_page):
     retval = False
