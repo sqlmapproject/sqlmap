@@ -361,7 +361,6 @@ This license does not apply to the following components:
 * The MultipartPost library located under thirdparty/multipartpost/.
 * The Odict library located under thirdparty/odict/.
 * The Oset library located under thirdparty/oset/.
-* The PageRank library located under thirdparty/pagerank/.
 * The PrettyPrint library located under thirdparty/prettyprint/.
 * The PyDes library located under thirdparty/pydes/.
 * The SocksiPy library located under thirdparty/socks/.
