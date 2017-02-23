@@ -245,7 +245,6 @@ Options:
     --skip-waf          Skip heuristic detection of WAF/IPS/IDS protection
     --mobile            Imitate smartphone through HTTP User-Agent header
     --offline           Work in offline mode (only use session data)
-    --page-rank         Display page rank (PR) for Google dork results
     --purge-output      Safely remove all content from output directory
     --smart             Conduct thorough tests only if positive heuristic(s)
     --sqlmap-shell      Prompt for an interactive sqlmap shell
@@ -2233,12 +2232,6 @@ Switch: `--offline`
 
 By using switch `--offline` sqlmap will use only previous session data in data enumeration. This basically means that there will be zero connection attempts during such run.
 
-### Display page rank (PR) for Google dork results
-
-Switch: `--page-rank`
-
-Performs further requests to Google when `-g` is provided and display page rank (PR) for Google dork results.
-
 ### Safely remove all content from output directory
 
 Switch `--purge-output`
@@ -2658,13 +2651,13 @@ Example client run:
 ```
 $ python sqlmapapi.py -c -H "192.168.110.1"
 [12:47:53] [DEBUG] Example client access from command line:
-	$ taskid=$(curl http://192.168.110.1:8775/task/new 2>1 | grep -o -I '[a-f0-9
+    $ taskid=$(curl http://192.168.110.1:8775/task/new 2>1 | grep -o -I '[a-f0-9
 ]\{16\}') && echo $taskid
-	$ curl -H "Content-Type: application/json" -X POST -d '{"url": "http://testp
+    $ curl -H "Content-Type: application/json" -X POST -d '{"url": "http://testp
 hp.vulnweb.com/artists.php?artist=1"}' http://192.168.110.1:8775/scan/$taskid/st
 art
-	$ curl http://192.168.110.1:8775/scan/$taskid/data
-	$ curl http://192.168.110.1:8775/scan/$taskid/log
+    $ curl http://192.168.110.1:8775/scan/$taskid/data
+    $ curl http://192.168.110.1:8775/scan/$taskid/log
 [12:47:53] [INFO] Starting REST-JSON API client to 'http://192.168.110.1:8775'..
 .
 [12:47:53] [DEBUG] Calling http://192.168.110.1:8775
