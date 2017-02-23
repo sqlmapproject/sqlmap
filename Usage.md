@@ -630,7 +630,7 @@ Depending on parameter placement (e.g. GET) its value could be URL encoded by de
 
 Options: `--csrf-token` and `--csrf-url`
 
-Lots of sites incorporate anti-CSRF protection in form of tokens, hidden field values that are randomly set during each page response. sqlmap will automatically try to recognize and bypass that kind of protection, but there are options `--csrf-token` and `--csrf-url` that can be used to furter fine tune it. Option `--csrf-token` can be used to set the name of the hidden value that contains the randomized token. This is useful in cases when web sites use non-standard names for such fields. Option `--csrf-url` can be used for retrieval of the token value from arbitrary URL address. This is useful if the vulnerable target URL doesn't contain the necessary token value in the first place, but it is required to extract it from some other location.
+Lots of sites incorporate anti-CSRF protection in form of tokens, hidden field values that are randomly set during each page response. sqlmap will automatically try to recognize and bypass that kind of protection, but there are options `--csrf-token` and `--csrf-url` that can be used to further fine tune it. Option `--csrf-token` can be used to set the name of the hidden value that contains the randomized token. This is useful in cases when web sites use non-standard names for such fields. Option `--csrf-url` can be used for retrieval of the token value from arbitrary URL address. This is useful if the vulnerable target URL doesn't contain the necessary token value in the first place, but it is required to extract it from some other location.
 
 ### Force usage of SSL/HTTPS
 
@@ -1039,7 +1039,7 @@ These options can be used to enumerate the back-end database management system i
 
 Switch: `--all`
 
-This switch can be used in situations where user wants to retrieve everything remotelly accessible by using a single switch. This is not recommended as it will generate large number of requests retrieving both useful and unuseful data.
+This switch can be used in situations where user wants to retrieve everything remotely accessible by using a single switch. This is not recommended as it will generate large number of requests retrieving both useful and unuseful data.
 
 ### Banner
 
