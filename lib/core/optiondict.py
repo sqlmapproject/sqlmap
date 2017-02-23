@@ -225,7 +225,6 @@ optDict = {
                                "identifyWaf":       "boolean",
                                "mobile":            "boolean",
                                "offline":           "boolean",
-                               "pageRank":          "boolean",
                                "purgeOutput":       "boolean",
                                "skipWaf":           "boolean",
                                "smart":             "boolean",
