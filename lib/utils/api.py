@@ -767,7 +767,12 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
                 logger.error("Program arguments are missing")
                 continue
 
-            argv = ["sqlmap.py"] + shlex.split(command)[1:]
+            try:
+                argv = ["sqlmap.py"] + shlex.split(command)[1:]
+            except Exception, ex:
+                logger.error("Error occurred while parsing arguments ('%s')" % ex)
+                taskid = None
+                continue
 
             try:
                 cmdLineOptions = cmdLineParser(argv).__dict__
@@ -819,18 +824,19 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             return
 
         elif command in ("help", "?"):
-            msg =  "help        Show this help message\n"
-            msg += "new ARGS    Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
-            msg += "use TASKID  Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
-            msg += "data        Retrieve and show data for current task\n"
-            msg += "log         Retrieve and show log for current task\n"
-            msg += "status      Retrieve and show status for current task\n"
-            msg += "option      Retrieve and show options for current task\n"
-            msg += "stop        Stop current task\n"
-            msg += "kill        Kill current task\n"
-            msg += "list        Display all tasks\n"
-            msg += "flush       Flush tasks (delete all tasks)\n"
-            msg += "exit        Exit this client\n"
+            msg =  "help           Show this help message\n"
+            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
+            msg += "data           Retrieve and show data for current task\n"
+            msg += "log            Retrieve and show log for current task\n"
+            msg += "status         Retrieve and show status for current task\n"
+            msg += "option OPTION  Retrieve and show option for current task\n"
+            msg += "options        Retrieve and show all options for current task\n"
+            msg += "stop           Stop current task\n"
+            msg += "kill           Kill current task\n"
+            msg += "list           Display all tasks\n"
+            msg += "flush          Flush tasks (delete all tasks)\n"
+            msg += "exit           Exit this client\n"
 
             dataToStdout(msg)
 
