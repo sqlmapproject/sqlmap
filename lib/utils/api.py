@@ -745,6 +745,22 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             if not res["success"]:
                 logger.error("Failed to execute command %s" % command)
             dataToStdout("%s\n" % raw)
+        
+        if command.startswith("option"):
+            if not taskid:
+                logger.error("No task ID in use")
+                continue
+            try:
+                command, option = command.split(" ")
+            except ValueError:
+                raw = _client("%s/option/%s/list" % (addr, taskid))
+            else:
+                options = {"option": option}
+                raw = _client("%s/option/%s/get" % (addr, taskid), options)
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to execute command %s" % command)
+            dataToStdout("%s\n" % raw)
 
         elif command.startswith("new"):
             if ' ' not in command:
@@ -809,6 +825,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             msg += "data        Retrieve and show data for current task\n"
             msg += "log         Retrieve and show log for current task\n"
             msg += "status      Retrieve and show status for current task\n"
+            msg += "option      Retrieve and show options for current task\n"
             msg += "stop        Stop current task\n"
             msg += "kill        Kill current task\n"
             msg += "list        Display all tasks\n"
