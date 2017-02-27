@@ -70,8 +70,8 @@ def tableExists(tableFile, regex=None):
 
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
-        errMsg += "to distinguish errornous results)"
+        errMsg += "(most probable cause is by inability of the used injection "
+        errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
@@ -178,8 +178,8 @@ def columnExists(columnFile, regex=None):
 
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
-        errMsg += "to distinguish errornous results)"
+        errMsg += "(most probable cause is by inability of the used injection "
+        errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
