@@ -465,6 +465,8 @@ class Backend:
 
         if not kb:
             pass
+        elif not kb.testMode and conf.dbmsHandler and getattr(conf.dbmsHandler, "_dbms", None):
+            dbms = conf.dbmsHandler._dbms
         elif Backend.getForcedDbms() is not None:
             dbms = Backend.getForcedDbms()
         elif Backend.getDbms() is not None:
