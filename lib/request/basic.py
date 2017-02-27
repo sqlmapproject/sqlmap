@@ -102,7 +102,7 @@ def forgeHeaders(items=None):
                         message = "you provided a HTTP %s header value. " % HTTP_HEADER.COOKIE
                         message += "The target URL provided its own cookies within "
                         message += "the HTTP %s header which intersect with yours. " % HTTP_HEADER.SET_COOKIE
-                        message += "Do you want to merge them in futher requests? [Y/n] "
+                        message += "Do you want to merge them in further requests? [Y/n] "
                         _ = readInput(message, default="Y")
                         kb.mergeCookies = not _ or _[0] in ("y", "Y")
 
