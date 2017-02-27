@@ -93,7 +93,7 @@ We already support the major and some minor databases. We do have plans to exten
 
 ## Tool `xyz` works against the target, while sqlmap doesn't!
 
-Please use that other tool that works
+Please use that other tool.
 
 ## Which tamper script to use to bypass a (WAF/IDS/IPS) protection?
 
