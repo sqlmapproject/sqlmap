@@ -249,7 +249,7 @@ def _setRequestParams():
                         if "=%s" % CUSTOM_INJECTION_MARK_CHAR in _:
                             warnMsg = "it seems that you've provided empty parameter value(s) "
                             warnMsg += "for testing. Please, always use only valid parameter values "
-                            warnMsg += "so sqlmap could be able to run properly"
+                            warnMsg += "so sqlmap will be able to run properly"
                             logger.warn(warnMsg)
 
             if not kb.processUserMarks:
