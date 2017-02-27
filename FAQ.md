@@ -91,6 +91,14 @@ We already support the major and some minor databases. We do have plans to exten
 
 **No**.
 
+## Tool `xyz` works against the target, while sqlmap doesn't!
+
+Please use that other tool that works
+
+## Which tamper script to use to bypass a (WAF/IDS/IPS) protection?
+
+Don't use tamper scripts if you are not able to manually assess the target. Tamper scripts are used only in cases when the penetration tester knows how to bypass the protection in the first place (most probably after hours of request/response inspection). Blind usage and combination of numerous tamper scripts without the comprehension is always a bad idea.
+
 ## My site was attacked with sqlmap. Stop developing it you *dumb f.cks*!?
 
 We get occasional rage bursts from unknown people. It should be emphasized that **with each sqlmap run end users are obligated** with the following prelude message:
