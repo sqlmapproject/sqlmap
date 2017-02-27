@@ -2329,7 +2329,7 @@ def wasLastResponseDBMSError():
 
 def wasLastResponseHTTPError():
     """
-    Returns True if the last web request resulted in an errornous HTTP code (like 500)
+    Returns True if the last web request resulted in an erroneous HTTP code (like 500)
     """
 
     threadData = getCurrentThreadData()

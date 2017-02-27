@@ -148,7 +148,7 @@ class Connect(object):
             # if the injectable piece of code is some kind of JOIN-like query
             warnMsg = "most probably web server instance hasn't recovered yet "
             warnMsg += "from previous timed based payload. If the problem "
-            warnMsg += "persists please wait for few minutes and rerun "
+            warnMsg += "persists please wait for a few minutes and rerun "
             warnMsg += "without flag 'T' in option '--technique' "
             warnMsg += "(e.g. '--flush-session --technique=BEUS') or try to "
             warnMsg += "lower the value of option '--time-sec' (e.g. '--time-sec=2')"

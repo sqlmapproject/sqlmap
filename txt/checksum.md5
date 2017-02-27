@@ -26,7 +26,7 @@ dc386321e8813788f155dc557a78be8d  lib/controller/controller.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
 19905ecb4437b94512cf21d5f1720091  lib/core/agent.py
 6cc95a117fbd34ef31b9aa25520f0e31  lib/core/bigarray.py
-901d4c3dba4aa1248b394e546fc5533e  lib/core/common.py
+987c70c04e4847b9b5528ddf68373134  lib/core/common.py
 5065a4242a8cccf72f91e22e1007ae63  lib/core/convert.py
 a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 7936d78b1a7f1f008ff92bf2f88574ba  lib/core/datatype.py
@@ -45,7 +45,7 @@ a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-9a6d263b4f3c37fe9a2b0c2575331f74  lib/core/settings.py
+48d1d13ed1a008fbe0067a9d8bfd5656  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -67,7 +67,7 @@ a0444cc351cd6d29015ad16d9eb46ff4  lib/parse/sitemap.py
 403d873f1d2fd0c7f73d83f104e41850  lib/request/basicauthhandler.py
 0035612a620934d7ebe6d18426cfb065  lib/request/basic.py
 ef48de622b0a6b4a71df64b0d2785ef8  lib/request/comparison.py
-d57655ea924108989a235a7fa02a45f0  lib/request/connect.py
+a75e2c97bb8b2a092239fa0571240d36  lib/request/connect.py
 fb6b788d0016ab4ec5e5f661f0f702ad  lib/request/direct.py
 cc1163d38e9b7ee5db2adac6784c02bb  lib/request/dns.py
 5dcdb37823a0b5eff65cd1018bcf09e4  lib/request/httpshandler.py
@@ -89,7 +89,7 @@ e5a82481947e798d0c11f3acf3e9db60  lib/takeover/xp_cmdshell.py
 cae752650755c706272a45ae84519a4b  lib/techniques/blind/inference.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/blind/__init__.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/brute/__init__.py
-b24fa5fe58828e00a84991015c561f59  lib/techniques/brute/use.py
+ad9087c1fa1f4854e103fd86841d1b8c  lib/techniques/brute/use.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/dns/__init__.py
 ab1601a7f429b47637c4fb8af703d0f1  lib/techniques/dns/test.py
 d3da4c7ceaf57c4687a052d58722f6bb  lib/techniques/dns/use.py
