@@ -18,6 +18,6 @@ try:
         __import__(_)
 except ImportError:
     errMsg = "missing one or more core extensions (%s) " % (", ".join("'%s'" % _ for _ in extensions))
-    errMsg += "most probably because current version of Python has been "
+    errMsg += "most likely because current version of Python has been "
     errMsg += "built without appropriate dev packages (e.g. 'libsqlite3-dev')"
     exit(errMsg)

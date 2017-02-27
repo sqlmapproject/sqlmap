@@ -70,7 +70,7 @@ def tableExists(tableFile, regex=None):
 
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
+        errMsg += "(most likely caused by inability of the used injection "
         errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
@@ -178,7 +178,7 @@ def columnExists(columnFile, regex=None):
 
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
+        errMsg += "(most likely caused by inability of the used injection "
         errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
