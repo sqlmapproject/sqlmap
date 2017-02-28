@@ -3638,13 +3638,31 @@ def randomizeParameterValue(value):
     value = re.sub(r"%[0-9a-fA-F]{2}", "", value)
 
     for match in re.finditer('[A-Z]+', value):
-        retVal = retVal.replace(match.group(), randomStr(len(match.group())).upper())
+        while True:
+            original = match.group()
+            candidate = randomStr(len(match.group())).upper()
+            if original != candidate:
+                break
+
+        retVal = retVal.replace(original, candidate)
 
     for match in re.finditer('[a-z]+', value):
-        retVal = retVal.replace(match.group(), randomStr(len(match.group())).lower())
+        while True:
+            original = match.group()
+            candidate = randomStr(len(match.group())).lower()
+            if original != candidate:
+                break
+
+        retVal = retVal.replace(original, candidate)
 
     for match in re.finditer('[0-9]+', value):
-        retVal = retVal.replace(match.group(), str(randomInt(len(match.group()))))
+        while True:
+            original = match.group()
+            candidate = str(randomInt(len(match.group())))
+            if original != candidate:
+                break
+
+        retVal = retVal.replace(original, candidate)
 
     return retVal
 
