@@ -229,6 +229,7 @@ optDict = {
                                "skipWaf":           "boolean",
                                "smart":             "boolean",
                                "tmpDir":            "string",
+                               "webRoot":           "string",
                                "wizard":            "boolean",
                                "verbose":           "integer",
                              },

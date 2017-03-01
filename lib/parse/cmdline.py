@@ -756,6 +756,9 @@ def cmdLineParser(argv=None):
         miscellaneous.add_option("--tmp-dir", dest="tmpDir",
                                   help="Local directory for storing temporary files")
 
+        miscellaneous.add_option("--web-root", dest="webRoot",
+                                  help="Web server document root directory (e.g. \"/var/www\")")
+
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
                                   help="Simple wizard interface for beginner users")
