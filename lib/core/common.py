@@ -465,7 +465,7 @@ class Backend:
 
         if not kb:
             pass
-        elif not kb.testMode and conf.dbmsHandler and getattr(conf.dbmsHandler, "_dbms", None):
+        elif not kb.get("testMode") and conf.get("dbmsHandler") and getattr(conf.dbmsHandler, "_dbms", None):
             dbms = conf.dbmsHandler._dbms
         elif Backend.getForcedDbms() is not None:
             dbms = Backend.getForcedDbms()
@@ -1497,11 +1497,12 @@ def getLimitRange(count, plusOne=False):
     count = int(count)
     limitStart, limitStop = 1, count
 
-    if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
-        limitStop = conf.limitStop
+    if kb.dumpTable:
+        if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
+            limitStop = conf.limitStop
 
-    if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
-        limitStart = conf.limitStart
+        if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
+            limitStart = conf.limitStart
 
     retVal = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
 
