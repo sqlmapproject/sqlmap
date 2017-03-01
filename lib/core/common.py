@@ -730,7 +730,7 @@ def getManualDirectories():
 
     directories = normalizePath(directories)
 
-    if conf.webRoot: 
+    if conf.webRoot:
         directories = [conf.webRoot]
         infoMsg = "using '%s' as web server document root" % conf.webRoot
         logger.info(infoMsg)
