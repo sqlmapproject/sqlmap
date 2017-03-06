@@ -192,7 +192,14 @@ class Entries:
                     query = agent.whereQuery(query)
 
                     if not entries and query:
-                        entries = inject.getValue(query, blind=False, time=False, dump=True)
+                        try:
+                            entries = inject.getValue(query, blind=False, time=False, dump=True)
+                        except KeyboardInterrupt:
+                            entries = None
+                            kb.dumpKeyboardInterrupt = True
+                            clearConsoleLine()
+                            warnMsg = "Ctrl+C detected in dumping phase"
+                            logger.warn(warnMsg)
 
                     if not isNoneValue(entries):
                         if isinstance(entries, basestring):
