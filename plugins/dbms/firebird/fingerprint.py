@@ -103,9 +103,7 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(FIREBIRD_ALIASES) \
-           or (conf.dbms or "").lower() in FIREBIRD_ALIASES) and Backend.getVersion() and \
-           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        if not conf.extensiveFp and Backend.isDbmsWithin(FIREBIRD_ALIASES):
             setDbms("%s %s" % (DBMS.FIREBIRD, Backend.getVersion()))
 
             self.getBanner()

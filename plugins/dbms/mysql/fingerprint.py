@@ -150,9 +150,7 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(MYSQL_ALIASES) \
-           or (conf.dbms or "").lower() in MYSQL_ALIASES) and Backend.getVersion() and \
-           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        if not conf.extensiveFp and Backend.isDbmsWithin(MYSQL_ALIASES):
             setDbms("%s %s" % (DBMS.MYSQL, Backend.getVersion()))
 
             if Backend.isVersionGreaterOrEqualThan("5"):

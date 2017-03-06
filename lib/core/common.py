@@ -517,10 +517,9 @@ class Backend:
     # Comparison methods
     @staticmethod
     def isDbms(dbms):
-        if Backend.getDbms() is not None:
-            return Backend.getDbms() == aliasToDbmsEnum(dbms)
-        else:
-            return Backend.getIdentifiedDbms() == aliasToDbmsEnum(dbms)
+        if not kb.get("testMode") and all((Backend.getDbms(), Backend.getIdentifiedDbms())) and Backend.getDbms() != Backend.getIdentifiedDbms():
+            singleTimeWarnMessage("identified ('%s') and fingerprinted ('%s') DBMSes differ. If you experience problems in enumeration phase please rerun with '--flush-session'" % (Backend.getIdentifiedDbms(), Backend.getDbms()))
+        return Backend.getIdentifiedDbms() == aliasToDbmsEnum(dbms)
 
     @staticmethod
     def isDbmsWithin(aliases):

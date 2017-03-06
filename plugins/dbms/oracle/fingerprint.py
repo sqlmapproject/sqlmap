@@ -58,7 +58,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(ORACLE_ALIASES) or (conf.dbms or "").lower() in ORACLE_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(ORACLE_ALIASES):
             setDbms(DBMS.ORACLE)
 
             self.getBanner()

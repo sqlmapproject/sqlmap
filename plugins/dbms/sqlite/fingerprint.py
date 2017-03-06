@@ -64,7 +64,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(SQLITE_ALIASES) or (conf.dbms or "").lower() in SQLITE_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(SQLITE_ALIASES):
             setDbms(DBMS.SQLITE)
 
             self.getBanner()

@@ -80,9 +80,7 @@ class Fingerprint(GenericFingerprint):
 
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \
-           or (conf.dbms or "").lower() in HSQLDB_ALIASES) and Backend.getVersion() and \
-           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        if not conf.extensiveFp and Backend.isDbmsWithin(HSQLDB_ALIASES):
             setDbms("%s %s" % (DBMS.HSQLDB, Backend.getVersion()))
 
             if Backend.isVersionGreaterOrEqualThan("1.7.2"):

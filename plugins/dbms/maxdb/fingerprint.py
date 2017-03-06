@@ -91,7 +91,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(MAXDB_ALIASES) or (conf.dbms or "").lower() in MAXDB_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(MAXDB_ALIASES):
             setDbms(DBMS.MAXDB)
 
             self.getBanner()

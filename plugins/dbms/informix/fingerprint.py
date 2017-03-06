@@ -56,7 +56,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(INFORMIX_ALIASES) or (conf.dbms or "").lower() in INFORMIX_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(INFORMIX_ALIASES):
             setDbms(DBMS.INFORMIX)
 
             self.getBanner()

@@ -63,7 +63,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.postgresql.org/docs/9.1/interactive/release.html (up to 9.1.3)
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(PGSQL_ALIASES) or (conf.dbms or "").lower() in PGSQL_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(PGSQL_ALIASES):
             setDbms(DBMS.PGSQL)
 
             self.getBanner()
