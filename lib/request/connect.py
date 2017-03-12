@@ -481,9 +481,14 @@ class Connect(object):
                 else:
                     page = Connect._connReadProxy(conn) if not skipRead else None
 
-                code = code or (conn.code if conn else None)
-                responseHeaders = conn.info()
-                responseHeaders[URI_HTTP_HEADER] = conn.geturl()
+                if conn:
+                    code = conn.code
+                    responseHeaders = conn.info()
+                    responseHeaders[URI_HTTP_HEADER] = conn.geturl()
+                else:
+                    code = None
+                    responseHeaders = {}
+
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
                 status = getUnicode(conn.msg)
 
