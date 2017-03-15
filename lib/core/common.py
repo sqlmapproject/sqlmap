@@ -2614,7 +2614,7 @@ def getPublicTypeMembers(type_, onlyValues=False):
     retVal = []
 
     for name, value in inspect.getmembers(type_):
-        if not name.startswith('__'):
+        if not name.startswith("__"):
             if not onlyValues:
                 retVal.append((name, value))
             else:
@@ -2674,7 +2674,7 @@ def extractTextTagContent(page):
         except MemoryError:
             page = page.replace(REFLECTED_VALUE_MARKER, "")
 
-    return filter(None, (_.group('result').strip() for _ in re.finditer(TEXT_TAG_REGEX, page)))
+    return filter(None, (_.group("result").strip() for _ in re.finditer(TEXT_TAG_REGEX, page)))
 
 def trimAlphaNum(value):
     """
@@ -2786,11 +2786,11 @@ def removeDynamicContent(page):
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
-                page = re.sub(r'(?s)^.+%s' % re.escape(suffix), suffix.replace('\\', r'\\'), page)
+                page = re.sub(r"(?s)^.+%s" % re.escape(suffix), suffix.replace('\\', r'\\'), page)
             elif suffix is None:
-                page = re.sub(r'(?s)%s.+$' % re.escape(prefix), prefix.replace('\\', r'\\'), page)
+                page = re.sub(r"(?s)%s.+$" % re.escape(prefix), prefix.replace('\\', r'\\'), page)
             else:
-                page = re.sub(r'(?s)%s.+%s' % (re.escape(prefix), re.escape(suffix)), '%s%s' % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
+                page = re.sub(r"(?s)%s.+%s" % (re.escape(prefix), re.escape(suffix)), "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
 
     return page
 
