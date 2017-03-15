@@ -622,7 +622,8 @@ def paramToDict(place, parameters=None):
                                         for key in current.keys():
                                             value = current[key]
                                             if isinstance(value, (list, tuple, set, dict)):
-                                                walk(head, value)
+                                                if value:
+                                                    walk(head, value)
                                             elif isinstance(value, (bool, int, float, basestring)):
                                                 original = current[key]
                                                 if isinstance(value, bool):
