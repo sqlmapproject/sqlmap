@@ -5,6 +5,7 @@ Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import logging
 import random
 import re
 
@@ -154,7 +155,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
     if retVal:
         infoMsg = "target URL appears to be UNION injectable with %d columns" % retVal
-        singleTimeLogMessage(infoMsg)
+        singleTimeLogMessage(infoMsg, logging.INFO, re.sub(r"\d+", "N", infoMsg))
 
     return retVal
 
