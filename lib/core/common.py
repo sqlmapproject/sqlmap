@@ -614,7 +614,8 @@ def paramToDict(place, parameters=None):
                                 candidates = OrderedDict()
 
                                 def walk(head, current=None):
-                                    current = current or head
+                                    if current is None:
+                                        current = head
                                     if isListLike(current):
                                         for _ in current:
                                             walk(head, _)
