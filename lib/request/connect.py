@@ -490,7 +490,7 @@ class Connect(object):
                     responseHeaders = {}
 
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
-                status = getUnicode(conn.msg)
+                status = getUnicode(conn.msg) if conn else None
 
             kb.connErrorCounter = 0
 
