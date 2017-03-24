@@ -620,7 +620,7 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        match = re.search("(Total size:|Length:|succeeded with size) ([\d]+)", payloadStderr)
+        match = re.search("(Total size:|Length:|succeeded with size|Final size of exe file:) ([\d]+)", payloadStderr)
 
         if match:
             payloadSize = int(match.group(2))
