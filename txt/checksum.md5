@@ -45,7 +45,7 @@ a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-dd0604da8e23963396dbecfddb597016  lib/core/settings.py
+ba6399c8321f618d237051e1e7110aeb  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -76,7 +76,7 @@ e68e1f00c7bb47b2c4ea6201995c56fb  lib/request/inject.py
 dc1e0af84ee8eb421797d61c8cb8f172  lib/request/methodrequest.py
 bb9c165b050f7696b089b96b5947fac3  lib/request/pkihandler.py
 602d4338a9fceaaee40c601410d8ac0b  lib/request/rangehandler.py
-e687a727b641211dfae7346b671059c5  lib/request/redirecthandler.py
+b581e0c5e27cd927883f2c7f1705bf4e  lib/request/redirecthandler.py
 20a0e6dac2edcf98fa8c47ee9a332c28  lib/request/templates.py
 36518b36ae0cf199490457916a85b367  lib/takeover/abstraction.py
 c6bc7961a186baabe0a9f5b7e0d8974b  lib/takeover/icmpsh.py
