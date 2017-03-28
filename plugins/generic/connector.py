@@ -11,6 +11,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUndefinedMethod
+from lib.core.settings import UNICODE_ENCODING
 
 class Connector:
     """
@@ -22,8 +23,8 @@ class Connector:
         self.cursor = None
 
     def initConnection(self):
-        self.user = conf.dbmsUser
-        self.password = conf.dbmsPass if conf.dbmsPass is not None else ""
+        self.user = conf.dbmsUser.encode(UNICODE_ENCODING) if conf.dbmsUser is not None else ""
+        self.password = conf.dbmsPass.encode(UNICODE_ENCODING) if conf.dbmsPass is not None else ""
         self.hostname = conf.hostname
         self.port = conf.port
         self.db = conf.dbmsDb
