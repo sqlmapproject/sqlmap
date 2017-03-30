@@ -45,7 +45,7 @@ a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-3d8c01162174b351f890ceb122fd9052  lib/core/settings.py
+d89b590877c9c7b9f0b6d993013a1baf  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
