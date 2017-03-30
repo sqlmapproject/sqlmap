@@ -1045,19 +1045,28 @@ class Connect(object):
                         found = False
                         value = getUnicode(value)
 
-                        regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
-                        if kb.postHint and re.search(regex, (post or "")):
-                            found = True
-                            post = re.sub(regex, "\g<1>\g<2>%s" % value, post)
+                        if kb.postHint and re.search(r"\b%s\b" % re.escape(name), post or ""):
+                            if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
+                                if re.search(r"<%s\b" % re.escape(name), post):
+                                    found = True
+                                    post = re.sub(r"(?s)(<%s\b[^>]*>)(.*?)(</%s)" % (re.escape(name), re.escape(name)), "\g<1>%s\g<3>" % value, post)
+                                elif re.search(r"\b%s>" % re.escape(name), post):
+                                    found = True
+                                    post = re.sub(r"(?s)(\b%s>)(.*?)(</[^<]*\b%s>)" % (re.escape(name), re.escape(name)), "\g<1>%s\g<3>" % value, post)
+
+                            regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
+                            if not found and re.search(regex, (post or "")):
+                                found = True
+                                post = re.sub(regex, "\g<1>\g<2>%s" % value, post)
 
                         regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
+                        if not found and re.search(regex, (post or "")):
+                            found = True
+                            post = re.sub(regex, "\g<1>%s\g<3>" % value, post)
+
                         if re.search(regex, (get or "")):
                             found = True
                             get = re.sub(regex, "\g<1>%s\g<3>" % value, get)
-
-                        if re.search(regex, (post or "")):
-                            found = True
-                            post = re.sub(regex, "\g<1>%s\g<3>" % value, post)
 
                         if re.search(regex, (query or "")):
                             found = True
