@@ -601,6 +601,8 @@ class Metasploit:
 
             except (EOFError, IOError, select.error):
                 return proc.returncode
+            except KeyboardInterrupt:
+                pass
 
     def createMsfShellcode(self, exitfunc, format, extra, encode):
         infoMsg = "creating Metasploit Framework multi-stage shellcode "
