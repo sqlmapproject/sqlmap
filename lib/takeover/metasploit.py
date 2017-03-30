@@ -351,7 +351,7 @@ class Metasploit:
 
             self._cliCmd += " E"
         else:
-            self._cliCmd = "%s -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
+            self._cliCmd = "%s -L -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
             self._cliCmd += "; set EXITFUNC %s" % exitfunc
             self._cliCmd += "; set LPORT %s" % self.portStr
 
