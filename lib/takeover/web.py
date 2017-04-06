@@ -206,7 +206,7 @@ class Web:
 
             if getOutput in ("y", "Y"):
                 headers = {}
-                been = {conf.url}
+                been = set([conf.url])
 
                 for match in re.finditer(r"=['\"]((https?):)?(//[^/'\"]+)?(/[\w/.-]*)\bwp-", kb.originalPage, re.I):
                     url = "%s%s" % (conf.url.replace(conf.path, match.group(4)), "wp-content/wp-db.php")
