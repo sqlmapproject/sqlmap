@@ -669,7 +669,7 @@ class Bottle(object):
     catchall = DictProperty('config', 'catchall')
 
     __hook_names = 'before_request', 'after_request', 'app_reset', 'config'
-    __hook_reversed = {'after_request'}
+    __hook_reversed = set(['after_request'])
 
     @cached_property
     def _hooks(self):
