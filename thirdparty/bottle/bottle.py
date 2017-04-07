@@ -2345,8 +2345,7 @@ class ConfigDict(dict):
                           represent namespaces (see :meth:`load_dict`).
         """
         config_obj = load(path)
-        obj = {key: getattr(config_obj, key) for key in dir(config_obj)
-               if key.isupper()}
+        obj = dict([(key, getattr(config_obj, key)) for key in dir(config_obj) if key.isupper()])
 
         if squash:
             self.load_dict(obj)
