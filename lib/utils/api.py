@@ -665,6 +665,9 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
 
     # Run RESTful API
     try:
+        # Supported adapters: aiohttp, auto, bjoern, cgi, cherrypy, diesel, eventlet, fapws3, flup, gae, gevent, geventSocketIO, gunicorn, meinheld, paste, rocket, tornado, twisted, waitress, wsgiref
+        # Reference: https://bottlepy.org/docs/dev/deployment.html || bottle.server_names
+
         if adapter == "gevent":
             from gevent import monkey
             monkey.patch_all()
@@ -690,7 +693,7 @@ def _client(url, options=None):
         data = None
         if options is not None:
             data = jsonize(options)
-        req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+        req = urllib2.Request(url, data, {"Content-Type": "application/json"})
         response = urllib2.urlopen(req)
         text = response.read()
     except:
