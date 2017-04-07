@@ -1,4 +1,5 @@
 *.conf text eol=lf
+*.md text eol=lf
 *.md5 text eol=lf
 *.py text eol=lf
 
