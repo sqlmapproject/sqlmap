@@ -50,6 +50,7 @@ from thirdparty.bottle.bottle import post
 from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
+from thirdparty.bottle.bottle import server_names
 
 
 # global settings
@@ -682,9 +683,12 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
         else:
             raise
     except ImportError:
-        errMsg = "Adapter '%s' is not available on this system" % adapter
-        if adapter in ("gevent", "eventlet"):
-            errMsg += " (e.g.: 'sudo apt-get install python-%s')" % adapter
+        if adapter.lower() not in server_names:
+            errMsg = "Adapter '%s' is unknown. " % adapter
+            errMsg += "(Note: available adapters '%s')" % ', '.join(sorted(server_names.keys()))
+        else:
+            errMsg = "Server '%s' is not installed on this system. " % adapter
+            errMsg += "(Note: you can try to install it with 'sudo apt-get install python-%s' or 'sudo pip install %s')" % (adapter, adapter)
         logger.critical(errMsg)
 
 def _client(url, options=None):
