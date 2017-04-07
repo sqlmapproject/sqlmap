@@ -7,7 +7,7 @@
 ## 2016
 
 * 2000th Issue closed.
-* **Feb 27**, stable version **1.0** released..
+* **Feb 27**, stable version **1.0** released.
 
 ## 2015
 
