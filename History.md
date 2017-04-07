@@ -2,12 +2,12 @@
 
 ## 2017
 
-* **Jan 2**, stable version **1.1** released.
+* **Jan 2**, stable version [1.1](https://github.com/sqlmapproject/sqlmap/releases/tag/1.1) released.
 
 ## 2016
 
-* 2000th Issue closed.
-* **Feb 27**, stable version **1.0** released.
+* **2000<sup>th</sup>** [Issue](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) closed.
+* **Feb 27**, stable version [1.0](https://github.com/sqlmapproject/sqlmap/releases/tag/1.0) released.
 
 ## 2015
 
@@ -15,7 +15,7 @@
 
 ## 2014
 
-* 1000th Issue closed.
+* **1000<sup>th</sup>** [Issue](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) closed.
 
 ## 2013
 
