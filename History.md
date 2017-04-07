@@ -2,11 +2,12 @@
 
 ## 2017
 
-* **Jan 2**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release stable version of sqlmap **1.1**.
+* **Jan 2**, stable version **1.1** released.
 
 ## 2016
 
-* **Feb 27**, [Bernardo and Miroslav](http://www.sqlmap.org/#developers) release stable version of sqlmap **1.0**.
+* 2000th Issue closed.
+* **Feb 27**, stable version **1.0** released..
 
 ## 2015
 
@@ -14,7 +15,7 @@
 
 ## 2014
 
-* First 1000 [Issues](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) are closed.
+* 1000th Issue closed.
 
 ## 2013
 
