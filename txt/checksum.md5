@@ -45,7 +45,7 @@ a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-96226306f47f98cf4dd80c88e5f36842  lib/core/settings.py
+877123fbd3780b15dc9b61d942269893  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -281,7 +281,7 @@ af9d948b4c861df0418355734418bcdc  tamper/unionalltounion.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/ansistrm/__init__.py
 8e775c25bc9e84891ad6fcb4f0005c23  thirdparty/beautifulsoup/beautifulsoup.py
 cb2e1fe7c404dff41a2ae9132828f532  thirdparty/beautifulsoup/__init__.py
-e9c2578a581b4d58972e4c59e3a06864  thirdparty/bottle/bottle.py
+ff54a1d98f0ab01ba7b58b068d2ebd26  thirdparty/bottle/bottle.py
 4528e6a7bb9341c36c425faf40ef32c3  thirdparty/bottle/__init__.py
 b20f539dc45fa9e514c1eb4f5aa8b5c6  thirdparty/chardet/big5freq.py
 44159687c2bae35f165b44f07f5f167a  thirdparty/chardet/big5prober.py
