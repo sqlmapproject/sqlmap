@@ -687,7 +687,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             errMsg = "Adapter '%s' is unknown. " % adapter
             errMsg += "(Note: available adapters '%s')" % ', '.join(sorted(server_names.keys()))
         else:
-            errMsg = "Server '%s' is not installed on this system. " % adapter
+            errMsg = "Server support for adapter '%s' is not installed on this system " % adapter
             errMsg += "(Note: you can try to install it with 'sudo apt-get install python-%s' or 'sudo pip install %s')" % (adapter, adapter)
         logger.critical(errMsg)
 
