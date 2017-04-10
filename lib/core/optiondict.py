@@ -243,5 +243,10 @@ optDict = {
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",
                                "runCase":           "string",
+                      },
+            "API": {
+                               "api":               "boolean",
+                               "taskid":            "string",
+                               "database":          "string",
                       }
           }

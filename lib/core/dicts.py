@@ -274,6 +274,7 @@ DEPRECATED_OPTIONS = {
     "--auth-private": "use '--auth-file' instead",
     "--check-payload": None,
     "--check-waf": None,
+    "--pickled-options": "use '--api -c ...' instead",
 }
 
 DUMP_DATA_PREPROCESS = {

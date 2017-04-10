@@ -72,6 +72,7 @@ from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MKSTEMP_PREFIX
+from lib.core.enums import OPTION_TYPE
 from lib.core.enums import OS
 from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
@@ -112,6 +113,7 @@ from lib.core.settings import GITHUB_REPORT_OAUTH_TOKEN
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
+from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import IP_ADDRESS_REGEX
@@ -1145,7 +1147,7 @@ def banner():
     This function prints sqlmap banner with its version
     """
 
-    if not any(_ in sys.argv for _ in ("--version", "--pickled-options")):
+    if not any(_ in sys.argv for _ in ("--version", "--api")):
         _ = BANNER
 
         if not getattr(LOGGER_HANDLER, "is_tty", False) or "--disable-coloring" in sys.argv:
@@ -2927,6 +2929,58 @@ def setOptimize():
     if not conf.nullConnection:
         debugMsg = "turning off switch '--null-connection' used indirectly by switch '-o'"
         logger.debug(debugMsg)
+
+def saveConfig(conf, filename):
+    """
+    Saves conf to configuration filename
+    """
+
+    config = UnicodeRawConfigParser()
+    userOpts = {}
+
+    for family in optDict.keys():
+        userOpts[family] = []
+
+    for option, value in conf.items():
+        for family, optionData in optDict.items():
+            if option in optionData:
+                userOpts[family].append((option, value, optionData[option]))
+
+    for family, optionData in userOpts.items():
+        config.add_section(family)
+
+        optionData.sort()
+
+        for option, value, datatype in optionData:
+            if datatype and isListLike(datatype):
+                datatype = datatype[0]
+
+            if option in IGNORE_SAVE_OPTIONS:
+                continue
+
+            if value is None:
+                if datatype == OPTION_TYPE.BOOLEAN:
+                    value = "False"
+                elif datatype in (OPTION_TYPE.INTEGER, OPTION_TYPE.FLOAT):
+                    if option in defaults:
+                        value = str(defaults[option])
+                    else:
+                        value = "0"
+                elif datatype == OPTION_TYPE.STRING:
+                    value = ""
+
+            if isinstance(value, basestring):
+                value = value.replace("\n", "\n ")
+
+            config.set(family, option, value)
+
+    with openFile(filename, "wb") as f:
+        try:
+            config.write(f)
+        except IOError, ex:
+            errMsg = "something went wrong while trying "
+            errMsg += "to write to the configuration file '%s' ('%s')" % (filename, getSafeExString(ex))
+            raise SqlmapSystemException(errMsg)
 
 def initTechnique(technique=None):
     """

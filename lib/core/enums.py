@@ -364,6 +364,7 @@ class MKSTEMP_PREFIX:
     HASHES = "sqlmaphashes-"
     CRAWLER = "sqlmapcrawler-"
     IPC = "sqlmapipc-"
+    CONFIG = "sqlmapconfig-"
     TESTING = "sqlmaptesting-"
     RESULTS = "sqlmapresults-"
     COOKIE_JAR = "sqlmapcookiejar-"

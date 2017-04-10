@@ -770,9 +770,6 @@ def cmdLineParser(argv=None):
         parser.add_option("--murphy-rate", dest="murphyRate", type="int",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--pickled-options", dest="pickledOptions",
-                          help=SUPPRESS_HELP)
-
         parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
                           help=SUPPRESS_HELP)
 
@@ -798,6 +795,14 @@ def cmdLineParser(argv=None):
                           help=SUPPRESS_HELP)
 
         parser.add_option("--run-case", dest="runCase", help=SUPPRESS_HELP)
+
+        # API options
+        parser.add_option("--api", dest="api", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--taskid", dest="taskid", help=SUPPRESS_HELP)
+
+        parser.add_option("--database", dest="database", help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)
@@ -963,7 +968,7 @@ def cmdLineParser(argv=None):
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
-            args.purgeOutput, args.pickledOptions, args.sitemapUrl)):
+            args.purgeOutput, args.sitemapUrl)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help\n"
             parser.error(errMsg)
