@@ -123,7 +123,7 @@ def main():
         cmdLineOptions.update(cmdLineParser().__dict__)
         initOptions(cmdLineOptions)
 
-        if hasattr(conf, "api"):
+        if conf.get("api"):
             # heavy imports
             from lib.utils.api import StdDbOut
             from lib.utils.api import setRestAPILog
@@ -285,7 +285,7 @@ def main():
             errMsg = maskSensitiveData(errMsg)
             excMsg = maskSensitiveData(excMsg)
 
-            if hasattr(conf, "api"):
+            if conf.get("api"):
                 logger.critical("%s\n%s" % (errMsg, excMsg))
             else:
                 logger.critical(errMsg)
@@ -326,7 +326,7 @@ def main():
             kb.clear()
             main()
 
-        if hasattr(conf, "api"):
+        if conf.get("api"):
             try:
                 conf.databaseCursor.disconnect()
             except KeyboardInterrupt:

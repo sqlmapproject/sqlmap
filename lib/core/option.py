@@ -2192,7 +2192,7 @@ def _mergeOptions(inputOptions, overrideOptions):
         if key not in conf or value not in (None, False) or overrideOptions:
             conf[key] = value
 
-    if not hasattr(conf, "api"):
+    if not conf.api:
         for key, value in conf.items():
             if value is not None:
                 kb.explicitSettings.add(key)

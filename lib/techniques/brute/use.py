@@ -114,7 +114,7 @@ def tableExists(tableFile, regex=None):
                 threadData.shared.value.append(table)
                 threadData.shared.unique.add(table.lower())
 
-                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
+                if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                     dataToStdout(infoMsg, True)
@@ -222,7 +222,7 @@ def columnExists(columnFile, regex=None):
             if result:
                 threadData.shared.value.append(column)
 
-                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
+                if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)

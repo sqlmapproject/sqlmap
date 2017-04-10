@@ -282,7 +282,7 @@ class LogRecorder(logging.StreamHandler):
 
 
 def setRestAPILog():
-    if hasattr(conf, "api"):
+    if conf.api:
         try:
             conf.databaseCursor = Database(conf.database)
             conf.databaseCursor.connect("client")

@@ -215,7 +215,7 @@ def unionUse(expression, unpack=True, dump=False):
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
     # Set kb.partRun in case the engine is called from the API
-    kb.partRun = getPartRun(alias=False) if hasattr(conf, "api") else None
+    kb.partRun = getPartRun(alias=False) if conf.api else None
 
     if Backend.isDbms(DBMS.MSSQL) and kb.dumpColumns:
         kb.rowXmlMode = True

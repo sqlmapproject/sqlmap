@@ -97,7 +97,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used or the engine is called from the API
         if conf.predictOutput:
             kb.partRun = getPartRun()
-        elif hasattr(conf, "api"):
+        elif conf.api:
             kb.partRun = getPartRun(alias=False)
         else:
             kb.partRun = None
@@ -168,7 +168,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             warnMsg += "usage of option '--threads' for faster data retrieval"
             singleTimeWarnMessage(warnMsg)
 
-        if conf.verbose in (1, 2) and not showEta and not hasattr(conf, "api"):
+        if conf.verbose in (1, 2) and not showEta and not conf.api:
             if isinstance(length, int) and conf.threads > 1:
                 dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
                 dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
@@ -492,7 +492,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length - 1):
                                     output = output[:-2] + '..'
 
-                                if conf.verbose in (1, 2) and not showEta and not hasattr(conf, "api"):
+                                if conf.verbose in (1, 2) and not showEta and not conf.api:
                                     _ = count - firstChar
                                     output += '_' * (min(length, conf.progressWidth) - len(output))
                                     status = ' %d/%d (%d%%)' % (_, length, round(100.0 * _ / length))
@@ -522,7 +522,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 finalValue = "".join(value)
                 infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
 
-            if conf.verbose in (1, 2) and not showEta and infoMsg and not hasattr(conf, "api"):
+            if conf.verbose in (1, 2) and not showEta and infoMsg and not conf.api:
                 dataToStdout(infoMsg)
 
         # No multi-threading (--threads = 1)
@@ -558,7 +558,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         if result:
                             if showEta:
                                 progress.progress(time.time() - charStart, len(commonValue))
-                            elif conf.verbose in (1, 2) or hasattr(conf, "api"):
+                            elif conf.verbose in (1, 2) or conf.api:
                                 dataToStdout(filterControlChars(commonValue[index - 1:]))
 
                             finalValue = commonValue
@@ -608,7 +608,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                 if showEta:
                     progress.progress(time.time() - charStart, index)
-                elif conf.verbose in (1, 2) or hasattr(conf, "api"):
+                elif conf.verbose in (1, 2) or conf.api:
                     dataToStdout(filterControlChars(val))
 
                 # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
@@ -635,11 +635,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 
-    if conf.hexConvert and not abortedFlag and not hasattr(conf, "api"):
+    if conf.hexConvert and not abortedFlag and not conf.api:
         infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
         dataToStdout(infoMsg)
     else:
-        if conf.verbose in (1, 2) and not showEta and not hasattr(conf, "api"):
+        if conf.verbose in (1, 2) and not showEta and not conf.api:
             dataToStdout("\n")
 
         if (conf.verbose in (1, 2) and showEta) or conf.verbose >= 3:

@@ -270,7 +270,7 @@ class Format(object):
         infoApi = {}
 
         if info and "type" in info:
-            if hasattr(conf, "api"):
+            if conf.api:
                 infoApi["%s operating system" % target] = info
             else:
                 infoStr += "%s operating system: %s" % (target, Format.humanize(info["type"]))
@@ -288,12 +288,12 @@ class Format(object):
                     infoStr += " (%s)" % Format.humanize(info["codename"])
 
         if "technology" in info:
-            if hasattr(conf, "api"):
+            if conf.api:
                 infoApi["web application technology"] = Format.humanize(info["technology"], ", ")
             else:
                 infoStr += "\nweb application technology: %s" % Format.humanize(info["technology"], ", ")
 
-        if hasattr(conf, "api"):
+        if conf.api:
             return infoApi
         else:
             return infoStr.lstrip()
@@ -896,7 +896,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
                 message = data
 
             try:
-                if hasattr(conf, "api"):
+                if conf.get("api"):
                     sys.stdout.write(message, status, content_type)
                 else:
                     sys.stdout.write(setColor(message, bold))

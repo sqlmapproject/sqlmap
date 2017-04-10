@@ -301,7 +301,7 @@ def errorUse(expression, dump=False):
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
     # Set kb.partRun in case the engine is called from the API
-    kb.partRun = getPartRun(alias=False) if hasattr(conf, "api") else None
+    kb.partRun = getPartRun(alias=False) if conf.api else None
 
     # We have to check if the SQL query might return multiple entries
     # and in such case forge the SQL limiting the query output one

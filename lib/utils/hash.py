@@ -583,7 +583,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
                     status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
-                    if not hasattr(conf, "api"):
+                    if not conf.api:
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
@@ -657,7 +657,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                     if user and not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
 
-                    if not hasattr(conf, "api"):
+                    if not conf.api:
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
