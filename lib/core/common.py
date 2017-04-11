@@ -3188,6 +3188,9 @@ def checkIntegrity():
     Checks integrity of code files during the unhandled exceptions
     """
 
+    if not paths:
+        return
+
     logger.debug("running code integrity check")
 
     retVal = True
