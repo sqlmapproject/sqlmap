@@ -483,13 +483,13 @@ def _setRequestFromFile():
 
     conf.requestFile = safeExpandUser(conf.requestFile)
 
-    infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
-    logger.info(infoMsg)
-
     if not os.path.isfile(conf.requestFile):
         errMsg = "the specified HTTP request file "
         errMsg += "does not exist"
         raise SqlmapFilePathException(errMsg)
+
+    infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
+    logger.info(infoMsg)
 
     _feedTargetsDict(conf.requestFile, addedTargetUrls)
 
