@@ -26,6 +26,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import urllib
 import urllib2
@@ -139,6 +140,7 @@ from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import REFLECTED_BORDER_REGEX
 from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
 from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
+from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SENSITIVE_DATA_REGEX
@@ -3429,11 +3431,27 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     else:
                         regex = r"%s\b" % regex
 
-                    retVal = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, retVal)
+                    _retVal = [retVal]
+                    def _thread(regex):
+                        _retVal[0] = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, _retVal[0])
 
-                    if len(parts) > 2:
-                        regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
-                        retVal = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, retVal)
+                        if len(parts) > 2:
+                            regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
+                            _retVal[0] = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, _retVal[0])
+
+                    thread = threading.Thread(target=_thread, args=(regex,))
+                    thread.daemon = True
+                    thread.start()
+                    thread.join(REFLECTED_REPLACEMENT_TIMEOUT)
+
+                    if thread.isAlive():
+                        kb.reflectiveMechanism = False
+                        retVal = content
+                        if not suppressWarning:
+                            debugMsg = "turning off reflection removal mechanism (because of timeouts)"
+                            logger.debug(debugMsg)
+                    else:
+                        retVal = _retVal[0]
 
                 if retVal != content:
                     kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
