@@ -45,7 +45,7 @@ dd19b4d930d418f8aef498941346ab2d  lib/core/option.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-78ce748dd65ba204321cb74c53ec55e3  lib/core/settings.py
+a69ceaa3f1d3c59bc4678777218ae334  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 afd0636d2e93c23f4f0a5c9b6023ea17  lib/core/target.py
@@ -236,6 +236,7 @@ e6e3ae32bc3c3d5acb4b93289e3fe698  tamper/bluecoat.py
 893e7d907bcd370394b70a30d502be2b  tamper/charunicodeencode.py
 596883203fbdd81ee760e4a00071bf39  tamper/commalesslimit.py
 f341a48112354a50347546fa73f4f531  tamper/commalessmid.py
+1a368a32530c04a11a531cd21d587682  tamper/commentbeforeparentheses.py
 28c21fd9c9801d398698c646bb894260  tamper/concat2concatws.py
 d496b8abd40ea1a86c771d9d20174f61  tamper/equaltolike.py
 fb3c31b72675f6ef27fa420a4e974a55  tamper/escapequotes.py
