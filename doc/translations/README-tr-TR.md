@@ -48,9 +48,6 @@ Links
 * Hata takip etme sistemi: https://github.com/sqlmapproject/sqlmap/issues
 * Kullanıcı Manueli: https://github.com/sqlmapproject/sqlmap/wiki
 * Sıkça Sorulan Sorular(SSS): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Mail listesi: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mail RSS takibi: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mail listesi arşivi: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demolar: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

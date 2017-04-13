@@ -45,9 +45,6 @@
 * Προβλήματα: https://github.com/sqlmapproject/sqlmap/issues
 * Εγχειρίδιο Χρήστη: https://github.com/sqlmapproject/sqlmap/wiki
 * Συχνές Ερωτήσεις (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Εγγραφή σε Mailing list: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mailing list αρχείο: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Εικόνες: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

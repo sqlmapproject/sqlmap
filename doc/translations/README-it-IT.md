@@ -45,9 +45,6 @@ Link
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * Manuale dell'utente: https://github.com/sqlmapproject/sqlmap/wiki
 * Domande più frequenti (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Iscrizione alla Mailing list: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Archivio della Mailing list: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Dimostrazioni: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Screenshot: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

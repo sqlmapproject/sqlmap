@@ -46,9 +46,6 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 * 課題管理: https://github.com/sqlmapproject/sqlmap/issues
 * ユーザーマニュアル: https://github.com/sqlmapproject/sqlmap/wiki
 * よくある質問 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* メーリングリストへの参加: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* メーリングリストのRSSフィード: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* メーリングリストのアーカイブ: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * デモ: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * スクリーンショット: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -46,9 +46,6 @@ Tautan
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * Wiki Manual Penggunaan: https://github.com/sqlmapproject/sqlmap/wiki
 * Pertanyaan yang Sering Ditanyakan (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Berlangganan milis: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* RSS feed dari milis: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Arsip milis: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Video Demo [#1](http://www.youtube.com/user/inquisb/videos) dan [#2](http://www.youtube.com/user/stamparm/videos)
 * Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
