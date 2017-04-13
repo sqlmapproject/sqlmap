@@ -35,7 +35,7 @@ sqlmapは、 [Python](http://www.python.org/download/) バージョン **2.6.x**
     python sqlmap.py -hh
 
 実行例を [こちら](https://asciinema.org/a/46601) で見ることができます。
-sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki) で確認することができます。
+sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage) で確認することができます。
 
 リンク
 ----

@@ -34,7 +34,7 @@ Per una lista di tutte le opzioni e di tutti i controlli:
     python sqlmap.py -hh
 
 Puoi trovare un esempio di esecuzione [qui](https://asciinema.org/a/46601).
-Per una panoramica delle capacità di sqlmap, una lista delle sue funzionalità e la descrizione di tutte le sue opzioni e controlli, insieme ad un gran numero di esempi, siete pregati di visitare lo [user's manual](https://github.com/sqlmapproject/sqlmap/wiki) (disponibile solo in inglese).
+Per una panoramica delle capacità di sqlmap, una lista delle sue funzionalità e la descrizione di tutte le sue opzioni e controlli, insieme ad un gran numero di esempi, siete pregati di visitare lo [user's manual](https://github.com/sqlmapproject/sqlmap/wiki/Usage) (disponibile solo in inglese).
 
 Link
 ----
