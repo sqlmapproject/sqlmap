@@ -226,7 +226,7 @@ def unionUse(expression, unpack=True, dump=False):
 
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
         # Removed ORDER BY clause because UNION does not play well with it
-        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I)
+        expression = re.compile("\s*ORDER BY\s+[\w,]+", re.I).sub("", expression)
         debugMsg = "stripping ORDER BY clause from statement because "
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
