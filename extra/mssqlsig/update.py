@@ -74,7 +74,7 @@ def updateMSSQLXML():
             stopIdx = mssqlVersionsHtmlString.index("SQL Server %s Builds" % releases[index + 1])
 
         mssqlVersionsReleaseString = mssqlVersionsHtmlString[startIdx:stopIdx]
-        servicepackVersion = re.findall("</td><td>[7\.0|2000|2005|2008|2008 R2]*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I)
+        servicepackVersion = re.findall("</td><td>(7\.0|2000|2005|2008|2008 R2)*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I)
 
         for servicePack, version in servicepackVersion:
             if servicePack.startswith(" "):
