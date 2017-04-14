@@ -140,7 +140,7 @@ def _formatInjection(inj):
         if inj.place == PLACE.CUSTOM_HEADER:
             payload = payload.split(',', 1)[1]
         if stype == PAYLOAD.TECHNIQUE.UNION:
-            count = re.sub(r"(?i)(\(.+\))|(\blimit[^A-Za-z]+)", "", sdata.payload).count(',') + 1
+            count = re.sub(r"(?i)(\(.+\))|(\blimit[^a-z]+)", "", sdata.payload).count(',') + 1
             title = re.sub(r"\d+ to \d+", str(count), title)
             vector = agent.forgeUnionQuery("[QUERY]", vector[0], vector[1], vector[2], None, None, vector[5], vector[6])
             if count == 1:

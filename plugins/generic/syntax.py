@@ -22,7 +22,7 @@ class Syntax:
         retVal = expression
 
         if quote:
-            for item in re.findall(r"'[^']*'+", expression, re.S):
+            for item in re.findall(r"'[^']*'+", expression):
                 _ = item[1:-1]
                 if _:
                     retVal = retVal.replace(item, escaper(_))

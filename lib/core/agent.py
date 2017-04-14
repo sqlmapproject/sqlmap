@@ -296,7 +296,7 @@ class Agent(object):
         elif suffix and not comment:
             expression += suffix.replace('\\', BOUNDARY_BACKSLASH_MARKER)
 
-        return re.sub(r"(?s);\W*;", ";", expression)
+        return re.sub(r";\W*;", ";", expression)
 
     def cleanupPayload(self, payload, origValue=None):
         if payload is None:

@@ -87,7 +87,7 @@ def crawl(target):
                         tags = soup('a')
 
                         if not tags:
-                            tags = re.finditer(r'(?si)<a[^>]+href="(?P<href>[^>"]+)"', content)
+                            tags = re.finditer(r'(?i)<a[^>]+href="(?P<href>[^>"]+)"', content)
 
                         for tag in tags:
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")

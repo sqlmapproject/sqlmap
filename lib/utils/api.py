@@ -163,7 +163,8 @@ class Task(object):
         self.options = AttribDict(self._original_options)
 
     def engine_start(self):
-        configFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CONFIG, text=True)[1]
+        handle, configFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CONFIG, text=True)
+        os.close(handle)
         saveConfig(self.options, configFile)
 
         if os.path.exists("sqlmap.py"):
@@ -651,7 +652,8 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     REST-JSON API server
     """
     DataStore.admin_id = hexencode(os.urandom(16))
-    Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)[1]
+    handle, Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)
+    os.close(handle)
 
     if port == 0:  # random
         with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
