@@ -83,7 +83,7 @@
 * Added option `--sql-file` for setting file(s) holding SQL statements to be executed (in case of stacked SQLi).
 * Added switch `--sqlmap-shell` to turn on interactive sqlmap shell prompt.
 * Added option `--test-filter` for test filtration by payloads and/or titles (e.g. `ROW`).
-* Added option `--test-skip` for skiping tests by payloads and/or titles (e.g. `BENCHMARK`).
+* Added option `--test-skip` for skipping tests by payloads and/or titles (e.g. `BENCHMARK`).
 * Added switch `--titles` to turn on comparison of pages based only on their titles.
 * Added option `--tor-port` to explicitly set Tor proxy port.
 * Added option `--tor-type` to set Tor proxy type (`HTTP` (default), `SOCKS4` or `SOCKS5`).
@@ -149,7 +149,7 @@
 * Major bugs fixed.
 * Cleanup of UDF source code repository, https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack.
 * Major code cleanup.
-* Added simple file encryption/compression utility, extra/cloak/cloak.py, used by sqlmap to decrypt on the fly Churrasco, UPX executable and web shells consequently reducing drastically the number of anti-virus softwares that mistakenly mark sqlmap as a malware.
+* Added simple file encryption/compression utility, extra/cloak/cloak.py, used by sqlmap to decrypt on the fly Churrasco, UPX executable and web shells consequently reducing drastically the number of anti-virus software that mistakenly mark sqlmap as a malware.
 * Updated user's manual.
 * Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://sqlmap.org/demo.html.
 
@@ -302,7 +302,7 @@
 * Added support to extract database users password hash on Microsoft SQL Server;
 * Added a fuzzer function with the aim to parse HTML page looking for standard database error messages consequently improving database fingerprinting;
 * Added support for SQL injection on HTTP Cookie and User-Agent headers;
-* Reviewed HTTP request library (lib/request.py) to support the extended inband SQL injection functionality. Splitted getValue() into getInband() and getBlind();
+* Reviewed HTTP request library (lib/request.py) to support the extended inband SQL injection functionality. Split getValue() into getInband() and getBlind();
 * Major enhancements in common library and added checkForBrackets() method to check if the bracket(s) are needed to perform a UNION query SQL injection attack;
 * Implemented `--dump-all` functionality to dump entire DBMS data from all databases tables;
 * Added support to exclude DBMS system databases' when enumeration tables and dumping their entries (`--exclude-sysdbs`);
@@ -335,7 +335,7 @@
 * Added inband SQL injection (UNION query) support (`--union-use`);
 * Complete code refactoring, a lot of minor and some major fixes in libraries, many minor improvements;
 * Reviewed the directory tree structure;
-* Splitted lib/common.py: inband injection functionalities now are moved to lib/union.py;
+* Split lib/common.py: inband injection functionalities now are moved to lib/union.py;
 * Updated documentation files.
 
 # Version 0.3 (2007-01-20)
