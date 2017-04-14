@@ -16,7 +16,6 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import HSQLDB_ALIASES
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 

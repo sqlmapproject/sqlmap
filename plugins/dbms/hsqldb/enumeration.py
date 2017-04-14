@@ -10,7 +10,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.common import Backend
 from lib.core.common import unArrayizeValue
 from lib.core.enums import DBMS
 from lib.core.settings import HSQLDB_DEFAULT_SCHEMA

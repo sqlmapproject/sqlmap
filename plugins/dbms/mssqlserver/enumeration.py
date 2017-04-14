@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
-from lib.core.common import Backend
 from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue

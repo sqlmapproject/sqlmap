@@ -5,7 +5,6 @@ Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
 from lib.core.common import filterPairValues
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr

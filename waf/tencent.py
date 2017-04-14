@@ -5,8 +5,6 @@ Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-import re
-
 from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "Tencent Cloud Web Application Firewall (Tencent Cloud Computing)"

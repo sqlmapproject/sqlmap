@@ -7,7 +7,6 @@ See the file 'doc/COPYING' for copying permission
 
 import difflib
 import random
-import thread
 import threading
 import time
 import traceback
@@ -151,7 +150,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
             try:
                 thread.start()
-            except thread.error, ex:
+            except Exception, ex:
                 errMsg = "error occurred while starting new thread ('%s')" % ex.message
                 logger.critical(errMsg)
                 break
@@ -208,7 +207,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             if lock.locked():
                 try:
                     lock.release()
-                except thread.error:
+                except:
                     pass
 
         if conf.get("hashDB"):
