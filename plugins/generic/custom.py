@@ -51,7 +51,7 @@ class Custom:
 
                 return output
             elif not isStackingAvailable() and not conf.direct:
-                    warnMsg = "execution of custom SQL queries is only "
+                    warnMsg = "execution of non-query SQL statements is only "
                     warnMsg += "available when stacked queries are supported"
                     logger.warn(warnMsg)
 
