@@ -24,8 +24,8 @@ from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
+from lib.utils.brute import columnExists
 from lib.utils.pivotdumptable import pivotDumpTable
-from lib.techniques.brute.use import columnExists
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):

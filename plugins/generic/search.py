@@ -33,8 +33,8 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
-from lib.techniques.brute.use import columnExists
-from lib.techniques.brute.use import tableExists
+from lib.utils.brute import columnExists
+from lib.utils.brute import tableExists
 
 class Search:
     """
