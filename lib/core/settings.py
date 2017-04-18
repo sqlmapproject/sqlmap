@@ -102,6 +102,9 @@ DUCKDUCKGO_REGEX = r'"u":"([^"]+)'
 # Regular expression used for extracting results from Disconnect Search
 DISCONNECT_SEARCH_REGEX = r'<p class="url wrapword">([^<]+)</p>'
 
+# Regular expression used for extracting results from Baidu Search
+BAIDU_SEARCH_REGEX = r'<a\s+[\w\W]+?\s+href\s*=\s*"(.+)?"\s+target\s*=\s*"_blank"\s*>'
+
 # Dummy user agent for search (if default one returns different results)
 DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0"
 
