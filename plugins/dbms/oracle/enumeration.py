@@ -50,7 +50,7 @@ class Enumeration(GenericEnumeration):
                 condition = rootQuery.inband.condition
 
             if conf.user:
-                users = conf.user.split(",")
+                users = conf.user.split(',')
                 query += " WHERE "
                 query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
@@ -86,7 +86,7 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedUsersRoles and isInferenceAvailable() and not conf.direct:
             if conf.user:
-                users = conf.user.split(",")
+                users = conf.user.split(',')
             else:
                 if not len(kb.data.cachedUsers):
                     users = self.getUsers()

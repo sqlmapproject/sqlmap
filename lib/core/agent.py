@@ -63,7 +63,7 @@ class Agent(object):
 
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE,):  # non-standard object(s) make problems to a database connector while returned (e.g. XMLTYPE)
             _, _, _, _, _, _, fieldsToCastStr, _ = self.getFields(query)
-            for field in fieldsToCastStr.split(","):
+            for field in fieldsToCastStr.split(','):
                 query = query.replace(field, self.nullAndCastField(field))
 
         if kb.tamperFunctions:

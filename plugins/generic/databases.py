@@ -215,7 +215,7 @@ class Databases:
             conf.db = conf.db.upper()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -269,9 +269,9 @@ class Databases:
                     if conf.excludeSysDbs:
                         infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                         logger.info(infoMsg)
-                        query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
+                        query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
                     else:
-                        query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
+                        query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
@@ -422,7 +422,7 @@ class Databases:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.tbl = conf.tbl.upper()
 
-            tblList = conf.tbl.split(",")
+            tblList = conf.tbl.split(',')
         else:
             self.getTables()
 
@@ -883,7 +883,7 @@ class Databases:
         self.forceDbmsEnum()
 
         if conf.tbl:
-            for table in conf.tbl.split(","):
+            for table in conf.tbl.split(','):
                 self._tableGetCount(conf.db, table)
         else:
             self.getTables()

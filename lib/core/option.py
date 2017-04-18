@@ -1766,13 +1766,13 @@ def _cleanupOptions():
         conf.torType = conf.torType.upper()
 
     if conf.col:
-        conf.col = re.sub(r"\s*,\s*", ",", conf.col)
+        conf.col = re.sub(r"\s*,\s*", ',', conf.col)
 
     if conf.excludeCol:
-        conf.excludeCol = re.sub(r"\s*,\s*", ",", conf.excludeCol)
+        conf.excludeCol = re.sub(r"\s*,\s*", ',', conf.excludeCol)
 
     if conf.binaryFields:
-        conf.binaryFields = re.sub(r"\s*,\s*", ",", conf.binaryFields)
+        conf.binaryFields = re.sub(r"\s*,\s*", ',', conf.binaryFields)
 
     if any((conf.proxy, conf.proxyFile, conf.tor)):
         conf.disablePrecon = True

@@ -79,7 +79,7 @@ class Entries:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.tbl = conf.tbl.upper()
 
-            tblList = conf.tbl.split(",")
+            tblList = conf.tbl.split(',')
         else:
             self.getTables()
 
@@ -441,7 +441,7 @@ class Entries:
         elif choice in ('q', 'Q'):
             return
         else:
-            dumpFromDbs = choice.replace(" ", "").split(",")
+            dumpFromDbs = choice.replace(" ", "").split(',')
 
         for db, tblData in dbs.items():
             if db not in dumpFromDbs or not tblData:
@@ -466,7 +466,7 @@ class Entries:
             elif choice in ('q', 'Q'):
                 return
             else:
-                dumpFromTbls = choice.replace(" ", "").split(",")
+                dumpFromTbls = choice.replace(" ", "").split(',')
 
             for table, columns in tblData.items():
                 if table not in dumpFromTbls:

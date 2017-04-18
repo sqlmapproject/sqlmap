@@ -124,7 +124,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -184,7 +184,7 @@ class Enumeration(GenericEnumeration):
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.col:
-            colList = conf.col.split(",")
+            colList = conf.col.split(',')
         else:
             colList = []
 
@@ -195,7 +195,7 @@ class Enumeration(GenericEnumeration):
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
 
         if conf.tbl:
-            tblList = conf.tbl.split(",")
+            tblList = conf.tbl.split(',')
         else:
             self.getTables()
 

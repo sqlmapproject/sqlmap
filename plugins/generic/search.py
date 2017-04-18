@@ -47,7 +47,7 @@ class Search:
     def searchDb(self):
         foundDbs = []
         rootQuery = queries[Backend.getIdentifiedDbms()].search_db
-        dbList = conf.db.split(",")
+        dbList = conf.db.split(',')
 
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             dbCond = rootQuery.inband.condition2
@@ -149,7 +149,7 @@ class Search:
             choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
 
             if choice == 'N':
-                pass
+                return
             elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
@@ -179,7 +179,7 @@ class Search:
                 conf.db = self.getCurrentDb()
 
             if dbCond and conf.db:
-                _ = conf.db.split(",")
+                _ = conf.db.split(',')
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
                 infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
@@ -264,7 +264,7 @@ class Search:
                         if tblConsider == "2":
                             continue
                     else:
-                        for db in conf.db.split(",") if conf.db else (self.getCurrentDb(),):
+                        for db in conf.db.split(',') if conf.db else (self.getCurrentDb(),):
                             db = safeSQLIdentificatorNaming(db)
                             if db not in foundTbls:
                                 foundTbls[db] = []
@@ -369,7 +369,7 @@ class Search:
         whereTblsQuery = ""
         infoMsgTbl = ""
         infoMsgDb = ""
-        colList = conf.col.split(",")
+        colList = conf.col.split(',')
 
         if conf.excludeCol:
             colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
@@ -398,7 +398,7 @@ class Search:
             foundCols[column] = {}
 
             if conf.tbl:
-                _ = conf.tbl.split(",")
+                _ = conf.tbl.split(',')
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in _))
 
@@ -406,7 +406,7 @@ class Search:
                 conf.db = self.getCurrentDb()
 
             if conf.db:
-                _ = conf.db.split(",")
+                _ = conf.db.split(',')
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
                 infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
             elif conf.excludeSysDbs:
@@ -433,13 +433,13 @@ class Search:
                     # column(s) provided
                     values = []
 
-                    for db in conf.db.split(","):
-                        for tbl in conf.tbl.split(","):
+                    for db in conf.db.split(','):
+                        for tbl in conf.tbl.split(','):
                             values.append([safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(tbl, True)])
 
                 for db, tbl in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
-                    tbls = tbl.split(",") if not isNoneValue(tbl) else []
+                    tbls = tbl.split(',') if not isNoneValue(tbl) else []
 
                     for tbl in tbls:
                         tbl = safeSQLIdentificatorNaming(tbl, True)
@@ -506,7 +506,7 @@ class Search:
                         if db not in foundCols[column]:
                             foundCols[column][db] = []
                 else:
-                    for db in conf.db.split(",") if conf.db else (self.getCurrentDb(),):
+                    for db in conf.db.split(',') if conf.db else (self.getCurrentDb(),):
                         db = safeSQLIdentificatorNaming(db)
                         if db not in foundCols[column]:
                             foundCols[column][db] = []

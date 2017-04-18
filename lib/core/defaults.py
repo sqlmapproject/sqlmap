@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 from lib.core.datatype import AttribDict
 
 _defaults = {
-   "csvDel":       ",",
+   "csvDel":       ',',
    "timeSec":      5,
    "googlePage":   1,
    "verbose":      1,

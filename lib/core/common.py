@@ -1002,7 +1002,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     if retVal is None:
         if checkBatch and conf.get("batch"):
             if isListLike(default):
-                options = ",".join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
+                options = ','.join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
             elif default:
                 options = getUnicode(default, UNICODE_ENCODING)
             else:

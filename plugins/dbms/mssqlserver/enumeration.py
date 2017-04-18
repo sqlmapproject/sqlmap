@@ -75,7 +75,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -163,7 +163,7 @@ class Enumeration(GenericEnumeration):
 
     def searchTable(self):
         foundTbls = {}
-        tblList = conf.tbl.split(",")
+        tblList = conf.tbl.split(',')
         rootQuery = queries[DBMS.MSSQL].search_table
         tblCond = rootQuery.inband.condition
         tblConsider, tblCondParam = self.likeOrExact("table")
@@ -172,7 +172,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            enumDbs = conf.db.split(",")
+            enumDbs = conf.db.split(',')
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
         else:
@@ -269,7 +269,7 @@ class Enumeration(GenericEnumeration):
         whereTblsQuery = ""
         infoMsgTbl = ""
         infoMsgDb = ""
-        colList = conf.col.split(",")
+        colList = conf.col.split(',')
 
         if conf.excludeCol:
             colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
@@ -284,7 +284,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            enumDbs = conf.db.split(",")
+            enumDbs = conf.db.split(',')
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
         else:
@@ -307,7 +307,7 @@ class Enumeration(GenericEnumeration):
             foundCols[column] = {}
 
             if conf.tbl:
-                _ = conf.tbl.split(",")
+                _ = conf.tbl.split(',')
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
 
@@ -315,7 +315,7 @@ class Enumeration(GenericEnumeration):
                 conf.db = self.getCurrentDb()
 
             if conf.db:
-                _ = conf.db.split(",")
+                _ = conf.db.split(',')
                 infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
                 msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))

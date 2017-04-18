@@ -204,7 +204,7 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        for remoteFile in remoteFiles.split(","):
+        for remoteFile in remoteFiles.split(','):
             fileContent = None
             kb.fileReadMode = True
 
