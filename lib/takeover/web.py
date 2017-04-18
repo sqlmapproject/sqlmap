@@ -371,7 +371,7 @@ class Web:
 
                 _ = "tmpe%s.exe" % randomStr(lowercase=True)
                 if self.webUpload(backdoorName, backdoorDirectory, content=backdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", _)):
-                    self.webUpload(_, backdoorDirectory, filepath=os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'))
+                    self.webUpload(_, backdoorDirectory, filepath=os.path.join(paths.SQLMAP_EXTRAS_PATH, "runcmd", "runcmd.exe_"))
                     self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = backdoorDirectory
                 else:
