@@ -146,18 +146,18 @@ class Search:
 
         if bruteForce:
             message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            test = readInput(message, default="Y" if "Y" in message else "N")
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
 
-            if test[0] in ("n", "N"):
-                return
-            elif test[0] in ("q", "Q"):
+            if choice == 'N':
+                pass
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
-                regex = "|".join(conf.tbl.split(","))
+                regex = '|'.join(conf.tbl.split(','))
                 return tableExists(paths.COMMON_TABLES, regex)
 
         foundTbls = {}
-        tblList = conf.tbl.split(",")
+        tblList = conf.tbl.split(',')
         rootQuery = queries[Backend.getIdentifiedDbms()].search_table
         tblCond = rootQuery.inband.condition
         dbCond = rootQuery.inband.condition2
@@ -171,7 +171,7 @@ class Search:
                 tbl = tbl.upper()
 
             infoMsg = "searching table"
-            if tblConsider == "1":
+            if tblConsider == '1':
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
 
@@ -345,20 +345,19 @@ class Search:
 
         if bruteForce:
             message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            test = readInput(message, default="Y" if "Y" in message else "N")
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
                 regex = '|'.join(conf.col.split(','))
                 conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS, regex))
 
                 message = "do you want to dump entries? [Y/n] "
-                output = readInput(message, default="Y")
 
-                if output and output[0] not in ("n", "N"):
+                if readInput(message, default='Y', boolean=True):
                     self.dumpAll()
 
                 return

@@ -509,9 +509,8 @@ class Connect(object):
                         msg += "(redirect like response common to login pages). "
                         msg += "Do you want to apply the refresh "
                         msg += "from now on (or stay on the original page)? [Y/n]"
-                        choice = readInput(msg, default="Y")
 
-                        kb.alwaysRefresh = choice not in ("n", "N")
+                        kb.alwaysRefresh = readInput(msg, default='Y', boolean=True)
 
                     if kb.alwaysRefresh:
                         if re.search(r"\Ahttps?://", refresh, re.I):
@@ -675,7 +674,8 @@ class Connect(object):
                     message = "there seems to be a continuous problem with connection to the target. "
                     message += "Are you sure that you want to continue "
                     message += "with further target testing? [y/N] "
-                    kb.connErrorChoice = readInput(message, default="N") in ("Y", "y")
+
+                    kb.connErrorChoice = readInput(message, default='N', boolean=True)
 
                 if kb.connErrorChoice is False:
                     raise SqlmapConnectionException(warnMsg)
@@ -832,7 +832,7 @@ class Connect(object):
                         if kb.cookieEncodeChoice is None:
                             msg = "do you want to URL encode cookie values (implementation specific)? %s" % ("[Y/n]" if not conf.url.endswith(".aspx") else "[y/N]")  # Reference: https://support.microsoft.com/en-us/kb/313282
                             choice = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N')
-                            kb.cookieEncodeChoice = choice.upper().strip() == "Y"
+                            kb.cookieEncodeChoice = choice.upper().strip() == 'Y'
                         if not kb.cookieEncodeChoice:
                             skip = True
 

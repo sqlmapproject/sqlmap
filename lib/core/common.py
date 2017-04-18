@@ -601,8 +601,8 @@ def paramToDict(place, parameters=None):
                         logger.warn(warnMsg)
 
                         message = "are you really sure that you want to continue (sqlmap could have problems)? [y/N] "
-                        test = readInput(message, default="N")
-                        if test[0] not in ("y", "Y"):
+
+                        if not readInput(message, default='N', boolean=True):
                             raise SqlmapSilentQuitException
                     elif not _:
                         warnMsg = "provided value for parameter '%s' is empty. " % parameter
@@ -644,8 +644,8 @@ def paramToDict(place, parameters=None):
                                 if candidates:
                                     message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                                     message += "is JSON deserializable. Do you want to inject inside? [y/N] "
-                                    test = readInput(message, default="N")
-                                    if test[0] in ("y", "Y"):
+
+                                    if not readInput(message, default='N', boolean=True):
                                         del testableParameters[parameter]
                                         testableParameters.update(candidates)
                                     break
@@ -657,8 +657,8 @@ def paramToDict(place, parameters=None):
                             _ = re.sub(regex, "\g<1>%s\g<%d>" % (CUSTOM_INJECTION_MARK_CHAR, len(match.groups())), testableParameters[parameter])
                             message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % _
-                            test = readInput(message, default="N")
-                            if test[0] in ("y", "Y"):
+
+                            if readInput(message, default='N', boolean=True):
                                 testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
                             break
 
@@ -965,7 +965,7 @@ def dataToOutFile(filename, data):
 
     return retVal
 
-def readInput(message, default=None, checkBatch=True):
+def readInput(message, default=None, checkBatch=True, boolean=False):
     """
     Reads input from terminal
     """
@@ -1037,6 +1037,9 @@ def readInput(message, default=None, checkBatch=True):
 
             finally:
                 logging._releaseLock()
+
+    if boolean:
+        retVal = retVal.strip().upper == 'Y'
 
     return retVal
 
@@ -1979,9 +1982,8 @@ def getSQLSnippet(dbms, sfile, **variables):
         logger.error(errMsg)
 
         msg = "do you want to provide the substitution values? [y/N] "
-        choice = readInput(msg, default="N")
 
-        if choice and choice[0].lower() == "y":
+        if readInput(msg, default='N', boolean=True):
             for var in variables:
                 msg = "insert value for variable '%s': " % var
                 val = readInput(msg, default="")
@@ -2370,8 +2372,8 @@ def wasLastResponseDelayed():
             if kb.adjustTimeDelay is None:
                 msg = "do you want sqlmap to try to optimize value(s) "
                 msg += "for DBMS delay responses (option '--time-sec')? [Y/n] "
-                choice = readInput(msg, default='Y')
-                kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE if choice.upper() == 'N' else ADJUST_TIME_DELAY.YES
+
+                kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE if not readInput(msg, default='Y', boolean=True) else ADJUST_TIME_DELAY.YES
             if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
                 adjustTimeDelay(threadData.lastQueryDuration, lowerStdLimit)
 
@@ -3263,11 +3265,11 @@ def createGithubIssue(errMsg, excMsg):
     msg += "with the unhandled exception information at "
     msg += "the official Github repository? [y/N] "
     try:
-        test = readInput(msg, default="N")
+        choice = readInput(msg, default='N', boolean=True)
     except:
-        test = None
+        choice = None
 
-    if test and test[0] in ("y", "Y"):
+    if choice:
         ex = None
         errMsg = errMsg[errMsg.find("\n"):]
 

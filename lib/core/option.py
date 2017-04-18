@@ -542,8 +542,7 @@ def _doSearch():
             elif re.search(URI_INJECTABLE_REGEX, link, re.I):
                 if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
-                    test = readInput(message, default="Y")
-                    kb.data.onlyGETs = test.lower() != 'n'
+                    kb.data.onlyGETs = readInput(message, default='Y', boolean=True)
                 if not kb.data.onlyGETs or conf.googleDork:
                     kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
 
@@ -570,9 +569,8 @@ def _doSearch():
             message += "for your search dork expression, but none of them "
             message += "have GET parameters to test for SQL injection. "
             message += "Do you want to skip to the next result page? [Y/n]"
-            test = readInput(message, default="Y")
 
-            if test[0] in ("n", "N"):
+            if not readInput(message, default='Y', boolean=True):
                 raise SqlmapSilentQuitException
             else:
                 conf.googlePage += 1
@@ -946,14 +944,14 @@ def _setTamperingFunctions():
                         message = "it appears that you might have mixed "
                         message += "the order of tamper scripts. "
                         message += "Do you want to auto resolve this? [Y/n/q] "
-                        test = readInput(message, default="Y")
+                        choice = readInput(message, default='Y').strip().upper()
 
-                        if not test or test[0] in ("y", "Y"):
-                            resolve_priorities = True
-                        elif test[0] in ("n", "N"):
+                        if choice == 'N':
                             resolve_priorities = False
-                        elif test[0] in ("q", "Q"):
+                        elif choice == 'Q':
                             raise SqlmapUserQuitException
+                        else:
+                            resolve_priorities = True
 
                         check_priority = False
 

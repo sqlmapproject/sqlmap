@@ -130,8 +130,8 @@ def crawl(target):
         if not conf.sitemapUrl:
             message = "do you want to check for the existence of "
             message += "site's sitemap(.xml) [y/N] "
-            test = readInput(message, default="n")
-            if test[0] in ("y", "Y"):
+
+            if readInput(message, default='N', boolean=True):
                 found = True
                 items = None
                 url = urlparse.urljoin(target, "/sitemap.xml")
@@ -198,8 +198,8 @@ def storeResultsToFile(results):
     if kb.storeCrawlingChoice is None:
         message = "do you want to store crawling results to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
-        test = readInput(message, default="N")
-        kb.storeCrawlingChoice = test[0] in ("y", "Y")
+
+        kb.storeCrawlingChoice = readInput(message, default='N', boolean=True)
 
     if kb.storeCrawlingChoice:
         handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CRAWLER, suffix=".csv" if conf.forms else ".txt")

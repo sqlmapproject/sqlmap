@@ -283,8 +283,8 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
             if not conf.uChar and count > 1 and kb.uChar == NULL:
                 message = "injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] "
-                test = readInput(message, default="Y")
-                if test[0] not in ("y", "Y"):
+
+                if not readInput(message, default="Y", boolean=True):
                     warnMsg += "usage of option '--union-char' "
                     warnMsg += "(e.g. '--union-char=1') "
                 else:

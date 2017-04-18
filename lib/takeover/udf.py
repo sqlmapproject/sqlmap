@@ -42,12 +42,8 @@ class UDF:
     def _askOverwriteUdf(self, udf):
         message = "UDF '%s' already exists, do you " % udf
         message += "want to overwrite it? [y/N] "
-        output = readInput(message, default="N")
 
-        if output and output[0] in ("y", "Y"):
-            return True
-        else:
-            return False
+        return readInput(message, default='N', boolean=True)
 
     def _checkExistUdf(self, udf):
         logger.info("checking if UDF '%s' already exist" % udf)
@@ -327,12 +323,12 @@ class UDF:
 
         msg = "do you want to call your injected user-defined "
         msg += "functions now? [Y/n/q] "
-        choice = readInput(msg, default="Y")
+        choice = readInput(msg, default='Y').strip().upper()
 
-        if choice[0] in ("n", "N"):
+        if choice == 'N':
             self.cleanup(udfDict=self.udfs)
             return
-        elif choice[0] in ("q", "Q"):
+        elif choice == 'Q':
             self.cleanup(udfDict=self.udfs)
             raise SqlmapUserQuitException
 
@@ -347,9 +343,9 @@ class UDF:
             msg += "\n[q] Quit"
 
             while True:
-                choice = readInput(msg)
+                choice = readInput(msg).strip().upper()
 
-                if choice and choice[0] in ("q", "Q"):
+                if choice == 'Q':
                     break
                 elif isinstance(choice, basestring) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)
@@ -390,9 +386,8 @@ class UDF:
             cmd = cmd[:-1]
             msg = "do you want to retrieve the return value of the "
             msg += "UDF? [Y/n] "
-            choice = readInput(msg, default="Y")
 
-            if choice[0] in ("y", "Y"):
+            if readInput(msg, default='Y', boolean=True):
                 output = self.udfEvalCmd(cmd, udfName=udfToCall)
 
                 if output:
@@ -403,9 +398,8 @@ class UDF:
                 self.udfExecCmd(cmd, udfName=udfToCall, silent=True)
 
             msg = "do you want to call this or another injected UDF? [Y/n] "
-            choice = readInput(msg, default="Y")
 
-            if choice[0] not in ("y", "Y"):
+            if not readInput(msg, default='Y', boolean=True):
                 break
 
         self.cleanup(udfDict=self.udfs)

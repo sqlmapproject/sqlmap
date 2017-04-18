@@ -183,8 +183,8 @@ def _randomFillBlankFields(value):
 
     if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, value):
         message = "do you want to fill blank fields with random values? [Y/n] "
-        test = readInput(message, default="Y")
-        if not test or test[0] in ("y", "Y"):
+
+        if readInput(message, default="Y", boolean=True):
             for match in re.finditer(EMPTY_FORM_FIELDS_REGEX, retVal):
                 item = match.group("result")
                 if not any(_ in item for _ in IGNORE_PARAMETERS) and not re.search(ASP_NET_CONTROL_REGEX, item):
@@ -305,7 +305,9 @@ def start():
                     message = "SQL injection vulnerability has already been detected "
                     message += "against '%s'. Do you want to skip " % conf.hostname
                     message += "further tests involving it? [Y/n]"
-                    kb.skipVulnHost = readInput(message, default="Y").upper() != 'N'
+
+                    kb.skipVulnHost = readInput(message, default="Y", boolean=True)
+
                 testSqlInj = not kb.skipVulnHost
 
             if not testSqlInj:
@@ -332,9 +334,8 @@ def start():
                         continue
 
                     message += "\ndo you want to test this form? [Y/n/q] "
-                    test = readInput(message, default="Y")
 
-                    if not test or test[0] in ("y", "Y"):
+                    if readInput(message, default='Y', boolean=True):
                         if conf.method != HTTPMETHOD.GET:
                             message = "Edit %s data [default: %s]%s: " % (conf.method, urlencode(conf.data) if conf.data else "None", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
@@ -359,14 +360,12 @@ def start():
 
                 else:
                     message += "\ndo you want to test this URL? [Y/n/q]"
-                    test = readInput(message, default="Y")
+                    choice = readInput(message, default='Y').strip().upper()
 
-                    if not test or test[0] in ("y", "Y"):
-                        pass
-                    elif test[0] in ("n", "N"):
+                    if choice == 'N':
                         dataToStdout(os.linesep)
                         continue
-                    elif test[0] in ("q", "Q"):
+                    elif choice == 'Q':
                         break
 
                     infoMsg = "testing URL '%s'" % targetUrl
@@ -543,9 +542,8 @@ def start():
 
                                         msg = "%s parameter '%s' " % (injection.place, injection.parameter)
                                         msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
-                                        test = readInput(msg, default="N")
 
-                                        if test[0] not in ("y", "Y"):
+                                        if not readInput(msg, default='N', boolean=True):
                                             proceed = False
                                             paramKey = (conf.hostname, conf.path, None, None)
                                             kb.testedParams.add(paramKey)
@@ -629,9 +627,7 @@ def start():
             if kb.injection.place is not None and kb.injection.parameter is not None:
                 if conf.multipleTargets:
                     message = "do you want to exploit this SQL injection? [Y/n] "
-                    exploit = readInput(message, default="Y")
-
-                    condition = not exploit or exploit[0] in ("y", "Y")
+                    condition = readInput(message, default='Y', boolean=True)
                 else:
                     condition = True
 
@@ -644,13 +640,11 @@ def start():
                 logger.warn(warnMsg)
 
                 message = "do you want to skip to the next target in list? [Y/n/q]"
-                test = readInput(message, default="Y")
+                choice = readInput(message, default='Y').strip().upper()
 
-                if not test or test[0] in ("y", "Y"):
-                    pass
-                elif test[0] in ("n", "N"):
+                if choice == 'N':
                     return False
-                elif test[0] in ("q", "Q"):
+                elif choice == 'Q':
                     raise SqlmapUserQuitException
             else:
                 raise

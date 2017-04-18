@@ -336,11 +336,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         msg = "this technique is likely to DoS the DBMS process, are you "
         msg += "sure that you want to carry with the exploit? [y/N] "
-        choice = readInput(msg, default="N")
 
-        dos = choice and choice[0].lower() == "y"
-
-        if dos:
+        if readInput(msg, default='N', boolean=True):
             self.initEnv(mandatory=False, detailed=True)
             self.getRemoteTempPath()
             self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)

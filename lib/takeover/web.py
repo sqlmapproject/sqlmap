@@ -202,9 +202,8 @@ class Web:
         if not kb.absFilePaths:
             message = "do you want sqlmap to further try to "
             message += "provoke the full path disclosure? [Y/n] "
-            getOutput = readInput(message, default="Y")
 
-            if getOutput in ("y", "Y"):
+            if readInput(message, default='Y', boolean=True):
                 headers = {}
                 been = set([conf.url])
 
@@ -391,9 +390,8 @@ class Web:
 
                     message = "do you want to try the same method used "
                     message += "for the file stager? [Y/n] "
-                    getOutput = readInput(message, default="Y")
 
-                    if getOutput in ("y", "Y"):
+                    if readInput(message, default='Y', boolean=True):
                         self._webFileInject(backdoorContent, backdoorName, directory)
                     else:
                         continue

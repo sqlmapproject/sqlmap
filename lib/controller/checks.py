@@ -137,7 +137,7 @@ def checkSqlInjection(place, parameter, value):
                    SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
                     msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or injection.dbms)
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
-                    kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y').upper() == 'Y' else []
+                    kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             # If the DBMS has been fingerprinted (via DBMS-specific error
             # message, via simple heuristic check or via DBMS-specific
@@ -152,7 +152,7 @@ def checkSqlInjection(place, parameter, value):
                 msg += " and " if conf.level < 5 and conf.risk < 3 else ""
                 msg += "risk (%d)" % conf.risk if conf.risk < 3 else ""
                 msg += " values? [Y/n]" if conf.level < 5 and conf.risk < 3 else " value? [Y/n]"
-                kb.extendTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y').upper() == 'Y' else []
+                kb.extendTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             title = test.title
             kb.testType = stype = test.stype
@@ -631,7 +631,8 @@ def checkSqlInjection(place, parameter, value):
                                         msg += "extended UNION tests if there is not "
                                         msg += "at least one other (potential) "
                                         msg += "technique found. Do you want to skip? [Y/n] "
-                                        kb.futileUnion = readInput(msg, default="Y").strip().upper() == 'N'
+
+                                        kb.futileUnion = not readInput(msg, default='Y', boolean=True)
                                     if kb.futileUnion is False:
                                         continue
 
@@ -738,11 +739,9 @@ def checkSqlInjection(place, parameter, value):
             logger.warn(warnMsg)
 
             msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
-            choice = readInput(msg, default="S", checkBatch=False)
+            choice = readInput(msg, default='S', checkBatch=False).strip().upper()
 
-            if choice[0] in ("s", "S"):
-                pass
-            elif choice[0] in ("c", "C"):
+            if choice == 'C':
                 choice = None
                 while not ((choice or "").isdigit() and 0 <= int(choice) <= 6):
                     if choice:
@@ -752,11 +751,11 @@ def checkSqlInjection(place, parameter, value):
                 conf.verbose = int(choice)
                 setVerbosity()
                 tests.insert(0, test)
-            elif choice[0] in ("n", "N"):
+            elif choice == 'N':
                 return None
-            elif choice[0] in ("e", "E"):
+            elif choice == 'E':
                 kb.endDetection = True
-            elif choice[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
 
         finally:
@@ -1177,19 +1176,19 @@ def checkStability():
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [(C)ontinue/(s)tring/(r)egex/(q)uit] "
-        test = readInput(message, default="C")
+        choice = readInput(message, default='C').strip().upper()
 
-        if test and test[0] in ("q", "Q"):
+        if choice == 'Q':
             raise SqlmapUserQuitException
 
-        elif test and test[0] in ("s", "S"):
+        elif choice == 'S':
             showStaticWords(firstPage, secondPage)
 
             message = "please enter value for parameter 'string': "
-            test = readInput(message)
+            string = readInput(message)
 
-            if test:
-                conf.string = test
+            if string:
+                conf.string = string
 
                 if kb.nullConnection:
                     debugMsg = "turning off NULL connection "
@@ -1201,12 +1200,12 @@ def checkStability():
                 errMsg = "Empty value supplied"
                 raise SqlmapNoneDataException(errMsg)
 
-        elif test and test[0] in ("r", "R"):
+        elif choice == 'R':
             message = "please enter value for parameter 'regex': "
-            test = readInput(message)
+            regex = readInput(message)
 
-            if test:
-                conf.regex = test
+            if regex:
+                conf.regex = regex
 
                 if kb.nullConnection:
                     debugMsg = "turning off NULL connection "
@@ -1372,13 +1371,13 @@ def identifyWaf():
     if retVal:
         message = "are you sure that you want to "
         message += "continue with further target testing? [y/N] "
-        output = readInput(message, default="N")
+        choice = readInput(message, default='N', boolean=True)
 
         if not conf.tamper:
             warnMsg = "please consider usage of tamper scripts (option '--tamper')"
             singleTimeWarnMessage(warnMsg)
 
-        if output and output[0] not in ("Y", "y"):
+        if not choice:
             raise SqlmapUserQuitException
     else:
         warnMsg = "WAF/IPS/IDS product hasn't been identified"
@@ -1494,7 +1493,7 @@ def checkConnection(suppressOutput=False):
                 return False
 
             msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
-            if readInput(msg, default="Y") not in ("n", "N"):
+            if readInput(msg, default='Y', boolean=True):
                 raise SqlmapSilentQuitException
             else:
                 kb.ignoreNotFound = True

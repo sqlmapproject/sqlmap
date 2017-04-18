@@ -41,8 +41,7 @@ def parseSitemap(url, retVal=None):
             if url.endswith(".xml") and "sitemap" in url.lower():
                 if kb.followSitemapRecursion is None:
                     message = "sitemap recursion detected. Do you want to follow? [y/N] "
-                    test = readInput(message, default="N")
-                    kb.followSitemapRecursion = test[0] in ("y", "Y")
+                    kb.followSitemapRecursion = readInput(message, default='N', boolean=True)
                 if kb.followSitemapRecursion:
                     parseSitemap(url, retVal)
             else:

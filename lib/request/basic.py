@@ -103,8 +103,8 @@ def forgeHeaders(items=None):
                         message += "The target URL provided its own cookies within "
                         message += "the HTTP %s header which intersect with yours. " % HTTP_HEADER.SET_COOKIE
                         message += "Do you want to merge them in further requests? [Y/n] "
-                        _ = readInput(message, default="Y")
-                        kb.mergeCookies = not _ or _[0] in ("y", "Y")
+
+                        kb.mergeCookies = readInput(message, default='Y', boolean=True)
 
                     if kb.mergeCookies and kb.injection.place != PLACE.COOKIE:
                         _ = lambda x: re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(getUnicode(cookie.name)), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value))).replace('\\', r'\\'), x)
@@ -368,8 +368,10 @@ def processResponse(page, responseHeaders):
                         continue
                     else:
                         msg = "do you want to automatically adjust the value of '%s'? [y/N]" % name
-                        if readInput(msg, default='N').strip().upper() != 'Y':
+
+                        if not readInput(msg, default='N', boolean=True):
                             continue
+
                         conf.paramDict[PLACE.POST][name] = value
                 conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % re.escape(name), r"\g<1>%s" % re.escape(value), conf.parameters[PLACE.POST])
 

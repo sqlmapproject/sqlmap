@@ -319,11 +319,11 @@ class Users:
 
             message = "do you want to perform a dictionary-based attack "
             message += "against retrieved password hashes? [Y/n/q]"
-            test = readInput(message, default="Y")
+            choice = readInput(message, default='Y').strip().upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 pass
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
                 attackCachedUsersPasswords()
@@ -345,7 +345,7 @@ class Users:
             conf.user = conf.user.upper()
 
         if conf.user:
-            users = conf.user.split(",")
+            users = conf.user.split(',')
 
             if Backend.isDbms(DBMS.MYSQL):
                 for user in users:

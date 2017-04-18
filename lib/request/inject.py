@@ -208,22 +208,22 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             message += "entries do you want to retrieve?\n"
                             message += "[a] All (default)\n[#] Specific number\n"
                             message += "[q] Quit"
-                            test = readInput(message, default="a")
+                            choice = readInput(message, default='A').strip().upper()
 
-                            if not test or test[0] in ("a", "A"):
+                            if choice == 'A':
                                 stopLimit = count
 
-                            elif test[0] in ("q", "Q"):
+                            elif choice == 'Q':
                                 raise SqlmapUserQuitException
 
-                            elif test.isdigit() and int(test) > 0 and int(test) <= count:
-                                stopLimit = int(test)
+                            elif choice.isdigit() and int(choice) > 0 and int(choice) <= count:
+                                stopLimit = int(choice)
 
                                 infoMsg = "sqlmap is now going to retrieve the "
                                 infoMsg += "first %d query output entries" % stopLimit
                                 logger.info(infoMsg)
 
-                            elif test[0] in ("#", "s", "S"):
+                            elif choice in ('#', 'S'):
                                 message = "how many? "
                                 stopLimit = readInput(message, default="10")
 

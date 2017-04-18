@@ -57,8 +57,7 @@ def tableExists(tableFile, regex=None):
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        test = readInput(message, default="N")
-        kb.tableExistsChoice = test[0] in ("y", "Y")
+        kb.tableExistsChoice = readInput(message, default='N', boolean=True)
 
         if not kb.tableExistsChoice:
             return None
@@ -161,8 +160,7 @@ def columnExists(columnFile, regex=None):
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        test = readInput(message, default="N")
-        kb.columnExistsChoice = test[0] in ("y", "Y")
+        kb.columnExistsChoice = readInput(message, default='N', boolean=True)
 
         if not kb.columnExistsChoice:
             return None

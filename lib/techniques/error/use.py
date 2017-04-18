@@ -358,9 +358,8 @@ def errorUse(expression, dump=False):
             if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
                 message = "due to huge table size do you want to remove "
                 message += "ORDER BY clause gaining speed over consistency? [y/N] "
-                _ = readInput(message, default="N")
 
-                if _ and _[0] in ("y", "Y"):
+                if readInput(message, default="N", boolean=True):
                     expression = expression[:expression.index(" ORDER BY ")]
 
             numThreads = min(conf.threads, (stopLimit - startLimit))

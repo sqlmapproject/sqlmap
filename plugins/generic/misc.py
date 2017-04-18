@@ -169,9 +169,8 @@ class Miscellaneous:
 
             for udf, inpRet in udfDict.items():
                 message = "do you want to remove UDF '%s'? [Y/n] " % udf
-                output = readInput(message, default="Y")
 
-                if not output or output in ("y", "Y"):
+                if readInput(message, default='Y', boolean=True):
                     dropStr = "DROP FUNCTION %s" % udf
 
                     if Backend.isDbms(DBMS.PGSQL):

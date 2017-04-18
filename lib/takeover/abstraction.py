@@ -75,17 +75,17 @@ class Abstraction(Web, UDF, XP_cmdshell):
         return safechardecode(retVal)
 
     def runCmd(self, cmd):
-        getOutput = None
+        choice = None
 
         if not self.alwaysRetrieveCmdOutput:
             message = "do you want to retrieve the command standard "
             message += "output? [Y/n/a] "
-            getOutput = readInput(message, default="Y")
+            choice = readInput(message, default='Y')
 
-            if getOutput in ("a", "A"):
+            if choice in ('a', 'A'):
                 self.alwaysRetrieveCmdOutput = True
 
-        if not getOutput or getOutput in ("y", "Y") or self.alwaysRetrieveCmdOutput:
+        if not choice or choice in ('y', 'Y') or self.alwaysRetrieveCmdOutput:
             output = self.evalCmd(cmd)
 
             if output:
@@ -166,9 +166,8 @@ class Abstraction(Web, UDF, XP_cmdshell):
             msg += "statements as another DBMS user since you provided the "
             msg += "option '--dbms-creds'. If you are DBA, you can enable it. "
             msg += "Do you want to enable it? [Y/n] "
-            choice = readInput(msg, default="Y")
 
-            if not choice or choice in ("y", "Y"):
+            if readInput(msg, default='Y', boolean=True):
                 expression = getSQLSnippet(DBMS.MSSQL, "configure_openrowset", ENABLE="1")
                 inject.goStacked(expression)
 

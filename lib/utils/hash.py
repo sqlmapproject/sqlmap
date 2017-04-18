@@ -382,8 +382,8 @@ def storeHashesToFile(attack_dict):
     if kb.storeHashesChoice is None:
         message = "do you want to store hashes to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
-        test = readInput(message, default="N")
-        kb.storeHashesChoice = test[0] in ("y", "Y")
+
+        kb.storeHashesChoice = readInput(message, default='N', boolean=True)
 
     if not kb.storeHashesChoice:
         return
@@ -482,11 +482,11 @@ def attackDumpedTable():
             storeHashesToFile(attack_dict)
 
             message = "do you want to crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
-            test = readInput(message, default="N" if conf.multipleTargets else "Y")
+            choice = readInput(message, default='N' if conf.multipleTargets else 'Y').strip().upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
 
             results = dictionaryAttack(attack_dict)
@@ -805,9 +805,8 @@ def dictionaryAttack(attack_dict):
                     logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "
-            test = readInput(message, default="N")
 
-            if test[0] in ("y", "Y"):
+            if readInput(message, default='N', boolean=True):
                 suffix_list += COMMON_PASSWORD_SUFFIXES
 
         infoMsg = "starting dictionary-based cracking (%s)" % __functions__[hash_regex].func_name

@@ -156,15 +156,15 @@ class Filesystem:
         return retVal
 
     def askCheckWrittenFile(self, localFile, remoteFile, forceCheck=False):
-        output = None
+        choice = None
 
         if forceCheck is not True:
             message = "do you want confirmation that the local file '%s' " % localFile
             message += "has been successfully written on the back-end DBMS "
             message += "file system ('%s')? [Y/n] " % remoteFile
-            output = readInput(message, default="Y")
+            choice = readInput(message, default='Y', boolean=True)
 
-        if forceCheck or (output and output.lower() == "y"):
+        if forceCheck or choice:
             return self._checkFileLength(localFile, remoteFile)
 
         return True
@@ -173,9 +173,8 @@ class Filesystem:
         message = "do you want confirmation that the remote file '%s' " % remoteFile
         message += "has been successfully downloaded from the back-end "
         message += "DBMS file system? [Y/n] "
-        output = readInput(message, default="Y")
 
-        if not output or output in ("y", "Y"):
+        if readInput(message, default='Y', boolean=True):
             return self._checkFileLength(localFile, remoteFile, True)
 
         return None

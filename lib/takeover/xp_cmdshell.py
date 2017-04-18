@@ -255,9 +255,8 @@ class XP_cmdshell:
                 message = "xp_cmdshell extended procedure does not seem to "
                 message += "be available. Do you want sqlmap to try to "
                 message += "re-enable it? [Y/n] "
-                choice = readInput(message, default="Y")
 
-                if not choice or choice in ("y", "Y"):
+                if readInput(message, default='Y', boolean=True):
                     self._xpCmdshellConfigure(1)
 
                     if self._xpCmdshellCheck():

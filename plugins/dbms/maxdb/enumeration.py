@@ -172,11 +172,11 @@ class Enumeration(GenericEnumeration):
                 return kb.data.cachedColumns
 
             message = "do you want to use common column existence check? [y/N/q] "
-            test = readInput(message, default="Y" if "Y" in message else "N")
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)

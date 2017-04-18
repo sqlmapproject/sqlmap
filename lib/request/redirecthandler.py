@@ -50,18 +50,16 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             if kb.redirectChoice is None:
                 msg = "sqlmap got a %d redirect to " % redcode
                 msg += "'%s'. Do you want to follow? [Y/n] " % redurl
-                choice = readInput(msg, default="Y")
 
-                kb.redirectChoice = choice.upper()
+                kb.redirectChoice = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO
 
             if kb.redirectChoice == REDIRECTION.YES and method == HTTPMETHOD.POST and kb.resendPostOnRedirect is None:
                 msg = "redirect is a result of a "
                 msg += "POST request. Do you want to "
                 msg += "resend original POST data to a new "
                 msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
-                choice = readInput(msg, default=("Y" if not kb.originalPage else "N"))
 
-                kb.resendPostOnRedirect = choice.upper() == 'Y'
+                kb.resendPostOnRedirect = readInput(msg, default=("Y" if not kb.originalPage else "N"), boolean=True)
 
             if kb.resendPostOnRedirect:
                 self.redirect_request = self._redirect_request
