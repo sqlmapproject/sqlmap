@@ -3187,6 +3187,21 @@ def decodeIntToUnicode(value):
 
     return retVal
 
+def md5File(filename):
+    """
+    Calculates MD5 digest of a file
+    Reference: http://stackoverflow.com/a/3431838
+    """
+
+    checkFile(filename)
+
+    digest = hashlib.md5()
+    with open(filename, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), ""):
+            digest.update(chunk)
+
+    return digest.hexdigest()
+
 def checkIntegrity():
     """
     Checks integrity of code files during the unhandled exceptions
@@ -3203,7 +3218,7 @@ def checkIntegrity():
         if not os.path.isfile(path):
             logger.error("missing file detected '%s'" % path)
             retVal = False
-        elif hashlib.md5(open(path, 'rb').read()).hexdigest() != checksum:
+        elif md5File(path) != checksum:
             logger.error("wrong checksum of file '%s' detected" % path)
             retVal = False
     return retVal
