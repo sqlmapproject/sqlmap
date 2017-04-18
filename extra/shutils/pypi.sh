@@ -11,7 +11,7 @@ cat > $TMP_DIR/setup.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -55,7 +55,7 @@ cat > sqlmap/__init__.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -107,7 +107,7 @@ If you prefer fetching daily updates, you can download sqlmap by cloning the
 
 ::
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap works out of the box with
 `Python <http://www.python.org/download/>`__ version **2.6.x** and
@@ -132,7 +132,7 @@ You can find a sample run `here <https://asciinema.org/a/46601>`__. To
 get an overview of sqlmap capabilities, list of supported features and
 description of all options and switches, along with examples, you are
 advised to consult the `user's
-manual <https://github.com/sqlmapproject/sqlmap/wiki>`__.
+manual <https://github.com/sqlmapproject/sqlmap/wiki/Usage>`__.
 
 Links
 -----
@@ -147,12 +147,6 @@ Links
 -  User's manual: https://github.com/sqlmapproject/sqlmap/wiki
 -  Frequently Asked Questions (FAQ):
    https://github.com/sqlmapproject/sqlmap/wiki/FAQ
--  Mailing list subscription:
-   https://lists.sourceforge.net/lists/listinfo/sqlmap-users
--  Mailing list RSS feed:
-   http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
--  Mailing list archive:
-   http://news.gmane.org/gmane.comp.security.sqlmap
 -  Twitter: [@sqlmap](https://twitter.com/sqlmap)
 -  Demos: http://www.youtube.com/user/inquisb/videos
 -  Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

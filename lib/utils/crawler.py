@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -12,6 +12,7 @@ import urlparse
 import tempfile
 import time
 
+from lib.core.common import checkSameHost
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import findPageForms
@@ -62,14 +63,14 @@ def crawl(target):
                     if current:
                         content = Request.getPage(url=current, crawling=True, raise404=False)[0]
                 except SqlmapConnectionException, ex:
-                    errMsg = "connection exception detected (%s). skipping " % ex
+                    errMsg = "connection exception detected (%s). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
                 except SqlmapSyntaxException:
                     errMsg = "invalid URL detected. skipping '%s'" % current
                     logger.critical(errMsg)
                 except httplib.InvalidURL, ex:
-                    errMsg = "invalid URL detected (%s). skipping " % ex
+                    errMsg = "invalid URL detected (%s). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
 
@@ -86,7 +87,7 @@ def crawl(target):
                         tags = soup('a')
 
                         if not tags:
-                            tags = re.finditer(r'(?si)<a[^>]+href="(?P<href>[^>"]+)"', content)
+                            tags = re.finditer(r'(?i)<a[^>]+href="(?P<href>[^>"]+)"', content)
 
                         for tag in tags:
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
@@ -97,7 +98,7 @@ def crawl(target):
                                 url = urlparse.urljoin(current, href)
 
                                 # flag to know if we are dealing with the same target host
-                                _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (url, target)))
+                                _ = checkSameHost(url, target)
 
                                 if conf.scope:
                                     if not re.search(conf.scope, url, re.I):
@@ -110,6 +111,8 @@ def crawl(target):
                                         threadData.shared.deeper.add(url)
                                         if re.search(r"(.*?)\?(.+)", url):
                                             threadData.shared.value.add(url)
+                    except ValueError:          # for non-valid links
+                        pass
                     except UnicodeEncodeError:  # for non-HTML files
                         pass
                     finally:
@@ -127,8 +130,8 @@ def crawl(target):
         if not conf.sitemapUrl:
             message = "do you want to check for the existence of "
             message += "site's sitemap(.xml) [y/N] "
-            test = readInput(message, default="n")
-            if test[0] in ("y", "Y"):
+
+            if readInput(message, default='N', boolean=True):
                 found = True
                 items = None
                 url = urlparse.urljoin(target, "/sitemap.xml")
@@ -195,8 +198,8 @@ def storeResultsToFile(results):
     if kb.storeCrawlingChoice is None:
         message = "do you want to store crawling results to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
-        test = readInput(message, default="N")
-        kb.storeCrawlingChoice = test[0] in ("y", "Y")
+
+        kb.storeCrawlingChoice = readInput(message, default='N', boolean=True)
 
     if kb.storeCrawlingChoice:
         handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CRAWLER, suffix=".csv" if conf.forms else ".txt")

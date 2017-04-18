@@ -19,7 +19,7 @@ Você pode baixar o arquivo tar mais recente clicando [aqui]
 
 De preferência, você pode baixar o sqlmap clonando o repositório [Git](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap funciona em [Python](http://www.python.org/download/) nas versões **2.6.x** e **2.7.x** em todas as plataformas.
 
@@ -46,9 +46,6 @@ Links
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * Manual do Usuário: https://github.com/sqlmapproject/sqlmap/wiki
 * Perguntas frequentes (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Mailing list subscription: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mailing list archive: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demonstrações: [#1](http://www.youtube.com/user/inquisb/videos) e [#2](http://www.youtube.com/user/stamparm/videos)
 * Imagens: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

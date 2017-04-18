@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
@@ -15,12 +14,13 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.enums import DBMS
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
+from lib.utils.brute import columnExists
 from lib.utils.pivotdumptable import pivotDumpTable
-from lib.techniques.brute.use import columnExists
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
@@ -42,7 +42,7 @@ class Enumeration(GenericEnumeration):
         infoMsg = "fetching database names"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].dbs
+        rootQuery = queries[DBMS.MAXDB].dbs
         randStr = randomStr()
         query = rootQuery.inband.query
         retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.schemaname' % randStr], blind=True)
@@ -65,7 +65,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -76,7 +76,7 @@ class Enumeration(GenericEnumeration):
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+        rootQuery = queries[DBMS.MAXDB].tables
 
         for db in dbs:
             randStr = randomStr()
@@ -116,7 +116,7 @@ class Enumeration(GenericEnumeration):
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.col:
-            colList = conf.col.split(",")
+            colList = conf.col.split(',')
         else:
             colList = []
 
@@ -127,7 +127,7 @@ class Enumeration(GenericEnumeration):
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
 
         if conf.tbl:
-            tblList = conf.tbl.split(",")
+            tblList = conf.tbl.split(',')
         else:
             self.getTables()
 
@@ -172,16 +172,16 @@ class Enumeration(GenericEnumeration):
                 return kb.data.cachedColumns
 
             message = "do you want to use common column existence check? [y/N/q] "
-            test = readInput(message, default="Y" if "Y" in message else "N")
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].columns
+        rootQuery = queries[DBMS.MAXDB].columns
 
         for tbl in tblList:
             if conf.db is not None and len(kb.data.cachedColumns) > 0 \

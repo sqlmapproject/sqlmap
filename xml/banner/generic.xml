@@ -115,7 +115,7 @@
         <info type="Linux" distrib="Mandriva"/>
     </regexp>
 
-    <regexp value="Red[\-\_\ ]*Hat">
+    <regexp value="Red[\-\_\ ]?Hat">
         <info type="Linux" distrib="Red Hat"/>
     </regexp>
 
@@ -147,7 +147,7 @@
 
     <!-- Mac OSX -->
 
-    <regexp value="Mac[\-\_\ ]*OSX">
+    <regexp value="Mac[\-\_\ ]?OSX">
         <info type="Mac OSX"/>
     </regexp>
 

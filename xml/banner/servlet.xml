@@ -3,7 +3,7 @@
 <!-- Reference: http://www.http-stats.com/Servlet-Engine -->
 
 <root>
-    <regexp value="Tomcat( Web Server)*\/([\d\.]+)">
+    <regexp value="Tomcat( Web Server)?\/([\d\.]+)">
         <info technology="Tomcat" tech_version="1"/>
     </regexp>
 

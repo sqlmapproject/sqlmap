@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -16,7 +16,6 @@ from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import HSQLDB_ALIASES
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
@@ -28,13 +27,13 @@ class Fingerprint(GenericFingerprint):
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
-        if wsOsFp and not hasattr(conf, "api"):
+        if wsOsFp and not conf.api:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
             dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
-            if dbmsOsFp and not hasattr(conf, "api"):
+            if dbmsOsFp and not conf.api:
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
@@ -80,9 +79,7 @@ class Fingerprint(GenericFingerprint):
 
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(HSQLDB_ALIASES) \
-           or (conf.dbms or "").lower() in HSQLDB_ALIASES) and Backend.getVersion() and \
-           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        if not conf.extensiveFp and Backend.isDbmsWithin(HSQLDB_ALIASES):
             setDbms("%s %s" % (DBMS.HSQLDB, Backend.getVersion()))
 
             if Backend.isVersionGreaterOrEqualThan("1.7.2"):

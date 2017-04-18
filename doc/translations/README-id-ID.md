@@ -19,7 +19,7 @@ Anda dapat mengunduh tarball versi terbaru [di sini]
 
 Sebagai alternatif, Anda dapat mengunduh sqlmap dengan men-_clone_ repositori [Git](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap berfungsi langsung pada [Python](http://www.python.org/download/) versi **2.6.x** dan **2.7.x** pada platform apapun.
 
@@ -35,7 +35,7 @@ Untuk mendapatkan daftar opsi lanjut gunakan:
     python sqlmap.py -hh
 
 Anda dapat mendapatkan contoh penggunaan [di sini](https://asciinema.org/a/46601).
-Untuk mendapatkan gambaran singkat kemampuan sqlmap, daftar fitur yang didukung, deskripsi dari semua opsi, berikut dengan contohnya, Anda disarankan untuk membaca [manual pengguna](https://github.com/sqlmapproject/sqlmap/wiki).
+Untuk mendapatkan gambaran singkat kemampuan sqlmap, daftar fitur yang didukung, deskripsi dari semua opsi, berikut dengan contohnya, Anda disarankan untuk membaca [manual pengguna](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Tautan
 ----
@@ -46,9 +46,6 @@ Tautan
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * Wiki Manual Penggunaan: https://github.com/sqlmapproject/sqlmap/wiki
 * Pertanyaan yang Sering Ditanyakan (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Berlangganan milis: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* RSS feed dari milis: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Arsip milis: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Video Demo [#1](http://www.youtube.com/user/inquisb/videos) dan [#2](http://www.youtube.com/user/stamparm/videos)
 * Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

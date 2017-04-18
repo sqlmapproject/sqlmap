@@ -17,7 +17,7 @@
     <!-- Preventive cleanup of database management system from sqlmap temporary tables and user-defined functions -->
     <case name="PostgreSQL cleanup from sqlmap temporary tables and user-defined functions (UDFs)">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="US"/>
             <verbose value="2"/>
             <cleanup value="True"/>
@@ -37,7 +37,7 @@
     <!-- Common enumeration switches across all techniques -->
     <case name="MySQL boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -61,9 +61,9 @@
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.5.0'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -80,7 +80,7 @@
     </case>
     <case name="MySQL error-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <extensiveFp value="True"/>
@@ -104,10 +104,10 @@
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
-            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.5.0'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -124,7 +124,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -148,10 +148,10 @@
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
-            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
-            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.5.0'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="Title: Generic UNION query (NULL) - 3 columns"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -168,7 +168,7 @@
     </case>
     <case name="MySQL partial UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -192,10 +192,10 @@
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
-            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
-            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.5.0'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="Type: UNION query"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -212,21 +212,21 @@
     </case>
     <case name="MySQL time-based single-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_nooutput.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_nooutput.php?id=1"/>
             <tech value="T"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
             <isDba value="True"/>
         </switches>
         <parse>
-            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="Title: MySQL &gt;= 5.0.12 AND time-based blind"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
     <case name="MySQL inline queries multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_inline.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_inline.php?id=1"/>
             <threads value="4"/>
             <tech value="Q"/>
             <extensiveFp value="True"/>
@@ -251,9 +251,9 @@
         </switches>
         <parse>
             <item value="Title: MySQL inline queries"/>
-            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.5.0'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -270,7 +270,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -294,9 +294,9 @@
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 9.1.0'"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
-            <item value="current user:    'postgres'"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="r'current user:[^\w]+(postgres|testuser)'"/>
             <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+postgres'"/>
@@ -312,7 +312,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <extensiveFp value="True"/>
@@ -337,9 +337,9 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL AND error-based - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 9.1.0'"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
-            <item value="current user:    'postgres'"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="r'current user:[^\w]+(postgres|testuser)'"/>
             <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+postgres'"/>
@@ -355,7 +355,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -380,9 +380,9 @@
         </switches>
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
-            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 9.1.0'"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
-            <item value="current user:    'postgres'"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="r'current user:[^\w]+(postgres|testuser)'"/>
             <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+postgres'"/>
@@ -398,7 +398,7 @@
     </case>
     <case name="PostgreSQL partial UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -423,9 +423,9 @@
         </switches>
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
-            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 9.1.0'"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
-            <item value="current user:    'postgres'"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="r'current user:[^\w]+(postgres|testuser)'"/>
             <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+postgres'"/>
@@ -441,7 +441,7 @@
     </case>
     <case name="PostgreSQL time-based single-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
             <tech value="T"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
@@ -449,13 +449,13 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 AND time-based blind"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
     <case name="PostgreSQL stacked queries single-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
             <tech value="S"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
@@ -463,13 +463,13 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 stacked queries"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
     <case name="PostgreSQL inline queries multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int_inline.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int_inline.php?id=1"/>
             <threads value="4"/>
             <tech value="Q"/>
             <extensiveFp value="True"/>
@@ -494,9 +494,9 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL inline queries"/>
-            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 9.1.0'"/>
-            <item value="banner:    'PostgreSQL 9.1.13 on i686-pc-linux-gnu, compiled by gcc (Debian 4.7.2-5) 4.7.2, 32-bit"/>
-            <item value="current user:    'postgres'"/>
+            <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
+            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="r'current user:[^\w]+(postgres|testuser)'"/>
             <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
             <item value="current user is DBA:    True"/>
             <item value="r'database management system users \[.+postgres'"/>
@@ -512,7 +512,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -536,7 +536,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
+            <item value="banner:    'Oracle Database 10g"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -553,7 +553,7 @@
     </case>
     <case name="Oracle error-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <extensiveFp value="True"/>
@@ -578,7 +578,7 @@
         <parse>
             <item value="Title: Oracle AND error-based - WHERE or HAVING clause (XMLType)"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
+            <item value="banner:    'Oracle Database 10g"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -596,7 +596,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -621,7 +621,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
+            <item value="banner:    'Oracle Database 10g"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -639,7 +639,7 @@
     </case>
     <case name="Oracle partial UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <dbms value="Oracle"/>
@@ -665,7 +665,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
+            <item value="banner:    'Oracle Database 10g"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -683,7 +683,7 @@
     </case>
     <case name="Oracle time-based single-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int_nooutput.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int_nooutput.php?id=1"/>
             <tech value="T"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
@@ -691,13 +691,13 @@
         </switches>
         <parse>
             <item value="Title: Oracle AND time-based blind"/>
-            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
+            <item value="banner:    'Oracle Database 10g"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
     <case name="Oracle inline queries multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int_inline.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int_inline.php?id=1"/>
             <threads value="4"/>
             <tech value="Q"/>
             <extensiveFp value="True"/>
@@ -722,7 +722,7 @@
         <parse>
             <item value="Title: Oracle inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g Express Edition Release 10.2.0.1.0 - Product'"/>
+            <item value="banner:    'Oracle Database 10g"/>
             <item value="current user:    'SYS'"/>
             <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
             <item value="hostname:    'debian"/>
@@ -740,7 +740,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -783,7 +783,7 @@
     <!-- NOTE: SQLite 2 driver on Debian 7 does not work
     <case name="SQLite boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -816,7 +816,7 @@
     </case>
     <case name="SQLite UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -849,7 +849,7 @@
     </case>
     <case name="SQLite partial UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -882,7 +882,7 @@
     -->
     <case name="SQLite 3 boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_3.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -915,7 +915,7 @@
     </case>
     <case name="SQLite 3 UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_3.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -948,7 +948,7 @@
     </case>
     <case name="SQLite 3 partial UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_3_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -980,7 +980,7 @@
     </case>
     <case name="SQLite 3 time-based single-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_3_nooutput.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3_nooutput.php?id=1"/>
             <tech value="T"/>
             <extensiveFp value="True"/>
             <level value="3"/>
@@ -996,7 +996,7 @@
     <!-- NOTE: SQLite 2 driver on Debian 7 does not work
     <case name="SQLite inline queries multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_inline.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_inline.php?id=1"/>
             <threads value="4"/>
             <tech value="Q"/>
             <extensiveFp value="True"/>
@@ -1029,7 +1029,7 @@
     -->
     <case name="Firebird boolean-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <extensiveFp value="True"/>
@@ -1069,7 +1069,7 @@
     <!-- TODO: this test case fails because of issue #358
     <case name="Firebird error-based multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <extensiveFp value="True"/>
@@ -1108,7 +1108,7 @@
     -->
     <case name="Firebird UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <extensiveFp value="True"/>
@@ -1146,7 +1146,7 @@
     </case>
     <case name="Firebird partial UNION query multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <dbms value="Firebird"/>
@@ -1185,7 +1185,7 @@
     </case>
     <case name="Firebird time-based single-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int_nooutput.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int_nooutput.php?id=1"/>
             <tech value="T"/>
             <level value="4"/>
             <risk value="2"/>
@@ -1201,7 +1201,7 @@
     </case>
     <case name="Firebird inline queries multi-threaded enumeration - all entries">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int_inline.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int_inline.php?id=1"/>
             <threads value="4"/>
             <tech value="Q"/>
             <level value="2"/>
@@ -1243,7 +1243,7 @@
     <!-- Custom enumeration switches -->
     <case name="MySQL error-based multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <getSchema value="True"/>
@@ -1261,7 +1261,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <getSchema value="True"/>
@@ -1279,7 +1279,7 @@
     </case>
     <case name="MySQL boolean-based multi-threaded custom enumeration - substring">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
@@ -1295,7 +1295,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <getSchema value="True"/>
@@ -1313,7 +1313,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <getSchema value="True"/>
@@ -1331,7 +1331,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded custom enumeration - substring">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
@@ -1347,7 +1347,7 @@
     </case>
     <case name="Oracle error-based multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <getSchema value="True"/>
@@ -1365,7 +1365,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <getSchema value="True"/>
@@ -1383,7 +1383,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded custom enumeration - substring">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
@@ -1399,7 +1399,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded custom enumeration - substring">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
@@ -1416,7 +1416,7 @@
     <!-- NOTE: SQLite 2 driver on Debian 7 does not work
     <case name="SQLite UNION query multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <getSchema value="True"/>
@@ -1433,7 +1433,7 @@
     </case>
     <case name="SQLite boolean-based multi-threaded custom enumeration - substring">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
@@ -1449,7 +1449,7 @@
     -->
     <case name="Firebird UNION query multi-threaded custom enumeration">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <getSchema value="True"/>
@@ -1466,7 +1466,7 @@
     </case>
     <case name="Firebird boolean-based multi-threaded custom enumeration - substring">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <dumpTable value="True"/>
@@ -1484,7 +1484,7 @@
     <!-- Brute force switches -->
     <case name="MySQL boolean-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <commonTables value="True"/>
@@ -1496,7 +1496,7 @@
     </case>
     <case name="MySQL boolean-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <db value="testdb"/>
@@ -1509,7 +1509,7 @@
     </case>
     <case name="MySQL error-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <commonTables value="True"/>
@@ -1521,7 +1521,7 @@
     </case>
     <case name="MySQL error-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <db value="testdb"/>
@@ -1534,7 +1534,7 @@
     </case>
     <case name="MySQL UNION query brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <commonTables value="True"/>
@@ -1546,7 +1546,7 @@
     </case>
     <case name="MySQL UNION query brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <db value="testdb"/>
@@ -1559,7 +1559,7 @@
     </case>
     <case name="PostgreSQL boolean-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <commonTables value="True"/>
@@ -1571,7 +1571,7 @@
     </case>
     <case name="PostgreSQL boolean-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <db value="public"/>
@@ -1584,7 +1584,7 @@
     </case>
     <case name="PostgreSQL error-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <commonTables value="True"/>
@@ -1596,7 +1596,7 @@
     </case>
     <case name="PostgreSQL error-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <db value="public"/>
@@ -1609,7 +1609,7 @@
     </case>
     <case name="PostgreSQL UNION query brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <commonTables value="True"/>
@@ -1621,7 +1621,7 @@
     </case>
     <case name="PostgreSQL UNION query brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <db value="public"/>
@@ -1634,7 +1634,7 @@
     </case>
     <case name="Oracle boolean-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <commonTables value="True"/>
@@ -1646,7 +1646,7 @@
     </case>
     <case name="Oracle boolean-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <db value="sys"/>
@@ -1659,7 +1659,7 @@
     </case>
     <case name="Oracle error-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <commonTables value="True"/>
@@ -1671,7 +1671,7 @@
     </case>
     <case name="Oracle error-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <db value="sys"/>
@@ -1684,7 +1684,7 @@
     </case>
     <case name="Oracle UNION query brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <commonTables value="True"/>
@@ -1696,7 +1696,7 @@
     </case>
     <case name="Oracle UNION query brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <db value="sys"/>
@@ -1709,7 +1709,7 @@
     </case>
     <case name="IBM DB2 boolean-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <commonTables value="True"/>
@@ -1721,7 +1721,7 @@
     </case>
     <case name="IBM DB2 boolean-based brute-force tables enumeration - provided database">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <db value="db2inst1"/>
@@ -1734,7 +1734,7 @@
     </case>
     <case name="SQLite 3 boolean-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_3.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <commonTables value="True"/>
@@ -1746,7 +1746,7 @@
     </case>
     <case name="SQLite 3 UNION query brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int_3.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <commonTables value="True"/>
@@ -1758,7 +1758,7 @@
     </case>
     <case name="Firebird boolean-based brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <commonTables value="True"/>
@@ -1770,7 +1770,7 @@
     </case>
     <case name="Firebird UNION query brute-force tables enumeration - provided no database">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <commonTables value="True"/>
@@ -1786,7 +1786,7 @@
     <!-- Search enumeration switches -->
     <case name="MySQL boolean-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -1798,7 +1798,7 @@
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -1810,7 +1810,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -1822,7 +1822,7 @@
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -1830,13 +1830,13 @@
             <tbl value="foo,se,bar"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'.+5 entries.+wu.+nameisnull'"/>
         </parse>
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -1844,13 +1844,13 @@
             <tbl value="foo,se,bar"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'.+5 entries.+wu.+nameisnull'"/>
         </parse>
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -1858,13 +1858,13 @@
             <tbl value="foo,se,bar"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+1 table.+users'"/>
+            <item value="r'Database: testdb.+3 tables.+users'"/>
             <item value="r'.+5 entries.+wu.+nameisnull'"/>
         </parse>
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -1872,12 +1872,12 @@
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+1 table.+users.+Database: mysql.+1 table.+user '"/>
+            <item value="r'Database: testdb.+3 tables.+users.+Database: mysql.+1 table.+user '"/>
         </parse>
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -1885,12 +1885,12 @@
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+1 table.+users.+Database: mysql.+1 table.+user '"/>
+            <item value="r'Database: testdb.+3 tables.+users.+Database: mysql.+1 table.+user '"/>
         </parse>
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -1898,12 +1898,12 @@
             <answers value="do you want to dump=N"/>
         </switches>
         <parse>
-            <item value="r'Database: testdb.+1 table.+users.+Database: mysql.+1 table.+user '"/>
+            <item value="r'Database: testdb.+3 tables.+users.+Database: mysql.+1 table.+user '"/>
         </parse>
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -1917,7 +1917,7 @@
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -1931,7 +1931,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -1945,7 +1945,7 @@
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -1960,7 +1960,7 @@
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -1975,7 +1975,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -1990,7 +1990,7 @@
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2005,7 +2005,7 @@
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2020,7 +2020,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2035,7 +2035,7 @@
     </case>
     <case name="MySQL boolean-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2050,7 +2050,7 @@
     </case>
     <case name="MySQL error-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2065,7 +2065,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2080,7 +2080,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2092,7 +2092,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2104,7 +2104,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2116,7 +2116,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2130,7 +2130,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2144,7 +2144,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2158,7 +2158,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2171,7 +2171,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2184,7 +2184,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2197,7 +2197,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2211,7 +2211,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2225,7 +2225,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2239,7 +2239,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2254,7 +2254,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2269,7 +2269,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2284,7 +2284,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2299,7 +2299,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2314,7 +2314,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2329,7 +2329,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2345,7 +2345,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2361,7 +2361,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2377,7 +2377,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2389,7 +2389,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2401,7 +2401,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2413,7 +2413,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2427,7 +2427,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2442,7 +2442,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2457,7 +2457,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2470,7 +2470,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2483,7 +2483,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2496,7 +2496,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2509,7 +2509,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2522,7 +2522,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2535,7 +2535,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2549,7 +2549,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2563,7 +2563,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2577,7 +2577,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2591,7 +2591,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2605,7 +2605,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2619,7 +2619,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2634,7 +2634,7 @@
     </case>
     <case name="Oracle error-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <search value="True"/>
@@ -2649,7 +2649,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2664,7 +2664,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2676,7 +2676,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - tables given database">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2690,7 +2690,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2703,7 +2703,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - column without given db or table">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2716,7 +2716,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given databases">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2730,7 +2730,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given tables">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2744,7 +2744,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded search enumeration - column given databases and table">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2760,7 +2760,7 @@
     <!-- NOTE: SQLite 2 driver on Debian 7 does not work
     <case name="SQLite multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <search value="True"/>
             <db value="e"/>
@@ -2771,7 +2771,7 @@
     </case>
     <case name="SQLite boolean-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2784,7 +2784,7 @@
     </case>
     <case name="SQLite UNION query multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2798,7 +2798,7 @@
     -->
     <case name="Firebird multi-threaded search enumeration - database">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <search value="True"/>
             <db value="e"/>
@@ -2809,7 +2809,7 @@
     </case>
     <case name="Firebird boolean-based multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <search value="True"/>
@@ -2822,7 +2822,7 @@
     </case>
     <case name="Firebird UNION query multi-threaded search enumeration - tables without given database">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <search value="True"/>
@@ -2838,7 +2838,7 @@
     <!-- User's provided statement enumeration switches -->
     <case name="MySQL boolean-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
@@ -2849,7 +2849,7 @@
     </case>
     <case name="MySQL error-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
@@ -2860,7 +2860,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
@@ -2871,7 +2871,7 @@
     </case>
     <case name="MySQL boolean-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -2882,7 +2882,7 @@
     </case>
     <case name="MySQL error-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -2893,7 +2893,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -2905,7 +2905,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
@@ -2916,7 +2916,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
@@ -2927,7 +2927,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
@@ -2938,7 +2938,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -2949,7 +2949,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -2960,7 +2960,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -2972,7 +2972,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
@@ -2983,7 +2983,7 @@
     </case>
     <case name="Oracle error-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
@@ -2994,7 +2994,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
@@ -3005,7 +3005,7 @@
     </case>
     <case name="Oracle boolean-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3016,7 +3016,7 @@
     </case>
     <case name="Oracle error-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3027,7 +3027,7 @@
     </case>
     <case name="Oracle UNION query multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/oracle/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3038,7 +3038,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM db2inst1.users"/>
@@ -3049,7 +3049,7 @@
     </case>
     <case name="IBM DB2 boolean-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/db2/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM db2inst1.users ORDER BY name"/>
@@ -3061,7 +3061,7 @@
     <!-- NOTE: SQLite 2 driver on Debian 7 does not work
     <case name="SQLite boolean-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
@@ -3072,7 +3072,7 @@
     </case>
     <case name="SQLite UNION query multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
@@ -3083,7 +3083,7 @@
     </case>
     <case name="SQLite boolean-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3094,7 +3094,7 @@
     </case>
     <case name="SQLite UNION query multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/sqlite/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3106,7 +3106,7 @@
     -->
     <case name="Firebird boolean-based multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users"/>
@@ -3117,7 +3117,7 @@
     </case>
     <case name="Firebird UNION query multi-threaded custom SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users"/>
@@ -3128,7 +3128,7 @@
     </case>
     <case name="Firebird boolean-based multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3139,7 +3139,7 @@
     </case>
     <case name="Firebird UNION query multi-threaded custom ordered SQL query enumeration">
         <switches>
-            <url value="http://debian/sqlmap/firebird/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
@@ -3153,7 +3153,7 @@
     <!-- File system access switches -->
     <case name="MySQL boolean-based multi-threaded file read">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
@@ -3164,7 +3164,7 @@
     </case>
     <case name="MySQL error-based multi-threaded file read">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
@@ -3175,7 +3175,7 @@
     </case>
     <case name="MySQL UNION query multi-threaded file read">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
@@ -3187,7 +3187,7 @@
     <case name="MySQL UNION query multi-threaded file write">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="U"/>
             <wFile value="/etc/passwd"/>
@@ -3199,7 +3199,7 @@
     </case>
     <case name="PostgreSQL boolean-based multi-threaded file read">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="BS"/>
             <timeSec value="2"/>
@@ -3212,7 +3212,7 @@
     </case>
     <case name="PostgreSQL error-based multi-threaded file read">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="ES"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
@@ -3224,7 +3224,7 @@
     </case>
     <case name="PostgreSQL UNION query multi-threaded file read">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="US"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
@@ -3237,7 +3237,7 @@
     <case name="PostgreSQL multi-threaded file write">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
             <wFile value="/etc/passwd"/>
             <dFile value="/tmp/passwd-${random}"/>
@@ -3252,7 +3252,7 @@
     <!-- Operating system access switches -->
     <case name="MySQL web shell - command execution">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <tech value="B"/>
             <osCmd value="id"/>
             <answers value="what do you want to use for writable directory=2,please provide a comma separate list of absolute directory paths=/var/www/test"/>
@@ -3263,7 +3263,7 @@
     </case>
     <case name="MySQL shell via Metasploit integration - command execution">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <tech value="BU"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
@@ -3275,7 +3275,7 @@
     </case>
     <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (UNION)">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="US"/>
             <osCmd value="id"/>
             <answers value="do you want to overwrite it=Y"/>
@@ -3286,7 +3286,7 @@
     </case>
     <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (boolean)">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="BS"/>
             <osCmd value="ls -1"/>
             <answers value="do you want to overwrite it=Y"/>
@@ -3297,7 +3297,7 @@
     </case>
     <case name="PostgreSQL shell via Metasploit integration - command execution">
         <switches>
-            <url value="http://debian/sqlmap/pgsql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <tech value="US"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
@@ -3313,7 +3313,7 @@
     <!-- Corner cases -->
     <case name="Time-based (heavy query)">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_benchmark.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_benchmark.php?id=1"/>
             <tech value="T"/>
             <level value="2"/>
             <risk value="2"/>
@@ -3326,7 +3326,7 @@
     </case>
     <case name="OR boolean-based">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <testFilter value="OR boolean"/>
@@ -3335,13 +3335,13 @@
         </switches>
         <parse>
             <item value="Title: OR boolean-based blind - WHERE or HAVING clause"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
     <case name="Page protected by custom (weak) filter">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_filtered.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_filtered.php?id=1"/>
             <tech value="BE"/>
             <level value="3"/>
         </switches>
@@ -3352,7 +3352,7 @@
     </case>
     <case name="GROUP BY clause">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_groupby.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_groupby.php?id=1"/>
             <tech value="B"/>
             <level value="3"/>
         </switches>
@@ -3362,7 +3362,7 @@
     </case>
     <case name="International data">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_international.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_international.php?id=1"/>
             <threads value="4"/>
             <tech value="B"/>
             <getBanner value="True"/>
@@ -3371,80 +3371,80 @@
             <tbl value="international"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+长江.+река Москва'"/>
         </parse>
     </case>
     <case name="Highly dynamic page">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_rand.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_rand.php?id=1"/>
             <timeSec value="2"/>
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
-            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+            <item value="Title: MySQL &gt;= 5.0.12 AND time-based blind"/>
         </parse>
     </case>
     <case name="302 redirect page when SQL statement return no output">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_redirected.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_redirected.php?id=1"/>
             <timeSec value="2"/>
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
-            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+            <item value="Title: MySQL &gt;= 5.0.12 AND time-based blind"/>
         </parse>
     </case>
     <case name="Page that returns an image">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_img.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_img.php?id=1"/>
             <tech value="BT"/>
             <timeSec value="2"/>
         </switches>
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
-            <item value="Title: MySQL &gt; 5.0.11 AND time-based blind"/>
+            <item value="Title: MySQL &gt;= 5.0.12 AND time-based blind"/>
         </parse>
     </case>
     <case name="302 redirect page when SQL statement returns output">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_redirected_true.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_redirected_true.php?id=1"/>
             <tech value="E"/>
         </switches>
         <parse>
-            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
         </parse>
     </case>
     <case name="Invalid bignum">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <tech value="U"/>
             <invalidBignum value="True"/>
             <getBanner value="True"/>
             <isDba value="True"/>
         </switches>
         <parse>
-            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="Type: UNION query"/>
             <item value="r'Payload: id=[\d]+\.[\d]+ UNION'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
     <case name="Invalid logical">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <tech value="U"/>
             <invalidLogical value="True"/>
             <getBanner value="True"/>
             <isDba value="True"/>
         </switches>
         <parse>
-            <item value="Title: MySQL UNION query (NULL) - 3 columns"/>
+            <item value="Type: UNION query"/>
             <item value="r'Payload: id=1 AND [\d]+=[\d]+ UNION'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="current user is DBA:    True"/>
         </parse>
     </case>
@@ -3453,71 +3453,71 @@
     <!-- Other switches -->
     <case name="HTTP basic authentication">
         <switches>
-            <url value="http://debian/sqlmap/mysql/basic/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/basic/get_int.php?id=1"/>
             <tech value="E"/>
             <authType value="Basic"/>
             <authCred value="testuser:testpass"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="HTTP digest authentication">
         <switches>
-            <url value="http://debian/sqlmap/mysql/digest/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/digest/get_int.php?id=1"/>
             <tech value="E"/>
             <authType value="Digest"/>
             <authCred value="testuser:testpass"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Boolean-based predict output enumeration">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <predictOutput value="True"/>
             <tech value="B"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
     <case name="Boolean-based ORDER BY predict output enumeration">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/get_int_orderby.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_orderby.php?id=1"/>
             <predictOutput value="True"/>
             <tech value="B"/>
             <testFilter value="boolean-based blind - GROUP BY and ORDER BY clauses"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
     <case name="Time-based predict output enumeration">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <predictOutput value="True"/>
             <tech value="T"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="r'performed 126 queries'" console_output="True"/>
         </parse>
     </case>
     <case name="Hex conversion data retrival">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
             <tech value="E"/>
             <extensiveFp value="True"/>
@@ -3542,10 +3542,10 @@
             <answers value="do you want to perform a dictionary-based attack against retrieved password hashes=N"/>
         </switches>
         <parse>
-            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE or HAVING clause"/>
-            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.5.0'"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
-            <item value="current user:    'root@localhost'"/>
+            <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
+            <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="current user:    'root@"/>
             <item value="current database:    'testdb'"/>
             <item value="hostname:    'debian"/>
             <item value="current user is DBA:    True"/>
@@ -3563,73 +3563,73 @@
     <case name="Custom GET parameter injection mark">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1*"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1*"/>
             <tech value="B"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Custom POST data injection mark">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/post_int.php"/>
+            <url value="http://debiandev/sqlmap/mysql/post_int.php"/>
             <data value="id=1*"/>
             <tech value="E"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Custom HTTP header (UA) injection mark">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/header_str.php"/>
+            <url value="http://debiandev/sqlmap/mysql/header_str.php"/>
             <headers value="User-Agent: 1*"/>
             <tech value="U"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Custom FROM table in UNION query">
         <switches>
             <verbose value="3"/>
-            <url value="http://debian/sqlmap/mysql/get_int_partialunion.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <tech value="U"/>
             <uFrom value="INFORMATION_SCHEMA.COLLATIONS"/>
             <getBanner value="True"/>
         </switches>
         <parse>
             <item value="r'VERSION\(\).+FROM INFORMATION_SCHEMA\.COLLATIONS'" console_output="True"/>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Estimated time of arrival">
         <switches>
             <verbose value="2"/>
-            <url value="http://debian/sqlmap/mysql/get_int.php?id=1"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <tech value="B"/>
             <eta value="True"/>
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="r'100\% \[===.+=\] 17\/17'" console_output="True"/>
         </parse>
     </case>
     <case name="Multiple parameters">
         <switches>
-            <url value="http://debian/sqlmap/mysql/get_int.php?pAram=value&amp;s=3&amp;id=1&amp;Par=VALUE"/>
+            <url value="http://debiandev/sqlmap/mysql/get_int.php?pAram=value&amp;s=3&amp;id=1&amp;Par=VALUE"/>
             <tech value="B"/>
             <getBanner value="True"/>
             <answers value="Do you want to keep testing the others=Y"/>
         </switches>
         <parse>
-            <item value="banner:    '5.5.37-0+wheezy1'"/>
+            <item value="banner:    '5.1.41-3~bpo50+1'"/>
             <item value="testing for SQL injection on GET parameter 'pAram'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 's'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 'id'" console_output="True"/>

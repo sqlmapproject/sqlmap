@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -22,7 +22,7 @@ class Syntax:
         retVal = expression
 
         if quote:
-            for item in re.findall(r"'[^']*'+", expression, re.S):
+            for item in re.findall(r"'[^']*'+", expression):
                 _ = item[1:-1]
                 if _:
                     retVal = retVal.replace(item, escaper(_))

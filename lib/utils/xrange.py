@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -85,3 +85,9 @@ class xrange(object):
 
     def _index(self, i):
         return self.start + self.step * i
+
+    def index(self, i):
+        if self.start <= i < self.stop:
+            return i - self.start
+        else:
+            raise ValueError("%d is not in list" % i)

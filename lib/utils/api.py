@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import contextlib
 import logging
 import os
 import re
@@ -19,8 +20,8 @@ import urllib2
 
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
+from lib.core.common import saveConfig
 from lib.core.common import unArrayizeValue
-from lib.core.convert import base64pickle
 from lib.core.convert import hexencode
 from lib.core.convert import dejsonize
 from lib.core.convert import jsonize
@@ -49,6 +50,7 @@ from thirdparty.bottle.bottle import post
 from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
+from thirdparty.bottle.bottle import server_names
 
 
 # global settings
@@ -161,10 +163,16 @@ class Task(object):
         self.options = AttribDict(self._original_options)
 
     def engine_start(self):
+        handle, configFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CONFIG, text=True)
+        os.close(handle)
+        saveConfig(self.options, configFile)
+
         if os.path.exists("sqlmap.py"):
-            self.process = Popen(["python", "sqlmap.py", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
+            self.process = Popen(["python", "sqlmap.py", "--api", "-c", configFile], shell=False, close_fds=not IS_WIN)
+        elif os.path.exists(os.path.join(os.getcwd(), "sqlmap.py")):
+            self.process = Popen(["python", "sqlmap.py", "--api", "-c", configFile], shell=False, cwd=os.getcwd(), close_fds=not IS_WIN)
         else:
-            self.process = Popen(["sqlmap", "--pickled-options", base64pickle(self.options)], shell=False, close_fds=not IS_WIN)
+            self.process = Popen(["sqlmap", "--api", "-c", configFile], shell=False, close_fds=not IS_WIN)
 
     def engine_stop(self):
         if self.process:
@@ -275,7 +283,7 @@ class LogRecorder(logging.StreamHandler):
 
 
 def setRestAPILog():
-    if hasattr(conf, "api"):
+    if conf.api:
         try:
             conf.databaseCursor = Database(conf.database)
             conf.databaseCursor.connect("client")
@@ -644,11 +652,17 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     REST-JSON API server
     """
     DataStore.admin_id = hexencode(os.urandom(16))
-    Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)[1]
+    handle, Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)
+    os.close(handle)
+
+    if port == 0:  # random
+        with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+            s.bind((host, 0))
+            port = s.getsockname()[1]
 
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
     logger.info("Admin ID: %s" % DataStore.admin_id)
-    logger.debug("IPC database: %s" % Database.filepath)
+    logger.debug("IPC database: '%s'" % Database.filepath)
 
     # Initialize IPC database
     DataStore.current_db = Database()
@@ -657,6 +671,9 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
 
     # Run RESTful API
     try:
+        # Supported adapters: aiohttp, auto, bjoern, cgi, cherrypy, diesel, eventlet, fapws3, flup, gae, gevent, geventSocketIO, gunicorn, meinheld, paste, rocket, tornado, twisted, waitress, wsgiref
+        # Reference: https://bottlepy.org/docs/dev/deployment.html || bottle.server_names
+
         if adapter == "gevent":
             from gevent import monkey
             monkey.patch_all()
@@ -671,9 +688,12 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
         else:
             raise
     except ImportError:
-        errMsg = "Adapter '%s' is not available on this system" % adapter
-        if adapter in ("gevent", "eventlet"):
-            errMsg += " (e.g.: 'sudo apt-get install python-%s')" % adapter
+        if adapter.lower() not in server_names:
+            errMsg = "Adapter '%s' is unknown. " % adapter
+            errMsg += "(Note: available adapters '%s')" % ', '.join(sorted(server_names.keys()))
+        else:
+            errMsg = "Server support for adapter '%s' is not installed on this system " % adapter
+            errMsg += "(Note: you can try to install it with 'sudo apt-get install python-%s' or 'sudo pip install %s')" % (adapter, adapter)
         logger.critical(errMsg)
 
 def _client(url, options=None):
@@ -682,7 +702,7 @@ def _client(url, options=None):
         data = None
         if options is not None:
             data = jsonize(options)
-        req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+        req = urllib2.Request(url, data, {"Content-Type": "application/json"})
         response = urllib2.urlopen(req)
         text = response.read()
     except:
@@ -737,13 +757,34 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             if not res["success"]:
                 logger.error("Failed to execute command %s" % command)
             dataToStdout("%s\n" % raw)
+        
+        elif command.startswith("option"):
+            if not taskid:
+                logger.error("No task ID in use")
+                continue
+            try:
+                command, option = command.split(" ")
+            except ValueError:
+                raw = _client("%s/option/%s/list" % (addr, taskid))
+            else:
+                options = {"option": option}
+                raw = _client("%s/option/%s/get" % (addr, taskid), options)
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to execute command %s" % command)
+            dataToStdout("%s\n" % raw)
 
         elif command.startswith("new"):
             if ' ' not in command:
                 logger.error("Program arguments are missing")
                 continue
 
-            argv = ["sqlmap.py"] + shlex.split(command)[1:]
+            try:
+                argv = ["sqlmap.py"] + shlex.split(command)[1:]
+            except Exception, ex:
+                logger.error("Error occurred while parsing arguments ('%s')" % ex)
+                taskid = None
+                continue
 
             try:
                 cmdLineOptions = cmdLineParser(argv).__dict__
@@ -795,17 +836,19 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             return
 
         elif command in ("help", "?"):
-            msg =  "help        Show this help message\n"
-            msg += "new ARGS    Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
-            msg += "use TASKID  Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
-            msg += "data        Retrieve and show data for current task\n"
-            msg += "log         Retrieve and show log for current task\n"
-            msg += "status      Retrieve and show status for current task\n"
-            msg += "stop        Stop current task\n"
-            msg += "kill        Kill current task\n"
-            msg += "list        Display all tasks\n"
-            msg += "flush       Flush tasks (delete all tasks)\n"
-            msg += "exit        Exit this client\n"
+            msg =  "help           Show this help message\n"
+            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
+            msg += "data           Retrieve and show data for current task\n"
+            msg += "log            Retrieve and show log for current task\n"
+            msg += "status         Retrieve and show status for current task\n"
+            msg += "option OPTION  Retrieve and show option for current task\n"
+            msg += "options        Retrieve and show all options for current task\n"
+            msg += "stop           Stop current task\n"
+            msg += "kill           Kill current task\n"
+            msg += "list           Display all tasks\n"
+            msg += "flush          Flush tasks (delete all tasks)\n"
+            msg += "exit           Exit this client\n"
 
             dataToStdout(msg)
 

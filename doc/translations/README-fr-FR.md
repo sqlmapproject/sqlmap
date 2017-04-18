@@ -17,7 +17,7 @@ Vous pouvez télécharger le plus récent fichier tarball en cliquant [ici](http
 
 De préférence, télécharger __sqlmap__ en le [clonant](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap fonctionne sur n'importe quel système d'exploitation avec la version **2.6.x** et **2.7.x** de [Python](http://www.python.org/download/)  
 
@@ -33,7 +33,7 @@ Pour afficher une liste complète des options et des commutateurs (switches), ta
     python sqlmap.py -hh
 
 Vous pouvez regarder un vidéo [ici](https://asciinema.org/a/46601) pour plus d'exemples.
-Pour obtenir un aperçu des ressources de __sqlmap__, une liste des fonctionnalités prises en charge et la description de toutes les options, ainsi que des exemples , nous vous recommandons de consulter [le wiki](https://github.com/sqlmapproject/sqlmap/wiki).
+Pour obtenir un aperçu des ressources de __sqlmap__, une liste des fonctionnalités prises en charge et la description de toutes les options, ainsi que des exemples , nous vous recommandons de consulter [le wiki](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Liens
 ----
@@ -44,9 +44,6 @@ Liens
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * Manuel de l'utilisateur: https://github.com/sqlmapproject/sqlmap/wiki
 * Foire aux questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Mailing list subscription: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mailing list archive: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Démonstrations: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Les captures d'écran: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

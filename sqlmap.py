@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -9,7 +9,7 @@ import sys
 
 sys.dont_write_bytecode = True
 
-from lib.utils import versioncheck  # this has to be the first non-standard import
+__import__("lib.utils.versioncheck")  # this has to be the first non-standard import
 
 import bdb
 import distutils
@@ -63,8 +63,6 @@ try:
     from lib.core.testing import smokeTest
     from lib.core.testing import liveTest
     from lib.parse.cmdline import cmdLineParser
-    from lib.utils.api import setRestAPILog
-    from lib.utils.api import StdDbOut
 except KeyboardInterrupt:
     errMsg = "user aborted"
     logger.error(errMsg)
@@ -101,6 +99,15 @@ def checkEnvironment():
         logger.critical(errMsg)
         raise SystemExit
 
+    # Patch for pip (import) environment
+    if "sqlmap.sqlmap" in sys.modules:
+        for _ in ("cmdLineOptions", "conf", "kb"):
+            globals()[_] = getattr(sys.modules["lib.core.data"], _)
+
+        for _ in ("SqlmapBaseException", "SqlmapShellQuitException", "SqlmapSilentQuitException", "SqlmapUserQuitException"):
+            globals()[_] = getattr(sys.modules["lib.core.exception"], _)
+
+
 def main():
     """
     Main function of sqlmap when running from command line.
@@ -108,7 +115,6 @@ def main():
 
     try:
         checkEnvironment()
-
         setPaths(modulePath())
         banner()
 
@@ -116,7 +122,11 @@ def main():
         cmdLineOptions.update(cmdLineParser().__dict__)
         initOptions(cmdLineOptions)
 
-        if hasattr(conf, "api"):
+        if conf.get("api"):
+            # heavy imports
+            from lib.utils.api import StdDbOut
+            from lib.utils.api import setRestAPILog
+
             # Overwrite system standard output and standard error to write
             # to an IPC database
             sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
@@ -192,15 +202,27 @@ def main():
         print
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
+        valid = checkIntegrity()
 
         try:
-            if not checkIntegrity():
-                errMsg = "code integrity check failed. "
+            if valid is False:
+                errMsg = "code integrity check failed (turning off automatic issue creation). "
                 errMsg += "You should retrieve the latest development version from official GitHub "
                 errMsg += "repository at '%s'" % GIT_PAGE
                 logger.critical(errMsg)
                 print
                 dataToStdout(excMsg)
+                raise SystemExit
+
+            elif "tamper/" in excMsg:
+                logger.critical(errMsg)
+                print
+                dataToStdout(excMsg)
+                raise SystemExit
+
+            elif "MemoryError" in excMsg:
+                errMsg = "memory exhaustion detected"
+                logger.error(errMsg)
                 raise SystemExit
 
             elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
@@ -263,7 +285,7 @@ def main():
             errMsg = maskSensitiveData(errMsg)
             excMsg = maskSensitiveData(excMsg)
 
-            if hasattr(conf, "api"):
+            if conf.get("api") or not valid:
                 logger.critical("%s\n%s" % (errMsg, excMsg))
             else:
                 logger.critical(errMsg)
@@ -304,7 +326,7 @@ def main():
             kb.clear()
             main()
 
-        if hasattr(conf, "api"):
+        if conf.get("api"):
             try:
                 conf.databaseCursor.disconnect()
             except KeyboardInterrupt:

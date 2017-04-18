@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.datatype import AttribDict
 
 _defaults = {
-   "csvDel":       ",",
+   "csvDel":       ',',
    "timeSec":      5,
    "googlePage":   1,
    "verbose":      1,

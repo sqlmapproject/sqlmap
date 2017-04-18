@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -16,8 +16,8 @@ from lib.core.enums import CONTENT_TYPE
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
-from lib.techniques.brute.use import columnExists
-from lib.techniques.brute.use import tableExists
+from lib.utils.brute import columnExists
+from lib.utils.brute import tableExists
 
 def action():
     """
@@ -74,8 +74,7 @@ def action():
 
     if conf.getPasswordHashes:
         try:
-            conf.dumper.userSettings("database management system users password hashes",
-                                    conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
+            conf.dumper.userSettings("database management system users password hashes", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
         except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
@@ -83,8 +82,7 @@ def action():
 
     if conf.getPrivileges:
         try:
-            conf.dumper.userSettings("database management system users privileges",
-                                    conf.dbmsHandler.getPrivileges(), "privilege", CONTENT_TYPE.PRIVILEGES)
+            conf.dumper.userSettings("database management system users privileges", conf.dbmsHandler.getPrivileges(), "privilege", CONTENT_TYPE.PRIVILEGES)
         except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:
@@ -92,8 +90,7 @@ def action():
 
     if conf.getRoles:
         try:
-            conf.dumper.userSettings("database management system users roles",
-                                    conf.dbmsHandler.getRoles(), "role", CONTENT_TYPE.ROLES)
+            conf.dumper.userSettings("database management system users roles", conf.dbmsHandler.getRoles(), "role", CONTENT_TYPE.ROLES)
         except SqlmapNoneDataException, ex:
             logger.critical(ex)
         except:

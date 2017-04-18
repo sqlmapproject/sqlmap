@@ -1,6 +1,8 @@
 *.conf text eol=lf
+*.md text eol=lf
 *.md5 text eol=lf
 *.py text eol=lf
+*.xml text eol=lf
 
 *_ binary
 *.dll binary

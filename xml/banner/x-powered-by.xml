@@ -19,11 +19,11 @@
         <info technology="ASP.NET" type="Windows"/>
     </regexp>
 
-    <regexp value="(JBoss|Tomcat)[\-\_\/\ ]*([\d\.]+)">
+    <regexp value="(JBoss|Tomcat)[\-\_\/\ ]?([\d\.]+)">
         <info technology="Tomcat" tech_version="2"/>
     </regexp>
 
-    <regexp value="Servlet[\-\_\/\ ]*([\d\.]+)">
+    <regexp value="Servlet[\-\_\/\ ]?([\d\.]+)">
         <info technology="Servlet" tech_version="1"/>
     </regexp>
 </root>

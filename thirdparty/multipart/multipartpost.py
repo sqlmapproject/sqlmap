@@ -47,13 +47,13 @@ class MultipartPostHandler(urllib2.BaseHandler):
     def http_request(self, request):
         data = request.get_data()
 
-        if data is not None and type(data) != str:
+        if isinstance(data, dict):
             v_files = []
             v_vars = []
 
             try:
                 for(key, value) in data.items():
-                    if isinstance(value, file) or hasattr(value, 'file') or isinstance(value, StringIO.StringIO):
+                    if isinstance(value, file) or hasattr(value, "file") or isinstance(value, StringIO.StringIO):
                         v_files.append((key, value))
                     else:
                         v_vars.append((key, value))
@@ -65,10 +65,10 @@ class MultipartPostHandler(urllib2.BaseHandler):
                 data = urllib.urlencode(v_vars, doseq)
             else:
                 boundary, data = self.multipart_encode(v_vars, v_files)
-                contenttype = 'multipart/form-data; boundary=%s' % boundary
-                #if (request.has_header('Content-Type') and request.get_header('Content-Type').find('multipart/form-data') != 0):
-                #    print "Replacing %s with %s" % (request.get_header('content-type'), 'multipart/form-data')
-                request.add_unredirected_header('Content-Type', contenttype)
+                contenttype = "multipart/form-data; boundary=%s" % boundary
+                #if (request.has_header("Content-Type") and request.get_header("Content-Type").find("multipart/form-data") != 0):
+                #    print "Replacing %s with %s" % (request.get_header("content-type"), "multipart/form-data")
+                request.add_unredirected_header("Content-Type", contenttype)
 
             request.add_data(data)
         return request
@@ -78,32 +78,32 @@ class MultipartPostHandler(urllib2.BaseHandler):
             boundary = mimetools.choose_boundary()
 
         if buf is None:
-            buf = ''
+            buf = ""
 
         for (key, value) in vars:
             if key is not None and value is not None:
-                buf += '--%s\r\n' % boundary
-                buf += 'Content-Disposition: form-data; name="%s"' % key
-                buf += '\r\n\r\n' + value + '\r\n'
+                buf += "--%s\r\n" % boundary
+                buf += "Content-Disposition: form-data; name=\"%s\"" % key
+                buf += "\r\n\r\n" + value + "\r\n"
 
         for (key, fd) in files:
             file_size = os.fstat(fd.fileno())[stat.ST_SIZE] if isinstance(fd, file) else fd.len
-            filename = fd.name.split('/')[-1] if '/' in fd.name else fd.name.split('\\')[-1]
+            filename = fd.name.split("/")[-1] if "/" in fd.name else fd.name.split("\\")[-1]
             try:
-                contenttype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+                contenttype = mimetypes.guess_type(filename)[0] or "application/octet-stream"
             except:
                 # Reference: http://bugs.python.org/issue9291
-                contenttype = 'application/octet-stream'
-            buf += '--%s\r\n' % boundary
-            buf += 'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (key, filename)
-            buf += 'Content-Type: %s\r\n' % contenttype
-            # buf += 'Content-Length: %s\r\n' % file_size
+                contenttype = "application/octet-stream"
+            buf += "--%s\r\n" % boundary
+            buf += "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n" % (key, filename)
+            buf += "Content-Type: %s\r\n" % contenttype
+            # buf += "Content-Length: %s\r\n" % file_size
             fd.seek(0)
 
             buf = str(buf) if not isinstance(buf, unicode) else buf.encode("utf8")
-            buf += '\r\n%s\r\n' % fd.read()
+            buf += "\r\n%s\r\n" % fd.read()
 
-        buf += '--%s--\r\n\r\n' % boundary
+        buf += "--%s--\r\n\r\n" % boundary
 
         return boundary, buf
 

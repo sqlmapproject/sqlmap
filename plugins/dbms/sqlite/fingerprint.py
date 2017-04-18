@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -64,7 +64,7 @@ class Fingerprint(GenericFingerprint):
         * http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(SQLITE_ALIASES) or (conf.dbms or "").lower() in SQLITE_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(SQLITE_ALIASES):
             setDbms(DBMS.SQLITE)
 
             self.getBanner()

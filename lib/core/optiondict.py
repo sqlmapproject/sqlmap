@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -38,10 +38,13 @@ optDict = {
                                "authType":          "string",
                                "authCred":          "string",
                                "authFile":          "string",
+                               "ignore401":         "boolean",
+                               "ignoreProxy":       "boolean",
+                               "ignoreRedirects":   "boolean",
+                               "ignoreTimeouts":    "boolean",
                                "proxy":             "string",
                                "proxyCred":         "string",
                                "proxyFile":         "string",
-                               "ignoreProxy":       "boolean",
                                "tor":               "boolean",
                                "torPort":           "integer",
                                "torType":           "string",
@@ -74,7 +77,8 @@ optDict = {
                                "testParameter":     "string",
                                "skip":              "string",
                                "skipStatic":        "boolean",
-                               "dbms":              "string",
+                               "skip":              "string",
+                               "paramExclude":      "string",
                                "dbmsCred":          "string",
                                "os":                "string",
                                "invalidBignum":     "boolean",
@@ -104,7 +108,7 @@ optDict = {
                                "uCols":             "string",
                                "uChar":             "string",
                                "uFrom":             "string",
-                               "dnsName":           "string",
+                               "dnsDomain":         "string",
                                "secondOrder":       "string",
                              },
 
@@ -221,11 +225,11 @@ optDict = {
                                "identifyWaf":       "boolean",
                                "mobile":            "boolean",
                                "offline":           "boolean",
-                               "pageRank":          "boolean",
                                "purgeOutput":       "boolean",
                                "skipWaf":           "boolean",
                                "smart":             "boolean",
                                "tmpDir":            "string",
+                               "webRoot":           "string",
                                "wizard":            "boolean",
                                "verbose":           "integer",
                              },
@@ -234,10 +238,15 @@ optDict = {
                                "disablePrecon":     "boolean",
                                "profile":           "boolean",
                                "forceDns":          "boolean",
-                               "ignore401":         "boolean",
+                               "murphyRate":        "integer",
                                "smokeTest":         "boolean",
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",
                                "runCase":           "string",
+                      },
+            "API": {
+                               "api":               "boolean",
+                               "taskid":            "string",
+                               "database":          "string",
                       }
           }

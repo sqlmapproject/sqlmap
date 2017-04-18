@@ -21,7 +21,7 @@ Kurulum
 
 Veya tercihen, [Git](https://github.com/sqlmapproject/sqlmap) reposunu klonlayarak indirebilirsiniz
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap [Python](http://www.python.org/download/) sitesinde bulunan **2.6.x** and **2.7.x** versiyonları ile bütün platformlarda çalışabilmektedir.
 
@@ -37,7 +37,7 @@ Bütün seçenekleri gösterir
 
     python sqlmap.py -hh
 
-Program ile ilgili örnekleri [burada](https://asciinema.org/a/46601) bulabilirsiniz. Daha fazlası içinsqlmap'in bütün açıklamaları ile birlikte bütün özelliklerinin, örnekleri ile bulunduğu  [manuel sayfamıza](https://github.com/sqlmapproject/sqlmap/wiki) bakmanızı tavsiye ediyoruz
+Program ile ilgili örnekleri [burada](https://asciinema.org/a/46601) bulabilirsiniz. Daha fazlası içinsqlmap'in bütün açıklamaları ile birlikte bütün özelliklerinin, örnekleri ile bulunduğu  [manuel sayfamıza](https://github.com/sqlmapproject/sqlmap/wiki/Usage) bakmanızı tavsiye ediyoruz
 
 Links
 ----
@@ -48,9 +48,6 @@ Links
 * Hata takip etme sistemi: https://github.com/sqlmapproject/sqlmap/issues
 * Kullanıcı Manueli: https://github.com/sqlmapproject/sqlmap/wiki
 * Sıkça Sorulan Sorular(SSS): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Mail listesi: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mail RSS takibi: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mail listesi arşivi: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demolar: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

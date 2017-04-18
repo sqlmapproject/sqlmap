@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -33,7 +33,7 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 
-class Xp_cmdshell:
+class XP_cmdshell:
     """
     This class defines methods to deal with Microsoft SQL Server
     xp_cmdshell extended procedure for plugins.
@@ -255,9 +255,8 @@ class Xp_cmdshell:
                 message = "xp_cmdshell extended procedure does not seem to "
                 message += "be available. Do you want sqlmap to try to "
                 message += "re-enable it? [Y/n] "
-                choice = readInput(message, default="Y")
 
-                if not choice or choice in ("y", "Y"):
+                if readInput(message, default='Y', boolean=True):
                     self._xpCmdshellConfigure(1)
 
                     if self._xpCmdshellCheck():

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -20,7 +20,6 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import MYSQL_ALIASES
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
@@ -46,12 +45,12 @@ class Fingerprint(GenericFingerprint):
                      (32300, 32359),    # MySQL 3.23
                      (40000, 40032),    # MySQL 4.0
                      (40100, 40131),    # MySQL 4.1
-                     (50000, 50092),    # MySQL 5.0
+                     (50000, 50096),    # MySQL 5.0
                      (50100, 50172),    # MySQL 5.1
                      (50400, 50404),    # MySQL 5.4
-                     (50500, 50549),    # MySQL 5.5
-                     (50600, 50630),    # MySQL 5.6
-                     (50700, 50712),    # MySQL 5.7
+                     (50500, 50554),    # MySQL 5.5
+                     (50600, 50635),    # MySQL 5.6
+                     (50700, 50717),    # MySQL 5.7
                      (60000, 60014),    # MySQL 6.0
                    )
 
@@ -95,13 +94,13 @@ class Fingerprint(GenericFingerprint):
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
-        if wsOsFp and not hasattr(conf, "api"):
+        if wsOsFp and not conf.api:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
             dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
-            if dbmsOsFp and not hasattr(conf, "api"):
+            if dbmsOsFp and not conf.api:
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
@@ -150,9 +149,7 @@ class Fingerprint(GenericFingerprint):
         * http://dev.mysql.com/doc/refman/6.0/en/news-6-0-x.html (manual has been withdrawn)
         """
 
-        if not conf.extensiveFp and (Backend.isDbmsWithin(MYSQL_ALIASES) \
-           or (conf.dbms or "").lower() in MYSQL_ALIASES) and Backend.getVersion() and \
-           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        if not conf.extensiveFp and Backend.isDbmsWithin(MYSQL_ALIASES):
             setDbms("%s %s" % (DBMS.MYSQL, Backend.getVersion()))
 
             if Backend.isVersionGreaterOrEqualThan("5"):

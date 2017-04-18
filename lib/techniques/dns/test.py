@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -24,7 +24,7 @@ def dnsTest(payload):
     if not kb.dnsTest:
         errMsg = "data retrieval through DNS channel failed"
         if not conf.forceDns:
-            conf.dnsName = None
+            conf.dnsDomain = None
             errMsg += ". Turning off DNS exfiltration support"
             logger.error(errMsg)
         else:

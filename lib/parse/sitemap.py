@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -41,8 +41,7 @@ def parseSitemap(url, retVal=None):
             if url.endswith(".xml") and "sitemap" in url.lower():
                 if kb.followSitemapRecursion is None:
                     message = "sitemap recursion detected. Do you want to follow? [y/N] "
-                    test = readInput(message, default="N")
-                    kb.followSitemapRecursion = test[0] in ("y", "Y")
+                    kb.followSitemapRecursion = readInput(message, default='N', boolean=True)
                 if kb.followSitemapRecursion:
                     parseSitemap(url, retVal)
             else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -26,6 +26,7 @@ from lib.core.settings import MAX_RATIO
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
@@ -48,7 +49,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     threadData = getCurrentThreadData()
 
     if kb.testMode:
-        threadData.lastComparisonHeaders = listToStrValue(headers.headers) if headers else ""
+        threadData.lastComparisonHeaders = listToStrValue([_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)]) if headers else ""
         threadData.lastComparisonPage = page
         threadData.lastComparisonCode = code
 
@@ -56,7 +57,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         return None
 
     if any((conf.string, conf.notString, conf.regexp)):
-        rawResponse = "%s%s" % (listToStrValue(headers.headers) if headers else "", page)
+        rawResponse = "%s%s" % (listToStrValue([_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)]) if headers else "", page)
 
         # String to match in page when the query is True and/or valid
         if conf.string:
@@ -142,6 +143,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         if ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
             logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
+
+    if kb.testMode:
+        threadData.lastComparisonRatio = ratio
 
     # If it has been requested to return the ratio and not a comparison
     # response

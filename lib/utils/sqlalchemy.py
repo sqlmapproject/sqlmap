@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -9,6 +9,7 @@ import imp
 import logging
 import os
 import sys
+import traceback
 import warnings
 
 _sqlalchemy = None
@@ -53,8 +54,17 @@ class SQLAlchemy(GenericConnector):
                 if self.dialect:
                     conf.direct = conf.direct.replace(conf.dbms, self.dialect, 1)
 
-                engine = _sqlalchemy.create_engine(conf.direct, connect_args={'check_same_thread':False} if self.dialect == "sqlite" else {})
+                engine = _sqlalchemy.create_engine(conf.direct, connect_args={"check_same_thread": False} if self.dialect == "sqlite" else {})
                 self.connector = engine.connect()
+            except (TypeError, ValueError):
+                if "_get_server_version_info" in traceback.format_exc():
+                    try:
+                        import pymssql
+                        if int(pymssql.__version__[0]) < 2:
+                            raise SqlmapConnectionException("SQLAlchemy connection issue (obsolete version of pymssql ('%s') is causing problems)" % pymssql.__version__)
+                    except ImportError:
+                        pass
+                raise
             except SqlmapFilePathException:
                 raise
             except Exception, msg:

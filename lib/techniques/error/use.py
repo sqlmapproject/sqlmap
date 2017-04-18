@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -301,7 +301,7 @@ def errorUse(expression, dump=False):
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
     # Set kb.partRun in case the engine is called from the API
-    kb.partRun = getPartRun(alias=False) if hasattr(conf, "api") else None
+    kb.partRun = getPartRun(alias=False) if conf.api else None
 
     # We have to check if the SQL query might return multiple entries
     # and in such case forge the SQL limiting the query output one
@@ -358,9 +358,8 @@ def errorUse(expression, dump=False):
             if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
                 message = "due to huge table size do you want to remove "
                 message += "ORDER BY clause gaining speed over consistency? [y/N] "
-                _ = readInput(message, default="N")
 
-                if _ and _[0] in ("y", "Y"):
+                if readInput(message, default="N", boolean=True):
                     expression = expression[:expression.index(" ORDER BY ")]
 
             numThreads = min(conf.threads, (stopLimit - startLimit))

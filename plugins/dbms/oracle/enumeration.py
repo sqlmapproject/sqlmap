@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
 from lib.core.common import getLimitRange
 from lib.core.common import isAdminFromPrivileges
 from lib.core.common import isInferenceAvailable
@@ -17,6 +16,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
@@ -30,7 +30,7 @@ class Enumeration(GenericEnumeration):
     def getRoles(self, query2=False):
         infoMsg = "fetching database users roles"
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].roles
+        rootQuery = queries[DBMS.ORACLE].roles
 
         if conf.user == "CU":
             infoMsg += " for current user"
@@ -50,7 +50,7 @@ class Enumeration(GenericEnumeration):
                 condition = rootQuery.inband.condition
 
             if conf.user:
-                users = conf.user.split(",")
+                users = conf.user.split(',')
                 query += " WHERE "
                 query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
 
@@ -86,7 +86,7 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedUsersRoles and isInferenceAvailable() and not conf.direct:
             if conf.user:
-                users = conf.user.split(",")
+                users = conf.user.split(',')
             else:
                 if not len(kb.data.cachedUsers):
                     users = self.getUsers()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -382,27 +382,24 @@ class Filesystem(GenericFilesystem):
         if written is False:
             message = "do you want to try to upload the file with "
             message += "the custom Visual Basic script technique? [Y/n] "
-            choice = readInput(message, default="Y")
 
-            if not choice or choice.lower() == "y":
+            if readInput(message, default='Y', boolean=True):
                 self._stackedWriteFileVbs(tmpPath, wFileContent, dFile, fileType)
                 written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         if written is False:
             message = "do you want to try to upload the file with "
             message += "the built-in debug.exe technique? [Y/n] "
-            choice = readInput(message, default="Y")
 
-            if not choice or choice.lower() == "y":
+            if readInput(message, default='Y', boolean=True):
                 self._stackedWriteFileDebugExe(tmpPath, wFile, wFileContent, dFile, fileType)
                 written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 
         if written is False:
             message = "do you want to try to upload the file with "
             message += "the built-in certutil.exe technique? [Y/n] "
-            choice = readInput(message, default="Y")
 
-            if not choice or choice.lower() == "y":
+            if readInput(message, default='Y', boolean=True):
                 self._stackedWriteFileCertutilExe(tmpPath, wFile, wFileContent, dFile, fileType)
                 written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
 

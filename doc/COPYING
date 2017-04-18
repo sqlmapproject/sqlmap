@@ -1,7 +1,7 @@
 COPYING -- Describes the terms under which sqlmap is distributed. A copy
 of the GNU General Public License (GPL) is appended to this file.
 
-sqlmap is (C) 2006-2016 Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar.
+sqlmap is (C) 2006-2017 Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar.
 
 This program is free software; you may redistribute and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -46,14 +46,14 @@ to know exactly what a program is going to do before they run it.
 Source code also allows you to fix bugs and add new features. You are
 highly encouraged to send your changes to dev@sqlmap.org for possible
 incorporation into the main distribution. By sending these changes to the
-sqlmap developers, to the mailing lists, or via Git pull request, checking
-them into the sqlmap source code repository, it is understood (unless you
-specify otherwise) that you are offering the sqlmap project the unlimited,
-non-exclusive right to reuse, modify, and relicense the code. sqlmap will
-always be available Open Source, but this is important because the
-inability to relicense code has caused devastating problems for other Free
-Software projects (such as KDE and NASM). If you wish to specify special
-license conditions of your contributions, just say so when you send them.
+sqlmap developers or via Git pull request, checking them into the sqlmap
+source code repository, it is understood (unless you specify otherwise)
+that you are offering the sqlmap project the unlimited, non-exclusive
+right to reuse, modify, and relicense the code. sqlmap will always be
+available Open Source, but this is important because the inability to
+relicense code has caused devastating problems for other Free Software
+projects (such as KDE and NASM). If you wish to specify special license
+conditions of your contributions, just say so when you send them.
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -361,7 +361,6 @@ This license does not apply to the following components:
 * The MultipartPost library located under thirdparty/multipartpost/.
 * The Odict library located under thirdparty/odict/.
 * The Oset library located under thirdparty/oset/.
-* The PageRank library located under thirdparty/pagerank/.
 * The PrettyPrint library located under thirdparty/prettyprint/.
 * The PyDes library located under thirdparty/pydes/.
 * The SocksiPy library located under thirdparty/socks/.

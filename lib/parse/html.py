@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -59,6 +59,13 @@ def htmlParser(page):
 
     xmlfile = paths.ERRORS_XML
     handler = HTMLHandler(page)
+    key = hash(page)
+
+    if key in kb.cache.parsedDbms:
+        retVal = kb.cache.parsedDbms[key]
+        if retVal:
+            handler._markAsErrorPage()
+        return retVal
 
     parseXmlFile(xmlfile, handler)
 
@@ -67,6 +74,8 @@ def htmlParser(page):
         kb.htmlFp.append(handler.dbms)
     else:
         kb.lastParserStatus = None
+
+    kb.cache.parsedDbms[key] = handler.dbms
 
     # generic SQL warning/error messages
     if re.search(r"SQL (warning|error|syntax)", page, re.I):

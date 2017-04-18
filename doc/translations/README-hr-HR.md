@@ -18,7 +18,7 @@ Možete preuzeti zadnji tarball klikom [ovdje](https://github.com/sqlmapproject/
 
 Po mogućnosti, možete preuzeti sqlmap kloniranjem [Git](https://github.com/sqlmapproject/sqlmap) repozitorija:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap radi bez posebnih zahtjeva korištenjem [Python](http://www.python.org/download/) verzije **2.6.x** i/ili **2.7.x** na bilo kojoj platformi.
 
@@ -34,7 +34,7 @@ Kako biste dobili listu svih opcija i prekidača koristite:
     python sqlmap.py -hh
 
 Možete pronaći primjer izvršavanja [ovdje](https://asciinema.org/a/46601).
-Kako biste dobili pregled mogućnosti sqlmap-a, liste podržanih značajki te opis svih opcija i prekidača, zajedno s primjerima, preporučen je uvid u [korisnički priručnik](https://github.com/sqlmapproject/sqlmap/wiki).
+Kako biste dobili pregled mogućnosti sqlmap-a, liste podržanih značajki te opis svih opcija i prekidača, zajedno s primjerima, preporučen je uvid u [korisnički priručnik](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Poveznice
 ----
@@ -45,9 +45,6 @@ Poveznice
 * Prijava problema: https://github.com/sqlmapproject/sqlmap/issues
 * Korisnički priručnik: https://github.com/sqlmapproject/sqlmap/wiki
 * Najčešće postavljena pitanja (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Pretplata na mailing listu: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* RSS feed mailing liste: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Arhiva mailing liste: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demo: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Slike zaslona: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

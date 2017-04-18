@@ -17,7 +17,7 @@ Se puede descargar el "tarball" más actual haciendo clic [aquí](https://github
 
 Preferentemente, se puede descargar sqlmap clonando el repositorio [Git](https://github.com/sqlmapproject/sqlmap):
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap funciona con las siguientes versiones de [Python](http://www.python.org/download/) ** 2.6.x** y ** 2.7.x** en cualquier plataforma.
 
@@ -26,14 +26,14 @@ Uso
 
 Para obtener una lista de opciones básicas: 
 
-    python sqlmap.py -h 
+    python sqlmap.py -h
 
 Para obtener una lista de todas las opciones:
 
     python sqlmap.py -hh
 
 Se puede encontrar una muestra de su funcionamiento [aquí](https://asciinema.org/a/46601).
-Para obtener una visión general de las capacidades de sqlmap, así como un listado funciones soportadas y descripción de todas las opciones y modificadores, junto con ejemplos, se recomienda consultar el [manual de usuario](https://github.com/sqlmapproject/sqlmap/wiki).
+Para obtener una visión general de las capacidades de sqlmap, así como un listado funciones soportadas y descripción de todas las opciones y modificadores, junto con ejemplos, se recomienda consultar el [manual de usuario](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Enlaces
 ---
@@ -44,9 +44,6 @@ Enlaces
 * Seguimiento de problemas "Issue tracker": https://github.com/sqlmapproject/sqlmap/issues
 * Manual de usuario: https://github.com/sqlmapproject/sqlmap/wiki
 * Preguntas frecuentes (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Subscripción a la lista de correo: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Fuente de la lista de correo "RSS feed": http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Archivos de lista de correo: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demostraciones: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Imágenes: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

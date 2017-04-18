@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -43,7 +43,7 @@ def updateMSSQLXML():
 
         return
 
-    releases = re.findall("class=\"BCC_DV_01DarkBlueTitle\">SQL Server\s(.+?)\sBuilds", mssqlVersionsHtmlString, re.I | re.M)
+    releases = re.findall("class=\"BCC_DV_01DarkBlueTitle\">SQL Server\s(.+?)\sBuilds", mssqlVersionsHtmlString, re.I)
     releasesCount = len(releases)
 
     # Create the minidom document
@@ -74,7 +74,7 @@ def updateMSSQLXML():
             stopIdx = mssqlVersionsHtmlString.index("SQL Server %s Builds" % releases[index + 1])
 
         mssqlVersionsReleaseString = mssqlVersionsHtmlString[startIdx:stopIdx]
-        servicepackVersion = re.findall("</td><td>[7\.0|2000|2005|2008|2008 R2]*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I | re.M)
+        servicepackVersion = re.findall("</td><td>(7\.0|2000|2005|2008|2008 R2)*(.*?)</td><td.*?([\d\.]+)</td>[\r]*\n", mssqlVersionsReleaseString, re.I)
 
         for servicePack, version in servicepackVersion:
             if servicePack.startswith(" "):

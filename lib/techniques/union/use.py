@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -215,7 +215,7 @@ def unionUse(expression, unpack=True, dump=False):
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
     # Set kb.partRun in case the engine is called from the API
-    kb.partRun = getPartRun(alias=False) if hasattr(conf, "api") else None
+    kb.partRun = getPartRun(alias=False) if conf.api else None
 
     if Backend.isDbms(DBMS.MSSQL) and kb.dumpColumns:
         kb.rowXmlMode = True
@@ -226,7 +226,7 @@ def unionUse(expression, unpack=True, dump=False):
 
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
         # Removed ORDER BY clause because UNION does not play well with it
-        expression = re.sub("\s*ORDER BY\s+[\w,]+", "", expression, re.I)
+        expression = re.sub("(?i)\s*ORDER BY\s+[\w,]+", "", expression)
         debugMsg = "stripping ORDER BY clause from statement because "
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
@@ -337,7 +337,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                         if output:
                             with kb.locks.value:
-                                if all(map(lambda _: _ in output, (kb.chars.start, kb.chars.stop))):
+                                if all(_ in output for _ in (kb.chars.start, kb.chars.stop)):
                                     items = parseUnionPage(output)
 
                                     if threadData.shared.showEta:
@@ -378,7 +378,7 @@ def unionUse(expression, unpack=True, dump=False):
                                     del threadData.shared.buffered[0]
 
                             if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
-                                _ = ",".join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items))) if not isinstance(items, basestring) else items
+                                _ = ','.join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items))) if not isinstance(items, basestring) else items
                                 status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
 
                                 if len(status) > width:

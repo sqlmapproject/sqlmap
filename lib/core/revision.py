@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import os
 import re
-
-from subprocess import PIPE
-from subprocess import Popen as execute
+import subprocess
 
 def getRevisionNumber():
     """
@@ -46,7 +44,7 @@ def getRevisionNumber():
             break
 
     if not retVal:
-        process = execute("git rev-parse --verify HEAD", shell=True, stdout=PIPE, stderr=PIPE)
+        process = subprocess.Popen("git rev-parse --verify HEAD", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, _ = process.communicate()
         match = re.search(r"(?i)[0-9a-f]{32}", stdout or "")
         retVal = match.group(0) if match else None

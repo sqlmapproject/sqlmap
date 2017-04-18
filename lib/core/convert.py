@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
+finally:
+    import pickle as picklePy
+
 import base64
 import json
-import pickle
 import re
 import StringIO
 import sys
@@ -41,7 +47,7 @@ def base64pickle(value):
     Serializes (with pickle) and encodes to Base64 format supplied (binary) value
 
     >>> base64pickle('foobar')
-    'gAJVBmZvb2JhcnEALg=='
+    'gAJVBmZvb2JhcnEBLg=='
     """
 
     retVal = None
@@ -60,11 +66,11 @@ def base64pickle(value):
 
     return retVal
 
-def base64unpickle(value):
+def base64unpickle(value, unsafe=False):
     """
     Decodes value from Base64 to plain format and deserializes (with pickle) its content
 
-    >>> base64unpickle('gAJVBmZvb2JhcnEALg==')
+    >>> base64unpickle('gAJVBmZvb2JhcnEBLg==')
     'foobar'
     """
 
@@ -78,9 +84,12 @@ def base64unpickle(value):
         self.load_reduce()
 
     def loads(str):
-        file = StringIO.StringIO(str)
-        unpickler = pickle.Unpickler(file)
-        unpickler.dispatch[pickle.REDUCE] = _
+        f = StringIO.StringIO(str)
+        if unsafe:
+            unpickler = picklePy.Unpickler(f)
+            unpickler.dispatch[picklePy.REDUCE] = _
+        else:
+            unpickler = pickle.Unpickler(f)
         return unpickler.load()
 
     try:

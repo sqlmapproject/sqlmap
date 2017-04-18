@@ -19,7 +19,7 @@ wikiに載っているいくつかの機能のデモをスクリーンショッ�
 
 [Git](https://github.com/sqlmapproject/sqlmap) レポジトリをクローンして、sqlmapをダウンロードすることも可能です。:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmapは、 [Python](http://www.python.org/download/) バージョン **2.6.x** または **2.7.x** がインストールされていれば、全てのプラットフォームですぐに使用できます。
 
@@ -35,7 +35,7 @@ sqlmapは、 [Python](http://www.python.org/download/) バージョン **2.6.x**
     python sqlmap.py -hh
 
 実行例を [こちら](https://asciinema.org/a/46601) で見ることができます。
-sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki) で確認することができます。
+sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage) で確認することができます。
 
 リンク
 ----
@@ -46,9 +46,6 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 * 課題管理: https://github.com/sqlmapproject/sqlmap/issues
 * ユーザーマニュアル: https://github.com/sqlmapproject/sqlmap/wiki
 * よくある質問 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* メーリングリストへの参加: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* メーリングリストのRSSフィード: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* メーリングリストのアーカイブ: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * デモ: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * スクリーンショット: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -34,6 +34,7 @@ class DBMS:
     SQLITE = "SQLite"
     SYBASE = "Sybase"
     HSQLDB = "HSQLDB"
+    INFORMIX = "Informix"
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
@@ -47,6 +48,7 @@ class DBMS_DIRECTORY_NAME:
     SQLITE = "sqlite"
     SYBASE = "sybase"
     HSQLDB = "hsqldb"
+    INFORMIX = "informix"
 
 class CUSTOM_LOGGING:
     PAYLOAD = 9
@@ -174,6 +176,7 @@ class HTTP_HEADER:
     PROXY_CONNECTION = "Proxy-Connection"
     RANGE = "Range"
     REFERER = "Referer"
+    REFRESH = "Refresh"  # Reference: http://stackoverflow.com/a/283794
     SERVER = "Server"
     SET_COOKIE = "Set-Cookie"
     TRANSFER_ENCODING = "Transfer-Encoding"
@@ -284,31 +287,32 @@ class WEB_API:
     JSP = "jsp"
 
 class CONTENT_TYPE:
-    TECHNIQUES = 0
-    DBMS_FINGERPRINT = 1
-    BANNER = 2
-    CURRENT_USER = 3
-    CURRENT_DB = 4
-    HOSTNAME = 5
-    IS_DBA = 6
-    USERS = 7
-    PASSWORDS = 8
-    PRIVILEGES = 9
-    ROLES = 10
-    DBS = 11
-    TABLES = 12
-    COLUMNS = 13
-    SCHEMA = 14
-    COUNT = 15
-    DUMP_TABLE = 16
-    SEARCH = 17
-    SQL_QUERY = 18
-    COMMON_TABLES = 19
-    COMMON_COLUMNS = 20
-    FILE_READ = 21
-    FILE_WRITE = 22
-    OS_CMD = 23
-    REG_READ = 24
+    TARGET = 0
+    TECHNIQUES = 1
+    DBMS_FINGERPRINT = 2
+    BANNER = 3
+    CURRENT_USER = 4
+    CURRENT_DB = 5
+    HOSTNAME = 6
+    IS_DBA = 7
+    USERS = 8
+    PASSWORDS = 9
+    PRIVILEGES = 10
+    ROLES = 11
+    DBS = 12
+    TABLES = 13
+    COLUMNS = 14
+    SCHEMA = 15
+    COUNT = 16
+    DUMP_TABLE = 17
+    SEARCH = 18
+    SQL_QUERY = 19
+    COMMON_TABLES = 20
+    COMMON_COLUMNS = 21
+    FILE_READ = 22
+    FILE_WRITE = 23
+    OS_CMD = 24
+    REG_READ = 25
 
 PART_RUN_CONTENT_TYPES = {
     "checkDbms": CONTENT_TYPE.TECHNIQUES,
@@ -360,7 +364,13 @@ class MKSTEMP_PREFIX:
     HASHES = "sqlmaphashes-"
     CRAWLER = "sqlmapcrawler-"
     IPC = "sqlmapipc-"
+    CONFIG = "sqlmapconfig-"
     TESTING = "sqlmaptesting-"
     RESULTS = "sqlmapresults-"
     COOKIE_JAR = "sqlmapcookiejar-"
     BIG_ARRAY = "sqlmapbigarray-"
+
+class TIMEOUT_STATE:
+    NORMAL = 0
+    EXCEPTION = 1
+    TIMEOUT = 2

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -43,6 +43,7 @@ from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
+from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.unescaper import unescaper
 
 class Agent(object):
@@ -62,7 +63,7 @@ class Agent(object):
 
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE,):  # non-standard object(s) make problems to a database connector while returned (e.g. XMLTYPE)
             _, _, _, _, _, _, fieldsToCastStr, _ = self.getFields(query)
-            for field in fieldsToCastStr.split(","):
+            for field in fieldsToCastStr.split(','):
                 query = query.replace(field, self.nullAndCastField(field))
 
         if kb.tamperFunctions:
@@ -295,7 +296,7 @@ class Agent(object):
         elif suffix and not comment:
             expression += suffix.replace('\\', BOUNDARY_BACKSLASH_MARKER)
 
-        return re.sub(r"(?s);\W*;", ";", expression)
+        return re.sub(r";\W*;", ";", expression)
 
     def cleanupPayload(self, payload, origValue=None):
         if payload is None:
@@ -343,7 +344,7 @@ class Agent(object):
         """
 
         if payload:
-            payload = payload.replace("[SLEEPTIME]", str(conf.timeSec))
+            payload = payload.replace(SLEEP_TIME_MARKER, str(conf.timeSec))
 
         return payload
 
@@ -486,7 +487,7 @@ class Agent(object):
         @rtype: C{str}
         """
 
-        prefixRegex = r"(?:\s+(?:FIRST|SKIP|LIMIT \d+)\s+\d+)*"
+        prefixRegex = r"(?:\s+(?:FIRST|SKIP|LIMIT(?: \d+)?)\s+\d+)*"
         fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectRownum = re.search(r"\ASELECT\s+([^()]+?),\s*ROWNUM AS LIMIT FROM", query, re.I)
         fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
@@ -507,26 +508,28 @@ class Agent(object):
         if fieldsSubstr:
             fieldsToCastStr = query
         elif fieldsMinMaxstr:
-            fieldsToCastStr = fieldsMinMaxstr.groups()[0]
+            fieldsToCastStr = fieldsMinMaxstr.group(1)
         elif fieldsExists:
             if fieldsSelect:
-                fieldsToCastStr = fieldsSelect.groups()[0]
+                fieldsToCastStr = fieldsSelect.group(1)
         elif fieldsSelectTop:
-            fieldsToCastStr = fieldsSelectTop.groups()[0]
+            fieldsToCastStr = fieldsSelectTop.group(1)
         elif fieldsSelectRownum:
-            fieldsToCastStr = fieldsSelectRownum.groups()[0]
+            fieldsToCastStr = fieldsSelectRownum.group(1)
         elif fieldsSelectDistinct:
             if Backend.getDbms() in (DBMS.HSQLDB,):
                 fieldsToCastStr = fieldsNoSelect
             else:
-                fieldsToCastStr = fieldsSelectDistinct.groups()[0]
+                fieldsToCastStr = fieldsSelectDistinct.group(1)
         elif fieldsSelectCase:
-            fieldsToCastStr = fieldsSelectCase.groups()[0]
+            fieldsToCastStr = fieldsSelectCase.group(1)
         elif fieldsSelectFrom:
             fieldsToCastStr = query[:unArrayizeValue(_)] if _ else query
             fieldsToCastStr = re.sub(r"\ASELECT%s\s+" % prefixRegex, "", fieldsToCastStr)
         elif fieldsSelect:
-            fieldsToCastStr = fieldsSelect.groups()[0]
+            fieldsToCastStr = fieldsSelect.group(1)
+
+        fieldsToCastStr = fieldsToCastStr or ""
 
         # Function
         if re.search("\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
@@ -667,24 +670,23 @@ class Agent(object):
                 concatenatedQuery = "'%s'&%s&'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
         else:
-            warnMsg = "applying generic concatenation with double pipes ('||')"
+            warnMsg = "applying generic concatenation (CONCAT)"
             singleTimeWarnMessage(warnMsg)
 
             if fieldsExists:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
-                concatenatedQuery += "||'%s'" % kb.chars.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
+                concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsSelectCase:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||(SELECT " % kb.chars.start, 1)
-                concatenatedQuery += ")||'%s'" % kb.chars.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
+                concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsSelectFrom:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
-                concatenatedQuery = "%s||'%s'%s" % (concatenatedQuery[:_], kb.chars.stop, concatenatedQuery[_:])
+                concatenatedQuery = "%s),'%s')%s" % (concatenatedQuery[:_].replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1), kb.chars.stop, concatenatedQuery[_:])
             elif fieldsSelect:
-                concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
-                concatenatedQuery += "||'%s'" % kb.chars.stop
+                concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
+                concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsNoSelect:
-                concatenatedQuery = "'%s'||%s||'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
+                concatenatedQuery = "CONCAT(CONCAT('%s',%s),'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
         return concatenatedQuery
 
@@ -1074,6 +1076,21 @@ class Agent(object):
     def runAsDBMSUser(self, query):
         if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:
             query = getSQLSnippet(DBMS.MSSQL, "run_statement_as_user", USER=conf.dbmsUsername, PASSWORD=conf.dbmsPassword, STATEMENT=query.replace("'", "''"))
+
+        return query
+
+    def whereQuery(self, query):
+        if conf.dumpWhere and query:
+            prefix, suffix = query.split(" ORDER BY ") if " ORDER BY " in query else (query, "")
+
+            if "%s)" % conf.tbl.upper() in prefix.upper():
+                prefix = re.sub(r"(?i)%s\)" % re.escape(conf.tbl), "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)
+            elif re.search(r"(?i)\bWHERE\b", prefix):
+                prefix += " AND %s" % conf.dumpWhere
+            else:
+                prefix += " WHERE %s" % conf.dumpWhere
+
+            query = "%s ORDER BY %s" % (prefix, suffix) if suffix else prefix
 
         return query
 

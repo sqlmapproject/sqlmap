@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -63,7 +63,7 @@ class Dump(object):
         self._lock = threading.Lock()
 
     def _write(self, data, newline=True, console=True, content_type=None):
-        if hasattr(conf, "api"):
+        if conf.api:
             dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
             return
 
@@ -110,7 +110,7 @@ class Dump(object):
     def string(self, header, data, content_type=None, sort=True):
         kb.stickyLevel = None
 
-        if hasattr(conf, "api"):
+        if conf.api:
             self._write(data, content_type=content_type)
             return
 
@@ -144,7 +144,7 @@ class Dump(object):
             except:
                 pass
 
-        if hasattr(conf, "api"):
+        if conf.api:
             self._write(elements, content_type=content_type)
             return
 
@@ -193,7 +193,7 @@ class Dump(object):
         users = userSettings.keys()
         users.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
 
-        if hasattr(conf, "api"):
+        if conf.api:
             self._write(userSettings, content_type=content_type)
             return
 
@@ -227,7 +227,7 @@ class Dump(object):
 
     def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
-            if hasattr(conf, "api"):
+            if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.TABLES)
                 return
 
@@ -270,7 +270,7 @@ class Dump(object):
 
     def dbTableColumns(self, tableColumns, content_type=None):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
-            if hasattr(conf, "api"):
+            if conf.api:
                 self._write(tableColumns, content_type=content_type)
                 return
 
@@ -344,7 +344,7 @@ class Dump(object):
 
     def dbTablesCount(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
-            if hasattr(conf, "api"):
+            if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.COUNT)
                 return
 
@@ -403,7 +403,7 @@ class Dump(object):
             db = "All"
         table = tableValues["__infos__"]["table"]
 
-        if hasattr(conf, "api"):
+        if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
             return
 
@@ -666,7 +666,7 @@ class Dump(object):
                 logger.warn(msg)
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
-        if hasattr(conf, "api"):
+        if conf.api:
             self._write(dbColumnsDict, content_type=CONTENT_TYPE.COLUMNS)
             return
 

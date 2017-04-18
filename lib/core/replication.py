@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -10,6 +10,7 @@ import sqlite3
 from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import getSafeExString
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import UNICODE_ENCODING
@@ -21,10 +22,15 @@ class Replication(object):
     """
 
     def __init__(self, dbpath):
-        self.dbpath = dbpath
-        self.connection = sqlite3.connect(dbpath)
-        self.connection.isolation_level = None
-        self.cursor = self.connection.cursor()
+        try:
+            self.dbpath = dbpath
+            self.connection = sqlite3.connect(dbpath)
+            self.connection.isolation_level = None
+            self.cursor = self.connection.cursor()
+        except sqlite3.OperationalError, ex:
+            errMsg = "error occurred while opening a replication "
+            errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+            raise SqlmapConnectionException(errMsg)
 
     class DataType:
         """

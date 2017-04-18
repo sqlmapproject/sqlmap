@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -18,7 +18,6 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
@@ -103,9 +102,7 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(FIREBIRD_ALIASES) \
-           or (conf.dbms or "").lower() in FIREBIRD_ALIASES) and Backend.getVersion() and \
-           Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        if not conf.extensiveFp and Backend.isDbmsWithin(FIREBIRD_ALIASES):
             setDbms("%s %s" % (DBMS.FIREBIRD, Backend.getVersion()))
 
             self.getBanner()

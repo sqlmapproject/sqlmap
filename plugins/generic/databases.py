@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -32,6 +32,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.dicts import FIREBIRD_TYPES
+from lib.core.dicts import INFORMIX_TYPES
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -41,9 +42,9 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
-from lib.techniques.brute.use import columnExists
-from lib.techniques.brute.use import tableExists
 from lib.techniques.union.use import unionUse
+from lib.utils.brute import columnExists
+from lib.utils.brute import tableExists
 
 class Databases:
     """
@@ -214,7 +215,7 @@ class Databases:
             conf.db = conf.db.upper()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -242,11 +243,11 @@ class Databases:
                 return kb.data.cachedTables
 
             message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            test = readInput(message, default="Y" if "Y" in message else "N")
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
                 return tableExists(paths.COMMON_TABLES)
@@ -268,9 +269,9 @@ class Databases:
                     if conf.excludeSysDbs:
                         infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                         logger.info(infoMsg)
-                        query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
+                        query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
                     else:
-                        query += " IN (%s)" % ",".join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
+                        query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
                 if len(dbs) < 2 and ("%s," % condition) in query:
                     query = query.replace("%s," % condition, "", 1)
@@ -335,7 +336,7 @@ class Databases:
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
-                    elif Backend.isDbms(DBMS.HSQLDB):
+                    elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX):
                         query = rootQuery.blind.query % (index, unsafeSQLIdentificatorNaming(db))
                     else:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
@@ -421,7 +422,7 @@ class Databases:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
                 conf.tbl = conf.tbl.upper()
 
-            tblList = conf.tbl.split(",")
+            tblList = conf.tbl.split(',')
         else:
             self.getTables()
 
@@ -485,11 +486,11 @@ class Databases:
                 return kb.data.cachedColumns
 
             message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            test = readInput(message, default="Y" if "Y" in message else "N")
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)
@@ -603,8 +604,17 @@ class Databases:
                                 if len(columnData) == 1:
                                     columns[name] = None
                                 else:
+                                    key = int(columnData[1]) if isinstance(columnData[1], basestring) and columnData[1].isdigit() else columnData[1]
                                     if Backend.isDbms(DBMS.FIREBIRD):
-                                        columnData[1] = FIREBIRD_TYPES.get(int(columnData[1]) if isinstance(columnData[1], basestring) and columnData[1].isdigit() else columnData[1], columnData[1])
+                                        columnData[1] = FIREBIRD_TYPES.get(key, columnData[1])
+                                    elif Backend.isDbms(DBMS.INFORMIX):
+                                        notNull = False
+                                        if isinstance(key, int) and key > 255:
+                                            key -= 256
+                                            notNull = True
+                                        columnData[1] = INFORMIX_TYPES.get(key, columnData[1])
+                                        if notNull:
+                                            columnData[1] = "%s NOT NULL" % columnData[1]
 
                                     columns[name] = columnData[1]
 
@@ -654,6 +664,10 @@ class Databases:
 
                 elif Backend.isDbms(DBMS.FIREBIRD):
                     query = rootQuery.blind.count % (tbl)
+                    query += condQuery
+
+                elif Backend.isDbms(DBMS.INFORMIX):
+                    query = rootQuery.blind.count % (conf.db, conf.db, conf.db, conf.db, conf.db, tbl)
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.SQLITE):
@@ -712,6 +726,10 @@ class Databases:
                         query = rootQuery.blind.query % (tbl)
                         query += condQuery
                         field = None
+                    elif Backend.isDbms(DBMS.INFORMIX):
+                        query = rootQuery.blind.query % (index, conf.db, conf.db, conf.db, conf.db, conf.db, tbl)
+                        query += condQuery
+                        field = condition
 
                     query = agent.limitQuery(index, query, field, field)
                     column = unArrayizeValue(inject.getValue(query, union=False, error=False))
@@ -744,11 +762,22 @@ class Databases:
                                                                 conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                             elif Backend.isDbms(DBMS.FIREBIRD):
                                 query = rootQuery.blind.query2 % (tbl, column)
+                            elif Backend.isDbms(DBMS.INFORMIX):
+                                query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, conf.db, tbl, column)
 
                             colType = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
+                            key = int(colType) if isinstance(colType, basestring) and colType.isdigit() else colType
                             if Backend.isDbms(DBMS.FIREBIRD):
-                                colType = FIREBIRD_TYPES.get(colType, colType)
+                                colType = FIREBIRD_TYPES.get(key, colType)
+                            elif Backend.isDbms(DBMS.INFORMIX):
+                                notNull = False
+                                if isinstance(key, int) and key > 255:
+                                    key -= 256
+                                    notNull = True
+                                colType = INFORMIX_TYPES.get(key, colType)
+                                if notNull:
+                                    colType = "%s NOT NULL" % colType
 
                             column = safeSQLIdentificatorNaming(column)
                             columns[column] = colType
@@ -854,7 +883,7 @@ class Databases:
         self.forceDbmsEnum()
 
         if conf.tbl:
-            for table in conf.tbl.split(","):
+            for table in conf.tbl.split(','):
                 self._tableGetCount(conf.db, table)
         else:
             self.getTables()

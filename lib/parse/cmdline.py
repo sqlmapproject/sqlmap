@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -152,6 +152,15 @@ def cmdLineParser(argv=None):
         request.add_option("--ignore-401", dest="ignore401", action="store_true",
                           help="Ignore HTTP Error 401 (Unauthorized)")
 
+        request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
+                           help="Ignore system default proxy settings")
+
+        request.add_option("--ignore-redirects", dest="ignoreRedirects", action="store_true",
+                          help="Ignore redirection attempts")
+
+        request.add_option("--ignore-timeouts", dest="ignoreTimeouts", action="store_true",
+                          help="Ignore connection timeouts")
+
         request.add_option("--proxy", dest="proxy",
                            help="Use a proxy to connect to the target URL")
 
@@ -161,9 +170,6 @@ def cmdLineParser(argv=None):
 
         request.add_option("--proxy-file", dest="proxyFile",
                            help="Load proxy list from a file")
-
-        request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
-                           help="Ignore system default proxy settings")
 
         request.add_option("--tor", dest="tor",
                                   action="store_true",
@@ -261,7 +267,10 @@ def cmdLineParser(argv=None):
                              help="Skip testing for given parameter(s)")
 
         injection.add_option("--skip-static", dest="skipStatic", action="store_true",
-                             help="Skip testing parameters that not appear dynamic")
+                             help="Skip testing parameters that not appear to be dynamic")
+
+        injection.add_option("--param-exclude", dest="paramExclude",
+                           help="Regexp to exclude parameters from testing (e.g. \"ses\")")
 
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to this value")
@@ -361,7 +370,7 @@ def cmdLineParser(argv=None):
         techniques.add_option("--union-from", dest="uFrom",
                               help="Table to use in FROM part of UNION query SQL injection")
 
-        techniques.add_option("--dns-domain", dest="dnsName",
+        techniques.add_option("--dns-domain", dest="dnsDomain",
                               help="Domain name used for DNS exfiltration attack")
 
         techniques.add_option("--second-order", dest="secondOrder",
@@ -473,10 +482,10 @@ def cmdLineParser(argv=None):
                                help="Use WHERE condition while table dumping")
 
         enumeration.add_option("--start", dest="limitStart", type="int",
-                               help="First query output entry to retrieve")
+                               help="First dump table entry to retrieve")
 
         enumeration.add_option("--stop", dest="limitStop", type="int",
-                               help="Last query output entry to retrieve")
+                               help="Last dump table entry to retrieve")
 
         enumeration.add_option("--first", dest="firstChar", type="int",
                                help="First query output word character to retrieve")
@@ -729,10 +738,6 @@ def cmdLineParser(argv=None):
                                   action="store_true",
                                   help="Work in offline mode (only use session data)")
 
-        miscellaneous.add_option("--page-rank", dest="pageRank",
-                                  action="store_true",
-                                  help="Display page rank (PR) for Google dork results")
-
         miscellaneous.add_option("--purge-output", dest="purgeOutput",
                                   action="store_true",
                                   help="Safely remove all content from output directory")
@@ -751,6 +756,9 @@ def cmdLineParser(argv=None):
         miscellaneous.add_option("--tmp-dir", dest="tmpDir",
                                   help="Local directory for storing temporary files")
 
+        miscellaneous.add_option("--web-root", dest="webRoot",
+                                  help="Web server document root directory (e.g. \"/var/www\")")
+
         miscellaneous.add_option("--wizard", dest="wizard",
                                   action="store_true",
                                   help="Simple wizard interface for beginner users")
@@ -759,10 +767,13 @@ def cmdLineParser(argv=None):
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--pickled-options", dest="pickledOptions",
+        parser.add_option("--murphy-rate", dest="murphyRate", type="int",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--disable-stats", dest="disableStats", action="store_true",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
@@ -784,6 +795,14 @@ def cmdLineParser(argv=None):
                           help=SUPPRESS_HELP)
 
         parser.add_option("--run-case", dest="runCase", help=SUPPRESS_HELP)
+
+        # API options
+        parser.add_option("--api", dest="api", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--taskid", dest="taskid", help=SUPPRESS_HELP)
+
+        parser.add_option("--database", dest="database", help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)
@@ -882,10 +901,15 @@ def cmdLineParser(argv=None):
             except ValueError, ex:
                 raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex.message
 
-        # Hide non-basic options in basic help case
         for i in xrange(len(argv)):
             if argv[i] == "-hh":
                 argv[i] = "-h"
+            elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in ((argv[i].split('=', 1)[-1].strip() or ' ')[0], argv[i][-1])):
+                dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is, well, illegal (%s)\n" % argv[i])
+                raise SystemExit
+            elif len(argv[i]) > 1 and u"\uff0c" in argv[i].split('=', 1)[-1]:
+                dataToStdout("[!] copy-pasting illegal (non-console) comma characters from Internet is, well, illegal (%s)\n" % argv[i])
+                raise SystemExit
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
                 raise SystemExit
@@ -898,7 +922,7 @@ def cmdLineParser(argv=None):
             elif argv[i] == "--version":
                 print VERSION_STRING.split('/')[-1]
                 raise SystemExit
-            elif argv[i] == "-h":
+            elif argv[i] in ("-h", "--help"):
                 advancedHelp = False
                 for group in parser.option_groups[:]:
                     found = False
@@ -909,6 +933,14 @@ def cmdLineParser(argv=None):
                             found = True
                     if not found:
                         parser.option_groups.remove(group)
+
+        for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
+            try:
+                if argv.index(verbosity) == len(argv) - 1 or not argv[argv.index(verbosity) + 1].isdigit():
+                    conf.verbose = verbosity.count('v') + 1
+                    del argv[argv.index(verbosity)]
+            except (IndexError, ValueError):
+                pass
 
         try:
             (args, _) = parser.parse_args(argv)
@@ -936,7 +968,7 @@ def cmdLineParser(argv=None):
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
-            args.purgeOutput, args.pickledOptions, args.sitemapUrl)):
+            args.purgeOutput, args.sitemapUrl)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help\n"
             parser.error(errMsg)

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
-from lib.core.common import Backend
 from lib.core.common import getLimitRange
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
@@ -22,6 +21,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
@@ -75,7 +75,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -88,7 +88,7 @@ class Enumeration(GenericEnumeration):
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+        rootQuery = queries[DBMS.MSSQL].tables
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             for db in dbs:
@@ -163,13 +163,16 @@ class Enumeration(GenericEnumeration):
 
     def searchTable(self):
         foundTbls = {}
-        tblList = conf.tbl.split(",")
-        rootQuery = queries[Backend.getIdentifiedDbms()].search_table
+        tblList = conf.tbl.split(',')
+        rootQuery = queries[DBMS.MSSQL].search_table
         tblCond = rootQuery.inband.condition
         tblConsider, tblCondParam = self.likeOrExact("table")
 
-        if conf.db and conf.db != CURRENT_DB:
-            enumDbs = conf.db.split(",")
+        if conf.db == CURRENT_DB:
+            conf.db = self.getCurrentDb()
+
+        if conf.db:
+            enumDbs = conf.db.split(',')
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
         else:
@@ -260,13 +263,13 @@ class Enumeration(GenericEnumeration):
         self.dumpFoundTables(foundTbls)
 
     def searchColumn(self):
-        rootQuery = queries[Backend.getIdentifiedDbms()].search_column
+        rootQuery = queries[DBMS.MSSQL].search_column
         foundCols = {}
         dbs = {}
         whereTblsQuery = ""
         infoMsgTbl = ""
         infoMsgDb = ""
-        colList = conf.col.split(",")
+        colList = conf.col.split(',')
 
         if conf.excludeCol:
             colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
@@ -277,8 +280,11 @@ class Enumeration(GenericEnumeration):
         tblCond = rootQuery.inband.condition2
         colConsider, colCondParam = self.likeOrExact("column")
 
-        if conf.db and conf.db != CURRENT_DB:
-            enumDbs = conf.db.split(",")
+        if conf.db == CURRENT_DB:
+            conf.db = self.getCurrentDb()
+
+        if conf.db:
+            enumDbs = conf.db.split(',')
         elif not len(kb.data.cachedDbs):
             enumDbs = self.getDbs()
         else:
@@ -301,16 +307,19 @@ class Enumeration(GenericEnumeration):
             foundCols[column] = {}
 
             if conf.tbl:
-                _ = conf.tbl.split(",")
+                _ = conf.tbl.split(',')
                 whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
 
-            if conf.db and conf.db != CURRENT_DB:
-                _ = conf.db.split(",")
+            if conf.db == CURRENT_DB:
+                conf.db = self.getCurrentDb()
+
+            if conf.db:
+                _ = conf.db.split(',')
                 infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
-                infoMsg2 = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
-                logger.info(infoMsg2)
+                msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                logger.info(msg)
             else:
                 infoMsgDb = " across all databases"
 

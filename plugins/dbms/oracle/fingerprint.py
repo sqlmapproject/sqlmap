@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -58,7 +58,7 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and (Backend.isDbmsWithin(ORACLE_ALIASES) or (conf.dbms or "").lower() in ORACLE_ALIASES):
+        if not conf.extensiveFp and Backend.isDbmsWithin(ORACLE_ALIASES):
             setDbms(DBMS.ORACLE)
 
             self.getBanner()

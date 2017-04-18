@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2016 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -57,8 +57,7 @@ def tableExists(tableFile, regex=None):
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        test = readInput(message, default="N")
-        kb.tableExistsChoice = test[0] in ("y", "Y")
+        kb.tableExistsChoice = readInput(message, default='N', boolean=True)
 
         if not kb.tableExistsChoice:
             return None
@@ -70,8 +69,8 @@ def tableExists(tableFile, regex=None):
 
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
-        errMsg += "to distinguish errornous results)"
+        errMsg += "(most likely caused by inability of the used injection "
+        errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
@@ -114,7 +113,7 @@ def tableExists(tableFile, regex=None):
                 threadData.shared.value.append(table)
                 threadData.shared.unique.add(table.lower())
 
-                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
+                if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                     dataToStdout(infoMsg, True)
@@ -161,8 +160,7 @@ def columnExists(columnFile, regex=None):
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        test = readInput(message, default="N")
-        kb.columnExistsChoice = test[0] in ("y", "Y")
+        kb.columnExistsChoice = readInput(message, default='N', boolean=True)
 
         if not kb.columnExistsChoice:
             return None
@@ -178,8 +176,8 @@ def columnExists(columnFile, regex=None):
 
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
-        errMsg += "to distinguish errornous results)"
+        errMsg += "(most likely caused by inability of the used injection "
+        errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
@@ -222,7 +220,7 @@ def columnExists(columnFile, regex=None):
             if result:
                 threadData.shared.value.append(column)
 
-                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
+                if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
