@@ -322,14 +322,14 @@ class Backend:
             msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
 
             while True:
-                _ = readInput(msg, default=kb.dbms)
+                choice = readInput(msg, default=kb.dbms)
 
-                if aliasToDbmsEnum(_) == kb.dbms:
+                if aliasToDbmsEnum(choice) == kb.dbms:
                     kb.dbmsVersion = []
                     kb.resolutionDbms = kb.dbms
                     break
-                elif aliasToDbmsEnum(_) == dbms:
-                    kb.dbms = aliasToDbmsEnum(_)
+                elif aliasToDbmsEnum(choice) == dbms:
+                    kb.dbms = aliasToDbmsEnum(choice)
                     break
                 else:
                     warnMsg = "invalid value"
@@ -382,12 +382,12 @@ class Backend:
             msg += "correct [%s (default)/%s] " % (kb.os, os)
 
             while True:
-                _ = readInput(msg, default=kb.os)
+                choice = readInput(msg, default=kb.os)
 
-                if _ == kb.os:
+                if choice == kb.os:
                     break
-                elif _ == os:
-                    kb.os = _.capitalize()
+                elif choice == os:
+                    kb.os = choice.capitalize()
                     break
                 else:
                     warnMsg = "invalid value"
@@ -421,10 +421,10 @@ class Backend:
         msg += "\n[2] 64-bit"
 
         while True:
-            _ = readInput(msg, default='1')
+            choice = readInput(msg, default='1')
 
-            if isinstance(_, basestring) and _.isdigit() and int(_) in (1, 2):
-                kb.arch = 32 if int(_) == 1 else 64
+            if isinstance(choice, basestring) and choice.isdigit() and int(choice) in (1, 2):
+                kb.arch = 32 if int(choice) == 1 else 64
                 break
             else:
                 warnMsg = "invalid value. Valid values are 1 and 2"
@@ -754,17 +754,17 @@ def getManualDirectories():
         message += "[2] custom location(s)\n"
         message += "[3] custom directory list file\n"
         message += "[4] brute force search"
-        choice = readInput(message, default="1").strip()
+        choice = readInput(message, default='1')
 
-        if choice == "2":
+        if choice == '2':
             message = "please provide a comma separate list of absolute directory paths: "
             directories = readInput(message, default="").split(',')
-        elif choice == "3":
+        elif choice == '3':
             message = "what's the list file location?\n"
             listPath = readInput(message, default="")
             checkFile(listPath)
             directories = getFileItems(listPath)
-        elif choice == "4":
+        elif choice == '4':
             targets = set([conf.hostname])
             _ = conf.hostname.split('.')
 
@@ -1038,8 +1038,11 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             finally:
                 logging._releaseLock()
 
+    if retVal and default and isinstance(default, basestring) and len(default) == 1:
+        retVal = retVal.strip()
+
     if boolean:
-        retVal = retVal.strip().upper == 'Y'
+        retVal = retVal.strip().upper() == 'Y'
 
     return retVal
 

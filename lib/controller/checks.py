@@ -739,7 +739,7 @@ def checkSqlInjection(place, parameter, value):
             logger.warn(warnMsg)
 
             msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
-            choice = readInput(msg, default='S', checkBatch=False).strip().upper()
+            choice = readInput(msg, default='S', checkBatch=False).upper()
 
             if choice == 'C':
                 choice = None
@@ -747,7 +747,7 @@ def checkSqlInjection(place, parameter, value):
                     if choice:
                         logger.warn("invalid value")
                     msg = "enter new verbosity level: [0-6] "
-                    choice = readInput(msg, default=str(conf.verbose), checkBatch=False).strip()
+                    choice = readInput(msg, default=str(conf.verbose), checkBatch=False)
                 conf.verbose = int(choice)
                 setVerbosity()
                 tests.insert(0, test)
@@ -998,7 +998,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
         if kb.ignoreCasted is None:
             message = "do you want to skip those kind of cases (and save scanning time)? %s " % ("[Y/n]" if conf.multipleTargets else "[y/N]")
-            kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N').upper() != 'N'
+            kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N', boolean=True)
 
     elif result:
         infoMsg += "be injectable"
@@ -1176,7 +1176,7 @@ def checkStability():
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [(C)ontinue/(s)tring/(r)egex/(q)uit] "
-        choice = readInput(message, default='C').strip().upper()
+        choice = readInput(message, default='C').upper()
 
         if choice == 'Q':
             raise SqlmapUserQuitException
@@ -1306,9 +1306,8 @@ def checkWaf():
         if not conf.identifyWaf:
             message = "do you want sqlmap to try to detect backend "
             message += "WAF/IPS/IDS? [y/N] "
-            output = readInput(message, default="N")
 
-            if output and output[0] in ("Y", "y"):
+            if readInput(message, default='N', boolean=True):
                 conf.identifyWaf = True
 
         if conf.timeout == defaults.timeout:

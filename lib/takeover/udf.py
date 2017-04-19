@@ -154,9 +154,8 @@ class UDF:
 
                 message = "do you want to proceed anyway? Beware that the "
                 message += "operating system takeover will fail [y/N] "
-                choice = readInput(message, default="N")
 
-                if choice and choice.lower() == "y":
+                if readInput(message, default='N', boolean=True):
                     written = True
                 else:
                     return False
@@ -237,9 +236,9 @@ class UDF:
         msg += "from the shared library? "
 
         while True:
-            udfCount = readInput(msg, default=1)
+            udfCount = readInput(msg, default='1')
 
-            if isinstance(udfCount, basestring) and udfCount.isdigit():
+            if udfCount.isdigit():
                 udfCount = int(udfCount)
 
                 if udfCount <= 0:
@@ -247,10 +246,6 @@ class UDF:
                     return
                 else:
                     break
-
-            elif isinstance(udfCount, int):
-                break
-
             else:
                 logger.warn("invalid value, only digits are allowed")
 
@@ -272,18 +267,14 @@ class UDF:
 
             self.udfs[udfName]["input"] = []
 
-            default = 1
             msg = "how many input parameters takes UDF "
-            msg += "'%s'? (default: %d) " % (udfName, default)
+            msg += "'%s'? (default: 1) " % udfName
 
             while True:
-                parCount = readInput(msg, default=default)
+                parCount = readInput(msg, default='1')
 
-                if isinstance(parCount, basestring) and parCount.isdigit() and int(parCount) >= 0:
+                if parCount.isdigit() and int(parCount) >= 0:
                     parCount = int(parCount)
-                    break
-
-                elif isinstance(parCount, int):
                     break
 
                 else:
@@ -294,9 +285,9 @@ class UDF:
                 msg += "number %d? (default: %s) " % ((y + 1), defaultType)
 
                 while True:
-                    parType = readInput(msg, default=defaultType)
+                    parType = readInput(msg, default=defaultType).strip()
 
-                    if isinstance(parType, basestring) and parType.isdigit():
+                    if parType.isdigit():
                         logger.warn("you need to specify the data-type of the parameter")
 
                     else:
@@ -323,7 +314,7 @@ class UDF:
 
         msg = "do you want to call your injected user-defined "
         msg += "functions now? [Y/n/q] "
-        choice = readInput(msg, default='Y').strip().upper()
+        choice = readInput(msg, default='Y').upper()
 
         if choice == 'N':
             self.cleanup(udfDict=self.udfs)
@@ -343,7 +334,7 @@ class UDF:
             msg += "\n[q] Quit"
 
             while True:
-                choice = readInput(msg).strip().upper()
+                choice = readInput(msg).upper()
 
                 if choice == 'Q':
                     break

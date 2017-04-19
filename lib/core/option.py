@@ -944,7 +944,7 @@ def _setTamperingFunctions():
                         message = "it appears that you might have mixed "
                         message += "the order of tamper scripts. "
                         message += "Do you want to auto resolve this? [Y/n/q] "
-                        choice = readInput(message, default='Y').strip().upper()
+                        choice = readInput(message, default='Y').upper()
 
                         if choice == 'N':
                             resolve_priorities = False

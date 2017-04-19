@@ -482,7 +482,7 @@ def attackDumpedTable():
             storeHashesToFile(attack_dict)
 
             message = "do you want to crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
-            choice = readInput(message, default='N' if conf.multipleTargets else 'Y').strip().upper()
+            choice = readInput(message, default='N' if conf.multipleTargets else 'Y').upper()
 
             if choice == 'N':
                 return

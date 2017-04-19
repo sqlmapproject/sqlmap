@@ -243,7 +243,7 @@ class Databases:
                 return kb.data.cachedTables
 
             message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
                 return
@@ -486,7 +486,7 @@ class Databases:
                 return kb.data.cachedColumns
 
             message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
                 return

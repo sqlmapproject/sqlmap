@@ -240,7 +240,7 @@ class Enumeration(GenericEnumeration):
                 return kb.data.cachedColumns
 
             message = "do you want to use common column existence check? [y/N/q] "
-            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
                 return

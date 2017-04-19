@@ -146,7 +146,7 @@ class Search:
 
         if bruteForce:
             message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
-            choice = readInput(message, default='Y' if 'Y' in message else 'N').strip().upper()
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
                 return

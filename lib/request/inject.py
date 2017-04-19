@@ -208,7 +208,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             message += "entries do you want to retrieve?\n"
                             message += "[a] All (default)\n[#] Specific number\n"
                             message += "[q] Quit"
-                            choice = readInput(message, default='A').strip().upper()
+                            choice = readInput(message, default='A').upper()
 
                             if choice == 'A':
                                 stopLimit = count

@@ -319,7 +319,7 @@ class Users:
 
             message = "do you want to perform a dictionary-based attack "
             message += "against retrieved password hashes? [Y/n/q]"
-            choice = readInput(message, default='Y').strip().upper()
+            choice = readInput(message, default='Y').upper()
 
             if choice == 'N':
                 pass

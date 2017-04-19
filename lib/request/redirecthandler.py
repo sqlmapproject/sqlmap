@@ -59,7 +59,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 msg += "resend original POST data to a new "
                 msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
 
-                kb.resendPostOnRedirect = readInput(msg, default=("Y" if not kb.originalPage else "N"), boolean=True)
+                kb.resendPostOnRedirect = readInput(msg, default=('Y' if not kb.originalPage else 'N'), boolean=True)
 
             if kb.resendPostOnRedirect:
                 self.redirect_request = self._redirect_request

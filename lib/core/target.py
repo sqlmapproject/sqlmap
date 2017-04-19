@@ -152,7 +152,7 @@ def _setRequestParams():
             elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
                 message = "JSON-like data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
-                choice = readInput(message, default='Y').strip().upper()
+                choice = readInput(message, default='Y').upper()
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
@@ -166,7 +166,7 @@ def _setRequestParams():
             elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
                 message = "Array-like data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
-                choice = readInput(message, default='Y').strip().upper()
+                choice = readInput(message, default='Y').upper()
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
@@ -178,7 +178,7 @@ def _setRequestParams():
             elif re.search(XML_RECOGNITION_REGEX, conf.data):
                 message = "SOAP/XML data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
-                choice = readInput(message, default='Y').strip().upper()
+                choice = readInput(message, default='Y').upper()
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
@@ -191,7 +191,7 @@ def _setRequestParams():
             elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
                 message = "Multipart-like data found in %s data. " % conf.method
                 message += "Do you want to process it? [Y/n/q] "
-                choice = readInput(message, default='Y').strip().upper()
+                choice = readInput(message, default='Y').upper()
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
@@ -228,7 +228,7 @@ def _setRequestParams():
 
         message = "do you want to try URI injections "
         message += "in the target URL itself? [Y/n/q] "
-        choice = readInput(message, default='Y').strip().upper()
+        choice = readInput(message, default='Y').upper()
 
         if choice == 'Q':
             raise SqlmapUserQuitException
@@ -243,7 +243,7 @@ def _setRequestParams():
                 lut = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer/--cookie'}
                 message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
                 message += "'%s'. Do you want to process it? [Y/n/q] " % lut[place]
-                choice = readInput(message, default='Y').strip().upper()
+                choice = readInput(message, default='Y').upper()
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException

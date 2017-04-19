@@ -116,11 +116,11 @@ def _selectInjection():
                 message += "\n"
 
         message += "[q] Quit"
-        select = readInput(message, default="0")
+        choice = readInput(message, default='0').upper()
 
-        if select.isdigit() and int(select) < len(kb.injections) and int(select) >= 0:
-            index = int(select)
-        elif select[0] in ("Q", "q"):
+        if choice.isdigit() and int(choice) < len(kb.injections) and int(choice) >= 0:
+            index = int(choice)
+        elif choice == 'Q':
             raise SqlmapUserQuitException
         else:
             errMsg = "invalid choice"
@@ -184,7 +184,7 @@ def _randomFillBlankFields(value):
     if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, value):
         message = "do you want to fill blank fields with random values? [Y/n] "
 
-        if readInput(message, default="Y", boolean=True):
+        if readInput(message, default='Y', boolean=True):
             for match in re.finditer(EMPTY_FORM_FIELDS_REGEX, retVal):
                 item = match.group("result")
                 if not any(_ in item for _ in IGNORE_PARAMETERS) and not re.search(ASP_NET_CONTROL_REGEX, item):
@@ -306,7 +306,7 @@ def start():
                     message += "against '%s'. Do you want to skip " % conf.hostname
                     message += "further tests involving it? [Y/n]"
 
-                    kb.skipVulnHost = readInput(message, default="Y", boolean=True)
+                    kb.skipVulnHost = readInput(message, default='Y', boolean=True)
 
                 testSqlInj = not kb.skipVulnHost
 
@@ -334,7 +334,7 @@ def start():
                         continue
 
                     message += "\ndo you want to test this form? [Y/n/q] "
-                    choice = readInput(message, default='Y').strip().upper()
+                    choice = readInput(message, default='Y').upper()
 
                     if choice == 'N':
                         continue
@@ -360,7 +360,7 @@ def start():
 
                 else:
                     message += "\ndo you want to test this URL? [Y/n/q]"
-                    choice = readInput(message, default='Y').strip().upper()
+                    choice = readInput(message, default='Y').upper()
 
                     if choice == 'N':
                         dataToStdout(os.linesep)
@@ -640,7 +640,7 @@ def start():
                 logger.warn(warnMsg)
 
                 message = "do you want to skip to the next target in list? [Y/n/q]"
-                choice = readInput(message, default='Y').strip().upper()
+                choice = readInput(message, default='Y').upper()
 
                 if choice == 'N':
                     return False

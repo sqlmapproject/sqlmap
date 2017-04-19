@@ -45,12 +45,12 @@ class Fingerprint:
         msg = "do you want to provide the OS? [(W)indows/(l)inux]"
 
         while True:
-            os = readInput(msg, default="W")
+            os = readInput(msg, default='W').upper()
 
-            if os[0].lower() == "w":
+            if os == 'W':
                 Backend.setOs(OS.WINDOWS)
                 break
-            elif os[0].lower() == "l":
+            elif os == 'L':
                 Backend.setOs(OS.LINUX)
                 break
             else:
