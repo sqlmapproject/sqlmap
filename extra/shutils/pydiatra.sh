@@ -4,4 +4,4 @@
 # See the file 'doc/COPYING' for copying permission
 
 # Runs py2diatra on all python files (prerequisite: pip install pydiatra)
-find . -wholename "./thirdparty" -prune -o -type f -iname "*.py" -exec py2diatra '{}' \;
+find . -wholename "./thirdparty" -prune -o -type f -iname "*.py" -exec py2diatra '{}' \; | grep -v bare-except

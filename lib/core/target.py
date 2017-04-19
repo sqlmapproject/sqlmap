@@ -438,7 +438,7 @@ def _resumeHashDBValues():
 
             if not conf.tech or intersect(conf.tech, injection.data.keys()):
                 if intersect(conf.tech, injection.data.keys()):
-                    injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
+                    injection.data = dict(filter(lambda key, item: key in conf.tech, injection.data.items()))
 
                 if injection not in kb.injections:
                     kb.injections.append(injection)
