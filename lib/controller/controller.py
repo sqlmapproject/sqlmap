@@ -334,8 +334,13 @@ def start():
                         continue
 
                     message += "\ndo you want to test this form? [Y/n/q] "
+                    choice = readInput(message, default='Y').strip().upper()
 
-                    if readInput(message, default='Y', boolean=True):
+                    if choice == 'N':
+                        continue
+                    elif choice == 'Q':
+                        break
+                    else:
                         if conf.method != HTTPMETHOD.GET:
                             message = "Edit %s data [default: %s]%s: " % (conf.method, urlencode(conf.data) if conf.data else "None", " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
@@ -352,11 +357,6 @@ def start():
                                 conf.url = "%s?%s" % (firstPart, test)
 
                         parseTargetUrl()
-
-                    elif test[0] in ("n", "N"):
-                        continue
-                    elif test[0] in ("q", "Q"):
-                        break
 
                 else:
                     message += "\ndo you want to test this URL? [Y/n/q]"
