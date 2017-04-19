@@ -3450,11 +3450,16 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
                     _retVal = [retVal]
                     def _thread(regex):
-                        _retVal[0] = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, _retVal[0])
+                        try:
+                            _retVal[0] = re.sub(r"(?i)%s" % regex, REFLECTED_VALUE_MARKER, _retVal[0])
 
-                        if len(parts) > 2:
-                            regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
-                            _retVal[0] = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, _retVal[0])
+                            if len(parts) > 2:
+                                regex = REFLECTED_REPLACEMENT_REGEX.join(parts[1:])
+                                _retVal[0] = re.sub(r"(?i)\b%s\b" % regex, REFLECTED_VALUE_MARKER, _retVal[0])
+                        except KeyboardInterrupt:
+                            raise
+                        except:
+                            pass
 
                     thread = threading.Thread(target=_thread, args=(regex,))
                     thread.daemon = True

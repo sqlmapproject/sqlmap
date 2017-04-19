@@ -87,7 +87,7 @@ def getCurrentThreadName():
 
     return threading.current_thread().getName()
 
-def exceptionHandledFunction(threadFunction):
+def exceptionHandledFunction(threadFunction, silent=False):
     try:
         threadFunction()
     except KeyboardInterrupt:
@@ -95,8 +95,8 @@ def exceptionHandledFunction(threadFunction):
         kb.threadException = True
         raise
     except Exception, ex:
-        # thread is just going to be silently killed
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
+        if not silent:
+            logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
 def setDaemon(thread):
     # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
