@@ -766,20 +766,20 @@ def dictionaryAttack(attack_dict):
                 message += "[1] default dictionary file '%s' (press Enter)\n" % dictPaths[0]
                 message += "[2] custom dictionary file\n"
                 message += "[3] file with list of dictionary files"
-                choice = readInput(message, default="1")
+                choice = readInput(message, default='1')
 
                 try:
-                    if choice == "2":
+                    if choice == '2':
                         message = "what's the custom dictionary's location?\n"
-                        dictPaths = [readInput(message)]
-
-                        logger.info("using custom dictionary")
-                    elif choice == "3":
+                        _ = readInput(message)
+                        if _:
+                            dictPaths = [readInput(message)]
+                            logger.info("using custom dictionary")
+                    elif choice == '3':
                         message = "what's the list file location?\n"
                         listPath = readInput(message)
                         checkFile(listPath)
                         dictPaths = getFileItems(listPath)
-
                         logger.info("using custom list of dictionaries")
                     else:
                         logger.info("using default dictionary")

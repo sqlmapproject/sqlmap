@@ -73,11 +73,19 @@ def tableExists(tableFile, regex=None):
         errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
-    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
+    message = "which common tables (wordlist) file do you want to use?\n"
+    message += "[1] default '%s' (press Enter)\n" % tableFile
+    message += "[2] custom"
+    choice = readInput(message, default='1')
+
+    if choice == '2':
+        message = "what's the custom common tables file location?\n"
+        tableFile = readInput(message) or tableFile
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
+    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
     tables.extend(_addPageTextWords())
     tables = filterListValue(tables, regex)
 
@@ -179,6 +187,15 @@ def columnExists(columnFile, regex=None):
         errMsg += "(most likely caused by inability of the used injection "
         errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
+
+    message = "which common columns (wordlist) file do you want to use?\n"
+    message += "[1] default '%s' (press Enter)\n" % columnFile
+    message += "[2] custom"
+    choice = readInput(message, default='1')
+
+    if choice == '2':
+        message = "what's the custom common columns file location?\n"
+        columnFile = readInput(message) or columnFile
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
