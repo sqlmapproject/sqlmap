@@ -356,16 +356,16 @@ def unionUse(expression, unpack=True, dump=False):
                                             items = filtered.values()
                                         items = [items]
                                     index = None
-                                    for index in xrange(len(threadData.shared.buffered)):
-                                        if threadData.shared.buffered[index][0] >= num:
+                                    for index in xrange(1 + len(threadData.shared.buffered)):
+                                        if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, items))
                                 else:
                                     index = None
                                     if threadData.shared.showEta:
                                         threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
-                                    for index in xrange(len(threadData.shared.buffered)):
-                                        if threadData.shared.buffered[index][0] >= num:
+                                    for index in xrange(1 + len(threadData.shared.buffered)):
+                                        if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
                                             break
                                     threadData.shared.buffered.insert(index or 0, (num, None))
 
