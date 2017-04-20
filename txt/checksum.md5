@@ -46,7 +46,7 @@ ebb778c2d26eba8b34d7d8658e4105a6  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-50c380893e7e1cf3f8f703de4fe23fc9  lib/core/settings.py
+5c0309b56aaa28782f85c32bcd6a3086  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 155e2d3fda87b2e3ffa4f7a770513946  lib/core/target.py
@@ -104,7 +104,7 @@ d3da4c7ceaf57c4687a052d58722f6bb  lib/techniques/dns/use.py
 ba12c69a90061aa14d848b8396e79191  lib/utils/deps.py
 3b9fd519164e0bf275d5fd361c3f11ff  lib/utils/getch.py
 ccfdad414ce2ec0c394c3deaa39a82bf  lib/utils/hashdb.py
-ff3b7796590db894a3686b3b67037b37  lib/utils/hash.py
+12e0e0ab70c6fe5786bc561c35dc067f  lib/utils/hash.py
 e76a08237ee6a4cd6855af79610ea8a5  lib/utils/htmlentities.py
 310efc965c862cfbd7b0da5150a5ad36  lib/utils/__init__.py
 9d8c858417d356e49e1959ba253aede4  lib/utils/pivotdumptable.py
