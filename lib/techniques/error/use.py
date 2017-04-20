@@ -176,7 +176,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                     else:
                         break
 
-                    if output:
+                    if output and conf.verbose in (1, 2) and not conf.api:
                         if kb.fileReadMode:
                             dataToStdout(_formatPartialContent(output).replace(r"\n", "\n").replace(r"\t", "\t"))
                         elif offset > 1:
