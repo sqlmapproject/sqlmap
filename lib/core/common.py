@@ -4131,7 +4131,7 @@ def decodeHexValue(value, raw=False):
         retVal = value
         if value and isinstance(value, basestring):
             if len(value) % 2 != 0:
-                retVal = "%s?" % hexdecode(value[:-1])
+                retVal = "%s?" % hexdecode(value[:-1]) if len(value) > 1 else value
                 singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
             else:
                 retVal = hexdecode(value)

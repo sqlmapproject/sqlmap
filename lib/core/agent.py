@@ -452,7 +452,7 @@ class Agent(object):
         @rtype: C{str}
         """
 
-        if not Backend.getDbms():
+        if not Backend.getIdentifiedDbms():
             return fields
 
         if fields.startswith("(CASE") or fields.startswith("(IIF") or fields.startswith("SUBSTR") or fields.startswith("MID(") or re.search(r"\A'[^']+'\Z", fields):
