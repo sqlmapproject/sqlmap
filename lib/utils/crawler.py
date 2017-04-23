@@ -20,6 +20,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.common import readInput
 from lib.core.common import safeCSValue
+from lib.core.common import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -187,7 +188,7 @@ def crawl(target):
             logger.warn(warnMsg)
         else:
             for url in threadData.shared.value:
-                kb.targets.add((url, None, None, None, None))
+                kb.targets.add((urldecode(url, kb.pageEncoding), None, None, None, None))
 
         storeResultsToFile(kb.targets)
 
