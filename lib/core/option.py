@@ -232,7 +232,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
             reqResList = re.finditer(BURP_REQUEST_REGEX, content, re.I | re.S)
 
         for match in reqResList:
-            request = match if isinstance(match, basestring) else match.group(0)
+            request = match if isinstance(match, basestring) else match.group(1)
             request = re.sub(r"\A[^\w]+", "", request)
 
             schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
