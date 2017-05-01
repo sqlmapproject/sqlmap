@@ -316,6 +316,7 @@ class Agent(object):
             payload = payload.replace(_, randomStr())
 
         if origValue is not None and "[ORIGVALUE]" in payload:
+            origValue = getUnicode(origValue)
             payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
 
         if "[INFERENCE]" in payload:
