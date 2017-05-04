@@ -1033,7 +1033,7 @@ class Connect(object):
                         conf.evalCode = conf.evalCode.replace(EVALCODE_KEYWORD_SUFFIX, "")
                         break
                     else:
-                        conf.evalCode = conf.evalCode.replace(ex.text.strip(), replacement)
+                        conf.evalCode = conf.evalCode.replace(getUnicode(ex.text.strip(), UNICODE_ENCODING), replacement)
                 else:
                     break
 
