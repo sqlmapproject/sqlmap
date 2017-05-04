@@ -105,6 +105,7 @@ from lib.core.settings import RANDOM_STRING_MARKER
 from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import TEXT_CONTENT_TYPE_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
 from lib.request.basic import decodePage
@@ -1051,7 +1052,7 @@ class Connect(object):
                 if name != "__builtins__" and originals.get(name, "") != value:
                     if isinstance(value, (basestring, int)):
                         found = False
-                        value = getUnicode(value)
+                        value = getUnicode(value, UNICODE_ENCODING)
 
                         if kb.postHint and re.search(r"\b%s\b" % re.escape(name), post or ""):
                             if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
