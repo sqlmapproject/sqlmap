@@ -5,6 +5,7 @@ Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import cgi
 import codecs
 import gzip
 import logging
@@ -338,7 +339,32 @@ def decodePage(page, contentEncoding, contentType):
             # e.g. &zeta;
             page = re.sub(r"&([^;]+);", lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
+    if contentType and contentType.lower() == 'application/vnd.ms-excel':
+        page = _xlsx2html(StringIO.StringIO(page))
+
     return page
+
+def _xlsx2html(fio):
+    sio = StringIO.StringIO()
+    try:
+        import openpyxl
+        wb = openpyxl.load_workbook(fio)
+        for ws in wb:
+            sio.write(u'<h1>{0}</h1>'.format(ws.title))
+            sio.write(u'<table border="1">')
+            rows, cols = len(ws.rows), len(ws.columns)
+            for y in range(1, rows + 1):
+                sio.write(u'<tr>')
+                for x in range(1, cols + 1):
+                    value = unicode(ws.cell(row=y, column=x).value or '')
+                    value = cgi.escape(value).encode('ascii', 'xmlcharrefreplace')
+                    sio.write(u'<td>{0}</td>'.format(value))
+                    sio.write(u'</tr>')
+            sio.write(u'</table>')
+    except Exception as e:
+        singleTimeLogMessage(e, logging.ERROR)
+        raise e
+    return sio.getvalue()
 
 def processResponse(page, responseHeaders):
     kb.processResponseCounter += 1
