@@ -7,6 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 import os
 import re
+import time
 
 from lib.controller.action import action
 from lib.controller.checks import checkSqlInjection
@@ -15,6 +16,7 @@ from lib.controller.checks import checkStability
 from lib.controller.checks import checkString
 from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
+from lib.controller.checks import checkInternet
 from lib.controller.checks import checkNullConnection
 from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
@@ -276,6 +278,21 @@ def start():
 
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         try:
+
+            if conf.checkInternet:
+                infoMsg = "[INFO] checking for Internet connection"
+                logger.info(infoMsg)
+
+                if not checkInternet():
+                    warnMsg = "[%s] [WARNING] no connection detected" % time.strftime("%X")
+                    dataToStdout(warnMsg)
+
+                    while not checkInternet():
+                        dataToStdout('.')
+                        time.sleep(5)
+
+                    dataToStdout("\n")
+
             conf.url = targetUrl
             conf.method = targetMethod.upper() if targetMethod else targetMethod
             conf.data = targetData

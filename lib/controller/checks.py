@@ -65,6 +65,8 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CANDIDATE_SENTENCE_MIN_LENGTH
+from lib.core.settings import CHECK_INTERNET_ADDRESS
+from lib.core.settings import CHECK_INTERNET_VALUE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
@@ -1500,6 +1502,10 @@ def checkConnection(suppressOutput=False):
             raise
 
     return True
+
+def checkInternet():
+    content = Request.getPage(url=CHECK_INTERNET_ADDRESS, checking=True)[0]
+    return CHECK_INTERNET_VALUE in (content or "")
 
 def setVerbosity():  # Cross-linked function
     raise NotImplementedError

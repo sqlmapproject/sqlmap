@@ -21,8 +21,8 @@ c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.
 310efc965c862cfbd7b0da5150a5ad36  extra/sqlharvest/__init__.py
 7713aa366c983cdf1f3dbaa7383ea9e1  extra/sqlharvest/sqlharvest.py
 7afe836fd97271ccba67b4c0da2482ff  lib/controller/action.py
-95fda7f284e0a882634cf5e94cbb73e1  lib/controller/checks.py
-df647d57cf02cc0e4bda6b8ccc9d8138  lib/controller/controller.py
+4ea6e0c35aedbdce88bbdff7c8786ae5  lib/controller/checks.py
+130d1c16708668b8d89605b6b5b38bf5  lib/controller/controller.py
 52a3969f57170e935e3fc0156335bf2c  lib/controller/handler.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
 60599fbb43b7d5e658b84371d3ad0b42  lib/core/agent.py
@@ -39,14 +39,14 @@ b9ff4e622c416116bee6024c0f050349  lib/core/enums.py
 9381a0c7e8bc19986299e84f4edda1a0  lib/core/exception.py
 310efc965c862cfbd7b0da5150a5ad36  lib/core/__init__.py
 9ba39bf66e9ecd469446bdbbeda906c3  lib/core/log.py
-ebb778c2d26eba8b34d7d8658e4105a6  lib/core/optiondict.py
+edcfce0850771e6454acef244d5c5760  lib/core/optiondict.py
 636485a22f158bec137d63c73aeace5c  lib/core/option.py
 5f2f56e6c5f274408df61943f1e080c0  lib/core/profiling.py
 40be71cd774662a7b420caeb7051e7d5  lib/core/readlineng.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-9724eef5ffad3ea233a9340f05210cdb  lib/core/settings.py
+aacedcb97c903d5e754a883f1a7617aa  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 155e2d3fda87b2e3ffa4f7a770513946  lib/core/target.py
@@ -57,7 +57,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 4d13ed693401a498b6d073a2a494bd83  lib/core/wordlist.py
 310efc965c862cfbd7b0da5150a5ad36  lib/__init__.py
 8c4b04062db2245d9e190b413985202a  lib/parse/banner.py
-aa89ea0c7c44eb74eaaeeccaddc94d39  lib/parse/cmdline.py
+4185a1ed8fbec400dd297474ac89c357  lib/parse/cmdline.py
 3a31657bc38f277d0016ff6d50bde61f  lib/parse/configfile.py
 14539f1be714d4f1ed042067d63bc50a  lib/parse/handler.py
 64e5bb3ecbdd75144500588b437ba8da  lib/parse/headers.py
@@ -68,7 +68,7 @@ aa89ea0c7c44eb74eaaeeccaddc94d39  lib/parse/cmdline.py
 403d873f1d2fd0c7f73d83f104e41850  lib/request/basicauthhandler.py
 aa8abda6eab79646b1759c0653925328  lib/request/basic.py
 ef48de622b0a6b4a71df64b0d2785ef8  lib/request/comparison.py
-e5d14d0b8c07e082fb819b515f5b1dfb  lib/request/connect.py
+108ca3607d42bd4923277019a8d6db7d  lib/request/connect.py
 fb6b788d0016ab4ec5e5f661f0f702ad  lib/request/direct.py
 cc1163d38e9b7ee5db2adac6784c02bb  lib/request/dns.py
 5dcdb37823a0b5eff65cd1018bcf09e4  lib/request/httpshandler.py

@@ -637,6 +637,10 @@ def cmdLineParser(argv=None):
         general.add_option("--charset", dest="charset",
                             help="Force character encoding used for data retrieval")
 
+        general.add_option("--check-internet", dest="checkInternet",
+                            action="store_true",
+                            help="Check Internet connection before assessing the target")
+
         general.add_option("--crawl", dest="crawlDepth", type="int",
                             help="Crawl the website starting from the target URL")
 

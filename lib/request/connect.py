@@ -257,6 +257,7 @@ class Connect(object):
         refreshing = kwargs.get("refreshing",       False)
         retrying = kwargs.get("retrying",           False)
         crawling = kwargs.get("crawling",           False)
+        checking = kwargs.get("checking",           False)
         skipRead = kwargs.get("skipRead",           False)
 
         if multipart:
@@ -284,7 +285,7 @@ class Connect(object):
 
         _ = urlparse.urlsplit(url)
         requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
-        requestMsg += ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling)) else url
+        requestMsg += ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling, checking)) else url
         responseMsg = u"HTTP response "
         requestHeaders = u""
         responseHeaders = None
@@ -306,7 +307,7 @@ class Connect(object):
                     params = urlencode(params)
                     url = "%s?%s" % (url, params)
 
-            elif any((refreshing, crawling)):
+            elif any((refreshing, crawling, checking)):
                 pass
 
             elif target:
@@ -544,6 +545,9 @@ class Connect(object):
             page = None
             responseHeaders = None
 
+            if checking:
+                return None, None, None
+
             try:
                 page = ex.read() if not skipRead else None
                 responseHeaders = ex.info()
@@ -618,7 +622,9 @@ class Connect(object):
         except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError):
             tbMsg = traceback.format_exc()
 
-            if "no host given" in tbMsg:
+            if checking:
+                return None, None, None
+            elif "no host given" in tbMsg:
                 warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
             elif "forcibly closed" in tbMsg or "Connection is already closed" in tbMsg:
