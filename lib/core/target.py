@@ -136,7 +136,7 @@ def _setRequestParams():
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
-                elif choice == 'N':
+                elif choice == 'Y':
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*"[^"]+)"', functools.partial(process, repl=r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
@@ -156,7 +156,7 @@ def _setRequestParams():
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
-                elif choice == 'N':
+                elif choice == 'Y':
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
@@ -170,7 +170,7 @@ def _setRequestParams():
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
-                elif choice == 'N':
+                elif choice == 'Y':
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(=[^%s]+)" % DEFAULT_GET_POST_DELIMITER, r"\g<1>%s" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
                     kb.postHint = POST_HINT.ARRAY_LIKE
@@ -182,7 +182,7 @@ def _setRequestParams():
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
-                elif choice == 'N':
+                elif choice == 'Y':
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
@@ -195,7 +195,7 @@ def _setRequestParams():
 
                 if choice == 'Q':
                     raise SqlmapUserQuitException
-                elif choice == 'N':
+                elif choice == 'Y':
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*[\"'](?P<name>[^\n]+?)[\"']).+?)(((\r)?\n)+--)", functools.partial(process, repl=r"\g<1>%s\g<4>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
