@@ -123,7 +123,7 @@ def forgeHeaders(items=None):
 
     return headers
 
-def parseResponse(page, headers):
+def parseResponse(page, headers, status=None):
     """
     @param page: the page to parse to feed the knowledge base htmlFp
     (back-end DBMS fingerprint based upon DBMS error messages return
@@ -135,7 +135,7 @@ def parseResponse(page, headers):
         headersParser(headers)
 
     if page:
-        htmlParser(page)
+        htmlParser(page if not status else "%s\n\n%s" % (status, page))
 
 @cachedmethod
 def checkCharEncoding(encoding, warn=True):
@@ -340,12 +340,12 @@ def decodePage(page, contentEncoding, contentType):
 
     return page
 
-def processResponse(page, responseHeaders):
+def processResponse(page, responseHeaders, status=None):
     kb.processResponseCounter += 1
 
     page = page or ""
 
-    parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None)
+    parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None, status)
 
     if not kb.tableFrom and Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
         kb.tableFrom = extractRegexResult(SELECT_FROM_TABLE_REGEX, page)

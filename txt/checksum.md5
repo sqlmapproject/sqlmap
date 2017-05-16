@@ -21,7 +21,7 @@ c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.
 310efc965c862cfbd7b0da5150a5ad36  extra/sqlharvest/__init__.py
 7713aa366c983cdf1f3dbaa7383ea9e1  extra/sqlharvest/sqlharvest.py
 7afe836fd97271ccba67b4c0da2482ff  lib/controller/action.py
-4ea6e0c35aedbdce88bbdff7c8786ae5  lib/controller/checks.py
+2e871354300eb72ae60da0d58aa78dcd  lib/controller/checks.py
 130d1c16708668b8d89605b6b5b38bf5  lib/controller/controller.py
 52a3969f57170e935e3fc0156335bf2c  lib/controller/handler.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
@@ -46,7 +46,7 @@ edcfce0850771e6454acef244d5c5760  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-de11a5dd8eba001298b2f6774af54d25  lib/core/settings.py
+e1f0497c4a8a98ce2804e08afed99330  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 8136241fdbdb99a5dc0e51ba72918f6e  lib/core/target.py
@@ -66,9 +66,9 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 0b010b7cdb2e42b5aa0caa59607279ad  lib/parse/payloads.py
 997d0452e6fc22411f81a334511bcb3d  lib/parse/sitemap.py
 403d873f1d2fd0c7f73d83f104e41850  lib/request/basicauthhandler.py
-7b3f95016175b9700bb2cc09c9e0fa91  lib/request/basic.py
+a79f7c4259418fbc66229a1cb2e945bd  lib/request/basic.py
 ef48de622b0a6b4a71df64b0d2785ef8  lib/request/comparison.py
-108ca3607d42bd4923277019a8d6db7d  lib/request/connect.py
+09ab01822da8f45dec4c995a7fb0e130  lib/request/connect.py
 fb6b788d0016ab4ec5e5f661f0f702ad  lib/request/direct.py
 cc1163d38e9b7ee5db2adac6784c02bb  lib/request/dns.py
 5dcdb37823a0b5eff65cd1018bcf09e4  lib/request/httpshandler.py
@@ -93,7 +93,7 @@ e7f3012f4f9e822d39eabd934d050b0e  lib/takeover/web.py
 ab1601a7f429b47637c4fb8af703d0f1  lib/techniques/dns/test.py
 d3da4c7ceaf57c4687a052d58722f6bb  lib/techniques/dns/use.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/error/__init__.py
-8e918c27b796dada3f87ed2fafeb9d8c  lib/techniques/error/use.py
+628f1fe86603512ae122f868cdabbfb9  lib/techniques/error/use.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/__init__.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/union/__init__.py
 211e6dc49af6ad6bd3590d16d41e86db  lib/techniques/union/test.py

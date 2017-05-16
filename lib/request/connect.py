@@ -280,8 +280,9 @@ class Connect(object):
         url = url.replace(" ", "%20")
 
         conn = None
-        code = None
         page = None
+        code = None
+        status = None
 
         _ = urlparse.urlsplit(url)
         requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
@@ -566,12 +567,12 @@ class Connect(object):
                 page = page if isinstance(page, unicode) else getUnicode(page)
 
             code = ex.code
+            status = getUnicode(ex.msg)
 
             kb.originalCode = kb.originalCode or code
-            threadData.lastHTTPError = (threadData.lastRequestUID, code)
+            threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
             kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
 
-            status = getUnicode(ex.msg)
             responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
@@ -600,7 +601,6 @@ class Connect(object):
                 else:
                     debugMsg = "page not found (%d)" % code
                     singleTimeLogMessage(debugMsg, logging.DEBUG)
-                    processResponse(page, responseHeaders)
             elif ex.code == httplib.GATEWAY_TIMEOUT:
                 if ignoreTimeout:
                     return None if not conf.ignoreTimeouts else "", None, None
@@ -716,7 +716,7 @@ class Connect(object):
                     page = getUnicode(page)
             socket.setdefaulttimeout(conf.timeout)
 
-        processResponse(page, responseHeaders)
+        processResponse(page, responseHeaders, status)
 
         if conn and getattr(conn, "redurl", None):
             _ = urlparse.urlsplit(conn.redurl)

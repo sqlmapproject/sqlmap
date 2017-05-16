@@ -28,6 +28,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
+from lib.core.common import wasLastResponseHTTPError
 from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
@@ -97,8 +98,8 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
     if retVal is None or partialValue:
         try:
             while True:
-                check = r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-                trimcheck = r"%s(?P<result>[^<\n]*)" % (kb.chars.start)
+                check = r"(?si)%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
+                trimcheck = r"(?si)%s(?P<result>[^<\n]*)" % kb.chars.start
 
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
@@ -130,23 +131,19 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
                 output = reduce(lambda x, y: x if x is not None else y, (\
-                        extractRegexResult(check, page, re.DOTALL | re.IGNORECASE), \
-                        extractRegexResult(check, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] \
-                        if headers else None), re.DOTALL | re.IGNORECASE), \
-                        extractRegexResult(check, threadData.lastRedirectMsg[1] \
-                        if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)), \
+                        extractRegexResult(check, page), \
+                        extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None), \
+                        extractRegexResult(check, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] if headers else None)), \
+                        extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)), \
                         None)
 
                 if output is not None:
                     output = getUnicode(output)
                 else:
-                    trimmed = extractRegexResult(trimcheck, page, re.DOTALL | re.IGNORECASE) \
-                        or extractRegexResult(trimcheck, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] \
-                        if headers else None), re.DOTALL | re.IGNORECASE) \
-                        or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] \
-                        if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+                    trimmed = extractRegexResult(trimcheck, page) \
+                        or extractRegexResult(trimcheck, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None) \
+                        or extractRegexResult(trimcheck, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] if headers else None)) \
+                        or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)
 
                     if trimmed:
                         if not chunkTest:
@@ -205,8 +202,8 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
             hashDBWrite(expression, retVal)
 
     else:
-        _ = "%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-        retVal = extractRegexResult(_, retVal, re.DOTALL | re.IGNORECASE) or retVal
+        _ = "(?si)%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
+        retVal = extractRegexResult(_, retVal) or retVal
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal
 

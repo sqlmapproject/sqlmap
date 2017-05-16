@@ -554,12 +554,9 @@ def checkSqlInjection(place, parameter, value):
                             try:
                                 page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
                                 output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-                                        or extractRegexResult(check, listToStrValue( \
-                                        [headers[key] for key in headers.keys() if key.lower() != URI_HTTP_HEADER.lower()] \
-                                        if headers else None), re.DOTALL | re.IGNORECASE) \
-                                        or extractRegexResult(check, threadData.lastRedirectMsg[1] \
-                                        if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == \
-                                        threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+                                        or extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None, re.DOTALL | re.IGNORECASE) \
+                                        or extractRegexResult(check, listToStrValue([headers[key] for key in headers.keys() if key.lower() != URI_HTTP_HEADER.lower()] if headers else None), re.DOTALL | re.IGNORECASE) \
+                                        or extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
                                 if output:
                                     result = output == "1"
