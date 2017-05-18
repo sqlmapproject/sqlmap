@@ -35,7 +35,7 @@ Untuk mendapatkan daftar opsi lanjut gunakan:
     python sqlmap.py -hh
 
 Anda dapat mendapatkan contoh penggunaan [di sini](https://asciinema.org/a/46601).
-Untuk mendapatkan gambaran singkat kemampuan sqlmap, daftar fitur yang didukung, deskripsi dari semua opsi, berikut dengan contohnya, Anda disarankan untuk membaca [manual pengguna](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
+Untuk mendapatkan gambaran singkat kemampuan sqlmap, daftar fitur yang didukung, deskripsi dari semua opsi, berikut dengan contohnya, Anda disarankan untuk membaca [Panduan Pengguna](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Tautan
 ----
