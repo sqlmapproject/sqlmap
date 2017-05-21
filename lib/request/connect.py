@@ -279,6 +279,9 @@ class Connect(object):
         # url splitted with space char while urlencoding it in the later phase
         url = url.replace(" ", "%20")
 
+        if "://" not in url:
+            url = "http://%s" % url
+
         conn = None
         page = None
         code = None
