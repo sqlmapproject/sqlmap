@@ -1902,6 +1902,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.dnsMode = False
     kb.dnsTest = None
     kb.docRoot = None
+    kb.droppingRequests = False
     kb.dumpColumns = None
     kb.dumpTable = None
     kb.dumpKeyboardInterrupt = False
