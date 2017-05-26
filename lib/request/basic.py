@@ -90,6 +90,8 @@ def forgeHeaders(items=None):
             headers[key] = value
 
     if conf.cj:
+        import pdb
+        pdb.set_trace()
         if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
                 if cookie.domain_specified and not conf.hostname.endswith(cookie.domain):
