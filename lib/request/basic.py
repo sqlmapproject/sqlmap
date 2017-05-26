@@ -90,14 +90,12 @@ def forgeHeaders(items=None):
             headers[key] = value
 
     if conf.cj:
-        import pdb
-        pdb.set_trace()
         if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
                 if cookie.domain_specified and not conf.hostname.endswith(cookie.domain):
                     continue
 
-                if ("%s=" % getUnicode(cookie.name)) in headers[HTTP_HEADER.COOKIE]:
+                if ("%s=" % getUnicode(cookie.name)) in getUnicode(headers[HTTP_HEADER.COOKIE]):
                     if conf.loadCookies:
                         conf.httpHeaders = filter(None, ((item if item[0] != HTTP_HEADER.COOKIE else None) for item in conf.httpHeaders))
                     elif kb.mergeCookies is None:
