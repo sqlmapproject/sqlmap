@@ -260,7 +260,7 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
-            elif "'DictObject' object has no attribute 'query'" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
+            elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
                 errMsg = "there has been a problem in enumeration. "
                 errMsg += "Because of a considerable chance of false-positive case "
                 errMsg += "you are advised to rerun with switch '--flush-session'"
