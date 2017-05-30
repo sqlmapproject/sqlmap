@@ -1201,7 +1201,6 @@ def cleanQuery(query):
             if queryMatch and "sys_exec" not in query:
                 retVal = retVal.replace(queryMatch.group(1), sqlStatement.upper())
 
-
     return retVal
 
 def setPaths(rootPath):
