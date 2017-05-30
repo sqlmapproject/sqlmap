@@ -1196,11 +1196,11 @@ def cleanQuery(query):
 
     for sqlStatements in SQL_STATEMENTS.values():
         for sqlStatement in sqlStatements:
-            sqlStatementEsc = sqlStatement.replace("(", "\\(")
-            queryMatch = re.search("(%s)" % sqlStatementEsc, query, re.I)
+            queryMatch = re.search("(?i)\b(%s)\b" % sqlStatement.replace("(", "").replace(")", "").strip(), query)
 
             if queryMatch and "sys_exec" not in query:
                 retVal = retVal.replace(queryMatch.group(1), sqlStatement.upper())
+
 
     return retVal
 
