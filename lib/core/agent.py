@@ -858,7 +858,7 @@ class Agent(object):
                     if expression.find(queries[Backend.getIdentifiedDbms()].limitstring.query) > 0:
                         _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
                     else:
-                        _ = expression.index("LIMIT ")
+                        _ = re.search(r"\bLIMIT\b", expression, re.I).start()
                     expression = expression[:_]
 
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
