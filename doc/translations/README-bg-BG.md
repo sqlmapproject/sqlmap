@@ -16,7 +16,7 @@ sqlmap e инструмент за тестване и проникване, с 
 
 Може да изтеглине най-новите tar архиви като кликнете [тук](https://github.com/sqlmapproject/sqlmap/tarball/master) или най-новите zip архиви като кликнете [тук](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
-За предпочитане, може да изтеглите sqlmap като клонирате [Git](https://github.com/sqlmapproject/sqlmap) хранилището:
+За предпочитане е да изтеглите sqlmap като клонирате [Git](https://github.com/sqlmapproject/sqlmap) хранилището:
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
@@ -33,10 +33,10 @@ sqlmap работи самостоятелно с [Python](http://www.python.org
 
     python sqlmap.py -hh
 
-Може да намерите пример от пускане [тук](https://asciinema.org/a/46601).
+Може да намерите пример за използване на sqlmap [тук](https://asciinema.org/a/46601).
 За да разберете възможностите на sqlmap, списък на поддържаните функции и описание на всички опции, заедно с примери, се препоръчва да се разгледа [упътването](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
-Линкове
+Връзки
 ----
 
 * Начална страница: http://sqlmap.org
