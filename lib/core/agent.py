@@ -760,6 +760,10 @@ class Agent(object):
         if intoRegExp:
             intoRegExp = intoRegExp.group(1)
             query = query[:query.index(intoRegExp)]
+            # The position is irrelevant when writing into a file,
+            # so bump the payload to the first position to avoid
+            # NULL bytes written into the file
+            position = 0
 
             position = 0
             char = NULL
