@@ -903,7 +903,11 @@ class Agent(object):
         fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = None
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+        if Backend.isDbms(DBMS.MYSQL):
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
+            limitedQuery += " %s" % limitStr
+
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.SQLITE):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
