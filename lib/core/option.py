@@ -1922,6 +1922,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.futileUnion = None
     kb.headersFp = {}
     kb.heuristicDbms = None
+    kb.heuristicExtendedDbms = None
     kb.heuristicMode = False
     kb.heuristicPage = False
     kb.heuristicTest = None

@@ -817,6 +817,8 @@ def heuristicCheckDbms(injection):
         infoMsg += "could be '%s' " % retVal
         logger.info(infoMsg)
 
+        kb.heuristicExtendedDbms = retVal
+
     return retVal
 
 def checkFalsePositives(injection):
