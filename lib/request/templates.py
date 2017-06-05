@@ -13,7 +13,7 @@ def getPageTemplate(payload, place):
 
     if payload and place:
         if (payload, place) not in kb.pageTemplates:
-            page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+            page, _, _ = Request.queryPage(payload, place, content=True, raise404=False)
             kb.pageTemplates[(payload, place)] = (page, kb.lastParserStatus is None)
 
         retVal = kb.pageTemplates[(payload, place)]

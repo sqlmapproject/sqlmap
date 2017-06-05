@@ -232,7 +232,7 @@ class Web:
                     if place in conf.parameters:
                         value = re.sub(r"(\A|&)(\w+)=", "\g<2>[]=", conf.parameters[place])
                         if "[]" in value:
-                            page, headers = Request.queryPage(value=value, place=place, content=True, raise404=False, silent=True, noteResponseTime=False)
+                            page, headers, _ = Request.queryPage(value=value, place=place, content=True, raise404=False, silent=True, noteResponseTime=False)
                             parseFilePaths(page)
 
                 cookie = None
@@ -244,12 +244,12 @@ class Web:
                 if cookie:
                     value = re.sub(r"(\A|;)(\w+)=[^;]*", "\g<2>=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", cookie)
                     if value != cookie:
-                        page, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
+                        page, _, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
                         parseFilePaths(page)
 
                     value = re.sub(r"(\A|;)(\w+)=[^;]*", "\g<2>=", cookie)
                     if value != cookie:
-                        page, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
+                        page, _, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
                         parseFilePaths(page)
 
         directories = list(arrayizeValue(getManualDirectories()))

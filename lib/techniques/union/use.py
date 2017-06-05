@@ -81,7 +81,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         payload = agent.payload(newValue=query, where=where)
 
         # Perform the request
-        page, headers = Request.queryPage(payload, content=True, raise404=False)
+        page, headers, _ = Request.queryPage(payload, content=True, raise404=False)
 
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 

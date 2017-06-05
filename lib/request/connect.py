@@ -1227,7 +1227,7 @@ class Connect(object):
         kb.permissionFlag = re.search(PERMISSION_DENIED_REGEX, page or "", re.I) is not None
 
         if content or response:
-            return page, headers
+            return page, headers, code
 
         if getRatioValue:
             return comparison(page, headers, code, getRatioValue=False, pageLength=pageLength), comparison(page, headers, code, getRatioValue=True, pageLength=pageLength)

@@ -552,7 +552,7 @@ def checkSqlInjection(place, parameter, value):
                             # Perform the test's request and grep the response
                             # body for the test's <grep> regular expression
                             try:
-                                page, headers = Request.queryPage(reqPayload, place, content=True, raise404=False)
+                                page, headers, _ = Request.queryPage(reqPayload, place, content=True, raise404=False)
                                 output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
                                         or extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None, re.DOTALL | re.IGNORECASE) \
                                         or extractRegexResult(check, listToStrValue([headers[key] for key in headers.keys() if key.lower() != URI_HTTP_HEADER.lower()] if headers else None), re.DOTALL | re.IGNORECASE) \
@@ -959,7 +959,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     payload = "%s%s%s" % (prefix, randStr, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
-    page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+    page, _, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
     kb.heuristicPage = page
     kb.heuristicMode = False
@@ -1015,7 +1015,7 @@ def heuristicCheckSqlInjection(place, parameter):
     value = "%s%s%s" % (randStr1, DUMMY_NON_SQLI_CHECK_APPENDIX, randStr2)
     payload = "%s%s%s" % (prefix, "'%s" % value, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
-    page, _ = Request.queryPage(payload, place, content=True, raise404=False)
+    page, _, _ = Request.queryPage(payload, place, content=True, raise404=False)
 
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
@@ -1124,7 +1124,7 @@ def checkDynamicContent(firstPage, secondPage):
             warnMsg += ". sqlmap is going to retry the request"
             logger.critical(warnMsg)
 
-            secondPage, _ = Request.queryPage(content=True)
+            secondPage, _, _ = Request.queryPage(content=True)
             findDynamicContent(firstPage, secondPage)
 
 def checkStability():
@@ -1147,7 +1147,7 @@ def checkStability():
     delay = max(0, min(1, delay))
     time.sleep(delay)
 
-    secondPage, _ = Request.queryPage(content=True, noteResponseTime=False, raise404=False)
+    secondPage, _, _ = Request.queryPage(content=True, noteResponseTime=False, raise404=False)
 
     if kb.redirectChoice:
         return None
@@ -1229,7 +1229,7 @@ def checkString():
     infoMsg += "target URL page content"
     logger.info(infoMsg)
 
-    page, headers = Request.queryPage(content=True)
+    page, headers, _ = Request.queryPage(content=True)
     rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
     if conf.string not in rawResponse:
@@ -1248,7 +1248,7 @@ def checkRegexp():
     infoMsg += "the target URL page content"
     logger.info(infoMsg)
 
-    page, headers = Request.queryPage(content=True)
+    page, headers, _ = Request.queryPage(content=True)
     rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
     if not re.search(conf.regexp, rawResponse, re.I | re.M):
@@ -1455,7 +1455,7 @@ def checkConnection(suppressOutput=False):
 
     try:
         kb.originalPageTime = time.time()
-        page, headers = Request.queryPage(content=True, noteResponseTime=False)
+        page, headers, _ = Request.queryPage(content=True, noteResponseTime=False)
         kb.originalPage = kb.pageTemplate = page
 
         kb.errorIsNone = False

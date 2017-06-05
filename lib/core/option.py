@@ -628,7 +628,7 @@ def _findPageForms():
     logger.info(infoMsg)
 
     if not any((conf.bulkFile, conf.googleDork, conf.sitemapUrl)):
-        page, _ = Request.queryPage(content=True)
+        page, _, _ = Request.queryPage(content=True)
         findPageForms(page, conf.url, True, True)
     else:
         if conf.bulkFile:
