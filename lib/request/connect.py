@@ -622,7 +622,7 @@ class Connect(object):
                 debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                 logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError):
+        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError):
             tbMsg = traceback.format_exc()
 
             if checking:
@@ -660,6 +660,8 @@ class Connect(object):
                     warnMsg += " ('%s')" % match.group(1).strip()
             elif "NTLM" in tbMsg:
                 warnMsg = "there has been a problem with NTLM authentication"
+            elif "Invalid header name" in tbMsg:  # (e.g. PostgreSQL ::Text payload)
+                return None, None, None
             elif "BadStatusLine" in tbMsg:
                 warnMsg = "connection dropped or unknown HTTP "
                 warnMsg += "status code received"
@@ -679,6 +681,9 @@ class Connect(object):
             if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
                 warnMsg += " or proxy"
 
+            if silent:
+                return None, None, None
+
             with kb.locks.connError:
                 kb.connErrorCounter += 1
 
@@ -692,9 +697,7 @@ class Connect(object):
                 if kb.connErrorChoice is False:
                     raise SqlmapConnectionException(warnMsg)
 
-            if silent:
-                return None, None, None
-            elif "forcibly closed" in tbMsg:
+            if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
                 return None, None, None
             elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead")):
