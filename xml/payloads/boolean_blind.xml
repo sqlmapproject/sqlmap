@@ -172,6 +172,22 @@ Tag: <test>
     </test>
 
     <test>
+        <title>AND boolean-based blind - WHERE or HAVING clause (Forced MySQL comment)</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [INFERENCE] #</vector>
+        <request>
+            <payload>AND [RANDNUM]=[RANDNUM] #</payload>
+        </request>
+        <response>
+            <comparison>AND [RANDNUM]=[RANDNUM1] #</comparison>
+        </response>
+    </test>
+
+    <test>
         <title>OR boolean-based blind - WHERE or HAVING clause</title>
         <stype>1</stype>
         <level>1</level>
@@ -184,6 +200,22 @@ Tag: <test>
         </request>
         <response>
             <comparison>OR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (Forced MySQL comment)</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [INFERENCE] #</vector>
+        <request>
+            <payload>OR [RANDNUM]=[RANDNUM] #</payload>
+        </request>
+        <response>
+            <comparison>OR [RANDNUM]=[RANDNUM1] #</comparison>
         </response>
     </test>
 
