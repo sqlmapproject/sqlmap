@@ -176,20 +176,26 @@ class Entries:
 
                                 count = inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
                                 if isNumPosStrValue(count):
-                                    indexRange = getLimitRange(count, plusOne=True)
+                                    try:
+                                        indexRange = getLimitRange(count, plusOne=True)
 
-                                    for index in indexRange:
-                                        row = []
+                                        for index in indexRange:
+                                            row = []
+                                            for column in colList:
+                                                query = rootQuery.blind.query3 % (column, column, table, index)
+                                                query = agent.whereQuery(query)
+                                                value = inject.getValue(query, blind=False, time=False, dump=True) or ""
+                                                row.append(value)
 
-                                        for column in colList:
-                                            query = rootQuery.blind.query3 % (column, column, table, index)
-                                            query = agent.whereQuery(query)
-                                            value = inject.getValue(query, blind=False, time=False, dump=True) or ""
-                                            row.append(value)
+                                            entries.append(row)
 
-                                        entries.append(row)
+                                    except KeyboardInterrupt:
+                                        kb.dumpKeyboardInterrupt = True
+                                        clearConsoleLine()
+                                        warnMsg = "Ctrl+C detected in dumping phase"
+                                        logger.warn(warnMsg)
 
-                            if not entries:
+                            if not entries and not kb.dumpKeyboardInterrupt:
                                 try:
                                     retVal = pivotDumpTable(table, colList, blind=False)
                                 except KeyboardInterrupt:
@@ -211,7 +217,7 @@ class Entries:
 
                     query = agent.whereQuery(query)
 
-                    if not entries and query:
+                    if not entries and query and not kb.dumpKeyboardInterrupt:
                         try:
                             entries = inject.getValue(query, blind=False, time=False, dump=True)
                         except KeyboardInterrupt:
@@ -306,24 +312,32 @@ class Entries:
                             table = "%s.%s" % (conf.db, tbl)
 
                         if Backend.isDbms(DBMS.MSSQL):
-                            indexRange = getLimitRange(count, plusOne=True)
-                            for index in indexRange:
-                                for column in colList:
-                                    query = rootQuery.blind.query3 % (column, column, table, index)
-                                    query = agent.whereQuery(query)
+                            try:
+                                indexRange = getLimitRange(count, plusOne=True)
 
-                                    value = inject.getValue(query, union=False, error=False, dump=True) or ""
+                                for index in indexRange:
+                                    for column in colList:
+                                        query = rootQuery.blind.query3 % (column, column, table, index)
+                                        query = agent.whereQuery(query)
 
-                                    if column not in lengths:
-                                        lengths[column] = 0
+                                        value = inject.getValue(query, union=False, error=False, dump=True) or ""
 
-                                    if column not in entries:
-                                        entries[column] = BigArray()
+                                        if column not in lengths:
+                                            lengths[column] = 0
 
-                                    lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
-                                    entries[column].append(value)
+                                        if column not in entries:
+                                            entries[column] = BigArray()
 
-                        if not entries:
+                                        lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                        entries[column].append(value)
+
+                            except KeyboardInterrupt:
+                                kb.dumpKeyboardInterrupt = True
+                                clearConsoleLine()
+                                warnMsg = "Ctrl+C detected in dumping phase"
+                                logger.warn(warnMsg)
+
+                        if not entries and not kb.dumpKeyboardInterrupt:
                             try:
                                 retVal = pivotDumpTable(table, colList, count, blind=True)
                             except KeyboardInterrupt:
