@@ -375,6 +375,13 @@ def processResponse(page, responseHeaders, status=None):
                         conf.paramDict[PLACE.POST][name] = value
                 conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % re.escape(name), r"\g<1>%s" % re.escape(value), conf.parameters[PLACE.POST])
 
+    if not kb.browserVerification and re.search(r"(?i)browser.?verification", page or ""):
+        kb.browserVerification = True
+        warnMsg = "potential browser verification protection mechanism detected"
+        if re.search(r"(?i)CloudFlare", page):
+            warnMsg += " (CloudFlare)"
+        singleTimeWarnMessage(warnMsg)
+
     if not kb.captchaDetected and re.search(r"(?i)captcha", page or ""):
         for match in re.finditer(r"(?si)<form.+?</form>", page):
             if re.search(r"(?i)captcha", match.group(0)):

@@ -1863,6 +1863,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.authHeader = None
     kb.bannerFp = AttribDict()
     kb.binaryField = False
+    kb.browserVerification = None
 
     kb.brute = AttribDict({"tables": [], "columns": []})
     kb.bruteMode = False
