@@ -170,18 +170,38 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            try:
-                                retVal = pivotDumpTable(table, colList, blind=False)
-                            except KeyboardInterrupt:
-                                retVal = None
-                                kb.dumpKeyboardInterrupt = True
-                                clearConsoleLine()
-                                warnMsg = "Ctrl+C detected in dumping phase"
-                                logger.warn(warnMsg)
+                            if Backend.isDbms(DBMS.MSSQL):
+                                query = rootQuery.blind.count % table
+                                query = agent.whereQuery(query)
 
-                            if retVal:
-                                entries, _ = retVal
-                                entries = zip(*[entries[colName] for colName in colList])
+                                count = inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                                if isNumPosStrValue(count):
+                                    indexRange = getLimitRange(count, plusOne=True)
+
+                                    for index in indexRange:
+                                        row = []
+
+                                        for column in colList:
+                                            query = rootQuery.blind.query3 % (column, column, table, index)
+                                            query = agent.whereQuery(query)
+                                            value = inject.getValue(query, blind=False, time=False, dump=True) or ""
+                                            row.append(value)
+
+                                        entries.append(row)
+
+                            if not entries:
+                                try:
+                                    retVal = pivotDumpTable(table, colList, blind=False)
+                                except KeyboardInterrupt:
+                                    retVal = None
+                                    kb.dumpKeyboardInterrupt = True
+                                    clearConsoleLine()
+                                    warnMsg = "Ctrl+C detected in dumping phase"
+                                    logger.warn(warnMsg)
+
+                                if retVal:
+                                    entries, _ = retVal
+                                    entries = zip(*[entries[colName] for colName in colList])
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB):
@@ -285,17 +305,36 @@ class Entries:
                         elif Backend.isDbms(DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
 
-                        try:
-                            retVal = pivotDumpTable(table, colList, count, blind=True)
-                        except KeyboardInterrupt:
-                            retVal = None
-                            kb.dumpKeyboardInterrupt = True
-                            clearConsoleLine()
-                            warnMsg = "Ctrl+C detected in dumping phase"
-                            logger.warn(warnMsg)
+                        if Backend.isDbms(DBMS.MSSQL):
+                            indexRange = getLimitRange(count, plusOne=True)
+                            for index in indexRange:
+                                for column in colList:
+                                    query = rootQuery.blind.query3 % (column, column, table, index)
+                                    query = agent.whereQuery(query)
 
-                        if retVal:
-                            entries, lengths = retVal
+                                    value = inject.getValue(query, union=False, error=False, dump=True) or ""
+
+                                    if column not in lengths:
+                                        lengths[column] = 0
+
+                                    if column not in entries:
+                                        entries[column] = BigArray()
+
+                                    lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                    entries[column].append(value)
+
+                        if not entries:
+                            try:
+                                retVal = pivotDumpTable(table, colList, count, blind=True)
+                            except KeyboardInterrupt:
+                                retVal = None
+                                kb.dumpKeyboardInterrupt = True
+                                clearConsoleLine()
+                                warnMsg = "Ctrl+C detected in dumping phase"
+                                logger.warn(warnMsg)
+
+                            if retVal:
+                                entries, lengths = retVal
 
                     else:
                         emptyColumns = []

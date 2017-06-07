@@ -284,126 +284,127 @@ def unionUse(expression, unpack=True, dump=False):
                     value = []  # for empty tables
                 return value
 
-            threadData = getCurrentThreadData()
+            if isNumPosStrValue(count) and int(count) > 1:
+                threadData = getCurrentThreadData()
 
-            try:
-                threadData.shared.limits = iter(xrange(startLimit, stopLimit))
-            except OverflowError:
-                errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
-                errMsg += "with switch '--fresh-queries'"
-                raise SqlmapDataException(errMsg)
+                try:
+                    threadData.shared.limits = iter(xrange(startLimit, stopLimit))
+                except OverflowError:
+                    errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
+                    errMsg += "with switch '--fresh-queries'"
+                    raise SqlmapDataException(errMsg)
 
-            numThreads = min(conf.threads, (stopLimit - startLimit))
-            threadData.shared.value = BigArray()
-            threadData.shared.buffered = []
-            threadData.shared.counter = 0
-            threadData.shared.lastFlushed = startLimit - 1
-            threadData.shared.showEta = conf.eta and (stopLimit - startLimit) > 1
+                numThreads = min(conf.threads, (stopLimit - startLimit))
+                threadData.shared.value = BigArray()
+                threadData.shared.buffered = []
+                threadData.shared.counter = 0
+                threadData.shared.lastFlushed = startLimit - 1
+                threadData.shared.showEta = conf.eta and (stopLimit - startLimit) > 1
 
-            if threadData.shared.showEta:
-                threadData.shared.progress = ProgressBar(maxValue=(stopLimit - startLimit))
+                if threadData.shared.showEta:
+                    threadData.shared.progress = ProgressBar(maxValue=(stopLimit - startLimit))
 
-            if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
-                kb.suppressResumeInfo = True
-                debugMsg = "suppressing possible resume console info because of "
-                debugMsg += "large number of rows. It might take too long"
-                logger.debug(debugMsg)
+                if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
+                    kb.suppressResumeInfo = True
+                    debugMsg = "suppressing possible resume console info because of "
+                    debugMsg += "large number of rows. It might take too long"
+                    logger.debug(debugMsg)
 
-            try:
-                def unionThread():
-                    threadData = getCurrentThreadData()
+                try:
+                    def unionThread():
+                        threadData = getCurrentThreadData()
 
-                    while kb.threadContinue:
-                        with kb.locks.limit:
-                            try:
-                                valueStart = time.time()
-                                threadData.shared.counter += 1
-                                num = threadData.shared.limits.next()
-                            except StopIteration:
+                        while kb.threadContinue:
+                            with kb.locks.limit:
+                                try:
+                                    valueStart = time.time()
+                                    threadData.shared.counter += 1
+                                    num = threadData.shared.limits.next()
+                                except StopIteration:
+                                    break
+
+                            if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                                field = expressionFieldsList[0]
+                            elif Backend.isDbms(DBMS.ORACLE):
+                                field = expressionFieldsList
+                            else:
+                                field = None
+
+                            limitedExpr = agent.limitQuery(num, expression, field)
+                            output = _oneShotUnionUse(limitedExpr, unpack, True)
+
+                            if not kb.threadContinue:
                                 break
 
-                        if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                            field = expressionFieldsList[0]
-                        elif Backend.isDbms(DBMS.ORACLE):
-                            field = expressionFieldsList
-                        else:
-                            field = None
+                            if output:
+                                with kb.locks.value:
+                                    if all(_ in output for _ in (kb.chars.start, kb.chars.stop)):
+                                        items = parseUnionPage(output)
 
-                        limitedExpr = agent.limitQuery(num, expression, field)
-                        output = _oneShotUnionUse(limitedExpr, unpack, True)
+                                        if threadData.shared.showEta:
+                                            threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
+                                        if isListLike(items):
+                                            # in case that we requested N columns and we get M!=N then we have to filter a bit
+                                            if len(items) > 1 and len(expressionFieldsList) > 1:
+                                                items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
+                                            items = [_ for _ in flattenValue(items)]
+                                            if len(items) > len(expressionFieldsList):
+                                                filtered = OrderedDict()
+                                                for item in items:
+                                                    key = re.sub(r"[^A-Za-z0-9]", "", item).lower()
+                                                    if key not in filtered or re.search(r"[^A-Za-z0-9]", item):
+                                                        filtered[key] = item
+                                                items = filtered.values()
+                                            items = [items]
+                                        index = None
+                                        for index in xrange(1 + len(threadData.shared.buffered)):
+                                            if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
+                                                break
+                                        threadData.shared.buffered.insert(index or 0, (num, items))
+                                    else:
+                                        index = None
+                                        if threadData.shared.showEta:
+                                            threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
+                                        for index in xrange(1 + len(threadData.shared.buffered)):
+                                            if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
+                                                break
+                                        threadData.shared.buffered.insert(index or 0, (num, None))
 
-                        if not kb.threadContinue:
-                            break
+                                        items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
 
-                        if output:
-                            with kb.locks.value:
-                                if all(_ in output for _ in (kb.chars.start, kb.chars.stop)):
-                                    items = parseUnionPage(output)
+                                    while threadData.shared.buffered and (threadData.shared.lastFlushed + 1 >= threadData.shared.buffered[0][0] or len(threadData.shared.buffered) > MAX_BUFFERED_PARTIAL_UNION_LENGTH):
+                                        threadData.shared.lastFlushed, _ = threadData.shared.buffered[0]
+                                        if not isNoneValue(_):
+                                            threadData.shared.value.extend(arrayizeValue(_))
+                                        del threadData.shared.buffered[0]
 
-                                    if threadData.shared.showEta:
-                                        threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
-                                    if isListLike(items):
-                                        # in case that we requested N columns and we get M!=N then we have to filter a bit
-                                        if len(items) > 1 and len(expressionFieldsList) > 1:
-                                            items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
-                                        items = [_ for _ in flattenValue(items)]
-                                        if len(items) > len(expressionFieldsList):
-                                            filtered = OrderedDict()
-                                            for item in items:
-                                                key = re.sub(r"[^A-Za-z0-9]", "", item).lower()
-                                                if key not in filtered or re.search(r"[^A-Za-z0-9]", item):
-                                                    filtered[key] = item
-                                            items = filtered.values()
-                                        items = [items]
-                                    index = None
-                                    for index in xrange(1 + len(threadData.shared.buffered)):
-                                        if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
-                                            break
-                                    threadData.shared.buffered.insert(index or 0, (num, items))
-                                else:
-                                    index = None
-                                    if threadData.shared.showEta:
-                                        threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
-                                    for index in xrange(1 + len(threadData.shared.buffered)):
-                                        if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
-                                            break
-                                    threadData.shared.buffered.insert(index or 0, (num, None))
+                                if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
+                                    _ = ','.join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items))) if not isinstance(items, basestring) else items
+                                    status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
 
-                                    items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
+                                    if len(status) > width:
+                                        status = "%s..." % status[:width - 3]
 
-                                while threadData.shared.buffered and (threadData.shared.lastFlushed + 1 >= threadData.shared.buffered[0][0] or len(threadData.shared.buffered) > MAX_BUFFERED_PARTIAL_UNION_LENGTH):
-                                    threadData.shared.lastFlushed, _ = threadData.shared.buffered[0]
-                                    if not isNoneValue(_):
-                                        threadData.shared.value.extend(arrayizeValue(_))
-                                    del threadData.shared.buffered[0]
+                                    dataToStdout("%s\n" % status)
 
-                            if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
-                                _ = ','.join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items))) if not isinstance(items, basestring) else items
-                                status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
+                    runThreads(numThreads, unionThread)
 
-                                if len(status) > width:
-                                    status = "%s..." % status[:width - 3]
+                    if conf.verbose == 1:
+                        clearConsoleLine(True)
 
-                                dataToStdout("%s\n" % status)
+                except KeyboardInterrupt:
+                    abortedFlag = True
 
-                runThreads(numThreads, unionThread)
+                    warnMsg = "user aborted during enumeration. sqlmap "
+                    warnMsg += "will display partial output"
+                    logger.warn(warnMsg)
 
-                if conf.verbose == 1:
-                    clearConsoleLine(True)
-
-            except KeyboardInterrupt:
-                abortedFlag = True
-
-                warnMsg = "user aborted during enumeration. sqlmap "
-                warnMsg += "will display partial output"
-                logger.warn(warnMsg)
-
-            finally:
-                for _ in sorted(threadData.shared.buffered):
-                    if not isNoneValue(_[1]):
-                        threadData.shared.value.extend(arrayizeValue(_[1]))
-                value = threadData.shared.value
-                kb.suppressResumeInfo = False
+                finally:
+                    for _ in sorted(threadData.shared.buffered):
+                        if not isNoneValue(_[1]):
+                            threadData.shared.value.extend(arrayizeValue(_[1]))
+                    value = threadData.shared.value
+                    kb.suppressResumeInfo = False
 
     if not value and not abortedFlag:
         output = _oneShotUnionUse(expression, unpack)
