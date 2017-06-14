@@ -232,34 +232,26 @@ class StdDbOut(object):
                     # Ignore all non-relevant messages
                     return
 
-            output = conf.databaseCursor.execute(
-                "SELECT id, status, value FROM data WHERE taskid = ? AND content_type = ?",
-                (self.taskid, content_type))
+            output = conf.databaseCursor.execute("SELECT id, status, value FROM data WHERE taskid = ? AND content_type = ?", (self.taskid, content_type))
 
             # Delete partial output from IPC database if we have got a complete output
             if status == CONTENT_STATUS.COMPLETE:
                 if len(output) > 0:
                     for index in xrange(len(output)):
-                        conf.databaseCursor.execute("DELETE FROM data WHERE id = ?",
-                                                     (output[index][0],))
+                        conf.databaseCursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
 
-                conf.databaseCursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
-                                             (self.taskid, status, content_type, jsonize(value)))
+                conf.databaseCursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
                 if kb.partRun:
                     kb.partRun = None
 
             elif status == CONTENT_STATUS.IN_PROGRESS:
                 if len(output) == 0:
-                    conf.databaseCursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
-                                                 (self.taskid, status, content_type,
-                                                  jsonize(value)))
+                    conf.databaseCursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
                 else:
                     new_value = "%s%s" % (dejsonize(output[0][2]), value)
-                    conf.databaseCursor.execute("UPDATE data SET value = ? WHERE id = ?",
-                                                 (jsonize(new_value), output[0][0]))
+                    conf.databaseCursor.execute("UPDATE data SET value = ? WHERE id = ?", (jsonize(new_value), output[0][0]))
         else:
-            conf.databaseCursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)",
-                                         (self.taskid, str(value) if value else ""))
+            conf.databaseCursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (self.taskid, str(value) if value else ""))
 
     def flush(self):
         pass
@@ -270,17 +262,13 @@ class StdDbOut(object):
     def seek(self):
         pass
 
-
 class LogRecorder(logging.StreamHandler):
     def emit(self, record):
         """
         Record emitted events to IPC database for asynchronous I/O
         communication with the parent process
         """
-        conf.databaseCursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)",
-                                     (conf.taskid, time.strftime("%X"), record.levelname,
-                                      record.msg % record.args if record.args else record.msg))
-
+        conf.databaseCursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)", (conf.taskid, time.strftime("%X"), record.levelname, record.msg % record.args if record.args else record.msg))
 
 def setRestAPILog():
     if conf.api:
@@ -555,16 +543,11 @@ def scan_data(taskid):
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all data from the IPC database for the taskid
-    for status, content_type, value in DataStore.current_db.execute(
-            "SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC",
-            (taskid,)):
-        json_data_message.append(
-            {"status": status, "type": content_type, "value": dejsonize(value)})
+    for status, content_type, value in DataStore.current_db.execute("SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+        json_data_message.append({"status": status, "type": content_type, "value": dejsonize(value)})
 
     # Read all error messages from the IPC database
-    for error in DataStore.current_db.execute(
-            "SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC",
-            (taskid,)):
+    for error in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
     logger.debug("[%s] Retrieved scan data and error messages" % taskid)
@@ -591,10 +574,7 @@ def scan_log_limited(taskid, start, end):
     end = max(1, int(end))
 
     # Read a subset of log messages from the IPC database
-    for time_, level, message in DataStore.current_db.execute(
-            ("SELECT time, level, message FROM logs WHERE "
-             "taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC"),
-            (taskid, start, end)):
+    for time_, level, message in DataStore.current_db.execute("SELECT time, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
     logger.debug("[%s] Retrieved scan log messages subset" % taskid)
@@ -613,8 +593,7 @@ def scan_log(taskid):
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all log messages from the IPC database
-    for time_, level, message in DataStore.current_db.execute(
-            "SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+    for time_, level, message in DataStore.current_db.execute("SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
     logger.debug("[%s] Retrieved scan log messages" % taskid)
