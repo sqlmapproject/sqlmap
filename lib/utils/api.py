@@ -70,7 +70,7 @@ class Database(object):
         self.cursor = None
 
     def connect(self, who="server"):
-        self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None)
+        self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None, check_same_thread=False)
         self.cursor = self.connection.cursor()
         logger.debug("REST-JSON API %s connected to IPC database" % who)
 
