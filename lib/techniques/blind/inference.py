@@ -187,8 +187,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     posValue = ord(hintValue[idx - 1])
 
-                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
-                result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                forgedPayload = agent.extractPayload(payload)
+                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
+                result = Request.queryPage(agent.replacePayload(payload, forgedPayload), timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)
 
                 if result:
