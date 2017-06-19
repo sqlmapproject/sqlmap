@@ -2543,7 +2543,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
         # corner case when character % really needs to be
         # encoded (when not representing URL encoded char)
         # except in cases when tampering scripts are used
-        if all(map(lambda x: '%' in x, [safe, value])) and not kb.tamperFunctions:
+        if all('%' in _ for _ in (safe, value)) and not kb.tamperFunctions:
             value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
 
         while True:
