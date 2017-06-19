@@ -42,7 +42,8 @@ def tamper(payload, **kwargs):
     #   FF      0C      new page
     #   CR      0D      carriage return
     #   VT      0B      vertical TAB        (MySQL and Microsoft SQL Server only)
-    blanks = ('%09', '%0A', '%0C', '%0D', '%0B')
+    #           A0      non-breaking space
+    blanks = ('%09', '%0A', '%0C', '%0D', '%0B', '%A0')
     retVal = payload
 
     if payload:
