@@ -4393,4 +4393,4 @@ def getSafeExString(ex, encoding=None):
     elif getattr(ex, "msg", None):
         retVal = ex.msg
 
-    return getUnicode(retVal, encoding=encoding)
+    return getUnicode(retVal or "", encoding=encoding).strip()

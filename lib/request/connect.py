@@ -1038,16 +1038,19 @@ class Connect(object):
                 try:
                     compiler.parse(unicodeencode(conf.evalCode.replace(';', '\n')))
                 except SyntaxError, ex:
-                    original = replacement = ex.text.strip()
-                    for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
-                        if _ in keywords:
-                            replacement = replacement.replace(_, "%s%s" % (_, EVALCODE_KEYWORD_SUFFIX))
+                    if ex.text:
+                        original = replacement = ex.text.strip()
+                        for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
+                            if _ in keywords:
+                                replacement = replacement.replace(_, "%s%s" % (_, EVALCODE_KEYWORD_SUFFIX))
+                                break
+                        if original == replacement:
+                            conf.evalCode = conf.evalCode.replace(EVALCODE_KEYWORD_SUFFIX, "")
                             break
-                    if original == replacement:
-                        conf.evalCode = conf.evalCode.replace(EVALCODE_KEYWORD_SUFFIX, "")
-                        break
+                        else:
+                            conf.evalCode = conf.evalCode.replace(getUnicode(ex.text.strip(), UNICODE_ENCODING), replacement)
                     else:
-                        conf.evalCode = conf.evalCode.replace(getUnicode(ex.text.strip(), UNICODE_ENCODING), replacement)
+                        break
                 else:
                     break
 
