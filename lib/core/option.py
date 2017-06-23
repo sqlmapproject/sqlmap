@@ -149,6 +149,7 @@ from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
 from lib.request.templates import getPageTemplate
+from lib.utils.collect import RequestCollectorFactory
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.search import search
@@ -1844,6 +1845,7 @@ def _setConfAttributes():
     conf.scheme = None
     conf.tests = []
     conf.trafficFP = None
+    conf.requestCollectorFactory = None
     conf.wFileType = None
 
 def _setKnowledgeBaseAttributes(flushAll=True):
@@ -2228,6 +2230,11 @@ def _setTrafficOutputFP():
 
         conf.trafficFP = openFile(conf.trafficFile, "w+")
 
+def _setupRequestCollector():
+    conf.requestCollectorFactory = RequestCollectorFactory(collect=conf.collectRequests)
+    threadData = getCurrentThreadData()
+    threadData.requestCollector = conf.requestCollectorFactory.create()
+
 def _setDNSServer():
     if not conf.dnsDomain:
         return
@@ -2604,6 +2611,7 @@ def init():
     _setTamperingFunctions()
     _setWafFunctions()
     _setTrafficOutputFP()
+    _setupRequestCollector()
     _resolveCrossReferences()
     _checkWebSocket()
 

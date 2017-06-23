@@ -197,6 +197,7 @@ optDict = {
                                "binaryFields":      "string",
                                "charset":           "string",
                                "checkInternet":     "boolean",
+                               "collectRequests":   "string",
                                "crawlDepth":        "integer",
                                "crawlExclude":      "string",
                                "csvDel":            "string",
