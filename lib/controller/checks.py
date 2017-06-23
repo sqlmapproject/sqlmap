@@ -117,6 +117,7 @@ def checkSqlInjection(place, parameter, value):
 
     while tests:
         test = tests.pop(0)
+        threadData.requestCollector.reset()
 
         try:
             if kb.endDetection:
@@ -700,6 +701,7 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].matchRatio = kb.matchRatio
                         injection.data[stype].trueCode = trueCode
                         injection.data[stype].falseCode = falseCode
+                        injection.data[stype].collectedRequests = threadData.requestCollector.obtain()
 
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles
