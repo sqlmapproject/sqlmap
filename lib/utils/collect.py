@@ -112,7 +112,6 @@ class Request:
             "url": self.url,
             "headers": [dict(name=key, value=value) for key, value in self.headers.items()],
             "comment": self.comment,
-            "_raw": self.raw,
         }
         if self.postBody:
             contentType = self.headers.get('Content-Type')
@@ -172,7 +171,6 @@ class Response:
                 "text": base64.b64encode(self.content),
             },
             "comment": self.comment,
-            "_raw": self.raw,
         }
 
 
