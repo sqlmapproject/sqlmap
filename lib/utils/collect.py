@@ -108,6 +108,7 @@ class Request:
 
     def toDict(self):
         out = {
+            "httpVersion": self.httpVersion,
             "method": self.method,
             "url": self.url,
             "headers": [dict(name=key, value=value) for key, value in self.headers.items()],
@@ -160,16 +161,22 @@ class Response:
                    raw=raw)
 
     def toDict(self):
+        content = {
+            "mimeType": self.headers.get('Content-Type'),
+            "text": self.content,
+        }
+
+        binary = set(['\0', '\1'])
+        if any(c in binary for c in self.content):
+            content["encoding"] = "base64"
+            content["text"] = base64.b64encode(self.content)
+
         return {
             "httpVersion": self.httpVersion,
             "status": self.status,
             "statusText": self.statusText,
             "headers": [dict(name=key, value=value) for key, value in self.headers.items()],
-            "content": {
-                "mimeType": self.headers.get('Content-Type'),
-                "encoding": "base64",
-                "text": base64.b64encode(self.content),
-            },
+            "content": content,
             "comment": self.comment,
         }
 
@@ -241,6 +248,7 @@ if __name__ == '__main__':
             self.assertEqual("http://example.com/test.php", out["url"])
             self.assertIn({"name": "Host", "value": "example.com"}, out["headers"])
             self.assertEqual("Hello World", out["comment"])
+            self.assertEqual("HTTP/1.1", out["httpVersion"])
 
         def test_render_with_post_body(self):
             req = Request(method="POST",
@@ -276,15 +284,26 @@ if __name__ == '__main__':
             resp = Response(status=200, statusText="OK",
                             httpVersion="HTTP/1.1",
                             headers={"Content-Type": "text/html"},
-                            content="<html><body>Hello</body></html>\n")
+                            content="<html>\n<body>Hello</body>\n</html>")
             out = resp.toDict()
             self.assertEqual(200, out["status"])
             self.assertEqual("OK", out["statusText"])
             self.assertIn({"name": "Content-Type", "value": "text/html"}, out["headers"])
             self.assertEqual(out["content"], {
                 "mimeType": "text/html",
+                "text": "<html>\n<body>Hello</body>\n</html>",
+            })
+
+        def test_simple_body_contains_binary_data(self):
+            resp = Response(status=200, statusText="OK",
+                            httpVersion="HTTP/1.1",
+                            headers={"Content-Type": "application/octet-stream"},
+                            content="test\0abc")
+            out = resp.toDict()
+            self.assertEqual(out["content"], {
                 "encoding": "base64",
-                "text": "PGh0bWw+PGJvZHk+SGVsbG88L2JvZHk+PC9odG1sPgo=",
+                "mimeType": "application/octet-stream",
+                "text": "dGVzdABhYmM=",
             })
 
     unittest.main(buffer=False)
