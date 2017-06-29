@@ -9,6 +9,8 @@ import codecs
 import functools
 import os
 import re
+import subprocess
+import sys
 import tempfile
 import time
 import urlparse
@@ -669,6 +671,7 @@ def _createTargetDirs():
         with codecs.open(os.path.join(conf.outputPath, "target.txt"), "w+", UNICODE_ENCODING) as f:
             f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
             f.write(" (%s)" % (HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET))
+            f.write("  # %s" % subprocess.list2cmdline(sys.argv))
             if conf.data:
                 f.write("\n\n%s" % getUnicode(conf.data))
     except IOError, ex:
