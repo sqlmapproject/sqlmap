@@ -671,7 +671,7 @@ def _createTargetDirs():
         with codecs.open(os.path.join(conf.outputPath, "target.txt"), "w+", UNICODE_ENCODING) as f:
             f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
             f.write(" (%s)" % (HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET))
-            f.write("  # %s" % subprocess.list2cmdline(sys.argv))
+            f.write("  # %s" % getUnicode(subprocess.list2cmdline(sys.argv), encoding=sys.stdin.encoding))
             if conf.data:
                 f.write("\n\n%s" % getUnicode(conf.data))
     except IOError, ex:
