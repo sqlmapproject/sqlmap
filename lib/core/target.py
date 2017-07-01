@@ -401,7 +401,7 @@ def _setRequestParams():
                     message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
 
                     if readInput(message, default='N', boolean=True):
-                        conf.csrfToken = parameter
+                        conf.csrfToken = getUnicode(parameter)
                     break
 
 def _setHashDB():
