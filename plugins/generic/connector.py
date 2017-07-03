@@ -23,8 +23,8 @@ class Connector:
         self.cursor = None
 
     def initConnection(self):
-        self.user = conf.dbmsUser.encode(UNICODE_ENCODING) if conf.dbmsUser is not None else ""
-        self.password = conf.dbmsPass.encode(UNICODE_ENCODING) if conf.dbmsPass is not None else ""
+        self.user = conf.dbmsUser or ""
+        self.password = conf.dbmsPass or ""
         self.hostname = conf.hostname
         self.port = conf.port
         self.db = conf.dbmsDb
