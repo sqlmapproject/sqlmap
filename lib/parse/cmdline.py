@@ -632,6 +632,10 @@ def cmdLineParser(argv=None):
                             action="store_true",
                             help="Never ask for user input, use the default behaviour")
 
+        general.add_option("--collect-requests", dest="collectRequests",
+                           action="store_true",
+                           help="Collect requests in HAR format")
+
         general.add_option("--binary-fields", dest="binaryFields",
                           help="Result fields having binary values (e.g. \"digest\")")
 

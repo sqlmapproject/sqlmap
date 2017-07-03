@@ -38,6 +38,8 @@ class _ThreadData(threading.local):
         Resets thread data model
         """
 
+        self.requestCollector = None
+
         self.disableStdOut = False
         self.hashDBCursor = None
         self.inTransaction = False

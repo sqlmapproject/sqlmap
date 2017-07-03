@@ -2601,6 +2601,9 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     """
     Logs HTTP traffic to the output file
     """
+    threadData = getCurrentThreadData()
+    assert threadData.requestCollector is not None, "Request collector should be initialized by now"
+    threadData.requestCollector.collectRequest(requestLogMsg, responseLogMsg)
 
     if not conf.trafficFile:
         return
