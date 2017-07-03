@@ -618,9 +618,6 @@ def cmdLineParser(argv=None):
         general = OptionGroup(parser, "General", "These options can be used "
                              "to set some general working parameters")
 
-        #general.add_option("-x", dest="xmlFile",
-        #                    help="Dump the data into an XML file")
-
         general.add_option("-s", dest="sessionFile",
                             help="Load session from a stored (.sqlite) file")
 
@@ -631,10 +628,6 @@ def cmdLineParser(argv=None):
         general.add_option("--batch", dest="batch",
                             action="store_true",
                             help="Never ask for user input, use the default behaviour")
-
-        general.add_option("--collect-requests", dest="collectRequests",
-                           action="store_true",
-                           help="Collect requests in HAR format")
 
         general.add_option("--binary-fields", dest="binaryFields",
                           help="Result fields having binary values (e.g. \"digest\")")
@@ -661,8 +654,7 @@ def cmdLineParser(argv=None):
 
         general.add_option("--eta", dest="eta",
                             action="store_true",
-                            help="Display for each output the "
-                                 "estimated time of arrival")
+                            help="Display for each output the estimated time of arrival")
 
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true",
@@ -675,6 +667,9 @@ def cmdLineParser(argv=None):
         general.add_option("--fresh-queries", dest="freshQueries",
                             action="store_true",
                             help="Ignore query results stored in session file")
+
+        general.add_option("--har", dest="harFile",
+                           help="Log all HTTP traffic into a HAR file")
 
         general.add_option("--hex", dest="hexConvert",
                             action="store_true",

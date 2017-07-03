@@ -2601,17 +2601,15 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg):
     """
     Logs HTTP traffic to the output file
     """
-    threadData = getCurrentThreadData()
-    assert threadData.requestCollector is not None, "Request collector should be initialized by now"
-    threadData.requestCollector.collectRequest(requestLogMsg, responseLogMsg)
+
+    if conf.harFile:
+        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg)
 
     if not conf.trafficFile:
-        return
-
-    with kb.locks.log:
-        dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
-        dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
-        dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
+        with kb.locks.log:
+            dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
+            dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
+            dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
 def getPageTemplate(payload, place):  # Cross-linked function
     raise NotImplementedError

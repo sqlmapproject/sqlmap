@@ -15,6 +15,7 @@ import bdb
 import distutils
 import glob
 import inspect
+import json
 import logging
 import os
 import re
@@ -40,6 +41,7 @@ try:
     from lib.core.common import getSafeExString
     from lib.core.common import getUnicode
     from lib.core.common import maskSensitiveData
+    from lib.core.common import openFile
     from lib.core.common import setPaths
     from lib.core.common import weAreFrozen
     from lib.core.data import cmdLineOptions
@@ -326,6 +328,10 @@ def main():
                 conf.hashDB.flush(True)
             except KeyboardInterrupt:
                 pass
+
+        if conf.harFile:
+            with openFile(conf.harFile, "w+b") as f:
+                f.write(json.dumps(conf.httpCollector.obtain(), indent=4, separators=(',', ': ')))
 
         if cmdLineOptions.get("sqlmapShell"):
             cmdLineOptions.clear()
