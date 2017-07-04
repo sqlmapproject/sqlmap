@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -18,6 +18,7 @@ def detect(get_page):
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
         retval = re.search(r"Rejected-By-UrlScan", headers.get(HTTP_HEADER.LOCATION, ""), re.I) is not None
+        retval |= code != 200 and re.search(r"/Rejected-By-UrlScan", page or "", re.I) is not None
         if retval:
             break
 

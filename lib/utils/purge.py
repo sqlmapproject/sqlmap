@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -11,6 +11,7 @@ import shutil
 import stat
 import string
 
+from lib.core.common import getSafeExString
 from lib.core.data import logger
 
 def purge(directory):
@@ -79,4 +80,4 @@ def purge(directory):
     try:
         shutil.rmtree(directory)
     except OSError, ex:
-        logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, unicode(ex)))
+        logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, getSafeExString(ex)))

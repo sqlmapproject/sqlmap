@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import os
 
 from lib.core.common import randomInt
-from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import LOBLKSIZE

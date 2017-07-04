@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -96,20 +96,16 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
             msg = "how do you want to establish the tunnel?"
             msg += "\n[1] TCP: Metasploit Framework (default)"
             msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
-            valids = (1, 2)
 
             while True:
-                tunnel = readInput(msg, default=1)
+                tunnel = readInput(msg, default='1')
 
-                if isinstance(tunnel, basestring) and tunnel.isdigit() and int(tunnel) in valids:
+                if tunnel.isdigit() and int(tunnel) in (1, 2):
                     tunnel = int(tunnel)
                     break
 
-                elif isinstance(tunnel, int) and tunnel in valids:
-                    break
-
                 else:
-                    warnMsg = "invalid value, valid values are 1 and 2"
+                    warnMsg = "invalid value, valid values are '1' and '2'"
                     logger.warn(warnMsg)
         else:
             tunnel = 1
@@ -170,17 +166,14 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     msg += "\n[2] Via shellcodeexec (file system way, preferred on 64-bit systems)"
 
                     while True:
-                        choice = readInput(msg, default=1)
+                        choice = readInput(msg, default='1')
 
-                        if isinstance(choice, basestring) and choice.isdigit() and int(choice) in (1, 2):
+                        if choice.isdigit() and int(choice) in (1, 2):
                             choice = int(choice)
                             break
 
-                        elif isinstance(choice, int) and choice in (1, 2):
-                            break
-
                         else:
-                            warnMsg = "invalid value, valid values are 1 and 2"
+                            warnMsg = "invalid value, valid values are '1' and '2'"
                             logger.warn(warnMsg)
 
                     if choice == 1:
@@ -336,11 +329,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         msg = "this technique is likely to DoS the DBMS process, are you "
         msg += "sure that you want to carry with the exploit? [y/N] "
-        choice = readInput(msg, default="N")
 
-        dos = choice and choice[0].lower() == "y"
-
-        if dos:
+        if readInput(msg, default='N', boolean=True):
             self.initEnv(mandatory=False, detailed=True)
             self.getRemoteTempPath()
             self.createMsfShellcode(exitfunc="seh", format="raw", extra="-b 27", encode=True)
@@ -460,9 +450,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
 
         message = "are you sure that you want to delete the Windows "
         message += "registry path '%s\%s? [y/N] " % (regKey, regVal)
-        output = readInput(message, default="N")
 
-        if output and output[0] not in ("Y", "y"):
+        if not readInput(message, default='N', boolean=True):
             return
 
         infoMsg = "deleting Windows registry path '%s\%s'. " % (regKey, regVal)

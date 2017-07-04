@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import os
 import zipfile
 
+from lib.core.common import getSafeExString
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapInstallationException
-from lib.core.settings import UNICODE_ENCODING
 
 class Wordlist(object):
     """
@@ -41,7 +41,13 @@ class Wordlist(object):
         else:
             self.current = self.filenames[self.index]
             if os.path.splitext(self.current)[1].lower() == ".zip":
-                _ = zipfile.ZipFile(self.current, 'r')
+                try:
+                    _ = zipfile.ZipFile(self.current, 'r')
+                except zipfile.error, ex:
+                    errMsg = "something appears to be wrong with "
+                    errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
+                    errMsg += "sure that you haven't made any changes to it"
+                    raise SqlmapInstallationException, errMsg
                 if len(_.namelist()) == 0:
                     errMsg = "no file(s) inside '%s'" % self.current
                     raise SqlmapDataException(errMsg)
@@ -64,17 +70,13 @@ class Wordlist(object):
             try:
                 retVal = self.iter.next().rstrip()
             except zipfile.error, ex:
-                errMsg = "something seems to be wrong with "
-                errMsg += "the file '%s' ('%s'). Please make " % (self.current, ex)
+                errMsg = "something appears to be wrong with "
+                errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                 errMsg += "sure that you haven't made any changes to it"
                 raise SqlmapInstallationException, errMsg
             except StopIteration:
                 self.adjust()
                 retVal = self.iter.next().rstrip()
-            try:
-                retVal = retVal.decode(UNICODE_ENCODING)
-            except UnicodeDecodeError:
-                continue
             if not self.proc_count or self.counter % self.proc_count == self.proc_id:
                 break
         return retVal

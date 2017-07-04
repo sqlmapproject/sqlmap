@@ -13,19 +13,17 @@
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301  USA
 ######################### END LICENSE BLOCK #########################
-
-import constants
 
 # 255: Control characters that usually does not exist in any text
 # 254: Carriage/Return
@@ -33,7 +31,7 @@ import constants
 # 252: 0 - 9
 
 # Character Mapping Table:
-Latin2_HungarianCharToOrderMap = ( \
+Latin2_HungarianCharToOrderMap = (
 255,255,255,255,255,255,255,255,255,255,254,255,255,254,255,255,  # 00
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  # 10
 253,253,253,253,253,253,253,253,253,253,253,253,253,253,253,253,  # 20
@@ -52,7 +50,7 @@ Latin2_HungarianCharToOrderMap = ( \
 245,246,247, 25, 73, 42, 24,248,249,250, 31, 56, 29,251,252,253,
 )
 
-win1250HungarianCharToOrderMap = ( \
+win1250HungarianCharToOrderMap = (
 255,255,255,255,255,255,255,255,255,255,254,255,255,254,255,255,  # 00
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  # 10
 253,253,253,253,253,253,253,253,253,253,253,253,253,253,253,253,  # 20
@@ -71,13 +69,13 @@ win1250HungarianCharToOrderMap = ( \
 245,246,247, 25, 74, 42, 24,248,249,250, 31, 56, 29,251,252,253,
 )
 
-# Model Table: 
+# Model Table:
 # total sequences: 100%
 # first 512 sequences: 94.7368%
 # first 1024 sequences:5.2623%
 # rest  sequences:     0.8894%
-# negative sequences:  0.0009% 
-HungarianLangModel = ( \
+# negative sequences:  0.0009%
+HungarianLangModel = (
 0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
 3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,2,2,3,3,1,1,2,2,2,2,2,1,2,
 3,2,2,3,3,3,3,3,2,3,3,3,3,3,3,1,2,3,3,3,3,2,3,3,1,1,3,3,0,1,1,1,
@@ -208,18 +206,20 @@ HungarianLangModel = ( \
 0,1,1,1,1,1,1,0,1,1,0,1,0,1,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,
 )
 
-Latin2HungarianModel = { \
+Latin2HungarianModel = {
   'charToOrderMap': Latin2_HungarianCharToOrderMap,
   'precedenceMatrix': HungarianLangModel,
   'mTypicalPositiveRatio': 0.947368,
-  'keepEnglishLetter': constants.True,
+  'keepEnglishLetter': True,
   'charsetName': "ISO-8859-2"
 }
 
-Win1250HungarianModel = { \
+Win1250HungarianModel = {
   'charToOrderMap': win1250HungarianCharToOrderMap,
   'precedenceMatrix': HungarianLangModel,
   'mTypicalPositiveRatio': 0.947368,
-  'keepEnglishLetter': constants.True,
+  'keepEnglishLetter': True,
   'charsetName': "windows-1250"
 }
+
+# flake8: noqa

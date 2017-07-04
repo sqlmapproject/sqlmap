@@ -1,17 +1,26 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
+finally:
+    import pickle as picklePy
+
 import base64
 import json
-import pickle
+import re
+import StringIO
 import sys
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
+from lib.core.settings import PICKLE_REDUCE_WHITELIST
 
 def base64decode(value):
     """
@@ -38,7 +47,7 @@ def base64pickle(value):
     Serializes (with pickle) and encodes to Base64 format supplied (binary) value
 
     >>> base64pickle('foobar')
-    'gAJVBmZvb2JhcnEALg=='
+    'gAJVBmZvb2JhcnEBLg=='
     """
 
     retVal = None
@@ -57,20 +66,36 @@ def base64pickle(value):
 
     return retVal
 
-def base64unpickle(value):
+def base64unpickle(value, unsafe=False):
     """
     Decodes value from Base64 to plain format and deserializes (with pickle) its content
 
-    >>> base64unpickle('gAJVBmZvb2JhcnEALg==')
+    >>> base64unpickle('gAJVBmZvb2JhcnEBLg==')
     'foobar'
     """
 
     retVal = None
 
+    def _(self):
+        if len(self.stack) > 1:
+            func = self.stack[-2]
+            if func not in PICKLE_REDUCE_WHITELIST:
+                raise Exception, "abusing reduce() is bad, Mkay!"
+        self.load_reduce()
+
+    def loads(str):
+        f = StringIO.StringIO(str)
+        if unsafe:
+            unpickler = picklePy.Unpickler(f)
+            unpickler.dispatch[picklePy.REDUCE] = _
+        else:
+            unpickler = pickle.Unpickler(f)
+        return unpickler.load()
+
     try:
-        retVal = pickle.loads(base64decode(value))
+        retVal = loads(base64decode(value))
     except TypeError: 
-        retVal = pickle.loads(base64decode(bytes(value)))
+        retVal = loads(base64decode(bytes(value)))
 
     return retVal
 
@@ -143,6 +168,10 @@ def htmlunescape(value):
     if value and isinstance(value, basestring):
         codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
+        try:
+            retVal = re.sub(r"&#x([^ ;]+);", lambda match: unichr(int(match.group(1), 16)), retVal)
+        except ValueError:
+            pass
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-linked function

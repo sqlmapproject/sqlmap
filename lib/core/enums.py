@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -34,6 +34,7 @@ class DBMS:
     SQLITE = "SQLite"
     SYBASE = "Sybase"
     HSQLDB = "HSQLDB"
+    INFORMIX = "Informix"
 
 class DBMS_DIRECTORY_NAME:
     ACCESS = "access"
@@ -47,6 +48,7 @@ class DBMS_DIRECTORY_NAME:
     SQLITE = "sqlite"
     SYBASE = "sybase"
     HSQLDB = "hsqldb"
+    INFORMIX = "informix"
 
 class CUSTOM_LOGGING:
     PAYLOAD = 9
@@ -81,7 +83,7 @@ class HTTPMETHOD:
     POST = "POST"
     HEAD = "HEAD"
     PUT = "PUT"
-    DELETE = "DETELE"
+    DELETE = "DELETE"
     TRACE = "TRACE"
     OPTIONS = "OPTIONS"
     CONNECT = "CONNECT"
@@ -164,19 +166,24 @@ class HTTP_HEADER:
     CONTENT_RANGE = "Content-Range"
     CONTENT_TYPE = "Content-Type"
     COOKIE = "Cookie"
-    SET_COOKIE = "Set-Cookie"
+    EXPIRES = "Expires"
     HOST = "Host"
+    IF_MODIFIED_SINCE = "If-Modified-Since"
+    LAST_MODIFIED = "Last-Modified"
     LOCATION = "Location"
     PRAGMA = "Pragma"
     PROXY_AUTHORIZATION = "Proxy-Authorization"
     PROXY_CONNECTION = "Proxy-Connection"
     RANGE = "Range"
     REFERER = "Referer"
+    REFRESH = "Refresh"  # Reference: http://stackoverflow.com/a/283794
     SERVER = "Server"
-    USER_AGENT = "User-Agent"
+    SET_COOKIE = "Set-Cookie"
     TRANSFER_ENCODING = "Transfer-Encoding"
     URI = "URI"
+    USER_AGENT = "User-Agent"
     VIA = "Via"
+    X_POWERED_BY = "X-Powered-By"
 
 class EXPECTED:
     BOOL = "bool"
@@ -190,6 +197,8 @@ class OPTION_TYPE:
 
 class HASHDB_KEYS:
     DBMS = "DBMS"
+    DBMS_FORK = "DBMS_FORK"
+    CHECK_WAF_RESULT = "CHECK_WAF_RESULT"
     CONF_TMP_PATH = "CONF_TMP_PATH"
     KB_ABS_FILE_PATHS = "KB_ABS_FILE_PATHS"
     KB_BRUTE_COLUMNS = "KB_BRUTE_COLUMNS"
@@ -197,6 +206,7 @@ class HASHDB_KEYS:
     KB_CHARS = "KB_CHARS"
     KB_DYNAMIC_MARKINGS = "KB_DYNAMIC_MARKINGS"
     KB_INJECTIONS = "KB_INJECTIONS"
+    KB_ERROR_CHUNK_LENGTH = "KB_ERROR_CHUNK_LENGTH"
     KB_XP_CMDSHELL_AVAILABLE = "KB_XP_CMDSHELL_AVAILABLE"
     OS = "OS"
 
@@ -277,31 +287,32 @@ class WEB_API:
     JSP = "jsp"
 
 class CONTENT_TYPE:
-    TECHNIQUES = 0
-    DBMS_FINGERPRINT = 1
-    BANNER = 2
-    CURRENT_USER = 3
-    CURRENT_DB = 4
-    HOSTNAME = 5
-    IS_DBA = 6
-    USERS = 7
-    PASSWORDS = 8
-    PRIVILEGES = 9
-    ROLES = 10
-    DBS = 11
-    TABLES = 12
-    COLUMNS = 13
-    SCHEMA = 14
-    COUNT = 15
-    DUMP_TABLE = 16
-    SEARCH = 17
-    SQL_QUERY = 18
-    COMMON_TABLES = 19
-    COMMON_COLUMNS = 20
-    FILE_READ = 21
-    FILE_WRITE = 22
-    OS_CMD = 23
-    REG_READ = 24
+    TARGET = 0
+    TECHNIQUES = 1
+    DBMS_FINGERPRINT = 2
+    BANNER = 3
+    CURRENT_USER = 4
+    CURRENT_DB = 5
+    HOSTNAME = 6
+    IS_DBA = 7
+    USERS = 8
+    PASSWORDS = 9
+    PRIVILEGES = 10
+    ROLES = 11
+    DBS = 12
+    TABLES = 13
+    COLUMNS = 14
+    SCHEMA = 15
+    COUNT = 16
+    DUMP_TABLE = 17
+    SEARCH = 18
+    SQL_QUERY = 19
+    COMMON_TABLES = 20
+    COMMON_COLUMNS = 21
+    FILE_READ = 22
+    FILE_WRITE = 23
+    OS_CMD = 24
+    REG_READ = 25
 
 PART_RUN_CONTENT_TYPES = {
     "checkDbms": CONTENT_TYPE.TECHNIQUES,
@@ -345,3 +356,21 @@ class AUTOCOMPLETE_TYPE:
     SQL = 0
     OS = 1
     SQLMAP = 2
+
+class NOTE:
+    FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"
+
+class MKSTEMP_PREFIX:
+    HASHES = "sqlmaphashes-"
+    CRAWLER = "sqlmapcrawler-"
+    IPC = "sqlmapipc-"
+    CONFIG = "sqlmapconfig-"
+    TESTING = "sqlmaptesting-"
+    RESULTS = "sqlmapresults-"
+    COOKIE_JAR = "sqlmapcookiejar-"
+    BIG_ARRAY = "sqlmapbigarray-"
+
+class TIMEOUT_STATE:
+    NORMAL = 0
+    EXCEPTION = 1
+    TIMEOUT = 2

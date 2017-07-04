@@ -1,26 +1,30 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
-from lib.core.common import Backend
 from lib.core.common import filterPairValues
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.dicts import SYBASE_TYPES
+from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
+from lib.utils.brute import columnExists
 from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
@@ -32,7 +36,7 @@ class Enumeration(GenericEnumeration):
         infoMsg = "fetching database users"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].users
+        rootQuery = queries[DBMS.SYBASE].users
 
         randStr = randomStr()
         query = rootQuery.inband.query
@@ -89,7 +93,7 @@ class Enumeration(GenericEnumeration):
         infoMsg = "fetching database names"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].dbs
+        rootQuery = queries[DBMS.SYBASE].dbs
         randStr = randomStr()
         query = rootQuery.inband.query
 
@@ -120,7 +124,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         if conf.db:
-            dbs = conf.db.split(",")
+            dbs = conf.db.split(',')
         else:
             dbs = self.getDbs()
 
@@ -138,7 +142,7 @@ class Enumeration(GenericEnumeration):
         else:
             blinds = [True]
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].tables
+        rootQuery = queries[DBMS.SYBASE].tables
 
         for db in dbs:
             for blind in blinds:
@@ -159,7 +163,7 @@ class Enumeration(GenericEnumeration):
 
         return kb.data.cachedTables
 
-    def getColumns(self, onlyColNames=False):
+    def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None, dumpMode=False):
         self.forceDbmsEnum()
 
         if conf.db is None or conf.db == CURRENT_DB:
@@ -180,7 +184,7 @@ class Enumeration(GenericEnumeration):
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.col:
-            colList = conf.col.split(",")
+            colList = conf.col.split(',')
         else:
             colList = []
 
@@ -191,7 +195,7 @@ class Enumeration(GenericEnumeration):
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
 
         if conf.tbl:
-            tblList = conf.tbl.split(",")
+            tblList = conf.tbl.split(',')
         else:
             self.getTables()
 
@@ -208,7 +212,44 @@ class Enumeration(GenericEnumeration):
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].columns
+        if bruteForce:
+            resumeAvailable = False
+
+            for tbl in tblList:
+                for db, table, colName, colType in kb.brute.columns:
+                    if db == conf.db and table == tbl:
+                        resumeAvailable = True
+                        break
+
+            if resumeAvailable and not conf.freshQueries or colList:
+                columns = {}
+
+                for column in colList:
+                    columns[column] = None
+
+                for tbl in tblList:
+                    for db, table, colName, colType in kb.brute.columns:
+                        if db == conf.db and table == tbl:
+                            columns[colName] = colType
+
+                    if conf.db in kb.data.cachedColumns:
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
+                    else:
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {safeSQLIdentificatorNaming(tbl, True): columns}
+
+                return kb.data.cachedColumns
+
+            message = "do you want to use common column existence check? [y/N/q] "
+            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
+
+            if choice == 'N':
+                return
+            elif choice == 'Q':
+                raise SqlmapUserQuitException
+            else:
+                return columnExists(paths.COMMON_COLUMNS)
+
+        rootQuery = queries[DBMS.SYBASE].columns
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             blinds = [False, True]
@@ -225,7 +266,7 @@ class Enumeration(GenericEnumeration):
 
                 return {conf.db: kb.data.cachedColumns[conf.db]}
 
-            if colList:
+            if dumpMode and colList:
                 table = {}
                 table[safeSQLIdentificatorNaming(tbl)] = dict((_, None) for _ in colList)
                 kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
@@ -246,7 +287,7 @@ class Enumeration(GenericEnumeration):
                     columns = {}
 
                     for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr])):
-                        columns[name] = SYBASE_TYPES.get(type_, type_)
+                        columns[name] = SYBASE_TYPES.get(int(type_) if isinstance(type_, basestring) and type_.isdigit() else type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl)] = columns
                     kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -39,6 +39,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
@@ -56,7 +57,7 @@ from lib.techniques.union.use import unionUse
 def _goDns(payload, expression):
     value = None
 
-    if conf.dnsName and kb.dnsTest is not False and not kb.testMode and Backend.getDbms() is not None:
+    if conf.dnsDomain and kb.dnsTest is not False and not kb.testMode and Backend.getDbms() is not None:
         if kb.dnsTest is None:
             dnsTest(payload)
 
@@ -78,7 +79,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     if not (timeBasedCompare and kb.dnsTest):
-        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not timeBasedCompare:
+        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not (timeBasedCompare and not conf.forceThreads):
 
             if field and re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
                 expression = "SELECT %s FROM (%s)" % (field, expression)
@@ -189,7 +190,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                 countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
                 countedExpression = expression.replace(expressionFields, countFirstField, 1)
 
-                if " ORDER BY " in expression.upper():
+                if " ORDER BY " in countedExpression.upper():
                     _ = countedExpression.upper().rindex(" ORDER BY ")
                     countedExpression = countedExpression[:_]
 
@@ -207,22 +208,22 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             message += "entries do you want to retrieve?\n"
                             message += "[a] All (default)\n[#] Specific number\n"
                             message += "[q] Quit"
-                            test = readInput(message, default="a")
+                            choice = readInput(message, default='A').upper()
 
-                            if not test or test[0] in ("a", "A"):
+                            if choice == 'A':
                                 stopLimit = count
 
-                            elif test[0] in ("q", "Q"):
+                            elif choice == 'Q':
                                 raise SqlmapUserQuitException
 
-                            elif test.isdigit() and int(test) > 0 and int(test) <= count:
-                                stopLimit = int(test)
+                            elif choice.isdigit() and int(choice) > 0 and int(choice) <= count:
+                                stopLimit = int(choice)
 
                                 infoMsg = "sqlmap is now going to retrieve the "
                                 infoMsg += "first %d query output entries" % stopLimit
                                 logger.info(infoMsg)
 
-                            elif test[0] in ("#", "s", "S"):
+                            elif choice in ('#', 'S'):
                                 message = "how many? "
                                 stopLimit = readInput(message, default="10")
 
@@ -262,9 +263,14 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                     return None
 
                 try:
-                    for num in xrange(startLimit, stopLimit):
-                        output = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
-                        outputs.append(output)
+                    try:
+                        for num in xrange(startLimit, stopLimit):
+                            output = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
+                            outputs.append(output)
+                    except OverflowError:
+                        errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
+                        errMsg += "with switch '--fresh-queries'"
+                        raise SqlmapDataException(errMsg)
 
                 except KeyboardInterrupt:
                     print
@@ -278,7 +284,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
     outputs = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
 
-    return ", ".join(output for output in outputs) if not isNoneValue(outputs) else None
+    return ", ".join(output or "" for output in outputs) if not isNoneValue(outputs) else None
 
 def _goBooleanProxy(expression):
     """
@@ -287,7 +293,7 @@ def _goBooleanProxy(expression):
 
     initTechnique(kb.technique)
 
-    if conf.dnsName:
+    if conf.dnsDomain:
         query = agent.prefixQuery(kb.injection.data[kb.technique].vector)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
@@ -358,7 +364,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         if conf.direct:
             value = direct(forgeCaseExpression if expected == EXPECTED.BOOL else expression)
 
-        elif any(map(isTechniqueAvailable, getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True))):
+        elif any(isTechniqueAvailable(_) for _ in getPublicTypeMembers(PAYLOAD.TECHNIQUE, onlyValues=True)):
             query = cleanQuery(expression)
             query = expandAsteriskForColumns(query)
             value = None
@@ -407,7 +413,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
-                if found and conf.dnsName:
+                if found and conf.dnsDomain:
                     _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E": PAYLOAD.TECHNIQUE.ERROR, "Q": PAYLOAD.TECHNIQUE.QUERY, "U": PAYLOAD.TECHNIQUE.UNION}.items())))
                     warnMsg = "option '--dns-domain' will be ignored "
                     warnMsg += "as faster techniques are usable "
@@ -426,6 +432,8 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
             if time and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME) or isTechniqueAvailable(PAYLOAD.TECHNIQUE.STACKED)) and not found:
+                kb.responseTimeMode = re.sub(r"(?i)[^a-z]", "", re.sub(r"'[^']+'", "", re.sub(r"(?i)(\w+)\(.+\)", r"\g<1>", expression))) if re.search(r"(?i)SELECT.+FROM", expression) else None
+
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
                     kb.technique = PAYLOAD.TECHNIQUE.TIME
                 else:
@@ -435,7 +443,6 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     value = _goBooleanProxy(booleanExpression)
                 else:
                     value = _goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
-
         else:
             errMsg = "none of the injection types identified can be "
             errMsg += "leveraged to retrieve queries output"
@@ -443,6 +450,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     finally:
         kb.resumeValues = True
+        kb.responseTimeMode = None
 
         conf.tbl = popValue()
         conf.db = popValue()

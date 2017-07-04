@@ -1139,7 +1139,11 @@ def _ParseFileEx(file, base_uri,
                 type, name, attrs, select_default=select_default, index=ii*10)
         forms.append(form)
     for form in forms:
-        form.fixup()
+        try:
+            form.fixup()
+        except AttributeError, ex:
+            if not any(_ in str(ex) for _ in ("is disabled", "is readonly")):
+                raise
     return forms
 
 

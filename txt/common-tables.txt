@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+# Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 # See the file 'doc/COPYING' for copying permission
 
 users
@@ -1615,6 +1615,7 @@ SPACE
 geo_Sea
 DATA_ORG
 Contributor
+flag
 
 # Various Joomla tables
 jos_vm_product_download
@@ -3366,3 +3367,6 @@ tuser
 tusers
 userstbl
 usertbl
+
+# WebGoat
+user_data

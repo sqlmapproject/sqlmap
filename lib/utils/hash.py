@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -30,6 +30,7 @@ import os
 import re
 import tempfile
 import time
+import zipfile
 
 from hashlib import md5
 from hashlib import sha1
@@ -44,6 +45,7 @@ from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -60,6 +62,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
+from lib.core.enums import MKSTEMP_PREFIX
+from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
@@ -122,6 +126,13 @@ def postgres_passwd(password, username, uppercase=False):
     >>> postgres_passwd(password='testpass', username='testuser', uppercase=False)
     'md599e5ea7a6f7c3269995cba3927fd0093'
     """
+
+
+    if isinstance(username, unicode):
+        username = unicode.encode(username, UNICODE_ENCODING)
+
+    if isinstance(password, unicode):
+        password = unicode.encode(password, UNICODE_ENCODING)
 
     retVal = "md5%s" % md5(password + username).hexdigest()
 
@@ -207,7 +218,10 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
     IV, pad = "\0" * 8, "\0"
 
     if isinstance(username, unicode):
-        username = unicode.encode(username, UNICODE_ENCODING)  # pyDes has issues with unicode strings
+        username = unicode.encode(username, UNICODE_ENCODING)
+
+    if isinstance(password, unicode):
+        password = unicode.encode(password, UNICODE_ENCODING)
 
     unistr = "".join("\0%s" % c for c in (username + password).upper())
 
@@ -327,8 +341,11 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
 
         return output
 
+    if isinstance(password, unicode):
+        password = password.encode(UNICODE_ENCODING)
+
     cipher = md5(salt)
-    cipher.update(password.encode(UNICODE_ENCODING))
+    cipher.update(password)
     hash_ = cipher.digest()
 
     for i in xrange(count):
@@ -365,13 +382,13 @@ def storeHashesToFile(attack_dict):
     if kb.storeHashesChoice is None:
         message = "do you want to store hashes to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
-        test = readInput(message, default="N")
-        kb.storeHashesChoice = test[0] in ("y", "Y")
+
+        kb.storeHashesChoice = readInput(message, default='N', boolean=True)
 
     if not kb.storeHashesChoice:
         return
 
-    handle, filename = tempfile.mkstemp(prefix="sqlmaphashes-", suffix=".txt")
+    handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
     os.close(handle)
 
     infoMsg = "writing hashes to a temporary file '%s' " % filename
@@ -465,11 +482,11 @@ def attackDumpedTable():
             storeHashesToFile(attack_dict)
 
             message = "do you want to crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
-            test = readInput(message, default="N" if conf.multipleTargets else "Y")
+            choice = readInput(message, default='N' if conf.multipleTargets else 'Y').upper()
 
-            if test[0] in ("n", "N"):
+            if choice == 'N':
                 return
-            elif test[0] in ("q", "Q"):
+            elif choice == 'Q':
                 raise SqlmapUserQuitException
 
             results = dictionaryAttack(attack_dict)
@@ -488,7 +505,7 @@ def attackDumpedTable():
                         value = table[column]['values'][i]
 
                         if value and value.lower() in lut:
-                            table[column]['values'][i] += " (%s)" % lut[value.lower()]
+                            table[column]['values'][i] = "%s (%s)" % (getUnicode(table[column]['values'][i]), getUnicode(lut[value.lower()]))
                             table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):
@@ -512,7 +529,7 @@ def hashRecognition(value):
 
     return retVal
 
-def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist):
+def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist, api):
     if IS_WIN:
         coloramainit()
 
@@ -566,7 +583,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
                     status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
-                    if not hasattr(conf, "api"):
+                    if not api:
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
@@ -588,7 +605,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
             with proc_count.get_lock():
                 proc_count.value -= 1
 
-def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist):
+def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found, proc_id, proc_count, wordlists, custom_wordlist, api):
     if IS_WIN:
         coloramainit()
 
@@ -640,7 +657,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                     if user and not user.startswith(DUMMY_USER_PREFIX):
                         status += ' (user: %s)' % user
 
-                    if not hasattr(conf, "api"):
+                    if not api:
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
 
             except KeyboardInterrupt:
@@ -668,8 +685,9 @@ def dictionaryAttack(attack_dict):
     hash_regexes = []
     results = []
     resumes = []
-    processException = False
     user_hash = []
+    processException = False
+    foundHash = False
 
     for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
@@ -693,6 +711,7 @@ def dictionaryAttack(attack_dict):
                 if not hash_:
                     continue
 
+                foundHash = True
                 hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
 
                 if re.match(hash_regex, hash_):
@@ -705,14 +724,18 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {}]
                     elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
                         item = [(user, hash_), {'username': user}]
-                    elif hash_regex in (HASH.ORACLE):
+                    elif hash_regex in (HASH.ORACLE,):
                         item = [(user, hash_), {'salt': hash_[-20:]}]
                     elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD, HASH.MSSQL_NEW):
                         item = [(user, hash_), {'salt': hash_[6:14]}]
-                    elif hash_regex in (HASH.CRYPT_GENERIC):
+                    elif hash_regex in (HASH.CRYPT_GENERIC,):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
-                    elif hash_regex in (HASH.WORDPRESS):
-                        item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
+                    elif hash_regex in (HASH.WORDPRESS,):
+                        if ITOA64.index(hash_[3]) < 32:
+                            item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
+                        else:
+                            warnMsg = "invalid hash '%s'" % hash_
+                            logger.warn(warnMsg)
 
                     if item and hash_ not in keys:
                         resumed = hashDBRetrieve(hash_)
@@ -743,20 +766,20 @@ def dictionaryAttack(attack_dict):
                 message += "[1] default dictionary file '%s' (press Enter)\n" % dictPaths[0]
                 message += "[2] custom dictionary file\n"
                 message += "[3] file with list of dictionary files"
-                choice = readInput(message, default="1")
+                choice = readInput(message, default='1')
 
                 try:
-                    if choice == "2":
+                    if choice == '2':
                         message = "what's the custom dictionary's location?\n"
-                        dictPaths = [readInput(message)]
-
-                        logger.info("using custom dictionary")
-                    elif choice == "3":
+                        _ = readInput(message)
+                        if _:
+                            dictPaths = [readInput(message)]
+                            logger.info("using custom dictionary")
+                    elif choice == '3':
                         message = "what's the list file location?\n"
                         listPath = readInput(message)
                         checkFile(listPath)
                         dictPaths = getFileItems(listPath)
-
                         logger.info("using custom list of dictionaries")
                     else:
                         logger.info("using default dictionary")
@@ -766,17 +789,24 @@ def dictionaryAttack(attack_dict):
                     for dictPath in dictPaths:
                         checkFile(dictPath)
 
+                        if os.path.splitext(dictPath)[1].lower() == ".zip":
+                            _ = zipfile.ZipFile(dictPath, 'r')
+                            if len(_.namelist()) == 0:
+                                errMsg = "no file(s) inside '%s'" % dictPath
+                                raise SqlmapDataException(errMsg)
+                            else:
+                                _.open(_.namelist()[0])
+
                     kb.wordlists = dictPaths
 
                 except Exception, ex:
                     warnMsg = "there was a problem while loading dictionaries"
-                    warnMsg += " ('%s')" % ex.message
+                    warnMsg += " ('%s')" % getSafeExString(ex)
                     logger.critical(warnMsg)
 
             message = "do you want to use common password suffixes? (slow!) [y/N] "
-            test = readInput(message, default="N")
 
-            if test[0] in ("y", "Y"):
+            if readInput(message, default='N', boolean=True):
                 suffix_list += COMMON_PASSWORD_SUFFIXES
 
         infoMsg = "starting dictionary-based cracking (%s)" % __functions__[hash_regex].func_name
@@ -812,12 +842,12 @@ def dictionaryAttack(attack_dict):
                         count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                         for i in xrange(_multiprocessing.cpu_count()):
-                            p = _multiprocessing.Process(target=_bruteProcessVariantA, args=(attack_info, hash_regex, suffix, retVal, i, count, kb.wordlists, custom_wordlist))
-                            processes.append(p)
+                            process = _multiprocessing.Process(target=_bruteProcessVariantA, args=(attack_info, hash_regex, suffix, retVal, i, count, kb.wordlists, custom_wordlist, conf.api))
+                            processes.append(process)
 
-                        for p in processes:
-                            p.daemon = True
-                            p.start()
+                        for process in processes:
+                            process.daemon = True
+                            process.start()
 
                         while count.value > 0:
                             time.sleep(0.5)
@@ -828,7 +858,7 @@ def dictionaryAttack(attack_dict):
                         singleTimeWarnMessage(warnMsg)
 
                         retVal = Queue()
-                        _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist)
+                        _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist, conf.api)
 
                 except KeyboardInterrupt:
                     print
@@ -896,12 +926,12 @@ def dictionaryAttack(attack_dict):
                             count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
 
                             for i in xrange(_multiprocessing.cpu_count()):
-                                p = _multiprocessing.Process(target=_bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, suffix, retVal, found_, i, count, kb.wordlists, custom_wordlist))
-                                processes.append(p)
+                                process = _multiprocessing.Process(target=_bruteProcessVariantB, args=(user, hash_, kwargs, hash_regex, suffix, retVal, found_, i, count, kb.wordlists, custom_wordlist, conf.api))
+                                processes.append(process)
 
-                            for p in processes:
-                                p.daemon = True
-                                p.start()
+                            for process in processes:
+                                process.daemon = True
+                                process.start()
 
                             while count.value > 0:
                                 time.sleep(0.5)
@@ -920,7 +950,7 @@ def dictionaryAttack(attack_dict):
                             found_ = Value()
                             found_.value = False
 
-                            _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found_, 0, 1, kb.wordlists, custom_wordlist)
+                            _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found_, 0, 1, kb.wordlists, custom_wordlist, conf.api)
 
                             found = found_.value
 
@@ -955,9 +985,8 @@ def dictionaryAttack(attack_dict):
 
     results.extend(resumes)
 
-    if len(hash_regexes) == 0:
-        warnMsg = "unknown hash format. "
-        warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
+    if foundHash and len(hash_regexes) == 0:
+        warnMsg = "unknown hash format"
         logger.warn(warnMsg)
 
     if len(results) == 0:

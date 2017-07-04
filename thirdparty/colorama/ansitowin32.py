@@ -1,14 +1,20 @@
-
+# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
 import re
 import sys
+import os
 
 from .ansi import AnsiFore, AnsiBack, AnsiStyle, Style
 from .winterm import WinTerm, WinColor, WinStyle
-from .win32 import windll
+from .win32 import windll, winapi_test
 
 
+winterm = None
 if windll is not None:
     winterm = WinTerm()
+
+
+def is_stream_closed(stream):
+    return not hasattr(stream, 'closed') or stream.closed
 
 
 def is_a_tty(stream):
@@ -40,7 +46,8 @@ class AnsiToWin32(object):
     sequences from the text, and if outputting to a tty, will convert them into
     win32 function calls.
     '''
-    ANSI_RE = re.compile('\033\[((?:\d|;)*)([a-zA-Z])')
+    ANSI_CSI_RE = re.compile('\001?\033\[((?:\d|;)*)([a-zA-Z])\002?')     # Control Sequence Introducer
+    ANSI_OSC_RE = re.compile('\001?\033\]((?:.|;)*?)(\x07)\002?')         # Operating System Command
 
     def __init__(self, wrapped, convert=None, strip=None, autoreset=False):
         # The wrapped stream (normally sys.stdout or sys.stderr)
@@ -52,16 +59,21 @@ class AnsiToWin32(object):
         # create the proxy wrapping our output stream
         self.stream = StreamWrapper(wrapped, self)
 
-        on_windows = sys.platform.startswith('win')
+        on_windows = os.name == 'nt'
+        # We test if the WinAPI works, because even if we are on Windows
+        # we may be using a terminal that doesn't support the WinAPI
+        # (e.g. Cygwin Terminal). In this case it's up to the terminal
+        # to support the ANSI codes.
+        conversion_supported = on_windows and winapi_test()
 
         # should we strip ANSI sequences from our output?
         if strip is None:
-            strip = on_windows
+            strip = conversion_supported or (not is_stream_closed(wrapped) and not is_a_tty(wrapped))
         self.strip = strip
 
         # should we should convert ANSI sequences into win32 calls?
         if convert is None:
-            convert = on_windows and is_a_tty(wrapped)
+            convert = conversion_supported and not is_stream_closed(wrapped) and is_a_tty(wrapped)
         self.convert = convert
 
         # dict of ansi codes to win32 functions and parameters
@@ -69,7 +81,6 @@ class AnsiToWin32(object):
 
         # are we wrapping stderr?
         self.on_stderr = self.wrapped is sys.stderr
-
 
     def should_wrap(self):
         '''
@@ -80,7 +91,6 @@ class AnsiToWin32(object):
         autoreset has been requested using kwargs to init()
         '''
         return self.convert or self.strip or self.autoreset
-
 
     def get_win32_calls(self):
         if self.convert and winterm:
@@ -98,6 +108,14 @@ class AnsiToWin32(object):
                 AnsiFore.CYAN: (winterm.fore, WinColor.CYAN),
                 AnsiFore.WHITE: (winterm.fore, WinColor.GREY),
                 AnsiFore.RESET: (winterm.fore, ),
+                AnsiFore.LIGHTBLACK_EX: (winterm.fore, WinColor.BLACK, True),
+                AnsiFore.LIGHTRED_EX: (winterm.fore, WinColor.RED, True),
+                AnsiFore.LIGHTGREEN_EX: (winterm.fore, WinColor.GREEN, True),
+                AnsiFore.LIGHTYELLOW_EX: (winterm.fore, WinColor.YELLOW, True),
+                AnsiFore.LIGHTBLUE_EX: (winterm.fore, WinColor.BLUE, True),
+                AnsiFore.LIGHTMAGENTA_EX: (winterm.fore, WinColor.MAGENTA, True),
+                AnsiFore.LIGHTCYAN_EX: (winterm.fore, WinColor.CYAN, True),
+                AnsiFore.LIGHTWHITE_EX: (winterm.fore, WinColor.GREY, True),
                 AnsiBack.BLACK: (winterm.back, WinColor.BLACK),
                 AnsiBack.RED: (winterm.back, WinColor.RED),
                 AnsiBack.GREEN: (winterm.back, WinColor.GREEN),
@@ -107,8 +125,16 @@ class AnsiToWin32(object):
                 AnsiBack.CYAN: (winterm.back, WinColor.CYAN),
                 AnsiBack.WHITE: (winterm.back, WinColor.GREY),
                 AnsiBack.RESET: (winterm.back, ),
+                AnsiBack.LIGHTBLACK_EX: (winterm.back, WinColor.BLACK, True),
+                AnsiBack.LIGHTRED_EX: (winterm.back, WinColor.RED, True),
+                AnsiBack.LIGHTGREEN_EX: (winterm.back, WinColor.GREEN, True),
+                AnsiBack.LIGHTYELLOW_EX: (winterm.back, WinColor.YELLOW, True),
+                AnsiBack.LIGHTBLUE_EX: (winterm.back, WinColor.BLUE, True),
+                AnsiBack.LIGHTMAGENTA_EX: (winterm.back, WinColor.MAGENTA, True),
+                AnsiBack.LIGHTCYAN_EX: (winterm.back, WinColor.CYAN, True),
+                AnsiBack.LIGHTWHITE_EX: (winterm.back, WinColor.GREY, True),
             }
-
+        return dict()
 
     def write(self, text):
         if self.strip or self.convert:
@@ -123,7 +149,7 @@ class AnsiToWin32(object):
     def reset_all(self):
         if self.convert:
             self.call_win32('m', (0,))
-        elif is_a_tty(self.wrapped):
+        elif not self.strip and not is_stream_closed(self.wrapped):
             self.wrapped.write(Style.RESET_ALL)
 
 
@@ -134,7 +160,8 @@ class AnsiToWin32(object):
         calls.
         '''
         cursor = 0
-        for match in self.ANSI_RE.finditer(text):
+        text = self.convert_osc(text)
+        for match in self.ANSI_CSI_RE.finditer(text):
             start, end = match.span()
             self.write_plain_text(text, cursor, start)
             self.convert_ansi(*match.groups())
@@ -150,21 +177,29 @@ class AnsiToWin32(object):
 
     def convert_ansi(self, paramstring, command):
         if self.convert:
-            params = self.extract_params(paramstring)
+            params = self.extract_params(command, paramstring)
             self.call_win32(command, params)
 
 
-    def extract_params(self, paramstring):
-        def split(paramstring):
-            for p in paramstring.split(';'):
-                if p != '':
-                    yield int(p)
-        return tuple(split(paramstring))
+    def extract_params(self, command, paramstring):
+        if command in 'Hf':
+            params = tuple(int(p) if len(p) != 0 else 1 for p in paramstring.split(';'))
+            while len(params) < 2:
+                # defaults:
+                params = params + (1,)
+        else:
+            params = tuple(int(p) for p in paramstring.split(';') if len(p) != 0)
+            if len(params) == 0:
+                # defaults:
+                if command in 'JKm':
+                    params = (0,)
+                elif command in 'ABCD':
+                    params = (1,)
+
+        return params
 
 
     def call_win32(self, command, params):
-        if params == []:
-            params = [0]
         if command == 'm':
             for param in params:
                 if param in self.win32_calls:
@@ -173,17 +208,29 @@ class AnsiToWin32(object):
                     args = func_args[1:]
                     kwargs = dict(on_stderr=self.on_stderr)
                     func(*args, **kwargs)
-        elif command in ('H', 'f'): # set cursor position
-            func = winterm.set_cursor_position
-            func(params, on_stderr=self.on_stderr)
-        elif command in ('J'):
-            func = winterm.erase_data
-            func(params, on_stderr=self.on_stderr)
-        elif command == 'A':
-            if params == () or params == None:
-                num_rows = 1
-            else:
-                num_rows = params[0]
-            func = winterm.cursor_up
-            func(num_rows, on_stderr=self.on_stderr)
+        elif command in 'J':
+            winterm.erase_screen(params[0], on_stderr=self.on_stderr)
+        elif command in 'K':
+            winterm.erase_line(params[0], on_stderr=self.on_stderr)
+        elif command in 'Hf':     # cursor position - absolute
+            winterm.set_cursor_position(params, on_stderr=self.on_stderr)
+        elif command in 'ABCD':   # cursor position - relative
+            n = params[0]
+            # A - up, B - down, C - forward, D - back
+            x, y = {'A': (0, -n), 'B': (0, n), 'C': (n, 0), 'D': (-n, 0)}[command]
+            winterm.cursor_adjust(x, y, on_stderr=self.on_stderr)
 
+
+    def convert_osc(self, text):
+        for match in self.ANSI_OSC_RE.finditer(text):
+            start, end = match.span()
+            text = text[:start] + text[end:]
+            paramstring, command = match.groups()
+            if command in '\x07':       # \x07 = BEL
+                params = paramstring.split(";")
+                # 0 - change title and icon (we will only change title)
+                # 1 - change icon (we don't support this)
+                # 2 - change title
+                if params[0] in '02':
+                    winterm.set_title(params[1])
+        return text

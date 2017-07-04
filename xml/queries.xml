@@ -194,7 +194,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS LIMIT FROM %s)x WHERE LIMIT=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
@@ -463,6 +463,10 @@
         <length query="LENGTH(%s)"/>
         <isnull query="VALUE(%s,' ')" query2="IFNULL(%s,' ')"/>
         <delimiter query=","/>
+        <limit query="LIMIT %d,%d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
         <!-- No real cast on SAP MaxDB -->
         <cast query="REPLACE(CHR(%s),' ','_')"/>
         <order query="ORDER BY %s ASC"/>
@@ -647,12 +651,13 @@
         </search_column>
     </dbms>
 
+    <!-- Hyper SQL Database -->
     <dbms value="HSQLDB">
         <cast query="CAST(%s AS LONGVARCHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
         <isnull query="IFNULL(%s,' ')"/>
-        <delimiter query=","/>
-        <limit query="LIMIT %d %d"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d %d" query2="LIMIT %d OFFSET %d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
@@ -675,30 +680,30 @@
         <check_udf/>
         <users>
             <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
-            <blind query="SELECT LIMIT %d 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS" count="SELECT COUNT(DISTINCT(user)) FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
-            <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
+            <blind query="SELECT LIMIT %d 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user" count="SELECT COUNT(DISTINCT(user)) FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
+            <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user"/>
         </users>
         <passwords>
             <!-- Passwords only shown in later versions &gt;=2.0  -->
-            <blind query="SELECT LIMIT %d 1 DISTINCT(password_digest) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'" count="SELECT COUNT(DISTINCT(password_digest)) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'"/>
-            <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS" condition="user_name"/>
+            <blind query="SELECT LIMIT %d 1 DISTINCT(password_digest) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s' ORDER BY password_digest" count="SELECT COUNT(DISTINCT(password_digest)) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'"/>
+            <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user_name" condition="user_name"/>
         </passwords>
         <privileges/>
         <roles/>
         <dbs>
-            <blind query="SELECT LIMIT %d 1 DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS" count="SELECT COUNT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS"/>
-            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS" />
+            <blind query="SELECT LIMIT %d 1 DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS ORDER BY table_schem" count="SELECT COUNT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS"/>
+            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS ORDER BY table_schem" />
         </dbs>
         <tables>
-            <blind query="SELECT LIMIT %d 1 table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s' " count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s'"/>
-            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES" condition="table_schem"/>
+            <blind query="SELECT LIMIT %d 1 table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s' ORDER BY table_name" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s'"/>
+            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES ORDER BY table_schem" condition="table_schem"/>
         </tables>
         <columns>
-            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s'" query2="SELECT column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
-            <inband query="SELECT column_name,type_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s'" condition="column_name"/>
+            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s' ORDER BY column_name" query2="SELECT column_type FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schem='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s'" condition="column_name"/>
+            <inband query="SELECT column_name,type_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s' ORDER BY column_name" condition="column_name"/>
         </columns>
         <dump_table>
-            <blind query="SELECT LIMIT %d 1 %s FROM %s.%s ORDER BY %s " count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
         </dump_table>
         <search_db>
@@ -713,5 +718,68 @@
             <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s"  count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
             <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
         </search_column>
+    </dbms>
+
+    <!-- Informix -->
+    <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_11.70.0/com.ibm.sqlr.doc/ids_sqr_072.htm -->
+    <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_12.1.0/com.ibm.sec.doc/ids_am_041.htm -->
+    <dbms value="Informix">
+        <cast query="RTRIM(TO_CHAR(%s))"/>
+        <length query="CHAR_LENGTH(RTRIM(%s))"/>
+        <isnull query="NVL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="SELECT SKIP %d LIMIT 1"/>
+        <limitregexp query="\s+SKIP\s+([\d]+)\s*LIMIT\s*([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSMASTER:SYSDUAL"/>
+        <hex query="HEX(%s)"/>
+        <!-- http://www.dbforums.com/showthread.php?1660588-select-first-and-union&p=6478613#post6478613 -->
+        <inference query="ASCII(SUBSTR((SELECT * FROM (%s)),%d,1))>%d"/>
+        <banner query="SELECT DBINFO('VERSION','FULL') FROM SYSMASTER:SYSDUAL"/>
+        <current_user query="SELECT USER FROM SYSMASTER:SYSDUAL"/>
+        <current_db query="SELECT DBINFO('DBNAME') FROM SYSMASTER:SYSDUAL"/>
+        <hostname query="SELECT DBINFO('DBHOSTNAME') FROM SYSMASTER:SYSDUAL"/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="(SELECT USERTYPE FROM SYSUSERS WHERE USERNAME=USER)='D'"/>
+        <users>
+            <inband query="SELECT USERNAME FROM SYSUSERS"/>
+            <blind query="SELECT SKIP %d LIMIT 1 USERNAME FROM SYSUSERS ORDER BY USERNAME" count="SELECT COUNT(USERNAME) FROM SYSUSERS"/>
+        </users>
+        <passwords>
+            <inband query="SELECT USERNAME,HASHED_PASSWORD||':'||SALT FROM SYSUSER:SYSINTAUTHUSERS" condition="USERNAME"/>
+            <blind query="SELECT HASHED_PASSWORD||':'||SALT FROM SYSUSER:SYSINTAUTHUSERS WHERE USERNAME='%s'"/>
+        </passwords>
+        <privileges>
+            <inband query="SELECT USERNAME,USERTYPE FROM SYSUSERS" condition="USERNAME"/>
+            <blind query="SELECT USERTYPE FROM SYSUSERS WHERE USERNAME='%s'"/>
+        </privileges>
+        <roles/>
+        <dbs>
+            <inband query="SELECT NAME FROM SYSMASTER:SYSDATABASES"/>
+            <blind query="SELECT SKIP %d LIMIT 1 NAME FROM SYSMASTER:SYSDATABASES ORDER BY NAME" count="SELECT COUNT(NAME) FROM SYSMASTER:SYSDATABASES"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT TABNAME FROM %s:SYSTABLES WHERE TABTYPE='T' AND TABID>99"/>
+            <blind query="SELECT SKIP %d LIMIT 1 TABNAME FROM %s:SYSTABLES WHERE TABTYPE='T' AND TABID>99 ORDER BY TABNAME" count="SELECT COUNT(TABNAME) FROM %s:SYSTABLES WHERE TABTYPE='T' AND TABID>99"/>
+        </tables>
+        <columns>
+            <inband query="SELECT COLNAME,COLTYPE FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s'" condition="COLNAME"/>
+            <blind query="SELECT SKIP %d LIMIT 1 COLNAME FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s' ORDER BY COLNAME" query2="SELECT COLTYPE FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s' AND COLNAME='%s'" count="SELECT COUNT(COLNAME) FROM %s:SYSTABLES,%s:SYSCOLUMNS WHERE %s:SYSTABLES.TABID=%s:SYSCOLUMNS.TABID AND %s:SYSTABLES.TABNAME='%s'"  condition="COLNAME"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s:%s"/>
+            <blind query="SELECT SKIP %d LIMIT 1 %s FROM %s:%s ORDER BY %s" count="SELECT COUNT(*) FROM %s:%s"/>
+        </dump_table>
+        <search_db/>
+        <search_table/>
+        <search_column/>
     </dbms>
 </root>

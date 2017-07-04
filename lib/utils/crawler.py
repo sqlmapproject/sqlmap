@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -12,16 +12,21 @@ import urlparse
 import tempfile
 import time
 
+from lib.core.common import checkSameHost
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import findPageForms
+from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.common import readInput
 from lib.core.common import safeCSValue
+from lib.core.common import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
@@ -58,12 +63,15 @@ def crawl(target):
                 try:
                     if current:
                         content = Request.getPage(url=current, crawling=True, raise404=False)[0]
-                except SqlmapConnectionException, e:
-                    errMsg = "connection exception detected (%s). skipping " % e
+                except SqlmapConnectionException, ex:
+                    errMsg = "connection exception detected (%s). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
-                except httplib.InvalidURL, e:
-                    errMsg = "invalid URL detected (%s). skipping " % e
+                except SqlmapSyntaxException:
+                    errMsg = "invalid URL detected. skipping '%s'" % current
+                    logger.critical(errMsg)
+                except httplib.InvalidURL, ex:
+                    errMsg = "invalid URL detected (%s). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
 
@@ -80,7 +88,7 @@ def crawl(target):
                         tags = soup('a')
 
                         if not tags:
-                            tags = re.finditer(r'(?si)<a[^>]+href="(?P<href>[^>"]+)"', content)
+                            tags = re.finditer(r'(?i)<a[^>]+href="(?P<href>[^>"]+)"', content)
 
                         for tag in tags:
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
@@ -91,7 +99,7 @@ def crawl(target):
                                 url = urlparse.urljoin(current, href)
 
                                 # flag to know if we are dealing with the same target host
-                                _ = reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], (url, target)))
+                                _ = checkSameHost(url, target)
 
                                 if conf.scope:
                                     if not re.search(conf.scope, url, re.I):
@@ -104,6 +112,8 @@ def crawl(target):
                                         threadData.shared.deeper.add(url)
                                         if re.search(r"(.*?)\?(.+)", url):
                                             threadData.shared.value.add(url)
+                    except ValueError:          # for non-valid links
+                        pass
                     except UnicodeEncodeError:  # for non-HTML files
                         pass
                     finally:
@@ -121,22 +131,28 @@ def crawl(target):
         if not conf.sitemapUrl:
             message = "do you want to check for the existence of "
             message += "site's sitemap(.xml) [y/N] "
-            test = readInput(message, default="n")
-            if test[0] in ("y", "Y"):
+
+            if readInput(message, default='N', boolean=True):
+                found = True
                 items = None
                 url = urlparse.urljoin(target, "/sitemap.xml")
                 try:
                     items = parseSitemap(url)
+                except SqlmapConnectionException, ex:
+                    if "page not found" in getSafeExString(ex):
+                        found = False
+                        logger.warn("'sitemap.xml' not found")
                 except:
                     pass
                 finally:
-                    if items:
-                        for item in items:
-                            if re.search(r"(.*?)\?(.+)", item):
-                                threadData.shared.value.add(item)
-                        if conf.crawlDepth > 1:
-                            threadData.shared.unprocessed.update(items)
-                    logger.info("%s links found" % ("no" if not items else len(items)))
+                    if found:
+                        if items:
+                            for item in items:
+                                if re.search(r"(.*?)\?(.+)", item):
+                                    threadData.shared.value.add(item)
+                            if conf.crawlDepth > 1:
+                                threadData.shared.unprocessed.update(items)
+                        logger.info("%s links found" % ("no" if not items else len(items)))
 
         infoMsg = "starting crawler"
         if conf.bulkFile:
@@ -172,7 +188,7 @@ def crawl(target):
             logger.warn(warnMsg)
         else:
             for url in threadData.shared.value:
-                kb.targets.add((url, None, None, None, None))
+                kb.targets.add((urldecode(url, kb.pageEncoding), None, None, None, None))
 
         storeResultsToFile(kb.targets)
 
@@ -183,11 +199,11 @@ def storeResultsToFile(results):
     if kb.storeCrawlingChoice is None:
         message = "do you want to store crawling results to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
-        test = readInput(message, default="N")
-        kb.storeCrawlingChoice = test[0] in ("y", "Y")
+
+        kb.storeCrawlingChoice = readInput(message, default='N', boolean=True)
 
     if kb.storeCrawlingChoice:
-        handle, filename = tempfile.mkstemp(prefix="sqlmapcrawling-", suffix=".csv" if conf.forms else ".txt")
+        handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CRAWLER, suffix=".csv" if conf.forms else ".txt")
         os.close(handle)
 
         infoMsg = "writing crawling results to a temporary file '%s' " % filename

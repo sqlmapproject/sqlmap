@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import os
+import re
+import socket
 import time
 
 from extra.icmpsh.icmpsh_m import main as icmpshmaster
@@ -18,6 +20,7 @@ from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.exception import SqlmapDataException
 
 class ICMPsh:
     """
@@ -32,18 +35,50 @@ class ICMPsh:
         self._icmpslave = normalizePath(os.path.join(paths.SQLMAP_EXTRAS_PATH, "icmpsh", "icmpsh.exe_"))
 
     def _selectRhost(self):
-        message = "what is the back-end DBMS address? [%s] " % self.remoteIP
-        address = readInput(message, default=self.remoteIP)
+        address = None
+        message = "what is the back-end DBMS address? "
+
+        if self.remoteIP:
+            message += "[Enter for '%s' (detected)] " % self.remoteIP
+
+        while not address:
+            address = readInput(message, default=self.remoteIP)
+
+            if conf.batch and not address:
+                raise SqlmapDataException("remote host address is missing")
 
         return address
 
     def _selectLhost(self):
-        message = "what is the local address? [%s] " % self.localIP
-        address = readInput(message, default=self.localIP)
+        address = None
+        message = "what is the local address? "
+
+        if self.localIP:
+            message += "[Enter for '%s' (detected)] " % self.localIP
+
+        valid = None
+        while not valid:
+            valid = True
+            address = readInput(message, default=self.localIP or "")
+
+            try:
+                socket.inet_aton(address)
+            except socket.error:
+                valid = False
+            finally:
+                valid = valid and re.search(r"\d+\.\d+\.\d+\.\d+", address) is not None
+
+            if conf.batch and not address:
+                raise SqlmapDataException("local host address is missing")
+            elif address and not valid:
+                warnMsg = "invalid local host address"
+                logger.warn(warnMsg)
 
         return address
 
     def _prepareIngredients(self, encode=True):
+        self.localIP = getattr(self, "localIP", None)
+        self.remoteIP = getattr(self, "remoteIP", None)
         self.lhostStr = ICMPsh._selectLhost(self)
         self.rhostStr = ICMPsh._selectRhost(self)
 

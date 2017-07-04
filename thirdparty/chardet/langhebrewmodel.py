@@ -15,19 +15,17 @@
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301  USA
 ######################### END LICENSE BLOCK #########################
-
-import constants
 
 # 255: Control characters that usually does not exist in any text
 # 254: Carriage/Return
@@ -36,7 +34,7 @@ import constants
 
 # Windows-1255 language model
 # Character Mapping Table:
-win1255_CharToOrderMap = ( \
+win1255_CharToOrderMap = (
 255,255,255,255,255,255,255,255,255,255,254,255,255,254,255,255,  # 00
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  # 10
 253,253,253,253,253,253,253,253,253,253,253,253,253,253,253,253,  # 20
@@ -55,13 +53,13 @@ win1255_CharToOrderMap = ( \
  12, 19, 13, 26, 18, 27, 21, 17,  7, 10,  5,251,252,128, 96,253,
 )
 
-# Model Table: 
+# Model Table:
 # total sequences: 100%
 # first 512 sequences: 98.4004%
 # first 1024 sequences: 1.5981%
 # rest  sequences:      0.087%
-# negative sequences:   0.0015% 
-HebrewLangModel = ( \
+# negative sequences:   0.0015%
+HebrewLangModel = (
 0,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,3,3,3,2,3,2,1,2,0,1,0,0,
 3,0,3,1,0,0,1,3,2,0,1,1,2,0,2,2,2,1,1,1,1,2,1,1,1,2,0,0,2,2,0,1,
 3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2,
@@ -192,10 +190,12 @@ HebrewLangModel = ( \
 0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,1,1,1,1,1,0,1,0,0,0,1,1,0,0,
 )
 
-Win1255HebrewModel = { \
+Win1255HebrewModel = {
   'charToOrderMap': win1255_CharToOrderMap,
   'precedenceMatrix': HebrewLangModel,
   'mTypicalPositiveRatio': 0.984004,
-  'keepEnglishLetter': constants.False,
+  'keepEnglishLetter': False,
   'charsetName': "windows-1255"
 }
+
+# flake8: noqa

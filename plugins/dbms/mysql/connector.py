@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -11,6 +11,7 @@ except ImportError:
     pass
 
 import logging
+import struct
 
 from lib.core.data import conf
 from lib.core.data import logger
@@ -38,6 +39,8 @@ class Connector(GenericConnector):
             self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
         except (pymysql.OperationalError, pymysql.InternalError), msg:
             raise SqlmapConnectionException(msg[1])
+        except struct.error, msg:
+            raise SqlmapConnectionException(msg)
 
         self.initCursor()
         self.printConnected()

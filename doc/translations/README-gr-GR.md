@@ -1,6 +1,6 @@
-sqlmap
-==
+# sqlmap
 
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 Το sqlmap είναι πρόγραμμα ανοιχτού κώδικα, που αυτοματοποιεί την εύρεση και εκμετάλλευση ευπαθειών τύπου SQL Injection σε βάσεις δεδομένων. Έρχεται με μια δυνατή μηχανή αναγνώρισης ευπαθειών, πολλά εξειδικευμένα χαρακτηριστικά για τον απόλυτο penetration tester όπως και με ένα μεγάλο εύρος επιλογών αρχίζοντας από την αναγνώριση της βάσης δεδομένων, κατέβασμα δεδομένων της βάσης, μέχρι και πρόσβαση στο βαθύτερο σύστημα αρχείων και εκτέλεση εντολών στο απευθείας στο λειτουργικό μέσω εκτός ζώνης συνδέσεων.
 
@@ -18,7 +18,7 @@ sqlmap
 
 Κατά προτίμηση, μπορείτε να κατεβάσετε το sqlmap κάνοντας κλώνο το [Git](https://github.com/sqlmapproject/sqlmap) αποθετήριο:
 
-    git clone https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 Το sqlmap λειτουργεί χωρίς περαιτέρω κόπο με την [Python](http://www.python.org/download/) έκδοσης **2.6.x** και **2.7.x** σε όποια πλατφόρμα.
 
@@ -33,8 +33,8 @@ sqlmap
 
     python sqlmap.py -hh
 
-Μπορείτε να δείτε ένα δείγμα λειτουργίας του προγράμματος [εδώ](https://gist.github.com/stamparm/5335217).
-Για μια γενικότερη άποψη των δυνατοτήτων του sqlmap, μια λίστα των υποστηριζόμενων χαρακτηριστικών και περιγραφή για όλες τις επιλογές, μαζί με παραδείγματα, καλείστε να συμβουλευτείτε το [εγχειρίδιο χρήστη](https://github.com/sqlmapproject/sqlmap/wiki).
+Μπορείτε να δείτε ένα δείγμα λειτουργίας του προγράμματος [εδώ](https://asciinema.org/a/46601).
+Για μια γενικότερη άποψη των δυνατοτήτων του sqlmap, μια λίστα των υποστηριζόμενων χαρακτηριστικών και περιγραφή για όλες τις επιλογές, μαζί με παραδείγματα, καλείστε να συμβουλευτείτε το [εγχειρίδιο χρήστη](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Σύνδεσμοι
 ----
@@ -45,9 +45,6 @@ sqlmap
 * Προβλήματα: https://github.com/sqlmapproject/sqlmap/issues
 * Εγχειρίδιο Χρήστη: https://github.com/sqlmapproject/sqlmap/wiki
 * Συχνές Ερωτήσεις (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Εγγραφή σε Mailing list: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mailing list RSS feed: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mailing list αρχείο: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Εικόνες: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

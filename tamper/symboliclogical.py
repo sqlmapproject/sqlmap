@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -19,7 +19,7 @@ def tamper(payload, **kwargs):
     Replaces AND and OR logical operators with their symbolic counterparts (&& and ||)
 
     >>> tamper("1 AND '1'='1")
-    '1 && '1'='1'
+    "1 %26%26 '1'='1"
     """
 
     retVal = payload

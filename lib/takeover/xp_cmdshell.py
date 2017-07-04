@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -33,7 +33,7 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 
-class Xp_cmdshell:
+class XP_cmdshell:
     """
     This class defines methods to deal with Microsoft SQL Server
     xp_cmdshell extended procedure for plugins.
@@ -45,7 +45,7 @@ class Xp_cmdshell:
     def _xpCmdshellCreate(self):
         cmd = ""
 
-        if Backend.isVersionWithin(("2005", "2008", "2012")):
+        if not Backend.isVersionWithin(("2000",)):
             logger.debug("activating sp_OACreate")
 
             cmd = getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
@@ -56,7 +56,7 @@ class Xp_cmdshell:
 
         cmd = getSQLSnippet(DBMS.MSSQL, "create_new_xp_cmdshell", RANDSTR=self._randStr)
 
-        if Backend.isVersionWithin(("2005", "2008")):
+        if not Backend.isVersionWithin(("2000",)):
             cmd += ";RECONFIGURE WITH OVERRIDE"
 
         inject.goStacked(agent.runAsDBMSUser(cmd))
@@ -83,10 +83,10 @@ class Xp_cmdshell:
         return cmd
 
     def _xpCmdshellConfigure(self, mode):
-        if Backend.isVersionWithin(("2005", "2008")):
-            cmd = self._xpCmdshellConfigure2005(mode)
-        else:
+        if Backend.isVersionWithin(("2000",)):
             cmd = self._xpCmdshellConfigure2000(mode)
+        else:
+            cmd = self._xpCmdshellConfigure2005(mode)
 
         inject.goStacked(agent.runAsDBMSUser(cmd))
 
@@ -111,8 +111,8 @@ class Xp_cmdshell:
             errMsg += "storing console output within the back-end file system "
             errMsg += "does not have writing permissions for the DBMS process. "
             errMsg += "You are advised to manually adjust it with option "
-            errMsg += "--tmp-path switch or you will not be able to retrieve "
-            errMsg += "the commands output"
+            errMsg += "'--tmp-path' or you won't be able to retrieve "
+            errMsg += "the command(s) output"
             logger.error(errMsg)
         elif isNoneValue(output):
             logger.error("unable to retrieve xp_cmdshell output")
@@ -255,9 +255,8 @@ class Xp_cmdshell:
                 message = "xp_cmdshell extended procedure does not seem to "
                 message += "be available. Do you want sqlmap to try to "
                 message += "re-enable it? [Y/n] "
-                choice = readInput(message, default="Y")
 
-                if not choice or choice in ("y", "Y"):
+                if readInput(message, default='Y', boolean=True):
                     self._xpCmdshellConfigure(1)
 
                     if self._xpCmdshellCheck():

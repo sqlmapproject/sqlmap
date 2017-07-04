@@ -3,3 +3,4 @@ output/
 .sqlmap_history
 traffic.txt
 *~
+.idea/

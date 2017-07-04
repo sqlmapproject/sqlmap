@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -28,9 +28,9 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
-from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
+from lib.core.settings import METADB_SUFFIX
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
@@ -57,8 +57,7 @@ def tableExists(tableFile, regex=None):
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        test = readInput(message, default="N")
-        kb.tableExistsChoice = test[0] in ("y", "Y")
+        kb.tableExistsChoice = readInput(message, default='N', boolean=True)
 
         if not kb.tableExistsChoice:
             return None
@@ -70,15 +69,23 @@ def tableExists(tableFile, regex=None):
 
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
-        errMsg += "to distinguish errornous results)"
+        errMsg += "(most likely caused by inability of the used injection "
+        errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
 
-    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
+    message = "which common tables (wordlist) file do you want to use?\n"
+    message += "[1] default '%s' (press Enter)\n" % tableFile
+    message += "[2] custom"
+    choice = readInput(message, default='1')
+
+    if choice == '2':
+        message = "what's the custom common tables file location?\n"
+        tableFile = readInput(message) or tableFile
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
+    tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
     tables.extend(_addPageTextWords())
     tables = filterListValue(tables, regex)
 
@@ -102,7 +109,7 @@ def tableExists(tableFile, regex=None):
                 break
 
             if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
-                fullTableName = "%s%s%s" % (conf.db, '..' if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) else '.', table)
+                fullTableName = "%s.%s" % (conf.db, table)
             else:
                 fullTableName = table
 
@@ -114,7 +121,7 @@ def tableExists(tableFile, regex=None):
                 threadData.shared.value.append(table)
                 threadData.shared.unique.add(table.lower())
 
-                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
+                if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                     dataToStdout(infoMsg, True)
@@ -161,8 +168,7 @@ def columnExists(columnFile, regex=None):
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        test = readInput(message, default="N")
-        kb.columnExistsChoice = test[0] in ("y", "Y")
+        kb.columnExistsChoice = readInput(message, default='N', boolean=True)
 
         if not kb.columnExistsChoice:
             return None
@@ -178,9 +184,18 @@ def columnExists(columnFile, regex=None):
 
     if result:
         errMsg = "can't use column existence check because of detected invalid results "
-        errMsg += "(most probably caused by inability of the used injection "
-        errMsg += "to distinguish errornous results)"
+        errMsg += "(most likely caused by inability of the used injection "
+        errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
+
+    message = "which common columns (wordlist) file do you want to use?\n"
+    message += "[1] default '%s' (press Enter)\n" % columnFile
+    message += "[2] custom"
+    choice = readInput(message, default='1')
+
+    if choice == '2':
+        message = "what's the custom common columns file location?\n"
+        columnFile = readInput(message) or columnFile
 
     infoMsg = "checking column existence using items from '%s'" % columnFile
     logger.info(infoMsg)
@@ -222,7 +237,7 @@ def columnExists(columnFile, regex=None):
             if result:
                 threadData.shared.value.append(column)
 
-                if conf.verbose in (1, 2) and not hasattr(conf, "api"):
+                if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)

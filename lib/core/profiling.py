@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -26,9 +26,8 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import gtk
         import pydot
     except ImportError, e:
-        errMsg = "profiling requires third-party libraries (%s). " % getUnicode(e, UNICODE_ENCODING)
-        errMsg += "Quick steps:%s" % os.linesep
-        errMsg += "1) sudo apt-get install python-pydot python-pyparsing python-profiler graphviz"
+        errMsg = "profiling requires third-party libraries ('%s') " % getUnicode(e, UNICODE_ENCODING)
+        errMsg += "(Hint: 'sudo apt-get install python-pydot python-pyparsing python-profiler graphviz')"
         logger.error(errMsg)
 
         return
@@ -76,6 +75,11 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     # Create graph image (png) by using pydot (python-pydot)
     # http://code.google.com/p/pydot/
     pydotGraph = pydot.graph_from_dot_file(dotOutputFile)
+
+    # Reference: http://stackoverflow.com/questions/38176472/graph-write-pdfiris-pdf-attributeerror-list-object-has-no-attribute-writ
+    if isinstance(pydotGraph, list):
+        pydotGraph = pydotGraph[0]
+
     pydotGraph.write_png(imageOutputFile)
 
     infoMsg = "displaying interactive graph with xdot library"
@@ -87,5 +91,4 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
     win.connect('destroy', gtk.main_quit)
     win.set_filter("dot")
     win.open_file(dotOutputFile)
-    gobject.timeout_add(1000, win.update, dotOutputFile)
     gtk.main()

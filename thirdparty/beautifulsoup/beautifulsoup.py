@@ -79,8 +79,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE, DAMMIT.
 from __future__ import generators
 
 __author__ = "Leonard Richardson (leonardr@segfault.org)"
-__version__ = "3.2.0"
-__copyright__ = "Copyright (c) 2004-2010 Leonard Richardson"
+__version__ = "3.2.1"
+__copyright__ = "Copyright (c) 2004-2012 Leonard Richardson"
 __license__ = "New-style BSD"
 
 from sgmllib import SGMLParser, SGMLParseError
@@ -113,6 +113,21 @@ def _match_css_class(str):
 class PageElement(object):
     """Contains the navigational information for some part of the page
     (either a tag or a piece of text)"""
+
+    def _invert(h):
+        "Cheap function to invert a hash."
+        i = {}
+        for k,v in h.items():
+            i[v] = k
+        return i
+
+    XML_ENTITIES_TO_SPECIAL_CHARS = { "apos" : "'",
+                                      "quot" : '"',
+                                      "amp" : "&",
+                                      "lt" : "<",
+                                      "gt" : ">" }
+
+    XML_SPECIAL_CHARS_TO_ENTITIES = _invert(XML_ENTITIES_TO_SPECIAL_CHARS)
 
     def setup(self, parent=None, previous=None):
         """Sets up the initial relations between this element and
@@ -421,6 +436,16 @@ class PageElement(object):
                 s = unicode(s)
         return s
 
+    BARE_AMPERSAND_OR_BRACKET = re.compile("([<>]|"
+                                           + "&(?!#\d+;|#x[0-9a-fA-F]+;|\w+;)"
+                                           + ")")
+
+    def _sub_entity(self, x):
+        """Used with a regular expression to substitute the
+        appropriate XML entity for an XML special character."""
+        return "&" + self.XML_SPECIAL_CHARS_TO_ENTITIES[x.group(0)[0]] + ";"
+
+
 class NavigableString(unicode, PageElement):
 
     def __new__(cls, value):
@@ -451,10 +476,12 @@ class NavigableString(unicode, PageElement):
         return str(self).decode(DEFAULT_OUTPUT_ENCODING)
 
     def __str__(self, encoding=DEFAULT_OUTPUT_ENCODING):
+        # Substitute outgoing XML entities.
+        data = self.BARE_AMPERSAND_OR_BRACKET.sub(self._sub_entity, self)
         if encoding:
-            return self.encode(encoding)
+            return data.encode(encoding)
         else:
-            return self
+            return data
 
 class CData(NavigableString):
 
@@ -480,45 +507,34 @@ class Tag(PageElement):
 
     """Represents a found HTML tag with its attributes and contents."""
 
-    def _invert(h):
-        "Cheap function to invert a hash."
-        i = {}
-        for k,v in h.items():
-            i[v] = k
-        return i
-
-    XML_ENTITIES_TO_SPECIAL_CHARS = { "apos" : "'",
-                                      "quot" : '"',
-                                      "amp" : "&",
-                                      "lt" : "<",
-                                      "gt" : ">" }
-
-    XML_SPECIAL_CHARS_TO_ENTITIES = _invert(XML_ENTITIES_TO_SPECIAL_CHARS)
-
     def _convertEntities(self, match):
         """Used in a call to re.sub to replace HTML, XML, and numeric
         entities with the appropriate Unicode characters. If HTML
         entities are being converted, any unrecognized entities are
         escaped."""
-        x = match.group(1)
-        if self.convertHTMLEntities and x in name2codepoint:
-            return unichr(name2codepoint[x])
-        elif x in self.XML_ENTITIES_TO_SPECIAL_CHARS:
-            if self.convertXMLEntities:
-                return self.XML_ENTITIES_TO_SPECIAL_CHARS[x]
-            else:
-                return u'&%s;' % x
-        elif len(x) > 0 and x[0] == '#':
-            # Handle numeric entities
-            if len(x) > 1 and x[1] == 'x':
-                return unichr(int(x[2:], 16))
-            else:
-                return unichr(int(x[1:]))
+        try:
+            x = match.group(1)
+            if self.convertHTMLEntities and x in name2codepoint:
+                return unichr(name2codepoint[x])
+            elif x in self.XML_ENTITIES_TO_SPECIAL_CHARS:
+                if self.convertXMLEntities:
+                    return self.XML_ENTITIES_TO_SPECIAL_CHARS[x]
+                else:
+                    return u'&%s;' % x
+            elif len(x) > 0 and x[0] == '#':
+                # Handle numeric entities
+                if len(x) > 1 and x[1] == 'x':
+                    return unichr(int(x[2:], 16))
+                else:
+                    return unichr(int(x[1:]))
 
-        elif self.escapeUnrecognizedEntities:
-            return u'&amp;%s;' % x
-        else:
-            return u'&%s;' % x
+            elif self.escapeUnrecognizedEntities:
+                return u'&amp;%s;' % x
+
+        except ValueError:  # e.g. ValueError: unichr() arg not in range(0x10000)
+            pass
+
+        return u'&%s;' % x
 
     def __init__(self, parser, name, attrs=None, parent=None,
                  previous=None):
@@ -680,15 +696,6 @@ class Tag(PageElement):
 
     def __unicode__(self):
         return self.__str__(None)
-
-    BARE_AMPERSAND_OR_BRACKET = re.compile("([<>]|"
-                                           + "&(?!#\d+;|#x[0-9a-fA-F]+;|\w+;)"
-                                           + ")")
-
-    def _sub_entity(self, x):
-        """Used with a regular expression to substitute the
-        appropriate XML entity for an XML special character."""
-        return "&" + self.XML_SPECIAL_CHARS_TO_ENTITIES[x.group(0)[0]] + ";"
 
     def __str__(self, encoding=DEFAULT_OUTPUT_ENCODING,
                 prettyPrint=False, indentLevel=0):

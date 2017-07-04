@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 import sqlite3
 
 from extra.safe2bin.safe2bin import safechardecode
+from lib.core.common import getSafeExString
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapValueException
+from lib.core.settings import UNICODE_ENCODING
 
 class Replication(object):
     """
@@ -19,10 +22,15 @@ class Replication(object):
     """
 
     def __init__(self, dbpath):
-        self.dbpath = dbpath
-        self.connection = sqlite3.connect(dbpath)
-        self.connection.isolation_level = None
-        self.cursor = self.connection.cursor()
+        try:
+            self.dbpath = dbpath
+            self.connection = sqlite3.connect(dbpath)
+            self.connection.isolation_level = None
+            self.cursor = self.connection.cursor()
+        except sqlite3.OperationalError, ex:
+            errMsg = "error occurred while opening a replication "
+            errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+            raise SqlmapConnectionException(errMsg)
 
     class DataType:
         """
@@ -49,11 +57,16 @@ class Replication(object):
             self.name = unsafeSQLIdentificatorNaming(name)
             self.columns = columns
             if create:
-                self.execute('DROP TABLE IF EXISTS "%s"' % self.name)
-                if not typeless:
-                    self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
-                else:
-                    self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
+                try:
+                    self.execute('DROP TABLE IF EXISTS "%s"' % self.name)
+                    if not typeless:
+                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
+                    else:
+                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
+                except Exception, ex:
+                    errMsg = "problem occurred ('%s') while initializing the sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
+                    errMsg += "located at '%s'" % self.parent.dbpath
+                    raise SqlmapGenericException(errMsg)
 
         def insert(self, values):
             """
@@ -70,7 +83,7 @@ class Replication(object):
             try:
                 self.parent.cursor.execute(sql, parameters)
             except sqlite3.OperationalError, ex:
-                errMsg = "problem occurred ('%s') while accessing sqlite database " % unicode(ex)
+                errMsg = "problem occurred ('%s') while accessing sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
                 errMsg += "it's not used by some other program"
                 raise SqlmapGenericException(errMsg)

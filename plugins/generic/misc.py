@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -70,7 +70,7 @@ class Miscellaneous:
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
 
-        singleTimeDebugMessage("going to use %s as temporary files directory" % conf.tmpPath)
+        singleTimeDebugMessage("going to use '%s' as temporary files directory" % conf.tmpPath)
 
         hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 
@@ -101,7 +101,7 @@ class Miscellaneous:
             query = "SELECT %s" % query
 
         kb.bannerFp["dbmsVersion"] = unArrayizeValue(inject.getValue(query))
-        kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(",", "").replace("-", "").replace(" ", "")
+        kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(',', "").replace('-', "").replace(' ', "")
 
     def delRemoteFile(self, filename):
         if not filename:
@@ -169,9 +169,8 @@ class Miscellaneous:
 
             for udf, inpRet in udfDict.items():
                 message = "do you want to remove UDF '%s'? [Y/n] " % udf
-                output = readInput(message, default="Y")
 
-                if not output or output in ("y", "Y"):
+                if readInput(message, default='Y', boolean=True):
                     dropStr = "DROP FUNCTION %s" % udf
 
                     if Backend.isDbms(DBMS.PGSQL):

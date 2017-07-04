@@ -3,7 +3,7 @@
 """
 cloak.py - Simple file encryption/compression utility
 
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -24,17 +24,19 @@ def hideAscii(data):
 
     return retVal
 
-def cloak(inputFile):
-    f = open(inputFile, 'rb')
-    data = zlib.compress(f.read())
-    f.close()
+def cloak(inputFile=None, data=None):
+    if data is None:
+        with open(inputFile, "rb") as f:
+            data = f.read()
 
-    return hideAscii(data)
+    return hideAscii(zlib.compress(data))
 
-def decloak(inputFile):
-    f = open(inputFile, 'rb')
+def decloak(inputFile=None, data=None):
+    if data is None:
+        with open(inputFile, "rb") as f:
+            data = f.read()
     try:
-        data = zlib.decompress(hideAscii(f.read()))
+        data = zlib.decompress(hideAscii(data))
     except:
         print 'ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile
         sys.exit(1)

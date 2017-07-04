@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -60,7 +60,7 @@ class Takeover(GenericTakeover):
                 else:
                     self.__plugindir = "%s/lib/mysql/plugin" % self.__basedir
 
-                self.__plugindir = ntToPosixSlashes(normalizePath(self.__plugindir))
+            self.__plugindir = ntToPosixSlashes(normalizePath(self.__plugindir)) or '.'
 
             self.udfRemoteFile = "%s/%s.%s" % (self.__plugindir, self.udfSharedLibName, self.udfSharedLibExt)
 
@@ -74,7 +74,7 @@ class Takeover(GenericTakeover):
 
             # NOTE: specifying the relative path as './udf.dll'
             # saves in @@datadir on both MySQL 4.1 and MySQL 5.0
-            self.__datadir = "."
+            self.__datadir = '.'
             self.__datadir = ntToPosixSlashes(normalizePath(self.__datadir))
 
             # The DLL can be in either C:\WINDOWS, C:\WINDOWS\system,

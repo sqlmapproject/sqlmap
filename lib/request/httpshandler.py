@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
+import distutils.version
 import httplib
+import re
 import socket
 import urllib2
 
+from lib.core.common import getSafeExString
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
+from lib.core.settings import PYVERSION
 
 ssl = None
 try:
@@ -42,7 +46,30 @@ class HTTPSConnection(httplib.HTTPSConnection):
 
         success = False
 
-        if not kb.tlsSNI:
+        # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
+        #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
+        if re.search(r"\A[\d.]+\Z", self.host) is None and kb.tlsSNI.get(self.host) != False and hasattr(ssl, "SSLContext"):
+            for protocol in filter(lambda _: _ >= ssl.PROTOCOL_TLSv1, _protocols):
+                try:
+                    sock = create_sock()
+                    context = ssl.SSLContext(protocol)
+                    _ = context.wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host)
+                    if _:
+                        success = True
+                        self.sock = _
+                        _protocols.remove(protocol)
+                        _protocols.insert(0, protocol)
+                        break
+                    else:
+                        sock.close()
+                except (ssl.SSLError, socket.error, httplib.BadStatusLine), ex:
+                    self._tunnel_host = None
+                    logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
+
+            if kb.tlsSNI.get(self.host) is None:
+                kb.tlsSNI[self.host] = success
+
+        if not success:
             for protocol in _protocols:
                 try:
                     sock = create_sock()
@@ -55,32 +82,16 @@ class HTTPSConnection(httplib.HTTPSConnection):
                         break
                     else:
                         sock.close()
-                except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
+                except (ssl.SSLError, socket.error, httplib.BadStatusLine), ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred ('%s')" % errMsg)
-
-        # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
-        #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
-        if not success and hasattr(ssl, "SSLContext"):
-            for protocol in filter(lambda _: _ >= ssl.PROTOCOL_TLSv1, _protocols):
-                try:
-                    sock = create_sock()
-                    context = ssl.SSLContext(protocol)
-                    _ = context.wrap_socket(sock, do_handshake_on_connect=False, server_hostname=self.host)
-                    if _:
-                        kb.tlsSNI = success = True
-                        self.sock = _
-                        _protocols.remove(protocol)
-                        _protocols.insert(0, protocol)
-                        break
-                    else:
-                        sock.close()
-                except (ssl.SSLError, socket.error, httplib.BadStatusLine), errMsg:
-                    self._tunnel_host = None
-                    logger.debug("SSL connection error occurred ('%s')" % errMsg)
+                    logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
         if not success:
-            raise SqlmapConnectionException("can't establish SSL connection")
+            errMsg = "can't establish SSL connection"
+            # Reference: https://docs.python.org/2/library/ssl.html
+            if distutils.version.LooseVersion(PYVERSION) < distutils.version.LooseVersion("2.7.9"):
+                errMsg += " (please retry with Python >= 2.7.9)"
+            raise SqlmapConnectionException(errMsg)
 
 class HTTPSHandler(urllib2.HTTPSHandler):
     def https_open(self, req):

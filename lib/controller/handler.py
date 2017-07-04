@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.common import Backend
 from lib.core.data import conf
-from lib.core.data import logger
+from lib.core.data import kb
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
 from lib.core.settings import MSSQL_ALIASES
@@ -21,6 +21,7 @@ from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
+from lib.core.settings import INFORMIX_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
@@ -45,6 +46,8 @@ from plugins.dbms.db2 import DB2Map
 from plugins.dbms.db2.connector import Connector as DB2Conn
 from plugins.dbms.hsqldb import HSQLDBMap
 from plugins.dbms.hsqldb.connector import Connector as HSQLDBConn
+from plugins.dbms.informix import InformixMap
+from plugins.dbms.informix.connector import Connector as InformixConn
 
 def setHandler():
     """
@@ -64,26 +67,19 @@ def setHandler():
                   (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
                   (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
                   (DBMS.HSQLDB, HSQLDB_ALIASES, HSQLDBMap, HSQLDBConn),
+                  (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
             ]
 
-    _ = max(_ if (Backend.getIdentifiedDbms() or "").lower() in _[1] else None for _ in items)
+    _ = max(_ if (Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else None for _ in items)
     if _:
         items.remove(_)
         items.insert(0, _)
 
     for dbms, aliases, Handler, Connector in items:
-        if conf.dbms and conf.dbms.lower() != dbms and conf.dbms.lower() not in aliases:
-            debugMsg = "skipping test for %s" % dbms
-            logger.debug(debugMsg)
-            continue
-
         handler = Handler()
         conf.dbmsConnector = Connector()
 
         if conf.direct:
-            logger.debug("forcing timeout to 10 seconds")
-            conf.timeout = 10
-
             dialect = DBMS_DICT[dbms][3]
 
             if dialect:
@@ -101,7 +97,12 @@ def setHandler():
                 conf.dbmsConnector.connect()
 
         if handler.checkDbms():
-            conf.dbmsHandler = handler
+            if kb.resolutionDbms:
+                conf.dbmsHandler = max(_ for _ in items if _[0] == kb.resolutionDbms)[2]()
+            else:
+                conf.dbmsHandler = handler
+
+            conf.dbmsHandler._dbms = dbms
             break
         else:
             conf.dbmsConnector = None

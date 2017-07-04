@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -20,7 +20,6 @@ from lib.core.common import isListLike
 from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
-from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -29,6 +28,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUndefinedMethod
+from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
 class Filesystem:
@@ -53,37 +53,42 @@ class Filesystem:
 
             lengthQuery = "SELECT DATALENGTH(%s) FROM %s" % (self.tblField, self.fileTblName)
 
-        localFileSize = os.path.getsize(localFile)
+        try:
+            localFileSize = os.path.getsize(localFile)
+        except OSError:
+            warnMsg = "file '%s' is missing" % localFile
+            logger.warn(warnMsg)
+            localFileSize = 0
 
         if fileRead and Backend.isDbms(DBMS.PGSQL):
-            logger.info("length of read file %s cannot be checked on PostgreSQL" % remoteFile)
+            logger.info("length of read file '%s' cannot be checked on PostgreSQL" % remoteFile)
             sameFile = True
         else:
-            logger.debug("checking the length of the remote file %s" % remoteFile)
+            logger.debug("checking the length of the remote file '%s'" % remoteFile)
             remoteFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
             sameFile = None
 
             if isNumPosStrValue(remoteFileSize):
                 remoteFileSize = long(remoteFileSize)
-                localFile = getUnicode(localFile, encoding=sys.getfilesystemencoding())
+                localFile = getUnicode(localFile, encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
                 sameFile = False
 
                 if localFileSize == remoteFileSize:
                     sameFile = True
-                    infoMsg = "the local file %s and the remote file " % localFile
-                    infoMsg += "%s have the same size (%db)" % (remoteFile, localFileSize)
+                    infoMsg = "the local file '%s' and the remote file " % localFile
+                    infoMsg += "'%s' have the same size (%d B)" % (remoteFile, localFileSize)
                 elif remoteFileSize > localFileSize:
-                    infoMsg = "the remote file %s is larger (%db) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "the local file %s (%db)" % (localFile, localFileSize)
+                    infoMsg = "the remote file '%s' is larger (%d B) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "the local file '%s' (%dB)" % (localFile, localFileSize)
                 else:
-                    infoMsg = "the remote file %s is smaller (%db) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "file %s (%db)" % (localFile, localFileSize)
+                    infoMsg = "the remote file '%s' is smaller (%d B) than " % (remoteFile, remoteFileSize)
+                    infoMsg += "file '%s' (%d B)" % (localFile, localFileSize)
 
                 logger.info(infoMsg)
             else:
                 sameFile = False
                 warnMsg = "it looks like the file has not been written (usually "
-                warnMsg += "occurs if the DBMS process' user has no write "
+                warnMsg += "occurs if the DBMS process user has no write "
                 warnMsg += "privileges in the destination path)"
                 logger.warn(warnMsg)
 
@@ -114,6 +119,8 @@ class Filesystem:
         Called by MySQL and PostgreSQL plugins to write a file on the
         back-end DBMS underlying file system
         """
+
+        checkFile(fileName)
 
         with open(fileName, "rb") as f:
             content = f.read()
@@ -149,15 +156,15 @@ class Filesystem:
         return retVal
 
     def askCheckWrittenFile(self, localFile, remoteFile, forceCheck=False):
-        output = None
+        choice = None
 
         if forceCheck is not True:
             message = "do you want confirmation that the local file '%s' " % localFile
             message += "has been successfully written on the back-end DBMS "
-            message += "file system (%s)? [Y/n] " % remoteFile
-            output = readInput(message, default="Y")
+            message += "file system ('%s')? [Y/n] " % remoteFile
+            choice = readInput(message, default='Y', boolean=True)
 
-        if forceCheck or (output and output.lower() == "y"):
+        if forceCheck or choice:
             return self._checkFileLength(localFile, remoteFile)
 
         return True
@@ -166,9 +173,8 @@ class Filesystem:
         message = "do you want confirmation that the remote file '%s' " % remoteFile
         message += "has been successfully downloaded from the back-end "
         message += "DBMS file system? [Y/n] "
-        output = readInput(message, default="Y")
 
-        if not output or output in ("y", "Y"):
+        if readInput(message, default='Y', boolean=True):
             return self._checkFileLength(localFile, remoteFile, True)
 
         return None
@@ -198,7 +204,7 @@ class Filesystem:
 
         self.checkDbmsOs()
 
-        for remoteFile in remoteFiles.split(","):
+        for remoteFile in remoteFiles.split(','):
             fileContent = None
             kb.fileReadMode = True
 
@@ -277,14 +283,14 @@ class Filesystem:
 
         if conf.direct or isStackingAvailable():
             if isStackingAvailable():
-                debugMsg = "going to upload the %s file with " % fileType
+                debugMsg = "going to upload the file '%s' with " % fileType
                 debugMsg += "stacked query SQL injection technique"
                 logger.debug(debugMsg)
 
             written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
-            debugMsg = "going to upload the %s file with " % fileType
+            debugMsg = "going to upload the file '%s' with " % fileType
             debugMsg += "UNION query SQL injection technique"
             logger.debug(debugMsg)
 

@@ -7,6 +7,7 @@
         <error regexp="Warning.*mysql_.*"/>
         <error regexp="MySqlException \(0x"/>
         <error regexp="valid MySQL result"/>
+        <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc\.exceptions"/>
     </dbms>
@@ -17,6 +18,7 @@
         <error regexp="Warning.*\Wpg_.*"/>
         <error regexp="valid PostgreSQL result"/>
         <error regexp="Npgsql\."/>
+        <error regexp="PG::SyntaxError:"/>
         <error regexp="org\.postgresql\.util\.PSQLException"/>
         <error regexp="ERROR:\s\ssyntax error at or near "/>
     </dbms>
@@ -25,11 +27,17 @@
     <dbms value="Microsoft SQL Server">
         <error regexp="Driver.* SQL[\-\_\ ]*Server"/>
         <error regexp="OLE DB.* SQL Server"/>
-        <error regexp="\bSQL Server.*Driver"/>
-        <error regexp="Warning.*mssql_.*"/>
-        <error regexp="\bSQL Server.*[0-9a-fA-F]{8}"/>
-        <error regexp="(?s)Exception.*\WSystem\.Data\.SqlClient\."/>
+        <error regexp="\bSQL Server[^&lt;&quot;]+Driver"/>
+        <error regexp="Warning.*(mssql|sqlsrv)_"/>
+        <error regexp="\bSQL Server[^&lt;&quot;]+[0-9a-fA-F]{8}"/>
+        <error regexp="System\.Data\.SqlClient\.SqlException"/>
         <error regexp="(?s)Exception.*\WRoadhouse\.Cms\."/>
+        <error regexp="Microsoft SQL Native Client error '[0-9a-fA-F]{8}"/>
+        <error regexp="com\.microsoft\.sqlserver\.jdbc\.SQLServerException"/>
+        <error regexp="ODBC SQL Server Driver"/>
+        <error regexp="SQLServer JDBC Driver"/>
+        <error regexp="macromedia\.jdbc\.sqlserver"/>
+        <error regexp="com\.jnetdirect\.jsql"/>
     </dbms>
 
     <!-- Microsoft Access -->
@@ -37,15 +45,19 @@
         <error regexp="Microsoft Access (\d+ )?Driver"/>
         <error regexp="JET Database Engine"/>
         <error regexp="Access Database Engine"/>
+        <error regexp="ODBC Microsoft Access"/>
+        <error regexp="Syntax error \(missing operator\) in query expression"/>
     </dbms>
 
     <!-- Oracle -->
     <dbms value="Oracle">
-        <error regexp="\bORA-[0-9][0-9][0-9][0-9]"/>
+        <error regexp="\bORA-\d{5}"/>
         <error regexp="Oracle error"/>
         <error regexp="Oracle.*Driver"/>
         <error regexp="Warning.*\Woci_.*"/>
         <error regexp="Warning.*\Wora_.*"/>
+        <error regexp="oracle\.jdbc\.driver"/>
+        <error regexp="quoted string not properly terminated"/>
     </dbms>
 
     <!-- IBM DB2 -->
@@ -53,11 +65,15 @@
         <error regexp="CLI Driver.*DB2"/>
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
+        <error regexp="SQLSTATE.+SQLCODE"/>
     </dbms>
 
     <!-- Informix -->
     <dbms value="Informix">
         <error regexp="Exception.*Informix"/>
+        <error regexp="Informix ODBC Driver"/>
+        <error regexp="com\.informix\.jdbc"/>
+        <error regexp="weblogic\.jdbc\.informix"/>
     </dbms>
 
     <!-- Interbase/Firebird -->
@@ -69,8 +85,8 @@
     <!-- SQLite -->
     <dbms value="SQLite">
         <error regexp="SQLite/JDBCDriver"/>
-        <error regexp="SQLite.Exception"/>
-        <error regexp="System.Data.SQLite.SQLiteException"/>
+        <error regexp="SQLite\.Exception"/>
+        <error regexp="System\.Data\.SQLite\.SQLiteException"/>
         <error regexp="Warning.*sqlite_.*"/>
         <error regexp="Warning.*SQLite3::"/>
         <error regexp="\[SQLITE_ERROR\]"/>
@@ -84,9 +100,11 @@
 
     <!-- Sybase -->
     <dbms value="Sybase">
-        <error regexp="(?i)Warning.*sybase.*"/>
+        <error regexp="Warning.*sybase.*"/>
         <error regexp="Sybase message"/>
         <error regexp="Sybase.*Server message.*"/>
+        <error regexp="SybSQLException"/>
+        <error regexp="com\.sybase\.jdbc"/>
     </dbms>
 
     <!-- Ingres -->
@@ -104,6 +122,8 @@
     <!-- HSQLDB -->
     <dbms value="HSQLDB">
         <error regexp="org\.hsqldb\.jdbc"/>
+        <error regexp="Unexpected end of command in statement \["/>
+        <error regexp="Unexpected token.*in statement \["/>
     </dbms>
 
 </root>

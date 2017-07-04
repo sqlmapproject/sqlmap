@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -15,6 +15,7 @@ import os
 import sys
 import tempfile
 
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_SIZE
 
@@ -79,7 +80,7 @@ class BigArray(list):
                     self.chunks[-1] = pickle.load(fp)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
-                errMsg += "from a temporary file ('%s')" % ex
+                errMsg += "from a temporary file ('%s')" % ex.message
                 raise SqlmapSystemException, errMsg
         return self.chunks[-1].pop()
 
@@ -91,7 +92,7 @@ class BigArray(list):
 
     def _dump(self, chunk):
         try:
-            handle, filename = tempfile.mkstemp()
+            handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
             self.filenames.add(filename)
             os.close(handle)
             with open(filename, "w+b") as fp:
@@ -99,7 +100,7 @@ class BigArray(list):
             return filename
         except (OSError, IOError), ex:
             errMsg = "exception occurred while storing data "
-            errMsg += "to a temporary file ('%s'). Please " % ex
+            errMsg += "to a temporary file ('%s'). Please " % ex.message
             errMsg += "make sure that there is enough disk space left. If problem persists, "
             errMsg += "try to set environment variable 'TEMP' to a location "
             errMsg += "writeable by the current user"
@@ -115,7 +116,7 @@ class BigArray(list):
                     self.cache = Cache(index, pickle.load(fp), False)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
-                errMsg += "from a temporary file ('%s')" % ex
+                errMsg += "from a temporary file ('%s')" % ex.message
                 raise SqlmapSystemException, errMsg
 
     def __getstate__(self):

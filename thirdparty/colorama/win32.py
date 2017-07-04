@@ -1,51 +1,30 @@
+# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
 
 # from winbase.h
 STDOUT = -11
 STDERR = -12
 
 try:
-    from ctypes import windll
-except ImportError:
+    import ctypes
+    from ctypes import LibraryLoader
+    windll = LibraryLoader(ctypes.WinDLL)
+    from ctypes import wintypes
+except (AttributeError, ImportError):
     windll = None
     SetConsoleTextAttribute = lambda *_: None
+    winapi_test = lambda *_: None
 else:
-    from ctypes import (
-        byref, Structure, c_char, c_short, c_uint32, c_ushort
-    )
+    from ctypes import byref, Structure, c_char, POINTER
 
-    handles = {
-        STDOUT: windll.kernel32.GetStdHandle(STDOUT),
-        STDERR: windll.kernel32.GetStdHandle(STDERR),
-    }
-
-    SHORT = c_short
-    WORD = c_ushort
-    DWORD = c_uint32
-    TCHAR = c_char
-
-    class COORD(Structure):
-        """struct in wincon.h"""
-        _fields_ = [
-            ('X', SHORT),
-            ('Y', SHORT),
-        ]
-
-    class  SMALL_RECT(Structure):
-        """struct in wincon.h."""
-        _fields_ = [
-            ("Left", SHORT),
-            ("Top", SHORT),
-            ("Right", SHORT),
-            ("Bottom", SHORT),
-        ]
+    COORD = wintypes._COORD
 
     class CONSOLE_SCREEN_BUFFER_INFO(Structure):
         """struct in wincon.h."""
         _fields_ = [
             ("dwSize", COORD),
             ("dwCursorPosition", COORD),
-            ("wAttributes", WORD),
-            ("srWindow", SMALL_RECT),
+            ("wAttributes", wintypes.WORD),
+            ("srWindow", wintypes.SMALL_RECT),
             ("dwMaximumWindowSize", COORD),
         ]
         def __str__(self):
@@ -57,20 +36,83 @@ else:
                 , self.dwMaximumWindowSize.Y, self.dwMaximumWindowSize.X
             )
 
+    _GetStdHandle = windll.kernel32.GetStdHandle
+    _GetStdHandle.argtypes = [
+        wintypes.DWORD,
+    ]
+    _GetStdHandle.restype = wintypes.HANDLE
+
+    _GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
+    _GetConsoleScreenBufferInfo.argtypes = [
+        wintypes.HANDLE,
+        POINTER(CONSOLE_SCREEN_BUFFER_INFO),
+    ]
+    _GetConsoleScreenBufferInfo.restype = wintypes.BOOL
+
+    _SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
+    _SetConsoleTextAttribute.argtypes = [
+        wintypes.HANDLE,
+        wintypes.WORD,
+    ]
+    _SetConsoleTextAttribute.restype = wintypes.BOOL
+
+    _SetConsoleCursorPosition = windll.kernel32.SetConsoleCursorPosition
+    _SetConsoleCursorPosition.argtypes = [
+        wintypes.HANDLE,
+        COORD,
+    ]
+    _SetConsoleCursorPosition.restype = wintypes.BOOL
+
+    _FillConsoleOutputCharacterA = windll.kernel32.FillConsoleOutputCharacterA
+    _FillConsoleOutputCharacterA.argtypes = [
+        wintypes.HANDLE,
+        c_char,
+        wintypes.DWORD,
+        COORD,
+        POINTER(wintypes.DWORD),
+    ]
+    _FillConsoleOutputCharacterA.restype = wintypes.BOOL
+
+    _FillConsoleOutputAttribute = windll.kernel32.FillConsoleOutputAttribute
+    _FillConsoleOutputAttribute.argtypes = [
+        wintypes.HANDLE,
+        wintypes.WORD,
+        wintypes.DWORD,
+        COORD,
+        POINTER(wintypes.DWORD),
+    ]
+    _FillConsoleOutputAttribute.restype = wintypes.BOOL
+
+    _SetConsoleTitleW = windll.kernel32.SetConsoleTitleA
+    _SetConsoleTitleW.argtypes = [
+        wintypes.LPCSTR
+    ]
+    _SetConsoleTitleW.restype = wintypes.BOOL
+
+    handles = {
+        STDOUT: _GetStdHandle(STDOUT),
+        STDERR: _GetStdHandle(STDERR),
+    }
+
+    def winapi_test():
+        handle = handles[STDOUT]
+        csbi = CONSOLE_SCREEN_BUFFER_INFO()
+        success = _GetConsoleScreenBufferInfo(
+            handle, byref(csbi))
+        return bool(success)
+
     def GetConsoleScreenBufferInfo(stream_id=STDOUT):
         handle = handles[stream_id]
         csbi = CONSOLE_SCREEN_BUFFER_INFO()
-        success = windll.kernel32.GetConsoleScreenBufferInfo(
+        success = _GetConsoleScreenBufferInfo(
             handle, byref(csbi))
         return csbi
 
-
     def SetConsoleTextAttribute(stream_id, attrs):
         handle = handles[stream_id]
-        return windll.kernel32.SetConsoleTextAttribute(handle, attrs)
+        return _SetConsoleTextAttribute(handle, attrs)
 
-
-    def SetConsoleCursorPosition(stream_id, position):
+    def SetConsoleCursorPosition(stream_id, position, adjust=True):
         position = COORD(*position)
         # If the position is out of range, do nothing.
         if position.Y <= 0 or position.X <= 0:
@@ -79,31 +121,34 @@ else:
         #    1. being 0-based, while ANSI is 1-based.
         #    2. expecting (x,y), while ANSI uses (y,x).
         adjusted_position = COORD(position.Y - 1, position.X - 1)
-        # Adjust for viewport's scroll position
-        sr = GetConsoleScreenBufferInfo(STDOUT).srWindow
-        adjusted_position.Y += sr.Top
-        adjusted_position.X += sr.Left
+        if adjust:
+            # Adjust for viewport's scroll position
+            sr = GetConsoleScreenBufferInfo(STDOUT).srWindow
+            adjusted_position.Y += sr.Top
+            adjusted_position.X += sr.Left
         # Resume normal processing
         handle = handles[stream_id]
-        return windll.kernel32.SetConsoleCursorPosition(handle, adjusted_position)
+        return _SetConsoleCursorPosition(handle, adjusted_position)
 
     def FillConsoleOutputCharacter(stream_id, char, length, start):
         handle = handles[stream_id]
-        char = TCHAR(char)
-        length = DWORD(length)
-        num_written = DWORD(0)
+        char = c_char(char.encode())
+        length = wintypes.DWORD(length)
+        num_written = wintypes.DWORD(0)
         # Note that this is hard-coded for ANSI (vs wide) bytes.
-        success = windll.kernel32.FillConsoleOutputCharacterA(
+        success = _FillConsoleOutputCharacterA(
             handle, char, length, start, byref(num_written))
         return num_written.value
 
     def FillConsoleOutputAttribute(stream_id, attr, length, start):
         ''' FillConsoleOutputAttribute( hConsole, csbi.wAttributes, dwConSize, coordScreen, &cCharsWritten )'''
         handle = handles[stream_id]
-        attribute = WORD(attr)
-        length = DWORD(length)
-        num_written = DWORD(0)
+        attribute = wintypes.WORD(attr)
+        length = wintypes.DWORD(length)
+        num_written = wintypes.DWORD(0)
         # Note that this is hard-coded for ANSI (vs wide) bytes.
-        return windll.kernel32.FillConsoleOutputAttribute(
+        return _FillConsoleOutputAttribute(
             handle, attribute, length, start, byref(num_written))
 
+    def SetConsoleTitle(title):
+        return _SetConsoleTitleW(title)

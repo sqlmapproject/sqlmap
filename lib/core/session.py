@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2015 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
 See the file 'doc/COPYING' for copying permission
 """
 
@@ -26,12 +26,14 @@ def setDbms(dbms):
     hashDBWrite(HASHDB_KEYS.DBMS, dbms)
 
     _ = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
-    _ = re.search("^%s" % _, dbms, re.I)
+    _ = re.search(r"\A%s( |\Z)" % _, dbms, re.I)
 
     if _:
         dbms = _.group(1)
 
     Backend.setDbms(dbms)
+    if kb.resolutionDbms:
+        hashDBWrite(HASHDB_KEYS.DBMS, kb.resolutionDbms)
 
     logger.info("the back-end DBMS is %s" % Backend.getDbms())
 

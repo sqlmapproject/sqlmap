@@ -12,7 +12,7 @@ This file lists bundled packages and their associated licensing terms.
   Copyright (C) 2005, Zope Corporation.
   Copyright (C) 1998-2000, Gisle Aas.
 * The Colorama library located under thirdparty/colorama/.
-  Copyright (C) 2010, Jonathan Hartley.
+  Copyright (C) 2013, Jonathan Hartley.
 * The Fcrypt library located under thirdparty/fcrypt/.
   Copyright (C) 2000, 2001, 2004 Carey Evans.
 * The Odict library located under thirdparty/odict/.
@@ -281,8 +281,6 @@ be bound by the terms and conditions of this License Agreement.
 
 * The bottle web framework library located under thirdparty/bottle/.
   Copyright (C) 2012, Marcel Hellkamp.
-* The PageRank library located under thirdparty/pagerank/.
-  Copyright (C) 2010, Corey Goldberg.
 * The Termcolor library located under thirdparty/termcolor/.
   Copyright (C) 2008-2011, Volvox Development Team.
 
@@ -312,3 +310,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 * The PyDes library located under thirdparty/pydes/.
    Copyleft 2009, Todd Whiteman.
+* The win_inet_pton library located under thirdparty/wininetpton/.
+   Copyleft 2014, Ryan Vennell.

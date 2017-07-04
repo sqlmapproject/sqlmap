@@ -20,8 +20,8 @@ def check(module):
         print "CHECKING ", module
         pout = os.popen("pylint --rcfile=/dev/null %s" % module, 'r')
         for line in pout:
-            if  re.match("E....:.", line):
-                print line
+            if  re.match("\AE:", line):
+                print line.strip()
             if __RATING__ and "Your code has been rated at" in line:
                 print line
                 score = re.findall("\d.\d\d", line)[0]
