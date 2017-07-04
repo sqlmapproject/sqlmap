@@ -223,6 +223,8 @@ class Connect(object):
         the target URL page content
         """
 
+        start = time.time()
+
         if isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
 
@@ -288,7 +290,7 @@ class Connect(object):
         status = None
 
         _ = urlparse.urlsplit(url)
-        requestMsg = u"HTTP request [#%d]:\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
+        requestMsg = u"HTTP request [#%d]:\r\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
         requestMsg += getUnicode(("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling, checking)) else url)
         responseMsg = u"HTTP response "
         requestHeaders = u""
@@ -413,13 +415,13 @@ class Connect(object):
                 responseHeaders = _(ws.getheaders())
                 responseHeaders.headers = ["%s: %s\r\n" % (_[0].capitalize(), _[1]) for _ in responseHeaders.items()]
 
-                requestHeaders += "\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
-                requestMsg += "\n%s" % requestHeaders
+                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+                requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
-                    requestMsg += "\n\n%s" % getUnicode(post)
+                    requestMsg += "\r\n\r\n%s" % getUnicode(post)
 
-                requestMsg += "\n"
+                requestMsg += "\r\n"
 
                 threadData.lastRequestMsg = requestMsg
 
@@ -432,26 +434,26 @@ class Connect(object):
                 else:
                     req = urllib2.Request(url, post, headers)
 
-                requestHeaders += "\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in req.header_items()])
+                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in req.header_items()])
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
                     conf.cj._policy._now = conf.cj._now = int(time.time())
                     cookies = conf.cj._cookies_for_request(req)
-                    requestHeaders += "\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
+                    requestHeaders += "\r\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
                 if post is not None:
                     if not getRequestHeader(req, HTTP_HEADER.CONTENT_LENGTH):
-                        requestHeaders += "\n%s: %d" % (string.capwords(HTTP_HEADER.CONTENT_LENGTH), len(post))
+                        requestHeaders += "\r\n%s: %d" % (string.capwords(HTTP_HEADER.CONTENT_LENGTH), len(post))
 
                 if not getRequestHeader(req, HTTP_HEADER.CONNECTION):
-                    requestHeaders += "\n%s: %s" % (HTTP_HEADER.CONNECTION, "close" if not conf.keepAlive else "keep-alive")
+                    requestHeaders += "\r\n%s: %s" % (HTTP_HEADER.CONNECTION, "close" if not conf.keepAlive else "keep-alive")
 
-                requestMsg += "\n%s" % requestHeaders
+                requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
-                    requestMsg += "\n\n%s" % getUnicode(post)
+                    requestMsg += "\r\n\r\n%s" % getUnicode(post)
 
-                requestMsg += "\n"
+                requestMsg += "\r\n"
 
                 if not multipart:
                     threadData.lastRequestMsg = requestMsg
@@ -576,19 +578,19 @@ class Connect(object):
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
             kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
 
-            responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
+            responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = "\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+                logHeaders = "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
 
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
+            logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]), start, time.time())
 
             skipLogTraffic = True
 
             if conf.verbose <= 5:
                 responseMsg += getUnicode(logHeaders)
             elif conf.verbose > 5:
-                responseMsg += "%s\n\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
+                responseMsg += "%s\r\n\r\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
             if not multipart:
                 logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
@@ -736,20 +738,20 @@ class Connect(object):
                 requestMsg = re.sub("(?i)Content-length: \d+\n", "", requestMsg)
                 requestMsg = re.sub("(?s)\n\n.+", "\n", requestMsg)
 
-            responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, conn.code, status)
+            responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, conn.code, status)
         else:
-            responseMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, status)
+            responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, status)
 
         if responseHeaders:
-            logHeaders = "\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+            logHeaders = "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
 
         if not skipLogTraffic:
-            logHTTPTraffic(requestMsg, "%s%s\n\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]))
+            logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]), start, time.time())
 
         if conf.verbose <= 5:
             responseMsg += getUnicode(logHeaders)
         elif conf.verbose > 5:
-            responseMsg += "%s\n\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
+            responseMsg += "%s\r\n\r\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
         if not multipart:
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)

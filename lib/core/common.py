@@ -2597,13 +2597,13 @@ def runningAsAdmin():
 
     return isAdmin
 
-def logHTTPTraffic(requestLogMsg, responseLogMsg):
+def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
     """
     Logs HTTP traffic to the output file
     """
 
     if conf.harFile:
-        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg)
+        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg, startTime, endTime)
 
     if not conf.trafficFile:
         with kb.locks.log:
