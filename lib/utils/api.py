@@ -736,7 +736,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT):
             if not res["success"]:
                 logger.error("Failed to execute command %s" % command)
             dataToStdout("%s\n" % raw)
-        
+
         elif command.startswith("option"):
             if not taskid:
                 logger.error("No task ID in use")

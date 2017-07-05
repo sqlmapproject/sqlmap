@@ -112,9 +112,9 @@ def crawl(target):
                                         threadData.shared.deeper.add(url)
                                         if re.search(r"(.*?)\?(.+)", url):
                                             threadData.shared.value.add(url)
-                    except ValueError:          # for non-valid links
-                        pass
                     except UnicodeEncodeError:  # for non-HTML files
+                        pass
+                    except ValueError:          # for non-valid links
                         pass
                     finally:
                         if conf.forms:
