@@ -345,6 +345,10 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     kb.safeCharEncode = safeCharEncode
     kb.resumeValues = resumeValue
 
+    # Note: following keywords are expected to be in uppercase
+    for keyword in ("SELECT", "FROM", "WHERE"):
+        expression = re.sub("(?i)(\A|\(|\)|\s)%s(\Z|\(|\)|\s)" % keyword, r"\g<1>%s\g<2>" % keyword, expression)
+
     if suppressOutput is not None:
         pushValue(getCurrentThreadData().disableStdOut)
         getCurrentThreadData().disableStdOut = suppressOutput
@@ -356,7 +360,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         if expected == EXPECTED.BOOL:
             forgeCaseExpression = booleanExpression = expression
 
-            if expression.upper().startswith("SELECT "):
+            if expression.startswith("SELECT "):
                 booleanExpression = "(%s)=%s" % (booleanExpression, "'1'" if "'1'" in booleanExpression else "1")
             else:
                 forgeCaseExpression = agent.forgeCaseStatement(expression)
