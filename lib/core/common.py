@@ -1118,6 +1118,13 @@ def sanitizeStr(value):
     return getUnicode(value).replace("\n", " ").replace("\r", "")
 
 def getHeader(headers, key):
+    """
+    Returns header value ignoring the letter case
+
+    >>> getHeader({"Foo": "bar"}, "foo")
+    'bar'
+    """
+
     retVal = None
     for _ in (headers or {}):
         if _.upper() == key.upper():
@@ -1619,6 +1626,13 @@ def getRemoteIP():
     return retVal
 
 def getFileType(filePath):
+    """
+    Returns "magic" file type for given file path
+
+    >>> getFileType(__file__)
+    'text'
+    """
+
     try:
         _ = magic.from_file(filePath)
     except:
@@ -4387,6 +4401,9 @@ def getSafeExString(ex, encoding=None):
     """
     Safe way how to get the proper exception represtation as a string
     (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
+
+    >>> getSafeExString(Exception('foobar'))
+    u'foobar'
     """
 
     retVal = ex

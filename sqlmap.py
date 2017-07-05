@@ -331,7 +331,7 @@ def main():
 
         if conf.get("harFile"):
             with openFile(conf.harFile, "w+b") as f:
-                f.write(json.dumps(conf.httpCollector.obtain(), indent=4, separators=(',', ': ')))
+                json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
 
         if cmdLineOptions.get("sqlmapShell"):
             cmdLineOptions.clear()

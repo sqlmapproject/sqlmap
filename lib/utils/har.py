@@ -13,6 +13,7 @@ import re
 import StringIO
 import time
 
+from lib.core.bigarray import BigArray
 from lib.core.settings import VERSION
 
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
@@ -27,7 +28,7 @@ class HTTPCollectorFactory:
 
 class HTTPCollector:
     def __init__(self):
-        self.messages = []
+        self.messages = BigArray()
 
     def collectRequest(self, requestMessage, responseMessage, startTime=None, endTime=None):
         self.messages.append(RawPair(requestMessage, responseMessage, startTime, endTime))
