@@ -9,7 +9,10 @@ import sys
 
 sys.dont_write_bytecode = True
 
-__import__("lib.utils.versioncheck")  # this has to be the first non-standard import
+try:
+    __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
+except ImportError:
+    exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
 import bdb
 import distutils
