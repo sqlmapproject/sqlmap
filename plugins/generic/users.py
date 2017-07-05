@@ -393,7 +393,7 @@ class Users:
                     user = None
                     privileges = set()
 
-                    for count in xrange(0, len(value)):
+                    for count in xrange(0, len(value or [])):
                         # The first column is always the username
                         if count == 0:
                             user = value[count]
