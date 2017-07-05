@@ -46,7 +46,7 @@ b9ff4e622c416116bee6024c0f050349  lib/core/enums.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-938c43b15900804e53882140493ffb71  lib/core/settings.py
+e65c91771c87c114238f281e198f802c  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 baa3f47efa6701076d026e43a6874a51  lib/core/target.py
@@ -57,7 +57,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 4d13ed693401a498b6d073a2a494bd83  lib/core/wordlist.py
 310efc965c862cfbd7b0da5150a5ad36  lib/__init__.py
 8c4b04062db2245d9e190b413985202a  lib/parse/banner.py
-0557c5fee58f2578e0dd502b1839e3a3  lib/parse/cmdline.py
+d548e2bff2edae0b0e40364a439bb6d4  lib/parse/cmdline.py
 3a31657bc38f277d0016ff6d50bde61f  lib/parse/configfile.py
 14539f1be714d4f1ed042067d63bc50a  lib/parse/handler.py
 64e5bb3ecbdd75144500588b437ba8da  lib/parse/headers.py
@@ -103,7 +103,7 @@ a73c3ddd0de359507a8ad59b363aa963  lib/utils/api.py
 ed70f1ca9113664043ec9e6778e48078  lib/utils/crawler.py
 ba12c69a90061aa14d848b8396e79191  lib/utils/deps.py
 3b9fd519164e0bf275d5fd361c3f11ff  lib/utils/getch.py
-40e987b76120f0327f891d1cc7866f4e  lib/utils/har.py
+1cd7599b5e6addb29cbab85d292ccf6c  lib/utils/har.py
 ccfdad414ce2ec0c394c3deaa39a82bf  lib/utils/hashdb.py
 12e0e0ab70c6fe5786bc561c35dc067f  lib/utils/hash.py
 e76a08237ee6a4cd6855af79610ea8a5  lib/utils/htmlentities.py
@@ -201,7 +201,7 @@ deed74334b637767fc9de8f74b37647a  plugins/dbms/sybase/fingerprint.py
 45436a42c2bb8075e1482a950d993d55  plugins/dbms/sybase/__init__.py
 89412a921c8c598c19d36762d5820f05  plugins/dbms/sybase/syntax.py
 654cd5e69cf5e5c644bfa5d284e61206  plugins/dbms/sybase/takeover.py
-3371edd2292e3daec8df238034684232  plugins/generic/connector.py
+f700954549ad8ebf77f5187262fb9af0  plugins/generic/connector.py
 5390591ca955036d492de11355b52e8f  plugins/generic/custom.py
 4ad4bccc03256b8f3d21ba4f8f759404  plugins/generic/databases.py
 106f19c1d895963e2efa8ee193a537ec  plugins/generic/entries.py
@@ -224,7 +224,7 @@ c3cc8b7727161e64ab59f312c33b541a  shell/stager.aspx_
 1f7f125f30e0e800beb21e2ebbab18e1  shell/stager.jsp_
 01e3505e796edf19aad6a996101c81c9  shell/stager.php_
 0751a45ac4c130131f2cdb74d866b664  sqlmapapi.py
-290b98e6923960e17bdef3db0a05b44c  sqlmap.py
+f53c10492a13c9f53024d8a963bd86a3  sqlmap.py
 08c711a470d7e0bf705320ba3c48b886  tamper/apostrophemask.py
 e8509df10d3f1c28014d7825562d32dd  tamper/apostrophenullencode.py
 bb27f7dc980ea07fcfedbd7da5e5e029  tamper/appendnullbyte.py

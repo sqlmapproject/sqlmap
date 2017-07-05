@@ -13,7 +13,6 @@ import re
 import StringIO
 import time
 
-from lib.core.data import logger
 from lib.core.settings import VERSION
 
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html

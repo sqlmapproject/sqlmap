@@ -329,7 +329,7 @@ def main():
             except KeyboardInterrupt:
                 pass
 
-        if conf.harFile:
+        if conf.get("harFile"):
             with openFile(conf.harFile, "w+b") as f:
                 f.write(json.dumps(conf.httpCollector.obtain(), indent=4, separators=(',', ': ')))
 
