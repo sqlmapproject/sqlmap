@@ -287,6 +287,9 @@ def main():
             elif "valueStack.pop" in excMsg and kb.get("dumpKeyboardInterrupt"):
                 raise SystemExit
 
+            elif any(_ in excMsg for _ in ("Broken pipe",)):
+                raise SystemExit
+
             for match in re.finditer(r'File "(.+?)", line', excMsg):
                 file_ = match.group(1)
                 file_ = os.path.relpath(file_, os.path.dirname(__file__))
