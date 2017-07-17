@@ -347,6 +347,12 @@ class Agent(object):
         if payload:
             payload = payload.replace(SLEEP_TIME_MARKER, str(conf.timeSec))
 
+            for _ in set(re.findall(r"\[RANDNUM(?:\d+)?\]", payload, re.I)):
+                payload = payload.replace(_, str(randomInt()))
+
+            for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
+                payload = payload.replace(_, randomStr())
+
         return payload
 
     def getComment(self, request):

@@ -11,7 +11,6 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapUndefinedMethod
-from lib.core.settings import UNICODE_ENCODING
 
 class Connector:
     """

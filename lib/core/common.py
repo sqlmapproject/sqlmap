@@ -1118,6 +1118,13 @@ def sanitizeStr(value):
     return getUnicode(value).replace("\n", " ").replace("\r", "")
 
 def getHeader(headers, key):
+    """
+    Returns header value ignoring the letter case
+
+    >>> getHeader({"Foo": "bar"}, "foo")
+    'bar'
+    """
+
     retVal = None
     for _ in (headers or {}):
         if _.upper() == key.upper():
@@ -1619,6 +1626,13 @@ def getRemoteIP():
     return retVal
 
 def getFileType(filePath):
+    """
+    Returns "magic" file type for given file path
+
+    >>> getFileType(__file__)
+    'text'
+    """
+
     try:
         _ = magic.from_file(filePath)
     except:
@@ -2597,13 +2611,13 @@ def runningAsAdmin():
 
     return isAdmin
 
-def logHTTPTraffic(requestLogMsg, responseLogMsg):
+def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
     """
     Logs HTTP traffic to the output file
     """
 
     if conf.harFile:
-        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg)
+        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg, startTime, endTime)
 
     if not conf.trafficFile:
         with kb.locks.log:
@@ -3535,11 +3549,11 @@ def safeSQLIdentificatorNaming(name, isTable=False):
         if retVal.upper() in kb.keywords or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ("." if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
                 retVal = "`%s`" % retVal.strip("`")
-            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2):
+            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.INFORMIX, DBMS.HSQLDB):
                 retVal = "\"%s\"" % retVal.strip("\"")
             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
                 retVal = "\"%s\"" % retVal.strip("\"").upper()
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,) and ((retVal or " ")[0].isdigit() or not re.match(r"\A\w+\Z", retVal, re.U)):
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and ((retVal or " ")[0].isdigit() or not re.match(r"\A\w+\Z", retVal, re.U)):
                 retVal = "[%s]" % retVal.strip("[]")
 
         if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
@@ -4387,6 +4401,9 @@ def getSafeExString(ex, encoding=None):
     """
     Safe way how to get the proper exception represtation as a string
     (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
+
+    >>> getSafeExString(Exception('foobar'))
+    u'foobar'
     """
 
     retVal = ex

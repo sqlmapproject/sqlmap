@@ -20,6 +20,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
+from lib.core.common import isNumPosStrValue
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import paramToDict
@@ -436,7 +437,7 @@ def _resumeHashDBValues():
     kb.xpCmdshellAvailable = hashDBRetrieve(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE) or kb.xpCmdshellAvailable
 
     kb.errorChunkLength = hashDBRetrieve(HASHDB_KEYS.KB_ERROR_CHUNK_LENGTH)
-    if kb.errorChunkLength and kb.errorChunkLength.isdigit():
+    if isNumPosStrValue(kb.errorChunkLength):
         kb.errorChunkLength = int(kb.errorChunkLength)
     else:
         kb.errorChunkLength = None

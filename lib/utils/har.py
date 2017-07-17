@@ -7,28 +7,31 @@ See the file 'doc/COPYING' for copying permission
 
 import base64
 import BaseHTTPServer
+import datetime
 import httplib
 import re
 import StringIO
+import time
 
-from lib.core.data import logger
+from lib.core.bigarray import BigArray
 from lib.core.settings import VERSION
+
+# Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
+#            http://www.softwareishard.com/har/viewer/
 
 class HTTPCollectorFactory:
     def __init__(self, harFile=False):
         self.harFile = harFile
 
     def create(self):
-        collector = HTTPCollector()
-
-        return collector
+        return HTTPCollector()
 
 class HTTPCollector:
     def __init__(self):
-        self.messages = []
+        self.messages = BigArray()
 
-    def collectRequest(self, requestMessage, responseMessage):
-        self.messages.append(RawPair(requestMessage, responseMessage))
+    def collectRequest(self, requestMessage, responseMessage, startTime=None, endTime=None):
+        self.messages.append(RawPair(requestMessage, responseMessage, startTime, endTime))
 
     def obtain(self):
         return {"log": {
@@ -38,23 +41,30 @@ class HTTPCollector:
         }}
 
 class RawPair:
-    def __init__(self, request, response):
+    def __init__(self, request, response, startTime=None, endTime=None):
         self.request = request
         self.response = response
+        self.startTime = startTime
+        self.endTime = endTime
 
     def toEntry(self):
-        return Entry(request=Request.parse(self.request),
-                     response=Response.parse(self.response))
+        return Entry(request=Request.parse(self.request), response=Response.parse(self.response), startTime=self.startTime, endTime=self.endTime)
 
 class Entry:
-    def __init__(self, request, response):
+    def __init__(self, request, response, startTime, endTime):
         self.request = request
         self.response = response
+        self.startTime = startTime or 0
+        self.endTime = endTime or 0
 
     def toDict(self):
         return {
             "request": self.request.toDict(),
             "response": self.response.toDict(),
+            "cache": {},
+            "timings": [],
+            "time": int(1000 * (self.endTime - self.startTime)),
+            "startedDateTime": "%s%s" % (datetime.datetime.fromtimestamp(self.startTime).isoformat(), time.strftime("%z")) if self.startTime else None
         }
 
 class Request:
@@ -64,7 +74,7 @@ class Request:
         self.httpVersion = httpVersion
         self.headers = headers or {}
         self.postBody = postBody
-        self.comment = comment
+        self.comment = comment.strip() if comment else comment
         self.raw = raw
 
     @classmethod
@@ -89,6 +99,10 @@ class Request:
             "method": self.method,
             "url": self.url,
             "headers": [dict(name=key.capitalize(), value=value) for key, value in self.headers.items()],
+            "cookies": [],
+            "queryString": [],
+            "headersSize": -1,
+            "bodySize": -1,
             "comment": self.comment,
         }
 
@@ -111,7 +125,7 @@ class Response:
         self.statusText = statusText
         self.headers = headers
         self.content = content
-        self.comment = comment
+        self.comment = comment.strip() if comment else comment
 
     @classmethod
     def parse(cls, raw):
@@ -124,7 +138,7 @@ class Response:
             parts = cls.extract_status.search(first_line)
             status_line = "HTTP/1.0 %s %s" % (parts.group(1), parts.group(2))
             remain = io.read()
-            altered = status_line + "\n" + remain
+            altered = status_line + "\r\n" + remain
             comment = first_line
 
         response = httplib.HTTPResponse(FakeSocket(altered))
@@ -133,7 +147,7 @@ class Response:
         try:
             content = response.read(-1)
         except httplib.IncompleteRead:
-            content = raw[raw.find("\n\n") + 2:].rstrip("\r\n")
+            content = raw[raw.find("\r\n\r\n") + 4:].rstrip("\r\n")
 
         return cls(httpVersion="HTTP/1.1" if response.version == 11 else "HTTP/1.0",
                    status=response.status,
@@ -147,6 +161,7 @@ class Response:
         content = {
             "mimeType": self.headers.get("Content-Type"),
             "text": self.content,
+            "size": len(self.content or "")
         }
 
         binary = set(['\0', '\1'])
@@ -159,7 +174,11 @@ class Response:
             "status": self.status,
             "statusText": self.statusText,
             "headers": [dict(name=key.capitalize(), value=value) for key, value in self.headers.items() if key.lower() != "uri"],
+            "cookies": [],
             "content": content,
+            "headersSize": -1,
+            "bodySize": -1,
+            "redirectURL": "",
             "comment": self.comment,
         }
 

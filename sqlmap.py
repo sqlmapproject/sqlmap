@@ -9,7 +9,10 @@ import sys
 
 sys.dont_write_bytecode = True
 
-__import__("lib.utils.versioncheck")  # this has to be the first non-standard import
+try:
+    __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
+except ImportError:
+    exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
 import bdb
 import distutils
@@ -284,6 +287,9 @@ def main():
             elif "valueStack.pop" in excMsg and kb.get("dumpKeyboardInterrupt"):
                 raise SystemExit
 
+            elif any(_ in excMsg for _ in ("Broken pipe",)):
+                raise SystemExit
+
             for match in re.finditer(r'File "(.+?)", line', excMsg):
                 file_ = match.group(1)
                 file_ = os.path.relpath(file_, os.path.dirname(__file__))
@@ -329,9 +335,9 @@ def main():
             except KeyboardInterrupt:
                 pass
 
-        if conf.harFile:
+        if conf.get("harFile"):
             with openFile(conf.harFile, "w+b") as f:
-                f.write(json.dumps(conf.httpCollector.obtain(), indent=4, separators=(',', ': ')))
+                json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
 
         if cmdLineOptions.get("sqlmapShell"):
             cmdLineOptions.clear()

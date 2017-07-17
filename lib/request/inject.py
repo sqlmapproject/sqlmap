@@ -42,6 +42,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
@@ -345,6 +346,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     kb.safeCharEncode = safeCharEncode
     kb.resumeValues = resumeValue
 
+    for keyword in GET_VALUE_UPPERCASE_KEYWORDS:
+        expression = re.sub("(?i)(\A|\(|\)|\s)%s(\Z|\(|\)|\s)" % keyword, r"\g<1>%s\g<2>" % keyword, expression)
+
     if suppressOutput is not None:
         pushValue(getCurrentThreadData().disableStdOut)
         getCurrentThreadData().disableStdOut = suppressOutput
@@ -356,7 +360,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         if expected == EXPECTED.BOOL:
             forgeCaseExpression = booleanExpression = expression
 
-            if expression.upper().startswith("SELECT "):
+            if expression.startswith("SELECT "):
                 booleanExpression = "(%s)=%s" % (booleanExpression, "'1'" if "'1'" in booleanExpression else "1")
             else:
                 forgeCaseExpression = agent.forgeCaseStatement(expression)
@@ -414,7 +418,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
                 if found and conf.dnsDomain:
-                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E": PAYLOAD.TECHNIQUE.ERROR, "Q": PAYLOAD.TECHNIQUE.QUERY, "U": PAYLOAD.TECHNIQUE.UNION}.items())))
+                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {'E': PAYLOAD.TECHNIQUE.ERROR, 'Q': PAYLOAD.TECHNIQUE.QUERY, 'U': PAYLOAD.TECHNIQUE.UNION}.items())))
                     warnMsg = "option '--dns-domain' will be ignored "
                     warnMsg += "as faster techniques are usable "
                     warnMsg += "(%s) " % _

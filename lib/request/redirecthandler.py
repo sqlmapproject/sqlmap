@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 import re
+import time
 import types
 import urllib2
 import urlparse
@@ -69,6 +70,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         return urllib2.Request(newurl, data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
 
     def http_error_302(self, req, fp, code, msg, headers):
+        start = time.time()
         content = None
         redurl = self._get_header_redirect(headers) if not conf.ignoreRedirects else None
 
@@ -92,18 +94,18 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
 
         redirectMsg = "HTTP redirect "
-        redirectMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
+        redirectMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
         if headers:
-            logHeaders = "\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in headers.items())
+            logHeaders = "\r\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in headers.items())
         else:
             logHeaders = ""
 
         redirectMsg += logHeaders
         if content:
-            redirectMsg += "\n\n%s" % getUnicode(content[:MAX_CONNECTION_CHUNK_SIZE])
+            redirectMsg += "\r\n\r\n%s" % getUnicode(content[:MAX_CONNECTION_CHUNK_SIZE])
 
-        logHTTPTraffic(threadData.lastRequestMsg, redirectMsg)
+        logHTTPTraffic(threadData.lastRequestMsg, redirectMsg, start, time.time())
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
 
         if redurl:
