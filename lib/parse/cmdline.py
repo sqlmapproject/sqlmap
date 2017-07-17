@@ -150,6 +150,9 @@ def cmdLineParser(argv=None):
         request.add_option("--auth-file", dest="authFile",
                            help="HTTP authentication PEM cert/private key file")
 
+        request.add_option("--ignore-400", dest="ignore400", action="store_true",
+                          help="Suppress HTTP Error 400 (Bad Request)")
+
         request.add_option("--ignore-401", dest="ignore401", action="store_true",
                           help="Ignore HTTP Error 401 (Unauthorized)")
 

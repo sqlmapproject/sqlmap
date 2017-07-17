@@ -619,8 +619,9 @@ class Connect(object):
                     else:
                         raise SqlmapConnectionException(warnMsg)
             else:
-                debugMsg = "got HTTP error code: %d (%s)" % (code, status)
-                logger.debug(debugMsg)
+		if ex.code == httplib.BAD_REQUEST and not conf.ignore400:
+			debugMsg = "got HTTP error code: %d (%s)" % (code, status)
+			logger.debug(debugMsg)
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError):
             tbMsg = traceback.format_exc()
