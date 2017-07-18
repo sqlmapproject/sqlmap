@@ -232,6 +232,10 @@ def cmdLineParser(argv=None):
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 
+        # Attempt to replace CUSTOM_INJECTION_MARK_CHAR with something dynamic
+        request.add_option("--custom-injection-char", dest="customInjectionChar", default='*',
+                           help="Assign a different character to be used as injection identifier")
+
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These "
                                "options can be used to optimize the "

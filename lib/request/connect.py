@@ -901,7 +901,7 @@ class Connect(object):
             post = value
 
         if PLACE.CUSTOM_POST in conf.parameters:
-            post = conf.parameters[PLACE.CUSTOM_POST].replace(CUSTOM_INJECTION_MARK_CHAR, "") if place != PLACE.CUSTOM_POST or not value else value
+            post = conf.parameters[PLACE.CUSTOM_POST].replace(conf.customInjectionChar, "") if place != PLACE.CUSTOM_POST or not value else value
             post = post.replace(ASTERISK_MARKER, '*') if post else post
 
         if PLACE.COOKIE in conf.parameters:

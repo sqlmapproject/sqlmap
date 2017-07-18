@@ -280,7 +280,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     method = match.group(1)
                     url = match.group(2)
 
-                    if any(_ in line for _ in ('?', '=', CUSTOM_INJECTION_MARK_CHAR)):
+                    if any(_ in line for _ in ('?', '=', conf.customInjectionChar)):
                         params = True
 
                     getPostReq = True
@@ -320,7 +320,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
                         headers.append((getUnicode(key), getUnicode(value)))
 
-                    if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
+                    if conf.customInjectionChar in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
                         params = True
 
             data = data.rstrip("\r\n") if data else data
@@ -539,9 +539,10 @@ def _doSearch():
 
         for link in links:
             link = urldecode(link)
+            _URI_INJECTABLE_REGEX = _URI_INJECTABLE_REGEX.replace('*',conf.customInjectionChar)
             if re.search(r"(.*?)\?(.+)", link):
                 kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
-            elif re.search(URI_INJECTABLE_REGEX, link, re.I):
+            elif re.search(_URI_INJECTABLE_REGEX, link, re.I):
                 if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
                     message = "do you want to scan only results containing GET parameters? [Y/n] "
                     kb.data.onlyGETs = readInput(message, default='Y', boolean=True)
@@ -593,7 +594,7 @@ def _setBulkMultipleTargets():
 
     found = False
     for line in getFileItems(conf.bulkFile):
-        if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
+        if re.match(r"[^ ]+\?(.+)", line, re.I) or conf.customInjectionChar in line:
             found = True
             kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
 
@@ -1686,10 +1687,10 @@ def _cleanupOptions():
         setOptimize()
 
     if conf.data:
-        conf.data = re.sub("(?i)%s" % INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.data)
+        conf.data = re.sub("(?i)%s" % INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), conf.customInjectionChar, conf.data)
 
     if conf.url:
-        conf.url = re.sub("(?i)%s" % INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.url)
+        conf.url = re.sub("(?i)%s" % INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), conf.customInjectionChar, conf.url)
 
     if conf.os:
         conf.os = conf.os.capitalize()
