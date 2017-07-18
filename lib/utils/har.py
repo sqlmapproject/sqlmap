@@ -29,9 +29,15 @@ class HTTPCollectorFactory:
 class HTTPCollector:
     def __init__(self):
         self.messages = BigArray()
+        self.extendedArguments = {}
+
+    def setExtendedArguments(self, arguments):
+        self.extendedArguments = arguments
 
     def collectRequest(self, requestMessage, responseMessage, startTime=None, endTime=None):
-        self.messages.append(RawPair(requestMessage, responseMessage, startTime, endTime))
+        self.messages.append(RawPair(requestMessage, responseMessage,
+                                     startTime=startTime, endTime=endTime,
+                                     extendedArguments=self.extendedArguments))
 
     def obtain(self):
         return {"log": {
@@ -41,24 +47,28 @@ class HTTPCollector:
         }}
 
 class RawPair:
-    def __init__(self, request, response, startTime=None, endTime=None):
+    def __init__(self, request, response, startTime=None, endTime=None, extendedArguments=None):
         self.request = request
         self.response = response
         self.startTime = startTime
         self.endTime = endTime
+        self.extendedArguments = extendedArguments or {}
 
     def toEntry(self):
-        return Entry(request=Request.parse(self.request), response=Response.parse(self.response), startTime=self.startTime, endTime=self.endTime)
+        return Entry(request=Request.parse(self.request), response=Response.parse(self.response),
+                     startTime=self.startTime, endTime=self.endTime,
+                     extendedArguments=self.extendedArguments)
 
 class Entry:
-    def __init__(self, request, response, startTime, endTime):
+    def __init__(self, request, response, startTime, endTime, extendedArguments):
         self.request = request
         self.response = response
         self.startTime = startTime or 0
         self.endTime = endTime or 0
+        self.extendedArguments = extendedArguments
 
     def toDict(self):
-        return {
+        out = {
             "request": self.request.toDict(),
             "response": self.response.toDict(),
             "cache": {},
@@ -66,6 +76,8 @@ class Entry:
             "time": int(1000 * (self.endTime - self.startTime)),
             "startedDateTime": "%s%s" % (datetime.datetime.fromtimestamp(self.startTime).isoformat(), time.strftime("%z")) if self.startTime else None
         }
+        out.update(self.extendedArguments)
+        return out
 
 class Request:
     def __init__(self, method, path, httpVersion, headers, postBody=None, raw=None, comment=None):
