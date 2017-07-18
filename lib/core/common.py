@@ -654,7 +654,8 @@ def paramToDict(place, parameters=None):
                             except Exception:
                                 pass
 
-                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (CUSTOM_INJECTION_MARK_CHAR, len(match.groups())), testableParameters[parameter])
+                            print "Testing injection char %c"%conf.customInjectionChar
+                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (conf.customInjectionChar, len(match.groups())), testableParameters[parameter])
                             message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
 
@@ -1394,7 +1395,7 @@ def parseTargetUrl():
         else:
             conf.url = "http://" + conf.url
 
-    if CUSTOM_INJECTION_MARK_CHAR in conf.url:
+    if conf.customInjectionChar in conf.url:
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     try:
@@ -1412,7 +1413,7 @@ def parseTargetUrl():
     conf.hostname = hostnamePort[0].strip()
 
     conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
-    conf.hostname = conf.hostname.strip("[]").replace(CUSTOM_INJECTION_MARK_CHAR, "")
+    conf.hostname = conf.hostname.strip("[]").replace(conf.customInjectionChar, "")
 
     try:
         _ = conf.hostname.encode("idna")
@@ -1453,7 +1454,7 @@ def parseTargetUrl():
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
-        conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, "")))
+        conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(conf.customInjectionChar, "")))
 
     if not conf.host and (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5):
         debugMsg = "setting the HTTP Host header to the target URL"
@@ -2498,7 +2499,8 @@ def findMultipartPostBoundary(post):
 
     return retVal
 
-def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, plusspace=True):
+# def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, plusspace=True):
+def urldecode(value, encoding=None, unsafe="UNSAFE_IDENTIFIER", convall=False, plusspace=True):
     """
     URL decodes given value
 
@@ -2506,6 +2508,8 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
     u'AND 1>(2+3)#'
     """
 
+    if unsafe == "UNSAFE_IDENTIFIER":
+        unsafe = "%%&=;+%s"%conf.customInjectionChar
     result = value
 
     if value:
