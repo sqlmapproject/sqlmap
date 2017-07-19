@@ -72,7 +72,7 @@ class Entry:
             "request": self.request.toDict(),
             "response": self.response.toDict(),
             "cache": {},
-            "timings": [],
+            "timings": {},
             "time": int(1000 * (self.endTime - self.startTime)),
             "startedDateTime": "%s%s" % (datetime.datetime.fromtimestamp(self.startTime).isoformat(), time.strftime("%z")) if self.startTime else None
         }
