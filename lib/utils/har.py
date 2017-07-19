@@ -144,7 +144,7 @@ class Response:
         altered = raw
         comment = ""
 
-        if altered.startswith("HTTP response ["):
+        if altered.startswith("HTTP response [") or altered.startswith("HTTP redirect ["):
             io = StringIO.StringIO(raw)
             first_line = io.readline()
             parts = cls.extract_status.search(first_line)
