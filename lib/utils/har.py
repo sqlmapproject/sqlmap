@@ -142,7 +142,7 @@ class Response:
     @classmethod
     def parse(cls, raw):
         altered = raw
-        comment = None
+        comment = ""
 
         if altered.startswith("HTTP response ["):
             io = StringIO.StringIO(raw)
