@@ -2619,7 +2619,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
     if conf.harFile:
         conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg, startTime, endTime)
 
-    if not conf.trafficFile:
+    if conf.trafficFile:
         with kb.locks.log:
             dataToTrafficFile("%s%s" % (requestLogMsg, os.linesep))
             dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
