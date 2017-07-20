@@ -110,7 +110,7 @@ from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORTS
 from lib.core.settings import DUMMY_URL
-from lib.core.settings import INJECT_HERE_MARK
+from lib.core.settings import INJECT_HERE_REGEX
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
 from lib.core.settings import KB_CHARS_LOW_FREQUENCY_ALPHABET
@@ -280,7 +280,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     method = match.group(1)
                     url = match.group(2)
 
-                    if any(_ in line for _ in ('?', '=', CUSTOM_INJECTION_MARK_CHAR)):
+                    if any(_ in line for _ in ('?', '=', kb.customInjectionMark)):
                         params = True
 
                     getPostReq = True
@@ -320,7 +320,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                     elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
                         headers.append((getUnicode(key), getUnicode(value)))
 
-                    if CUSTOM_INJECTION_MARK_CHAR in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
+                    if kb.customInjectionMark in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
                         params = True
 
             data = data.rstrip("\r\n") if data else data
@@ -593,7 +593,7 @@ def _setBulkMultipleTargets():
 
     found = False
     for line in getFileItems(conf.bulkFile):
-        if re.match(r"[^ ]+\?(.+)", line, re.I) or CUSTOM_INJECTION_MARK_CHAR in line:
+        if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line:
             found = True
             kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
 
@@ -1685,11 +1685,13 @@ def _cleanupOptions():
     if conf.optimize:
         setOptimize()
 
-    if conf.data:
-        conf.data = re.sub("(?i)%s" % INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.data)
+    match = re.search(INJECT_HERE_REGEX, conf.data or "")
+    if match:
+        kb.customInjectionMark = match.group(0)
 
-    if conf.url:
-        conf.url = re.sub("(?i)%s" % INJECT_HERE_MARK.replace(" ", r"[^A-Za-z]*"), CUSTOM_INJECTION_MARK_CHAR, conf.url)
+    match = re.search(INJECT_HERE_REGEX, conf.url or "")
+    if match:
+        kb.customInjectionMark = match.group(0)
 
     if conf.os:
         conf.os = conf.os.capitalize()
@@ -1894,6 +1896,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.connErrorCounter = 0
     kb.cookieEncodeChoice = None
     kb.counters = {}
+    kb.customInjectionMark = CUSTOM_INJECTION_MARK_CHAR
     kb.data = AttribDict()
     kb.dataOutputFlag = False
 

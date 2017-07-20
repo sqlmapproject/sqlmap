@@ -321,7 +321,7 @@ def cmdLineParser(argv=None):
 
         detection.add_option("--risk", dest="risk", type="int",
                              help="Risk of tests to perform (1-3, "
-                                  "default %d)" % defaults.level)
+                                  "default %d)" % defaults.risk)
 
         detection.add_option("--string", dest="string",
                              help="String to match when "

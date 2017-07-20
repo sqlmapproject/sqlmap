@@ -97,8 +97,8 @@ from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_TARGET_MARK
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DBMS_DIRECTORY_DICT
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
@@ -654,7 +654,7 @@ def paramToDict(place, parameters=None):
                             except Exception:
                                 pass
 
-                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (CUSTOM_INJECTION_MARK_CHAR, len(match.groups())), testableParameters[parameter])
+                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())), testableParameters[parameter])
                             message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
 
@@ -1394,7 +1394,7 @@ def parseTargetUrl():
         else:
             conf.url = "http://" + conf.url
 
-    if CUSTOM_INJECTION_MARK_CHAR in conf.url:
+    if kb.customInjectionMark in conf.url:
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     try:
@@ -1412,7 +1412,7 @@ def parseTargetUrl():
     conf.hostname = hostnamePort[0].strip()
 
     conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
-    conf.hostname = conf.hostname.strip("[]").replace(CUSTOM_INJECTION_MARK_CHAR, "")
+    conf.hostname = conf.hostname.strip("[]").replace(kb.customInjectionMark, "")
 
     try:
         _ = conf.hostname.encode("idna")
@@ -1453,7 +1453,7 @@ def parseTargetUrl():
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
-        conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(CUSTOM_INJECTION_MARK_CHAR, "")))
+        conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(kb.customInjectionMark, "")))
 
     if not conf.host and (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5):
         debugMsg = "setting the HTTP Host header to the target URL"

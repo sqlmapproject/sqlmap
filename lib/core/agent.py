@@ -36,7 +36,6 @@ from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
@@ -101,7 +100,7 @@ class Agent(object):
         if place == PLACE.URI or BOUNDED_INJECTION_MARKER in origValue:
             paramString = origValue
             if place == PLACE.URI:
-                origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+                origValue = origValue.split(kb.customInjectionMark)[0]
             else:
                 origValue = filter(None, (re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z")))[0].group(0)
             origValue = origValue[origValue.rfind('/') + 1:]
@@ -110,7 +109,7 @@ class Agent(object):
                     origValue = origValue[origValue.rfind(char) + 1:]
         elif place == PLACE.CUSTOM_POST:
             paramString = origValue
-            origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            origValue = origValue.split(kb.customInjectionMark)[0]
             if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                 origValue = origValue.split('>')[-1]
             elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
@@ -120,7 +119,7 @@ class Agent(object):
                 origValue = _.split('=', 1)[1] if '=' in _ else ""
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
-            origValue = origValue.split(CUSTOM_INJECTION_MARK_CHAR)[0]
+            origValue = origValue.split(kb.customInjectionMark)[0]
             origValue = origValue[origValue.find(',') + 1:]
             match = re.search(r"([^;]+)=(?P<value>[^;]+);?\Z", origValue)
             if match:
@@ -159,14 +158,14 @@ class Agent(object):
         newValue = self.cleanupPayload(newValue, origValue)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
-            _ = "%s%s" % (origValue, CUSTOM_INJECTION_MARK_CHAR)
+            _ = "%s%s" % (origValue, kb.customInjectionMark)
             if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and not '"%s"' % _ in paramString:
                 newValue = '"%s"' % newValue
             elif kb.postHint == POST_HINT.JSON_LIKE and not isNumber(newValue) and not "'%s'" % _ in paramString:
                 newValue = "'%s'" % newValue
-            newValue = newValue.replace(CUSTOM_INJECTION_MARK_CHAR, REPLACEMENT_MARKER)
+            newValue = newValue.replace(kb.customInjectionMark, REPLACEMENT_MARKER)
             retVal = paramString.replace(_, self.addPayloadDelimiters(newValue))
-            retVal = retVal.replace(CUSTOM_INJECTION_MARK_CHAR, "").replace(REPLACEMENT_MARKER, CUSTOM_INJECTION_MARK_CHAR)
+            retVal = retVal.replace(kb.customInjectionMark, "").replace(REPLACEMENT_MARKER, kb.customInjectionMark)
         elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
             _ = "%s%s" % (origValue, BOUNDED_INJECTION_MARKER)
             retVal = "%s=%s" % (re.sub(r" (\#\d\*|\(.+\))\Z", "", parameter), paramString.replace(_, self.addPayloadDelimiters(newValue)))
