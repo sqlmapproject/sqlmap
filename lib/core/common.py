@@ -1436,7 +1436,7 @@ def parseTargetUrl():
     else:
         conf.port = 80
 
-    if conf.port < 0 or conf.port > 65535:
+    if conf.port < 1 or conf.port > 65535:
         errMsg = "invalid target URL's port (%d)" % conf.port
         raise SqlmapSyntaxException(errMsg)
 
