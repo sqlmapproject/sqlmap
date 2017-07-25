@@ -80,12 +80,12 @@ class Abstraction(Web, UDF, XP_cmdshell):
         if not self.alwaysRetrieveCmdOutput:
             message = "do you want to retrieve the command standard "
             message += "output? [Y/n/a] "
-            choice = readInput(message, default='Y')
+            choice = readInput(message, default='Y').upper()
 
-            if choice in ('a', 'A'):
+            if choice == 'A':
                 self.alwaysRetrieveCmdOutput = True
 
-        if not choice or choice in ('y', 'Y') or self.alwaysRetrieveCmdOutput:
+        if choice == 'Y' or self.alwaysRetrieveCmdOutput:
             output = self.evalCmd(cmd)
 
             if output:

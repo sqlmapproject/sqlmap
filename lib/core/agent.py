@@ -130,6 +130,8 @@ class Agent(object):
                 if header.upper() == HTTP_HEADER.AUTHORIZATION.upper():
                     origValue = origValue.split(' ')[-1].split(':')[-1]
 
+        origValue = origValue or ""
+
         if value is None:
             if where == PAYLOAD.WHERE.ORIGINAL:
                 value = origValue

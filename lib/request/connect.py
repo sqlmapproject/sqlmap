@@ -847,8 +847,7 @@ class Connect(object):
                     if place == PLACE.COOKIE or place == PLACE.CUSTOM_HEADER and value.split(',')[0] == HTTP_HEADER.COOKIE:
                         if kb.cookieEncodeChoice is None:
                             msg = "do you want to URL encode cookie values (implementation specific)? %s" % ("[Y/n]" if not conf.url.endswith(".aspx") else "[y/N]")  # Reference: https://support.microsoft.com/en-us/kb/313282
-                            choice = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N')
-                            kb.cookieEncodeChoice = choice.upper().strip() == 'Y'
+                            kb.cookieEncodeChoice = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N', boolean=True)
                         if not kb.cookieEncodeChoice:
                             skip = True
 

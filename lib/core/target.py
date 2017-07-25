@@ -120,7 +120,7 @@ def _setRequestParams():
         if kb.processUserMarks is None and kb.customInjectionMark in conf.data:
             message = "custom injection marker ('%s') found in option " % kb.customInjectionMark
             message += "'--data'. Do you want to process it? [Y/n/q] "
-            choice = readInput(message, default='Y')
+            choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
                 raise SqlmapUserQuitException
@@ -133,7 +133,7 @@ def _setRequestParams():
         if re.search(JSON_RECOGNITION_REGEX, conf.data):
             message = "JSON data found in %s data. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
-            choice = readInput(message, default='Y')
+            choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
                 raise SqlmapUserQuitException

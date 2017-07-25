@@ -25,7 +25,7 @@ c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.
 a66093c734c7f94ecdf94d882c2d8b89  lib/controller/controller.py
 a97df93b552ee4e4ba3692eae870de7c  lib/controller/handler.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
-49b4e3b75322bf5f95b1568633bc7914  lib/core/agent.py
+ca0a4eba91d73c9d7adedabf528ca4f1  lib/core/agent.py
 6cc95a117fbd34ef31b9aa25520f0e31  lib/core/bigarray.py
 0040490cdda0118a065ddc2e5bb8d108  lib/core/common.py
 5065a4242a8cccf72f91e22e1007ae63  lib/core/convert.py
@@ -46,10 +46,10 @@ fbf750dc617c3549ee423d6c2334ba4d  lib/core/option.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-947bd803e9e364f0511cace7f4fb97dc  lib/core/settings.py
+2b842e75ea7c83733e1efae89c2ffbb2  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
-080dad10c8350a66fd5321935b53fa70  lib/core/target.py
+4496a66116852bce7a7b27e41ed4a8c2  lib/core/target.py
 8970b88627902239d695280b1160e16c  lib/core/testing.py
 40881e63d516d8304fc19971049cded0  lib/core/threads.py
 ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
@@ -68,7 +68,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 403d873f1d2fd0c7f73d83f104e41850  lib/request/basicauthhandler.py
 3ba1c71e68953d34fc526a9d79d5a457  lib/request/basic.py
 ef48de622b0a6b4a71df64b0d2785ef8  lib/request/comparison.py
-b5094652c5e0a8b2bc29f95a484ceb27  lib/request/connect.py
+44528a7580f8ca598312e8c7b1d47c78  lib/request/connect.py
 fb6b788d0016ab4ec5e5f661f0f702ad  lib/request/direct.py
 cc1163d38e9b7ee5db2adac6784c02bb  lib/request/dns.py
 5dcdb37823a0b5eff65cd1018bcf09e4  lib/request/httpshandler.py
@@ -79,7 +79,7 @@ bb9c165b050f7696b089b96b5947fac3  lib/request/pkihandler.py
 602d4338a9fceaaee40c601410d8ac0b  lib/request/rangehandler.py
 3ba71e1571d105386d4d30746f5d6ab2  lib/request/redirecthandler.py
 b373770137dc885889e495de95169b93  lib/request/templates.py
-992a02767d12254784f15501a7ab8dd8  lib/takeover/abstraction.py
+4f45a856e0273b9a8954a0e6b03d8eb5  lib/takeover/abstraction.py
 c6bc7961a186baabe0a9f5b7e0d8974b  lib/takeover/icmpsh.py
 310efc965c862cfbd7b0da5150a5ad36  lib/takeover/__init__.py
 c90c993b020a6ae0f0e497fd84f37466  lib/takeover/metasploit.py
