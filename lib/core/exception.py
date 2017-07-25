@@ -50,6 +50,9 @@ class SqlmapUserQuitException(SqlmapBaseException):
 class SqlmapShellQuitException(SqlmapBaseException):
     pass
 
+class SqlmapSkipTargetException(SqlmapBaseException):
+    pass
+
 class SqlmapSyntaxException(SqlmapBaseException):
     pass
 

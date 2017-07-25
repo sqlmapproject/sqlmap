@@ -21,8 +21,8 @@ c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.
 310efc965c862cfbd7b0da5150a5ad36  extra/sqlharvest/__init__.py
 7713aa366c983cdf1f3dbaa7383ea9e1  extra/sqlharvest/sqlharvest.py
 7afe836fd97271ccba67b4c0da2482ff  lib/controller/action.py
-c9733bcd06caea8262240262e4c6a06a  lib/controller/checks.py
-130d1c16708668b8d89605b6b5b38bf5  lib/controller/controller.py
+e711f036d9c561cdb04aec62f872e170  lib/controller/checks.py
+a66093c734c7f94ecdf94d882c2d8b89  lib/controller/controller.py
 a97df93b552ee4e4ba3692eae870de7c  lib/controller/handler.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
 49b4e3b75322bf5f95b1568633bc7914  lib/core/agent.py
@@ -36,7 +36,7 @@ a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 7309cf449b009723d1a4655fcf1a96d7  lib/core/dicts.py
 65b9187de3d8c9c28ddab53ef2b399bc  lib/core/dump.py
 b9ff4e622c416116bee6024c0f050349  lib/core/enums.py
-9381a0c7e8bc19986299e84f4edda1a0  lib/core/exception.py
+a44d7a4cc6c9a67a72d6af2f25f4ddac  lib/core/exception.py
 310efc965c862cfbd7b0da5150a5ad36  lib/core/__init__.py
 9ba39bf66e9ecd469446bdbbeda906c3  lib/core/log.py
 5a34a1be62eab520cacc197b5eacda39  lib/core/optiondict.py
@@ -46,7 +46,7 @@ f664e993a4e4d0f8b3153778bec49794  lib/core/option.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-590db8b7ada687074d1eed39a9a1c628  lib/core/settings.py
+abde6355f9cd07ba43b7f35b3068eb1f  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 080dad10c8350a66fd5321935b53fa70  lib/core/target.py

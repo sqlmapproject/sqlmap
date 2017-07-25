@@ -54,6 +54,7 @@ from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSilentQuitException
+from lib.core.exception import SqlmapSkipTargetException
 from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
@@ -665,6 +666,9 @@ def start():
                     raise SqlmapUserQuitException
             else:
                 raise
+
+        except SqlmapSkipTargetException:
+            pass
 
         except SqlmapUserQuitException:
             raise
