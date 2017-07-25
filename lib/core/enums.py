@@ -369,6 +369,7 @@ class MKSTEMP_PREFIX:
     RESULTS = "sqlmapresults-"
     COOKIE_JAR = "sqlmapcookiejar-"
     BIG_ARRAY = "sqlmapbigarray-"
+    SPECIFIC_RESPONSE = "sqlmapresponse-"
 
 class TIMEOUT_STATE:
     NORMAL = 0

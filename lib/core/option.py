@@ -2019,6 +2019,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.tableExistsChoice = None
     kb.uChar = NULL
     kb.unionDuplicates = False
+    kb.wafSpecificResponse = None
     kb.xpCmdshellAvailable = False
 
     if flushAll:
