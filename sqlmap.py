@@ -219,7 +219,7 @@ def main():
                 dataToStdout(excMsg)
                 raise SystemExit
 
-            elif "tamper/" in excMsg:
+            elif any(_ in excMsg for _ in ("tamper/", "waf/")):
                 logger.critical(errMsg)
                 print
                 dataToStdout(excMsg)
