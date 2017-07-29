@@ -70,7 +70,7 @@ def setHandler():
                   (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
             ]
 
-    _ = max(_ if (Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else None for _ in items)
+    _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else None for _ in items)
     if _:
         items.remove(_)
         items.insert(0, _)
