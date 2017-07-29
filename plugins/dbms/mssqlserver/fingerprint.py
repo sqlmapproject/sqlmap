@@ -82,7 +82,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("SQUARE([RANDNUM])=SQUARE([RANDNUM])")
+            result = inject.checkBooleanExpression("UNICODE(SQUARE(NULL)) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MSSQL
