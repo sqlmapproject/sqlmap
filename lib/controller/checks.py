@@ -1297,6 +1297,9 @@ def checkWaf():
             logger.critical(warnMsg)
         return _
 
+    if not kb.originalPage:
+        return None
+
     infoMsg = "checking if the target is protected by "
     infoMsg += "some kind of WAF/IPS/IDS"
     logger.info(infoMsg)
