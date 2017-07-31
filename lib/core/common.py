@@ -1985,7 +1985,7 @@ def getSQLSnippet(dbms, sfile, **variables):
     retVal = re.sub(r";\s+", "; ", retVal).strip("\r\n")
 
     for _ in variables.keys():
-        retVal = re.sub(r"%%%s%%" % _, variables[_], retVal)
+        retVal = re.sub(r"%%%s%%" % _, variables[_].replace('\\', r'\\'), retVal)
 
     for _ in re.findall(r"%RANDSTR\d+%", retVal, re.I):
         retVal = retVal.replace(_, randomStr())
