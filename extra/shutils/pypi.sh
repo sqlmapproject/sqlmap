@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ ! -f ~/.pypirc ]; then
+    echo "File ~/.pypirc is missing"
+    exit 1
+fi
+
 declare -x SCRIPTPATH="${0}"
 SETTINGS="${SCRIPTPATH%/*}/../../lib/core/settings.py"
 VERSION=$(cat $SETTINGS | grep -E "^VERSION =" | cut -d '"' -f 2 | cut -d '.' -f 1-3)
