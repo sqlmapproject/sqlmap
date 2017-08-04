@@ -40,13 +40,15 @@ def main():
     apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
     apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
     apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
+    apiparser.add_option("--username", help="Basic authentication username (optional)", action="store")
+    apiparser.add_option("--password", help="Basic authentication password (optional)", action="store")
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
     if args.server is True:
-        server(args.host, args.port, adapter=args.adapter)
+        server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password)
     elif args.client is True:
-        client(args.host, args.port)
+        client(args.host, args.port, username=args.username, password=args.password)
     else:
         apiparser.print_help()
 
