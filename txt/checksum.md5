@@ -46,10 +46,10 @@ fbf750dc617c3549ee423d6c2334ba4d  lib/core/option.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-e8e3bd1b64f3a44ae9ff1793e5aadfaf  lib/core/settings.py
+560d3c0717bd0d50c4a48f6eae4073e9  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
-85e3a98bc9ba62125baa13e864f37a3f  lib/core/target.py
+4a6ecdd8a6e44bb4737bd9bc7f9b5743  lib/core/target.py
 8970b88627902239d695280b1160e16c  lib/core/testing.py
 40881e63d516d8304fc19971049cded0  lib/core/threads.py
 ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py

@@ -647,25 +647,25 @@ def _createTargetDirs():
 
     conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), normalizeUnicode(getUnicode(conf.hostname)))
 
-    if not os.path.isdir(conf.outputPath):
-        try:
+    try:
+        if not os.path.isdir(conf.outputPath):
             os.makedirs(conf.outputPath, 0755)
-        except (OSError, IOError), ex:
-            try:
-                tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-            except Exception, _:
-                errMsg = "unable to write to the temporary directory ('%s'). " % _
-                errMsg += "Please make sure that your disk is not full and "
-                errMsg += "that you have sufficient write permissions to "
-                errMsg += "create temporary files and/or directories"
-                raise SqlmapSystemException(errMsg)
+    except (OSError, IOError, TypeError), ex:
+        try:
+            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
+        except Exception, _:
+            errMsg = "unable to write to the temporary directory ('%s'). " % _
+            errMsg += "Please make sure that your disk is not full and "
+            errMsg += "that you have sufficient write permissions to "
+            errMsg += "create temporary files and/or directories"
+            raise SqlmapSystemException(errMsg)
 
-            warnMsg = "unable to create output directory "
-            warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
+        warnMsg = "unable to create output directory "
+        warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
+        warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
+        logger.warn(warnMsg)
 
-            conf.outputPath = tempDir
+        conf.outputPath = tempDir
 
     try:
         with codecs.open(os.path.join(conf.outputPath, "target.txt"), "w+", UNICODE_ENCODING) as f:
