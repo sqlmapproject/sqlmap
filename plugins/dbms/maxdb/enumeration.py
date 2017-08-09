@@ -226,11 +226,9 @@ class Enumeration(GenericEnumeration):
 
         return {}
 
-    def searchDb(self):
-        warnMsg = "on SAP MaxDB it is not possible to search databases"
+    def search(self):
+        warnMsg = "on SAP MaxDB search option is not available"
         logger.warn(warnMsg)
-
-        return []
 
     def getHostname(self):
         warnMsg = "on SAP MaxDB it is not possible to enumerate the hostname"
