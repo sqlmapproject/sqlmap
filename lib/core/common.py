@@ -635,7 +635,7 @@ def paramToDict(place, parameters=None):
                                                     current[key] = "%s%s" % (str(value).lower(), BOUNDED_INJECTION_MARKER)
                                                 else:
                                                     current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
-                                                candidates["%s (%s)" % (parameter, key)] = re.sub("(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized), parameters)
+                                                candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized), parameters)
                                                 current[key] = original
 
                                 deserialized = json.loads(testableParameters[parameter])
@@ -654,12 +654,12 @@ def paramToDict(place, parameters=None):
                             except Exception:
                                 pass
 
-                            _ = re.sub(regex, "\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())), testableParameters[parameter])
+                            _ = re.sub(regex, r"\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())), testableParameters[parameter])
                             message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
 
                             if readInput(message, default='N', boolean=True):
-                                testableParameters[parameter] = re.sub(regex, "\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])
+                                testableParameters[parameter] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % re.sub(regex, r"\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter]), parameters)
                             break
 
     if conf.testParameter:
