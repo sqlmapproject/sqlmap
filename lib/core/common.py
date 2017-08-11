@@ -1515,15 +1515,24 @@ def getLimitRange(count, plusOne=False):
     retVal = None
     count = int(count)
     limitStart, limitStop = 1, count
+    reverse = False
 
     if kb.dumpTable:
-        if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
-            limitStop = conf.limitStop
+        if conf.limitStart and conf.limitStop and conf.limitStart > conf.limitStop:
+            limitStop = conf.limitStart
+            limitStart = conf.limitStop
+            reverse = True
+        else:
+            if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
+                limitStop = conf.limitStop
 
-        if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
-            limitStart = conf.limitStart
+            if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
+                limitStart = conf.limitStart
 
     retVal = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
+
+    if reverse:
+        retVal = xrange(retVal[-1], retVal[0] - 1, -1)
 
     return retVal
 

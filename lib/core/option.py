@@ -2370,8 +2370,8 @@ def _basicOptionValidation():
 
     if isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
        isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
-        errMsg = "value for option '--start' (limitStart) must be smaller or equal than value for --stop (limitStop) option"
-        raise SqlmapSyntaxException(errMsg)
+        warnMsg = "usage of option '--start' (limitStart) which is bigger than value for --stop (limitStop) option is considered unstable"
+        logger.warn(warnMsg)
 
     if isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
        isinstance(conf.lastChar, int) and conf.lastChar < conf.firstChar:
