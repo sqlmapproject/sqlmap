@@ -384,11 +384,7 @@ class Connect(object):
                 headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie})
 
             if auxHeaders:
-                for key, value in auxHeaders.items():
-                    for _ in headers.keys():
-                        if _.upper() == key.upper():
-                            del headers[_]
-                    headers[key] = value
+                headers = forgeHeaders(auxHeaders, headers)
 
             for key, value in headers.items():
                 del headers[key]

@@ -46,7 +46,7 @@ from lib.utils.htmlentities import htmlEntities
 from thirdparty.chardet import detect
 from thirdparty.odict.odict import OrderedDict
 
-def forgeHeaders(items=None):
+def forgeHeaders(items=None, base=None):
     """
     Prepare HTTP Cookie, HTTP User-Agent and HTTP Referer headers to use when performing
     the HTTP requests
@@ -58,7 +58,7 @@ def forgeHeaders(items=None):
         if items[_] is None:
             del items[_]
 
-    headers = OrderedDict(conf.httpHeaders)
+    headers = OrderedDict(base or conf.httpHeaders)
     headers.update(items.items())
 
     class _str(str):
