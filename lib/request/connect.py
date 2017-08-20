@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
@@ -596,8 +597,11 @@ class Connect(object):
                 raise SqlmapConnectionException(errMsg)
             elif ex.code == httplib.NOT_FOUND:
                 if raise404:
-                    errMsg = "page not found (%d)" % code
-                    raise SqlmapConnectionException(errMsg)
+                    if re.search(r"(not found)|(404)|(页面不存在)",page,re.I):
+                        # If both code=404 and page content has 404's features,then url is 404 url
+                        # If not as upon,only code=404 can not determin the url is 404 url,because waf always return 404 code
+                        errMsg = "page not found (%d)" % code
+                        raise SqlmapConnectionException(errMsg)
                 else:
                     debugMsg = "page not found (%d)" % code
                     singleTimeLogMessage(debugMsg, logging.DEBUG)
