@@ -189,7 +189,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
 
             if mandatory and not self.isDba():
                 warnMsg = "functionality requested probably does not work because "
-                warnMsg += "the curent session user is not a database administrator"
+                warnMsg += "the current session user is not a database administrator"
 
                 if not conf.dbmsCred and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
                     warnMsg += ". You can try to use option '--dbms-cred' "
