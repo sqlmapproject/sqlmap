@@ -934,12 +934,14 @@ class Connect(object):
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            match = re.search(r"<input[^>]+name=[\"']?%s[\"']?\s[^>]*value=(\"([^\"]+)|'([^']+)|([^ >]+))" % re.escape(conf.csrfToken), page or "")
-            token = (match.group(2) or match.group(3) or match.group(4)) if match else None
+            token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s[\"']?[^>]*\bvalue=(?P<result>(\"([^\"]+)|'([^']+)|([^ >]+)))" % re.escape(conf.csrfToken), page or "")
 
             if not token:
-                match = re.search(r"%s[\"']:[\"']([^\"']+)" % re.escape(conf.csrfToken), page or "")
-                token = match.group(1) if match else None
+                token = extractRegexResult(r"(?i)<input[^>]+\bvalue=(?P<result>(\"([^\"]+)|'([^']+)|([^ >]+)))[^>]+\bname=[\"']?%s[\"']?" % re.escape(conf.csrfToken), page or "")
+
+                if not token:
+                    match = re.search(r"%s[\"']:[\"']([^\"']+)" % re.escape(conf.csrfToken), page or "")
+                    token = match.group(1) if match else None
 
             if not token:
                 if conf.csrfUrl != conf.url and code == httplib.OK:
@@ -967,6 +969,8 @@ class Connect(object):
                     raise SqlmapTokenException, errMsg
 
             if token:
+                token = token.strip("'\"")
+
                 for place in (PLACE.GET, PLACE.POST):
                     if place in conf.parameters:
                         if place == PLACE.GET and get:
