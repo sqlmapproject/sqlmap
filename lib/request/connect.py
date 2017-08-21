@@ -597,7 +597,7 @@ class Connect(object):
                 raise SqlmapConnectionException(errMsg)
             elif ex.code == httplib.NOT_FOUND:
                 if raise404:
-                    if re.search(r"(not found)|(404)|(页面不存在)",page,re.I):
+                    if re.search(r"(not found)|(404)|(页面不存在)|(未找到页面)",page,re.I):
                         # If both code=404 and page content has 404's features,then url is 404 url
                         # If not as upon,only code=404 can not determin the url is 404 url,because waf always return 404 code
                         errMsg = "page not found (%d)" % code
