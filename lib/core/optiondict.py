@@ -38,7 +38,7 @@ optDict = {
                                "authType":          "string",
                                "authCred":          "string",
                                "authFile":          "string",
-                               "ignore401":         "boolean",
+                               "ignoreCode":        "integer",
                                "ignoreProxy":       "boolean",
                                "ignoreRedirects":   "boolean",
                                "ignoreTimeouts":    "boolean",

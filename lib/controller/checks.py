@@ -1504,9 +1504,10 @@ def checkConnection(suppressOutput=False):
             warnMsg += "which could interfere with the results of the tests"
             logger.warn(warnMsg)
         elif wasLastResponseHTTPError():
-            warnMsg = "the web server responded with an HTTP error code (%d) " % getLastRequestHTTPError()
-            warnMsg += "which could interfere with the results of the tests"
-            logger.warn(warnMsg)
+            if getLastRequestHTTPError() != conf.ignoreCode:
+                warnMsg = "the web server responded with an HTTP error code (%d) " % getLastRequestHTTPError()
+                warnMsg += "which could interfere with the results of the tests"
+                logger.warn(warnMsg)
         else:
             kb.errorIsNone = True
 

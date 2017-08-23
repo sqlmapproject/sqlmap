@@ -590,34 +590,35 @@ class Connect(object):
             if not multipart:
                 logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
-            if ex.code == httplib.UNAUTHORIZED and not conf.ignore401:
-                errMsg = "not authorized, try to provide right HTTP "
-                errMsg += "authentication type and valid credentials (%d)" % code
-                raise SqlmapConnectionException(errMsg)
-            elif ex.code == httplib.NOT_FOUND:
-                if raise404:
-                    errMsg = "page not found (%d)" % code
+            if ex.code != conf.ignoreCode:
+                if ex.code == httplib.UNAUTHORIZED:
+                    errMsg = "not authorized, try to provide right HTTP "
+                    errMsg += "authentication type and valid credentials (%d)" % code
                     raise SqlmapConnectionException(errMsg)
-                else:
-                    debugMsg = "page not found (%d)" % code
-                    singleTimeLogMessage(debugMsg, logging.DEBUG)
-            elif ex.code == httplib.GATEWAY_TIMEOUT:
-                if ignoreTimeout:
-                    return None if not conf.ignoreTimeouts else "", None, None
-                else:
-                    warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, httplib.responses[ex.code])
-                    if threadData.retriesCount < conf.retries and not kb.threadException:
-                        warnMsg += ". sqlmap is going to retry the request"
-                        logger.critical(warnMsg)
-                        return Connect._retryProxy(**kwargs)
-                    elif kb.testMode:
-                        logger.critical(warnMsg)
-                        return None, None, None
+                elif ex.code == httplib.NOT_FOUND:
+                    if raise404:
+                        errMsg = "page not found (%d)" % code
+                        raise SqlmapConnectionException(errMsg)
                     else:
-                        raise SqlmapConnectionException(warnMsg)
-            else:
-                debugMsg = "got HTTP error code: %d (%s)" % (code, status)
-                logger.debug(debugMsg)
+                        debugMsg = "page not found (%d)" % code
+                        singleTimeLogMessage(debugMsg, logging.DEBUG)
+                elif ex.code == httplib.GATEWAY_TIMEOUT:
+                    if ignoreTimeout:
+                        return None if not conf.ignoreTimeouts else "", None, None
+                    else:
+                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, httplib.responses[ex.code])
+                        if threadData.retriesCount < conf.retries and not kb.threadException:
+                            warnMsg += ". sqlmap is going to retry the request"
+                            logger.critical(warnMsg)
+                            return Connect._retryProxy(**kwargs)
+                        elif kb.testMode:
+                            logger.critical(warnMsg)
+                            return None, None, None
+                        else:
+                            raise SqlmapConnectionException(warnMsg)
+                else:
+                    debugMsg = "got HTTP error code: %d (%s)" % (code, status)
+                    logger.debug(debugMsg)
 
         except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError):
             tbMsg = traceback.format_exc()
