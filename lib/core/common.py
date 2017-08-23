@@ -1139,7 +1139,8 @@ def checkFile(filename, raiseOnError=True):
 
     valid = True
 
-    filename = filename.strip('"\'')
+    if filename:
+        filename = filename.strip('"\'')
 
     try:
         if filename is None or not os.path.isfile(filename):
@@ -2123,7 +2124,8 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
 
     retVal = list() if not unique else OrderedDict()
 
-    filename = filename.strip('"\'')
+    if filename:
+        filename = filename.strip('"\'')
 
     checkFile(filename)
 
