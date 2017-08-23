@@ -542,6 +542,16 @@ class Connect(object):
                     warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
                     logger.warn(warnMsg)
 
+        except SqlmapConnectionException, ex:
+            if conf.proxyList:
+                warnMsg = "unable to connect to the target URL ('%s')" % ex
+                if threadData.retriesCount < conf.retries and not kb.threadException:
+                    warnMsg += ". sqlmap is going to retry the request"
+                    logger.critical(warnMsg)
+                    return Connect._retryProxy(**kwargs)
+            else:
+                raise
+
         except urllib2.HTTPError, ex:
             page = None
             responseHeaders = None
