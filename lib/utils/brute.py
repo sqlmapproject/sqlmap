@@ -81,6 +81,7 @@ def tableExists(tableFile, regex=None):
     if choice == '2':
         message = "what's the custom common tables file location?\n"
         tableFile = readInput(message) or tableFile
+        tableFile = tableFile.strim('"')
 
     infoMsg = "checking table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
