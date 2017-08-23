@@ -331,7 +331,12 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
                 elif not scheme and port == "443":
                     scheme = "https"
 
-                if conf.forceSSL:
+                hostPattern=host.replace(".","\.")
+                if (conf.forceSSL or re.search(r"host:[^\n\r]*%s:%s[\s\S]*referer:[^\n\r]*https://%s:%s.*" %
+                                              (hostPattern, port, hostPattern, port), request, re.I)
+                or (port != 80
+                    and re.search(r"host:[^\n\r]*%s:%s[\s\S]*referer:[^\n\r]*https://.*cdn.*" %
+                                  (hostPattern, port), request, re.I))):
                     scheme = "https"
                     port = port or "443"
 
