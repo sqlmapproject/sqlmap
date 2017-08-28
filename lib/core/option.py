@@ -1700,7 +1700,13 @@ def _cleanupOptions():
         conf.dbms = conf.forceDbms
 
     if conf.dbms:
-        conf.dbms = conf.dbms.capitalize()
+        kb.dbmsFilter = []
+        for _ in conf.dbms.split(','):
+            for dbms, aliases in DBMS_ALIASES:
+                if _.strip().lower() in aliases:
+                    kb.dbmsFilter.append(dbms)
+                    conf.dbms = dbms if conf.dbms and ',' not in conf.dbms else None
+                    break
 
     if conf.testFilter:
         conf.testFilter = conf.testFilter.strip('*+')
@@ -1905,6 +1911,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     # Active back-end DBMS fingerprint
     kb.dbms = None
+    kb.dbmsFilter = []
     kb.dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
     kb.delayCandidates = TIME_DELAY_CANDIDATES * [0]

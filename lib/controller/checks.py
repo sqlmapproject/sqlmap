@@ -259,7 +259,13 @@ def checkSqlInjection(place, parameter, value):
                 # provided DBMS
                 if conf.dbms is not None and not intersect(payloadDbms, conf.dbms, True):
                     debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "the provided DBMS is %s" % conf.dbms
+                    debugMsg += "it is different than provided"
+                    logger.debug(debugMsg)
+                    continue
+
+                if kb.dbmsFilter is not None and not intersect(payloadDbms, kb.dbmsFilter, True):
+                    debugMsg = "skipping test '%s' because " % title
+                    debugMsg += "it is different than provided"
                     logger.debug(debugMsg)
                     continue
 
@@ -618,7 +624,9 @@ def checkSqlInjection(place, parameter, value):
 
                             configUnion(test.request.char, test.request.columns)
 
-                            if not Backend.getIdentifiedDbms():
+                            if len(kb.dbmsFilter or []) == 1:
+                                Backend.forceDbms(kb.dbmsFilter[0])
+                            elif not Backend.getIdentifiedDbms():
                                 if kb.heuristicDbms is None:
                                     warnMsg = "using unescaped version of the test "
                                     warnMsg += "because of zero knowledge of the "

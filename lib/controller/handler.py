@@ -82,6 +82,10 @@ def setHandler():
             else:
                 kb.dbms = conf.dbms = conf.forceDbms = dbms
 
+        if kb.dbmsFilter:
+            if dbms not in kb.dbmsFilter:
+                continue
+
         handler = Handler()
         conf.dbmsConnector = Connector()
 
