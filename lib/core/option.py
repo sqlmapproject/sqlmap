@@ -1696,6 +1696,9 @@ def _cleanupOptions():
     if conf.os:
         conf.os = conf.os.capitalize()
 
+    if conf.forceDbms:
+        conf.dbms = conf.forceDbms
+
     if conf.dbms:
         conf.dbms = conf.dbms.capitalize()
 

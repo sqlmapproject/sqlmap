@@ -435,7 +435,7 @@ class Backend:
     # Get methods
     @staticmethod
     def getForcedDbms():
-        return aliasToDbmsEnum(kb.get("forcedDbms"))
+        return aliasToDbmsEnum(conf.get("forceDbms")) or aliasToDbmsEnum(kb.get("forcedDbms"))
 
     @staticmethod
     def getDbms():
