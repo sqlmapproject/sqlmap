@@ -534,7 +534,7 @@ class Databases:
                                                       conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                     query += condQuery.replace("[DB]", conf.db)
                 elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
-                    query = rootQuery.inband.query % tbl
+                    query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl)
 
                 if dumpMode and colList:
                     values = [(_,) for _ in colList]
@@ -564,7 +564,7 @@ class Databases:
                     index, values = 1, []
 
                     while True:
-                        query = rootQuery.inband.query2 % (conf.db, tbl, index)
+                        query = rootQuery.inband.query2 % (conf.db, unsafeSQLIdentificatorNaming(tbl), index)
                         value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
 
                         if isNoneValue(value) or value == " ":
@@ -663,15 +663,15 @@ class Databases:
                     query += condQuery.replace("[DB]", conf.db)
 
                 elif Backend.isDbms(DBMS.FIREBIRD):
-                    query = rootQuery.blind.count % (tbl)
+                    query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl)
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.INFORMIX):
-                    query = rootQuery.blind.count % (conf.db, conf.db, conf.db, conf.db, conf.db, tbl)
+                    query = rootQuery.blind.count % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.SQLITE):
-                    query = rootQuery.blind.query % tbl
+                    query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl)
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
                     parseSqliteTableSchema(value)
                     return kb.data.cachedColumns
@@ -694,7 +694,7 @@ class Databases:
                         if Backend.isDbms(DBMS.MSSQL):
                             count, index, values = 0, 1, []
                             while True:
-                                query = rootQuery.blind.query3 % (conf.db, tbl, index)
+                                query = rootQuery.blind.query3 % (conf.db, unsafeSQLIdentificatorNaming(tbl), index)
                                 value = unArrayizeValue(inject.getValue(query, union=False, error=False))
                                 if isNoneValue(value) or value == " ":
                                     break
@@ -723,11 +723,11 @@ class Databases:
                         query += condQuery.replace("[DB]", conf.db)
                         field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
-                        query = rootQuery.blind.query % (tbl)
+                        query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl)
                         query += condQuery
                         field = None
                     elif Backend.isDbms(DBMS.INFORMIX):
-                        query = rootQuery.blind.query % (index, conf.db, conf.db, conf.db, conf.db, conf.db, tbl)
+                        query = rootQuery.blind.query % (index, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
                         query += condQuery
                         field = condition
 
@@ -761,9 +761,9 @@ class Databases:
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db,
                                                                 conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                             elif Backend.isDbms(DBMS.FIREBIRD):
-                                query = rootQuery.blind.query2 % (tbl, column)
+                                query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column)
                             elif Backend.isDbms(DBMS.INFORMIX):
-                                query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, conf.db, tbl, column)
+                                query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl), column)
 
                             colType = unArrayizeValue(inject.getValue(query, union=False, error=False))
 

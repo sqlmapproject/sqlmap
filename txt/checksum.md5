@@ -27,7 +27,7 @@ a66093c734c7f94ecdf94d882c2d8b89  lib/controller/controller.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
 9f1adb993f66da030a4168571978e6fa  lib/core/agent.py
 6cc95a117fbd34ef31b9aa25520f0e31  lib/core/bigarray.py
-fc1f0a8732386fd502612fb4094fbcec  lib/core/common.py
+55e0317b8bacce94bd6edb1a644e6b4d  lib/core/common.py
 5065a4242a8cccf72f91e22e1007ae63  lib/core/convert.py
 a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 7936d78b1a7f1f008ff92bf2f88574ba  lib/core/datatype.py
@@ -46,7 +46,7 @@ c5f09788ee8ff9c9d12a052986875bc6  lib/core/option.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-5c4f3ca6d7e34e0c004c45cef1019e4a  lib/core/settings.py
+b57b58b96088042397ce57b93a6be153  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 4a6ecdd8a6e44bb4737bd9bc7f9b5743  lib/core/target.py
@@ -203,7 +203,7 @@ deed74334b637767fc9de8f74b37647a  plugins/dbms/sybase/fingerprint.py
 654cd5e69cf5e5c644bfa5d284e61206  plugins/dbms/sybase/takeover.py
 f700954549ad8ebf77f5187262fb9af0  plugins/generic/connector.py
 5390591ca955036d492de11355b52e8f  plugins/generic/custom.py
-4ad4bccc03256b8f3d21ba4f8f759404  plugins/generic/databases.py
+9fc0c45c314e597fd6ae3b0068daafc0  plugins/generic/databases.py
 106f19c1d895963e2efa8ee193a537ec  plugins/generic/entries.py
 55802d1d5d65938414c77ccc27731cab  plugins/generic/enumeration.py
 0d10a0410c416fece51c26a935e68568  plugins/generic/filesystem.py

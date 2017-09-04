@@ -3586,11 +3586,11 @@ def unsafeSQLIdentificatorNaming(name):
     if isinstance(name, basestring):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.INFORMIX, DBMS.HSQLDB):
             retVal = name.replace("\"", "")
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
             retVal = name.replace("\"", "").upper()
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL,):
+        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = name.replace("[", "").replace("]", "")
 
         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
