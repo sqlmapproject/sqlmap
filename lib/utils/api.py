@@ -469,6 +469,10 @@ def option_set(taskid):
         logger.warning("[%s] Invalid task ID provided to option_set()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
+    if request.json is None:
+        logger.warning("[%s] Invalid JSON options provided to option_set()" % taskid)
+        return jsonize({"success": False, "message": "Invalid JSON options"})
+
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
@@ -485,6 +489,10 @@ def scan_start(taskid):
     if taskid not in DataStore.tasks:
         logger.warning("[%s] Invalid task ID provided to scan_start()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
+
+    if request.json is None:
+        logger.warning("[%s] Invalid JSON options provided to scan_start()" % taskid)
+        return jsonize({"success": False, "message": "Invalid JSON options"})
 
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
