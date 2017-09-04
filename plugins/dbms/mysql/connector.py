@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import pymysql
-except ImportError:
+except:
     pass
 
 import logging

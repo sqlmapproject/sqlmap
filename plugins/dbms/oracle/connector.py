@@ -7,7 +7,7 @@ See the file 'doc/COPYING' for copying permission
 
 try:
     import cx_Oracle
-except ImportError:
+except:
     pass
 
 import logging

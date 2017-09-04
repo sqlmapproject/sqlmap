@@ -8,7 +8,7 @@ See the file 'doc/COPYING' for copying permission
 try:
     import jaydebeapi
     import jpype
-except ImportError, msg:
+except:
     pass
 
 import logging
