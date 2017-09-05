@@ -118,7 +118,7 @@ def hexencode(value):
     '666f6f626172'
     """
 
-    return utf8encode(value).encode("hex")
+    return unicodeencode(value, conf.charset or UNICODE_ENCODING).encode("hex")
 
 def unicodeencode(value, encoding=None):
     """
