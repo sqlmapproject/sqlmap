@@ -144,7 +144,7 @@ class Web:
                 randInt = randomInt()
                 query += "OR %d=%d " % (randInt, randInt)
 
-        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery))
+        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery, conf.charset))
         query = agent.prefixQuery(query)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)

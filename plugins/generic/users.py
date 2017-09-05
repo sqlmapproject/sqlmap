@@ -235,7 +235,7 @@ class Users:
 
                 if retVal:
                     for user, password in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.password" % randStr])):
-                        password = "0x%s" % hexencode(password).upper()
+                        password = "0x%s" % hexencode(password, conf.charset).upper()
 
                         if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]

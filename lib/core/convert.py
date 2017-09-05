@@ -110,7 +110,7 @@ def hexdecode(value):
     value = value.lower()
     return (value[2:] if value.startswith("0x") else value).decode("hex")
 
-def hexencode(value):
+def hexencode(value, encoding=None):
     """
     Encodes string value from plain to hex format
 
@@ -118,7 +118,7 @@ def hexencode(value):
     '666f6f626172'
     """
 
-    return unicodeencode(value, conf.charset or UNICODE_ENCODING).encode("hex")
+    return unicodeencode(value, encoding).encode("hex")
 
 def unicodeencode(value, encoding=None):
     """
