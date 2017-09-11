@@ -259,21 +259,21 @@ def checkSqlInjection(place, parameter, value):
                 # provided DBMS
                 if conf.dbms and not intersect(payloadDbms, conf.dbms, True):
                     debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "it is different than provided"
+                    debugMsg += "its declared DBMS is different than provided"
                     logger.debug(debugMsg)
                     continue
 
                 if kb.dbmsFilter and not intersect(payloadDbms, kb.dbmsFilter, True):
                     debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "it is different than provided"
+                    debugMsg += "its declared DBMS is different than provided"
                     logger.debug(debugMsg)
                     continue
 
                 # Skip DBMS-specific test if it does not match the
                 # previously identified DBMS (via DBMS-specific payload)
                 if injection.dbms and not intersect(payloadDbms, injection.dbms, True):
-                    debugMsg = "skipping test '%s' because the identified " % title
-                    debugMsg += "back-end DBMS is %s" % injection.dbms
+                    debugMsg = "skipping test '%s' because " % title
+                    debugMsg += "its declared DBMS is different than identified"
                     logger.debug(debugMsg)
                     continue
 
