@@ -21,7 +21,7 @@ c55b400b72acc43e0e59c87dd8bb8d75  extra/shellcodeexec/windows/shellcodeexec.x32.
 310efc965c862cfbd7b0da5150a5ad36  extra/sqlharvest/__init__.py
 7713aa366c983cdf1f3dbaa7383ea9e1  extra/sqlharvest/sqlharvest.py
 7afe836fd97271ccba67b4c0da2482ff  lib/controller/action.py
-20ec996d592a09f0b4607ddd231586f7  lib/controller/checks.py
+5fd3320fc6e86e7864c5c87919d63488  lib/controller/checks.py
 a66093c734c7f94ecdf94d882c2d8b89  lib/controller/controller.py
 926bdaf98d082a41fdd57bb41c1692d1  lib/controller/handler.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
@@ -46,7 +46,7 @@ c5f09788ee8ff9c9d12a052986875bc6  lib/core/option.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-0a387452776db9ef7f0648048f965561  lib/core/settings.py
+979db28e78f1698e28d31d5287a17705  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
