@@ -113,7 +113,7 @@ class Agent(object):
             if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                 origValue = origValue.split('>')[-1]
             elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
-                origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)\s*(?P<result>[^"\[,]+\Z)', origValue)
+                origValue = extractRegexResult(r"(?s)\"\s*:\s*(?P<result>\d+\Z)", origValue) or extractRegexResult(r'(?s)[\s:]*(?P<result>[^"\[,]+\Z)', origValue)
             else:
                 _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"&]+\Z)", origValue) or ""
                 origValue = _.split('=', 1)[1] if '=' in _ else ""
