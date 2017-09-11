@@ -767,8 +767,8 @@ class Connect(object):
     def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True):
         """
         This method calls a function to get the target URL page content
-        and returns its page MD5 hash or a boolean value in case of
-        string match check ('--string' command line parameter)
+        and returns its page ratio (0 <= ratio <= 1) or a boolean value
+        representing False/True match in case of !getRatioValue
         """
 
         if conf.direct:
