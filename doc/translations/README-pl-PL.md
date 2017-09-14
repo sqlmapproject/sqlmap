@@ -14,7 +14,7 @@ Możesz odwiedzić [kolekcję zrzutów](https://github.com/sqlmapproject/sqlmap/
 Instalacja
 ----
 
-Najnowsze archiwum .tar jest dostępne po klikcięciu [tutaj](https://github.com/sqlmapproject/sqlmap/tarball/master) lub najnowsze archiwum .zip po kliknięciu [tutaj](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Najnowsze tarball archiwum jest dostępne po klikcięciu [tutaj](https://github.com/sqlmapproject/sqlmap/tarball/master) lub najnowsze zipball archiwum po kliknięciu [tutaj](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
 Można również pobrać sqlmap klonując rezozytorium [Git](https://github.com/sqlmapproject/sqlmap):
 
@@ -22,7 +22,7 @@ Można również pobrać sqlmap klonując rezozytorium [Git](https://github.com/
 
 do użycia sqlmap potrzebny jest [Python](http://www.python.org/download/) w wersji **2.6.x** lub **2.7.x** na dowolnej platformie systemowej.
 
-Sposób użycia:
+Sposób użycia
 ----
 
 Aby uzyskać listę podstawowych funkcji i parametrów użyj polecenia:
@@ -36,7 +36,7 @@ Aby uzyskać listę wszystkich funkcji i parametrów użyj polecenia:
 Przykładowy wynik działania dostępny [tutaj](https://asciinema.org/a/46601).
 Aby uzyskać listę wszystkich dostępnych fukcji, parametrów i opisów ich działania wraz z przykładami użycia sqlnap proponujemy odwiedzić [instrukjcę użytkowania](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
-Odnośniki:
+Odnośniki
 ----
 
 * Strona projektu: http://sqlmap.org
