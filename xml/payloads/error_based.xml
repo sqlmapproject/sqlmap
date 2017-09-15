@@ -28,7 +28,7 @@
 
     <test>
         <!-- It does not work against ORDER BY or GROUP BY clause -->
-        <title>MySQL &gt;= 5.5 OR error-based - WHERE, HAVING clause (BIGINT UNSIGNED)</title>
+        <title>MySQL &gt;= 5.5 OR error-based - WHERE or HAVING clause (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
@@ -72,7 +72,7 @@
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.5 OR error-based - WHERE, HAVING clause (EXP)</title>
+        <title>MySQL &gt;= 5.5 OR error-based - WHERE or HAVING clause (EXP)</title>
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
@@ -113,7 +113,7 @@
 
     <test>
         <!-- It does not work against ORDER BY or GROUP BY clause -->
-        <title>MySQL &gt;= 5.7.8 OR error-based - WHERE, HAVING clause (JSON_KEYS)</title>
+        <title>MySQL &gt;= 5.7.8 OR error-based - WHERE or HAVING clause (JSON_KEYS)</title>
         <stype>2</stype>
         <level>5</level>
         <risk>3</risk>
@@ -305,7 +305,7 @@
 
     <test>
         <!-- It does not work against ORDER BY or GROUP BY clause -->
-        <title>MySQL &gt;= 4.1 OR error-based - WHERE, HAVING clause (FLOOR)</title>
+        <title>MySQL &gt;= 4.1 OR error-based - WHERE or HAVING clause (FLOOR)</title>
         <stype>2</stype>
         <level>2</level>
         <risk>3</risk>

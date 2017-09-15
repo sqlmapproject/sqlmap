@@ -46,7 +46,7 @@ a44d7a4cc6c9a67a72d6af2f25f4ddac  lib/core/exception.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-8c9f54349f35bb47b8f1b2899be65ee8  lib/core/settings.py
+a68c970393d16970207aa9799f9772e0  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
@@ -456,7 +456,7 @@ fb93505ef0ab3b4a20900f3e5625260d  xml/boundaries.xml
 535d625cff8418bdc086ab4e1bbf5135  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 14a2abeb88b00ab489359d0dd7a3017f  xml/payloads/boolean_blind.xml
-5a4ec9aaac9129205b88f2a7df9ffb27  xml/payloads/error_based.xml
+b5b8b0aebce810e6cdda1b7106c96427  xml/payloads/error_based.xml
 06b1a210b190d52477a9d492443725b5  xml/payloads/inline_query.xml
 3194e2688a7576e1f877d5b137f7c260  xml/payloads/stacked_queries.xml
 c2d8dd03db5a663e79eabb4495dd0723  xml/payloads/time_blind.xml
