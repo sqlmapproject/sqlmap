@@ -46,7 +46,7 @@ a44d7a4cc6c9a67a72d6af2f25f4ddac  lib/core/exception.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-a68c970393d16970207aa9799f9772e0  lib/core/settings.py
+234e894c58cebccf21c2217fccf8fd76  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
@@ -403,7 +403,7 @@ ab6f6e3169cb43efcf5b6ed84b58252f  waf/comodo.py
 e4b058d759198216d24f8fed6ef97be4  waf/edgecast.py
 f633953970fb181b9ac5420a47e6a610  waf/expressionengine.py
 1df78b6ad49259514cb6e4d68371cbcf  waf/fortiweb.py
-a63bc52b39a7fac38a8a3adee1545851  waf/generic.py
+f183f0bd0923917f070984caf987d5d7  waf/generic.py
 d50e17ed49e1a3cb846e652ed98e3b3c  waf/hyperguard.py
 5b5382ccfb82ee6afdc1b47c8a4bce70  waf/incapsula.py
 310efc965c862cfbd7b0da5150a5ad36  waf/__init__.py
