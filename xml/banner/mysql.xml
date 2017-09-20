@@ -27,6 +27,14 @@
         <info dbms_version="1" type="Linux" distrib="Debian" release="4.0" codename="etch"/>
     </regexp>
 
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+lenny">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="5.0" codename="lenny"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+squeeze">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="6.0" codename="squeeze"/>
+    </regexp>
+
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+(sid|unstable)">
         <info dbms_version="1" type="Linux" distrib="Debian" codename="unstable"/>
     </regexp>
@@ -35,8 +43,4 @@
         <info dbms_version="1" type="Linux" distrib="Debian" codename="testing"/>
     </regexp>
 
-    <!-- Ubuntu -->
-    <regexp value="^(5\.0\.67)-0ubuntu6">
-        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="8.10" codename="Intrepid Ibex"/>
-    </regexp>
 </root>

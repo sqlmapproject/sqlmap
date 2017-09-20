@@ -46,7 +46,7 @@ a44d7a4cc6c9a67a72d6af2f25f4ddac  lib/core/exception.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-1b0c524c75375ae969a357cbc9e83b72  lib/core/settings.py
+64dbe305e1d88e9b90e66829b183a75d  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
@@ -60,7 +60,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 96a762a2ed36b34baedd59b9bfae80c2  lib/parse/cmdline.py
 3a31657bc38f277d0016ff6d50bde61f  lib/parse/configfile.py
 14539f1be714d4f1ed042067d63bc50a  lib/parse/handler.py
-64e5bb3ecbdd75144500588b437ba8da  lib/parse/headers.py
+8da3684e70bfeef80b1d221ff0cd958c  lib/parse/headers.py
 165dc27660c8559318009d44354f27cb  lib/parse/html.py
 310efc965c862cfbd7b0da5150a5ad36  lib/parse/__init__.py
 0b010b7cdb2e42b5aa0caa59607279ad  lib/parse/payloads.py
@@ -441,14 +441,14 @@ f3727ed5d1b5b06495233c413c8687a6  waf/wallarm.py
 3792fb08791f0f77fa5386f6e9374068  waf/webknight.py
 76c50593f1fbb8d4e87ff4781688e728  waf/yundun.py
 83a57aff89cf698b3e4aac9814a03e67  waf/yunsuo.py
-2d53fdaca0d7b42edad5192661248d76  xml/banner/cookie.xml
 e87d59af23b7b18cd56c9883e5f02d5c  xml/banner/generic.xml
 d8925c034263bf1b83e7d8e1c78eec57  xml/banner/mssql.xml
-c97c383b560cd578f74c5e4d88c88ed2  xml/banner/mysql.xml
+b8b56f4aa34bf65365808919b97119a7  xml/banner/mysql.xml
 9b262a617b06af56b1267987d694bf6f  xml/banner/oracle.xml
 d90fe5a47b95dff3eb1797764c9db6c5  xml/banner/postgresql.xml
 b07b5c47c751787e136650ded060197f  xml/banner/server.xml
-d48c971769c6131e35bd52d2315a8d58  xml/banner/servlet.xml
+d48c971769c6131e35bd52d2315a8d58  xml/banner/servlet-engine.xml
+2d53fdaca0d7b42edad5192661248d76  xml/banner/set-cookie.xml
 d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 350605448f049cd982554123a75f11e1  xml/banner/x-aspnet-version.xml
 817078783e1edaa492773d3b34d8eef0  xml/banner/x-powered-by.xml
