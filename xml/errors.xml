@@ -3,8 +3,8 @@
 <root>
     <!-- MySQL -->
     <dbms value="MySQL">
-        <error regexp="SQL syntax.*MySQL"/>
-        <error regexp="Warning.*mysql_.*"/>
+        <error regexp="SQL syntax.*?MySQL"/>
+        <error regexp="Warning.*?mysql_"/>
         <error regexp="MySqlException \(0x"/>
         <error regexp="valid MySQL result"/>
         <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
@@ -14,24 +14,24 @@
 
     <!-- PostgreSQL -->
     <dbms value="PostgreSQL">
-        <error regexp="PostgreSQL.*ERROR"/>
-        <error regexp="Warning.*\Wpg_.*"/>
+        <error regexp="PostgreSQL.*?ERROR"/>
+        <error regexp="Warning.*?\Wpg_"/>
         <error regexp="valid PostgreSQL result"/>
         <error regexp="Npgsql\."/>
         <error regexp="PG::SyntaxError:"/>
         <error regexp="org\.postgresql\.util\.PSQLException"/>
-        <error regexp="ERROR:\s\ssyntax error at or near "/>
+        <error regexp="ERROR:\s\ssyntax error at or near"/>
     </dbms>
 
     <!-- Microsoft SQL Server -->
     <dbms value="Microsoft SQL Server">
-        <error regexp="Driver.* SQL[\-\_\ ]*Server"/>
-        <error regexp="OLE DB.* SQL Server"/>
+        <error regexp="Driver.*? SQL[\-\_\ ]*Server"/>
+        <error regexp="OLE DB.*? SQL Server"/>
         <error regexp="\bSQL Server[^&lt;&quot;]+Driver"/>
-        <error regexp="Warning.*(mssql|sqlsrv)_"/>
+        <error regexp="Warning.*?(mssql|sqlsrv)_"/>
         <error regexp="\bSQL Server[^&lt;&quot;]+[0-9a-fA-F]{8}"/>
         <error regexp="System\.Data\.SqlClient\.SqlException"/>
-        <error regexp="(?s)Exception.*\WRoadhouse\.Cms\."/>
+        <error regexp="(?s)Exception.*?\WRoadhouse\.Cms\."/>
         <error regexp="Microsoft SQL Native Client error '[0-9a-fA-F]{8}"/>
         <error regexp="com\.microsoft\.sqlserver\.jdbc\.SQLServerException"/>
         <error regexp="ODBC SQL Server Driver"/>
@@ -53,16 +53,17 @@
     <dbms value="Oracle">
         <error regexp="\bORA-\d{5}"/>
         <error regexp="Oracle error"/>
-        <error regexp="Oracle.*Driver"/>
-        <error regexp="Warning.*\Woci_.*"/>
-        <error regexp="Warning.*\Wora_.*"/>
+        <error regexp="Oracle.*?Driver"/>
+        <error regexp="Warning.*?\Woci_"/>
+        <error regexp="Warning.*?\Wora_"/>
         <error regexp="oracle\.jdbc\.driver"/>
         <error regexp="quoted string not properly terminated"/>
+        <error regexp="SQL command not properly ended"/>
     </dbms>
 
     <!-- IBM DB2 -->
     <dbms value="IBM DB2">
-        <error regexp="CLI Driver.*DB2"/>
+        <error regexp="CLI Driver.*?DB2"/>
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
         <error regexp="SQLSTATE.+SQLCODE"/>
@@ -70,7 +71,7 @@
 
     <!-- Informix -->
     <dbms value="Informix">
-        <error regexp="Exception.*Informix"/>
+        <error regexp="Exception.*?Informix"/>
         <error regexp="Informix ODBC Driver"/>
         <error regexp="com\.informix\.jdbc"/>
         <error regexp="weblogic\.jdbc\.informix"/>
@@ -79,51 +80,54 @@
     <!-- Interbase/Firebird -->
     <dbms value="Firebird">
         <error regexp="Dynamic SQL Error"/>
-        <error regexp="Warning.*ibase_.*"/>
+        <error regexp="Warning.*?ibase_"/>
     </dbms>
 
     <!-- SQLite -->
     <dbms value="SQLite">
         <error regexp="SQLite/JDBCDriver"/>
         <error regexp="SQLite\.Exception"/>
-        <error regexp="System\.Data\.SQLite\.SQLiteException"/>
-        <error regexp="Warning.*sqlite_.*"/>
-        <error regexp="Warning.*SQLite3::"/>
+        <error regexp="(Microsoft|System)\.Data\.SQLite\.SQLiteException"/>
+        <error regexp="Warning.*?sqlite_"/>
+        <error regexp="Warning.*?SQLite3::"/>
         <error regexp="\[SQLITE_ERROR\]"/>
+        <error regexp="SQLite error \d+:"/>
+        <error regexp="sqlite3.OperationalError:"/>
     </dbms>
 
     <!-- SAP MaxDB -->
     <dbms value="SAP MaxDB">
-        <error regexp="SQL error.*POS([0-9]+).*"/>
-        <error regexp="Warning.*maxdb.*"/>
+        <error regexp="SQL error.*?POS([0-9]+)"/>
+        <error regexp="Warning.*?maxdb"/>
     </dbms>
 
     <!-- Sybase -->
     <dbms value="Sybase">
-        <error regexp="Warning.*sybase.*"/>
+        <error regexp="Warning.*?sybase"/>
         <error regexp="Sybase message"/>
-        <error regexp="Sybase.*Server message.*"/>
+        <error regexp="Sybase.*?Server message"/>
         <error regexp="SybSQLException"/>
         <error regexp="com\.sybase\.jdbc"/>
     </dbms>
 
     <!-- Ingres -->
     <dbms value="Ingres">
-        <error regexp="Warning.*ingres_"/>
+        <error regexp="Warning.*?ingres_"/>
         <error regexp="Ingres SQLSTATE"/>
-        <error regexp="Ingres\W.*Driver"/>
+        <error regexp="Ingres\W.*?Driver"/>
     </dbms>
 
     <!-- Frontbase -->
     <dbms value="Frontbase">
-        <error regexp="Exception (condition )?\d+. Transaction rollback."/>
+        <error regexp="Exception (condition )?\d+\. Transaction rollback"/>
+        <error regexp="com\.frontbase\.jdbc"/>
     </dbms>
 
     <!-- HSQLDB -->
     <dbms value="HSQLDB">
         <error regexp="org\.hsqldb\.jdbc"/>
         <error regexp="Unexpected end of command in statement \["/>
-        <error regexp="Unexpected token.*in statement \["/>
+        <error regexp="Unexpected token.*?in statement \["/>
     </dbms>
 
 </root>

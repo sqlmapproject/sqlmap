@@ -46,7 +46,7 @@ a44d7a4cc6c9a67a72d6af2f25f4ddac  lib/core/exception.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-ef5cf593cd595b00fadb67e5004de5c0  lib/core/settings.py
+1b0c524c75375ae969a357cbc9e83b72  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
@@ -453,7 +453,7 @@ d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 350605448f049cd982554123a75f11e1  xml/banner/x-aspnet-version.xml
 817078783e1edaa492773d3b34d8eef0  xml/banner/x-powered-by.xml
 fb93505ef0ab3b4a20900f3e5625260d  xml/boundaries.xml
-535d625cff8418bdc086ab4e1bbf5135  xml/errors.xml
+9567590d35dfd9f214b9979e6000b139  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 14a2abeb88b00ab489359d0dd7a3017f  xml/payloads/boolean_blind.xml
 b5b8b0aebce810e6cdda1b7106c96427  xml/payloads/error_based.xml
