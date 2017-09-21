@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.1.9.22"
+VERSION = "1.1.9.23"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -67,6 +67,7 @@ BOUNDED_INJECTION_MARKER = "__BOUNDED_INJECTION_MARK__"
 RANDOM_INTEGER_MARKER = "[RANDINT]"
 RANDOM_STRING_MARKER = "[RANDSTR]"
 SLEEP_TIME_MARKER = "[SLEEPTIME]"
+INFERENCE_MARKER = "[INFERENCE]"
 
 PAYLOAD_DELIMITER = "__PAYLOAD_DELIMITER__"
 CHAR_INFERENCE_MARK = "%c"
@@ -174,6 +175,9 @@ INFERENCE_UNKNOWN_CHAR = '?'
 
 # Character used for operation "greater" in inference
 INFERENCE_GREATER_CHAR = ">"
+
+# Character used for operation "greater or equal" in inference
+INFERENCE_GREATER_EQUALS_CHAR = ">="
 
 # Character used for operation "equals" in inference
 INFERENCE_EQUALS_CHAR = "="

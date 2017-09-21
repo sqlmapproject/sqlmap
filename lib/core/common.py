@@ -3207,13 +3207,13 @@ def decodeIntToUnicode(value):
 
                 if Backend.isDbms(DBMS.MYSQL):
                     # https://github.com/sqlmapproject/sqlmap/issues/1531
-                    retVal = getUnicode(raw, conf.charset or UNICODE_ENCODING)
+                    retVal = getUnicode(raw, conf.encoding or UNICODE_ENCODING)
                 elif Backend.isDbms(DBMS.MSSQL):
                     retVal = getUnicode(raw, "UTF-16-BE")
                 elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
                     retVal = unichr(value)
                 else:
-                    retVal = getUnicode(raw, conf.charset)
+                    retVal = getUnicode(raw, conf.encoding)
             else:
                 retVal = getUnicode(chr(value))
         except:

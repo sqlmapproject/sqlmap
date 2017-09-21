@@ -46,7 +46,7 @@ class Filesystem(GenericFilesystem):
             scrString = ""
 
             for lineChar in fileContent[fileLine:fileLine + lineLen]:
-                strLineChar = hexencode(lineChar, conf.charset)
+                strLineChar = hexencode(lineChar, conf.encoding)
 
                 if not scrString:
                     scrString = "e %x %s" % (lineAddr, strLineChar)

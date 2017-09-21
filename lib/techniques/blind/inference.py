@@ -39,7 +39,9 @@ from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
+from lib.core.settings import INFERENCE_GREATER_EQUALS_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
+from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import MAX_BISECTION_LENGTH
 from lib.core.settings import MAX_REVALIDATION_STEPS
@@ -67,7 +69,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     partialValue = u""
     finalValue = None
     retrievedLength = 0
-    asciiTbl = getCharset(charsetType)
+
+    if charsetType is None and conf.charset:
+        asciiTbl = sorted(set(ord(_) for _ in conf.charset))
+    else:
+        asciiTbl = getCharset(charsetType)
+
     threadData = getCurrentThreadData()
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
     retVal = hashDBRetrieve(expression, checkConf=True)
@@ -109,7 +116,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         elif (kb.fileReadMode or dump) and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
             if kb.fileReadMode:
-                firstChar *= 2
+                firstChar <<= 1
         elif isinstance(firstChar, basestring) and firstChar.isdigit() or isinstance(firstChar, int):
             firstChar = int(firstChar) - 1
         else:
@@ -271,7 +278,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             lastCheck = False
             unexpectedCode = False
 
-            while len(charTbl) != 1:
+            while len(charTbl) > 1:
                 position = None
 
                 if charsetType is None:
@@ -444,23 +451,22 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         if threadData.shared.index[0] - firstChar >= length:
                             kb.locks.index.release()
-
                             return
 
                         threadData.shared.index[0] += 1
-                        curidx = threadData.shared.index[0]
+                        currentCharIndex = threadData.shared.index[0]
                         kb.locks.index.release()
 
                         if kb.threadContinue:
                             charStart = time.time()
-                            val = getChar(curidx)
+                            val = getChar(currentCharIndex, asciiTbl, not(charsetType is None and conf.charset))
                             if val is None:
                                 val = INFERENCE_UNKNOWN_CHAR
                         else:
                             break
 
                         with kb.locks.value:
-                            threadData.shared.value[curidx - 1 - firstChar] = val
+                            threadData.shared.value[currentCharIndex - 1 - firstChar] = val
                             currentValue = list(threadData.shared.value)
 
                         if kb.threadContinue:
@@ -488,10 +494,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     count += 1 if currentValue[i] is not None else 0
 
                                 if startCharIndex > 0:
-                                    output = '..' + output[2:]
+                                    output = ".." + output[2:]
 
                                 if (endCharIndex - startCharIndex == conf.progressWidth) and (endCharIndex < length - 1):
-                                    output = output[:-2] + '..'
+                                    output = output[:-2] + ".."
 
                                 if conf.verbose in (1, 2) and not showEta and not conf.api:
                                     _ = count - firstChar
@@ -549,7 +555,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         testValue = unescaper.escape("'%s'" % commonValue) if "'" not in commonValue else unescaper.escape("%s" % commonValue, quote=False)
 
                         query = kb.injection.data[kb.technique].vector
-                        query = agent.prefixQuery(query.replace("[INFERENCE]", "(%s)=%s" % (expressionUnescaped, testValue)))
+                        query = agent.prefixQuery(query.replace(INFERENCE_MARKER, "(%s)%s%s" % (expressionUnescaped, INFERENCE_EQUALS_CHAR, testValue)))
                         query = agent.suffixQuery(query)
 
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
@@ -573,7 +579,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         testValue = unescaper.escape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.escape("%s" % commonPattern, quote=False)
 
                         query = kb.injection.data[kb.technique].vector
-                        query = agent.prefixQuery(query.replace("[INFERENCE]", "(%s)=%s" % (subquery, testValue)))
+                        query = agent.prefixQuery(query.replace(INFERENCE_MARKER, "(%s)=%s" % (subquery, testValue)))
                         query = agent.suffixQuery(query)
 
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
@@ -594,9 +600,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     # If we had no luck with commonValue and common charset,
                     # use the returned other charset
                     if not val:
-                        val = getChar(index, otherCharset, otherCharset == asciiTbl)
+                        val = getChar(index, otherCharset, otherCharset==asciiTbl)
                 else:
-                    val = getChar(index, asciiTbl)
+                    val = getChar(index, asciiTbl, not(charsetType is None and conf.charset))
 
                 if val is None:
                     finalValue = partialValue

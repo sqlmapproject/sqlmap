@@ -27,7 +27,7 @@ a66093c734c7f94ecdf94d882c2d8b89  lib/controller/controller.py
 310efc965c862cfbd7b0da5150a5ad36  lib/controller/__init__.py
 90b4f40ccde13c44e26f53db474afc19  lib/core/agent.py
 6cc95a117fbd34ef31b9aa25520f0e31  lib/core/bigarray.py
-8dafb651e35d90c05ffe08bf2a9832ae  lib/core/common.py
+ff068a628d68a4dcf597ae60e6e8abe2  lib/core/common.py
 9edefb92b0b9cad862543fcd587aaa66  lib/core/convert.py
 a8143dab9d3a27490f7d49b6b29ea530  lib/core/data.py
 7936d78b1a7f1f008ff92bf2f88574ba  lib/core/datatype.py
@@ -39,14 +39,14 @@ c8553b821a2089cb8ddd39ae661f25fc  lib/core/enums.py
 a44d7a4cc6c9a67a72d6af2f25f4ddac  lib/core/exception.py
 310efc965c862cfbd7b0da5150a5ad36  lib/core/__init__.py
 9ba39bf66e9ecd469446bdbbeda906c3  lib/core/log.py
-9d7069d81e4a520ed3fbcac584c1e86e  lib/core/optiondict.py
-79700f211e6824f183c2f776134a8b92  lib/core/option.py
+e8e9fd4f224ead0caa1569312b5b2582  lib/core/optiondict.py
+1b22c491f07c838eb470624ee4320d12  lib/core/option.py
 5f2f56e6c5f274408df61943f1e080c0  lib/core/profiling.py
 40be71cd774662a7b420caeb7051e7d5  lib/core/readlineng.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-64dbe305e1d88e9b90e66829b183a75d  lib/core/settings.py
+bc83df99ea0febcf872e078408a71c8f  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
@@ -57,7 +57,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 4d13ed693401a498b6d073a2a494bd83  lib/core/wordlist.py
 310efc965c862cfbd7b0da5150a5ad36  lib/__init__.py
 8c4b04062db2245d9e190b413985202a  lib/parse/banner.py
-96a762a2ed36b34baedd59b9bfae80c2  lib/parse/cmdline.py
+850041c049ae5a8f4a318680e1ef812d  lib/parse/cmdline.py
 3a31657bc38f277d0016ff6d50bde61f  lib/parse/configfile.py
 14539f1be714d4f1ed042067d63bc50a  lib/parse/handler.py
 8da3684e70bfeef80b1d221ff0cd958c  lib/parse/headers.py
@@ -66,7 +66,7 @@ ad74fc58fc7214802fd27067bce18dd2  lib/core/unescaper.py
 0b010b7cdb2e42b5aa0caa59607279ad  lib/parse/payloads.py
 997d0452e6fc22411f81a334511bcb3d  lib/parse/sitemap.py
 403d873f1d2fd0c7f73d83f104e41850  lib/request/basicauthhandler.py
-a06eddbdb529d4253c57250decb8e960  lib/request/basic.py
+0c476bde96ad035b3f0dde3b845e5e6e  lib/request/basic.py
 ef48de622b0a6b4a71df64b0d2785ef8  lib/request/comparison.py
 1ec370ec9d037135607b48ad6afd4f40  lib/request/connect.py
 fb6b788d0016ab4ec5e5f661f0f702ad  lib/request/direct.py
@@ -85,9 +85,9 @@ c6bc7961a186baabe0a9f5b7e0d8974b  lib/takeover/icmpsh.py
 c90c993b020a6ae0f0e497fd84f37466  lib/takeover/metasploit.py
 ac541a0d38e4ecb4e41e97799a7235f4  lib/takeover/registry.py
 ff1af7f85fdf4f2a5369f2927d149824  lib/takeover/udf.py
-8ecd543e41709ff48e0ff7bed0f2a5a9  lib/takeover/web.py
-9aa222e644db8d129b65ff2f119fc7f5  lib/takeover/xp_cmdshell.py
-201e7e69f9161dfa3aa10d83f690a488  lib/techniques/blind/inference.py
+8df5a334823b724a2207a28c94f6fe3d  lib/takeover/web.py
+b4c3264b9b6dcbf00cb7bffa447d1f6c  lib/takeover/xp_cmdshell.py
+988677fd3625518b771566b407adfef6  lib/techniques/blind/inference.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/blind/__init__.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/dns/__init__.py
 ab1601a7f429b47637c4fb8af703d0f1  lib/techniques/dns/test.py
@@ -161,7 +161,7 @@ e6036f5b2e39aec37ba036a8cf0efd6f  plugins/dbms/maxdb/syntax.py
 0be362015605e26551e5d79cc83ed466  plugins/dbms/maxdb/takeover.py
 9b3a681ff4087824fb43e23679057fa3  plugins/dbms/mssqlserver/connector.py
 b8de437eaa3e05c3db666968b7d142e4  plugins/dbms/mssqlserver/enumeration.py
-2129d6c7af5b40a58fe71f8bb49eb80b  plugins/dbms/mssqlserver/filesystem.py
+77db701972e01e50a61be528e6cad6e2  plugins/dbms/mssqlserver/filesystem.py
 5207943c31e166a70d5fc7cec8b5ef18  plugins/dbms/mssqlserver/fingerprint.py
 40bd890988f9acd3942255d687445371  plugins/dbms/mssqlserver/__init__.py
 400ce654ff6bc57a40fb291322a18282  plugins/dbms/mssqlserver/syntax.py
@@ -213,7 +213,7 @@ f700954549ad8ebf77f5187262fb9af0  plugins/generic/connector.py
 070f58c52e2a04e7a9896b42b2d17dc2  plugins/generic/search.py
 562cfa80a15d5f7f1d52e10c5736d7e2  plugins/generic/syntax.py
 fca9946e960942cc9b22ef26e12b8b3a  plugins/generic/takeover.py
-841c785748c22ad0f5e7af2f5cf7fd6e  plugins/generic/users.py
+f5c3c5da9ef0f265dc28becbf75ff5e9  plugins/generic/users.py
 310efc965c862cfbd7b0da5150a5ad36  plugins/__init__.py
 b04db3e861edde1f9dd0a3850d5b96c8  shell/backdoor.asp_
 158bfa168128393dde8d6ed11fe9a1b8  shell/backdoor.aspx_

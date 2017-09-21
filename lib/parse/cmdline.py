@@ -631,9 +631,6 @@ def cmdLineParser(argv=None):
         general.add_option("--binary-fields", dest="binaryFields",
                           help="Result fields having binary values (e.g. \"digest\")")
 
-        general.add_option("--charset", dest="charset",
-                            help="Force character encoding used for data retrieval")
-
         general.add_option("--check-internet", dest="checkInternet",
                             action="store_true",
                             help="Check Internet connection before assessing the target")
@@ -648,8 +645,14 @@ def cmdLineParser(argv=None):
                                   help="Delimiting character used in CSV output "
                                   "(default \"%s\")" % defaults.csvDel)
 
+        general.add_option("--charset", dest="charset",
+                           help="Blind SQL injection charset (e.g. \"0123456789abcdef\")")
+
         general.add_option("--dump-format", dest="dumpFormat",
                                   help="Format of dumped data (CSV (default), HTML or SQLITE)")
+
+        general.add_option("--encoding", dest="encoding",
+                            help="Character encoding used for data retrieval (e.g. GBK)")
 
         general.add_option("--eta", dest="eta",
                             action="store_true",
