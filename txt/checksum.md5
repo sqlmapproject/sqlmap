@@ -46,7 +46,7 @@ e8e9fd4f224ead0caa1569312b5b2582  lib/core/optiondict.py
 d8e9250f3775119df07e9070eddccd16  lib/core/replication.py
 785f86e3f963fa3798f84286a4e83ff2  lib/core/revision.py
 40c80b28b3a5819b737a5a17d4565ae9  lib/core/session.py
-bc83df99ea0febcf872e078408a71c8f  lib/core/settings.py
+bb423d7f62041a13e0264e9718d003f2  lib/core/settings.py
 d91291997d2bd2f6028aaf371bf1d3b6  lib/core/shell.py
 2ad85c130cc5f2b3701ea85c2f6bbf20  lib/core/subprocessng.py
 effc153067a00bd43461bfc1cdec1122  lib/core/target.py
@@ -87,7 +87,7 @@ ac541a0d38e4ecb4e41e97799a7235f4  lib/takeover/registry.py
 ff1af7f85fdf4f2a5369f2927d149824  lib/takeover/udf.py
 8df5a334823b724a2207a28c94f6fe3d  lib/takeover/web.py
 b4c3264b9b6dcbf00cb7bffa447d1f6c  lib/takeover/xp_cmdshell.py
-988677fd3625518b771566b407adfef6  lib/techniques/blind/inference.py
+f18caf2e50366057771316a490c90795  lib/techniques/blind/inference.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/blind/__init__.py
 310efc965c862cfbd7b0da5150a5ad36  lib/techniques/dns/__init__.py
 ab1601a7f429b47637c4fb8af703d0f1  lib/techniques/dns/test.py
