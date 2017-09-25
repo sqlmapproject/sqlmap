@@ -41,14 +41,16 @@ Options:
     --auth-type=AUTH..  HTTP authentication type (Basic, Digest, NTLM or PKI)
     --auth-cred=AUTH..  HTTP authentication credentials (name:password)
     --auth-file=AUTH..  HTTP authentication PEM cert/private key file
-    --ignore-401        Ignore HTTP Error 401 (Unauthorized)
+    --ignore-code=IG..  Ignore HTTP error code (e.g. 401)
+    --ignore-proxy      Ignore system default proxy settings
+    --ignore-redirects  Ignore redirection attempts
+    --ignore-timeouts   Ignore connection timeouts
     --proxy=PROXY       Use a proxy to connect to the target URL
     --proxy-cred=PRO..  Proxy authentication credentials (name:password)
     --proxy-file=PRO..  Load proxy list from a file
-    --ignore-proxy      Ignore system default proxy settings
     --tor               Use Tor anonymity network
     --tor-port=TORPORT  Set Tor proxy port other than default
-    --tor-type=TORTYPE  Set Tor proxy type (HTTP (default), SOCKS4 or SOCKS5)
+    --tor-type=TORTYPE  Set Tor proxy type (HTTP, SOCKS4 or SOCKS5 (default))
     --check-tor         Check to see if Tor is used properly
     --delay=DELAY       Delay in seconds between each HTTP request
     --timeout=TIMEOUT   Seconds to wait before timeout connection (default 30)
@@ -154,8 +156,8 @@ Options:
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
     --pivot-column=P..  Pivot column name
     --where=DUMPWHERE   Use WHERE condition while table dumping
-    --start=LIMITSTART  First query output entry to retrieve
-    --stop=LIMITSTOP    Last query output entry to retrieve
+    --start=LIMITSTART  First dump table entry to retrieve
+    --stop=LIMITSTOP    Last dump table entry to retrieve
     --first=FIRSTCHAR   First query output word character to retrieve
     --last=LASTCHAR     Last query output word character to retrieve
     --sql-query=QUERY   SQL statement to be executed
@@ -214,15 +216,18 @@ Options:
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
     --batch             Never ask for user input, use the default behaviour
     --binary-fields=..  Result fields having binary values (e.g. "digest")
-    --charset=CHARSET   Force character encoding used for data retrieval
+    --check-internet    Check Internet connection before assessing the target
     --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
     --crawl-exclude=..  Regexp to exclude pages from crawling (e.g. "logout")
     --csv-del=CSVDEL    Delimiting character used in CSV output (default ",")
+    --charset=CHARSET   Blind SQL injection charset (e.g. "0123456789abcdef")
     --dump-format=DU..  Format of dumped data (CSV (default), HTML or SQLITE)
+    --encoding=ENCOD..  Character encoding used for data retrieval (e.g. GBK)
     --eta               Display for each output the estimated time of arrival
     --flush-session     Flush session files for current target
     --forms             Parse and test forms on target URL
     --fresh-queries     Ignore query results stored in session file
+    --har=HARFILE       Log all HTTP traffic into a HAR file
     --hex               Use DBMS hex function(s) for data retrieval
     --output-dir=OUT..  Custom output directory path
     --parse-errors      Parse and display DBMS error messages from responses
@@ -242,12 +247,14 @@ Options:
     --disable-coloring  Disable console output coloring
     --gpage=GOOGLEPAGE  Use Google dork results from specified page number
     --identify-waf      Make a thorough testing for a WAF/IPS/IDS protection
-    --skip-waf          Skip heuristic detection of WAF/IPS/IDS protection
     --mobile            Imitate smartphone through HTTP User-Agent header
     --offline           Work in offline mode (only use session data)
     --purge-output      Safely remove all content from output directory
+    --skip-waf          Skip heuristic detection of WAF/IPS/IDS protection
     --smart             Conduct thorough tests only if positive heuristic(s)
     --sqlmap-shell      Prompt for an interactive sqlmap shell
+    --tmp-dir=TMPDIR    Local directory for storing temporary files
+    --web-root=WEBROOT  Web server document root directory (e.g. "/var/www")
     --wizard            Simple wizard interface for beginner users
 ```
 
@@ -1811,13 +1818,11 @@ Option `--binary-fields`
 
 In case of binary content retrieval, like in example of tables having column(s) with stored binary values (e.g. column `password` with binary stored password hash values), it is possible to use option `--binary-fields` for (extra) proper handling by sqlmap. All those fields (i.e. table columns) are then retrieved and represented in their hexadecimal representation, so afterwards they could be properly processed with other tools (e.g. `john`).
 
-### Force character encoding used for data retrieval
+### Custom (blind) SQL injection charset
 
 Option: `--charset`
 
-For proper decoding of character data sqlmap uses either web server provided information (e.g. HTTP header `Content-Type`) or a heuristic result coming from a 3rd party library [chardet](https://pypi.python.org/pypi/chardet).
-
-Nevertheless, there are cases when this value has to be overwritten, especially when retrieving data containing international non-ASCII letters (e.g. `--charset=GBK`). It has to be noted that there is a possibility that character information is going to be irreversibly lost due to implicit incompatibility between stored database content and used database connector at the target side.
+During boolean-based blind and time-based blind SQL injection cases, user can force the usage of custom charset to speed-up the data retrieval process. For example, in case of dumping message digest values (e.g. SHA1), by using (e.g.) `--charset="0123456789abcdef"` expected number of requests is around 30% less than in regular run.
 
 ### Crawl the website starting from the target URL
 
@@ -1860,6 +1865,14 @@ In some cases user will be warned that some operations failed because of lack of
 Option: `--dump-format`
 
 sqlmap supports three different types of formatting when storing dumped table data into the corresponding file inside an output directory: `CSV`, `HTML` and `SQLITE`. Default one is `CSV`, where each table row is stored into a textual file line by line, and where each entry is separated with a comma character `,` (or one provided with option `--csv-del`). In case of `HTML`, output is being stored into a HTML file, where each row is represented with a row inside a formatted table. In case of `SQLITE`, output is being stored into a SQLITE database, where original table content is replicated into the corresponding table having a same name.
+
+### Force character encoding used for data retrieval
+
+Option: `--encoding`
+
+For proper decoding of character data sqlmap uses either web server provided information (e.g. HTTP header `Content-Type`) or a heuristic result coming from a 3rd party library [chardet](https://pypi.python.org/pypi/chardet).
+
+Nevertheless, there are cases when this value has to be overwritten, especially when retrieving data containing international non-ASCII letters (e.g. `--encoding=GBK`). It has to be noted that there is a possibility that character information is going to be irreversibly lost due to implicit incompatibility between stored database content and used database connector at the target side.
 
 ### Estimated time of arrival
 
