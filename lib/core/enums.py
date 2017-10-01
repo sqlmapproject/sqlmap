@@ -184,6 +184,7 @@ class HTTP_HEADER:
     USER_AGENT = "User-Agent"
     VIA = "Via"
     X_POWERED_BY = "X-Powered-By"
+    X_DATA_ORIGIN = "X-Data-Origin"
 
 class EXPECTED:
     BOOL = "bool"
