@@ -717,6 +717,9 @@ METASPLOIT_SESSION_TIMEOUT = 120
 # Reference: http://www.postgresql.org/docs/9.0/static/catalog-pg-largeobject.html
 LOBLKSIZE = 2048
 
+# Replacement for non-ALNUM chars in variables
+EVALCODE_NONALNUM_REP = "_%s_"  # %s to be changed for hex(ord(char))
+
 # Suffix used to mark variables having keyword names
 EVALCODE_KEYWORD_SUFFIX = "_KEYWORD"
 
