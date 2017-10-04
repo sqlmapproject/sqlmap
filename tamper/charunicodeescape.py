@@ -21,8 +21,8 @@ def tamper(payload, **kwargs):
     Notes:
         * Useful to bypass weak filtering and/or WAFs in JSON contexes
 
-    >>> tamper('SELECT FIELD%20FROM TABLE')
-    '\u0053\u0045\u004C\u0045\u0043\u0054\u0020\u0046\u0049\u0045\u004C\u0044\u0020\u0046\u0052\u004F\u004D\u0020\u0054\u0041\u0042\u004C\u0045'
+    >>> tamper('SELECT FIELD FROM TABLE')
+    '\\\\u0053\\\\u0045\\\\u004C\\\\u0045\\\\u0043\\\\u0054\\\\u0020\\\\u0046\\\\u0049\\\\u0045\\\\u004C\\\\u0044\\\\u0020\\\\u0046\\\\u0052\\\\u004F\\\\u004D\\\\u0020\\\\u0054\\\\u0041\\\\u0042\\\\u004C\\\\u0045'
     """
 
     retVal = payload
