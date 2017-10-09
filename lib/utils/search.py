@@ -26,6 +26,7 @@ from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import BING_REGEX
 from lib.core.settings import DUMMY_SEARCH_USER_AGENT
 from lib.core.settings import DUCKDUCKGO_REGEX
 from lib.core.settings import GOOGLE_REGEX
@@ -108,11 +109,15 @@ def _search(dork):
     if not retVal:
         message = "no usable links found. What do you want to do?"
         message += "\n[1] (re)try with DuckDuckGo (default)"
-        message += "\n[2] quit"
+        message += "\n[2] (re)try with Bing"
+        message += "\n[3] quit"
         choice = readInput(message, default='1')
 
-        if choice == '2':
+        if choice == '3':
             raise SqlmapUserQuitException
+        elif choice == '2':
+            url = "https://www.bing.com/search?q=%s&first=%d" % (urlencode(dork, convall=True), (gpage - 1) * 10 + 1)
+            regex = BING_REGEX
         elif choice == '1':
             url = "https://duckduckgo.com/d.js?"
             url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
