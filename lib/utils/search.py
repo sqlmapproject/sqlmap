@@ -28,7 +28,6 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import DUMMY_SEARCH_USER_AGENT
 from lib.core.settings import DUCKDUCKGO_REGEX
-from lib.core.settings import DISCONNECT_SEARCH_REGEX
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
@@ -109,21 +108,12 @@ def _search(dork):
     if not retVal:
         message = "no usable links found. What do you want to do?"
         message += "\n[1] (re)try with DuckDuckGo (default)"
-        message += "\n[2] (re)try with Disconnect Search"
-        message += "\n[3] quit"
+        message += "\n[2] quit"
         choice = readInput(message, default='1')
 
-        if choice == '3':
+        if choice == '2':
             raise SqlmapUserQuitException
-        elif choice == '2':
-            url = "https://search.disconnect.me/searchTerms/search?"
-            url += "start=nav&option=Web"
-            url += "&query=%s" % urlencode(dork, convall=True)
-            url += "&ses=Google&location_option=US"
-            url += "&nextDDG=%s" % urlencode("/search?q=%s&setmkt=en-US&setplang=en-us&setlang=en-us&first=%d&FORM=PORE" % (urlencode(dork, convall=True), (gpage - 1) * 10), convall=True)
-            url += "&sa=N&showIcons=false&filterIcons=none&js_enabled=1"
-            regex = DISCONNECT_SEARCH_REGEX
-        else:
+        elif choice == '1':
             url = "https://duckduckgo.com/d.js?"
             url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
             regex = DUCKDUCKGO_REGEX
