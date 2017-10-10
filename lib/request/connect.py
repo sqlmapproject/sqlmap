@@ -51,11 +51,13 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
+from lib.core.common import safeVariableNaming
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastResponseDelayed
 from lib.core.common import unicodeencode
+from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.data import conf
@@ -1028,8 +1030,11 @@ class Connect(object):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        name = re.sub(r"[^\w]", "", name.strip())
-                        if name in keywords:
+                        name = name.strip()
+                        if safeVariableNaming(name) != name:
+                            conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
+                            name = safeVariableNaming(name)
+                        elif name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
                         variables[name] = value
@@ -1038,8 +1043,11 @@ class Connect(object):
                 for part in cookie.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER):
                     if '=' in part:
                         name, value = part.split('=', 1)
-                        name = re.sub(r"[^\w]", "", name.strip())
-                        if name in keywords:
+                        name = name.strip()
+                        if safeVariableNaming(name) != name:
+                            conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
+                            name = safeVariableNaming(name)
+                        elif name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True)
                         variables[name] = value
@@ -1050,10 +1058,18 @@ class Connect(object):
                 except SyntaxError, ex:
                     if ex.text:
                         original = replacement = ex.text.strip()
-                        for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
-                            if _ in keywords:
-                                replacement = replacement.replace(_, "%s%s" % (_, EVALCODE_KEYWORD_SUFFIX))
-                                break
+                        if '=' in original:
+                            name, value = original.split('=', 1)
+                            name = name.strip()
+                            if safeVariableNaming(name) != name:
+                                replacement = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), replacement)
+                            elif name in keywords:
+                                replacement = re.sub(r"\b%s\b" % re.escape(name), "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX), replacement)
+                        else:
+                            for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
+                                if _ in keywords:
+                                    replacement = replacement.replace(_, "%s%s" % (_, EVALCODE_KEYWORD_SUFFIX))
+                                    break
                         if original == replacement:
                             conf.evalCode = conf.evalCode.replace(EVALCODE_KEYWORD_SUFFIX, "")
                             break
@@ -1072,6 +1088,11 @@ class Connect(object):
                     value = variables[variable]
                     del variables[variable]
                     variables[variable.replace(EVALCODE_KEYWORD_SUFFIX, "")] = value
+
+                if unsafeVariableNaming(variable) != variable:
+                    value = variables[variable]
+                    del variables[variable]
+                    variables[unsafeVariableNaming(variable)] = value
 
             uri = variables["uri"]
 

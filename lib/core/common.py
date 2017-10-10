@@ -143,6 +143,7 @@ from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
+from lib.core.settings import SAFE_VARIABLE_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
 from lib.core.settings import SUPPORTED_DBMS
@@ -4429,3 +4430,9 @@ def getSafeExString(ex, encoding=None):
         retVal = ex.msg
 
     return getUnicode(retVal or "", encoding=encoding).strip()
+
+def safeVariableNaming(value):
+    return re.sub(r"[^\w]", lambda match: "%s%02x" % (SAFE_VARIABLE_MARKER, ord(match.group(0))), value)
+
+def unsafeVariableNaming(value):
+    return re.sub(r"%s([0-9a-f]{2})" % SAFE_VARIABLE_MARKER, lambda match: match.group(1).decode("hex"), value)
