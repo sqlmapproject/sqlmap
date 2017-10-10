@@ -252,6 +252,11 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "Violation of BIDI" in excMsg:
+                errMsg = "invalid URL (violation of Bidi IDNA rule - RFC 5893)"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "_mkstemp_inner" in excMsg:
                 errMsg = "there has been a problem while accessing temporary files"
                 logger.error(errMsg)
