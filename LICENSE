@@ -31,6 +31,9 @@ interpretation of derived works with some common examples. Our
 interpretation applies only to sqlmap - we do not speak for other people's
 GPL works.
 
+This license does not apply to the third-party components. More details can
+be found inside the file 'doc/THIRD-PARTY.md'.
+
 If you have any questions about the GPL licensing restrictions on using
 sqlmap in non-GPL works, we would be happy to help. As mentioned above,
 we also offer alternative license to integrate sqlmap into proprietary
@@ -343,7 +346,3 @@ PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGES.
 
                      END OF TERMS AND CONDITIONS
-
-****************************************************************************
-
-License details for the third-party components can be found in the 'doc/THIRD-PARTY.md' file.
