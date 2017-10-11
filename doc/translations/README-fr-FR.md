@@ -1,6 +1,6 @@
 # sqlmap
 
-[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 **sqlmap** est un outil Open Source de test d'intrusion. Cet outil permet d'automatiser le processus de détection et d'exploitation des failles d'injection SQL afin de prendre le contrôle des serveurs de base de données. __sqlmap__ dispose d'un puissant moteur de détection utilisant les techniques les plus récentes et les plus dévastatrices de tests d'intrusion comme L'Injection SQL, qui permet d'accéder à la base de données, au système de fichiers sous-jacent et permet aussi l'exécution des commandes sur le système d'exploitation.
 

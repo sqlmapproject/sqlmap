@@ -1,6 +1,6 @@
 # sqlmap
 
-[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 sqlmap merupakan alat _(tool)_ bantu _open source_ dalam melakukan tes penetrasi yang mengotomasi proses deteksi dan eksploitasi kelemahan _SQL injection_ dan pengambil-alihan server basisdata. sqlmap dilengkapi dengan pendeteksi canggih, fitur-fitur hanal bagi _penetration tester_, beragam cara untuk mendeteksi basisdata, hingga mengakses _file system_ dan mengeksekusi perintah dalam sistem operasi melalui koneksi _out-of-band_. 
 

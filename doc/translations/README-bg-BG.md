@@ -1,6 +1,6 @@
 # sqlmap
 
-[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![Лиценз](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![Лиценз](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 sqlmap e инструмент за тестване и проникване, с отворен код, който автоматизира процеса на откриване и използване на недостатъците на SQL база данните чрез SQL инжекция, която ги взима от сървъра. Снабден е с мощен детектор, множество специални функции за най-добрия тестер и широк спектър от функции, които могат да се използват за множество цели - извличане на данни от базата данни, достъп до основната файлова система и изпълняване на команди на операционната система.
 

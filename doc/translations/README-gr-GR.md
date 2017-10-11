@@ -1,6 +1,6 @@
 # sqlmap
 
-[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 Το sqlmap είναι πρόγραμμα ανοιχτού κώδικα, που αυτοματοποιεί την εύρεση και εκμετάλλευση ευπαθειών τύπου SQL Injection σε βάσεις δεδομένων. Έρχεται με μια δυνατή μηχανή αναγνώρισης ευπαθειών, πολλά εξειδικευμένα χαρακτηριστικά για τον απόλυτο penetration tester όπως και με ένα μεγάλο εύρος επιλογών αρχίζοντας από την αναγνώριση της βάσης δεδομένων, κατέβασμα δεδομένων της βάσης, μέχρι και πρόσβαση στο βαθύτερο σύστημα αρχείων και εκτέλεση εντολών στο απευθείας στο λειτουργικό μέσω εκτός ζώνης συνδέσεων.
 
