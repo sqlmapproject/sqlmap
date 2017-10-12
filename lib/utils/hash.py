@@ -300,6 +300,80 @@ def crypt_generic_passwd(password, salt, uppercase=False):
 
     return retVal.upper() if uppercase else retVal
 
+def unix_md5_passwd(password, salt, magic="$1$", uppercase=False):
+    """
+    Reference(s):
+        http://www.sabren.net/code/python/crypt/md5crypt.py
+
+    >>> unix_md5_passwd(password='testpass', salt='aD9ZLmkp')
+    '$1$aD9ZLmkp$DRM5a7rRZGyuuOPOjTEk61'
+    """
+
+    def _encode64(value, count):
+        output = ""
+
+        while (count - 1 >= 0):
+            count = count - 1
+            output += ITOA64[value & 0x3f]
+            value = value >> 6
+
+        return output
+
+    if isinstance(password, unicode):
+        password = password.encode(UNICODE_ENCODING)
+
+    salt = salt[:8]
+    ctx = password + magic + salt
+    final = md5(password + salt + password).digest()
+
+    for pl in xrange(len(password),0,-16):
+        if pl > 16:
+            ctx = ctx + final[:16]
+        else:
+            ctx = ctx + final[:pl]
+
+    i = len(password)
+    while i:
+        if i & 1:
+            ctx = ctx + chr(0)  #if ($i & 1) { $ctx->add(pack("C", 0)); }
+        else:
+            ctx = ctx + password[0]
+        i = i >> 1
+
+    final = md5(ctx).digest()
+
+    for i in xrange(1000):
+        ctx1 = ""
+
+        if i & 1:
+            ctx1 = ctx1 + password
+        else:
+            ctx1 = ctx1 + final[:16]
+
+        if i % 3:
+            ctx1 = ctx1 + salt
+
+        if i % 7:
+            ctx1 = ctx1 + password
+
+        if i & 1:
+            ctx1 = ctx1 + final[:16]
+        else:
+            ctx1 = ctx1 + password
+
+        final = md5(ctx1).digest()
+
+    hash_ = _encode64((int(ord(final[0])) << 16) | (int(ord(final[6])) << 8) | (int(ord(final[12]))),4)
+    hash_ = hash_ + _encode64((int(ord(final[1])) << 16) | (int(ord(final[7])) << 8) | (int(ord(final[13]))), 4)
+    hash_ = hash_ + _encode64((int(ord(final[2])) << 16) | (int(ord(final[8])) << 8) | (int(ord(final[14]))), 4)
+    hash_ = hash_ + _encode64((int(ord(final[3])) << 16) | (int(ord(final[9])) << 8) | (int(ord(final[15]))), 4)
+    hash_ = hash_ + _encode64((int(ord(final[4])) << 16) | (int(ord(final[10])) << 8) | (int(ord(final[5]))), 4)
+    hash_ = hash_ + _encode64((int(ord(final[11]))), 2)
+
+    output = magic + salt + '$' + hash_
+
+    return output.upper() if uppercase else output
+
 def wordpress_passwd(password, salt, count, prefix, uppercase=False):
     """
     Reference(s):
@@ -373,6 +447,8 @@ __functions__ = {
                     HASH.SHA512_GENERIC: sha512_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
                     HASH.WORDPRESS: wordpress_passwd,
+                    HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
+                    HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
                 }
 
 def storeHashesToFile(attack_dict):
@@ -717,7 +793,7 @@ def dictionaryAttack(attack_dict):
                 if re.match(hash_regex, hash_):
                     item = None
 
-                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS):
+                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
                         hash_ = hash_.lower()
 
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
@@ -730,6 +806,8 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {'salt': hash_[6:14]}]
                     elif hash_regex in (HASH.CRYPT_GENERIC,):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
+                    elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
+                        item = [(user, hash_), {'salt': hash_.split('$')[2], 'magic': '$%s$' % hash_.split('$')[1]}]
                     elif hash_regex in (HASH.WORDPRESS,):
                         if ITOA64.index(hash_[3]) < 32:
                             item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
