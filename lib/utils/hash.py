@@ -849,9 +849,9 @@ def dictionaryAttack(attack_dict):
                 try:
                     if choice == '2':
                         message = "what's the custom dictionary's location?\n"
-                        _ = readInput(message)
-                        if _:
-                            dictPaths = [readInput(message)]
+                        dictPath = readInput(message)
+                        if dictPath:
+                            dictPaths = [dictPath]
                             logger.info("using custom dictionary")
                     elif choice == '3':
                         message = "what's the list file location?\n"
