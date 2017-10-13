@@ -254,6 +254,14 @@ def sha1_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
+def apache_sha1_passwd(password, uppercase=False):
+    """
+    >>> apache_sha1_passwd(password='testpass')
+    '{SHA}IGyAQTualsExLMNGt9JRe4RGPt0='
+    """
+
+    return "{SHA}%s" % sha1(password).digest().encode("base64").strip()
+
 def sha224_generic_passwd(password, uppercase=False):
     """
     >>> sha224_generic_passwd(password='testpass', uppercase=False)
@@ -284,7 +292,7 @@ def sha512_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def crypt_generic_passwd(password, salt, uppercase=False):
+def crypt_generic_passwd(password, salt, **kwargs):
     """
     Reference(s):
         http://docs.python.org/library/crypt.html
@@ -296,11 +304,9 @@ def crypt_generic_passwd(password, salt, uppercase=False):
     'rl.3StKT.4T8M'
     """
 
-    retVal = crypt(password, salt)
+    return crypt(password, salt)
 
-    return retVal.upper() if uppercase else retVal
-
-def unix_md5_passwd(password, salt, magic="$1$", uppercase=False):
+def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     """
     Reference(s):
         http://www.sabren.net/code/python/crypt/md5crypt.py
@@ -370,17 +376,15 @@ def unix_md5_passwd(password, salt, magic="$1$", uppercase=False):
     hash_ = hash_ + _encode64((int(ord(final[4])) << 16) | (int(ord(final[10])) << 8) | (int(ord(final[5]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[11]))), 2)
 
-    output = magic + salt + '$' + hash_
+    return "%s%s$%s" % (magic, salt, hash_)
 
-    return output.upper() if uppercase else output
-
-def wordpress_passwd(password, salt, count, prefix, uppercase=False):
+def wordpress_passwd(password, salt, count, prefix, **kwargs):
     """
     Reference(s):
         http://packetstormsecurity.org/files/74448/phpassbrute.py.txt
         http://scriptserver.mainframe8.com/wordpress_password_hasher.php
 
-    >>> wordpress_passwd(password='testpass', salt='aD9ZLmkp', count=2048, prefix='$P$9aD9ZLmkp', uppercase=False)
+    >>> wordpress_passwd(password='testpass', salt='aD9ZLmkp', count=2048, prefix='$P$9aD9ZLmkp')
     '$P$9aD9ZLmkpsN4A83G8MefaaP888gVKX0'
     """
 
@@ -427,9 +431,7 @@ def wordpress_passwd(password, salt, count, prefix, uppercase=False):
         _.update(password)
         hash_ = _.digest()
 
-    retVal = prefix + _encode64(hash_, 16)
-
-    return retVal.upper() if uppercase else retVal
+    return "%s%s" % (prefix, _encode64(hash_, 16))
 
 __functions__ = {
                     HASH.MYSQL: mysql_passwd,
@@ -449,6 +451,7 @@ __functions__ = {
                     HASH.WORDPRESS: wordpress_passwd,
                     HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
                     HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
+                    HASH.APACHE_SHA1: apache_sha1_passwd,
                 }
 
 def storeHashesToFile(attack_dict):
@@ -793,10 +796,10 @@ def dictionaryAttack(attack_dict):
                 if re.match(hash_regex, hash_):
                     item = None
 
-                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
+                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1):
                         hash_ = hash_.lower()
 
-                    if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
+                    if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
                         item = [(user, hash_), {}]
                     elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
                         item = [(user, hash_), {'username': user}]
@@ -895,7 +898,7 @@ def dictionaryAttack(attack_dict):
             if user and not user.startswith(DUMMY_USER_PREFIX):
                 custom_wordlist.append(normalizeUnicode(user))
 
-        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC):
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
             for suffix in suffix_list:
                 if not attack_info or processException:
                     break

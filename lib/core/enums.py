@@ -128,6 +128,7 @@ class HASH:
     WORDPRESS = r'(?i)\A\$P\$[./0-9A-Za-z]{31}\Z'
     APACHE_MD5_CRYPT = r'(?i)\A\$apr1\$.{1,8}\$[./a-z0-9]+\Z'
     UNIX_MD5_CRYPT = r'(?i)\A\$1\$.{1,8}\$[./a-z0-9]+\Z'
+    APACHE_SHA1 = r'(?i)\A\{SHA\}[a-z0-9+/]+={0,2}\Z'
 
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
 class MOBILES:
