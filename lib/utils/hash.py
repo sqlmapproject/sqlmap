@@ -378,6 +378,16 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
 
     return "%s%s$%s" % (magic, salt, hash_)
 
+def joomla_passwd(password, salt, **kwargs):
+    """
+    Reference: https://stackoverflow.com/a/10428239
+
+    >>> joomla_passwd(password='testpass', salt='WZGO7gQEl1UHHKeT7mN9n1VNtHj7xhC')
+    'd5875f832ce9d83c21a14075019d3d24:WZGO7gQEl1UHHKeT7mN9n1VNtHj7xhC'
+    """
+
+    return "%s:%s" % (md5("%s%s" % (password, salt)).hexdigest(), salt)
+
 def wordpress_passwd(password, salt, count, prefix, **kwargs):
     """
     Reference(s):
@@ -448,6 +458,7 @@ __functions__ = {
                     HASH.SHA384_GENERIC: sha384_generic_passwd,
                     HASH.SHA512_GENERIC: sha512_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
+                    HASH.JOOMLA: joomla_passwd,
                     HASH.WORDPRESS: wordpress_passwd,
                     HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
                     HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
@@ -796,7 +807,7 @@ def dictionaryAttack(attack_dict):
                 if re.match(hash_regex, hash_):
                     item = None
 
-                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1):
+                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1):
                         hash_ = hash_.lower()
 
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
@@ -811,6 +822,8 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
                     elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
                         item = [(user, hash_), {'salt': hash_.split('$')[2], 'magic': '$%s$' % hash_.split('$')[1]}]
+                    elif hash_regex in (HASH.JOOMLA,):
+                        item = [(user, hash_), {'salt': hash_.split(':')[-1]}]
                     elif hash_regex in (HASH.WORDPRESS,):
                         if ITOA64.index(hash_[3]) < 32:
                             item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
