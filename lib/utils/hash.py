@@ -382,8 +382,8 @@ def joomla_passwd(password, salt, **kwargs):
     """
     Reference: https://stackoverflow.com/a/10428239
 
-    >>> joomla_passwd(password='testpass', salt='WZGO7gQEl1UHHKeT7mN9n1VNtHj7xhC')
-    'd5875f832ce9d83c21a14075019d3d24:WZGO7gQEl1UHHKeT7mN9n1VNtHj7xhC'
+    >>> joomla_passwd(password='testpass', salt='6GGlnaquVXI80b3HRmSyE3K1wEFFaBIf')
+    'e3d5794da74e917637332e0d21b76328:6GGlnaquVXI80b3HRmSyE3K1wEFFaBIf'
     """
 
     return "%s:%s" % (md5("%s%s" % (password, salt)).hexdigest(), salt)
