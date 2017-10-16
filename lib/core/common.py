@@ -32,6 +32,9 @@ import urllib
 import urllib2
 import urlparse
 import unicodedata
+import warnings
+
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
