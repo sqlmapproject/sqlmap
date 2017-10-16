@@ -35,6 +35,7 @@ import zipfile
 from hashlib import md5
 from hashlib import sha1
 from hashlib import sha224
+from hashlib import sha256
 from hashlib import sha384
 from hashlib import sha512
 from Queue import Queue
@@ -272,6 +273,16 @@ def sha224_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
+def sha256_generic_passwd(password, uppercase=False):
+    """
+    >>> sha256_generic_passwd(password='testpass', uppercase=False)
+    '13d249f2cb4127b40cfa757866850278793f814ded3c587fe5889e889a7a9f6c'
+    """
+
+    retVal = sha256(password).hexdigest()
+
+    return retVal.upper() if uppercase else retVal.lower()
+
 def sha384_generic_passwd(password, uppercase=False):
     """
     >>> sha384_generic_passwd(password='testpass', uppercase=False)
@@ -455,6 +466,7 @@ __functions__ = {
                     HASH.MD5_GENERIC: md5_generic_passwd,
                     HASH.SHA1_GENERIC: sha1_generic_passwd,
                     HASH.SHA224_GENERIC: sha224_generic_passwd,
+                    HASH.SHA256_GENERIC: sha256_generic_passwd,
                     HASH.SHA384_GENERIC: sha384_generic_passwd,
                     HASH.SHA512_GENERIC: sha512_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
@@ -911,7 +923,8 @@ def dictionaryAttack(attack_dict):
             if user and not user.startswith(DUMMY_USER_PREFIX):
                 custom_wordlist.append(normalizeUnicode(user))
 
-        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
+        # Algorithms without extra arguments (e.g. salt and/or username)
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
             for suffix in suffix_list:
                 if not attack_info or processException:
                     break
