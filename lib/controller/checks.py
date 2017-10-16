@@ -1382,6 +1382,9 @@ def identifyWaf():
     retVal = []
 
     for function, product in kb.wafFunctions:
+        if retVal and "unknown" in product.lower():
+            continue
+
         try:
             logger.debug("checking for WAF/IPS/IDS product '%s'" % product)
             found = function(_)
