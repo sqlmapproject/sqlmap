@@ -131,6 +131,8 @@ class HASH:
     APACHE_MD5_CRYPT = r'\A\$apr1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
     UNIX_MD5_CRYPT = r'\A\$1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
     APACHE_SHA1 = r'\A\{SHA\}[a-zA-Z0-9+/]+={0,2}\Z'
+    VBULLETIN = r'\A[0-9a-fA-F]{32}:.{30}\Z'
+    VBULLETIN_OLD = r'\A[0-9a-fA-F]{32}:.{3}\Z'
 
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
 class MOBILES:

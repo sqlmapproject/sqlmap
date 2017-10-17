@@ -255,7 +255,7 @@ def sha1_generic_passwd(password, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def apache_sha1_passwd(password, uppercase=False):
+def apache_sha1_passwd(password, **kwargs):
     """
     >>> apache_sha1_passwd(password='testpass')
     '{SHA}IGyAQTualsExLMNGt9JRe4RGPt0='
@@ -399,6 +399,16 @@ def joomla_passwd(password, salt, **kwargs):
 
     return "%s:%s" % (md5("%s%s" % (password, salt)).hexdigest(), salt)
 
+def vbulletin_passwd(password, salt, **kwargs):
+    """
+    Reference: https://stackoverflow.com/a/2202810
+
+    >>> vbulletin_passwd(password='testpass', salt='xOs')
+    'dfc52862d70bc8813c366fca5a6b7f88:xOs'
+    """
+
+    return "%s:%s" % (md5("%s%s" % (md5(password).hexdigest(), salt)).hexdigest(), salt)
+
 def wordpress_passwd(password, salt, count, prefix, **kwargs):
     """
     Reference(s):
@@ -475,6 +485,8 @@ __functions__ = {
                     HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
                     HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
                     HASH.APACHE_SHA1: apache_sha1_passwd,
+                    HASH.VBULLETIN: vbulletin_passwd,
+                    HASH.VBULLETIN_OLD: vbulletin_passwd,
                 }
 
 def storeHashesToFile(attack_dict):
@@ -819,7 +831,7 @@ def dictionaryAttack(attack_dict):
                 if re.match(hash_regex, hash_):
                     item = None
 
-                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1):
+                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
                         hash_ = hash_.lower()
 
                     if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
@@ -834,7 +846,7 @@ def dictionaryAttack(attack_dict):
                         item = [(user, hash_), {'salt': hash_[0:2]}]
                     elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
                         item = [(user, hash_), {'salt': hash_.split('$')[2], 'magic': '$%s$' % hash_.split('$')[1]}]
-                    elif hash_regex in (HASH.JOOMLA,):
+                    elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
                         item = [(user, hash_), {'salt': hash_.split(':')[-1]}]
                     elif hash_regex in (HASH.WORDPRESS,):
                         if ITOA64.index(hash_[3]) < 32:
@@ -924,7 +936,7 @@ def dictionaryAttack(attack_dict):
                 custom_wordlist.append(normalizeUnicode(user))
 
         # Algorithms without extra arguments (e.g. salt and/or username)
-        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
             for suffix in suffix_list:
                 if not attack_info or processException:
                     break
