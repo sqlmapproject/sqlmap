@@ -92,7 +92,7 @@ def forgeHeaders(items=None, base=None):
     if conf.cj:
         if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
-                if cookie.domain_specified and not conf.hostname.endswith(cookie.domain):
+                if cookie.domain_specified and not (conf.hostname or "").endswith(cookie.domain):
                     continue
 
                 if ("%s=" % getUnicode(cookie.name)) in getUnicode(headers[HTTP_HEADER.COOKIE]):
