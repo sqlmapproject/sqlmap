@@ -425,12 +425,32 @@ def joomla_passwd(password, salt, **kwargs):
 
     return "%s:%s" % (md5("%s%s" % (password, salt)).hexdigest(), salt)
 
+def django_md5_passwd(password, salt, **kwargs):
+    """
+    Reference: https://github.com/jay0lee/GAM/blob/master/src/passlib/handlers/django.py
+
+    >>> django_md5_passwd(password='testpass', salt='salt')
+    'md5$salt$972141bcbcb6a0acc96e92309175b3c5'
+    """
+
+    return "md5$%s$%s" % (salt, md5("%s%s" % (salt, password)).hexdigest())
+
+def django_sha1_passwd(password, salt, **kwargs):
+    """
+    Reference: https://github.com/jay0lee/GAM/blob/master/src/passlib/handlers/django.py
+
+    >>> django_sha1_passwd(password='testpass', salt='salt')
+    'sha1$salt$6ce0e522aba69d8baa873f01420fccd0250fc5b2'
+    """
+
+    return "sha1$%s$%s" % (salt, sha1("%s%s" % (salt, password)).hexdigest())
+
 def vbulletin_passwd(password, salt, **kwargs):
     """
     Reference: https://stackoverflow.com/a/2202810
 
-    >>> vbulletin_passwd(password='testpass', salt='xOs')
-    'dfc52862d70bc8813c366fca5a6b7f88:xOs'
+    >>> vbulletin_passwd(password='testpass', salt='salt')
+    '85c4d8ea77ebef2236fb7e9d24ba9482:salt'
     """
 
     return "%s:%s" % (md5("%s%s" % (md5(password).hexdigest(), salt)).hexdigest(), salt)
@@ -507,6 +527,8 @@ __functions__ = {
                     HASH.SHA512_GENERIC: sha512_generic_passwd,
                     HASH.CRYPT_GENERIC: crypt_generic_passwd,
                     HASH.JOOMLA: joomla_passwd,
+                    HASH.DJANGO_MD5: django_md5_passwd,
+                    HASH.DJANGO_SHA1: django_sha1_passwd,
                     HASH.WORDPRESS: wordpress_passwd,
                     HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
                     HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
@@ -861,7 +883,7 @@ def dictionaryAttack(attack_dict):
                     try:
                         item = None
 
-                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512):
+                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512, HASH.DJANGO_MD5, HASH.DJANGO_SHA1):
                             hash_ = hash_.lower()
 
                         if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
@@ -884,6 +906,8 @@ def dictionaryAttack(attack_dict):
                             item = [(user, hash_), {'salt': hash_.split('$')[2], 'magic': '$%s$' % hash_.split('$')[1]}]
                         elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
                             item = [(user, hash_), {'salt': hash_.split(':')[-1]}]
+                        elif hash_regex in (HASH.DJANGO_MD5, DJANGO_SHA1):
+                            item = [(user, hash_), {'salt': hash_.split('$')[1]}]
                         elif hash_regex in (HASH.WORDPRESS,):
                             if ITOA64.index(hash_[3]) < 32:
                                 item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
