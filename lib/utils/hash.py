@@ -25,6 +25,8 @@ else:
     except NotImplementedError:
         pass
 
+import base64
+import binascii
 import gc
 import os
 import re
@@ -261,7 +263,31 @@ def apache_sha1_passwd(password, **kwargs):
     '{SHA}IGyAQTualsExLMNGt9JRe4RGPt0='
     """
 
-    return "{SHA}%s" % sha1(password).digest().encode("base64").strip()
+    return "{SHA}%s" % base64.b64encode(sha1(password).digest())
+
+def ssha_passwd(password, salt, **kwargs):
+    """
+    >>> ssha_passwd(password='testpass', salt='salt')
+    '{SSHA}mU1HPTvnmoXOhE4ROHP6sWfbfoRzYWx0'
+    """
+
+    return "{SSHA}%s" % base64.b64encode(sha1(password + salt).digest() + salt)
+
+def ssha256_passwd(password, salt, **kwargs):
+    """
+    >>> ssha256_passwd(password='testpass', salt='salt')
+    '{SSHA256}hhubsLrO/Aje9F/kJrgv5ZLE40UmTrVWvI7Dt6InP99zYWx0'
+    """
+
+    return "{SSHA256}%s" % base64.b64encode(sha256(password + salt).digest() + salt)
+
+def ssha512_passwd(password, salt, **kwargs):
+    """
+    >>> ssha512_passwd(password='testpass', salt='salt')
+    '{SSHA512}mCUSLfPMhXCQOJl9WHW/QMn9v9sjq7Ht/Wk7iVau8vLOfh+PeynkGMikqIE8sStFd0khdfcCD8xZmC6UyjTxsHNhbHQ='
+    """
+
+    return "{SSHA512}%s" % base64.b64encode(sha512(password + salt).digest() + salt)
 
 def sha224_generic_passwd(password, uppercase=False):
     """
@@ -487,6 +513,9 @@ __functions__ = {
                     HASH.APACHE_SHA1: apache_sha1_passwd,
                     HASH.VBULLETIN: vbulletin_passwd,
                     HASH.VBULLETIN_OLD: vbulletin_passwd,
+                    HASH.SSHA: ssha_passwd,
+                    HASH.SSHA256: ssha256_passwd,
+                    HASH.SSHA512: ssha512_passwd,
                 }
 
 def storeHashesToFile(attack_dict):
@@ -829,44 +858,54 @@ def dictionaryAttack(attack_dict):
                 hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
 
                 if re.match(hash_regex, hash_):
-                    item = None
+                    try:
+                        item = None
 
-                    if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
-                        hash_ = hash_.lower()
+                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512):
+                            hash_ = hash_.lower()
 
-                    if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
-                        item = [(user, hash_), {}]
-                    elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
-                        item = [(user, hash_), {'username': user}]
-                    elif hash_regex in (HASH.ORACLE,):
-                        item = [(user, hash_), {'salt': hash_[-20:]}]
-                    elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD, HASH.MSSQL_NEW):
-                        item = [(user, hash_), {'salt': hash_[6:14]}]
-                    elif hash_regex in (HASH.CRYPT_GENERIC,):
-                        item = [(user, hash_), {'salt': hash_[0:2]}]
-                    elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
-                        item = [(user, hash_), {'salt': hash_.split('$')[2], 'magic': '$%s$' % hash_.split('$')[1]}]
-                    elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
-                        item = [(user, hash_), {'salt': hash_.split(':')[-1]}]
-                    elif hash_regex in (HASH.WORDPRESS,):
-                        if ITOA64.index(hash_[3]) < 32:
-                            item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
-                        else:
-                            warnMsg = "invalid hash '%s'" % hash_
-                            logger.warn(warnMsg)
+                        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
+                            item = [(user, hash_), {}]
+                        elif hash_regex in (HASH.SSHA,):
+                            item = [(user, hash_), {'salt': hash_.decode("base64")[20:]}]
+                        elif hash_regex in (HASH.SSHA256,):
+                            item = [(user, hash_), {'salt': hash_.decode("base64")[32:]}]
+                        elif hash_regex in (HASH.SSHA512,):
+                            item = [(user, hash_), {'salt': hash_.decode("base64")[64:]}]
+                        elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
+                            item = [(user, hash_), {'username': user}]
+                        elif hash_regex in (HASH.ORACLE,):
+                            item = [(user, hash_), {'salt': hash_[-20:]}]
+                        elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD, HASH.MSSQL_NEW):
+                            item = [(user, hash_), {'salt': hash_[6:14]}]
+                        elif hash_regex in (HASH.CRYPT_GENERIC,):
+                            item = [(user, hash_), {'salt': hash_[0:2]}]
+                        elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
+                            item = [(user, hash_), {'salt': hash_.split('$')[2], 'magic': '$%s$' % hash_.split('$')[1]}]
+                        elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
+                            item = [(user, hash_), {'salt': hash_.split(':')[-1]}]
+                        elif hash_regex in (HASH.WORDPRESS,):
+                            if ITOA64.index(hash_[3]) < 32:
+                                item = [(user, hash_), {'salt': hash_[4:12], 'count': 1 << ITOA64.index(hash_[3]), 'prefix': hash_[:12]}]
+                            else:
+                                warnMsg = "invalid hash '%s'" % hash_
+                                logger.warn(warnMsg)
 
-                    if item and hash_ not in keys:
-                        resumed = hashDBRetrieve(hash_)
-                        if not resumed:
-                            attack_info.append(item)
-                            user_hash.append(item[0])
-                        else:
-                            infoMsg = "resuming password '%s' for hash '%s'" % (resumed, hash_)
-                            if user and not user.startswith(DUMMY_USER_PREFIX):
-                                infoMsg += " for user '%s'" % user
-                            logger.info(infoMsg)
-                            resumes.append((user, hash_, resumed))
-                        keys.add(hash_)
+                        if item and hash_ not in keys:
+                            resumed = hashDBRetrieve(hash_)
+                            if not resumed:
+                                attack_info.append(item)
+                                user_hash.append(item[0])
+                            else:
+                                infoMsg = "resuming password '%s' for hash '%s'" % (resumed, hash_)
+                                if user and not user.startswith(DUMMY_USER_PREFIX):
+                                    infoMsg += " for user '%s'" % user
+                                logger.info(infoMsg)
+                                resumes.append((user, hash_, resumed))
+                            keys.add(hash_)
+
+                    except (binascii.Error, IndexError):
+                        pass
 
         if not attack_info:
             continue
@@ -875,7 +914,7 @@ def dictionaryAttack(attack_dict):
             while not kb.wordlists:
 
                 # the slowest of all methods hence smaller default dict
-                if hash_regex in (HASH.ORACLE_OLD, HASH.WORDPRESS):
+                if hash_regex in (HASH.ORACLE_OLD,):
                     dictPaths = [paths.SMALL_DICT]
                 else:
                     dictPaths = [paths.WORDLIST]
