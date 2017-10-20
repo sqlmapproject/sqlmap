@@ -1365,7 +1365,7 @@ def parseTargetDirect():
                     import pyodbc
                 elif dbmsName == DBMS.FIREBIRD:
                     import kinterbasdb
-            except ImportError:
+            except:
                 if _sqlalchemy and data[3] in _sqlalchemy.dialects.__all__:
                     pass
                 else:

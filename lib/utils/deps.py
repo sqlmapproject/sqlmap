@@ -46,7 +46,7 @@ def checkDependencies():
                 __import__("jpype")
             elif dbmsName == DBMS.INFORMIX:
                 __import__("ibm_db_dbi")
-        except ImportError:
+        except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
             warnMsg += "'%s'. Download from %s" % (dbmsName, data[2])
