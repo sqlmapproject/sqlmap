@@ -138,6 +138,10 @@ class HASH:
     SSHA512 = r'\A\{SSHA512\}[a-zA-Z0-9+/]+={0,2}\Z'
     DJANGO_MD5 = r'\Amd5\$[^$]+\$[0-9a-f]{32}\Z'
     DJANGO_SHA1 = r'\Asha1\$[^$]+\$[0-9a-f]{40}\Z'
+    MD5_BASE64 = r'\A[a-zA-Z0-9+/]{22}==\Z'
+    SHA1_BASE64 = r'\A[a-zA-Z0-9+/]{27}=\Z'
+    SHA256_BASE64 = r'\A[a-zA-Z0-9+/]{43}=\Z'
+    SHA512_BASE64 = r'\A[a-zA-Z0-9+/]{86}==\Z'
 
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
 class MOBILES:
