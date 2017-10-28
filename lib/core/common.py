@@ -3294,11 +3294,10 @@ def createGithubIssue(errMsg, excMsg):
     Automatically create a Github issue with unhandled exception information
     """
 
-    issues = []
     try:
         issues = getFileItems(paths.GITHUB_HISTORY, unique=True)
     except:
-        pass
+        issues = []
     finally:
         issues = set(issues)
 
@@ -3373,7 +3372,7 @@ def maskSensitiveData(msg):
 
     retVal = getUnicode(msg)
 
-    for item in filter(None, map(lambda x: conf.get(x), SENSITIVE_OPTIONS)):
+    for item in filter(None, (conf.get(_) for _ in SENSITIVE_OPTIONS)):
         regex = SENSITIVE_DATA_REGEX % re.sub("(\W)", r"\\\1", getUnicode(item))
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
