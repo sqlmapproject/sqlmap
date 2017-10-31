@@ -1649,11 +1649,11 @@ def getFileType(filePath):
     """
 
     try:
-        _ = magic.from_file(filePath)
+        desc = magic.from_file(filePath) or ""
     except:
         return "unknown"
 
-    return "text" if "ASCII" in _ or "text" in _ else "binary"
+    return "text" if any(_ in desc.lower() for _ in ("ascii", "text")) else "binary"
 
 def getCharset(charsetType=None):
     """
@@ -1669,14 +1669,14 @@ def getCharset(charsetType=None):
     if charsetType is None:
         asciiTbl.extend(xrange(0, 128))
 
-    # 0 or 1
+    # Binary
     elif charsetType == CHARSET_TYPE.BINARY:
         asciiTbl.extend([0, 1])
         asciiTbl.extend(xrange(47, 50))
 
     # Digits
     elif charsetType == CHARSET_TYPE.DIGITS:
-        asciiTbl.extend([0, 1])
+        asciiTbl.extend([0, 9])
         asciiTbl.extend(xrange(47, 58))
 
     # Hexadecimal
