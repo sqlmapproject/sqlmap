@@ -913,7 +913,7 @@ def dictionaryAttack(attack_dict):
                             item = [(user, hash_), {"salt": hash_.split('$')[2], "magic": "$%s$" % hash_.split('$')[1]}]
                         elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
                             item = [(user, hash_), {"salt": hash_.split(':')[-1]}]
-                        elif hash_regex in (HASH.DJANGO_MD5, DJANGO_SHA1):
+                        elif hash_regex in (HASH.DJANGO_MD5, HASH.DJANGO_SHA1):
                             item = [(user, hash_), {"salt": hash_.split('$')[1]}]
                         elif hash_regex in (HASH.WORDPRESS,):
                             if ITOA64.index(hash_[3]) < 32:
