@@ -73,6 +73,7 @@ from lib.core.settings import CANDIDATE_SENTENCE_MIN_LENGTH
 from lib.core.settings import CHECK_INTERNET_ADDRESS
 from lib.core.settings import CHECK_INTERNET_VALUE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
+from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
@@ -1411,7 +1412,7 @@ def identifyWaf():
             message = "WAF/IPS/IDS specific response can be found in '%s'. " % filename
             message += "If you know the details on used protection please "
             message += "report it along with specific response "
-            message += "to 'dev@sqlmap.org'"
+            message += "to '%s'" % DEV_EMAIL_ADDRESS
             logger.warn(message)
 
         message = "are you sure that you want to "

@@ -33,6 +33,7 @@ from lib.core.enums import PLACE
 from lib.core.exception import SqlmapCompressionException
 from lib.core.settings import BLOCKED_IP_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
+from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
@@ -214,7 +215,7 @@ def checkCharEncoding(encoding, warn=True):
     except (LookupError, ValueError):
         if warn:
             warnMsg = "unknown web page charset '%s'. " % encoding
-            warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
+            warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
             singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
 

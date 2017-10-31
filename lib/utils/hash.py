@@ -70,6 +70,7 @@ from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
+from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_USER_PREFIX
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
@@ -763,7 +764,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
-                warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
+                warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -837,7 +838,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
             except Exception, e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
-                warnMsg += "Please report by e-mail to 'dev@sqlmap.org'"
+                warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:

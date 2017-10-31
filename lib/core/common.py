@@ -102,6 +102,7 @@ from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
+from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_MARK_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
@@ -1768,7 +1769,7 @@ def safeStringFormat(format_, params):
     if isinstance(params, basestring):
         retVal = retVal.replace("%s", params, 1)
     elif not isListLike(params):
-        retVal = retVal.replace("%s", str(params), 1)
+        retVal = retVal.replace("%s", getUnicode(params), 1)
     else:
         start, end = 0, len(retVal)
         match = re.search(r"%s(.+)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), retVal)
@@ -1794,7 +1795,7 @@ def safeStringFormat(format_, params):
                 if match:
                     if count >= len(params):
                         warnMsg = "wrong number of parameters during string formatting. "
-                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to 'dev@sqlmap.org'" % (format_, params, retVal)
+                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
                         raise SqlmapValueException(warnMsg)
                     else:
                         retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
