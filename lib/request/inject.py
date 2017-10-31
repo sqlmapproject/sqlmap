@@ -43,6 +43,7 @@ from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
+from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
@@ -304,7 +305,7 @@ def _goBooleanProxy(expression):
             return output
 
     vector = kb.injection.data[kb.technique].vector
-    vector = vector.replace("[INFERENCE]", expression)
+    vector = vector.replace(INFERENCE_MARKER, expression)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)

@@ -166,7 +166,7 @@ def htmlunescape(value):
 
     retVal = value
     if value and isinstance(value, basestring):
-        codes = (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&nbsp;', ' '), ('&amp;', '&'))
+        codes = (("&lt;", '<'), ("&gt;", '>'), ("&quot;", '"'), ("&nbsp;", ' '), ("&amp;", '&'), ("&apos;", "'"))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
         try:
             retVal = re.sub(r"&#x([^ ;]+);", lambda match: unichr(int(match.group(1), 16)), retVal)

@@ -27,10 +27,12 @@ def _size_of(object_):
     """
 
     retval = sys.getsizeof(object_, DEFAULT_SIZE_OF)
+
     if isinstance(object_, dict):
         retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(object_.items()))
     elif hasattr(object_, "__iter__"):
         retval += sum(_size_of(_) for _ in object_)
+
     return retval
 
 class Cache(object):
@@ -58,11 +60,13 @@ class BigArray(list):
 
     def append(self, value):
         self.chunks[-1].append(value)
+
         if self.chunk_length == sys.maxint:
             self._size_counter += _size_of(value)
             if self._size_counter >= BIGARRAY_CHUNK_SIZE:
                 self.chunk_length = len(self.chunks[-1])
                 self._size_counter = None
+
         if len(self.chunks[-1]) >= self.chunk_length:
             filename = self._dump(self.chunks[-1])
             self.chunks[-1] = filename
@@ -82,12 +86,14 @@ class BigArray(list):
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex.message
                 raise SqlmapSystemException, errMsg
+
         return self.chunks[-1].pop()
 
     def index(self, value):
         for index in xrange(len(self)):
             if self[index] == value:
                 return index
+
         return ValueError, "%s is not in list" % value
 
     def _dump(self, chunk):
@@ -110,6 +116,7 @@ class BigArray(list):
         if (self.cache and self.cache.index != index and self.cache.dirty):
             filename = self._dump(self.cache.data)
             self.chunks[self.cache.index] = filename
+
         if not (self.cache and self.cache.index == index):
             try:
                 with open(self.chunks[index], "rb") as fp:
@@ -128,18 +135,23 @@ class BigArray(list):
 
     def __getslice__(self, i, j):
         retval = BigArray()
+
         i = max(0, len(self) + i if i < 0 else i)
         j = min(len(self), len(self) + j if j < 0 else j)
+
         for _ in xrange(i, j):
             retval.append(self[_])
+
         return retval
 
     def __getitem__(self, y):
         if y < 0:
             y += len(self)
+
         index = y / self.chunk_length
         offset = y % self.chunk_length
         chunk = self.chunks[index]
+
         if isinstance(chunk, list):
             return chunk[offset]
         else:
@@ -150,6 +162,7 @@ class BigArray(list):
         index = y / self.chunk_length
         offset = y % self.chunk_length
         chunk = self.chunks[index]
+
         if isinstance(chunk, list):
             chunk[offset] = value
         else:

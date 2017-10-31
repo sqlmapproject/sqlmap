@@ -39,6 +39,7 @@ from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
+from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
@@ -319,7 +320,7 @@ class Agent(object):
             origValue = getUnicode(origValue)
             payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
 
-        if "[INFERENCE]" in payload:
+        if INFERENCE_MARKER in payload:
             if Backend.getIdentifiedDbms() is not None:
                 inference = queries[Backend.getIdentifiedDbms()].inference
 
@@ -331,7 +332,7 @@ class Agent(object):
                 else:
                     inferenceQuery = inference.query
 
-                payload = payload.replace("[INFERENCE]", inferenceQuery)
+                payload = payload.replace(INFERENCE_MARKER, inferenceQuery)
             elif not kb.testMode:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
