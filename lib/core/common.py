@@ -1475,15 +1475,16 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    asterisk = re.search("^SELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+`?([^`\s()]+)", expression, re.I)
+    asterisk = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+`?([^`\s()]+)", expression)
 
     if asterisk:
         infoMsg = "you did not provide the fields in your query. "
         infoMsg += "sqlmap will retrieve the column names itself"
         logger.info(infoMsg)
 
-        _ = asterisk.group(2).replace("..", ".").replace(".dbo.", ".")
-        db, conf.tbl = _.split(".", 1) if '.' in _ else (None, _)
+        _ = asterisk.group(2).replace("..", '.').replace(".dbo.", '.')
+        db, conf.tbl = _.split('.', 1) if '.' in _ else (None, _)
+
         if db is None:
             if expression != conf.query:
                 conf.db = db
@@ -1491,6 +1492,7 @@ def expandAsteriskForColumns(expression):
                 expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), "\g<1>%s.%s" % (conf.db, conf.tbl), expression)
         else:
             conf.db = db
+
         conf.db = safeSQLIdentificatorNaming(conf.db)
         conf.tbl = safeSQLIdentificatorNaming(conf.tbl, True)
 
@@ -1500,7 +1502,7 @@ def expandAsteriskForColumns(expression):
             columns = columnsDict[conf.db][conf.tbl].keys()
             columns.sort()
             columnsStr = ", ".join(column for column in columns)
-            expression = expression.replace("*", columnsStr, 1)
+            expression = expression.replace('*', columnsStr, 1)
 
             infoMsg = "the query with expanded column name(s) is: "
             infoMsg += "%s" % expression
@@ -1548,7 +1550,7 @@ def parseUnionPage(page):
     if page is None:
         return None
 
-    if re.search("(?si)\A%s.*%s\Z" % (kb.chars.start, kb.chars.stop), page):
+    if re.search(r"(?si)\A%s.*%s\Z" % (kb.chars.start, kb.chars.stop), page):
         if len(page) > LARGE_OUTPUT_THRESHOLD:
             warnMsg = "large output detected. This might take a while"
             logger.warn(warnMsg)
