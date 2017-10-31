@@ -138,7 +138,7 @@ class Agent(object):
                 value = origValue
             elif where == PAYLOAD.WHERE.NEGATIVE:
                 if conf.invalidLogical:
-                    match = re.search(r'\A[^ ]+', newValue)
+                    match = re.search(r"\A[^ ]+", newValue)
                     newValue = newValue[len(match.group() if match else ""):]
                     _ = randomInt(2)
                     value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", _, _ + 1)
@@ -756,13 +756,13 @@ class Agent(object):
             if fromTable and query.endswith(fromTable):
                 query = query[:-len(fromTable)]
 
-        topNumRegex = re.search("\ATOP\s+([\d]+)\s+", query, re.I)
+        topNumRegex = re.search(r"\ATOP\s+([\d]+)\s+", query, re.I)
         if topNumRegex:
             topNum = topNumRegex.group(1)
             query = query[len("TOP %s " % topNum):]
             unionQuery += "TOP %s " % topNum
 
-        intoRegExp = re.search("(\s+INTO (DUMP|OUT)FILE\s+\'(.+?)\')", query, re.I)
+        intoRegExp = re.search(r"(\s+INTO (DUMP|OUT)FILE\s+'(.+?)')", query, re.I)
 
         if intoRegExp:
             intoRegExp = intoRegExp.group(1)
@@ -810,7 +810,7 @@ class Agent(object):
         stopLimit = None
         limitCond = True
 
-        topLimit = re.search("TOP\s+([\d]+)\s+", expression, re.I)
+        topLimit = re.search(r"TOP\s+([\d]+)\s+", expression, re.I)
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
 
@@ -958,7 +958,7 @@ class Agent(object):
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
-            notDistincts = re.findall("DISTINCT[\(\s+](.+?)\)*\s+", limitedQuery, re.I)
+            notDistincts = re.findall(r"DISTINCT[\(\s+](.+?)\)*\s+", limitedQuery, re.I)
 
             for notDistinct in notDistincts:
                 limitedQuery = limitedQuery.replace("DISTINCT(%s)" % notDistinct, notDistinct)
@@ -975,7 +975,7 @@ class Agent(object):
                     limitedQuery = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
                     forgeNotIn = False
                 else:
-                    topNum = re.search("TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
+                    topNum = re.search(r"TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
                     limitedQuery = limitedQuery.replace("TOP %s " % topNum, "")
 
             if forgeNotIn:
@@ -991,7 +991,7 @@ class Agent(object):
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
                     limitedQuery += "%s %s ORDER BY %s) ORDER BY %s" % (self.nullAndCastField(uniqueField or field), fromFrom, uniqueField or "1", uniqueField or "1")
                 else:
-                    match = re.search(" ORDER BY (\w+)\Z", query)
+                    match = re.search(r" ORDER BY (\w+)\Z", query)
                     field = match.group(1) if match else field
 
                     if " WHERE " in limitedQuery:
@@ -1071,7 +1071,7 @@ class Agent(object):
         """
 
         _ = re.escape(PAYLOAD_DELIMITER)
-        return extractRegexResult("(?s)%s(?P<result>.*?)%s" % (_, _), value)
+        return extractRegexResult(r"(?s)%s(?P<result>.*?)%s" % (_, _), value)
 
     def replacePayload(self, value, payload):
         """
@@ -1079,7 +1079,7 @@ class Agent(object):
         """
 
         _ = re.escape(PAYLOAD_DELIMITER)
-        return re.sub("(?s)(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, getUnicode(payload), PAYLOAD_DELIMITER)).replace("\\", r"\\"), value) if value else value
+        return re.sub(r"(?s)(%s.*?%s)" % (_, _), ("%s%s%s" % (PAYLOAD_DELIMITER, getUnicode(payload), PAYLOAD_DELIMITER)).replace("\\", r"\\"), value) if value else value
 
     def runAsDBMSUser(self, query):
         if conf.dbmsCred and "Ad Hoc Distributed Queries" not in query:

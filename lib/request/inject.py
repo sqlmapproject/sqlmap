@@ -81,9 +81,9 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     if not (timeBasedCompare and kb.dnsTest):
-        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not (timeBasedCompare and not conf.forceThreads):
+        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search(r"(COUNT|LTRIM)\(", expression, re.I) and not (timeBasedCompare and not conf.forceThreads):
 
-            if field and re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
+            if field and re.search(r"\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
                 expression = "SELECT %s FROM (%s)" % (field, expression)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -158,7 +158,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
-    rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
+    rdbRegExp = re.search(r"RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
     if rdbRegExp and Backend.isDbms(DBMS.FIREBIRD):
         expressionFieldsList = [expressionFields]
 
@@ -348,7 +348,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     kb.resumeValues = resumeValue
 
     for keyword in GET_VALUE_UPPERCASE_KEYWORDS:
-        expression = re.sub("(?i)(\A|\(|\)|\s)%s(\Z|\(|\)|\s)" % keyword, r"\g<1>%s\g<2>" % keyword, expression)
+        expression = re.sub(r"(?i)(\A|\(|\)|\s)%s(\Z|\(|\)|\s)" % keyword, r"\g<1>%s\g<2>" % keyword, expression)
 
     if suppressOutput is not None:
         pushValue(getCurrentThreadData().disableStdOut)

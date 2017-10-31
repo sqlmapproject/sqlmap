@@ -319,8 +319,8 @@ class Connect(object):
 
             elif target:
                 if conf.forceSSL and urlparse.urlparse(url).scheme != "https":
-                    url = re.sub("(?i)\Ahttp:", "https:", url)
-                    url = re.sub("(?i):80/", ":443/", url)
+                    url = re.sub(r"(?i)\Ahttp:", "https:", url)
+                    url = re.sub(r"(?i):80/", ":443/", url)
 
                 if PLACE.GET in conf.parameters and not get:
                     get = conf.parameters[PLACE.GET]
@@ -681,7 +681,7 @@ class Connect(object):
                 warnMsg = "there was an incomplete read error while retrieving data "
                 warnMsg += "from the target URL"
             elif "Handshake status" in tbMsg:
-                status = re.search("Handshake status ([\d]{3})", tbMsg)
+                status = re.search(r"Handshake status ([\d]{3})", tbMsg)
                 errMsg = "websocket handshake status %s" % status.group(1) if status else "unknown"
                 raise SqlmapConnectionException(errMsg)
             else:
@@ -738,12 +738,12 @@ class Connect(object):
         if conn and getattr(conn, "redurl", None):
             _ = urlparse.urlsplit(conn.redurl)
             _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
-            requestMsg = re.sub("(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
+            requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
 
             if kb.resendPostOnRedirect is False:
-                requestMsg = re.sub("(\[#\d+\]:\n)POST ", "\g<1>GET ", requestMsg)
-                requestMsg = re.sub("(?i)Content-length: \d+\n", "", requestMsg)
-                requestMsg = re.sub("(?s)\n\n.+", "\n", requestMsg)
+                requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", "\g<1>GET ", requestMsg)
+                requestMsg = re.sub(r"(?i)Content-length: \d+\n", "", requestMsg)
+                requestMsg = re.sub(r"(?s)\n\n.+", "\n", requestMsg)
 
             responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, conn.code, status)
         else:
@@ -870,7 +870,7 @@ class Connect(object):
                     singleTimeWarnMessage(warnMsg)
                 if place in (PLACE.GET, PLACE.POST):
                     _ = re.escape(PAYLOAD_DELIMITER)
-                    match = re.search("(?P<name>\w+)=%s(?P<value>.+?)%s" % (_, _), value)
+                    match = re.search(r"(?P<name>\w+)=%s(?P<value>.+?)%s" % (_, _), value)
                     if match:
                         payload = match.group("value")
 
@@ -936,11 +936,11 @@ class Connect(object):
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
                 retVal = paramString
-                match = re.search("%s=[^&]*" % re.escape(parameter), paramString)
+                match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString)
                 if match:
                     retVal = re.sub(re.escape(match.group(0)), "%s=%s" % (parameter, newValue), paramString)
                 else:
-                    match = re.search("(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString)
+                    match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString)
                     if match:
                         retVal = re.sub(re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
                 return retVal

@@ -374,7 +374,7 @@ def processResponse(page, responseHeaders, status=None):
                             continue
 
                         conf.paramDict[PLACE.POST][name] = value
-                conf.parameters[PLACE.POST] = re.sub("(?i)(%s=)[^&]+" % re.escape(name), r"\g<1>%s" % re.escape(value), conf.parameters[PLACE.POST])
+                conf.parameters[PLACE.POST] = re.sub(r"(?i)(%s=)[^&]+" % re.escape(name), r"\g<1>%s" % re.escape(value), conf.parameters[PLACE.POST])
 
     if not kb.browserVerification and re.search(r"(?i)browser.?verification", page or ""):
         kb.browserVerification = True

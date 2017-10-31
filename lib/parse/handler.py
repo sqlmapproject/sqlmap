@@ -44,7 +44,7 @@ class FingerprintHandler(ContentHandler):
     def startElement(self, name, attrs):
         if name == "regexp":
             self._regexp = sanitizeStr(attrs.get("value"))
-            _ = re.match("\A[A-Za-z0-9]+", self._regexp)  # minor trick avoiding compiling of large amount of regexes
+            _ = re.match(r"\A[A-Za-z0-9]+", self._regexp)  # minor trick avoiding compiling of large amount of regexes
 
             if _ and _.group(0).lower() in self._banner.lower() or not _:
                 self._match = re.search(self._regexp, self._banner, re.I | re.M)

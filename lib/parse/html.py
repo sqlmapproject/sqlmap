@@ -43,7 +43,7 @@ class HTMLHandler(ContentHandler):
         elif name == "error":
             regexp = attrs.get("regexp")
             if regexp not in kb.cache.regex:
-                keywords = re.findall("\w+", re.sub(r"\\.", " ", regexp))
+                keywords = re.findall(r"\w+", re.sub(r"\\.", " ", regexp))
                 keywords = sorted(keywords, key=len)
                 kb.cache.regex[regexp] = keywords[-1].lower()
 

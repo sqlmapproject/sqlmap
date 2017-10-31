@@ -434,7 +434,7 @@ def _setMultipleTargets():
         files.sort()
 
         for reqFile in files:
-            if not re.search("([\d]+)\-request", reqFile):
+            if not re.search(r"([\d]+)\-request", reqFile):
                 continue
 
             _feedTargetsDict(os.path.join(conf.logFile, reqFile), addedTargetUrls)
@@ -666,7 +666,7 @@ def _setDBMSAuthentication():
     debugMsg = "setting the DBMS authentication credentials"
     logger.debug(debugMsg)
 
-    match = re.search("^(.+?):(.*?)$", conf.dbmsCred)
+    match = re.search(r"^(.+?):(.*?)$", conf.dbmsCred)
 
     if not match:
         errMsg = "DBMS authentication credentials value must be in format "
@@ -861,7 +861,7 @@ def _setDBMS():
     logger.debug(debugMsg)
 
     conf.dbms = conf.dbms.lower()
-    regex = re.search("%s ([\d\.]+)" % ("(%s)" % "|".join([alias for alias in SUPPORTED_DBMS])), conf.dbms, re.I)
+    regex = re.search(r"%s ([\d\.]+)" % ("(%s)" % "|".join([alias for alias in SUPPORTED_DBMS])), conf.dbms, re.I)
 
     if regex:
         conf.dbms = regex.group(1)
@@ -1148,7 +1148,7 @@ def _setHTTPHandlers():
             raise SqlmapSyntaxException(errMsg)
 
         if conf.proxyCred:
-            _ = re.search("^(.*?):(.*?)$", conf.proxyCred)
+            _ = re.search(r"\A(.*?):(.*?)\Z", conf.proxyCred)
             if not _:
                 errMsg = "proxy authentication credentials "
                 errMsg += "value must be in format username:password"
@@ -1256,7 +1256,7 @@ def _setSafeVisit():
             errMsg = "invalid format of a safe request file"
             raise SqlmapSyntaxException, errMsg
     else:
-        if not re.search("^http[s]*://", conf.safeUrl):
+        if not re.search(r"\Ahttp[s]*://", conf.safeUrl):
             if ":443/" in conf.safeUrl:
                 conf.safeUrl = "https://" + conf.safeUrl
             else:

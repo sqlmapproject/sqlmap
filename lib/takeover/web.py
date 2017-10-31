@@ -80,7 +80,7 @@ class Web:
         page, _, _ = Request.getPage(url=cmdUrl, direct=True, silent=True, timeout=BACKDOOR_RUN_CMD_TIMEOUT)
 
         if page is not None:
-            output = re.search("<pre>(.+?)</pre>", page, re.I | re.S)
+            output = re.search(r"<pre>(.+?)</pre>", page, re.I | re.S)
 
             if output:
                 output = output.group(1)

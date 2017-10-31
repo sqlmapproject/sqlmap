@@ -52,7 +52,7 @@ class Fingerprint(GenericFingerprint):
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]
 
-            if re.search("-log$", kb.data.banner):
+            if re.search(r"-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
             banVer = Format.getDbms([banVer])

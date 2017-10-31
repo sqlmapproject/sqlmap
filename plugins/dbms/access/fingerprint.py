@@ -94,7 +94,7 @@ class Fingerprint(GenericFingerprint):
 
         if wasLastResponseDBMSError():
             threadData = getCurrentThreadData()
-            match = re.search("Could not find file\s+'([^']+?)'", threadData.lastErrorPage[1])
+            match = re.search(r"Could not find file\s+'([^']+?)'", threadData.lastErrorPage[1])
 
             if match:
                 retVal = match.group(1).rstrip("%s.mdb" % randStr)
@@ -130,7 +130,7 @@ class Fingerprint(GenericFingerprint):
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]
 
-            if re.search("-log$", kb.data.banner):
+            if re.search(r"-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
             banVer = Format.getDbms([banVer])

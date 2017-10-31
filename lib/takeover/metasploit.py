@@ -576,7 +576,7 @@ class Metasploit:
                 timeout = time.time() - start_time > METASPLOIT_SESSION_TIMEOUT
 
                 if not initialized:
-                    match = re.search("Meterpreter session ([\d]+) opened", out)
+                    match = re.search(r"Meterpreter session ([\d]+) opened", out)
 
                     if match:
                         self._loadMetExtensions(proc, match.group(1))
@@ -622,7 +622,7 @@ class Metasploit:
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
-        match = re.search("(Total size:|Length:|succeeded with size|Final size of exe file:) ([\d]+)", payloadStderr)
+        match = re.search(r"(Total size:|Length:|succeeded with size|Final size of exe file:) ([\d]+)", payloadStderr)
 
         if match:
             payloadSize = int(match.group(2))

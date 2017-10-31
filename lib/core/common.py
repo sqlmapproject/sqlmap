@@ -1208,7 +1208,7 @@ def cleanQuery(query):
 
     for sqlStatements in SQL_STATEMENTS.values():
         for sqlStatement in sqlStatements:
-            queryMatch = re.search("(?i)\b(%s)\b" % sqlStatement.replace("(", "").replace(")", "").strip(), query)
+            queryMatch = re.search(r"(?i)\b(%s)\b" % sqlStatement.replace("(", "").replace(")", "").strip(), query)
 
             if queryMatch and "sys_exec" not in query:
                 retVal = retVal.replace(queryMatch.group(1), sqlStatement.upper())
@@ -1387,13 +1387,12 @@ def parseTargetUrl():
 
     originalUrl = conf.url
 
-    if re.search("\[.+\]", conf.url) and not socket.has_ipv6:
+    if re.search(r"\[.+\]", conf.url) and not socket.has_ipv6:
         errMsg = "IPv6 addressing is not supported "
         errMsg += "on this platform"
         raise SqlmapGenericException(errMsg)
 
-    if not re.search("^http[s]*://", conf.url, re.I) and \
-            not re.search("^ws[s]*://", conf.url, re.I):
+    if not re.search(r"^http[s]*://", conf.url, re.I) and not re.search(r"^ws[s]*://", conf.url, re.I):
         if ":443/" in conf.url:
             conf.url = "https://" + conf.url
         else:
@@ -1410,7 +1409,7 @@ def parseTargetUrl():
         errMsg += "in the hostname part"
         raise SqlmapGenericException(errMsg)
 
-    hostnamePort = urlSplit.netloc.split(":") if not re.search("\[.+\]", urlSplit.netloc) else filter(None, (re.search("\[.+\]", urlSplit.netloc).group(0), re.search("\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
+    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filter(None, (re.search("\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
     conf.scheme = (urlSplit.scheme.strip().lower() or "http") if not conf.forceSSL else "https"
     conf.path = urlSplit.path.strip()
@@ -1426,7 +1425,7 @@ def parseTargetUrl():
     except UnicodeError:
         _ = None
 
-    if any((_ is None, re.search(r'\s', conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
+    if any((_ is None, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
         errMsg = "invalid target URL ('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
@@ -1559,7 +1558,7 @@ def parseUnionPage(page):
         data = BigArray()
         keys = set()
 
-        for match in re.finditer("%s(.*?)%s" % (kb.chars.start, kb.chars.stop), page, re.DOTALL | re.IGNORECASE):
+        for match in re.finditer(r"%s(.*?)%s" % (kb.chars.start, kb.chars.stop), page, re.DOTALL | re.IGNORECASE):
             entry = match.group(1)
 
             if kb.chars.start in entry:
@@ -1885,7 +1884,7 @@ def isWindowsDriveLetterPath(filepath):
     False
     """
 
-    return re.search("\A[\w]\:", filepath) is not None
+    return re.search(r"\A[\w]\:", filepath) is not None
 
 def posixToNtSlashes(filepath):
     """
@@ -2579,7 +2578,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
         # encoded (when not representing URL encoded char)
         # except in cases when tampering scripts are used
         if all('%' in _ for _ in (safe, value)) and not kb.tamperFunctions:
-            value = re.sub("%(?![0-9a-fA-F]{2})", "%25", value)
+            value = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", value)
 
         while True:
             result = urllib.quote(utf8encode(value), safe)
@@ -3277,7 +3276,7 @@ def unhandledExceptionMessage():
     errMsg += "sqlmap version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % PLATFORM
-    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
+    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else ("DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS:"
 
@@ -3376,7 +3375,7 @@ def maskSensitiveData(msg):
     retVal = getUnicode(msg)
 
     for item in filter(None, (conf.get(_) for _ in SENSITIVE_OPTIONS)):
-        regex = SENSITIVE_DATA_REGEX % re.sub("(\W)", r"\\\1", getUnicode(item))
+        regex = SENSITIVE_DATA_REGEX % re.sub(r"(\W)", r"\\\1", getUnicode(item))
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
             retVal = retVal.replace(value, '*' * len(value))
@@ -3777,7 +3776,7 @@ def randomizeParameterValue(value):
 
     value = re.sub(r"%[0-9a-fA-F]{2}", "", value)
 
-    for match in re.finditer('[A-Z]+', value):
+    for match in re.finditer(r"[A-Z]+", value):
         while True:
             original = match.group()
             candidate = randomStr(len(match.group())).upper()
@@ -3786,7 +3785,7 @@ def randomizeParameterValue(value):
 
         retVal = retVal.replace(original, candidate)
 
-    for match in re.finditer('[a-z]+', value):
+    for match in re.finditer(r"[a-z]+", value):
         while True:
             original = match.group()
             candidate = randomStr(len(match.group())).lower()
@@ -3795,7 +3794,7 @@ def randomizeParameterValue(value):
 
         retVal = retVal.replace(original, candidate)
 
-    for match in re.finditer('[0-9]+', value):
+    for match in re.finditer(r"[0-9]+", value):
         while True:
             original = match.group()
             candidate = str(randomInt(len(match.group())))
@@ -4034,7 +4033,7 @@ def getHostHeader(url):
     if url:
         retVal = urlparse.urlparse(url).netloc
 
-        if re.search("http(s)?://\[.+\]", url, re.I):
+        if re.search(r"http(s)?://\[.+\]", url, re.I):
             retVal = extractRegexResult("http(s)?://\[(?P<result>.+)\]", url)
         elif any(retVal.endswith(':%d' % _) for _ in (80, 443)):
             retVal = retVal.split(':')[0]

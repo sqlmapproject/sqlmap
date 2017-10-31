@@ -6,12 +6,12 @@ See the file 'LICENSE' for copying permission
 """
 
 import os
-import re
 
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import decloakToTemp
 from lib.core.common import isStackingAvailable
+from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import randomStr
@@ -49,7 +49,7 @@ class Takeover(GenericTakeover):
                 # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
                 self.__basedir = unArrayizeValue(inject.getValue("SELECT @@basedir"))
 
-                if re.search("^[\w]\:[\/\\\\]+", (self.__basedir or ""), re.I):
+                if isWindowsDriveLetterPath(self.__basedir or ""):
                     Backend.setOs(OS.WINDOWS)
                 else:
                     Backend.setOs(OS.LINUX)

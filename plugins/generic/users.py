@@ -165,7 +165,7 @@ class Users:
 
             if Backend.isDbms(DBMS.MYSQL):
                 for user in users:
-                    parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+                    parsedUser = re.search(r"['\"]?(.*?)['\"]?\@", user)
 
                     if parsedUser:
                         users[users.index(user)] = parsedUser.groups()[0]
@@ -220,7 +220,7 @@ class Users:
 
                 if Backend.isDbms(DBMS.MYSQL):
                     for user in users:
-                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+                        parsedUser = re.search(r"['\"]?(.*?)['\"]?\@", user)
 
                         if parsedUser:
                             users[users.index(user)] = parsedUser.groups()[0]
@@ -349,7 +349,7 @@ class Users:
 
             if Backend.isDbms(DBMS.MYSQL):
                 for user in users:
-                    parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+                    parsedUser = re.search(r"['\"]?(.*?)['\"]?\@", user)
 
                     if parsedUser:
                         users[users.index(user)] = parsedUser.groups()[0]
@@ -463,7 +463,7 @@ class Users:
 
                 if Backend.isDbms(DBMS.MYSQL):
                     for user in users:
-                        parsedUser = re.search("[\047]*(.*?)[\047]*\@", user)
+                        parsedUser = re.search(r"['\"]?(.*?)['\"]?\@", user)
 
                         if parsedUser:
                             users[users.index(user)] = parsedUser.groups()[0]
