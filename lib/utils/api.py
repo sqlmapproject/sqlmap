@@ -23,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import saveConfig
 from lib.core.common import unArrayizeValue
+from lib.core.convert import base64encode
 from lib.core.convert import hexencode
 from lib.core.convert import dejsonize
 from lib.core.convert import jsonize
@@ -654,7 +655,7 @@ def download(taskid, target, filename):
         logger.debug("[%s] Retrieved content of file %s" % (taskid, target))
         with open(path, 'rb') as inf:
             file_content = inf.read()
-        return jsonize({"success": True, "file": file_content.encode("base64")})
+        return jsonize({"success": True, "file": base64encode(file_content)})
     else:
         logger.warning("[%s] File does not exist %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
@@ -722,7 +723,7 @@ def _client(url, options=None):
         headers = {"Content-Type": "application/json"}
 
         if DataStore.username or DataStore.password:
-            headers["Authorization"] = "Basic %s" % ("%s:%s" % (DataStore.username or "", DataStore.password or "")).encode("base64").strip()
+            headers["Authorization"] = "Basic %s" % base64encode("%s:%s" % (DataStore.username or "", DataStore.password or ""))
 
         req = urllib2.Request(url, data, headers)
         response = urllib2.urlopen(req)
