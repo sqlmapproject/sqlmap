@@ -2333,7 +2333,7 @@ def longestCommonPrefix(*sequences):
     return sequences[0]
 
 def commonFinderOnly(initial, sequence):
-    return longestCommonPrefix(*filter(lambda x: x.startswith(initial), sequence))
+    return longestCommonPrefix(*filter(lambda _: _.startswith(initial), sequence))
 
 def pushValue(value):
     """
@@ -2431,7 +2431,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     if candidate:
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
 
-        if all((x == candidate for x in kb.delayCandidates)) and candidate < conf.timeSec:
+        if all((_ == candidate for _ in kb.delayCandidates)) and candidate < conf.timeSec:
             conf.timeSec = candidate
 
             infoMsg = "adjusting time delay to "
@@ -2543,8 +2543,8 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                     return char if char in charset else match.group(0)
                 result = value
                 if plusspace:
-                    result = result.replace("+", " ")  # plus sign has a special meaning in URL encoded data (hence the usage of urllib.unquote_plus in convall case)
-                result = re.sub("%([0-9a-fA-F]{2})", _, result)
+                    result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of urllib.unquote_plus in convall case)
+                result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
 
     if isinstance(result, str):
         result = unicode(result, encoding or UNICODE_ENCODING, "replace")
@@ -2944,8 +2944,8 @@ def isStackingAvailable():
         retVal = True
     else:
         for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
-            _ = getTechniqueData(technique)
-            if _ and "stacked" in _["title"].lower():
+            data = getTechniqueData(technique)
+            if data and "stacked" in data["title"].lower():
                 retVal = True
                 break
 
@@ -3007,7 +3007,7 @@ def saveConfig(conf, filename):
                     if option in defaults:
                         value = str(defaults[option])
                     else:
-                        value = "0"
+                        value = '0'
                 elif datatype == OPTION_TYPE.STRING:
                     value = ""
 
@@ -3131,7 +3131,7 @@ def getSortedInjectionTests():
         if test.stype == PAYLOAD.TECHNIQUE.UNION:
             retVal = SORT_ORDER.LAST
 
-        elif 'details' in test and 'dbms' in test.details:
+        elif "details" in test and "dbms" in test.details:
             if intersect(test.details.dbms, Backend.getIdentifiedDbms()):
                 retVal = SORT_ORDER.SECOND
             else:
@@ -3210,7 +3210,7 @@ def decodeIntToUnicode(value):
                 raw = hexdecode(_)
 
                 if Backend.isDbms(DBMS.MYSQL):
-                    # https://github.com/sqlmapproject/sqlmap/issues/1531
+                    # Note: https://github.com/sqlmapproject/sqlmap/issues/1531
                     retVal = getUnicode(raw, conf.encoding or UNICODE_ENCODING)
                 elif Backend.isDbms(DBMS.MSSQL):
                     retVal = getUnicode(raw, "UTF-16-BE")
@@ -3387,7 +3387,7 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     if getpass.getuser():
-        retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), "*" * len(getpass.getuser()), retVal)
+        retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), '*' * len(getpass.getuser()), retVal)
 
     return retVal
 
@@ -3462,7 +3462,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
                 return value
 
-            payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ''), convall=True))
+            payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ""), convall=True))
             regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string-escape")))
 
             if regex != payload:
@@ -3518,7 +3518,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                         warnMsg = "reflective value(s) found and filtering out"
                         singleTimeWarnMessage(warnMsg)
 
-                    if re.search(r"FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal, re.I):
+                    if re.search(r"(?i)FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal):
                         warnMsg = "frames detected containing attacked parameter values. Please be sure to "
                         warnMsg += "test those separately in case that attack on this page fails"
                         singleTimeWarnMessage(warnMsg)
@@ -3547,7 +3547,7 @@ def normalizeUnicode(value):
     'sucuraj'
     """
 
-    return unicodedata.normalize('NFKD', value).encode('ascii', 'ignore') if isinstance(value, unicode) else value
+    return unicodedata.normalize("NFKD", value).encode("ascii", "ignore") if isinstance(value, unicode) else value
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
@@ -3669,7 +3669,7 @@ def expandMnemonics(mnemonics, parser, args):
 
     for mnemonic in (mnemonics or "").split(','):
         found = None
-        name = mnemonic.split('=')[0].replace("-", "").strip()
+        name = mnemonic.split('=')[0].replace('-', "").strip()
         value = mnemonic.split('=')[1] if len(mnemonic.split('=')) > 1 else None
         pointer = head
 
@@ -4242,8 +4242,10 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
 
     _ = "%s%s%s" % (conf.url or "%s%s" % (conf.hostname, conf.port), key, HASHDB_MILESTONE_VALUE)
     retVal = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any((conf.flushSession, conf.freshQueries))) else None
+
     if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, basestring) and any(_ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
         retVal = None
+
     return retVal
 
 def resetCookieJar(cookieJar):
