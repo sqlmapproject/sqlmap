@@ -605,8 +605,8 @@ def attackDumpedTable():
         if not count:
             return
 
-        infoMsg = "analyzing table dump for possible password hashes"
-        logger.info(infoMsg)
+        debugMsg = "analyzing table dump for possible password hashes"
+        logger.debug(debugMsg)
 
         found = False
         col_user = ''
@@ -666,8 +666,8 @@ def attackDumpedTable():
                 if hash_:
                     lut[hash_.lower()] = password
 
-            infoMsg = "postprocessing table dump"
-            logger.info(infoMsg)
+            debugMsg = "post-processing table dump"
+            logger.debug(debugMsg)
 
             for i in xrange(count):
                 for column in columns:
