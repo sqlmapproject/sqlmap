@@ -1411,7 +1411,7 @@ def parseTargetUrl():
 
     hostnamePort = urlSplit.netloc.split(":") if not re.search("\[.+\]", urlSplit.netloc) else filter(None, (re.search("\[.+\]", urlSplit.netloc).group(0), re.search("\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
-    conf.scheme = urlSplit.scheme.strip().lower() if not conf.forceSSL else "https"
+    conf.scheme = (urlSplit.scheme.strip().lower() or "http") if not conf.forceSSL else "https"
     conf.path = urlSplit.path.strip()
     conf.hostname = hostnamePort[0].strip()
 
