@@ -104,7 +104,11 @@ def _search(dork):
     if not retVal and "detected unusual traffic" in page:
         warnMsg = "Google has detected 'unusual' traffic from "
         warnMsg += "used IP address disabling further searches"
-        logger.warn(warnMsg)
+
+        if conf.proxyList:
+            raise SqlmapBaseException(warnMsg)
+        else:
+            logger.critical(warnMsg)
 
     if not retVal:
         message = "no usable links found. What do you want to do?"
