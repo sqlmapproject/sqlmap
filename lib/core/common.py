@@ -1202,16 +1202,20 @@ def parsePasswordHash(password):
 def cleanQuery(query):
     """
     Switch all SQL statement (alike) keywords to upper case
+
+    >>> cleanQuery("select id from users")
+    'SELECT id FROM users'
     """
 
     retVal = query
 
     for sqlStatements in SQL_STATEMENTS.values():
         for sqlStatement in sqlStatements:
-            queryMatch = re.search(r"(?i)\b(%s)\b" % sqlStatement.replace("(", "").replace(")", "").strip(), query)
+            candidate = sqlStatement.replace("(", "").replace(")", "").strip()
+            queryMatch = re.search(r"(?i)\b(%s)\b" % candidate, query)
 
             if queryMatch and "sys_exec" not in query:
-                retVal = retVal.replace(queryMatch.group(1), sqlStatement.upper())
+                retVal = retVal.replace(queryMatch.group(1), candidate.upper())
 
     return retVal
 
