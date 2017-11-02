@@ -1727,14 +1727,14 @@ def normalizePath(filepath):
     Returns normalized string representation of a given filepath
 
     >>> normalizePath('//var///log/apache.log')
-    '//var/log/apache.log'
+    '/var/log/apache.log'
     """
 
     retVal = filepath
 
     if retVal:
         retVal = retVal.strip("\r\n")
-        retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else posixpath.normpath(retVal)
+        retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else re.sub(r"\A/{2,}", "/", posixpath.normpath(retVal))
 
     return retVal
 
