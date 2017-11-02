@@ -500,7 +500,7 @@ IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,NULL,'<script>alert(\"XSS\")
 SHELLCODEEXEC_RANDOM_STRING_MARKER = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Generic address for checking the Internet connection while using switch --check-internet
-CHECK_INTERNET_ADDRESS = "http://ipinfo.io/"
+CHECK_INTERNET_ADDRESS = "https://ipinfo.io/"
 
 # Value to look for in response to CHECK_INTERNET_ADDRESS
 CHECK_INTERNET_VALUE = "IP Address Details"
