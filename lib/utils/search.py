@@ -122,7 +122,7 @@ def _search(dork):
         elif choice == '2':
             url = "https://www.bing.com/search?q=%s&first=%d" % (urlencode(dork, convall=True), (gpage - 1) * 10 + 1)
             regex = BING_REGEX
-        elif choice == '1':
+        else:
             url = "https://duckduckgo.com/d.js?"
             url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
             regex = DUCKDUCKGO_REGEX
