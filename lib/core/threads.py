@@ -64,9 +64,6 @@ class _ThreadData(threading.local):
 
 ThreadData = _ThreadData()
 
-def getCurrentThreadUID():
-    return hash(threading.currentThread())
-
 def readInput(message, default=None, checkBatch=True, boolean=False):
     # It will be overwritten by original from lib.core.common
     pass

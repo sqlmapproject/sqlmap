@@ -207,16 +207,6 @@ class Agent(object):
 
         return retVal
 
-    def fullPayload(self, query):
-        if conf.direct:
-            return self.payloadDirect(query)
-
-        query = self.prefixQuery(query)
-        query = self.suffixQuery(query)
-        payload = self.payload(newValue=query)
-
-        return payload
-
     def prefixQuery(self, expression, prefix=None, where=None, clause=None):
         """
         This method defines how the input expression has to be escaped

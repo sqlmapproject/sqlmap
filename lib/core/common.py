@@ -3428,21 +3428,6 @@ def listToStrValue(value):
 
     return retVal
 
-def getExceptionFrameLocals():
-    """
-    Returns dictionary with local variable content from frame where exception has been raised
-    """
-
-    retVal = {}
-
-    if sys.exc_info():
-        trace = sys.exc_info()[2]
-        while trace.tb_next:
-            trace = trace.tb_next
-        retVal = trace.tb_frame.f_locals
-
-    return retVal
-
 def intersect(valueA, valueB, lowerCase=False):
     """
     Returns intersection of the array-ized values
