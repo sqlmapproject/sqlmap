@@ -46,7 +46,7 @@ ec6a778b0e74749b916caead78ba88b7  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-d5835ec26ff3cde1f1bafedc593dbde6  lib/core/settings.py
+8891f0465540e47f2f56adfa5f516e17  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 7c9f2af3c0a8dd89223cfe07b0a0b826  lib/core/target.py
@@ -100,7 +100,7 @@ fcc3a6ac3b5f7aad86686e5f9adc7a43  lib/techniques/union/test.py
 505682f95cb23573dd60bf6d0063a632  lib/techniques/union/use.py
 452cb280aa51a4ddf38d94534a6e8d5f  lib/utils/api.py
 d9d62fa5d7367e7fb23180240c8d03f4  lib/utils/brute.py
-95e4eab120640fd9330d569a29a25be4  lib/utils/crawler.py
+7e0078da1dff59530d64f9b1e2f68607  lib/utils/crawler.py
 a2d2087353fb64a8441c3247ae0ad719  lib/utils/deps.py
 b806de9710a02436e576ac9065816021  lib/utils/getch.py
 fe3a38f820ae05a95f92ab53e22b46d0  lib/utils/har.py
