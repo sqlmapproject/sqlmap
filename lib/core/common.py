@@ -28,6 +28,7 @@ import sys
 import tempfile
 import threading
 import time
+import types
 import urllib
 import urllib2
 import urlparse
@@ -3418,7 +3419,7 @@ def listToStrValue(value):
     '1, 2, 3'
     """
 
-    if isinstance(value, (set, tuple)):
+    if isinstance(value, (set, tuple, types.GeneratorType)):
         value = list(value)
 
     if isinstance(value, list):

