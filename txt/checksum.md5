@@ -46,7 +46,7 @@ ec6a778b0e74749b916caead78ba88b7  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-5cfc263d2081144f63918be068e126e3  lib/core/settings.py
+131b671b06a10d4fb46daa6c1b9399c4  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 7c9f2af3c0a8dd89223cfe07b0a0b826  lib/core/target.py
@@ -87,7 +87,7 @@ ac3f47b2f8d2cd530512405b4a23a9db  lib/takeover/metasploit.py
 21b6eff33f5d28c5e167a948976817cb  lib/takeover/udf.py
 916917ef27d12544fdc68265ba28f70e  lib/takeover/web.py
 d3080bf68b4b85ed2c98af5de74e8b73  lib/takeover/xp_cmdshell.py
-4ec8685f767dc2419e46380320273ff9  lib/techniques/blind/inference.py
+ab58650253fdad04e7a53a4e4d36df8a  lib/techniques/blind/inference.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/techniques/blind/__init__.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/techniques/dns/__init__.py
 95331b2826f28db9ff962670391aa7d6  lib/techniques/dns/test.py

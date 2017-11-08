@@ -110,7 +110,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if partialValue:
             firstChar = len(partialValue)
-        elif "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
+        elif re.search(r"(?i)\b(LENGTH|LEN)\(", expression):
             firstChar = 0
         elif (kb.fileReadMode or dump) and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
@@ -121,7 +121,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             firstChar = 0
 
-        if "LENGTH(" in expression.upper() or "LEN(" in expression.upper():
+        if re.search(r"(?i)\b(LENGTH|LEN)\(", expression):
             lastChar = 0
         elif dump and conf.lastChar is not None and (isinstance(conf.lastChar, int) or (isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
@@ -343,7 +343,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if result:
                         minValue = posValue
 
-                        if type(charTbl) != xrange:
+                        if not isinstance(charTbl, xrange):
                             charTbl = charTbl[position:]
                         else:
                             # xrange() - extended virtual charset used for memory/space optimization
@@ -351,7 +351,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     else:
                         maxValue = posValue
 
-                        if type(charTbl) != xrange:
+                        if not isinstance(charTbl, xrange):
                             charTbl = charTbl[:position]
                         else:
                             charTbl = xrange(charTbl[0], charTbl[position])
@@ -390,7 +390,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         if timeBasedCompare:
                                             if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
                                                 conf.timeSec += 1
-                                                warnMsg = "increasing time delay to %d second%s " % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                                warnMsg = "increasing time delay to %d second%s" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
                                                 logger.warn(warnMsg)
 
                                             if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
