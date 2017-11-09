@@ -254,12 +254,22 @@ def decodePage(page, contentEncoding, contentType):
     if not page or (conf.nullConnection and len(page) < 2):
         return getUnicode(page)
 
-    if isinstance(contentEncoding, basestring) and contentEncoding.lower() in ("gzip", "x-gzip", "deflate"):
+    if isinstance(contentEncoding, basestring) and contentEncoding:
+        contentEncoding = contentEncoding.lower()
+    else:
+        contentEncoding = ""
+
+    if isinstance(contentType, basestring) and contentType:
+        contentType = contentType.lower()
+    else:
+        contentType = ""
+
+    if contentEncoding in ("gzip", "x-gzip", "deflate"):
         if not kb.pageCompress:
             return None
 
         try:
-            if contentEncoding.lower() == "deflate":
+            if contentEncoding == "deflate":
                 data = StringIO.StringIO(zlib.decompress(page, -15))  # Reference: http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             else:
                 data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
@@ -284,7 +294,7 @@ def decodePage(page, contentEncoding, contentType):
         httpCharset, metaCharset = None, None
 
         # Reference: http://stackoverflow.com/questions/1020892/python-urllib2-read-to-unicode
-        if contentType and (contentType.find("charset=") != -1):
+        if contentType.find("charset=") != -1:
             httpCharset = checkCharEncoding(contentType.split("charset=")[-1])
 
         metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page))
@@ -300,7 +310,7 @@ def decodePage(page, contentEncoding, contentType):
         kb.pageEncoding = conf.encoding
 
     # can't do for all responses because we need to support binary files too
-    if contentType and not isinstance(page, unicode) and "text/" in contentType.lower():
+    if not isinstance(page, unicode) and "text/" in contentType:
         if kb.heuristicMode:
             kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
             page = getUnicode(page, kb.pageEncoding)

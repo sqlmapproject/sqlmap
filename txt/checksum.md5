@@ -46,7 +46,7 @@ ec6a778b0e74749b916caead78ba88b7  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-15a317ddbd48bdf94e1642df57664790  lib/core/settings.py
+4092cefeab1270e5f9a987582eb1c099  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 7c9f2af3c0a8dd89223cfe07b0a0b826  lib/core/target.py
