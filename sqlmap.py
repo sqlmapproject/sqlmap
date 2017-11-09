@@ -262,6 +262,12 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "twophase" in excMsg:
+                errMsg = "please update the 'sqlalchemy' package"
+                errMsg += "(Reference: https://github.com/apache/incubator-superset/issues/3447)"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "can't start new thread" in excMsg:
                 errMsg = "there has been a problem while creating new thread instance. "
                 errMsg += "Please make sure that you are not running too many processes"
