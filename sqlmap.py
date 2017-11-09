@@ -262,7 +262,7 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
-            elif "twophase" in excMsg:
+            elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
                 errMsg = "please update the 'sqlalchemy' package"
                 errMsg += "(Reference: https://github.com/apache/incubator-superset/issues/3447)"
                 logger.error(errMsg)
