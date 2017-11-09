@@ -27,11 +27,11 @@ d2cdb9e832e18a81e936ca3348144b16  lib/controller/handler.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/controller/__init__.py
 c1ba81136151b327c71fd01376376451  lib/core/agent.py
 d55b4b58019d6dbfddd40ec919f9f172  lib/core/bigarray.py
-8ba4d3870b4a7a5a89eb8fe4f039e355  lib/core/common.py
+f424e35d21529dafe60c0c5564855d5f  lib/core/common.py
 54326d3a690f8b26fe5a5da1a589b369  lib/core/convert.py
 90b1b08368ac8a859300e6fa6a8c796e  lib/core/data.py
 1c14bdbf47b8dba31f73da9ad731a54a  lib/core/datatype.py
-70d60d7a9518083cfa8900b97c065f7a  lib/core/decorators.py
+2c16cdbbccbfcfc0ddac2cff876ce9f3  lib/core/decorators.py
 d3ed5f9baa074df33390d33164d9d8b5  lib/core/defaults.py
 96fe4769b6e3e68635fa82cd59cc49fc  lib/core/dicts.py
 956be8ca65c7f04f08c6f2dce710b3b2  lib/core/dump.py
@@ -46,7 +46,7 @@ ec6a778b0e74749b916caead78ba88b7  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-b1cea79f42496d6b39be19a0bdc26070  lib/core/settings.py
+15a317ddbd48bdf94e1642df57664790  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 7c9f2af3c0a8dd89223cfe07b0a0b826  lib/core/target.py
@@ -66,7 +66,7 @@ e07930095e56de11c297d7ac1a1706f2  lib/parse/html.py
 d8d9bcf9e7107a5e2cf2dd10f115ac28  lib/parse/payloads.py
 2b87577dc6d3609e96fc1e049def5b4f  lib/parse/sitemap.py
 d2f13a0e2fef5273d419d06e516122e1  lib/request/basicauthhandler.py
-669e8cf941bba4a2e987045b3002b8e3  lib/request/basic.py
+9ef264b5c0f9e7989b8c2ab91d40400d  lib/request/basic.py
 28348595147a731677c8bef470c6f57a  lib/request/comparison.py
 a253670611499bc159879122e05622de  lib/request/connect.py
 ad6f76839408d827abfcdc57813f8518  lib/request/direct.py

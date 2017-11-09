@@ -2691,6 +2691,7 @@ def enumValueToNameLookup(type_, value_):
 
     return retVal
 
+@cachedmethod
 def extractRegexResult(regex, content, flags=0):
     """
     Returns 'result' group value from a possible match with regex on a given
