@@ -36,7 +36,6 @@ warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 from lib.core.data import logger
 
 try:
-    from lib.controller.controller import start
     from lib.core.common import banner
     from lib.core.common import checkIntegrity
     from lib.core.common import createGithubIssue
@@ -58,15 +57,12 @@ try:
     from lib.core.exception import SqlmapUserQuitException
     from lib.core.option import initOptions
     from lib.core.option import init
-    from lib.core.profiling import profile
     from lib.core.settings import GIT_PAGE
     from lib.core.settings import IS_WIN
     from lib.core.settings import LEGAL_DISCLAIMER
     from lib.core.settings import THREAD_FINALIZATION_TIMEOUT
     from lib.core.settings import UNICODE_ENCODING
     from lib.core.settings import VERSION
-    from lib.core.testing import smokeTest
-    from lib.core.testing import liveTest
     from lib.parse.cmdline import cmdLineParser
 except KeyboardInterrupt:
     errMsg = "user aborted"
@@ -141,6 +137,12 @@ def main():
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
+
+        # Delayed imports (33% of all imports)
+        from lib.controller.controller import start
+        from lib.core.profiling import profile
+        from lib.core.testing import smokeTest
+        from lib.core.testing import liveTest
 
         init()
 
