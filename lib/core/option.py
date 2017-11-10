@@ -2097,11 +2097,11 @@ def _useWizardInterface():
             choice = readInput(message, default='1')
 
             if choice == '2':
-                map(lambda x: conf.__setitem__(x, True), WIZARD.INTERMEDIATE)
+                map(lambda _: conf.__setitem__(_, True), WIZARD.INTERMEDIATE)
             elif choice == '3':
-                map(lambda x: conf.__setitem__(x, True), WIZARD.ALL)
+                map(lambda _: conf.__setitem__(_, True), WIZARD.ALL)
             else:
-                map(lambda x: conf.__setitem__(x, True), WIZARD.BASIC)
+                map(lambda _: conf.__setitem__(_, True), WIZARD.BASIC)
 
     logger.debug("muting sqlmap.. it will do the magic for you")
     conf.verbose = 0

@@ -153,7 +153,7 @@ def mssql_passwd(password, salt, uppercase=False):
     """
 
     binsalt = hexdecode(salt)
-    unistr = "".join(map(lambda c: ("%s\0" if ord(c) < 256 else "%s") % utf8encode(c), password))
+    unistr = "".join(("%s\0" if ord(_) < 256 else "%s") % utf8encode(_) for _ in password)
 
     retVal = "0100%s%s" % (salt, sha1(unistr + binsalt).hexdigest())
 
@@ -171,7 +171,7 @@ def mssql_old_passwd(password, salt, uppercase=True):  # prior to version '2005'
     """
 
     binsalt = hexdecode(salt)
-    unistr = "".join(map(lambda c: ("%s\0" if ord(c) < 256 else "%s") % utf8encode(c), password))
+    unistr = "".join(("%s\0" if ord(_) < 256 else "%s") % utf8encode(_) for _ in password)
 
     retVal = "0100%s%s%s" % (salt, sha1(unistr + binsalt).hexdigest(), sha1(unistr.upper() + binsalt).hexdigest())
 
@@ -187,7 +187,7 @@ def mssql_new_passwd(password, salt, uppercase=False):
     """
 
     binsalt = hexdecode(salt)
-    unistr = "".join(map(lambda c: ("%s\0" if ord(c) < 256 else "%s") % utf8encode(c), password))
+    unistr = "".join(("%s\0" if ord(_) < 256 else "%s") % utf8encode(_) for _ in password)
 
     retVal = "0200%s%s" % (salt, sha512(unistr + binsalt).hexdigest())
 
