@@ -105,7 +105,7 @@ class Agent(object):
             else:
                 origValue = filter(None, (re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z")))[0].group(0)
             origValue = origValue[origValue.rfind('/') + 1:]
-            for char in ('?', '=', ':'):
+            for char in ('?', '=', ':', ','):
                 if char in origValue:
                     origValue = origValue[origValue.rfind(char) + 1:]
         elif place == PLACE.CUSTOM_POST:
