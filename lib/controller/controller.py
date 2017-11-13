@@ -242,11 +242,13 @@ def _saveToResultsFile():
     for key, value in results.items():
         place, parameter, notes = key
         line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
-        conf.resultsFP.writelines(line)
+        conf.resultsFP.write(line)
 
     if not results:
         line = "%s,,,,%s" % (conf.url, os.linesep)
-        conf.resultsFP.writelines(line)
+        conf.resultsFP.write(line)
+
+    conf.resultsFP.flush()
 
 def start():
     """
