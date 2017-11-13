@@ -796,6 +796,8 @@ class Connect(object):
         raise404 = place != PLACE.URI if raise404 is None else raise404
         method = method or conf.method
 
+        pushValue(kb.postUrlEncode)
+
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
@@ -862,6 +864,7 @@ class Connect(object):
                     if not skip:
                         payload = urlencode(payload, '%', False, place != PLACE.URI)  # spaceplus is handled down below
                         value = agent.replacePayload(value, payload)
+                        kb.postUrlEncode = False
 
             if conf.hpp:
                 if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_API.ASP, WEB_API.ASPX)):
@@ -1244,6 +1247,8 @@ class Connect(object):
         threadData.lastCode = code
 
         kb.originalCode = kb.originalCode or code
+
+        kb.postUrlEncode = popValue()
 
         if kb.testMode:
             kb.testQueryCount += 1
