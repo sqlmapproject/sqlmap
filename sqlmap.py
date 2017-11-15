@@ -138,21 +138,20 @@ def main():
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
         dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
 
-        # Delayed imports (33% of all imports)
-        from lib.controller.controller import start
-        from lib.core.profiling import profile
-        from lib.core.testing import smokeTest
-        from lib.core.testing import liveTest
-
         init()
 
+        # Postponed imports (faster start)
         if conf.profile:
+            from lib.core.profiling import profile
             profile()
         elif conf.smokeTest:
+            from lib.core.testing import smokeTest
             smokeTest()
         elif conf.liveTest:
+            from lib.core.testing import liveTest
             liveTest()
         else:
+            from lib.controller.controller import start
             try:
                 start()
             except thread.error as ex:
