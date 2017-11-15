@@ -46,7 +46,7 @@ e1c000db9be27f973569b1a430629037  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-5f6af60945e1b932d173d9dffe082695  lib/core/settings.py
+00c57f5e38a9d7b5668f5ae247880246  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d5a04d672a18f78deb2839c3745ff83c  lib/core/target.py
@@ -206,7 +206,7 @@ c811c9267896033a1d206bdec774782b  plugins/generic/custom.py
 43f19ede05350b42704b55d237f3d715  plugins/generic/databases.py
 d769db0ec3586855a8197229c2a27ffa  plugins/generic/entries.py
 16882f2840da3161ed4dbf4a7ff8fc8b  plugins/generic/enumeration.py
-c1a3f3c21d17d74298be8c3bf4fa4e66  plugins/generic/filesystem.py
+ed82a43b822e265919b6164c628e433c  plugins/generic/filesystem.py
 c4f4c6754e09a2418a08d1002184f260  plugins/generic/fingerprint.py
 5fb9aaf874daa47ea2b672a22740e56b  plugins/generic/__init__.py
 3e9a5909f250dfefd1e51abbf69d3973  plugins/generic/misc.py

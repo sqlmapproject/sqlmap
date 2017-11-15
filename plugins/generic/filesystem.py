@@ -279,7 +279,7 @@ class Filesystem:
         self.checkDbmsOs()
 
         if localFile.endswith('_'):
-            localFile = decloakToTemp(localFile)
+            localFile = getUnicode(decloakToTemp(localFile))
 
         if conf.direct or isStackingAvailable():
             if isStackingAvailable():
