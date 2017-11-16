@@ -13,7 +13,7 @@ Les captures d'écran disponible [ici](https://github.com/sqlmapproject/sqlmap/w
 Installation
 ----
 
-Vous pouvez télécharger le plus récent fichier tarball en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master). Vous pouvez aussi télécharger le plus récent archive zip [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Vous pouvez télécharger le fichier "tarball" le plus récent en cliquant [ici](https://github.com/sqlmapproject/sqlmap/tarball/master). Vous pouvez aussi télécharger l'archive zip la plus récente [ici](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
 De préférence, télécharger __sqlmap__ en le [clonant](https://github.com/sqlmapproject/sqlmap):
 
@@ -21,7 +21,7 @@ De préférence, télécharger __sqlmap__ en le [clonant](https://github.com/sql
 
 sqlmap fonctionne sur n'importe quel système d'exploitation avec la version **2.6.x** et **2.7.x** de [Python](http://www.python.org/download/)  
 
-Usage
+Utilisation
 ----
 
 Pour afficher une liste des fonctions de bases et des commutateurs (switches), tapez:
@@ -33,7 +33,7 @@ Pour afficher une liste complète des options et des commutateurs (switches), ta
     python sqlmap.py -hh
 
 Vous pouvez regarder un vidéo [ici](https://asciinema.org/a/46601) pour plus d'exemples.
-Pour obtenir un aperçu des ressources de __sqlmap__, une liste des fonctionnalités prises en charge et la description de toutes les options, ainsi que des exemples , nous vous recommandons de consulter [le wiki](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
+Pour obtenir un aperçu des ressources de __sqlmap__, une liste des fonctionnalités prises en charge, la description de toutes les options, ainsi que des exemples, nous vous recommandons de consulter [le wiki](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Liens
 ----
@@ -41,7 +41,7 @@ Liens
 * Page d'acceuil: http://sqlmap.org
 * Téléchargement: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) ou [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
-* Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
+* Suivi des issues: https://github.com/sqlmapproject/sqlmap/issues
 * Manuel de l'utilisateur: https://github.com/sqlmapproject/sqlmap/wiki
 * Foire aux questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
