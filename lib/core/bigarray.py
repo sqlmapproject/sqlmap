@@ -14,10 +14,12 @@ import itertools
 import os
 import sys
 import tempfile
+import zlib
 
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_SIZE
+from lib.core.settings import BIGARRAY_COMPRESS_LEVEL
 
 DEFAULT_SIZE_OF = sys.getsizeof(object())
 
@@ -80,8 +82,8 @@ class BigArray(list):
         if len(self.chunks[-1]) < 1:
             self.chunks.pop()
             try:
-                with open(self.chunks[-1], "rb") as fp:
-                    self.chunks[-1] = pickle.load(fp)
+                with open(self.chunks[-1], "rb") as f:
+                    self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex.message
@@ -101,8 +103,8 @@ class BigArray(list):
             handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
             self.filenames.add(filename)
             os.close(handle)
-            with open(filename, "w+b") as fp:
-                pickle.dump(chunk, fp, pickle.HIGHEST_PROTOCOL)
+            with open(filename, "w+b") as f:
+                f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError), ex:
             errMsg = "exception occurred while storing data "
@@ -119,8 +121,8 @@ class BigArray(list):
 
         if not (self.cache and self.cache.index == index):
             try:
-                with open(self.chunks[index], "rb") as fp:
-                    self.cache = Cache(index, pickle.load(fp), False)
+                with open(self.chunks[index], "rb") as f:
+                    self.cache = Cache(index, pickle.loads(zlib.decompress(f.read())), False)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex.message

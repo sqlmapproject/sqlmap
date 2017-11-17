@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.1.11.21"
+VERSION = "1.1.11.22"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -519,6 +519,9 @@ ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 
 # Approximate chunk length (in bytes) used by BigArray objects (only last chunk and cached one are held in memory)
 BIGARRAY_CHUNK_SIZE = 1024 * 1024
+
+# Compress (zlib) level used for storing BigArray chunks to disk (0-9)
+BIGARRAY_COMPRESS_LEVEL = 9
 
 # Maximum number of socket pre-connects
 SOCKET_PRE_CONNECT_QUEUE_SIZE = 3
