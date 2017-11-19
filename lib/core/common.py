@@ -105,7 +105,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_USER_INJECTION
-from lib.core.settings import DYNAMICITY_MARK_LENGTH
+from lib.core.settings import DYNAMICITY_BOUNDARY_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import FILE_PATH_REGEXES
 from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
@@ -2795,7 +2795,7 @@ def findDynamicContent(firstPage, secondPage):
     for block in blocks[:]:
         (_, _, length) = block
 
-        if length <= DYNAMICITY_MARK_LENGTH:
+        if length <= 2 * DYNAMICITY_BOUNDARY_LENGTH:
             blocks.remove(block)
 
     # Making of dynamic markings based on prefix/suffix principle
@@ -2814,6 +2814,9 @@ def findDynamicContent(firstPage, secondPage):
                 continue
 
             if prefix and suffix:
+                prefix = prefix[-DYNAMICITY_BOUNDARY_LENGTH:]
+                suffix = suffix[:DYNAMICITY_BOUNDARY_LENGTH]
+
                 infix = max(re.search(r"(?s)%s(.+)%s" % (re.escape(prefix), re.escape(suffix)), _) for _ in (firstPage, secondPage)).group(1)
 
                 if infix[0].isalnum():
@@ -2822,7 +2825,7 @@ def findDynamicContent(firstPage, secondPage):
                 if infix[-1].isalnum():
                     suffix = trimAlphaNum(suffix)
 
-            kb.dynamicMarkings.append((prefix[-DYNAMICITY_MARK_LENGTH / 2:] if prefix else None, suffix[:DYNAMICITY_MARK_LENGTH / 2] if suffix else None))
+            kb.dynamicMarkings.append((prefix if prefix else None, suffix if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
