@@ -796,7 +796,7 @@ class Connect(object):
         raise404 = place != PLACE.URI if raise404 is None else raise404
         method = method or conf.method
 
-        pushValue(kb.postUrlEncode)
+        postUrlEncode = kb.postUrlEncode
 
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
@@ -806,8 +806,8 @@ class Connect(object):
             headers = OrderedDict(conf.httpHeaders)
             contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
 
-            if (kb.postHint or conf.skipUrlEncode) and kb.postUrlEncode:
-                kb.postUrlEncode = False
+            if (kb.postHint or conf.skipUrlEncode) and postUrlEncode:
+                postUrlEncode = False
                 conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
                 contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
                 conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
@@ -851,7 +851,7 @@ class Connect(object):
                 value = agent.replacePayload(value, payload)
             else:
                 # GET, POST, URI and Cookie payload needs to be thoroughly URL encoded
-                if (place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) or place == PLACE.CUSTOM_HEADER and value.split(',')[0] == HTTP_HEADER.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST, PLACE.CUSTOM_POST) and kb.postUrlEncode:
+                if (place in (PLACE.GET, PLACE.URI, PLACE.COOKIE) or place == PLACE.CUSTOM_HEADER and value.split(',')[0] == HTTP_HEADER.COOKIE) and not conf.skipUrlEncode or place in (PLACE.POST, PLACE.CUSTOM_POST) and postUrlEncode:
                     skip = False
 
                     if place == PLACE.COOKIE or place == PLACE.CUSTOM_HEADER and value.split(',')[0] == HTTP_HEADER.COOKIE:
@@ -864,7 +864,7 @@ class Connect(object):
                     if not skip:
                         payload = urlencode(payload, '%', False, place != PLACE.URI)  # spaceplus is handled down below
                         value = agent.replacePayload(value, payload)
-                        kb.postUrlEncode = False
+                        postUrlEncode = False
 
             if conf.hpp:
                 if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_API.ASP, WEB_API.ASPX)):
@@ -1151,7 +1151,7 @@ class Connect(object):
         if post is not None:
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
                 post = getattr(post, UNENCODED_ORIGINAL_VALUE)
-            elif kb.postUrlEncode:
+            elif postUrlEncode:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
         if timeBasedCompare and not conf.disableStats:
@@ -1247,8 +1247,6 @@ class Connect(object):
         threadData.lastCode = code
 
         kb.originalCode = kb.originalCode or code
-
-        kb.postUrlEncode = popValue()
 
         if kb.testMode:
             kb.testQueryCount += 1
