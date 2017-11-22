@@ -26,7 +26,7 @@ def tamper(payload, **kwargs):
 
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
-          that filter the IFNULL() and IF() functions 
+          that filter the IFNULL() functions
 
     >>> tamper('IFNULL(1, 2)')
     'CASE WHEN ISNULL(1) THEN (2) ELSE (1) END'
