@@ -2779,7 +2779,7 @@ def findDynamicContent(firstPage, secondPage):
 
     >>> findDynamicContent("Lorem ipsum dolor sit amet, congue tation referrentur ei sed. Ne nec legimus habemus recusabo, natum reque et per. Facer tritani reprehendunt eos id, modus constituam est te. Usu sumo indoctum ad, pri paulo molestiae complectitur no.", "Lorem ipsum dolor sit amet, congue tation referrentur ei sed. Ne nec legimus habemus recusabo, natum reque et per. <script src='ads.js'></script>Facer tritani reprehendunt eos id, modus constituam est te. Usu sumo indoctum ad, pri paulo molestiae complectitur no.")
     >>> kb.dynamicMarkings
-    [('m reque et per. ', 'Facer tritani re')]
+    [('natum reque et per. ', 'Facer tritani repreh')]
     """
 
     if not firstPage or not secondPage:
