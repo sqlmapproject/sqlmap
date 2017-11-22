@@ -1132,7 +1132,7 @@ class Connect(object):
                             found = True
                             uri = re.sub(regex.replace(r"\A", r"\?"), "\g<1>%s\g<3>" % value.replace('\\', r'\\'), uri)
 
-                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), name, re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
+                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), re.escape(name), re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
                         if re.search(regex, (cookie or "")):
                             found = True
                             cookie = re.sub(regex, "\g<1>%s\g<3>" % value.replace('\\', r'\\'), cookie)
