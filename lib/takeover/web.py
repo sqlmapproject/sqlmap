@@ -266,9 +266,9 @@ class Web:
             directories = _
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webApi)
-        backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoor.%s_" % self.webApi))
+        backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.%s_" % self.webApi))
 
-        stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
+        stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webApi))
 
         for directory in directories:
             if not directory:
@@ -323,7 +323,7 @@ class Web:
                     os.close(handle)
 
                     with open(filename, "w+b") as f:
-                        _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stager.%s_" % self.webApi))
+                        _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webApi))
                         _ = _.replace("WRITABLE_DIR", utf8encode(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
                         f.write(_)
 
