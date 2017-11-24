@@ -1018,16 +1018,16 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
             retVal = default
         else:
-            logging._acquireLock()
-
-            if conf.get("beep"):
-                beep()
-
-            dataToStdout("\r%s" % message, forceOutput=True, bold=True)
-            kb.prependFlag = False
-
             try:
-                retVal = raw_input() or default
+                logging._acquireLock()
+
+                if conf.get("beep"):
+                    beep()
+
+                dataToStdout("\r%s" % message, forceOutput=True, bold=True)
+                kb.prependFlag = False
+
+                retVal = raw_input().strip() or default
                 retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
             except:
                 try:
