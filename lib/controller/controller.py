@@ -583,11 +583,11 @@ def start():
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
                     raise SqlmapNoneDataException(errMsg)
                 else:
-                    errMsg = "all tested parameters appear to be not injectable."
+                    errMsg = "all tested parameters do not appear to be injectable."
 
                     if conf.level < 5 or conf.risk < 3:
-                        errMsg += " Try to increase '--level'/'--risk' values "
-                        errMsg += "to perform more tests."
+                        errMsg += " Try to increase values for '--level'/'--risk' options "
+                        errMsg += "if you wish to perform more tests."
 
                     if isinstance(conf.tech, list) and len(conf.tech) < 5:
                         errMsg += " Rerun without providing the option '--technique'."
@@ -610,15 +610,9 @@ def start():
 
                     if kb.heuristicTest == HEURISTIC_TEST.POSITIVE:
                         errMsg += " As heuristic test turned out positive you are "
-                        errMsg += "strongly advised to continue on with the tests. "
-                        errMsg += "Please, consider usage of tampering scripts as "
-                        errMsg += "your target might filter the queries."
+                        errMsg += "strongly advised to continue on with the tests."
 
-                    if not conf.string and not conf.notString and not conf.regexp:
-                        errMsg += " Also, you can try to rerun by providing "
-                        errMsg += "either a valid value for option '--string' "
-                        errMsg += "(or '--regexp')."
-                    elif conf.string:
+                    if conf.string:
                         errMsg += " Also, you can try to rerun by providing a "
                         errMsg += "valid value for option '--string' as perhaps the string you "
                         errMsg += "have chosen does not match "
@@ -631,8 +625,8 @@ def start():
 
                     if not conf.tamper:
                         errMsg += " If you suspect that there is some kind of protection mechanism "
-                        errMsg += "involved (e.g. WAF) maybe you could retry "
-                        errMsg += "with an option '--tamper' (e.g. '--tamper=space2comment')"
+                        errMsg += "involved (e.g. WAF) maybe you could try to use "
+                        errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
 
                     raise SqlmapNotVulnerableException(errMsg.rstrip('.'))
             else:

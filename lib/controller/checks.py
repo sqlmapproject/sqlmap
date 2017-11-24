@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import copy
 import httplib
+import logging
 import os
 import random
 import re
@@ -629,11 +630,12 @@ def checkSqlInjection(place, parameter, value):
                                 Backend.forceDbms(kb.dbmsFilter[0])
                             elif not Backend.getIdentifiedDbms():
                                 if kb.heuristicDbms is None:
-                                    warnMsg = "using unescaped version of the test "
-                                    warnMsg += "because of zero knowledge of the "
-                                    warnMsg += "back-end DBMS. You can try to "
-                                    warnMsg += "explicitly set it with option '--dbms'"
-                                    singleTimeWarnMessage(warnMsg)
+                                    if kb.heuristicTest == HEURISTIC_TEST.POSITIVE or injection.data:
+                                        warnMsg = "using unescaped version of the test "
+                                        warnMsg += "because of zero knowledge of the "
+                                        warnMsg += "back-end DBMS. You can try to "
+                                        warnMsg += "explicitly set it with option '--dbms'"
+                                        singleTimeWarnMessage(warnMsg)
                                 else:
                                     Backend.forceDbms(kb.heuristicDbms)
 
@@ -1143,16 +1145,16 @@ def checkDynamicContent(firstPage, secondPage):
             count += 1
 
             if count > conf.retries:
-                warnMsg = "target URL is too dynamic. "
+                warnMsg = "target URL content appears to be too dynamic. "
                 warnMsg += "Switching to '--text-only' "
                 logger.warn(warnMsg)
 
                 conf.textOnly = True
                 return
 
-            warnMsg = "target URL is heavily dynamic"
-            warnMsg += ". sqlmap is going to retry the request"
-            logger.critical(warnMsg)
+            warnMsg = "target URL content appears to be heavily dynamic. "
+            warnMsg += "sqlmap is going to retry the request(s)"
+            singleTimeLogMessage(warnMsg, logging.CRITICAL)
 
             secondPage, _, _ = Request.queryPage(content=True)
             findDynamicContent(firstPage, secondPage)
@@ -1168,7 +1170,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the target URL is stable"
+    infoMsg = "testing if the target URL content is stable"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
@@ -1186,7 +1188,7 @@ def checkStability():
 
     if kb.pageStable:
         if firstPage:
-            infoMsg = "target URL is stable"
+            infoMsg = "target URL content is stable"
             logger.info(infoMsg)
         else:
             errMsg = "there was an error checking the stability of page "
@@ -1196,12 +1198,11 @@ def checkStability():
             logger.error(errMsg)
 
     else:
-        warnMsg = "target URL is not stable. sqlmap will base the page "
+        warnMsg = "target URL content is not stable. sqlmap will base the page "
         warnMsg += "comparison on a sequence matcher. If no dynamic nor "
         warnMsg += "injectable parameters are detected, or in case of "
         warnMsg += "junk results, refer to user's manual paragraph "
-        warnMsg += "'Page comparison' and provide a string or regular "
-        warnMsg += "expression to match on"
+        warnMsg += "'Page comparison'"
         logger.warn(warnMsg)
 
         message = "how do you want to proceed? [(C)ontinue/(s)tring/(r)egex/(q)uit] "
