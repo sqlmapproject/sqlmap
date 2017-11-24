@@ -3565,14 +3565,16 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             retVal = re.sub(r"(?i)\A%s\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
 
         if retVal.upper() in kb.keywords or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ("." if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
+            retVal = unsafeSQLIdentificatorNaming(retVal)
+
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
-                retVal = "`%s`" % retVal.strip("`")
+                retVal = "`%s`" % retVal
             elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.INFORMIX, DBMS.HSQLDB):
-                retVal = "\"%s\"" % retVal.strip("\"")
+                retVal = "\"%s\"" % retVal
             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
-                retVal = "\"%s\"" % retVal.strip("\"").upper()
+                retVal = "\"%s\"" % retVal.upper()
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and ((retVal or " ")[0].isdigit() or not re.match(r"\A\w+\Z", retVal, re.U)):
-                retVal = "[%s]" % retVal.strip("[]")
+                retVal = "[%s]" % retVal
 
         if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
             retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
