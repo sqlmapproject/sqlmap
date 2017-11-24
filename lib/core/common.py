@@ -1840,8 +1840,7 @@ def getPageWordSet(page):
 
     # only if the page's charset has been successfully identified
     if isinstance(page, unicode):
-        _ = getFilteredPageContent(page)
-        retVal = set(re.findall(r"\w+", _))
+        retVal = set(_.group(0) for _ in re.finditer(r"\w+", getFilteredPageContent(page)))
 
     return retVal
 
@@ -3562,9 +3561,9 @@ def safeSQLIdentificatorNaming(name, isTable=False):
         _ = isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE)
 
         if _:
-            retVal = re.sub(r"(?i)\A%s\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
+            retVal = re.sub(r"(?i)\A\[?%s\]?\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
 
-        if retVal.upper() in kb.keywords or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ("." if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
+        if retVal.upper() in kb.keywords or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ('.' if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
             retVal = unsafeSQLIdentificatorNaming(retVal)
 
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
@@ -3599,9 +3598,7 @@ def unsafeSQLIdentificatorNaming(name):
             retVal = name.replace("[", "").replace("]", "")
 
         if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-            prefix = "%s." % DEFAULT_MSSQL_SCHEMA
-            if retVal.startswith(prefix):
-                retVal = retVal[len(prefix):]
+            retVal = re.sub(r"(?i)\A\[?%s\]?\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
 
     return retVal
 
