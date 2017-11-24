@@ -461,15 +461,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     threadData = getCurrentThreadData()
 
                     while kb.threadContinue:
-                        kb.locks.index.acquire()
+                        with kb.locks.index:
+                            if threadData.shared.index[0] - firstChar >= length:
+                                return
 
-                        if threadData.shared.index[0] - firstChar >= length:
-                            kb.locks.index.release()
-                            return
-
-                        threadData.shared.index[0] += 1
-                        currentCharIndex = threadData.shared.index[0]
-                        kb.locks.index.release()
+                            threadData.shared.index[0] += 1
+                            currentCharIndex = threadData.shared.index[0]
 
                         if kb.threadContinue:
                             charStart = time.time()
