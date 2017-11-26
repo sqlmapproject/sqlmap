@@ -46,7 +46,7 @@ e1c000db9be27f973569b1a430629037  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-e89b14c4721391f547a76476221beaa8  lib/core/settings.py
+08ba426f7157982ff9aa4c8d40a5f2b5  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d5a04d672a18f78deb2839c3745ff83c  lib/core/target.py
@@ -441,11 +441,13 @@ a4fca90afde376962f09ac10c965b6e7  waf/urlscan.py
 2952dadc49a810bde918ae70ca9bb042  waf/uspses.py
 e0e9afe5330645bcf63103cf7df6ef56  waf/varnish.py
 c6b044f4f29680e0767b36c893b9346b  waf/wallarm.py
+fe451f569a88c198adda6d22b39c9a4b  waf/watchguard.py
 dc78bd60735f4c2b2cfc05dc8b148a56  waf/webappsecure.py
 755709c2c28da8dc612ce0d277d8ba02  waf/webknight.py
 07ca74cd2e76310caacb709c5304999b  waf/wordfence.py
 d347378166b781e39569eaaa036268d5  waf/yundun.py
 c32f8c216fab0a0672f734a48da8d6ff  waf/yunsuo.py
+fd87445df19ad9e58b5ffff464bd7413  waf/zenedge.py
 e87d59af23b7b18cd56c9883e5f02d5c  xml/banner/generic.xml
 d8925c034263bf1b83e7d8e1c78eec57  xml/banner/mssql.xml
 b8b56f4aa34bf65365808919b97119a7  xml/banner/mysql.xml
