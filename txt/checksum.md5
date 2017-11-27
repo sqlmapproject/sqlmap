@@ -46,7 +46,7 @@ e1c000db9be27f973569b1a430629037  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-71199d4a6f86e6c1bf6da24a41a9c1b7  lib/core/settings.py
+d61f9cea6f98ad14a6ffda2319a67a6d  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d5a04d672a18f78deb2839c3745ff83c  lib/core/target.py
@@ -392,7 +392,7 @@ ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqlud
 58faaa04de90a44c306e862bbbe0ed83  waf/aws.py
 2347b494b91dc50d93d1437e1302f9f1  waf/baidu.py
 72fd38a1fa212fb154f74d0c978d489a  waf/barracuda.py
-02aa8b095f7fabd439a3afda0430ca84  waf/bigip.py
+5c55654a7611e767dd2be797716e2d75  waf/bigip.py
 5430f2a681071e894fa3c152eebf68e4  waf/binarysec.py
 2ce52bac62825acd4456817af6f10b14  waf/blockdos.py
 fe60962fc1d80e557b1d602fbe4934dc  waf/ciscoacexml.py
