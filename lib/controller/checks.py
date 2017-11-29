@@ -43,6 +43,7 @@ from lib.core.common import readInput
 from lib.core.common import showStaticWords
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
@@ -282,9 +283,9 @@ def checkSqlInjection(place, parameter, value):
                 # Skip DBMS-specific test if it does not match the
                 # previously identified DBMS (via DBMS-specific error message)
                 if kb.reduceTests and not intersect(payloadDbms, kb.reduceTests, True):
-                    debugMsg = "skipping test '%s' because the parsed " % title
-                    debugMsg += "error message(s) showed that the back-end DBMS "
-                    debugMsg += "could be %s" % Format.getErrorParsedDBMSes()
+                    debugMsg = "skipping test '%s' because the heuristic " % title
+                    debugMsg += "tests showed that the back-end DBMS "
+                    debugMsg += "could be '%s'" % unArrayizeValue(kb.reduceTests)
                     logger.debug(debugMsg)
                     continue
 
