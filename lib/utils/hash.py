@@ -366,6 +366,12 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     if isinstance(password, unicode):
         password = password.encode(UNICODE_ENCODING)
 
+    if isinstance(magic, unicode):
+        magic = magic.encode(UNICODE_ENCODING)
+
+    if isinstance(salt, unicode):
+        salt = salt.encode(UNICODE_ENCODING)
+
     salt = salt[:8]
     ctx = password + magic + salt
     final = md5(password + salt + password).digest()
