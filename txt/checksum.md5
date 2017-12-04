@@ -21,7 +21,7 @@ f96467fc5cd1d87f52dd7966c8ae6e79  extra/shutils/regressiontest.py
 5fb9aaf874daa47ea2b672a22740e56b  extra/sqlharvest/__init__.py
 1fc7772edce5a01c31f3932b2fc4c1c6  extra/sqlharvest/sqlharvest.py
 21bf2b3a7a22b8cd5d96a6457a1b4997  lib/controller/action.py
-beb3207c65d01c1e5d959cd6393cd420  lib/controller/checks.py
+c0c9a87e5829c76efc69067081edb8b1  lib/controller/checks.py
 2db2666dba713c710d248a62b2c1c1fe  lib/controller/controller.py
 d2cdb9e832e18a81e936ca3348144b16  lib/controller/handler.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/controller/__init__.py
@@ -46,7 +46,7 @@ e1c000db9be27f973569b1a430629037  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-4a2c73dcb44a0982c61e35afee07aada  lib/core/settings.py
+faf4f1fadbe9ab2c911e8e8b9e382c11  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d93501771b41315f9fb949305b6ed257  lib/core/target.py
@@ -68,7 +68,7 @@ d8d9bcf9e7107a5e2cf2dd10f115ac28  lib/parse/payloads.py
 d2f13a0e2fef5273d419d06e516122e1  lib/request/basicauthhandler.py
 9ef264b5c0f9e7989b8c2ab91d40400d  lib/request/basic.py
 28348595147a731677c8bef470c6f57a  lib/request/comparison.py
-5a2d97c7b672228e695855ff43fb7960  lib/request/connect.py
+ae823462aad7cd1081e6609192ba3109  lib/request/connect.py
 ad6f76839408d827abfcdc57813f8518  lib/request/direct.py
 4853bd0d523646315607a6a9a4c0b745  lib/request/dns.py
 effa0c3e4efceaf4932855e8e6677bf7  lib/request/httpshandler.py
@@ -93,11 +93,11 @@ ca47f20b11f58ce60a0ddfcfca242d3f  lib/techniques/blind/inference.py
 95331b2826f28db9ff962670391aa7d6  lib/techniques/dns/test.py
 82cc907fb335250703072337d8f8cceb  lib/techniques/dns/use.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/techniques/error/__init__.py
-5953b814b91e6a03d26f319203b48d01  lib/techniques/error/use.py
+6ac0636513e7e009034fec33d6a6af7e  lib/techniques/error/use.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/techniques/__init__.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/techniques/union/__init__.py
 882bed15db948bd0487d24ff072a1593  lib/techniques/union/test.py
-505682f95cb23573dd60bf6d0063a632  lib/techniques/union/use.py
+a958a3e7113b2e0d5a3c30ef1114cdc4  lib/techniques/union/use.py
 452cb280aa51a4ddf38d94534a6e8d5f  lib/utils/api.py
 48c3f8216b64825c50f5304cb4dadd95  lib/utils/brute.py
 7e0078da1dff59530d64f9b1e2f68607  lib/utils/crawler.py
@@ -213,7 +213,7 @@ c4f4c6754e09a2418a08d1002184f260  plugins/generic/fingerprint.py
 136f56e9b7c56c81dec8a2d6ee231b90  plugins/generic/search.py
 f65197bb16a0c7b243a322cf89715891  plugins/generic/syntax.py
 659b5821b3bfc4c8ef94759bbf968b25  plugins/generic/takeover.py
-65524d3fc3373c4ec241a6358f634bbd  plugins/generic/users.py
+c8e0d8b79d4378d466b1006cff930f7d  plugins/generic/users.py
 5fb9aaf874daa47ea2b672a22740e56b  plugins/__init__.py
 b04db3e861edde1f9dd0a3850d5b96c8  shell/backdoors/backdoor.asp_
 158bfa168128393dde8d6ed11fe9a1b8  shell/backdoors/backdoor.aspx_

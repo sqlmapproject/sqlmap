@@ -307,9 +307,9 @@ class Users:
 
         if not kb.data.cachedUsersPasswords:
             errMsg = "unable to retrieve the password hashes for the "
-            errMsg += "database users (probably because the session "
-            errMsg += "user has no read privileges over the relevant "
-            errMsg += "system database table)"
+            errMsg += "database users (probably because the DBMS "
+            errMsg += "current user has no read privileges over the relevant "
+            errMsg += "system database table(s))"
             logger.error(errMsg)
         else:
             for user in kb.data.cachedUsersPasswords:

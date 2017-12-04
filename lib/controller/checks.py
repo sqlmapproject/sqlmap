@@ -1054,13 +1054,13 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if value.lower() in (page or "").lower():
         infoMsg = "heuristic (XSS) test shows that %s parameter " % paramType
-        infoMsg += "'%s' might be vulnerable to cross-site scripting attacks" % parameter
+        infoMsg += "'%s' might be vulnerable to cross-site scripting (XSS) attacks" % parameter
         logger.info(infoMsg)
 
     for match in re.finditer(FI_ERROR_REGEX, page or ""):
         if randStr1.lower() in match.group(0).lower():
             infoMsg = "heuristic (FI) test shows that %s parameter " % paramType
-            infoMsg += "'%s' might be vulnerable to file inclusion attacks" % parameter
+            infoMsg += "'%s' might be vulnerable to file inclusion (FI) attacks" % parameter
             logger.info(infoMsg)
             break
 

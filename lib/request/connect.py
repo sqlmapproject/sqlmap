@@ -1162,7 +1162,7 @@ class Connect(object):
 
                 if conf.tor:
                     warnMsg = "it's highly recommended to avoid usage of switch '--tor' for "
-                    warnMsg += "time-based injections because of its high latency time"
+                    warnMsg += "time-based injections because of inherent high latency time"
                     singleTimeWarnMessage(warnMsg)
 
                 warnMsg = "[%s] [WARNING] %stime-based comparison requires " % (time.strftime("%X"), "(case) " if kb.responseTimeMode else "")

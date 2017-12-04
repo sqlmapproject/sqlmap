@@ -262,7 +262,7 @@ def unionUse(expression, unpack=True, dump=False):
                 else:
                     stopLimit = int(count)
 
-                    infoMsg = "the SQL query used returns "
+                    infoMsg = "used SQL query returns "
                     infoMsg += "%d entries" % stopLimit
                     logger.info(infoMsg)
 
