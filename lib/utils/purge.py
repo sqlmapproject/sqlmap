@@ -31,8 +31,8 @@ def purge(directory):
     dirpaths = []
 
     for rootpath, directories, filenames in os.walk(directory):
-        dirpaths.extend([os.path.abspath(os.path.join(rootpath, _)) for _ in directories])
-        filepaths.extend([os.path.abspath(os.path.join(rootpath, _)) for _ in filenames])
+        dirpaths.extend(os.path.abspath(os.path.join(rootpath, _)) for _ in directories)
+        filepaths.extend(os.path.abspath(os.path.join(rootpath, _)) for _ in filenames)
 
     logger.debug("changing file attributes")
     for filepath in filepaths:
