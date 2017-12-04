@@ -62,6 +62,7 @@ from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import RESTORE_MERGED_OPTIONS
 from lib.core.settings import RESULTS_FILE_FORMAT
+from lib.core.settings import SESSION_SQLITE_FILE
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
@@ -396,6 +397,9 @@ def _setRequestParams():
             raise SqlmapGenericException(errMsg)
     else:
         for place in (PLACE.GET, PLACE.POST, PLACE.COOKIE):
+            if conf.csrfToken:
+                break
+
             for parameter in conf.paramDict.get(place, {}):
                 if any(parameter.lower().count(_) for _ in CSRF_TOKEN_PARAMETER_INFIXES):
                     message = "%s parameter '%s' appears to hold anti-CSRF token. " % (place, parameter)
@@ -403,7 +407,7 @@ def _setRequestParams():
 
                     if readInput(message, default='N', boolean=True):
                         conf.csrfToken = getUnicode(parameter)
-                    break
+                        break
 
 def _setHashDB():
     """
@@ -411,7 +415,7 @@ def _setHashDB():
     """
 
     if not conf.hashDBFile:
-        conf.hashDBFile = conf.sessionFile or os.path.join(conf.outputPath, "session.sqlite")
+        conf.hashDBFile = conf.sessionFile or os.path.join(conf.outputPath, SESSION_SQLITE_FILE)
 
     if os.path.exists(conf.hashDBFile):
         if conf.flushSession:

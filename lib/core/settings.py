@@ -300,6 +300,9 @@ BLANK = "<blank>"
 # String representation for current database
 CURRENT_DB = "CD"
 
+# Name of SQLite file used for storing session data
+SESSION_SQLITE_FILE = "session.sqlite"
+
 # Regular expressions used for finding file paths in error messages
 FILE_PATH_REGEXES = (r"<b>(?P<result>[^<>]+?)</b> on line \d+", r"(?P<result>[^<>'\"]+?)['\"]? on line \d+", r"(?:[>(\[\s])(?P<result>[A-Za-z]:[\\/][\w. \\/-]*)", r"(?:[>(\[\s])(?P<result>/\w[/\w.~-]+)", r"href=['\"]file://(?P<result>/[^'\"]+)")
 
