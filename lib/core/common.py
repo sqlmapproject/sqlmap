@@ -635,7 +635,7 @@ def paramToDict(place, parameters=None):
                                             elif isinstance(value, (bool, int, float, basestring)):
                                                 original = current[key]
                                                 if isinstance(value, bool):
-                                                    current[key] = "%s%s" % (str(value).lower(), BOUNDED_INJECTION_MARKER)
+                                                    current[key] = "%s%s" % (getUnicode(value).lower(), BOUNDED_INJECTION_MARKER)
                                                 else:
                                                     current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
                                                 candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized), parameters)

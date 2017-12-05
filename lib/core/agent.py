@@ -97,6 +97,7 @@ class Agent(object):
         paramString = conf.parameters[place]
         paramDict = conf.paramDict[place]
         origValue = getUnicode(paramDict[parameter])
+        newValue = getUnicode(newValue) if newValue else newValue
 
         if place == PLACE.URI or BOUNDED_INJECTION_MARKER in origValue:
             paramString = origValue
