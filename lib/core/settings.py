@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.1.12.6"
+VERSION = "1.1.12.7"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -201,6 +201,11 @@ DUMMY_USER_PREFIX = "__dummy__"
 
 # Reference: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
 DEFAULT_PAGE_ENCODING = "iso-8859-1"
+
+try:
+    unicode(DEFAULT_PAGE_ENCODING, DEFAULT_PAGE_ENCODING)
+except LookupError:
+    DEFAULT_PAGE_ENCODING = "utf8"
 
 # URL used in dummy runs
 DUMMY_URL = "http://foo/bar?id=1"

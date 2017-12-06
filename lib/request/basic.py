@@ -299,8 +299,7 @@ def decodePage(page, contentEncoding, contentType):
 
         metaCharset = checkCharEncoding(extractRegexResult(META_CHARSET_REGEX, page))
 
-        if (any((httpCharset, metaCharset)) and not all((httpCharset, metaCharset)))\
-            or (httpCharset == metaCharset and all((httpCharset, metaCharset))):
+        if (any((httpCharset, metaCharset)) and not all((httpCharset, metaCharset))) or (httpCharset == metaCharset and all((httpCharset, metaCharset))):
             kb.pageEncoding = httpCharset or metaCharset  # Reference: http://bytes.com/topic/html-css/answers/154758-http-equiv-vs-true-header-has-precedence
             debugMsg = "declared web page charset '%s'" % kb.pageEncoding
             singleTimeLogMessage(debugMsg, logging.DEBUG, debugMsg)
