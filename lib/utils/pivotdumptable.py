@@ -121,9 +121,9 @@ def pivotDumpTable(table, colList, count=None, blind=True):
 
     def _(column, pivotValue):
         if column == colList[0]:
-            query = dumpNode.query.replace("'%s'", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, column), unescaper.escape(pivotValue, False))
+            query = dumpNode.query.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, column), unescaper.escape(pivotValue, False))
         else:
-            query = dumpNode.query2.replace("'%s'", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]), unescaper.escape(pivotValue, False))
+            query = dumpNode.query2.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]), unescaper.escape(pivotValue, False))
 
         query = agent.whereQuery(query)
         return unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))

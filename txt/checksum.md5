@@ -46,7 +46,7 @@ f872699e948d0692ce11b54781da814c  lib/core/log.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-801dcf41cef89852f754a6d7ecdc8955  lib/core/settings.py
+51d5d97293138acfd70568c9f20eaf8f  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d93501771b41315f9fb949305b6ed257  lib/core/target.py
@@ -108,7 +108,7 @@ fe3a38f820ae05a95f92ab53e22b46d0  lib/utils/har.py
 193c294d960c310808495a63167eab00  lib/utils/hash.py
 f20ae1aa6a8d1d5373ace1f7ed3476a7  lib/utils/htmlentities.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/utils/__init__.py
-06cd61b634ca6142281da699a504cc85  lib/utils/pivotdumptable.py
+67dbbf9cc9aa9665c1efcebdba5b1559  lib/utils/pivotdumptable.py
 56c922696bd3d05d7be96e73b0650c4e  lib/utils/progress.py
 77ae65dba6d0fc69dfb96f800537308d  lib/utils/purge.py
 760290393e35e5f53f15ba46e09d59dd  lib/utils/search.py
@@ -204,7 +204,7 @@ f9485d1ea9be87356fd8708c1d1c7455  plugins/dbms/sybase/takeover.py
 daab081cdc3a08581f804b498e8ef3a2  plugins/generic/connector.py
 c811c9267896033a1d206bdec774782b  plugins/generic/custom.py
 43f19ede05350b42704b55d237f3d715  plugins/generic/databases.py
-d769db0ec3586855a8197229c2a27ffa  plugins/generic/entries.py
+f0a93ac7c8143b59132ee859a158d113  plugins/generic/entries.py
 16882f2840da3161ed4dbf4a7ff8fc8b  plugins/generic/enumeration.py
 ed82a43b822e265919b6164c628e433c  plugins/generic/filesystem.py
 c4f4c6754e09a2418a08d1002184f260  plugins/generic/fingerprint.py
@@ -468,4 +468,4 @@ b5b8b0aebce810e6cdda1b7106c96427  xml/payloads/error_based.xml
 3194e2688a7576e1f877d5b137f7c260  xml/payloads/stacked_queries.xml
 c2d8dd03db5a663e79eabb4495dd0723  xml/payloads/time_blind.xml
 ac649aff0e7db413e4937e446e398736  xml/payloads/union_query.xml
-8f984712da3f23f105fc0b3391114e4b  xml/queries.xml
+775ed5c7e1340f76f17f6186abbd8c92  xml/queries.xml
