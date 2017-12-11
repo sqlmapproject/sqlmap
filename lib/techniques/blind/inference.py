@@ -625,7 +625,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 threadData.shared.value = partialValue = partialValue + val
 
                 if showEta:
-                    progress.progress(time.time() - charStart, index)
+                    progress.progress(calculateDeltaSeconds(start), index)
                 elif conf.verbose in (1, 2) or conf.api:
                     dataToStdout(filterControlChars(val))
 
