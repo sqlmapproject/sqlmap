@@ -80,6 +80,10 @@ class Fingerprint(GenericFingerprint):
 
                 return False
 
+            # Determine if it is Informix >= 11.70
+            if inject.checkBooleanExpression("CHR(32)=' '"):
+                Backend.setVersion(">= 11.70")
+
             setDbms(DBMS.INFORMIX)
 
             self.getBanner()

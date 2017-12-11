@@ -9,6 +9,7 @@ import codecs
 import contextlib
 import cookielib
 import copy
+import distutils
 import getpass
 import hashlib
 import httplib
@@ -2908,7 +2909,7 @@ def isDBMSVersionAtLeast(version):
             elif value.startswith(">"):
                 value = float(value.replace("<", "")) - 0.01
 
-        retVal = getUnicode(value) >= getUnicode(version)
+        retVal = distutils.version.LooseVersion(getUnicode(value)) < distutils.version.LooseVersion(getUnicode(version))
 
     return retVal
 
