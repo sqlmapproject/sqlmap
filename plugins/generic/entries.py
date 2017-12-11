@@ -303,13 +303,15 @@ class Entries:
 
                         continue
 
-                    elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL):
+                    elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX):
                         if Backend.isDbms(DBMS.ACCESS):
                             table = tbl
                         elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                             table = "%s.%s" % (conf.db, tbl)
                         elif Backend.isDbms(DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
+                        elif Backend.isDbms(DBMS.INFORMIX):
+                            table = "%s:%s" % (conf.db, tbl)
 
                         if Backend.isDbms(DBMS.MSSQL):
                             try:

@@ -776,7 +776,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s:%s"/>
-            <blind query="SELECT SKIP %d LIMIT 1 %s FROM %s:%s ORDER BY %s" count="SELECT COUNT(*) FROM %s:%s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE RTRIM(TO_CHAR(%s))>'%s'" query2="SELECT MAX(%s) FROM %s WHERE RTRIM(TO_CHAR(%s)) LIKE '%s'" count="SELECT COUNT(*) FROM %s:%s" count2="SELECT COUNT(DISTINCT %s) FROM %s"/>
         </dump_table>
         <search_db/>
         <search_table/>
