@@ -2909,7 +2909,7 @@ def isDBMSVersionAtLeast(version):
             elif value.startswith(">"):
                 value = float(value.replace("<", "")) - 0.01
 
-        retVal = distutils.version.LooseVersion(getUnicode(value)) < distutils.version.LooseVersion(getUnicode(version))
+        retVal = distutils.version.LooseVersion(getUnicode(value)) >= distutils.version.LooseVersion(getUnicode(version))
 
     return retVal
 
