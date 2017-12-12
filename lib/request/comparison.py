@@ -106,9 +106,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         # Preventing "Unicode equal comparison failed to convert both arguments to Unicode"
         # (e.g. if one page is PDF and the other is HTML)
         if isinstance(seqMatcher.a, str) and isinstance(page, unicode):
-            page = page.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, 'ignore')
+            page = page.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
         elif isinstance(seqMatcher.a, unicode) and isinstance(page, str):
-            seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, 'ignore')
+            seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
 
         if seqMatcher.a and page and seqMatcher.a == page:
             ratio = 1

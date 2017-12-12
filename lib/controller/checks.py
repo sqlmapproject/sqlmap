@@ -508,8 +508,13 @@ def checkSqlInjection(place, parameter, value):
                                     trueSet = set(getFilteredPageContent(truePage, True, "\n").split("\n"))
                                     falseSet = set(getFilteredPageContent(falsePage, True, "\n").split("\n"))
 
+                                    if threadData.lastErrorPage and threadData.lastErrorPage[1]:
+                                        errorSet = set(getFilteredPageContent(threadData.lastErrorPage[1], True, "\n").split("\n"))
+                                    else:
+                                        errorSet = set()
+
                                     if originalSet == trueSet != falseSet:
-                                        candidates = trueSet - falseSet
+                                        candidates = trueSet - falseSet - errorSet
 
                                         if candidates:
                                             candidates = sorted(candidates, key=lambda _: len(_))
@@ -537,7 +542,13 @@ def checkSqlInjection(place, parameter, value):
                                         falseSet = set(extractTextTagContent(falseRawResponse))
                                         falseSet = falseSet.union(__ for _ in falseSet for __ in _.split())
 
-                                        candidates = filter(None, (_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet)))
+                                        if threadData.lastErrorPage and threadData.lastErrorPage[1]:
+                                            errorSet = set(extractTextTagContent(threadData.lastErrorPage[1]))
+                                            errorSet = errorSet.union(__ for _ in errorSet for __ in _.split())
+                                        else:
+                                            errorSet = set()
+
+                                        candidates = filter(None, (_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet - errorSet)))
 
                                         if candidates:
                                             candidates = sorted(candidates, key=lambda _: len(_))
