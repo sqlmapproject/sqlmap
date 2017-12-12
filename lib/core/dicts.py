@@ -184,10 +184,10 @@ DUMP_REPLACEMENTS = {" ": NULL, "": BLANK}
 
 DBMS_DICT = {
     DBMS.MSSQL: (MSSQL_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", "mssql+pymssql"),
-    DBMS.MYSQL: (MYSQL_ALIASES, "python-pymysql", "https://github.com/petehunt/PyMySQL/", "mysql"),
+    DBMS.MYSQL: (MYSQL_ALIASES, "python-pymysql", "https://github.com/PyMySQL/PyMySQL", "mysql"),
     DBMS.PGSQL: (PGSQL_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
-    DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "http://cx-oracle.sourceforge.net/", "oracle"),
-    DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "http://packages.ubuntu.com/quantal/python-sqlite", "sqlite"),
+    DBMS.ORACLE: (ORACLE_ALIASES, "python cx_Oracle", "https://oracle.github.io/python-cx_Oracle/", "oracle"),
+    DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "https://docs.python.org/2/library/sqlite3.html", "sqlite"),
     DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "https://github.com/mkleehammer/pyodbc", "access"),
     DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/", "firebird"),
     DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),

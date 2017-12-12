@@ -692,7 +692,7 @@ def _setMetasploit():
             errMsg = "sqlmap requires third-party module 'pywin32' "
             errMsg += "in order to use Metasploit functionalities on "
             errMsg += "Windows. You can download it from "
-            errMsg += "'http://sourceforge.net/projects/pywin32/files/pywin32/'"
+            errMsg += "'https://sourceforge.net/projects/pywin32/files/pywin32/'"
             raise SqlmapMissingDependence(errMsg)
 
         if not conf.msfPath:
@@ -784,7 +784,7 @@ def _setMetasploit():
 
     if not msfEnvPathExists:
         errMsg = "unable to locate Metasploit Framework installation. "
-        errMsg += "You can get it at 'http://www.metasploit.com/download/'"
+        errMsg += "You can get it at 'https://www.metasploit.com/download/'"
         raise SqlmapFilePathException(errMsg)
 
 def _setWriteFile():
@@ -1376,7 +1376,7 @@ def _setHTTPAuthentication():
             except ImportError:
                 errMsg = "sqlmap requires Python NTLM third-party library "
                 errMsg += "in order to authenticate via NTLM, "
-                errMsg += "http://code.google.com/p/python-ntlm/"
+                errMsg += "https://github.com/mullender/python-ntlm"
                 raise SqlmapMissingDependence(errMsg)
 
             authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
