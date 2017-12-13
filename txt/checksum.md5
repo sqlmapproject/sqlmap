@@ -21,14 +21,14 @@ f96467fc5cd1d87f52dd7966c8ae6e79  extra/shutils/regressiontest.py
 5fb9aaf874daa47ea2b672a22740e56b  extra/sqlharvest/__init__.py
 1fc7772edce5a01c31f3932b2fc4c1c6  extra/sqlharvest/sqlharvest.py
 21bf2b3a7a22b8cd5d96a6457a1b4997  lib/controller/action.py
-8c18f767d400a442f97c72c7d613f200  lib/controller/checks.py
+8266f1119366b0857d88f139de9b2035  lib/controller/checks.py
 2db2666dba713c710d248a62b2c1c1fe  lib/controller/controller.py
 d2cdb9e832e18a81e936ca3348144b16  lib/controller/handler.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/controller/__init__.py
 f8a7165253874a9ce0c6e0d089e5fb8c  lib/core/agent.py
 9eccf8db8b8e259e30c1eade4ee499b0  lib/core/bigarray.py
-8b9d75682900c0dc73dbe85293cd41ac  lib/core/common.py
-54326d3a690f8b26fe5a5da1a589b369  lib/core/convert.py
+4c384d4c5af98c12f1dcc7eaa7fb3886  lib/core/common.py
+5c918135b3776bb129edbfdd422ece1b  lib/core/convert.py
 90b1b08368ac8a859300e6fa6a8c796e  lib/core/data.py
 1c14bdbf47b8dba31f73da9ad731a54a  lib/core/datatype.py
 2c16cdbbccbfcfc0ddac2cff876ce9f3  lib/core/decorators.py
@@ -46,7 +46,7 @@ f872699e948d0692ce11b54781da814c  lib/core/log.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-92cc67e770d2a170ab982f1d9d8ad3ed  lib/core/settings.py
+abc5b37347c8ab56f108538d03eeda38  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d93501771b41315f9fb949305b6ed257  lib/core/target.py
@@ -57,7 +57,7 @@ e7fb8c09fe7520c32895b859c4edf77a  lib/core/update.py
 c976dd450b663cb4455cd9efbbcf625b  lib/core/wordlist.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/__init__.py
 040081c06de7f4859fdad94264e3ba58  lib/parse/banner.py
-dc4c194f9dd2131ff1049cd2674f3695  lib/parse/cmdline.py
+3cdffb2379b6e414f799394c40b7fa9e  lib/parse/cmdline.py
 8247a5483caea5f3004d9ba5d00ab341  lib/parse/configfile.py
 c6b7ab146554b660ad264b147815be22  lib/parse/handler.py
 fb760bceedfbf70168eb2c4475038c09  lib/parse/headers.py
@@ -82,7 +82,7 @@ b3b351fb8d5e96f9243f7bfa3079d3c7  lib/request/rangehandler.py
 76c5ddf3dfeef6611277d6e10b2ab0ad  lib/takeover/abstraction.py
 a53a068f7b5651fca1ae8da932ba4d96  lib/takeover/icmpsh.py
 5fb9aaf874daa47ea2b672a22740e56b  lib/takeover/__init__.py
-ac3f47b2f8d2cd530512405b4a23a9db  lib/takeover/metasploit.py
+376cd8d6887d175abb10604e0bc9bd24  lib/takeover/metasploit.py
 3309f439e0cb68a707dc3a3c807645b0  lib/takeover/registry.py
 21b6eff33f5d28c5e167a948976817cb  lib/takeover/udf.py
 e49d1213f9ae0c0f922c5aef4febe205  lib/takeover/web.py
@@ -239,7 +239,7 @@ adb6ab6106b93ce9304513b3d72ae60c  tamper/charunicodeencode.py
 3543785380bad0a5ce563cd998e183d8  tamper/commalessmid.py
 178ad9311184baa3e1d4a172fce77cbd  tamper/commentbeforeparentheses.py
 e9d64dc52b02ae141bca2b2c69540ccc  tamper/concat2concatws.py
-75f823d925e6f823b8f7dbbe9b72cd5e  tamper/equaltolike.py
+75b7ebc02f1973e22e54436ce15ca35a  tamper/equaltolike.py
 6b4e67782f4930b55348fe06f744fc78  tamper/escapequotes.py
 573e3304d0dd5977e5a8a93d24fa3f99  tamper/greatest.py
 fe4ce7c1d5219fce225048ef8b00a272  tamper/halfversionedmorekeywords.py

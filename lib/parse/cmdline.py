@@ -626,7 +626,7 @@ def cmdLineParser(argv=None):
 
         general.add_option("--batch", dest="batch",
                             action="store_true",
-                            help="Never ask for user input, use the default behaviour")
+                            help="Never ask for user input, use the default behavior")
 
         general.add_option("--binary-fields", dest="binaryFields",
                           help="Result fields having binary values (e.g. \"digest\")")

@@ -193,7 +193,7 @@ def stdoutencode(data):
                 warnMsg = "cannot properly display Unicode characters "
                 warnMsg += "inside Windows OS command prompt "
                 warnMsg += "(http://bugs.python.org/issue1602). All "
-                warnMsg += "unhandled occurances will result in "
+                warnMsg += "unhandled occurrences will result in "
                 warnMsg += "replacement with '?' character. Please, find "
                 warnMsg += "proper character representation inside "
                 warnMsg += "corresponding output files. "

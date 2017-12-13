@@ -932,7 +932,7 @@ def checkSuhosinPatch(injection):
 
     if injection.place == PLACE.GET:
         debugMsg = "checking for parameter length "
-        debugMsg += "constrainting mechanisms"
+        debugMsg += "constraining mechanisms"
         logger.debug(debugMsg)
 
         pushValue(kb.injection)
@@ -941,7 +941,7 @@ def checkSuhosinPatch(injection):
         randInt = randomInt()
 
         if not checkBooleanExpression("%d=%s%d" % (randInt, ' ' * SUHOSIN_MAX_VALUE_LENGTH, randInt)):
-            warnMsg = "parameter length constrainting "
+            warnMsg = "parameter length constraining "
             warnMsg += "mechanism detected (e.g. Suhosin patch). "
             warnMsg += "Potential problems in enumeration phase can be expected"
             logger.warn(warnMsg)

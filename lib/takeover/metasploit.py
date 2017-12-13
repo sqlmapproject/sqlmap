@@ -501,7 +501,7 @@ class Metasploit:
 
             send_all(proc, "getsystem\n")
 
-            infoMsg = "displaying the list of Access Tokens availables. "
+            infoMsg = "displaying the list of available Access Tokens. "
             infoMsg += "Choose which user you want to impersonate by "
             infoMsg += "using incognito's command 'impersonate_token' if "
             infoMsg += "'getsystem' does not success to elevate privileges"

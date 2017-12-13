@@ -1014,7 +1014,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
             dataToStdout("\r%s%s\n" % (message, options), forceOutput=True, bold=True)
 
-            debugMsg = "used the default behaviour, running in batch mode"
+            debugMsg = "used the default behavior, running in batch mode"
             logger.debug(debugMsg)
 
             retVal = default
@@ -1893,7 +1893,7 @@ def isWindowsDriveLetterPath(filepath):
 
 def posixToNtSlashes(filepath):
     """
-    Replaces all occurances of Posix slashes (/) in provided
+    Replaces all occurrences of Posix slashes (/) in provided
     filepath with NT ones (\)
 
     >>> posixToNtSlashes('C:/Windows')
@@ -1904,7 +1904,7 @@ def posixToNtSlashes(filepath):
 
 def ntToPosixSlashes(filepath):
     """
-    Replaces all occurances of NT slashes (\) in provided
+    Replaces all occurrences of NT slashes (\) in provided
     filepath with Posix ones (/)
 
     >>> ntToPosixSlashes('C:\\Windows')
@@ -3764,7 +3764,7 @@ def filterPairValues(values):
 
 def randomizeParameterValue(value):
     """
-    Randomize a parameter value based on occurances of alphanumeric characters
+    Randomize a parameter value based on occurrences of alphanumeric characters
 
     >>> random.seed(0)
     >>> randomizeParameterValue('foobar')
