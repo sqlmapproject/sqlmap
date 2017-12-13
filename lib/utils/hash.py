@@ -81,6 +81,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
 from thirdparty.colorama.initialise import init as coloramainit
+from thirdparty.oset.pyoset import oset
 from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
 
@@ -555,37 +556,37 @@ def storeHashesToFile(attack_dict):
     if not attack_dict:
         return
 
+    items = oset()
+
+    for user, hashes in attack_dict.items():
+        for hash_ in hashes:
+            hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
+            if hash_ and hash_ != NULL and hashRecognition(hash_):
+                item = None
+                if user and not user.startswith(DUMMY_USER_PREFIX):
+                    item = "%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING))
+                else:
+                    item = "%s\n" % hash_.encode(UNICODE_ENCODING)
+
+                if item and item not in items:
+                    items.add(item)
+
     if kb.storeHashesChoice is None:
         message = "do you want to store hashes to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
 
         kb.storeHashesChoice = readInput(message, default='N', boolean=True)
 
-    if not kb.storeHashesChoice:
-        return
+    if kb.storeHashesChoice:
+        handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
+        os.close(handle)
 
-    handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
-    os.close(handle)
+        infoMsg = "writing hashes to a temporary file '%s' " % filename
+        logger.info(infoMsg)
 
-    infoMsg = "writing hashes to a temporary file '%s' " % filename
-    logger.info(infoMsg)
-
-    items = set()
-
-    with open(filename, "w+") as f:
-        for user, hashes in attack_dict.items():
-            for hash_ in hashes:
-                hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
-                if hash_ and hash_ != NULL and hashRecognition(hash_):
-                    item = None
-                    if user and not user.startswith(DUMMY_USER_PREFIX):
-                        item = "%s:%s\n" % (user.encode(UNICODE_ENCODING), hash_.encode(UNICODE_ENCODING))
-                    else:
-                        item = "%s\n" % hash_.encode(UNICODE_ENCODING)
-
-                    if item and item not in items:
-                        f.write(item)
-                        items.add(item)
+        with open(filename, "w+") as f:
+            for item in items:
+                f.write(item)
 
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
