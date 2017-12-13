@@ -110,12 +110,17 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         elif isinstance(seqMatcher.a, unicode) and isinstance(page, str):
             seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
 
-        if seqMatcher.a and page and seqMatcher.a == page:
-            ratio = 1
+        if any(_ is None for _ in (page, seqMatcher.a)):
+            return None
+        elif seqMatcher.a and page and seqMatcher.a == page:
+            ratio = 1.
         elif kb.skipSeqMatcher or seqMatcher.a and page and any(len(_) > MAX_DIFFLIB_SEQUENCE_LENGTH for _ in (seqMatcher.a, page)):
-            ratio = 1.0 * len(seqMatcher.a) / len(page)
-            if ratio > 1:
-                ratio = 1. / ratio
+            if not page or not seqMatcher.a:
+                return float(seqMatcher.a == page)
+            else:
+                ratio = 1. * len(seqMatcher.a) / len(page)
+                if ratio > 1:
+                    ratio = 1. / ratio
         else:
             seq1, seq2 = None, None
 
