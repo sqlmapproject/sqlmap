@@ -3809,7 +3809,7 @@ def randomizeParameterValue(value):
 @cachedmethod
 def asciifyUrl(url, forceQuote=False):
     """
-    Attempts to make a unicode URL usuable with ``urllib/urllib2``.
+    Attempts to make a unicode URL usable with ``urllib/urllib2``.
 
     More specifically, it attempts to convert the unicode object ``url``,
     which is meant to represent a IRI, to an unicode object that,
@@ -3874,7 +3874,7 @@ def asciifyUrl(url, forceQuote=False):
     if port:
         netloc += ':' + str(port)
 
-    return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment])
+    return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment]) or url
 
 def isAdminFromPrivileges(privileges):
     """
