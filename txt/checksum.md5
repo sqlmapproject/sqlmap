@@ -46,7 +46,7 @@ f872699e948d0692ce11b54781da814c  lib/core/log.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-e073bdbcda9622faa1179eb62d9c420e  lib/core/settings.py
+8876dee2d5d1f9efbb520c78849b9a3a  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d93501771b41315f9fb949305b6ed257  lib/core/target.py
@@ -431,7 +431,7 @@ de671bbe9acee86d5e3a66fd4126b4e3  waf/safedog.py
 b03fdbf8f427ab614303a03416970927  waf/secureiis.py
 877ea097e56abf01868945a00c2afdea  waf/senginx.py
 90f3c0c895d5d564b6614e25549b6355  waf/sitelock.py
-664f73359b87bfb684fb49df1e0b1fa4  waf/sonicwall.py
+5a126dfde1b1c6c75b1c19a673a185a2  waf/sonicwall.py
 b384581ce833d147690c7c77c9509bdc  waf/sophos.py
 e9127a67621440fba41e1cd176890851  waf/stingray.py
 b9ede1695617c883e4230e6018753ba4  waf/sucuri.py
