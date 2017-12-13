@@ -46,7 +46,7 @@ f872699e948d0692ce11b54781da814c  lib/core/log.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-abc5b37347c8ab56f108538d03eeda38  lib/core/settings.py
+e073bdbcda9622faa1179eb62d9c420e  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d93501771b41315f9fb949305b6ed257  lib/core/target.py
@@ -389,6 +389,7 @@ ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqlud
 8f21bc536648bbe73de32cb58036564a  waf/airlock.py
 05fde87480ea622db4c84b0fc248a613  waf/anquanbao.py
 4adfebe23101d542365d8c92b4f49af7  waf/armor.py
+d4c8df8461e8633cc4cc94c687102396  waf/asm.py
 58faaa04de90a44c306e862bbbe0ed83  waf/aws.py
 2347b494b91dc50d93d1437e1302f9f1  waf/baidu.py
 72fd38a1fa212fb154f74d0c978d489a  waf/barracuda.py
