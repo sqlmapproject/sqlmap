@@ -577,7 +577,7 @@ def storeHashesToFile(attack_dict):
 
         kb.storeHashesChoice = readInput(message, default='N', boolean=True)
 
-    if kb.storeHashesChoice:
+    if items and kb.storeHashesChoice:
         handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
         os.close(handle)
 
