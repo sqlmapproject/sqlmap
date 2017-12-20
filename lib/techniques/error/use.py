@@ -76,7 +76,10 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
         current = MAX_ERROR_CHUNK_LENGTH
         while current >= MIN_ERROR_CHUNK_LENGTH:
             testChar = str(current % 10)
-            testQuery = "SELECT %s('%s',%d)" % ("REPEAT" if Backend.isDbms(DBMS.MYSQL) else "REPLICATE", testChar, current)
+
+            testQuery = "%s('%s',%d)" % ("REPEAT" if Backend.isDbms(DBMS.MYSQL) else "REPLICATE", testChar, current)
+            testQuery = "SELECT %s" % (agent.hexConvertField(testQuery) if conf.hexConvert else testQuery)
+
             result = unArrayizeValue(_oneShotErrorUse(testQuery, chunkTest=True))
 
             if (result or "").startswith(testChar):
