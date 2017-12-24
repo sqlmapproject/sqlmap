@@ -1048,7 +1048,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     if boolean:
         retVal = retVal.strip().upper() == 'Y'
 
-    return retVal
+    return retVal or ""
 
 def randomRange(start=0, stop=1000, seed=None):
     """
