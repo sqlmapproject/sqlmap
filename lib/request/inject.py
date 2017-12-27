@@ -46,6 +46,7 @@ from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -470,6 +471,15 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         warnMsg += "a switch '--no-cast' "
         warnMsg += "or switch '--hex'" if Backend.getIdentifiedDbms() not in (DBMS.ACCESS, DBMS.FIREBIRD) else ""
         singleTimeWarnMessage(warnMsg)
+
+    # Dirty patch (safe-encoded unicode characters)
+    if isinstance(value, unicode) and "\\x" in value:
+        try:
+            candidate = eval(repr(value).replace("\\\\x", "\\x").replace("u'", "'", 1)).decode(UNICODE_ENCODING)
+            if "\\x" not in candidate:
+                value = candidate
+        except:
+            pass
 
     return extractExpectedValue(value, expected)
 
