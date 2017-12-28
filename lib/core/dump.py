@@ -140,7 +140,7 @@ class Dump(object):
             try:
                 elements = set(elements)
                 elements = list(elements)
-                elements.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+                elements.sort(key=lambda _: _.lower() if isinstance(_, basestring) else _)
             except:
                 pass
 
@@ -191,7 +191,7 @@ class Dump(object):
             userSettings = userSettings[0]
 
         users = userSettings.keys()
-        users.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+        users.sort(key=lambda _: _.lower() if isinstance(_, basestring) else _)
 
         if conf.api:
             self._write(userSettings, content_type=content_type)
@@ -285,7 +285,7 @@ class Dump(object):
                     colType = None
 
                     colList = columns.keys()
-                    colList.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+                    colList.sort(key=lambda _: _.lower() if isinstance(_, basestring) else _)
 
                     for column in colList:
                         colType = columns[column]
@@ -377,7 +377,7 @@ class Dump(object):
                     if count is None:
                         count = "Unknown"
 
-                    tables.sort(key=lambda x: x.lower() if isinstance(x, basestring) else x)
+                    tables.sort(key=lambda _: _.lower() if isinstance(_, basestring) else _)
 
                     for table in tables:
                         blank1 = " " * (maxlength1 - len(normalizeUnicode(table) or unicode(table)))
