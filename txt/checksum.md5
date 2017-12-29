@@ -46,12 +46,12 @@ eec64e3d4c3f77eded3270b8116698ea  lib/core/option.py
 760d9df2a27ded29109b390ab202e72d  lib/core/replication.py
 a2466b62e67f8b31736bac4dac590e51  lib/core/revision.py
 02d4762140a72fd44668d3dab5eabda9  lib/core/session.py
-ec31a0f93542b8b7984f94eb96684fe8  lib/core/settings.py
+e529f917531d8212bf7efcdf4796a341  lib/core/settings.py
 35bffbad762eb9e03db9e93b1c991103  lib/core/shell.py
 a59ec28371ae067a6fdd8f810edbee3d  lib/core/subprocessng.py
 d93501771b41315f9fb949305b6ed257  lib/core/target.py
 df8f6475a53d83400c1a3967c0a21bd7  lib/core/testing.py
-632538fe50f6b3179e1a5a85e8b79741  lib/core/threads.py
+bd984b3dfd2753f384b8a132838916e1  lib/core/threads.py
 a119989ca03f8c8fbdf7d3035084eb31  lib/core/unescaper.py
 e7fb8c09fe7520c32895b859c4edf77a  lib/core/update.py
 c976dd450b663cb4455cd9efbbcf625b  lib/core/wordlist.py

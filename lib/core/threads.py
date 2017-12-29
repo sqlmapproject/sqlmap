@@ -95,6 +95,9 @@ def exceptionHandledFunction(threadFunction, silent=False):
         if not silent:
             logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
+            if conf.verbose > 1:
+                traceback.print_exc()
+
 def setDaemon(thread):
     # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
     if PYVERSION >= "2.6":
