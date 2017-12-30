@@ -188,6 +188,9 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadException = True
         logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
+        if conf.verbose > 1:
+            traceback.print_exc()
+
     except:
         from lib.core.common import unhandledExceptionMessage
 
