@@ -18,11 +18,13 @@ from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getUnicode
+from lib.core.common import isListLike
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -149,6 +151,9 @@ def checkCharEncoding(encoding, warn=True):
     >>> checkCharEncoding('en_us', False)
     'utf8'
     """
+
+    if isListLike(encoding):
+        encoding = unArrayizeValue(encoding)
 
     if encoding:
         encoding = encoding.lower()
