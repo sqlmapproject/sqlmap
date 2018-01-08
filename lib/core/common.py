@@ -868,7 +868,7 @@ def boldifyMessage(message):
 
 def setColor(message, bold=False):
     retVal = message
-    level = extractRegexResult(r"\[(?P<result>[A-Z ]+)\]", message) or kb.get("stickyLevel")
+    level = extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_ for _ in dir(logging) if _ == _.upper()), message) or kb.get("stickyLevel")
 
     if message and getattr(LOGGER_HANDLER, "is_tty", False):  # colorizing handler
         if bold:
