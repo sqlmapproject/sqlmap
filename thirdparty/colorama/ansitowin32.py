@@ -171,9 +171,19 @@ class AnsiToWin32(object):
 
     def write_plain_text(self, text, start, end):
         if start < end:
-            self.wrapped.write(text[start:end])
+            self._write(text[start:end])
             self.wrapped.flush()
 
+    # Reference: https://github.com/robotframework/robotframework/commit/828c67695d85519e4435c556c43ed1b00985df05
+    #  Workaround for Windows 10 console bug:
+    #  https://github.com/robotframework/robotframework/issues/2709
+    def _write(self, text, retry=5):
+        try:
+            self.wrapped.write(text)
+        except IOError, err:
+            if not (err.errno == 0 and retry > 0):
+                raise
+            self._write(text, retry-1)
 
     def convert_ansi(self, paramstring, command):
         if self.convert:
