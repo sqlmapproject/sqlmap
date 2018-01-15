@@ -4186,7 +4186,7 @@ def decodeHexValue(value, raw=False):
                     except UnicodeDecodeError:
                         pass
                 if not isinstance(retVal, unicode):
-                    retVal = getUnicode(retVal, "utf8")
+                    retVal = getUnicode(retVal, conf.encoding or "utf8")
 
         return retVal
 
