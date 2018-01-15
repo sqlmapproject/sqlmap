@@ -1400,9 +1400,9 @@ def parseTargetUrl():
 
     if not re.search(r"^http[s]*://", conf.url, re.I) and not re.search(r"^ws[s]*://", conf.url, re.I):
         if ":443/" in conf.url:
-            conf.url = "https://" + conf.url
+            conf.url = "https://%s" % conf.url
         else:
-            conf.url = "http://" + conf.url
+            conf.url = "http://%s" % conf.url
 
     if kb.customInjectionMark in conf.url:
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
