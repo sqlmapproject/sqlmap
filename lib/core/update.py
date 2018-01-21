@@ -32,7 +32,7 @@ def update():
         errMsg += "from GitHub (e.g. 'git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap')"
         logger.error(errMsg)
     else:
-        infoMsg = "updating sqlmap to the latest development version from the "
+        infoMsg = "updating sqlmap to the latest development revision from the "
         infoMsg += "GitHub repository"
         logger.info(infoMsg)
 
