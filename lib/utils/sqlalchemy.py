@@ -41,8 +41,6 @@ class SQLAlchemy(GenericConnector):
 
     def connect(self):
         if _sqlalchemy:
-            import pdb
-            pdb.set_trace()
             self.initConnection()
 
             try:
