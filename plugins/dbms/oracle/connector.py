@@ -44,8 +44,10 @@ class Connector(GenericConnector):
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
         except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError), ex:
-            if "" in str(ex):
-                msg = re.sub(r'DPI-\d+:\s+|: "[^"]+"', "", str(ex))
+            if "Oracle Client library" in str(ex):
+                msg = re.sub(r"DPI-\d+:\s+", "", str(ex))
+                msg = re.sub(r': ("[^"]+")', r" (\g<1>)", msg)
+                msg = re.sub(r". See (http[^ ]+)", r'. See "\g<1>"', msg)
                 raise SqlmapConnectionException(msg)
 
             try:
