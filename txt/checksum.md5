@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-6d8165a67243d0bc98f7bbc4d9b1ec36  lib/core/settings.py
+7bf6ba3c580b0a956d82189140784d17  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 505aaa61e1bba3c3d4567c3e667699e3  lib/core/target.py
@@ -173,7 +173,7 @@ d6836e2a6a308eb3536e2e7fc74fdc8b  plugins/dbms/mysql/filesystem.py
 88b876f085fec2569a0697f4b69f41da  plugins/dbms/mysql/__init__.py
 0e2adbee217f5b94dcc124d24b8dde99  plugins/dbms/mysql/syntax.py
 f30009816db6a0b41342301f0d657a01  plugins/dbms/mysql/takeover.py
-9a50b600d65d178b374d19775d1f95e4  plugins/dbms/oracle/connector.py
+120637663f66cbb40f44a3a3bb2260dc  plugins/dbms/oracle/connector.py
 e1ffee36fd18f33f34bb4bac4ae43f14  plugins/dbms/oracle/enumeration.py
 c326b0d8bed92be67888b0242f565ac8  plugins/dbms/oracle/filesystem.py
 e16cbf8abda91a906ca7bafb81d8866e  plugins/dbms/oracle/fingerprint.py
