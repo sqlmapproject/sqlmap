@@ -6,10 +6,12 @@
         <error regexp="SQL syntax.*?MySQL"/>
         <error regexp="Warning.*?mysql_"/>
         <error regexp="MySqlException \(0x"/>
+        <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
         <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc\.exceptions"/>
+        <error regexp="Zend_Db_Statement_Mysqli_Exception"/>
     </dbms>
 
     <!-- PostgreSQL -->
@@ -35,9 +37,11 @@
         <error regexp="Microsoft SQL Native Client error '[0-9a-fA-F]{8}"/>
         <error regexp="com\.microsoft\.sqlserver\.jdbc\.SQLServerException"/>
         <error regexp="ODBC SQL Server Driver"/>
+        <error regexp="ODBC Driver \d+ for SQL Server"/>
         <error regexp="SQLServer JDBC Driver"/>
         <error regexp="macromedia\.jdbc\.sqlserver"/>
         <error regexp="com\.jnetdirect\.jsql"/>
+        <error regexp="SQLSrvException"/>
     </dbms>
 
     <!-- Microsoft Access -->
