@@ -1461,11 +1461,11 @@ def checkNullConnection():
     infoMsg = "testing NULL connection to the target URL"
     logger.info(infoMsg)
 
-    try:
-        pushValue(kb.pageCompress)
-        kb.pageCompress = False
+    pushValue(kb.pageCompress)
+    kb.pageCompress = False
 
-        page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD)
+    try:
+        page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD, raise404=False)
 
         if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
             kb.nullConnection = NULLCONNECTION.HEAD
@@ -1489,9 +1489,8 @@ def checkNullConnection():
                     infoMsg = "NULL connection is supported with 'skip-read' method"
                     logger.info(infoMsg)
 
-    except SqlmapConnectionException, ex:
-        errMsg = getSafeExString(ex)
-        raise SqlmapConnectionException(errMsg)
+    except SqlmapConnectionException:
+        pass
 
     finally:
         kb.pageCompress = popValue()
