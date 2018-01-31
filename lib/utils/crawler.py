@@ -126,7 +126,7 @@ def crawl(target):
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
 
         threadData.shared.deeper = set()
-        threadData.shared.unprocessed = set([target])
+        threadData.shared.unprocessed = {target}
 
         if not conf.sitemapUrl:
             message = "do you want to check for the existence of "

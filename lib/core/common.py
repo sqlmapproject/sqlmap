@@ -770,7 +770,7 @@ def getManualDirectories():
             checkFile(listPath)
             directories = getFileItems(listPath)
         elif choice == '4':
-            targets = set([conf.hostname])
+            targets = {conf.hostname}
             _ = conf.hostname.split('.')
 
             if _[0] == "www":

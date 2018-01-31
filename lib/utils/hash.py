@@ -693,9 +693,7 @@ def hashRecognition(value):
     if isinstance(value, basestring):
         for name, regex in getPublicTypeMembers(HASH):
             # Hashes for Oracle and old MySQL look the same hence these checks
-            if isOracle and regex == HASH.MYSQL_OLD:
-                continue
-            elif isMySQL and regex == HASH.ORACLE_OLD:
+            if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
                 continue
             elif regex == HASH.CRYPT_GENERIC:
                 if any((value.lower() == value, value.upper() == value)):
@@ -712,7 +710,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
     count = 0
     rotator = 0
-    hashes = set([item[0][1] for item in attack_info])
+    hashes = set(item[0][1] for item in attack_info)
 
     wordlist = Wordlist(wordlists, proc_id, getattr(proc_count, "value", 0), custom_wordlist)
 
@@ -758,7 +756,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
 
-                    status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
+                    status = "current status: %s... %s" % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
                     if not api:
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
@@ -827,12 +825,14 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
                 elif (proc_id == 0 or getattr(proc_count, "value", 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0:
                     rotator += 1
+
                     if rotator >= len(ROTATING_CHARS):
                         rotator = 0
-                    status = 'current status: %s... %s' % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
+
+                    status = "current status: %s... %s" % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
                     if user and not user.startswith(DUMMY_USER_PREFIX):
-                        status += ' (user: %s)' % user
+                        status += " (user: %s)" % user
 
                     if not api:
                         dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
