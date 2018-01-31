@@ -26,7 +26,7 @@ ccd66880fc677a3c83db2a3a70d196d7  lib/controller/controller.py
 a7b0c8e5a18a3abe8803999dcfc4664f  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
 e3a3f5218b2e52dd0afafdfc9fed2002  lib/core/agent.py
-62fade52c1524364e6e0653c31143a9c  lib/core/bigarray.py
+86a4703d5474badd8462146510b2c460  lib/core/bigarray.py
 27d1b0a4609eece643141408d1f18716  lib/core/common.py
 2a40d5b5997265daa890545d4a4a59b9  lib/core/convert.py
 9f87391b6a3395f7f50830b391264f27  lib/core/data.py
@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-0fe2ab6fe688d723c96b1f0326d4bdb5  lib/core/settings.py
+2ef6392db210a10901554ea061ee7256  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 505aaa61e1bba3c3d4567c3e667699e3  lib/core/target.py
@@ -114,7 +114,7 @@ a6d6888e14a7c11f0884c8cc18489caa  lib/utils/getch.py
 4a6886d3a0c7bf768df97738fa257de9  lib/utils/search.py
 4b17311256f0081904a67831252e3fb9  lib/utils/sqlalchemy.py
 dcc25183c6bd85b172c87cfcbc305ab6  lib/utils/timeout.py
-e426eae9ddf6a42bcb6b7355e2c2936f  lib/utils/versioncheck.py
+ce5ec6300bc0a185827a21d8a8f09de3  lib/utils/versioncheck.py
 1e9cf437451ff8147a372a002641b963  lib/utils/xrange.py
 b9d2761f47fec3d98b88311a263fd5db  plugins/dbms/access/connector.py
 3f1c50a1507d1c2f69c20c706230e2e2  plugins/dbms/access/enumeration.py

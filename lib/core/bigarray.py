@@ -10,11 +10,11 @@ try:
 except:
    import pickle
 
+import bz2
 import itertools
 import os
 import sys
 import tempfile
-import zlib
 
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapSystemException
@@ -86,7 +86,7 @@ class BigArray(list):
             self.chunks.pop()
             try:
                 with open(self.chunks[-1], "rb") as f:
-                    self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
+                    self.chunks[-1] = pickle.loads(bz2.decompress(f.read()))
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex.message
@@ -107,7 +107,7 @@ class BigArray(list):
             self.filenames.add(filename)
             os.close(handle)
             with open(filename, "w+b") as f:
-                f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
+                f.write(bz2.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError), ex:
             errMsg = "exception occurred while storing data "
@@ -125,7 +125,7 @@ class BigArray(list):
         if not (self.cache and self.cache.index == index):
             try:
                 with open(self.chunks[index], "rb") as f:
-                    self.cache = Cache(index, pickle.loads(zlib.decompress(f.read())), False)
+                    self.cache = Cache(index, pickle.loads(bz2.decompress(f.read())), False)
             except IOError, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex.message
