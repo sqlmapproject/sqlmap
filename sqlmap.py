@@ -381,3 +381,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    # cancelling postponed imports (because of Travis CI checks)
+    from lib.controller.controller import start
