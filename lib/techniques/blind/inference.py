@@ -223,7 +223,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
-            if result and timeBasedCompare:
+            if result and timeBasedCompare and kb.injection.data[kb.technique].trueCode:
                 result = threadData.lastCode == kb.injection.data[kb.technique].trueCode
                 if not result:
                     warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, kb.injection.data[kb.technique].trueCode)
