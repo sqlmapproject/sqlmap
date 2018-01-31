@@ -45,7 +45,6 @@ from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.core.subprocessng import Popen
 from lib.parse.cmdline import cmdLineParser
-from thirdparty.bottle.bottle import abort
 from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
 from thirdparty.bottle.bottle import hook

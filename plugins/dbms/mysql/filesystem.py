@@ -68,14 +68,13 @@ class Filesystem(GenericFilesystem):
                 raise SqlmapNoneDataException(warnMsg)
         else:
             length = int(length)
-            sustrLen = 1024
+            chunkSize = 1024
 
-            if length > sustrLen:
+            if length > chunkSize:
                 result = []
 
-                for i in xrange(1, length, sustrLen):
-                    chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, sustrLen, self.fileTblName), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
-
+                for i in xrange(1, length, chunkSize):
+                    chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, chunkSize, self.fileTblName), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
                     result.append(chunk)
             else:
                 result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)

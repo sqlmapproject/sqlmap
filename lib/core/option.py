@@ -1046,7 +1046,7 @@ def _setSocketPreConnect():
     if conf.disablePrecon:
         return
 
-    def _():
+    def _thread():
         while kb.get("threadContinue") and not conf.get("disablePrecon"):
             try:
                 for key in socket._ready:
@@ -1078,6 +1078,7 @@ def _setSocketPreConnect():
                     break
                 else:
                     try:
+                        candidate.shutdown(socket.SHUT_RDWR)
                         candidate.close()
                     except socket.error:
                         pass
@@ -1090,7 +1091,7 @@ def _setSocketPreConnect():
         socket.socket._connect = socket.socket.connect
         socket.socket.connect = connect
 
-        thread = threading.Thread(target=_)
+        thread = threading.Thread(target=_thread)
         setDaemon(thread)
         thread.start()
 
