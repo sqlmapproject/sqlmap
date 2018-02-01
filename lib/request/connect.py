@@ -982,7 +982,7 @@ class Connect(object):
                     if not conf.csrfUrl:
                         errMsg += ". You can try to rerun by providing "
                         errMsg += "a valid value for option '--csrf-url'"
-                    raise SqlmapTokenException, errMsg
+                    raise SqlmapTokenException(errMsg)
 
             if token:
                 token = token.strip("'\"")

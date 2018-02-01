@@ -80,7 +80,7 @@ def base64unpickle(value, unsafe=False):
         if len(self.stack) > 1:
             func = self.stack[-2]
             if func not in PICKLE_REDUCE_WHITELIST:
-                raise Exception, "abusing reduce() is bad, Mkay!"
+                raise Exception("abusing reduce() is bad, Mkay!")
         self.load_reduce()
 
     def loads(str):

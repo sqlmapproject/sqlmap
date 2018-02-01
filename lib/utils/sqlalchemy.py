@@ -46,7 +46,7 @@ class SQLAlchemy(GenericConnector):
             try:
                 if not self.port and self.db:
                     if not os.path.exists(self.db):
-                        raise SqlmapFilePathException, "the provided database file '%s' does not exist" % self.db
+                        raise SqlmapFilePathException("the provided database file '%s' does not exist" % self.db)
 
                     _ = conf.direct.split("//", 1)
                     conf.direct = "%s////%s" % (_[0], os.path.abspath(self.db))

@@ -337,7 +337,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not host:
                     errMsg = "invalid format of a request file"
-                    raise SqlmapSyntaxException, errMsg
+                    raise SqlmapSyntaxException(errMsg)
 
                 if not url.startswith("http"):
                     url = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
@@ -402,7 +402,7 @@ def _loadQueries():
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
-        raise SqlmapInstallationException, errMsg
+        raise SqlmapInstallationException(errMsg)
 
     for node in tree.findall("*"):
         queries[node.attrib['value']] = iterate(node)
@@ -1128,7 +1128,7 @@ def _setHTTPHandlers():
             _ = urlparse.urlsplit(conf.proxy)
         except Exception as ex:
             errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
         hostnamePort = _.netloc.split(":")
 
@@ -1255,7 +1255,7 @@ def _setSafeVisit():
                 kb.safeReq.post = None
         else:
             errMsg = "invalid format of a safe request file"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
     else:
         if not re.search(r"\Ahttp[s]*://", conf.safeUrl):
             if ":443/" in conf.safeUrl:
@@ -1580,7 +1580,7 @@ def _createTemporaryDirectory():
         except (OSError, IOError) as ex:
             errMsg = "there has been a problem while accessing "
             errMsg += "temporary directory location(s) ('%s')" % getSafeExString(ex)
-            raise SqlmapSystemException, errMsg
+            raise SqlmapSystemException(errMsg)
     else:
         try:
             if not os.path.isdir(tempfile.gettempdir()):
@@ -1607,7 +1607,7 @@ def _createTemporaryDirectory():
         except (OSError, IOError, WindowsError) as ex:
             errMsg = "there has been a problem while setting "
             errMsg += "temporary directory location ('%s')" % getSafeExString(ex)
-            raise SqlmapSystemException, errMsg
+            raise SqlmapSystemException(errMsg)
 
 def _cleanupOptions():
     """

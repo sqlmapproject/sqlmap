@@ -2005,7 +2005,7 @@ def parseXmlFile(xmlFile, handler):
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
-        raise SqlmapInstallationException, errMsg
+        raise SqlmapInstallationException(errMsg)
 
 def getSQLSnippet(dbms, sfile, **variables):
     """
