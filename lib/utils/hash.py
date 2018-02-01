@@ -771,7 +771,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
             except (UnicodeEncodeError, UnicodeDecodeError):
                 pass  # ignore possible encoding problems caused by some words in custom dictionaries
 
-            except Exception, e:
+            except Exception as e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
                 warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
                 logger.critical(warnMsg)
@@ -848,7 +848,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
             except (UnicodeEncodeError, UnicodeDecodeError):
                 pass  # ignore possible encoding problems caused by some words in custom dictionaries
 
-            except Exception, e:
+            except Exception as e:
                 warnMsg = "there was a problem while hashing entry: %s (%s). " % (repr(word), e)
                 warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
                 logger.critical(warnMsg)
@@ -999,7 +999,7 @@ def dictionaryAttack(attack_dict):
 
                     kb.wordlists = dictPaths
 
-                except Exception, ex:
+                except Exception as ex:
                     warnMsg = "there was a problem while loading dictionaries"
                     warnMsg += " ('%s')" % getSafeExString(ex)
                     logger.critical(warnMsg)

@@ -92,7 +92,7 @@ def exceptionHandledFunction(threadFunction, silent=False):
         kb.threadContinue = False
         kb.threadException = True
         raise
-    except Exception, ex:
+    except Exception as ex:
         if not silent:
             logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
@@ -151,7 +151,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
             try:
                 thread.start()
-            except Exception, ex:
+            except Exception as ex:
                 errMsg = "error occurred while starting new thread ('%s')" % ex.message
                 logger.critical(errMsg)
                 break
@@ -167,7 +167,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                     alive = True
                     time.sleep(0.1)
 
-    except (KeyboardInterrupt, SqlmapUserQuitException), ex:
+    except (KeyboardInterrupt, SqlmapUserQuitException) as ex:
         print()
         kb.threadContinue = False
         kb.threadException = True
@@ -184,7 +184,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if forwardException:
             raise
 
-    except (SqlmapConnectionException, SqlmapValueException), ex:
+    except (SqlmapConnectionException, SqlmapValueException) as ex:
         print()
         kb.threadException = True
         logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))

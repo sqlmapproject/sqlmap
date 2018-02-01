@@ -109,7 +109,7 @@ def main():
         if not args.inputFile:
             parser.error('Missing the input file, -h for help')
 
-    except (OptionError, TypeError), e:
+    except (OptionError, TypeError) as e:
         parser.error(e)
 
     if not os.path.isfile(args.inputFile):

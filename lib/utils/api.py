@@ -94,7 +94,7 @@ class Database(object):
                     self.cursor.execute(statement, arguments)
                 else:
                     self.cursor.execute(statement)
-            except sqlite3.OperationalError, ex:
+            except sqlite3.OperationalError as ex:
                 if not "locked" in getSafeExString(ex):
                     raise
             else:
@@ -277,7 +277,7 @@ def setRestAPILog():
         try:
             conf.databaseCursor = Database(conf.database)
             conf.databaseCursor.connect("client")
-        except sqlite3.OperationalError, ex:
+        except sqlite3.OperationalError as ex:
             raise SqlmapConnectionException, "%s ('%s')" % (ex, conf.database)
 
         # Set a logging handler that writes log messages to a IPC database
@@ -700,7 +700,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             eventlet.monkey_patch()
         logger.debug("Using adapter '%s' to run bottle" % adapter)
         run(host=host, port=port, quiet=True, debug=True, server=adapter)
-    except socket.error, ex:
+    except socket.error as ex:
         if "already in use" in getSafeExString(ex):
             logger.error("Address already in use ('%s:%s')" % (host, port))
         else:
@@ -754,7 +754,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
     try:
         _client(addr)
-    except Exception, ex:
+    except Exception as ex:
         if not isinstance(ex, urllib2.HTTPError) or ex.code == httplib.UNAUTHORIZED:
             errMsg = "There has been a problem while connecting to the "
             errMsg += "REST-JSON API server at '%s' " % addr
@@ -806,7 +806,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
             try:
                 argv = ["sqlmap.py"] + shlex.split(command)[1:]
-            except Exception, ex:
+            except Exception as ex:
                 logger.error("Error occurred while parsing arguments ('%s')" % ex)
                 taskid = None
                 continue

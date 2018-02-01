@@ -46,7 +46,7 @@ class Connector(GenericConnector):
             cursor.execute("SELECT * FROM sqlite_master")
             cursor.close()
 
-        except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
+        except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError) as msg:
             warnMsg = "unable to connect using SQLite 3 library, trying with SQLite 2"
             logger.warn(warnMsg)
 
@@ -60,7 +60,7 @@ class Connector(GenericConnector):
 
                 self.__sqlite = sqlite
                 self.connector = self.__sqlite.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
-            except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
+            except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError) as msg:
                 raise SqlmapConnectionException(msg[0])
 
         self.initCursor()
@@ -69,16 +69,16 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except self.__sqlite.OperationalError, msg:
+        except self.__sqlite.OperationalError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(utf8encode(query))
-        except self.__sqlite.OperationalError, msg:
+        except self.__sqlite.OperationalError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
-        except self.__sqlite.DatabaseError, msg:
+        except self.__sqlite.DatabaseError as msg:
             raise SqlmapConnectionException(msg[0])
 
         self.connector.commit()

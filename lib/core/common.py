@@ -943,7 +943,7 @@ def dataToTrafficFile(data):
     try:
         conf.trafficFP.write(data)
         conf.trafficFP.flush()
-    except IOError, ex:
+    except IOError as ex:
         errMsg = "something went wrong while trying "
         errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
@@ -952,7 +952,7 @@ def dataToDumpFile(dumpFile, data):
     try:
         dumpFile.write(data)
         dumpFile.flush()
-    except IOError, ex:
+    except IOError as ex:
         if "No space left" in getUnicode(ex):
             errMsg = "no space left on output device"
             logger.error(errMsg)
@@ -972,7 +972,7 @@ def dataToOutFile(filename, data):
             try:
                 with open(retVal, "w+b") as f:  # has to stay as non-codecs because data is raw ASCII encoded data
                     f.write(unicodeencode(data))
-            except UnicodeEncodeError, ex:
+            except UnicodeEncodeError as ex:
                 _ = normalizeUnicode(filename)
                 if filename != _:
                     filename = _
@@ -980,7 +980,7 @@ def dataToOutFile(filename, data):
                     errMsg = "couldn't write to the "
                     errMsg += "output file ('%s')" % getSafeExString(ex)
                     raise SqlmapGenericException(errMsg)
-            except IOError, ex:
+            except IOError as ex:
                 errMsg = "something went wrong while trying to write "
                 errMsg += "to the output file ('%s')" % getSafeExString(ex)
                 raise SqlmapGenericException(errMsg)
@@ -1429,7 +1429,7 @@ def parseTargetUrl():
 
     try:
         urlSplit = urlparse.urlsplit(conf.url)
-    except ValueError, ex:
+    except ValueError as ex:
         errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, getSafeExString(ex))
         errMsg += "Please be sure that you don't have any leftover characters (e.g. '[' or ']') "
         errMsg += "in the hostname part"
@@ -2001,7 +2001,7 @@ def parseXmlFile(xmlFile, handler):
     try:
         with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
             parse(stream, handler)
-    except (SAXParseException, UnicodeError), ex:
+    except (SAXParseException, UnicodeError) as ex:
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
@@ -2061,7 +2061,7 @@ def readCachedFileContent(filename, mode='rb'):
                 try:
                     with openFile(filename, mode) as f:
                         kb.cache.content[filename] = f.read()
-                except (IOError, OSError, MemoryError), ex:
+                except (IOError, OSError, MemoryError) as ex:
                     errMsg = "something went wrong while trying "
                     errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
                     raise SqlmapSystemException(errMsg)
@@ -2175,7 +2175,7 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
                         retVal[line] = True
                     else:
                         retVal.append(line)
-    except (IOError, OSError, MemoryError), ex:
+    except (IOError, OSError, MemoryError) as ex:
         errMsg = "something went wrong while trying "
         errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
@@ -2308,7 +2308,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         while True:
             try:
                 return unicode(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
-            except UnicodeDecodeError, ex:
+            except UnicodeDecodeError as ex:
                 try:
                     return unicode(value, UNICODE_ENCODING)
                 except:
@@ -2364,7 +2364,7 @@ def pushValue(value):
             getCurrentThreadData().valueStack.append(copy.deepcopy(value))
             success = True
             break
-        except Exception, ex:
+        except Exception as ex:
             _ = ex
 
     if not success:
@@ -3052,7 +3052,7 @@ def saveConfig(conf, filename):
     with openFile(filename, "wb") as f:
         try:
             config.write(f)
-        except IOError, ex:
+        except IOError as ex:
             errMsg = "something went wrong while trying "
             errMsg += "to write to the configuration file '%s' ('%s')" % (filename, getSafeExString(ex))
             raise SqlmapSystemException(errMsg)
@@ -3380,7 +3380,7 @@ def createGithubIssue(errMsg, excMsg):
 
         try:
             content = urllib2.urlopen(req).read()
-        except Exception, ex:
+        except Exception as ex:
             content = None
 
         issueUrl = re.search(r"https://github.com/sqlmapproject/sqlmap/issues/\d+", content or "")
@@ -3990,7 +3990,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                     continue
 
                 request = form.click()
-            except (ValueError, TypeError), ex:
+            except (ValueError, TypeError) as ex:
                 errMsg = "there has been a problem while "
                 errMsg += "processing page forms ('%s')" % getSafeExString(ex)
                 if raise_:
@@ -4111,7 +4111,7 @@ def evaluateCode(code, variables=None):
         exec(code, variables)
     except KeyboardInterrupt:
         raise
-    except Exception, ex:
+    except Exception as ex:
         errMsg = "an error occurred while evaluating provided code ('%s') " % getSafeExString(ex)
         raise SqlmapGenericException(errMsg)
 
@@ -4318,7 +4318,7 @@ def resetCookieJar(cookieJar):
                 errMsg = "no valid cookies found"
                 raise SqlmapGenericException(errMsg)
 
-        except cookielib.LoadError, msg:
+        except cookielib.LoadError as msg:
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", "\g<1>", str(msg))
             raise SqlmapGenericException(errMsg)

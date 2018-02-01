@@ -76,7 +76,7 @@ def main():
             except KeyboardInterrupt:
                 raise
 
-            except Exception, msg:
+            except Exception as msg:
                 print(msg)
 
             if abort:
@@ -119,7 +119,7 @@ def main():
                 except KeyboardInterrupt:
                     raise
 
-                except Exception, msg:
+                except Exception as msg:
                     print(msg)
 
             else:

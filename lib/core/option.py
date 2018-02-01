@@ -353,7 +353,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
     try:
         with openFile(reqFile, "rb") as f:
             content = f.read()
-    except (IOError, OSError, MemoryError), ex:
+    except (IOError, OSError, MemoryError) as ex:
         errMsg = "something went wrong while trying "
         errMsg += "to read the content of file '%s' ('%s')" % (reqFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
@@ -398,7 +398,7 @@ def _loadQueries():
     tree = ElementTree()
     try:
         tree.parse(paths.QUERIES_XML)
-    except Exception, ex:
+    except Exception as ex:
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
@@ -514,7 +514,7 @@ def _setCrawler():
                 if conf.verbose in (1, 2):
                     status = "%d/%d links visited (%d%%)" % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
-            except Exception, ex:
+            except Exception as ex:
                 errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, getSafeExString(ex))
                 logger.error(errMsg)
 
@@ -650,7 +650,7 @@ def _findPageForms():
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except KeyboardInterrupt:
                 break
-            except Exception, ex:
+            except Exception as ex:
                 errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, getSafeExString(ex))
                 logger.error(errMsg)
 
@@ -931,7 +931,7 @@ def _setTamperingFunctions():
 
             try:
                 module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
-            except Exception, ex:
+            except (ImportError, SyntaxError) as ex:
                 raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
@@ -1004,7 +1004,7 @@ def _setWafFunctions():
                 if filename[:-3] in sys.modules:
                     del sys.modules[filename[:-3]]
                 module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
-            except ImportError, msg:
+            except ImportError as msg:
                 raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], msg))
 
             _ = dict(inspect.getmembers(module))
@@ -1126,7 +1126,7 @@ def _setHTTPHandlers():
 
         try:
             _ = urlparse.urlsplit(conf.proxy)
-        except Exception, ex:
+        except Exception as ex:
             errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
             raise SqlmapSyntaxException, errMsg
 
@@ -1577,7 +1577,7 @@ def _createTemporaryDirectory():
 
             warnMsg = "using '%s' as the temporary directory" % conf.tmpDir
             logger.warn(warnMsg)
-        except (OSError, IOError), ex:
+        except (OSError, IOError) as ex:
             errMsg = "there has been a problem while accessing "
             errMsg += "temporary directory location(s) ('%s')" % getSafeExString(ex)
             raise SqlmapSystemException, errMsg
@@ -1585,7 +1585,7 @@ def _createTemporaryDirectory():
         try:
             if not os.path.isdir(tempfile.gettempdir()):
                 os.makedirs(tempfile.gettempdir())
-        except (OSError, IOError, WindowsError), ex:
+        except (OSError, IOError, WindowsError) as ex:
             warnMsg = "there has been a problem while accessing "
             warnMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
             warnMsg += "make sure that there is enough disk space left. If problem persists, "
@@ -1604,7 +1604,7 @@ def _createTemporaryDirectory():
     if not os.path.isdir(tempfile.tempdir):
         try:
             os.makedirs(tempfile.tempdir)
-        except (OSError, IOError, WindowsError), ex:
+        except (OSError, IOError, WindowsError) as ex:
             errMsg = "there has been a problem while setting "
             errMsg += "temporary directory location ('%s')" % getSafeExString(ex)
             raise SqlmapSystemException, errMsg
@@ -2275,7 +2275,7 @@ def _setDNSServer():
         try:
             conf.dnsServer = DNSServer()
             conf.dnsServer.run()
-        except socket.error, msg:
+        except socket.error as msg:
             errMsg = "there was an error while setting up "
             errMsg += "DNS server instance ('%s')" % msg
             raise SqlmapGenericException(errMsg)
@@ -2462,14 +2462,14 @@ def _basicOptionValidation():
     if conf.regexp:
         try:
             re.compile(conf.regexp)
-        except Exception, ex:
+        except Exception as ex:
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.regexp, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
     if conf.crawlExclude:
         try:
             re.compile(conf.crawlExclude)
-        except Exception, ex:
+        except Exception as ex:
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.crawlExclude, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 

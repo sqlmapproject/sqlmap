@@ -283,7 +283,7 @@ def decodePage(page, contentEncoding, contentType):
                     raise Exception("size too large")
 
             page = data.read()
-        except Exception, msg:
+        except Exception as msg:
             if "<html" not in page:  # in some cases, invalid "Content-Encoding" appears for plain HTML (should be ignored)
                 errMsg = "detected invalid data for declared content "
                 errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)

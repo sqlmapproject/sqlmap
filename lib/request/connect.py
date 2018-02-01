@@ -539,11 +539,11 @@ class Connect(object):
                     if hasattr(conn.fp, '_sock'):
                         conn.fp._sock.close()
                     conn.close()
-                except Exception, ex:
+                except Exception as ex:
                     warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
                     logger.warn(warnMsg)
 
-        except SqlmapConnectionException, ex:
+        except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
                 warnMsg = "unable to connect to the target URL ('%s')" % ex
                 logger.critical(warnMsg)
@@ -552,7 +552,7 @@ class Connect(object):
             else:
                 raise
 
-        except urllib2.HTTPError, ex:
+        except urllib2.HTTPError as ex:
             page = None
             responseHeaders = None
 
@@ -816,7 +816,7 @@ class Connect(object):
                 for function in kb.tamperFunctions:
                     try:
                         payload = function(payload=payload, headers=auxHeaders)
-                    except Exception, ex:
+                    except Exception as ex:
                         errMsg = "error occurred while running tamper "
                         errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
                         raise SqlmapGenericException(errMsg)
@@ -1059,7 +1059,7 @@ class Connect(object):
             while True:
                 try:
                     compiler.parse(unicodeencode(conf.evalCode.replace(';', '\n')))
-                except SyntaxError, ex:
+                except SyntaxError as ex:
                     if ex.text:
                         original = replacement = ex.text.strip()
                         if '=' in original:

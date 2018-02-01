@@ -34,7 +34,7 @@ class Connector(GenericConnector):
         try:
             database = "DATABASE=%s;HOSTNAME=%s;PORT=%s;PROTOCOL=TCPIP;" % (self.db, self.hostname, self.port)
             self.connector = ibm_db_dbi.connect(database, self.user, self.password)
-        except ibm_db_dbi.OperationalError, msg:
+        except ibm_db_dbi.OperationalError as msg:
             raise SqlmapConnectionException(msg)
 
 
@@ -44,16 +44,16 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except ibm_db_dbi.ProgrammingError, msg:
+        except ibm_db_dbi.ProgrammingError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
-        except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError), msg:
+        except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError) as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
-        except ibm_db_dbi.InternalError, msg:
+        except ibm_db_dbi.InternalError as msg:
             raise SqlmapConnectionException(msg[1])
 
         self.connector.commit()

@@ -909,7 +909,7 @@ def cmdLineParser(argv=None):
             try:
                 for arg in shlex.split(command):
                     argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
-            except ValueError, ex:
+            except ValueError as ex:
                 raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex.message
 
         for i in xrange(len(argv)):
@@ -955,7 +955,7 @@ def cmdLineParser(argv=None):
 
         try:
             (args, _) = parser.parse_args(argv)
-        except UnicodeEncodeError, ex:
+        except UnicodeEncodeError as ex:
             dataToStdout("\n[!] %s\n" % ex.object.encode("unicode-escape"))
             raise SystemExit
         except SystemExit:
@@ -986,7 +986,7 @@ def cmdLineParser(argv=None):
 
         return args
 
-    except (OptionError, TypeError), e:
+    except (OptionError, TypeError) as e:
         parser.error(e)
 
     except SystemExit:

@@ -43,7 +43,7 @@ class Connector(GenericConnector):
         try:
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
-        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError), ex:
+        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
             if "Oracle Client library" in str(ex):
                 msg = re.sub(r"DPI-\d+:\s+", "", str(ex))
                 msg = re.sub(r': ("[^"]+")', r" (\g<1>)", msg)
@@ -52,7 +52,7 @@ class Connector(GenericConnector):
 
             try:
                 self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password)
-            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError), msg:
+            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as msg:
                 raise SqlmapConnectionException(msg)
 
         self.initCursor()
@@ -61,7 +61,7 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except cx_Oracle.InterfaceError, msg:
+        except cx_Oracle.InterfaceError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
             return None
 
@@ -71,7 +71,7 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(utf8encode(query))
             retVal = True
-        except cx_Oracle.DatabaseError, msg:
+        except cx_Oracle.DatabaseError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
 
         self.connector.commit()

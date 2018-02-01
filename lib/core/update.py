@@ -47,7 +47,7 @@ def update():
             pollProcess(process, True)
             stdout, stderr = process.communicate()
             success = not process.returncode
-        except (IOError, OSError), ex:
+        except (IOError, OSError) as ex:
             success = False
             stderr = getSafeExString(ex)
 

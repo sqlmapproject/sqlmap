@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
             time.sleep(1)
 
-    except socket.error, ex:
+    except socket.error as ex:
         if 'Permission' in str(ex):
             print("[x] Please run with sudo/Administrator privileges")
         else:
