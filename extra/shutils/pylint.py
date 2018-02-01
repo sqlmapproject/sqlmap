@@ -3,6 +3,7 @@
 # Runs pylint on all python scripts found in a directory tree
 # Reference: http://rowinggolfer.blogspot.com/2009/08/pylint-recursively.html
 
+from __future__ import print_function
 import os
 import re
 import sys
