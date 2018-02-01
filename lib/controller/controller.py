@@ -672,7 +672,7 @@ def start():
         except SqlmapSilentQuitException:
             raise
 
-        except SqlmapBaseException, ex:
+        except SqlmapBaseException as ex:
             errMsg = getSafeExString(ex)
 
             if conf.multipleTargets:

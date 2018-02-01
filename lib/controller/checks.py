@@ -602,7 +602,7 @@ def checkSqlInjection(place, parameter, value):
 
                                         injectable = True
 
-                            except SqlmapConnectionException, msg:
+                            except SqlmapConnectionException as msg:
                                 debugMsg = "problem occurred most likely because the "
                                 debugMsg += "server hasn't recovered as expected from the "
                                 debugMsg += "error-based payload used ('%s')" % msg
@@ -1405,7 +1405,7 @@ def identifyWaf():
         try:
             logger.debug("checking for WAF/IPS/IDS product '%s'" % product)
             found = function(_)
-        except Exception, ex:
+        except Exception as ex:
             errMsg = "exception occurred while running "
             errMsg += "WAF script for '%s' ('%s')" % (product, getSafeExString(ex))
             logger.critical(errMsg)
@@ -1506,7 +1506,7 @@ def checkConnection(suppressOutput=False):
         except socket.gaierror:
             errMsg = "host '%s' does not exist" % conf.hostname
             raise SqlmapConnectionException(errMsg)
-        except socket.error, ex:
+        except socket.error as ex:
             errMsg = "problem occurred while "
             errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)
@@ -1537,7 +1537,7 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-    except SqlmapConnectionException, ex:
+    except SqlmapConnectionException as ex:
         if conf.ipv6:
             warnMsg = "check connection to a provided "
             warnMsg += "IPv6 address with a tool like ping6 "

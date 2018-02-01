@@ -50,7 +50,7 @@ class Connector:
                 self.cursor.close()
             if self.connector:
                 self.connector.close()
-        except Exception, msg:
+        except Exception as msg:
             logger.debug(msg)
         finally:
             self.closed()

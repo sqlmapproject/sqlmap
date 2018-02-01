@@ -37,9 +37,9 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
-        except (pymysql.OperationalError, pymysql.InternalError), msg:
+        except (pymysql.OperationalError, pymysql.InternalError) as msg:
             raise SqlmapConnectionException(msg[1])
-        except struct.error, msg:
+        except struct.error as msg:
             raise SqlmapConnectionException(msg)
 
         self.initCursor()
@@ -48,7 +48,7 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except pymysql.ProgrammingError, msg:
+        except pymysql.ProgrammingError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
             return None
 
@@ -58,9 +58,9 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(query)
             retVal = True
-        except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
+        except (pymysql.OperationalError, pymysql.ProgrammingError) as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
-        except pymysql.InternalError, msg:
+        except pymysql.InternalError as msg:
             raise SqlmapConnectionException(msg[1])
 
         self.connector.commit()

@@ -424,13 +424,13 @@ class Entries:
                                                         "db": safeSQLIdentificatorNaming(conf.db)}
                     try:
                         attackDumpedTable()
-                    except (IOError, OSError), ex:
+                    except (IOError, OSError) as ex:
                         errMsg = "an error occurred while attacking "
                         errMsg += "table dump ('%s')" % getSafeExString(ex)
                         logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
-            except SqlmapConnectionException, ex:
+            except SqlmapConnectionException as ex:
                 errMsg = "connection exception detected in dumping phase "
                 errMsg += "('%s')" % getSafeExString(ex)
                 logger.critical(errMsg)

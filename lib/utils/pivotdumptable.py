@@ -174,7 +174,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
         warnMsg += "will display partial output"
         logger.warn(warnMsg)
 
-    except SqlmapConnectionException, e:
+    except SqlmapConnectionException as e:
         errMsg = "connection exception detected. sqlmap "
         errMsg += "will display partial output"
         errMsg += "'%s'" % e

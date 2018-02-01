@@ -22,7 +22,7 @@ def timeout(func, args=(), kwargs={}, duration=1, default=None):
             try:
                 self.result = func(*args, **kwargs)
                 self.timeout_state = TIMEOUT_STATE.NORMAL
-            except Exception, msg:
+            except Exception as msg:
                 logger.log(CUSTOM_LOGGING.TRAFFIC_IN, msg)
                 self.result = default
                 self.timeout_state = TIMEOUT_STATE.EXCEPTION
