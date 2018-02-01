@@ -276,7 +276,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                         raise SqlmapDataException(errMsg)
 
                 except KeyboardInterrupt:
-                    print
+                    print()
                     warnMsg = "user aborted during dumping phase"
                     logger.warn(warnMsg)
 

@@ -239,7 +239,7 @@ def _errorFields(expression, expressionFields, expressionFieldsList, num=None, e
 
         if not suppressOutput:
             if kb.fileReadMode and output and output.strip():
-                print
+                print()
             elif output is not None and not (threadData.resumed and kb.suppressResumeInfo) and not (emptyFields and field in emptyFields):
                 status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", output if kb.safeCharEncode else safecharencode(output))
 

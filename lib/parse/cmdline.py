@@ -886,7 +886,7 @@ def cmdLineParser(argv=None):
                     command = raw_input("sqlmap-shell> ").strip()
                     command = getUnicode(command, encoding=sys.stdin.encoding)
                 except (KeyboardInterrupt, EOFError):
-                    print
+                    print()
                     raise SqlmapShellQuitException
 
                 if not command:
@@ -930,7 +930,7 @@ def cmdLineParser(argv=None):
                 argv[i] = argv[i][:-1]
                 conf.skipThreadCheck = True
             elif argv[i] == "--version":
-                print VERSION_STRING.split('/')[-1]
+                print(VERSION_STRING.split('/')[-1])
                 raise SystemExit
             elif argv[i] in ("-h", "--help"):
                 advancedHelp = False
