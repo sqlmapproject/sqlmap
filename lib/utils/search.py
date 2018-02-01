@@ -53,7 +53,7 @@ def _search(dork):
     try:
         req = urllib2.Request("https://www.google.com/ncr", headers=headers)
         conn = urllib2.urlopen(req)
-    except Exception, ex:
+    except Exception as ex:
         errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
         raise SqlmapConnectionException(errMsg)
 
@@ -87,10 +87,10 @@ def _search(dork):
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-    except urllib2.HTTPError, e:
+    except urllib2.HTTPError as e:
         try:
             page = e.read()
-        except Exception, ex:
+        except Exception as ex:
             warnMsg = "problem occurred while trying to get "
             warnMsg += "an error page information (%s)" % getSafeExString(ex)
             logger.critical(warnMsg)
@@ -149,7 +149,7 @@ def _search(dork):
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             try:
                 page = e.read()
             except socket.timeout:
@@ -171,7 +171,7 @@ def search(dork):
 
     try:
         return _search(dork)
-    except SqlmapBaseException, ex:
+    except SqlmapBaseException as ex:
         if conf.proxyList:
             logger.critical(getSafeExString(ex))
 

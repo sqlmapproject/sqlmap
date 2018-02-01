@@ -41,7 +41,7 @@ class Connector(GenericConnector):
         try:
             self.connector = kinterbasdb.connect(host=self.hostname.encode(UNICODE_ENCODING), database=self.db.encode(UNICODE_ENCODING), \
                 user=self.user.encode(UNICODE_ENCODING), password=self.password.encode(UNICODE_ENCODING), charset="UTF8")  # Reference: http://www.daniweb.com/forums/thread248499.html
-        except kinterbasdb.OperationalError, msg:
+        except kinterbasdb.OperationalError as msg:
             raise SqlmapConnectionException(msg[1])
 
         self.initCursor()
@@ -50,16 +50,16 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except kinterbasdb.OperationalError, msg:
+        except kinterbasdb.OperationalError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
-        except kinterbasdb.OperationalError, msg:
+        except kinterbasdb.OperationalError as msg:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
-        except kinterbasdb.Error, msg:
+        except kinterbasdb.Error as msg:
             raise SqlmapConnectionException(msg[1])
 
         self.connector.commit()

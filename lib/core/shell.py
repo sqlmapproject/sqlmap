@@ -72,7 +72,7 @@ def saveHistory(completion=None):
     readline.set_history_length(MAX_HISTORY_LENGTH)
     try:
         readline.write_history_file(historyPath)
-    except IOError, msg:
+    except IOError as msg:
         warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, msg)
         logger.warn(warnMsg)
 
@@ -92,7 +92,7 @@ def loadHistory(completion=None):
     if os.path.exists(historyPath):
         try:
             readline.read_history_file(historyPath)
-        except IOError, msg:
+        except IOError as msg:
             warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, msg)
             logger.warn(warnMsg)
 

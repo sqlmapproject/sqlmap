@@ -56,7 +56,7 @@ def send_email(msg):
         s.sendmail(FROM, TO, msg.as_string())
         s.quit()
     # Catch all for SMTP exceptions
-    except smtplib.SMTPException, e:
+    except smtplib.SMTPException as e:
         print "Failure to send email: %s" % str(e)
 
 def failure_email(msg):
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
     try:
         main()
-    except Exception, e:
+    except Exception as e:
         log_fd.write("An exception has occurred:\n%s" % str(traceback.format_exc()))
 
     log_fd.write("Regression test finished at %s\n\n" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime()))

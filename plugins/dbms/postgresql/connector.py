@@ -36,7 +36,7 @@ class Connector(GenericConnector):
 
         try:
             self.connector = psycopg2.connect(host=self.hostname, user=self.user, password=self.password, database=self.db, port=self.port)
-        except psycopg2.OperationalError, msg:
+        except psycopg2.OperationalError as msg:
             raise SqlmapConnectionException(msg)
 
         self.connector.set_client_encoding('UNICODE')
@@ -47,7 +47,7 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except psycopg2.ProgrammingError, msg:
+        except psycopg2.ProgrammingError as msg:
             logger.warn(msg)
             return None
 
@@ -57,9 +57,9 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(query)
             retVal = True
-        except (psycopg2.OperationalError, psycopg2.ProgrammingError), msg:
+        except (psycopg2.OperationalError, psycopg2.ProgrammingError) as msg:
             logger.warn(("(remote) %s" % msg).strip())
-        except psycopg2.InternalError, msg:
+        except psycopg2.InternalError as msg:
             raise SqlmapConnectionException(msg)
 
         self.connector.commit()

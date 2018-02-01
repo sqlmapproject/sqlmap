@@ -79,5 +79,5 @@ def purge(directory):
 
     try:
         shutil.rmtree(directory)
-    except OSError, ex:
+    except OSError as ex:
         logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, getSafeExString(ex)))

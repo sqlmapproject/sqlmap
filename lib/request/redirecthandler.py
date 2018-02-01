@@ -76,7 +76,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
         try:
             content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
-        except Exception, msg:
+        except Exception as msg:
             dbgMsg = "there was a problem while retrieving "
             dbgMsg += "redirect response content (%s)" % msg
             logger.debug(dbgMsg)
@@ -132,7 +132,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                     req.headers[HTTP_HEADER.COOKIE] = re.sub(r"%s{2,}" % delimiter, delimiter, ("%s%s%s" % (re.sub(r"\b%s=[^%s]*%s?" % (re.escape(_.split('=')[0]), delimiter, delimiter), "", req.headers[HTTP_HEADER.COOKIE]), delimiter, _)).strip(delimiter))
             try:
                 result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-            except urllib2.HTTPError, e:
+            except urllib2.HTTPError as e:
                 result = e
 
                 # Dirty hack for http://bugs.python.org/issue15701
