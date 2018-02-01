@@ -17,7 +17,7 @@ if len(sys.argv) > 0:
                 str.encode(item)
                 if item in items:
                     if item:
-                        print item
+                        print(item)
                 else:
                     items.append(item)
             except:

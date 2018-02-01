@@ -492,7 +492,7 @@ class Metasploit:
         send_all(proc, "getuid\n")
 
         if conf.privEsc:
-            print
+            print()
 
             infoMsg = "trying to escalate privileges using Meterpreter "
             infoMsg += "'getsystem' command which tries different "

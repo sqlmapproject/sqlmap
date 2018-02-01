@@ -185,7 +185,7 @@ def main():
         raise SystemExit
 
     except KeyboardInterrupt:
-        print
+        print()
 
         errMsg = "user aborted"
         try:
@@ -194,7 +194,7 @@ def main():
             pass
 
     except EOFError:
-        print
+        print()
         errMsg = "exit"
 
         try:
@@ -206,7 +206,7 @@ def main():
         pass
 
     except:
-        print
+        print()
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
         valid = checkIntegrity()
@@ -217,13 +217,13 @@ def main():
                 errMsg += "You should retrieve the latest development version from official GitHub "
                 errMsg += "repository at '%s'" % GIT_PAGE
                 logger.critical(errMsg)
-                print
+                print()
                 dataToStdout(excMsg)
                 raise SystemExit
 
             elif any(_ in excMsg for _ in ("tamper/", "waf/")):
                 logger.critical(errMsg)
-                print
+                print()
                 dataToStdout(excMsg)
                 raise SystemExit
 
@@ -299,7 +299,7 @@ def main():
 
             elif "url = url.strip()" in excMsg:
                 dataToStdout(excMsg)
-                print
+                print()
                 errMsg = "please contact 'miroslav@sqlmap.org' with details for this issue "
                 errMsg += "as he is trying to reproduce it for long time"
                 logger.error(errMsg)

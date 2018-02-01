@@ -130,11 +130,11 @@ class Abstraction(Web, UDF, XP_cmdshell):
                 command = raw_input("os-shell> ")
                 command = getUnicode(command, encoding=sys.stdin.encoding)
             except KeyboardInterrupt:
-                print
+                print()
                 errMsg = "user aborted"
                 logger.error(errMsg)
             except EOFError:
-                print
+                print()
                 errMsg = "exit"
                 logger.error(errMsg)
                 break

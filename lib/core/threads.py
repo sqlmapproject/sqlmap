@@ -167,7 +167,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                     time.sleep(0.1)
 
     except (KeyboardInterrupt, SqlmapUserQuitException), ex:
-        print
+        print()
         kb.threadContinue = False
         kb.threadException = True
 
@@ -184,7 +184,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             raise
 
     except (SqlmapConnectionException, SqlmapValueException), ex:
-        print
+        print()
         kb.threadException = True
         logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
@@ -194,7 +194,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     except:
         from lib.core.common import unhandledExceptionMessage
 
-        print
+        print()
         kb.threadException = True
         errMsg = unhandledExceptionMessage()
         logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))

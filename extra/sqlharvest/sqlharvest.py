@@ -76,7 +76,7 @@ def main():
                 raise
 
             except Exception, msg:
-                print msg
+                print(msg)
 
             if abort:
                 break
@@ -86,7 +86,7 @@ def main():
             sys.stdout.write("---------------\n")
 
             for sqlfile in files:
-                print sqlfile
+                print(sqlfile)
 
                 try:
                     req = urllib2.Request(sqlfile)
@@ -119,7 +119,7 @@ def main():
                     raise
 
                 except Exception, msg:
-                    print msg
+                    print(msg)
 
             else:
                 i += 1

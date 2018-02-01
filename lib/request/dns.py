@@ -145,13 +145,13 @@ if __name__ == "__main__":
                 if _ is None:
                     break
                 else:
-                    print "[i] %s" % _
+                    print("[i] %s" % _)
 
             time.sleep(1)
 
     except socket.error, ex:
         if 'Permission' in str(ex):
-            print "[x] Please run with sudo/Administrator privileges"
+            print("[x] Please run with sudo/Administrator privileges")
         else:
             raise
     except KeyboardInterrupt:

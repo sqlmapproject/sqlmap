@@ -112,7 +112,7 @@ def main():
         parser.error(e)
 
     if not os.path.isfile(args.inputFile):
-        print 'ERROR: the provided input file \'%s\' is not a regular file' % args.inputFile
+        print('ERROR: the provided input file \'%s\' is not a regular file' % args.inputFile)
         sys.exit(1)
 
     f = open(args.inputFile, 'r')
