@@ -32,7 +32,7 @@ def parseSitemap(url, retVal=None):
             content = Request.getPage(url=url, raise404=True)[0] if not abortedFlag else ""
         except httplib.InvalidURL:
             errMsg = "invalid URL given for sitemap ('%s')" % url
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
         for match in re.finditer(r"<loc>\s*([^<]+)", content or ""):
             if abortedFlag:
