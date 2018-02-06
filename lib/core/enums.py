@@ -22,6 +22,15 @@ class SORT_ORDER:
     FIFTH = 4
     LAST = 100
 
+# Reference: https://docs.python.org/2/library/logging.html#logging-levels
+class LOGGING_LEVELS:
+    NOTSET = 0
+    DEBUG = 10
+    INFO = 20
+    WARNING = 30
+    ERROR = 40
+    CRITICAL = 50
+
 class DBMS:
     ACCESS = "Microsoft Access"
     DB2 = "IBM DB2"
