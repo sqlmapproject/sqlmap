@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-a2aed50a1a6605d67d688b524bda5f56  lib/core/settings.py
+20d4b1198a1583059a993ea7864c79c4  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 505aaa61e1bba3c3d4567c3e667699e3  lib/core/target.py
@@ -254,7 +254,7 @@ e44163d21e055805b5e55667e72f5978  tamper/modsecurityversioned.py
 f83a11d594fad3ed3291074c7b37b281  tamper/modsecurityzeroversioned.py
 abd6490408551a8c8226a32fbc2b5345  tamper/multiplespaces.py
 be757e4c9a6fb36af7b9a8c444fddb05  tamper/nonrecursivereplacement.py
-aca15cb5474fb0a32e517ae5e940cbd0  tamper/overlongutf8.py
+7de367954d124c29847c23909d82d92e  tamper/overlongutf8.py
 bc0363e4fc04240c9f7b81e4ecce0714  tamper/percentage.py
 4fa8b6c0e7573e395330bb6a405abbaf  tamper/plus2concat.py
 5b947c6cd78eab22ee53f5f534c532d3  tamper/plus2fnconcat.py
