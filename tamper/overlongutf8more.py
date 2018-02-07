@@ -16,13 +16,13 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Converts all (non-alphanum) characters in a given payload (not processing already encoded)
+    Converts all characters in a given payload (not processing already encoded)
 
     Reference: https://www.acunetix.com/vulnerabilities/unicode-transformation-issues/
     Reference: https://www.thecodingforums.com/threads/newbie-question-about-character-encoding-what-does-0xc0-0x8a-have-in-common-with-0xe0-0x80-0x8a.170201/
 
     >>> tamper('SELECT FIELD FROM TABLE WHERE 2>1')
-    'SELECT%C0%A0FIELD%C0%A0FROM%C0%A0TABLE%C0%A0WHERE%C0%A02%C0%BE1'
+    '%C1%93%C1%85%C1%8C%C1%85%C1%83%C1%94%C0%A0%C1%86%C1%89%C1%85%C1%8C%C1%84%C0%A0%C1%86%C1%92%C1%8F%C1%8D%C0%A0%C1%94%C1%81%C1%82%C1%8C%C1%85%C0%A0%C1%97%C1%88%C1%85%C1%92%C1%85%C0%A0%C0%B2%C0%BE%C0%B1'
     """
 
     retVal = payload
@@ -36,10 +36,7 @@ def tamper(payload, **kwargs):
                 retVal += payload[i:i + 3]
                 i += 3
             else:
-                if payload[i] not in (string.ascii_letters + string.digits):
-                    retVal += "%%%.2X%%%.2X" % (0xc0 + (ord(payload[i]) >> 6), 0x80 + (ord(payload[i]) & 0x3f))
-                else:
-                    retVal += payload[i]
+                retVal += "%%%.2X%%%.2X" % (0xc0 + (ord(payload[i]) >> 6), 0x80 + (ord(payload[i]) & 0x3f))
                 i += 1
 
     return retVal
