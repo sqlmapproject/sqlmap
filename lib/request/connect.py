@@ -479,8 +479,7 @@ class Connect(object):
 
                 # Get HTTP response
                 if hasattr(conn, "redurl"):
-                    page = (threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO\
-                    else Connect._connReadProxy(conn)) if not skipRead else None
+                    page = (threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO else Connect._connReadProxy(conn)) if not skipRead else None
                     skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
                     code = conn.redcode
                 else:

@@ -368,9 +368,8 @@ def start():
                             conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
 
                         else:
-                            if targetUrl.find("?") > -1:
-                                firstPart = targetUrl[:targetUrl.find("?")]
-                                secondPart = targetUrl[targetUrl.find("?") + 1:]
+                            if '?' in targetUrl:
+                                firstPart, secondPart = targetUrl.split('?', 1)
                                 message = "Edit GET data [default: %s]: " % secondPart
                                 test = readInput(message, default=secondPart)
                                 test = _randomFillBlankFields(test)
