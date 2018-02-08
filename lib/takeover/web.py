@@ -47,6 +47,8 @@ from lib.core.enums import WEB_API
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BACKDOOR_RUN_CMD_TIMEOUT
 from lib.core.settings import EVENTVALIDATION_REGEX
+from lib.core.settings import SHELL_RUNCMD_EXE_TAG
+from lib.core.settings import SHELL_WRITABLE_DIR_TAG
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
 from thirdparty.oset.pyoset import oset
@@ -134,7 +136,7 @@ class Web:
 
     def _webFileInject(self, fileContent, fileName, directory):
         outFile = posixpath.join(ntToPosixSlashes(directory), fileName)
-        uplQuery = getUnicode(fileContent).replace("WRITABLE_DIR", directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
+        uplQuery = getUnicode(fileContent).replace(SHELL_WRITABLE_DIR_TAG, directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
         query = ""
 
         if isTechniqueAvailable(kb.technique):
@@ -324,7 +326,7 @@ class Web:
 
                     with open(filename, "w+b") as f:
                         _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webApi))
-                        _ = _.replace("WRITABLE_DIR", utf8encode(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
+                        _ = _.replace(SHELL_WRITABLE_DIR_TAG, utf8encode(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
                         f.write(_)
 
                     self.unionWriteFile(filename, self.webStagerFilePath, "text", forceCheck=True)
@@ -369,7 +371,7 @@ class Web:
                     continue
 
                 _ = "tmpe%s.exe" % randomStr(lowercase=True)
-                if self.webUpload(backdoorName, backdoorDirectory, content=backdoorContent.replace("WRITABLE_DIR", backdoorDirectory).replace("RUNCMD_EXE", _)):
+                if self.webUpload(backdoorName, backdoorDirectory, content=backdoorContent.replace(SHELL_WRITABLE_DIR_TAG, backdoorDirectory).replace(SHELL_RUNCMD_EXE_TAG, _)):
                     self.webUpload(_, backdoorDirectory, filepath=os.path.join(paths.SQLMAP_EXTRAS_PATH, "runcmd", "runcmd.exe_"))
                     self.webBackdoorUrl = "%s/Scripts/%s" % (self.webBaseUrl, backdoorName)
                     self.webDirectory = backdoorDirectory
