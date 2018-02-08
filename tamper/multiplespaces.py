@@ -36,7 +36,7 @@ def tamper(payload, **kwargs):
     if payload:
         words = set()
 
-        for match in re.finditer(r"[A-Za-z_]+", payload):
+        for match in re.finditer(r"\b[A-Za-z_]+\b", payload):
             word = match.group()
 
             if word.upper() in kb.keywords:

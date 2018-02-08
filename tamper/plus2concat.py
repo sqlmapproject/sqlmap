@@ -7,13 +7,15 @@ See the file 'LICENSE' for copying permission
 
 import re
 
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import zeroDepthSearch
+from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHEST
 
 def dependencies():
-    pass
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MSSQL))
 
 def tamper(payload, **kwargs):
     """
@@ -58,7 +60,7 @@ def tamper(payload, **kwargs):
 
                 retVal = "%sCONCAT(%s)%s" % (retVal[:start], ''.join(chars)[start:end], retVal[end:])
             else:
-                match = re.search(r"\((CHAR\(\d+.+CHAR\(\d+\))\)", retVal)
+                match = re.search(r"\((CHAR\(\d+.+\bCHAR\(\d+\))\)", retVal)
                 if match:
                     part = match.group(0)
                     indexes = set(zeroDepthSearch(match.group(1), '+'))

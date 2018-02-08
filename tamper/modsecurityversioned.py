@@ -6,12 +6,14 @@ See the file 'LICENSE' for copying permission
 """
 
 from lib.core.common import randomInt
+from lib.core.common import singleTimeWarnMessage
+from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHER
 
 def dependencies():
-    pass
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
 def tamper(payload, **kwargs):
     """

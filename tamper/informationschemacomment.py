@@ -9,7 +9,7 @@ import re
 
 from lib.core.enums import PRIORITY
 
-__priority__ = PRIORITY.LOW
+__priority__ = PRIORITY.NORMAL
 
 def tamper(payload, **kwargs):
     """

@@ -40,7 +40,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"[A-Za-z_]+", retVal):
+        for match in re.finditer(r"\b[A-Za-z_]+\b", retVal):
             word = match.group()
 
             if word.upper() in kb.keywords:

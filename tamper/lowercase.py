@@ -28,7 +28,6 @@ def tamper(payload, **kwargs):
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
           that has poorly written permissive regular expressions
-        * This tamper script should work against all (?) databases
 
     >>> tamper('INSERT')
     'insert'
@@ -37,7 +36,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"[A-Za-z_]+", retVal):
+        for match in re.finditer(r"\b[A-Za-z_]+\b", retVal):
             word = match.group()
 
             if word.upper() in kb.keywords:

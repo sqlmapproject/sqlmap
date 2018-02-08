@@ -24,7 +24,6 @@ Many [people](https://raw.github.com/sqlmapproject/sqlmap/master/doc/THANKS.md) 
 In order to maintain consistency and readability throughout the code, we ask that you adhere to the following instructions:
 
 * Each patch should make one logical change.
-* Wrap code to 76 columns when possible.
 * Avoid tabbing, use four blank spaces instead.
 * Before you put time into a non-trivial patch, it is worth discussing it privately by [email](mailto:dev@sqlmap.org).
 * Do not change style on numerous files in one single pull request, we can [discuss](mailto:dev@sqlmap.org) about those before doing any major restyling, but be sure that personal preferences not having a strong support in [PEP 8](http://www.python.org/dev/peps/pep-0008/) will likely to be rejected.
