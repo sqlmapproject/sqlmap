@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-77b3fc93b10a517a0dde172b13f480c9  lib/core/settings.py
+a333cf1cf7e533c13bf1aec774c82938  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 505aaa61e1bba3c3d4567c3e667699e3  lib/core/target.py
@@ -217,7 +217,7 @@ e522c294676ede15bee751107e9bb449  plugins/generic/takeover.py
 1e5532ede194ac9c083891c2f02bca93  plugins/__init__.py
 b04db3e861edde1f9dd0a3850d5b96c8  shell/backdoors/backdoor.asp_
 158bfa168128393dde8d6ed11fe9a1b8  shell/backdoors/backdoor.aspx_
-1add5a9a67539e7fd1999c8c20a69d15  shell/backdoors/backdoor.jsp_
+595f711adf1ecb5f3b9a64532b04d8b9  shell/backdoors/backdoor.jsp_
 09fc3ed6543f4d1885e338b271e5e97a  shell/backdoors/backdoor.php_
 0e7aba05423c272f051f31165b0e416d  shell/stagers/stager.asp_
 c3cc8b7727161e64ab59f312c33b541a  shell/stagers/stager.aspx_
