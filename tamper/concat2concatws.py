@@ -5,6 +5,8 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import os
+
 from lib.core.common import singleTimeWarnMessage
 from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
