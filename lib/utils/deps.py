@@ -25,7 +25,7 @@ def checkDependencies():
                 if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
                     warnMsg = "'%s' third-party library must be " % data[1]
                     warnMsg += "version >= 1.0.2 to work properly. "
-                    warnMsg += "Download from %s" % data[2]
+                    warnMsg += "Download from '%s'" % data[2]
                     logger.warn(warnMsg)
             elif dbmsName == DBMS.MYSQL:
                 __import__("pymysql")
@@ -49,7 +49,7 @@ def checkDependencies():
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
-            warnMsg += "'%s'. Download from %s" % (dbmsName, data[2])
+            warnMsg += "'%s'. Download from '%s'" % (dbmsName, data[2])
             logger.warn(warnMsg)
             missing_libraries.add(data[1])
 
@@ -65,7 +65,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'python-impacket' third-party library for "
         warnMsg += "out-of-band takeover feature. Download from "
-        warnMsg += "http://code.google.com/p/impacket/"
+        warnMsg += "'http://code.google.com/p/impacket/'"
         logger.warn(warnMsg)
         missing_libraries.add('python-impacket')
 
@@ -76,7 +76,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'python-ntlm' third-party library "
         warnMsg += "if you plan to attack a web application behind NTLM "
-        warnMsg += "authentication. Download from http://code.google.com/p/python-ntlm/"
+        warnMsg += "authentication. Download from 'http://code.google.com/p/python-ntlm/'"
         logger.warn(warnMsg)
         missing_libraries.add('python-ntlm')
 
@@ -87,7 +87,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'websocket-client' third-party library "
         warnMsg += "if you plan to attack a web application using WebSocket. "
-        warnMsg += "Download from https://pypi.python.org/pypi/websocket-client/"
+        warnMsg += "Download from 'https://pypi.python.org/pypi/websocket-client/'"
         logger.warn(warnMsg)
         missing_libraries.add('websocket-client')
 
@@ -101,7 +101,7 @@ def checkDependencies():
             warnMsg += "be able to take advantage of the sqlmap TAB "
             warnMsg += "completion and history support features in the SQL "
             warnMsg += "shell and OS shell. Download from "
-            warnMsg += "http://ipython.scipy.org/moin/PyReadline/Intro"
+            warnMsg += "'http://ipython.scipy.org/moin/PyReadline/Intro'"
             logger.warn(warnMsg)
             missing_libraries.add('python-pyreadline')
 
