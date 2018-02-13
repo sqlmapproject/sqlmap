@@ -23,6 +23,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -298,7 +299,11 @@ class Databases:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
+                    continue
 
+                if conf.exclude and db in conf.exclude.split(','):
+                    infoMsg = "skipping database '%s'" % unsafeSQLIdentificatorNaming(db)
+                    singleTimeLogMessage(infoMsg)
                     continue
 
                 infoMsg = "fetching number of tables for "
@@ -410,8 +415,8 @@ class Databases:
         else:
             colList = []
 
-        if conf.excludeCol:
-            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+        if conf.exclude:
+            colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
 
         for col in colList:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)

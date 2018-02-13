@@ -1785,8 +1785,8 @@ def _cleanupOptions():
     if conf.col:
         conf.col = re.sub(r"\s*,\s*", ',', conf.col)
 
-    if conf.excludeCol:
-        conf.excludeCol = re.sub(r"\s*,\s*", ',', conf.excludeCol)
+    if conf.exclude:
+        conf.exclude = re.sub(r"\s*,\s*", ',', conf.exclude)
 
     if conf.binaryFields:
         conf.binaryFields = re.sub(r"\s*,\s*", ',', conf.binaryFields)

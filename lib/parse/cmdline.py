@@ -464,8 +464,8 @@ def cmdLineParser(argv=None):
         enumeration.add_option("-C", dest="col",
                                help="DBMS database table column(s) to enumerate")
 
-        enumeration.add_option("-X", dest="excludeCol",
-                               help="DBMS database table column(s) to not enumerate")
+        enumeration.add_option("-X", dest="exclude",
+                               help="DBMS database identifier(s) to not enumerate")
 
         enumeration.add_option("-U", dest="user",
                                help="DBMS user to enumerate")

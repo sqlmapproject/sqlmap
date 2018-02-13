@@ -139,7 +139,7 @@ optDict = {
                                "db":                "string",
                                "tbl":               "string",
                                "col":               "string",
-                               "excludeCol":        "string",
+                               "exclude":           "string",
                                "pivotColumn":       "string",
                                "dumpWhere":         "string",
                                "user":              "string",

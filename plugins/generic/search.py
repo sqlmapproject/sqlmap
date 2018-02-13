@@ -371,8 +371,8 @@ class Search:
         infoMsgDb = ""
         colList = conf.col.split(',')
 
-        if conf.excludeCol:
-            colList = [_ for _ in colList if _ not in conf.excludeCol.split(',')]
+        if conf.exclude:
+            colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
 
         origTbl = conf.tbl
         origDb = conf.db
