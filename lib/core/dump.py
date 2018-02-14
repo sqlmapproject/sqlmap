@@ -48,8 +48,10 @@ from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNSAFE_DUMP_FILEPATH_REPLACEMENT
 from lib.core.settings import WINDOWS_RESERVED_NAMES
-from thirdparty.magic import magic
-
+try:
+    import magic
+except:
+    from thirdparty.magic import magic
 from extra.safe2bin.safe2bin import safechardecode
 
 class Dump(object):
