@@ -889,6 +889,21 @@ def setColor(message, bold=False):
 
     return retVal
 
+def clearColors(message):
+    """
+    Clears ANSI color codes
+
+    >>> clearColors("\x1b[38;5;82mHello \x1b[38;5;198mWorld")
+    'Hello World'
+    """
+
+    retVal = message
+
+    if message:
+        retVal = re.sub(r"\x1b\[[\d;]+m", "", message)
+
+    return retVal
+
 def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=CONTENT_STATUS.IN_PROGRESS):
     """
     Writes text to the stdout (console) stream
@@ -1178,7 +1193,7 @@ def banner():
         _ = BANNER
 
         if not getattr(LOGGER_HANDLER, "is_tty", False) or "--disable-coloring" in sys.argv:
-            _ = re.sub("\033.+?m", "", _)
+            _ = clearColors(_)
         elif IS_WIN:
             coloramainit()
 
