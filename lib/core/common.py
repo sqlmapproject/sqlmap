@@ -3307,7 +3307,7 @@ def unhandledExceptionMessage():
     errMsg += "reproduce the bug. The "
     errMsg += "developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you\n"
-    errMsg += "sqlmap version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
+    errMsg += "Running version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % platform.platform()
     errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
