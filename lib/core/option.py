@@ -1648,7 +1648,10 @@ def _cleanupOptions():
         conf.rParam = []
 
     if conf.paramDel and '\\' in conf.paramDel:
-        conf.paramDel = conf.paramDel.decode("string_escape")
+        try:
+            conf.paramDel = conf.paramDel.decode("string_escape")
+        except ValueError:
+            pass
 
     if conf.skip:
         conf.skip = conf.skip.replace(" ", "")
