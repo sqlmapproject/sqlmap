@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-f80eeded0ed77a678dd7a69d6a8fd3ae  lib/core/settings.py
+616fd4427943e75033dcf128e11fcaff  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 505aaa61e1bba3c3d4567c3e667699e3  lib/core/target.py
@@ -224,7 +224,7 @@ ec2ba8c757ac96425dcd2b97970edd3a  shell/stagers/stager.asp_
 0c48ddb1feb7e38a951ef05a0d48e032  shell/stagers/stager.jsp_
 2f9e459a4cf6a58680978cdce5ff7971  shell/stagers/stager.php_
 4eaeef94314956e4517e5310a28d579a  sqlmapapi.py
-3e2e790c370442c3d98eaa88a3523b15  sqlmap.py
+082aa29ab77c647a0d3830c07279d437  sqlmap.py
 4c3b8a7daa4bff52e01d4168be0eedbe  tamper/apostrophemask.py
 4115a55b8aba464723d645b7d3156b6e  tamper/apostrophenullencode.py
 d7e9a979eff4d7315d804a181e66fc93  tamper/appendnullbyte.py

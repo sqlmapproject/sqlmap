@@ -297,6 +297,14 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif "url = url.strip()" in excMsg:
+                dataToStdout(excMsg)
+                print
+                errMsg = "please contact 'miroslav@sqlmap.org' with details for this issue "
+                errMsg += "as he is trying to reproduce it for long time"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "valueStack.pop" in excMsg and kb.get("dumpKeyboardInterrupt"):
                 raise SystemExit
 
