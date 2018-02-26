@@ -383,7 +383,7 @@ def errorUse(expression, dump=False):
                 if threadData.shared.showEta:
                     threadData.shared.progress = ProgressBar(maxValue=(stopLimit - startLimit))
 
-                if kb.dumpTable and (len(expressionFieldsList) < (stopLimit - startLimit) > CHECK_ZERO_COLUMNS_THRESHOLD):
+                if kb.dumpTable and (kb.count) and (len(expressionFieldsList) < (stopLimit - startLimit) > CHECK_ZERO_COLUMNS_THRESHOLD):
                     for field in expressionFieldsList:
                         if _oneShotErrorUse("SELECT COUNT(%s) FROM %s" % (field, kb.dumpTable)) == '0':
                             emptyFields.append(field)
