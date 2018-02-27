@@ -259,6 +259,7 @@ class Web:
         directories = list(oset(directories))
 
         path = urlparse.urlparse(conf.url).path or '/'
+        path = re.sub(r"/[^/]*\.\w+\Z", '/', path)
         if path != '/':
             _ = []
             for directory in directories:
