@@ -158,6 +158,9 @@ def _formatInjection(inj):
     return data
 
 def _showInjections():
+    if conf.wizard and kb.wizardMode:
+        kb.wizardMode = False
+
     if kb.testQueryCount > 0:
         header = "sqlmap identified the following injection point(s) with "
         header += "a total of %d HTTP(s) requests" % kb.testQueryCount

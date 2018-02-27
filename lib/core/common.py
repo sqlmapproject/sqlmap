@@ -912,7 +912,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
     message = ""
 
     if not kb.get("threadException"):
-        if forceOutput or not getCurrentThreadData().disableStdOut:
+        if forceOutput or not (getCurrentThreadData().disableStdOut or kb.get("wizardMode")):
             if kb.get("multiThreadMode"):
                 logging._acquireLock()
 
@@ -1018,7 +1018,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 retVal = "%s,%s" % (retVal, getUnicode(item, UNICODE_ENCODING))
 
     if retVal:
-        dataToStdout("\r%s%s\n" % (message, retVal), forceOutput=True, bold=True)
+        dataToStdout("\r%s%s\n" % (message, retVal), forceOutput=not kb.wizardMode, bold=True)
 
         debugMsg = "used the given answer"
         logger.debug(debugMsg)
@@ -1032,7 +1032,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             else:
                 options = unicode()
 
-            dataToStdout("\r%s%s\n" % (message, options), forceOutput=True, bold=True)
+            dataToStdout("\r%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
 
             debugMsg = "used the default behavior, running in batch mode"
             logger.debug(debugMsg)
@@ -1045,7 +1045,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 if conf.get("beep"):
                     beep()
 
-                dataToStdout("\r%s" % message, forceOutput=True, bold=True)
+                dataToStdout("\r%s" % message, forceOutput=not kb.wizardMode, bold=True)
                 kb.prependFlag = False
 
                 retVal = raw_input().strip() or default

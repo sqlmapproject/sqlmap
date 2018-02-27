@@ -2038,6 +2038,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.uChar = NULL
     kb.unionDuplicates = False
     kb.wafSpecificResponse = None
+    kb.wizardMode = False
     kb.xpCmdshellAvailable = False
 
     if flushAll:
@@ -2118,6 +2119,8 @@ def _useWizardInterface():
     conf.threads = 4
 
     dataToStdout("\nsqlmap is running, please wait..\n\n")
+
+    kb.wizardMode = True
 
 def _saveConfig():
     """
