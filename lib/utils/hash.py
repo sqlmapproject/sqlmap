@@ -16,6 +16,9 @@ try:
 
     # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
     _ = multiprocessing.Queue()
+
+    # problems with ctypes (Reference: https://github.com/sqlmapproject/sqlmap/issues/2952)
+    _ = multiprocessing.Value('i')
 except (ImportError, OSError):
     pass
 else:
