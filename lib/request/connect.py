@@ -718,7 +718,7 @@ class Connect(object):
                 else:
                     logger.debug(warnMsg)
                 return Connect._retryProxy(**kwargs)
-            elif kb.testMode:
+            elif kb.testMode or kb.multiThreadMode:
                 logger.critical(warnMsg)
                 return None, None, None
             else:
