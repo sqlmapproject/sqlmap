@@ -722,6 +722,8 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
             if not attack_info:
                 break
 
+            count += 1
+
             if not isinstance(word, basestring):
                 continue
 
@@ -730,8 +732,6 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
             try:
                 current = __functions__[hash_regex](password=word, uppercase=False)
-
-                count += 1
 
                 if current in hashes:
                     for item in attack_info[:]:
@@ -797,7 +797,6 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
             if found.value:
                 break
 
-            current = __functions__[hash_regex](password=word, uppercase=False, **kwargs)
             count += 1
 
             if not isinstance(word, basestring):
@@ -807,6 +806,8 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                 word = word + suffix
 
             try:
+                current = __functions__[hash_regex](password=word, uppercase=False, **kwargs)
+
                 if hash_ == current:
                     if hash_regex == HASH.ORACLE_OLD:  # only for cosmetic purposes
                         word = word.upper()
