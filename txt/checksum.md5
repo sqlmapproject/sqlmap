@@ -46,14 +46,14 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-a78fff3d9089addb212c284c87baaad4  lib/core/settings.py
+2826b47bfd9c3157039f7de0dba235ab  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 505aaa61e1bba3c3d4567c3e667699e3  lib/core/target.py
 72d499ca8d792e90a1ebfb2ad2341a51  lib/core/testing.py
 de9922a29c71a235cb95a916ff925db2  lib/core/threads.py
 c40758411bb0bd68764d78e0bb72bd0f  lib/core/unescaper.py
-755dc074f42ca8c73d1f2549a1cf09d1  lib/core/update.py
+063c10fb8261994fe1f8c8ace715aa76  lib/core/update.py
 fc624104ddb36d41794b7a943fde5f21  lib/core/wordlist.py
 1e5532ede194ac9c083891c2f02bca93  lib/__init__.py
 7620f1f4b8791e13c7184c06b5421754  lib/parse/banner.py

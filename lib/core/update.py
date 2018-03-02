@@ -5,10 +5,10 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import locale
 import os
 import re
 import subprocess
+import sys
 import time
 
 from lib.core.common import dataToStdout
