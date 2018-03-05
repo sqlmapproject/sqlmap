@@ -861,7 +861,9 @@ class Connect(object):
                             skip = True
 
                     if not skip:
-                        payload = urlencode(payload, '%', False, place != PLACE.URI)  # spaceplus is handled down below
+                        spaceplus = kb.postSpaceToPlus and place in (PLACE.POST, PLACE.CUSTOM_POST)
+                        value = urlencode(value, spaceplus=spaceplus)
+                        payload = urlencode(payload, safe='%', spaceplus=spaceplus)
                         value = agent.replacePayload(value, payload)
                         postUrlEncode = False
 
@@ -1038,7 +1040,7 @@ class Connect(object):
                             name = safeVariableNaming(name)
                         elif name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
-                        value = urldecode(value, convall=True, plusspace=(item==post and kb.postSpaceToPlus))
+                        value = urldecode(value, convall=True, spaceplus=(item==post and kb.postSpaceToPlus))
                         variables[name] = value
 
             if cookie:
