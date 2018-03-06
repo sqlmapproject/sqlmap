@@ -7,6 +7,7 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
 import os
 import sys
 import zlib
@@ -38,7 +39,7 @@ def decloak(inputFile=None, data=None):
     try:
         data = zlib.decompress(hideAscii(data))
     except:
-        print 'ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile
+        print('ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile)
         sys.exit(1)
     finally:
         f.close()
@@ -63,7 +64,7 @@ def main():
         parser.error(e)
 
     if not os.path.isfile(args.inputFile):
-        print 'ERROR: the provided input file \'%s\' is non existent' % args.inputFile
+        print('ERROR: the provided input file \'%s\' is non existent' % args.inputFile)
         sys.exit(1)
 
     if not args.decrypt:

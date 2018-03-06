@@ -5,6 +5,7 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
 import os
 import re
 import select
@@ -492,7 +493,7 @@ class Metasploit:
         send_all(proc, "getuid\n")
 
         if conf.privEsc:
-            print
+            print()
 
             infoMsg = "trying to escalate privileges using Meterpreter "
             infoMsg += "'getsystem' command which tries different "

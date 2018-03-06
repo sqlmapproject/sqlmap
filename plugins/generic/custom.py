@@ -5,6 +5,7 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
 import re
 import sys
 
@@ -89,11 +90,11 @@ class Custom:
                 query = raw_input("sql-shell> ")
                 query = getUnicode(query, encoding=sys.stdin.encoding)
             except KeyboardInterrupt:
-                print
+                print()
                 errMsg = "user aborted"
                 logger.error(errMsg)
             except EOFError:
-                print
+                print()
                 errMsg = "exit"
                 logger.error(errMsg)
                 break

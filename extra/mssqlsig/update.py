@@ -5,6 +5,7 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
 import codecs
 import os
 import re
@@ -22,11 +23,11 @@ MSSQL_VERSIONS_URL = "http://www.sqlsecurity.com/FAQs/SQLServerVersionDatabase/t
 def updateMSSQLXML():
     if not os.path.exists(MSSQL_XML):
         errMsg = "[ERROR] file '%s' does not exist. Please run the script from its parent directory" % MSSQL_XML
-        print errMsg
+        print(errMsg)
         return
 
     infoMsg = "[INFO] retrieving data from '%s'" % MSSQL_VERSIONS_URL
-    print infoMsg
+    print(infoMsg)
 
     try:
         req = urllib2.Request(MSSQL_VERSIONS_URL)
@@ -39,7 +40,7 @@ def updateMSSQLXML():
 
         warnMsg = "[WARNING] sqlmap was unable to connect to %s," % __mssqlHostname
         warnMsg += " check your Internet connection and retry"
-        print warnMsg
+        print(warnMsg)
 
         return
 
@@ -131,7 +132,7 @@ def updateMSSQLXML():
     mssqlXml.close()
 
     infoMsg = "[INFO] done. retrieved data parsed and saved into '%s'" % MSSQL_XML
-    print infoMsg
+    print(infoMsg)
 
 if __name__ == "__main__":
     updateMSSQLXML()
