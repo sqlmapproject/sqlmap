@@ -381,7 +381,7 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     ctx = password + magic + salt
     final = md5(password + salt + password).digest()
 
-    for pl in xrange(len(password),0,-16):
+    for pl in xrange(len(password), 0, -16):
         if pl > 16:
             ctx = ctx + final[:16]
         else:
@@ -418,7 +418,7 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
 
         final = md5(ctx1).digest()
 
-    hash_ = _encode64((int(ord(final[0])) << 16) | (int(ord(final[6])) << 8) | (int(ord(final[12]))),4)
+    hash_ = _encode64((int(ord(final[0])) << 16) | (int(ord(final[6])) << 8) | (int(ord(final[12]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[1])) << 16) | (int(ord(final[7])) << 8) | (int(ord(final[13]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[2])) << 16) | (int(ord(final[8])) << 8) | (int(ord(final[14]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[3])) << 16) | (int(ord(final[9])) << 8) | (int(ord(final[15]))), 4)
