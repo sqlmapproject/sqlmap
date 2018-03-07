@@ -415,7 +415,7 @@ class Dump(object):
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if not os.path.isdir(dumpDbPath):
                 try:
-                    os.makedirs(dumpDbPath, 0755)
+                    os.makedirs(dumpDbPath)
                 except:
                     warnFile = True
 
@@ -424,7 +424,7 @@ class Dump(object):
 
                     if not os.path.isdir(dumpDbPath):
                         try:
-                            os.makedirs(dumpDbPath, 0755)
+                            os.makedirs(dumpDbPath)
                         except Exception, ex:
                             try:
                                 tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
@@ -612,7 +612,7 @@ class Dump(object):
                             mimetype = magic.from_buffer(value, mime=True)
                             if any(mimetype.startswith(_) for _ in ("application", "image")):
                                 if not os.path.isdir(dumpDbPath):
-                                    os.makedirs(dumpDbPath, 0755)
+                                    os.makedirs(dumpDbPath)
 
                                 _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(unsafeSQLIdentificatorNaming(column)))
                                 filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))

@@ -581,7 +581,7 @@ def _createFilesDir():
 
     if not os.path.isdir(conf.filePath):
         try:
-            os.makedirs(conf.filePath, 0755)
+            os.makedirs(conf.filePath)
         except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
             warnMsg = "unable to create files directory "
@@ -603,7 +603,7 @@ def _createDumpDir():
 
     if not os.path.isdir(conf.dumpPath):
         try:
-            os.makedirs(conf.dumpPath, 0755)
+            os.makedirs(conf.dumpPath)
         except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
@@ -624,7 +624,7 @@ def _createTargetDirs():
 
     try:
         if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-            os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+            os.makedirs(paths.SQLMAP_OUTPUT_PATH)
 
         _ = os.path.join(paths.SQLMAP_OUTPUT_PATH, randomStr())
         open(_, "w+b").close()
@@ -654,7 +654,7 @@ def _createTargetDirs():
 
     try:
         if not os.path.isdir(conf.outputPath):
-            os.makedirs(conf.outputPath, 0755)
+            os.makedirs(conf.outputPath)
     except (OSError, IOError, TypeError), ex:
         try:
             tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
