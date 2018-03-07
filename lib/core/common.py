@@ -1525,8 +1525,7 @@ def expandAsteriskForColumns(expression):
         columnsDict = conf.dbmsHandler.getColumns(onlyColNames=True)
 
         if columnsDict and conf.db in columnsDict and conf.tbl in columnsDict[conf.db]:
-            columns = columnsDict[conf.db][conf.tbl].keys()
-            columns.sort()
+            columns = sorted(columnsDict[conf.db][conf.tbl].keys())
             columnsStr = ", ".join(column for column in columns)
             expression = expression.replace('*', columnsStr, 1)
 

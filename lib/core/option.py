@@ -430,8 +430,7 @@ def _setMultipleTargets():
         _feedTargetsDict(conf.logFile, addedTargetUrls)
 
     elif os.path.isdir(conf.logFile):
-        files = os.listdir(conf.logFile)
-        files.sort()
+        files = sorted(os.listdir(conf.logFile))
 
         for reqFile in files:
             if not re.search(r"([\d]+)\-request", reqFile):

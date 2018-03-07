@@ -98,7 +98,7 @@ def smokeTest():
 def adjustValueType(tagName, value):
     for family in optDict.keys():
         for name, type_ in optDict[family].items():
-            if type(type_) == tuple:
+            if isinstance(type_, tuple):
                 type_ = type_[0]
             if tagName == name:
                 if type_ == "boolean":
