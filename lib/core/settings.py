@@ -426,7 +426,7 @@ DEFAULT_MSSQL_SCHEMA = "dbo"
 HASH_MOD_ITEM_DISPLAY = 11
 
 # Maximum integer value
-MAX_INT = sys.maxint
+MAX_INT = sys.maxsize
 
 # Replacement for unsafe characters in dump table filenames
 UNSAFE_DUMP_FILEPATH_REPLACEMENT = '_'
