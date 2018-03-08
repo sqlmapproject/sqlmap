@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-22b96798d429186f0f273b3e2b399289  lib/core/settings.py
+bcacc60d5d1a2769a667e787eb08b625  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 3cc852f927833895361973fbcfd156d2  lib/core/target.py
@@ -365,7 +365,7 @@ a44e7cf30f2189b2fbdb635b310cdc0c  thirdparty/wininetpton/win_inet_pton.py
 08c706478fad0acba049d0e32cbb6411  udf/mysql/linux/32/lib_mysqludf_sys.so_
 1501fa7150239b18acc0f4a9db2ebc0d  udf/mysql/linux/64/lib_mysqludf_sys.so_
 70d83edb90c4a20bd95eb62f71c99bd0  udf/mysql/windows/32/lib_mysqludf_sys.dll_
-7fed5b8e99e36ce255c64527ec61a995  udf/mysql/windows/64/lib_mysqludf_sys.dll_
+15aaa93872ca87366065568375ad8eb1  udf/mysql/windows/64/lib_mysqludf_sys.dll_
 0ee1310d4e2a4cc5a7295df01a3a78bf  udf/postgresql/linux/32/8.2/lib_postgresqludf_sys.so_
 c7d9e1fcac5f047edf17d79a825fb64b  udf/postgresql/linux/32/8.3/lib_postgresqludf_sys.so_
 ec41a080f4570c3866b9a7219f7623c4  udf/postgresql/linux/32/8.4/lib_postgresqludf_sys.so_
