@@ -121,8 +121,8 @@ class Agent(object):
                 origValue = _.split('=', 1)[1] if '=' in _ else ""
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
-            origValue = origValue.split(kb.customInjectionMark)[0]
             origValue = origValue[origValue.find(',') + 1:]
+            origValue = origValue.split(kb.customInjectionMark)[0]
             match = re.search(r"([^;]+)=(?P<value>[^;]*);?\Z", origValue)
             if match:
                 origValue = match.group("value")

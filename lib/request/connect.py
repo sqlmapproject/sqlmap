@@ -933,9 +933,9 @@ class Connect(object):
 
         if value and place == PLACE.CUSTOM_HEADER:
             if value.split(',')[0].capitalize() == PLACE.COOKIE:
-                cookie = value.split(',', 1)[1]
+                cookie = value.split(',', 1)[-1]
             else:
-                auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
+                auxHeaders[value.split(',')[0]] = value.split(',', 1)[-1]
 
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
