@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-8cf22f36f6449f4cc5fea234a9a02cbe  lib/core/settings.py
+73907fd758301e42c53a71c82ca52bd2  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 3cc852f927833895361973fbcfd156d2  lib/core/target.py
@@ -140,7 +140,7 @@ c56f2dabe88fd761a1a9a51e4d104088  plugins/dbms/firebird/syntax.py
 61225f674e64bc6eafea140c4cf93deb  plugins/dbms/hsqldb/connector.py
 95919592e5bb83df00b99bb9e8a70977  plugins/dbms/hsqldb/enumeration.py
 616595e74ecb644271cbbd31815d92e0  plugins/dbms/hsqldb/filesystem.py
-b207e728934f768732852c1928c38483  plugins/dbms/hsqldb/fingerprint.py
+bc8bc5d69cb720fb5dc23af490c7c11c  plugins/dbms/hsqldb/fingerprint.py
 fd369161778d6b48d7f1f7fc14dcdb5c  plugins/dbms/hsqldb/__init__.py
 4673ebfdce9859718c19e8a7765da8d3  plugins/dbms/hsqldb/syntax.py
 7c0535736215ca612756cf589adb249b  plugins/dbms/hsqldb/takeover.py
