@@ -1333,7 +1333,7 @@ def checkWaf():
     payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
 
     value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
-    value += agent.addPayloadDelimiters("%s=%s" % (randomStr(), payload))
+    value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
 
     pushValue(conf.timeout)
     conf.timeout = IDS_WAF_CHECK_TIMEOUT
