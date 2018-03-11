@@ -128,6 +128,8 @@ class WinTerm(object):
         elif mode == 2:
             from_coord = win32.COORD(0, 0)
             cells_to_erase = cells_in_screen
+        else:
+            return
         # fill the entire screen with blanks
         win32.FillConsoleOutputCharacter(handle, ' ', cells_to_erase, from_coord)
         # now set the buffer's attributes accordingly
@@ -153,6 +155,8 @@ class WinTerm(object):
         elif mode == 2:
             from_coord = win32.COORD(0, csbi.dwCursorPosition.Y)
             cells_to_erase = csbi.dwSize.X
+        else:
+            return
         # fill the entire screen with blanks
         win32.FillConsoleOutputCharacter(handle, ' ', cells_to_erase, from_coord)
         # now set the buffer's attributes accordingly

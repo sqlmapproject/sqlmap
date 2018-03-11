@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-3e4a8bea5a0f5b2f4e1fa0c0c5baf9ee  lib/core/settings.py
+8cf22f36f6449f4cc5fea234a9a02cbe  lib/core/settings.py
 d0adc28a38e43a787df4471f7f027413  lib/core/shell.py
 63491be462c515a1a3880c27c2acc4a2  lib/core/subprocessng.py
 3cc852f927833895361973fbcfd156d2  lib/core/target.py
@@ -333,7 +333,7 @@ bcae4c645a737d3f0e7c96a66528ca4a  thirdparty/chardet/universaldetector.py
 ed4d76c08741d34ac79f6488663345f7  thirdparty/colorama/initialise.py
 c0707ca77ccb4a2c0f12b4085057193c  thirdparty/colorama/__init__.py
 ad3d022d4591aee80f7391248d722413  thirdparty/colorama/win32.py
-c690e140157d0caac5824c73688231b3  thirdparty/colorama/winterm.py
+cdd682cbf77137ef4253b77a95ed9bd8  thirdparty/colorama/winterm.py
 be7eac2e6cfb45c5e297ec5eee66e747  thirdparty/fcrypt/fcrypt.py
 e00542d22ffa8d8ac894c210f38454be  thirdparty/fcrypt/__init__.py
 2f94ddd6ada38e4091e819568e7c4b7c  thirdparty/gprof2dot/gprof2dot.py
