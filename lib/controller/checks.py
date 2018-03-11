@@ -1332,14 +1332,19 @@ def checkWaf():
     retVal = False
     payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
 
-    value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
-    value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
+    if PLACE.URI in conf.parameters:
+        place = PLACE.POST
+        value = "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
+    else:
+        place = PLACE.GET
+        value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
+        value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
 
     pushValue(conf.timeout)
     conf.timeout = IDS_WAF_CHECK_TIMEOUT
 
     try:
-        retVal = Request.queryPage(place=PLACE.GET, value=value, getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
+        retVal = Request.queryPage(place=place, value=value, getRatioValue=True, noteResponseTime=False, silent=True)[1] < IDS_WAF_CHECK_RATIO
     except SqlmapConnectionException:
         retVal = True
     finally:
