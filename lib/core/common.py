@@ -1443,13 +1443,14 @@ def parseTargetUrl():
     conf.hostname = conf.hostname.strip("[]").replace(kb.customInjectionMark, "")
 
     try:
-        _ = conf.hostname.encode("idna")
-    except LookupError:
-        _ = conf.hostname.encode(UNICODE_ENCODING)
-    except UnicodeError:
-        _ = None
+        conf.hostname.encode("idna")
+        conf.hostname.encode(UNICODE_ENCODING)
+    except (LookupError, UnicodeError):
+        invalid = True
+    else:
+        invalid = False
 
-    if any((_ is None, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
+    if any((invalid, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
         errMsg = "invalid target URL ('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
@@ -2994,7 +2995,7 @@ def setOptimize():
     Sets options turned on by switch '-o'
     """
 
-    #conf.predictOutput = True
+    # conf.predictOutput = True
     conf.keepAlive = True
     conf.threads = 3 if conf.threads < 3 else conf.threads
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
@@ -3198,9 +3199,7 @@ def showHttpErrorCodes():
 
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during run:\n"
-        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] \
-          if code in httplib.responses else '?', count) \
-          for code, count in kb.httpErrorCodes.items())
+        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] if code in httplib.responses else '?', count) for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
         if any((str(_).startswith('4') or str(_).startswith('5')) and _ != httplib.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
             msg = "too many 4xx and/or 5xx HTTP error codes "
@@ -3216,8 +3215,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", bu
         return codecs.open(filename, mode, encoding, errors, buffering)
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
-        errMsg += "Please check %s permissions on a file " % ("write" if \
-          mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
+        errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
         raise SqlmapSystemException(errMsg)
 
@@ -4350,7 +4348,9 @@ def prioritySortColumns(columns):
     ['userid', 'name', 'password']
     """
 
-    _ = lambda x: x and "id" in x.lower()
+    def _(column):
+        return column and "id" in column.lower()
+
     return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
 
 def getRequestHeader(request, name):
