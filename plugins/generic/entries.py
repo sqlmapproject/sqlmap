@@ -105,6 +105,9 @@ class Entries:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
 
         for tbl in tblList:
+            if kb.dumpKeyboardInterrupt:
+                break
+
             if conf.exclude and tbl in conf.exclude.split(','):
                 infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 singleTimeLogMessage(infoMsg)
