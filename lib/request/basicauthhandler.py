@@ -30,10 +30,8 @@ class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
             self.retried_count = 0
         else:
             if self.retried_count > 5:
-                raise urllib2.HTTPError(req.get_full_url(), 401, "basic auth failed",
-                                headers, None)
+                raise urllib2.HTTPError(req.get_full_url(), 401, "basic auth failed", headers, None)
             else:
                 self.retried_count += 1
 
-        return urllib2.HTTPBasicAuthHandler.http_error_auth_reqed(
-                        self, auth_header, host, req, headers)
+        return urllib2.HTTPBasicAuthHandler.http_error_auth_reqed(self, auth_header, host, req, headers)

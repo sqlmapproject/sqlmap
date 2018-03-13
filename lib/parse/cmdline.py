@@ -909,7 +909,7 @@ def cmdLineParser(argv=None):
                 for arg in shlex.split(command):
                     argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
             except ValueError, ex:
-                raise SqlmapSyntaxException, "something went wrong during command line parsing ('%s')" % ex.message
+                raise SqlmapSyntaxException("something went wrong during command line parsing ('%s')" % ex.message)
 
         for i in xrange(len(argv)):
             if argv[i] == "-hh":

@@ -92,7 +92,7 @@ class HashDB(object):
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
                         errMsg += "If the problem persists please rerun with `--flush-session`"
-                        raise SqlmapConnectionException, errMsg
+                        raise SqlmapConnectionException(errMsg)
                     else:
                         break
 

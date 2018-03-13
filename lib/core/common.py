@@ -596,9 +596,7 @@ def paramToDict(place, parameters=None):
                 testableParameters[parameter] = "=".join(parts[1:])
                 if not conf.multipleTargets and not (conf.csrfToken and parameter == conf.csrfToken):
                     _ = urldecode(testableParameters[parameter], convall=True)
-                    if (_.endswith("'") and _.count("'") == 1
-                      or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _))\
-                      and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
+                    if (_.endswith("'") and _.count("'") == 1 or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _)) and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most likely leftover " % element
                         warnMsg += "chars/statements from manual SQL injection test(s). "
@@ -1371,7 +1369,7 @@ def parseTargetDirect():
                     raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
-                    import _mssql
+                    __import__("_mssql")
                     import pymssql
 
                     if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
@@ -1381,17 +1379,17 @@ def parseTargetDirect():
                         raise SqlmapMissingDependence(errMsg)
 
                 elif dbmsName == DBMS.MYSQL:
-                    import pymysql
+                    __import__("pymysql")
                 elif dbmsName == DBMS.PGSQL:
-                    import psycopg2
+                    __import__("psycopg2")
                 elif dbmsName == DBMS.ORACLE:
-                    import cx_Oracle
+                    __import__("cx_Oracle")
                 elif dbmsName == DBMS.SQLITE:
-                    import sqlite3
+                    __import__("sqlite3")
                 elif dbmsName == DBMS.ACCESS:
-                    import pyodbc
+                    __import__("pyodbc")
                 elif dbmsName == DBMS.FIREBIRD:
-                    import kinterbasdb
+                    __import__("kinterbasdb")
             except:
                 if _sqlalchemy and data[3] in _sqlalchemy.dialects.__all__:
                     pass
@@ -2005,7 +2003,7 @@ def parseXmlFile(xmlFile, handler):
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
-        raise SqlmapInstallationException, errMsg
+        raise SqlmapInstallationException(errMsg)
 
 def getSQLSnippet(dbms, sfile, **variables):
     """
