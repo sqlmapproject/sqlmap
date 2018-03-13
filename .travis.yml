@@ -1,4 +1,7 @@
 language: python
+sudo: false
+git:
+    depth: 1
 python:
     - "2.6"
     - "2.7"
