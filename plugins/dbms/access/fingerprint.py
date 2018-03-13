@@ -48,11 +48,12 @@ class Fingerprint(GenericFingerprint):
 
         # Microsoft Access table reference updated on 01/2010
         sysTables = {
-                      "97":           ("MSysModules2", "MSysAccessObjects"),
-                      "2000" :        ("!MSysModules2", "MSysAccessObjects"),
-                      "2002-2003" :   ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),
-                      "2007" :        ("MSysAccessStorage", "MSysNavPaneObjectIDs"),
-                    }
+            "97": ("MSysModules2", "MSysAccessObjects"),
+            "2000": ("!MSysModules2", "MSysAccessObjects"),
+            "2002-2003": ("MSysAccessStorage", "!MSysNavPaneObjectIDs"),
+            "2007": ("MSysAccessStorage", "MSysNavPaneObjectIDs"),
+        }
+
         # MSysAccessXML is not a reliable system table because it doesn't always exist
         # ("Access through Access", p6, should be "normally doesn't exist" instead of "is normally empty")
 

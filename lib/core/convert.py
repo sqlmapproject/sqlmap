@@ -94,7 +94,7 @@ def base64unpickle(value, unsafe=False):
 
     try:
         retVal = loads(base64decode(value))
-    except TypeError: 
+    except TypeError:
         retVal = loads(base64decode(bytes(value)))
 
     return retVal

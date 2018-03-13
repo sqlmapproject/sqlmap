@@ -19,4 +19,3 @@ def getPageTemplate(payload, place):
         retVal = kb.pageTemplates[(payload, place)]
 
     return retVal
-

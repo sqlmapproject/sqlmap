@@ -368,16 +368,16 @@ class Enumeration(GenericEnumeration):
                             if foundTbl not in dbs[db]:
                                 dbs[db][foundTbl] = {}
 
-                            if colConsider == "1":
+                            if colConsider == '1':
                                 conf.db = db
                                 conf.tbl = foundTbl
                                 conf.col = column
 
                                 self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
 
-                                if db in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[db]\
-                                  and not isNoneValue(kb.data.cachedColumns[db][foundTbl]):
+                                if db in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[db] and not isNoneValue(kb.data.cachedColumns[db][foundTbl]):
                                     dbs[db][foundTbl].update(kb.data.cachedColumns[db][foundTbl])
+
                                 kb.data.cachedColumns = {}
                             else:
                                 dbs[db][foundTbl][column] = None

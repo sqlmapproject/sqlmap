@@ -175,10 +175,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
     # forge the SQL limiting the query output one entry at a time
     # NOTE: we assume that only queries that get data from a table
     # can return multiple entries
-    if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
-      not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not \
-      expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
-      and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+    if fromUser and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) and not re.search(SQL_SCALAR_REGEX, expression, re.I):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression)
 
         if limitCond:

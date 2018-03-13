@@ -294,17 +294,21 @@ class Agent(object):
         if payload is None:
             return
 
-        _ = (
-                ("[DELIMITER_START]", kb.chars.start), ("[DELIMITER_STOP]", kb.chars.stop),\
-                ("[AT_REPLACE]", kb.chars.at), ("[SPACE_REPLACE]", kb.chars.space), ("[DOLLAR_REPLACE]", kb.chars.dollar),\
-                ("[HASH_REPLACE]", kb.chars.hash_), ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT)
-            )
-        payload = reduce(lambda x, y: x.replace(y[0], y[1]), _, payload)
+        replacements = (
+            ("[DELIMITER_START]", kb.chars.start),
+            ("[DELIMITER_STOP]", kb.chars.stop),
+            ("[AT_REPLACE]", kb.chars.at),
+            ("[SPACE_REPLACE]", kb.chars.space),
+            ("[DOLLAR_REPLACE]", kb.chars.dollar),
+            ("[HASH_REPLACE]", kb.chars.hash_),
+            ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT)
+        )
+        payload = reduce(lambda x, y: x.replace(y[0], y[1]), replacements, payload)
 
-        for _ in set(re.findall(r"\[RANDNUM(?:\d+)?\]", payload, re.I)):
+        for _ in set(re.findall(r"(?i)\[RANDNUM(?:\d+)?\]", payload)):
             payload = payload.replace(_, str(randomInt()))
 
-        for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
+        for _ in set(re.findall(r"(?i)\[RANDSTR(?:\d+)?\]", payload)):
             payload = payload.replace(_, randomStr())
 
         if origValue is not None and "[ORIGVALUE]" in payload:
@@ -928,7 +932,7 @@ class Agent(object):
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-            if not " ORDER BY " in limitedQuery:
+            if " ORDER BY " not in limitedQuery:
                 limitStr = limitStr.replace(") WHERE LIMIT", " ORDER BY 1 ASC) WHERE LIMIT")
             elif " ORDER BY " in limitedQuery and "SELECT " in limitedQuery:
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]

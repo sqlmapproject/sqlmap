@@ -172,9 +172,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
                 inject.goStacked(expression)
 
         # TODO: add support for PostgreSQL
-        #elif Backend.isDbms(DBMS.PGSQL):
-        #    expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
-        #    inject.goStacked(expression)
+        # elif Backend.isDbms(DBMS.PGSQL):
+        #     expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
+        #     inject.goStacked(expression)
 
     def initEnv(self, mandatory=True, detailed=False, web=False, forceInit=False):
         self._initRunAs()

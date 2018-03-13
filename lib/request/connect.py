@@ -187,8 +187,7 @@ class Connect(object):
 
         if not kb.dnsMode and conn:
             headers = conn.info()
-            if headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
-              or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
+            if headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate") or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
                 retVal = conn.read(MAX_CONNECTION_TOTAL_SIZE)
                 if len(retVal) == MAX_CONNECTION_TOTAL_SIZE:
                     warnMsg = "large compressed response detected. Disabling compression"
@@ -241,27 +240,27 @@ class Connect(object):
             kb.requestCounter += 1
             threadData.lastRequestUID = kb.requestCounter
 
-        url = kwargs.get("url",                     None) or conf.url
-        get = kwargs.get("get",                     None)
-        post = kwargs.get("post",                   None)
-        method = kwargs.get("method",               None)
-        cookie = kwargs.get("cookie",               None)
-        ua = kwargs.get("ua",                       None) or conf.agent
-        referer = kwargs.get("referer",             None) or conf.referer
-        host = kwargs.get("host",                   None) or conf.host
-        direct_ = kwargs.get("direct",              False)
-        multipart = kwargs.get("multipart",         None)
-        silent = kwargs.get("silent",               False)
-        raise404 = kwargs.get("raise404",           True)
-        timeout = kwargs.get("timeout",             None) or conf.timeout
-        auxHeaders = kwargs.get("auxHeaders",       None)
-        response = kwargs.get("response",           False)
+        url = kwargs.get("url", None) or conf.url
+        get = kwargs.get("get", None)
+        post = kwargs.get("post", None)
+        method = kwargs.get("method", None)
+        cookie = kwargs.get("cookie", None)
+        ua = kwargs.get("ua", None) or conf.agent
+        referer = kwargs.get("referer", None) or conf.referer
+        host = kwargs.get("host", None) or conf.host
+        direct_ = kwargs.get("direct", False)
+        multipart = kwargs.get("multipart", None)
+        silent = kwargs.get("silent", False)
+        raise404 = kwargs.get("raise404", True)
+        timeout = kwargs.get("timeout", None) or conf.timeout
+        auxHeaders = kwargs.get("auxHeaders", None)
+        response = kwargs.get("response", False)
         ignoreTimeout = kwargs.get("ignoreTimeout", False) or kb.ignoreTimeout or conf.ignoreTimeouts
-        refreshing = kwargs.get("refreshing",       False)
-        retrying = kwargs.get("retrying",           False)
-        crawling = kwargs.get("crawling",           False)
-        checking = kwargs.get("checking",           False)
-        skipRead = kwargs.get("skipRead",           False)
+        refreshing = kwargs.get("refreshing", False)
+        retrying = kwargs.get("retrying", False)
+        crawling = kwargs.get("crawling", False)
+        checking = kwargs.get("checking", False)
+        skipRead = kwargs.get("skipRead", False)
 
         if multipart:
             post = multipart
@@ -1040,7 +1039,7 @@ class Connect(object):
                             name = safeVariableNaming(name)
                         elif name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
-                        value = urldecode(value, convall=True, spaceplus=(item==post and kb.postSpaceToPlus))
+                        value = urldecode(value, convall=True, spaceplus=(item == post and kb.postSpaceToPlus))
                         variables[name] = value
 
             if cookie:

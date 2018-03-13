@@ -33,19 +33,19 @@ class Registry:
             readParse = "REG QUERY \"" + self._regKey + "\" /v \"" + self._regValue + "\""
 
         self._batRead = (
-                           "@ECHO OFF\r\n",
-                           readParse,
-                        )
+            "@ECHO OFF\r\n",
+            readParse,
+        )
 
         self._batAdd = (
-                           "@ECHO OFF\r\n",
-                           "REG ADD \"%s\" /v \"%s\" /t %s /d %s /f" % (self._regKey, self._regValue, self._regType, self._regData),
-                       )
+            "@ECHO OFF\r\n",
+            "REG ADD \"%s\" /v \"%s\" /t %s /d %s /f" % (self._regKey, self._regValue, self._regType, self._regData),
+        )
 
         self._batDel = (
-                           "@ECHO OFF\r\n",
-                           "REG DELETE \"%s\" /v \"%s\" /f" % (self._regKey, self._regValue),
-                       )
+            "@ECHO OFF\r\n",
+            "REG DELETE \"%s\" /v \"%s\" /f" % (self._regKey, self._regValue),
+        )
 
     def _createLocalBatchFile(self):
         self._batPathFp = open(self._batPathLocal, "w")

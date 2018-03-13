@@ -6,9 +6,9 @@ See the file 'LICENSE' for copying permission
 """
 
 try:
-   import cPickle as pickle
+    import cPickle as pickle
 except:
-   import pickle
+    import pickle
 
 import bz2
 import itertools

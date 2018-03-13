@@ -37,7 +37,6 @@ class Connector(GenericConnector):
         except ibm_db_dbi.OperationalError, msg:
             raise SqlmapConnectionException(msg)
 
-
         self.initCursor()
         self.printConnected()
 

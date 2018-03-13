@@ -56,19 +56,19 @@ def setHandler():
     """
 
     items = [
-                  (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, MySQLConn),
-                  (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, OracleConn),
-                  (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
-                  (DBMS.MSSQL, MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn),
-                  (DBMS.SQLITE, SQLITE_ALIASES, SQLiteMap, SQLiteConn),
-                  (DBMS.ACCESS, ACCESS_ALIASES, AccessMap, AccessConn),
-                  (DBMS.FIREBIRD, FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
-                  (DBMS.MAXDB, MAXDB_ALIASES, MaxDBMap, MaxDBConn),
-                  (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
-                  (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
-                  (DBMS.HSQLDB, HSQLDB_ALIASES, HSQLDBMap, HSQLDBConn),
-                  (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
-            ]
+        (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, MySQLConn),
+        (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, OracleConn),
+        (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
+        (DBMS.MSSQL, MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn),
+        (DBMS.SQLITE, SQLITE_ALIASES, SQLiteMap, SQLiteConn),
+        (DBMS.ACCESS, ACCESS_ALIASES, AccessMap, AccessConn),
+        (DBMS.FIREBIRD, FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
+        (DBMS.MAXDB, MAXDB_ALIASES, MaxDBMap, MaxDBConn),
+        (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
+        (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
+        (DBMS.HSQLDB, HSQLDB_ALIASES, HSQLDBMap, HSQLDBConn),
+        (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
+    ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else None for _ in items)
     if _:

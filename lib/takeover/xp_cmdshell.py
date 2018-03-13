@@ -214,7 +214,7 @@ class XP_cmdshell:
             if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 output = inject.getValue(query, resumeValue=False, blind=False, time=False)
 
-            if (output is None) or len(output)==0 or output[0] is None:
+            if (output is None) or len(output) == 0 or output[0] is None:
                 output = []
                 count = inject.getValue("SELECT COUNT(id) FROM %s" % self.cmdTblName, resumeValue=False, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 

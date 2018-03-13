@@ -46,11 +46,8 @@ class Connector(GenericConnector):
 
         try:
             driver = 'org.hsqldb.jdbc.JDBCDriver'
-            connection_string = 'jdbc:hsqldb:mem:.' #'jdbc:hsqldb:hsql://%s/%s' % (self.hostname, self.db)
-            self.connector = jaydebeapi.connect(driver,
-                                        connection_string,
-                                        str(self.user),
-                                        str(self.password))
+            connection_string = 'jdbc:hsqldb:mem:.'  # 'jdbc:hsqldb:hsql://%s/%s' % (self.hostname, self.db)
+            self.connector = jaydebeapi.connect(driver, connection_string, str(self.user), str(self.password))
         except Exception, msg:
             raise SqlmapConnectionException(msg[0])
 
@@ -70,7 +67,7 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(query)
             retVal = True
-        except Exception, msg: #todo fix with specific error
+        except Exception, msg:  # TODO: fix with specific error
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
 
         self.connector.commit()

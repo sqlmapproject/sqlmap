@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 import errno
 import os
 import subprocess
-import sys
 import time
 
 from lib.core.settings import IS_WIN
@@ -23,11 +22,6 @@ if IS_WIN:
 else:
     import select
     import fcntl
-
-    if (sys.hexversion >> 16) >= 0x202:
-        FCNTL = fcntl
-    else:
-        import FCNTL
 
 def blockingReadFromFD(fd):
     # Quick twist around original Twisted function

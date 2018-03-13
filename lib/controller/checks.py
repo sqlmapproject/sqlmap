@@ -146,8 +146,7 @@ def checkSqlInjection(place, parameter, value):
                 # error message, simple heuristic check or via DBMS-specific
                 # payload), ask the user to limit the tests to the fingerprinted
                 # DBMS
-                if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), \
-                   SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
+                if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
                     msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or injection.dbms)
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
                     kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
@@ -156,9 +155,7 @@ def checkSqlInjection(place, parameter, value):
             # message, via simple heuristic check or via DBMS-specific
             # payload), ask the user to extend the tests to all DBMS-specific,
             # regardless of --level and --risk values provided
-            if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) \
-               and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or \
-               kb.heuristicDbms or injection.dbms):
+            if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
                 msg = "for the remaining tests, do you want to include all tests "
                 msg += "for '%s' extending provided " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or injection.dbms)
                 msg += "level (%d)" % conf.level if conf.level < 5 else ""
@@ -242,9 +239,7 @@ def checkSqlInjection(place, parameter, value):
 
             # Skip tests if title, vector or DBMS is not included by the
             # given test filter
-            if conf.testFilter and not any(conf.testFilter in str(item) or \
-               re.search(conf.testFilter, str(item), re.I) for item in \
-               (test.title, test.vector, payloadDbms)):
+            if conf.testFilter and not any(conf.testFilter in str(item) or re.search(conf.testFilter, str(item), re.I) for item in (test.title, test.vector, payloadDbms)):
                     debugMsg = "skipping test '%s' because its " % title
                     debugMsg += "name/vector/DBMS is not included by the given filter"
                     logger.debug(debugMsg)
@@ -252,9 +247,7 @@ def checkSqlInjection(place, parameter, value):
 
             # Skip tests if title, vector or DBMS is included by the
             # given skip filter
-            if conf.testSkip and any(conf.testSkip in str(item) or \
-               re.search(conf.testSkip, str(item), re.I) for item in \
-               (test.title, test.vector, payloadDbms)):
+            if conf.testSkip and any(conf.testSkip in str(item) or re.search(conf.testSkip, str(item), re.I) for item in (test.title, test.vector, payloadDbms)):
                     debugMsg = "skipping test '%s' because its " % title
                     debugMsg += "name/vector/DBMS is included by the given skip filter"
                     logger.debug(debugMsg)
@@ -588,10 +581,10 @@ def checkSqlInjection(place, parameter, value):
                             # body for the test's <grep> regular expression
                             try:
                                 page, headers, _ = Request.queryPage(reqPayload, place, content=True, raise404=False)
-                                output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE) \
-                                        or extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None, re.DOTALL | re.IGNORECASE) \
-                                        or extractRegexResult(check, listToStrValue((headers[key] for key in headers.keys() if key.lower() != URI_HTTP_HEADER.lower()) if headers else None), re.DOTALL | re.IGNORECASE) \
-                                        or extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
+                                output = extractRegexResult(check, page, re.DOTALL | re.IGNORECASE)
+                                output = output or extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None, re.DOTALL | re.IGNORECASE)
+                                output = output or extractRegexResult(check, listToStrValue((headers[key] for key in headers.keys() if key.lower() != URI_HTTP_HEADER.lower()) if headers else None), re.DOTALL | re.IGNORECASE)
+                                output = output or extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
                                 if output:
                                     result = output == "1"
@@ -873,8 +866,7 @@ def checkFalsePositives(injection):
 
     retVal = True
 
-    if all(_ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in injection.data) or\
-      (len(injection.data) == 1 and PAYLOAD.TECHNIQUE.UNION in injection.data and "Generic" in injection.data[PAYLOAD.TECHNIQUE.UNION].title):
+    if all(_ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in injection.data) or (len(injection.data) == 1 and PAYLOAD.TECHNIQUE.UNION in injection.data and "Generic" in injection.data[PAYLOAD.TECHNIQUE.UNION].title):
         pushValue(kb.injection)
 
         infoMsg = "checking if the injection point on %s " % injection.place
@@ -971,7 +963,7 @@ def checkFilteredChars(injection):
 
     # inference techniques depend on character '>'
     if not any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.QUERY)):
-        if not checkBooleanExpression("%d>%d" % (randInt+1, randInt)):
+        if not checkBooleanExpression("%d>%d" % (randInt + 1, randInt)):
             warnMsg = "it appears that the character '>' is "
             warnMsg += "filtered by the back-end server. You are strongly "
             warnMsg += "advised to rerun with the '--tamper=between'"

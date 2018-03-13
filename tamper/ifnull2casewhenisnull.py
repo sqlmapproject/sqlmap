@@ -61,5 +61,3 @@ def tamper(payload, **kwargs):
                 break
 
     return payload
-
-
