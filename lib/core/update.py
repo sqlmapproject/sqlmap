@@ -30,7 +30,7 @@ def update():
 
     if not os.path.exists(os.path.join(paths.SQLMAP_ROOT_PATH, ".git")):
         errMsg = "not a git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
-        errMsg += "from GitHub (e.g. 'git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap')"
+        errMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
         logger.error(errMsg)
     else:
         infoMsg = "updating sqlmap to the latest development revision from the "
@@ -56,7 +56,7 @@ def update():
         else:
             if "Not a git repository" in stderr:
                 errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
-                errMsg += "from GitHub (e.g. 'git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap')"
+                errMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
                 logger.error(errMsg)
             else:
                 logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", stderr).strip())
