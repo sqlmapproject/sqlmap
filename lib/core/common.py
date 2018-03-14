@@ -2535,7 +2535,7 @@ def findMultipartPostBoundary(post):
 
     return retVal
 
-def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, plusspace=True):
+def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, spaceplus=True):
     """
     URL decodes given value
 
@@ -2553,14 +2553,14 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
             pass
         finally:
             if convall:
-                result = urllib.unquote_plus(value) if plusspace else urllib.unquote(value)
+                result = urllib.unquote_plus(value) if spaceplus else urllib.unquote(value)
             else:
                 def _(match):
                     charset = reduce(lambda x, y: x.replace(y, ""), unsafe, string.printable)
                     char = chr(ord(match.group(1).decode("hex")))
                     return char if char in charset else match.group(0)
                 result = value
-                if plusspace:
+                if spaceplus:
                     result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of urllib.unquote_plus in convall case)
                 result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
 
@@ -3997,7 +3997,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 url = urldecode(request.get_full_url(), kb.pageEncoding)
                 method = request.get_method()
                 data = request.get_data() if request.has_data() else None
-                data = urldecode(data, kb.pageEncoding, plusspace=False)
+                data = urldecode(data, kb.pageEncoding, spaceplus=False)
 
                 if not data and method and method.upper() == HTTPMETHOD.POST:
                     debugMsg = "invalid POST form with blank data detected"
