@@ -39,8 +39,8 @@ def update():
         warnMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
         logger.warn(warnMsg)
 
-        message = "do you want to try to fetch the latest 'zipball' from repository and extract it? [Y/n]"
-        if readInput(message, default='Y', boolean=True):
+        message = "do you want to try to fetch the latest 'zipball' from repository and extract it (experimental) ? [y/N]"
+        if readInput(message, default='N', boolean=True):
             directory = os.path.abspath(paths.SQLMAP_ROOT_PATH)
 
             try:
