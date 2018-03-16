@@ -203,7 +203,7 @@ def checkSqlInjection(place, parameter, value):
                     continue
 
                 match = re.search(r"(\d+)-(\d+)", test.request.columns)
-                if injection.data and match:
+                if match and injection.data:
                     lower, upper = int(match.group(1)), int(match.group(2))
                     for _ in (lower, upper):
                         if _ > 1:
@@ -328,6 +328,22 @@ def checkSqlInjection(place, parameter, value):
                 debugMsg += "provided a specific character, %s" % conf.uChar
                 logger.debug(debugMsg)
                 continue
+
+            match = re.search(r"(\d+)-(\d+)", test.request.columns)
+            if match and not injection.data:
+                _ = test.request.columns.split('-')[-1]
+                if conf.uCols is None and _.isdigit() and int(_) > 10:
+                    if kb.futileUnion is None:
+                        msg = "it is not recommended to perform "
+                        msg += "extended UNION tests if there is not "
+                        msg += "at least one other (potential) "
+                        msg += "technique found. Do you want to skip? [Y/n] "
+                        kb.futileUnion = not readInput(msg, default='Y', boolean=True)
+
+                    if kb.futileUnion is False:
+                        debugMsg = "skipping test '%s'" % title
+                        logger.debug(debugMsg)
+                        continue
 
             infoMsg = "testing '%s'" % title
             logger.info(infoMsg)
@@ -653,18 +669,6 @@ def checkSqlInjection(place, parameter, value):
                                 infoMsg += "there is at least one other (potential) "
                                 infoMsg += "technique found"
                                 singleTimeLogMessage(infoMsg)
-                            elif not injection.data:
-                                _ = test.request.columns.split('-')[-1]
-                                if _.isdigit() and int(_) > 10:
-                                    if kb.futileUnion is None:
-                                        msg = "it is not recommended to perform "
-                                        msg += "extended UNION tests if there is not "
-                                        msg += "at least one other (potential) "
-                                        msg += "technique found. Do you want to skip? [Y/n] "
-
-                                        kb.futileUnion = not readInput(msg, default='Y', boolean=True)
-                                    if kb.futileUnion is False:
-                                        continue
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
