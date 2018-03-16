@@ -286,7 +286,7 @@ def start():
         try:
 
             if conf.checkInternet:
-                infoMsg = "[INFO] checking for Internet connection"
+                infoMsg = "checking for Internet connection"
                 logger.info(infoMsg)
 
                 if not checkInternet():
