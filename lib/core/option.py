@@ -2542,11 +2542,11 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.checkTor and not any((conf.tor, conf.proxy)):
-        errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
+        errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address of Tor service)"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.torPort is not None and not (isinstance(conf.torPort, int) and conf.torPort >= 0 and conf.torPort <= 65535):
-        errMsg = "value for option '--tor-port' must be in range 0-65535"
+        errMsg = "value for option '--tor-port' must be in range [0, 65535]"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.torType not in getPublicTypeMembers(PROXY_TYPE, True):
