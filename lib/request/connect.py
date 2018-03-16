@@ -1261,7 +1261,11 @@ class Connect(object):
             page = removeReflectiveValues(page, payload)
 
         kb.maxConnectionsFlag = re.search(MAX_CONNECTIONS_REGEX, page or "", re.I) is not None
-        kb.permissionFlag = re.search(PERMISSION_DENIED_REGEX, page or "", re.I) is not None
+
+        message = extractRegexResult(PERMISSION_DENIED_REGEX, page or "", re.I)
+        if message:
+            kb.permissionFlag = True
+            singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
 
         if content or response:
             return page, headers, code
