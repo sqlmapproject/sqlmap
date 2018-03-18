@@ -187,12 +187,13 @@ class Connect(object):
 
         if not kb.dnsMode and conn:
             headers = conn.info()
-            if headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate") or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
+            if kb.pageCompress and headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate") or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
                 retVal = conn.read(MAX_CONNECTION_TOTAL_SIZE)
                 if len(retVal) == MAX_CONNECTION_TOTAL_SIZE:
                     warnMsg = "large compressed response detected. Disabling compression"
                     singleTimeWarnMessage(warnMsg)
                     kb.pageCompress = False
+                    raise SqlmapCompressionException
             else:
                 while True:
                     if not conn:
@@ -682,6 +683,9 @@ class Connect(object):
                 status = re.search(r"Handshake status ([\d]{3})", tbMsg)
                 errMsg = "websocket handshake status %s" % status.group(1) if status else "unknown"
                 raise SqlmapConnectionException(errMsg)
+            elif "SqlmapCompressionException" in tbMsg:
+                warnMsg = "problems with response (de)compression"
+                retrying = True
             else:
                 warnMsg = "unable to connect to the target URL"
 
