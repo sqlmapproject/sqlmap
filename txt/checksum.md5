@@ -46,11 +46,11 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-86aca5c620149829e45eec160205b5dc  lib/core/settings.py
+0e552878afbf998e3eaa913dee384aa9  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 12f8c42ed742581644f6476a7d80dcf8  lib/core/target.py
-a76f81b3e9e620b3e1d4bdea9160eef8  lib/core/testing.py
+72d499ca8d792e90a1ebfb2ad2341a51  lib/core/testing.py
 de9922a29c71a235cb95a916ff925db2  lib/core/threads.py
 c40758411bb0bd68764d78e0bb72bd0f  lib/core/unescaper.py
 af2d1810b6a7ebc61689a53c253ddbaa  lib/core/update.py

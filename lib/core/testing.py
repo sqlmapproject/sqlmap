@@ -17,7 +17,6 @@ import traceback
 
 from extra.beep.beep import beep
 from lib.controller.controller import start
-from lib.core.common import checkIntegrity
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
@@ -87,8 +86,6 @@ def smokeTest():
                 count += 1
                 status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
                 dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
-
-    retVal &= checkIntegrity()
 
     clearConsoleLine()
     if retVal:
