@@ -3928,6 +3928,9 @@ def isAdminFromPrivileges(privileges):
 def findPageForms(content, url, raise_=False, addToTargets=False):
     """
     Parses given page content for possible forms
+
+    >>> findPageForms('<html><form action="/input.php" method="POST"><input type="text" name="id" value="1"><input type="submit" value="Submit"></form></html>', '')
+    set([(u'/input.php', 'POST', u'id=1', None, None)])
     """
 
     class _(StringIO):
@@ -3950,8 +3953,6 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     try:
         forms = ParseResponse(response, backwards_compat=False)
-    except (UnicodeError, ValueError):
-        pass
     except ParseError:
         if re.search(r"(?i)<!DOCTYPE html|<html", content or ""):
             warnMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
@@ -3967,6 +3968,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                         raise SqlmapGenericException(errMsg)
                     else:
                         logger.debug(errMsg)
+    except:
+        pass
 
     if forms:
         for form in forms:
