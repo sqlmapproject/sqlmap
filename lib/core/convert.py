@@ -174,7 +174,7 @@ def htmlunescape(value):
             pass
     return retVal
 
-def singleTimeWarnMessage(message):  # Cross-linked function
+def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.write(message)
     sys.stdout.write("\n")
     sys.stdout.flush()

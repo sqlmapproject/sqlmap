@@ -2662,7 +2662,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
             dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
             dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
-def getPageTemplate(payload, place):  # Cross-linked function
+def getPageTemplate(payload, place):  # Cross-referenced function
     raise NotImplementedError
 
 @cachedmethod

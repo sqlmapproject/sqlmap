@@ -1569,8 +1569,8 @@ def checkInternet():
     content = Request.getPage(url=CHECK_INTERNET_ADDRESS, checking=True)[0]
     return CHECK_INTERNET_VALUE in (content or "")
 
-def setVerbosity():  # Cross-linked function
+def setVerbosity():  # Cross-referenced function
     raise NotImplementedError
 
-def setWafFunctions():  # Cross-linked function
+def setWafFunctions():  # Cross-referenced function
     raise NotImplementedError

@@ -1279,5 +1279,5 @@ class Connect(object):
         else:
             return comparison(page, headers, code, getRatioValue, pageLength)
 
-def setHTTPHandlers():  # Cross-linked function
+def setHTTPHandlers():  # Cross-referenced function
     raise NotImplementedError

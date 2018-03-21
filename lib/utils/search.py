@@ -187,5 +187,5 @@ def search(dork):
     finally:
         kb.redirectChoice = popValue()
 
-def setHTTPHandlers():  # Cross-linked function
+def setHTTPHandlers():  # Cross-referenced function
     raise NotImplementedError
