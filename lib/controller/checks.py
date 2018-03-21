@@ -686,7 +686,7 @@ def checkSqlInjection(place, parameter, value):
 
                         kb.previousMethod = method
 
-                        if conf.dummy or conf.offline:
+                        if conf.offline:
                             injectable = False
 
                     # If the injection test was successful feed the injection
