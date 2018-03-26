@@ -61,7 +61,7 @@ def forgeHeaders(items=None, base=None):
         if items[_] is None:
             del items[_]
 
-    headers = OrderedDict(base or conf.httpHeaders)
+    headers = OrderedDict(conf.httpHeaders if base is None else base)
     headers.update(items.items())
 
     class _str(str):

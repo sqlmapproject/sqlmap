@@ -2359,7 +2359,7 @@ def _checkTor():
     logger.info(infoMsg)
 
     try:
-        page, _, _ = Request.getPage(url="https://check.torproject.org/", referer=None, raise404=False)
+        page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
     except SqlmapConnectionException:
         page = None
 
