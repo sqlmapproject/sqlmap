@@ -1543,7 +1543,7 @@ def checkConnection(suppressOutput=False):
         threadData = getCurrentThreadData()
 
         if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
-            if conf.hostname in threadData.lastRedirectURL[1] and threadData.lastRedirectURL[1].startswith("https://"):
+            if conf.hostname in (threadData.lastRedirectURL[1] or "") and threadData.lastRedirectURL[1].startswith("https://"):
                 conf.url = re.sub(r"https?://", "https://", conf.url)
                 match = re.search(r":(\d+)", threadData.lastRedirectURL[1])
                 port = match.group(1) if match else 443
