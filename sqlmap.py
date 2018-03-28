@@ -305,7 +305,7 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
-            elif "valueStack.pop" in excMsg and kb.get("dumpKeyboardInterrupt"):
+            elif kb.get("dumpKeyboardInterrupt"):
                 raise SystemExit
 
             elif any(_ in excMsg for _ in ("Broken pipe",)):
