@@ -1539,6 +1539,16 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
+
+        threadData = getCurrentThreadData()
+
+        if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
+            if conf.hostname in threadData.lastRedirectURL[1] and threadData.lastRedirectURL[1].startswith("https://"):
+                conf.url = re.sub(r"https?://", "https://", conf.url)
+                match = re.search(r":(\d+)", threadData.lastRedirectURL[1])
+                port = match.group(1) if match else 443
+                conf.url = re.sub(r":\d+/", ":%s/" % port, conf.url)
+
     except SqlmapConnectionException, ex:
         if conf.ipv6:
             warnMsg = "check connection to a provided "
