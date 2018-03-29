@@ -514,6 +514,10 @@ def checkSqlInjection(place, parameter, value):
                                             kb.matchRatio = _
                                             logger.debug("adjusting match ratio for current parameter to %.3f" % kb.matchRatio)
 
+                                    # Reducing false-positive "appears" messages in heavily dynamic environment
+                                    if kb.heavyDynamic and not Request.queryPage(reqPayload, place, raise404=False):
+                                        continue
+
                                     injectable = True
 
                                 elif threadData.lastComparisonRatio > UPPER_RATIO_BOUND and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
