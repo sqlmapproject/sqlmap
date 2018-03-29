@@ -1168,6 +1168,8 @@ def checkDynamicContent(firstPage, secondPage):
             warnMsg += "sqlmap is going to retry the request(s)"
             singleTimeLogMessage(warnMsg, logging.CRITICAL)
 
+            kb.heavyDynamic = True
+
             secondPage, _, _ = Request.queryPage(content=True)
             findDynamicContent(firstPage, secondPage)
 

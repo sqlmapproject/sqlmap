@@ -1945,6 +1945,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.forcePartialUnion = False
     kb.forceWhere = None
     kb.futileUnion = None
+    kb.heavyDynamic = False
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicExtendedDbms = None
