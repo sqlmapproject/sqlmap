@@ -508,14 +508,14 @@ def checkSqlInjection(place, parameter, value):
                                         errorResult = Request.queryPage(errorPayload, place, raise404=False)
                                         if errorResult:
                                             continue
-                                    elif not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
+                                    elif kb.heuristicPage and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
                                         _ = comparison(kb.heuristicPage, None, getRatioValue=True)
                                         if _ > kb.matchRatio:
                                             kb.matchRatio = _
                                             logger.debug("adjusting match ratio for current parameter to %.3f" % kb.matchRatio)
 
                                     # Reducing false-positive "appears" messages in heavily dynamic environment
-                                    if kb.heavyDynamic and not Request.queryPage(reqPayload, place, raise404=False):
+                                    if kb.heavilyDynamic and not Request.queryPage(reqPayload, place, raise404=False):
                                         continue
 
                                     injectable = True
@@ -986,6 +986,11 @@ def heuristicCheckSqlInjection(place, parameter):
         logger.debug(debugMsg)
         return None
 
+    if kb.heavilyDynamic:
+        debugMsg = "heuristic check skipped because of heavy dynamicity"
+        logger.debug(debugMsg)
+        return None
+
     origValue = conf.paramDict[place][parameter]
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
@@ -1048,6 +1053,8 @@ def heuristicCheckSqlInjection(place, parameter):
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N', boolean=True)
 
     elif result:
+        import pdb
+        pdb.set_trace()
         infoMsg += "be injectable"
         if Backend.getErrorParsedDBMSes():
             infoMsg += " (possible DBMS: '%s')" % Format.getErrorParsedDBMSes()
@@ -1172,7 +1179,7 @@ def checkDynamicContent(firstPage, secondPage):
             warnMsg += "sqlmap is going to retry the request(s)"
             singleTimeLogMessage(warnMsg, logging.CRITICAL)
 
-            kb.heavyDynamic = True
+            kb.heavilyDynamic = True
 
             secondPage, _, _ = Request.queryPage(content=True)
             findDynamicContent(firstPage, secondPage)

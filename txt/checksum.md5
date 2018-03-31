@@ -21,7 +21,7 @@ c88d66597f4aab719bde4542b0a1a6e0  extra/shutils/regressiontest.py
 1e5532ede194ac9c083891c2f02bca93  extra/sqlharvest/__init__.py
 b3e60ea4e18a65c48515d04aab28ff68  extra/sqlharvest/sqlharvest.py
 0f581182871148b0456a691ae85b04c0  lib/controller/action.py
-28c80dd4b8f288f46388770415d7c1df  lib/controller/checks.py
+71a8af96273cde7fd8e8c8b3122df27a  lib/controller/checks.py
 33689bb1b064d4eebc216934795a595f  lib/controller/controller.py
 c7443613a0a2505b1faec931cee2a6ef  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
@@ -40,13 +40,13 @@ cada93357a7321655927fc9625b3bfec  lib/core/exception.py
 1e5532ede194ac9c083891c2f02bca93  lib/core/__init__.py
 458a194764805cd8312c14ecd4be4d1e  lib/core/log.py
 c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
-8484e95c616b7a5220157c13e24fa1d6  lib/core/option.py
+b950c8c2f2ae87ad2ec99e1d19b2c03a  lib/core/option.py
 7cfd04e583cca782b843f6f6d973981a  lib/core/profiling.py
 ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-30cc59cf0722d37effce632dcd38dc62  lib/core/settings.py
+05c1496418a91fba529536205a7e9cc0  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
@@ -96,7 +96,7 @@ fb9e34d558293b5d6b9727f440712886  lib/takeover/registry.py
 f999f2e88dea9ac8831eb2f468478b5f  lib/techniques/error/use.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/union/__init__.py
-07882f244fc73e130ab1a17caa6f5fb0  lib/techniques/union/test.py
+36c49359a110fe0f797b2eb9e2d694ed  lib/techniques/union/test.py
 11ecf2effbe9f40b361843d546c3c521  lib/techniques/union/use.py
 c552f8d924d962a26f2ded250bcea3b8  lib/utils/api.py
 37dfb641358669f62c2acedff241348b  lib/utils/brute.py
