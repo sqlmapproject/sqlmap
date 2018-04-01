@@ -1053,8 +1053,6 @@ def heuristicCheckSqlInjection(place, parameter):
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N', boolean=True)
 
     elif result:
-        import pdb
-        pdb.set_trace()
         infoMsg += "be injectable"
         if Backend.getErrorParsedDBMSes():
             infoMsg += " (possible DBMS: '%s')" % Format.getErrorParsedDBMSes()
