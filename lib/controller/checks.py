@@ -54,6 +54,7 @@ from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
 from lib.core.decorators import cachedmethod
+from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
@@ -832,6 +833,7 @@ def checkSqlInjection(place, parameter, value):
 
     return injection
 
+@stackedmethod
 def heuristicCheckDbms(injection):
     """
     This functions is called when boolean-based blind is identified with a
@@ -868,6 +870,7 @@ def heuristicCheckDbms(injection):
 
     return retVal
 
+@stackedmethod
 def checkFalsePositives(injection):
     """
     Checks for false positives (only in single special cases)
@@ -929,6 +932,7 @@ def checkFalsePositives(injection):
 
     return retVal
 
+@stackedmethod
 def checkSuhosinPatch(injection):
     """
     Checks for existence of Suhosin-patch (and alike) protection mechanism(s)
@@ -952,6 +956,7 @@ def checkSuhosinPatch(injection):
 
         kb.injection = popValue()
 
+@stackedmethod
 def checkFilteredChars(injection):
     debugMsg = "checking for filtered characters"
     logger.debug(debugMsg)
@@ -1314,6 +1319,7 @@ def checkRegexp():
 
     return True
 
+@stackedmethod
 def checkWaf():
     """
     Reference: http://seclists.org/nmap-dev/2011/q2/att-1005/http-waf-detect.nse
@@ -1379,6 +1385,7 @@ def checkWaf():
 
     return retVal
 
+@stackedmethod
 def identifyWaf():
     if not conf.identifyWaf:
         return None
@@ -1463,6 +1470,7 @@ def identifyWaf():
 
     return retVal
 
+@stackedmethod
 def checkNullConnection():
     """
     Reference: http://www.wisec.it/sectou.php?id=472f952d79293

@@ -32,6 +32,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.decorators import stackedmethod
 from lib.core.dicts import FIREBIRD_TYPES
 from lib.core.dicts import INFORMIX_TYPES
 from lib.core.enums import CHARSET_TYPE
@@ -806,6 +807,7 @@ class Databases:
 
         return kb.data.cachedColumns
 
+    @stackedmethod
     def getSchema(self):
         infoMsg = "enumerating database management system schema"
         logger.info(infoMsg)

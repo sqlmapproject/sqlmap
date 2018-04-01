@@ -21,8 +21,8 @@ c88d66597f4aab719bde4542b0a1a6e0  extra/shutils/regressiontest.py
 1e5532ede194ac9c083891c2f02bca93  extra/sqlharvest/__init__.py
 b3e60ea4e18a65c48515d04aab28ff68  extra/sqlharvest/sqlharvest.py
 0f581182871148b0456a691ae85b04c0  lib/controller/action.py
-8901cbab8f3885c554fe9ac43a1e5f14  lib/controller/checks.py
-33689bb1b064d4eebc216934795a595f  lib/controller/controller.py
+84c8694d4ecacd843b6d745f032ff41f  lib/controller/checks.py
+c414cecdb0472c92cf50ed5b01e4438c  lib/controller/controller.py
 c7443613a0a2505b1faec931cee2a6ef  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
 b1990c7805943f0c973a853bba981d96  lib/core/agent.py
@@ -31,7 +31,7 @@ fd8f239e259afaf5f24bcf34a0ad187f  lib/core/bigarray.py
 0d082da16c388b3445e656e0760fb582  lib/core/convert.py
 9f87391b6a3395f7f50830b391264f27  lib/core/data.py
 72016ea5c994a711a262fd64572a0fcd  lib/core/datatype.py
-12e80071013606f01822c3823fb51054  lib/core/decorators.py
+04638422b6ad1613238a9abf4fdf6491  lib/core/decorators.py
 fbb55cc6100318ff922957b6577dc58f  lib/core/defaults.py
 da98f5288aad57855c6d287ba3b397a1  lib/core/dicts.py
 9ea8a043030796e6faef7f7e957729d5  lib/core/dump.py
@@ -46,7 +46,7 @@ ffa5f01f39b17c8d73423acca6cfe86a  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-88d4f1d18b6919f1ad5f179ed959e7a7  lib/core/settings.py
+f0f522f95a11b24bec01d42a9a535e23  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
@@ -68,12 +68,12 @@ ec4e56bbb1349176b2a22e0b99ba6a55  lib/parse/payloads.py
 30eed3a92a04ed2c29770e1b10d39dc0  lib/request/basicauthhandler.py
 7e8e0a3fdebbe443832c1bab2f8d3869  lib/request/basic.py
 c0cabedead14b8a23353b606672cff42  lib/request/comparison.py
-a42707d6e89312659d3bdc8fb4ad1336  lib/request/connect.py
+acc31fac4efc25741c061bf8d7f8c3a2  lib/request/connect.py
 dd4598675027fae99f2e2475b05986da  lib/request/direct.py
 2044fce3f4ffa268fcfaaf63241b1e64  lib/request/dns.py
 eee965d781546d05f36cfd14af050913  lib/request/httpshandler.py
 1e5532ede194ac9c083891c2f02bca93  lib/request/__init__.py
-cb05d965aa3d5871d14b5e45fe9128b4  lib/request/inject.py
+b188a11542a996276abbbc48913501c3  lib/request/inject.py
 aaf956c1e9855836c3f372e29d481393  lib/request/methodrequest.py
 51eeaa8abf5ba62aaaade66d46ff8b00  lib/request/pkihandler.py
 aa7cb67139bbc57d67a728fd2abf80ed  lib/request/rangehandler.py
@@ -86,7 +86,7 @@ b1a6689e92e6ce998337bd41d8b09d6e  lib/takeover/metasploit.py
 fb9e34d558293b5d6b9727f440712886  lib/takeover/registry.py
 48575dde7bb867b7937769f569a98309  lib/takeover/udf.py
 4584ac6ee5c13d4d395f0a7a21d8478c  lib/takeover/web.py
-79d1ba3ab7b2552c5f09992ce08e765d  lib/takeover/xp_cmdshell.py
+f1decf0a987bd3a4bc757212cbe6a6c8  lib/takeover/xp_cmdshell.py
 2543e14cc7f6e239b49dd40f41bc34fa  lib/techniques/blind/inference.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/blind/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/dns/__init__.py
@@ -96,7 +96,7 @@ fb9e34d558293b5d6b9727f440712886  lib/takeover/registry.py
 f999f2e88dea9ac8831eb2f468478b5f  lib/techniques/error/use.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/union/__init__.py
-36c49359a110fe0f797b2eb9e2d694ed  lib/techniques/union/test.py
+cbe59feb11526068bbbd35dca97b3b37  lib/techniques/union/test.py
 11ecf2effbe9f40b361843d546c3c521  lib/techniques/union/use.py
 c552f8d924d962a26f2ded250bcea3b8  lib/utils/api.py
 37dfb641358669f62c2acedff241348b  lib/utils/brute.py
@@ -111,7 +111,7 @@ cc1cfe36057f1d9bbdcba1bcc03359f9  lib/utils/hash.py
 010d8327239d33af4ce9f25683cfc012  lib/utils/pivotdumptable.py
 5cb78b0e60fd7fd84502d62cf85d2064  lib/utils/progress.py
 0ec5cec9d93d5ffd1eaeda6e942ecadf  lib/utils/purge.py
-fb6cf3415fbbf117e2dc87aae2f35993  lib/utils/search.py
+2e3e7213f50b52fc4d5a014a2ff8d163  lib/utils/search.py
 236a8d9e596602b53f8e0aa09c30c0ef  lib/utils/sqlalchemy.py
 dcc25183c6bd85b172c87cfcbc305ab6  lib/utils/timeout.py
 3d230e342a6c8d60ac7c68c556fbba9b  lib/utils/versioncheck.py
@@ -168,7 +168,7 @@ affef90b1442285da7e89e46603c502e  plugins/dbms/mssqlserver/__init__.py
 08fe8ac7acdfc0e3168b5b069a7c73bf  plugins/dbms/mssqlserver/takeover.py
 f6e1f3f09f32b9cb2ca11c016d373423  plugins/dbms/mysql/connector.py
 445164daf59b890aeacc968af58fcb53  plugins/dbms/mysql/enumeration.py
-f36e09edc3eafedd989fbe44ec048e71  plugins/dbms/mysql/filesystem.py
+4578fa29f04d0a75499f9668466ded07  plugins/dbms/mysql/filesystem.py
 fcbf7ff279c527b4aca0dac94c28d20c  plugins/dbms/mysql/fingerprint.py
 30065993f8300994e4658634121609e9  plugins/dbms/mysql/__init__.py
 0e2adbee217f5b94dcc124d24b8dde99  plugins/dbms/mysql/syntax.py
@@ -203,7 +203,7 @@ a3db8618eed5bb2807b6f77605cba9cc  plugins/dbms/sybase/__init__.py
 79f6c7017db4ded8f74a0117188836ff  plugins/dbms/sybase/takeover.py
 34d181a7086d6dfc7e72ae5f8a4cfe0f  plugins/generic/connector.py
 e6cd1c5a5244d83396b401f7db43d323  plugins/generic/custom.py
-dc07665887191ac977e5377f5a66d288  plugins/generic/databases.py
+79c6dbcb7e6ad5e993a44aa52fdc36ed  plugins/generic/databases.py
 a9c8637f0526d751cd1a6a18f91967f5  plugins/generic/entries.py
 d82f2c78c1d4d7c6487e94fd3a68a908  plugins/generic/enumeration.py
 0c8abe66a78edca0660bfb8049d109e2  plugins/generic/filesystem.py

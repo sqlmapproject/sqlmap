@@ -24,6 +24,7 @@ from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
@@ -96,6 +97,7 @@ class XP_cmdshell:
 
         return wasLastResponseDelayed()
 
+    @stackedmethod
     def _xpCmdshellTest(self):
         threadData = getCurrentThreadData()
         pushValue(threadData.disableStdOut)

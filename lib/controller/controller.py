@@ -43,6 +43,7 @@ from lib.core.common import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
@@ -253,6 +254,7 @@ def _saveToResultsFile():
 
     conf.resultsFP.flush()
 
+@stackedmethod
 def start():
     """
     This function calls a function that performs checks on both URL

@@ -14,6 +14,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
@@ -81,6 +82,7 @@ class Filesystem(GenericFilesystem):
 
         return result
 
+    @stackedmethod
     def unionWriteFile(self, wFile, dFile, fileType, forceCheck=False):
         logger.debug("encoding file to its hexadecimal string value")
 

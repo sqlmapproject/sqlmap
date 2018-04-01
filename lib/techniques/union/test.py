@@ -27,6 +27,7 @@ from lib.core.common import wasLastResponseDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import PAYLOAD
 from lib.core.settings import LIMITED_ROWS_TEST_NUMBER
@@ -48,6 +49,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
     """
     retVal = None
 
+    @stackedmethod
     def _orderByTechnique(lowerCount, upperCount):
         def _orderByTest(cols):
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)

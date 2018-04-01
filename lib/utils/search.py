@@ -20,6 +20,7 @@ from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import REDIRECTION
@@ -165,6 +166,7 @@ def _search(dork):
 
     return retVal
 
+@stackedmethod
 def search(dork):
     pushValue(kb.redirectChoice)
     kb.redirectChoice = REDIRECTION.YES
