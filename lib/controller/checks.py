@@ -47,6 +47,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
+from lib.core.convert import unicodeencode
 from lib.core.defaults import defaults
 from lib.core.data import conf
 from lib.core.data import kb
@@ -1562,7 +1563,7 @@ def checkConnection(suppressOutput=False):
         threadData = getCurrentThreadData()
 
         if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
-            if conf.hostname in (threadData.lastRedirectURL[1] or "") and threadData.lastRedirectURL[1].startswith("https://"):
+            if (threadData.lastRedirectURL[1] or "").startswith("https://") and unicodeencode(conf.hostname) in threadData.lastRedirectURL[1]:
                 conf.url = re.sub(r"https?://", "https://", conf.url)
                 match = re.search(r":(\d+)", threadData.lastRedirectURL[1])
                 port = match.group(1) if match else 443
