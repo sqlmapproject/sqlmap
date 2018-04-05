@@ -14,11 +14,11 @@ _readline = None
 try:
     from readline import *
     import readline as _readline
-except ImportError:
+except:
     try:
         from pyreadline import *
         import pyreadline as _readline
-    except ImportError:
+    except:
         pass
 
 if IS_WIN and _readline:
