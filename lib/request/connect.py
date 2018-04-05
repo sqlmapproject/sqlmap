@@ -578,7 +578,7 @@ class Connect(object):
                 page = page if isinstance(page, unicode) else getUnicode(page)
 
             code = ex.code
-            status = getUnicode(ex.msg)
+            status = getSafeExString(ex)
 
             kb.originalCode = kb.originalCode or code
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
