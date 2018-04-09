@@ -46,7 +46,7 @@ b950c8c2f2ae87ad2ec99e1d19b2c03a  lib/core/option.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-3cb22d21169fd140938c5ecdeb209b83  lib/core/settings.py
+6fd851fdbd1fd040f6212a6eff80bd0b  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
@@ -159,7 +159,7 @@ ffd26f64142226d0b1ed1d70f7f294c0  plugins/dbms/maxdb/filesystem.py
 4321d7018f5121343460ebfd83bb69be  plugins/dbms/maxdb/__init__.py
 e7d44671ae26c0bcd5fe8448be070bbd  plugins/dbms/maxdb/syntax.py
 bf7842bb291e2297c3c8d1023eb3e550  plugins/dbms/maxdb/takeover.py
-6439d15c1e8cdb069056c4fa725326df  plugins/dbms/mssqlserver/connector.py
+9e64e67291a4c369bad8b8cf2cfa722a  plugins/dbms/mssqlserver/connector.py
 f1f1541a54faf67440179fa521f99849  plugins/dbms/mssqlserver/enumeration.py
 177e1d55d28ed3190bc0079b8126c6be  plugins/dbms/mssqlserver/filesystem.py
 51eb413ac62408965be20a812f2412c8  plugins/dbms/mssqlserver/fingerprint.py
@@ -194,7 +194,7 @@ ed52c198f3346ceabdef676e9f5d3c0f  plugins/dbms/sqlite/fingerprint.py
 f639120d42b33b6ca67930bddbf2ac1f  plugins/dbms/sqlite/__init__.py
 964e59d2eba619b068b0a15cea28efe0  plugins/dbms/sqlite/syntax.py
 3364b2938d7040c507cd622c323557dc  plugins/dbms/sqlite/takeover.py
-6439d15c1e8cdb069056c4fa725326df  plugins/dbms/sybase/connector.py
+9e64e67291a4c369bad8b8cf2cfa722a  plugins/dbms/sybase/connector.py
 426698152f63504061e5875e64957691  plugins/dbms/sybase/enumeration.py
 74de450dd6d6d006aa9c7eed56e6b09a  plugins/dbms/sybase/filesystem.py
 c8ee0deaa2309e96d9a409ff1524f3ad  plugins/dbms/sybase/fingerprint.py
