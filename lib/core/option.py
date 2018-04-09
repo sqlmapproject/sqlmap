@@ -918,7 +918,7 @@ def _setTamperingFunctions():
             dirname, filename = os.path.split(script)
             dirname = os.path.abspath(dirname)
 
-            infoMsg = "loading tamper script '%s'" % filename[:-3]
+            infoMsg = "loading tamper module '%s'" % filename[:-3]
             logger.info(infoMsg)
 
             if not os.path.exists(os.path.join(dirname, "__init__.py")):
@@ -932,7 +932,7 @@ def _setTamperingFunctions():
             try:
                 module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
             except Exception, ex:
-                raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
+                raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
 
@@ -962,7 +962,12 @@ def _setTamperingFunctions():
 
                     break
                 elif name == "dependencies":
-                    function()
+                    try:
+                        function()
+                    except Exception, ex:
+                        errMsg = "error occurred while checking dependencies "
+                        errMsg += "for tamper module '%s' ('%s')" % (filename[:-3], getSafeExString(ex))
+                        raise SqlmapGenericException(errMsg)
 
             if not found:
                 errMsg = "missing function 'tamper(payload, **kwargs)' "
