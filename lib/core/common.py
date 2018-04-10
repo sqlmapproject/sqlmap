@@ -3280,14 +3280,17 @@ def checkIntegrity():
     logger.debug("running code integrity check")
 
     retVal = True
-    for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
-        path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
-        if not os.path.isfile(path):
-            logger.error("missing file detected '%s'" % path)
-            retVal = False
-        elif md5File(path) != checksum:
-            logger.error("wrong checksum of file '%s' detected" % path)
-            retVal = False
+
+    if os.path.isfile(paths.CHECKSUM_MD5):
+        for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
+            path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
+            if not os.path.isfile(path):
+                logger.error("missing file detected '%s'" % path)
+                retVal = False
+            elif md5File(path) != checksum:
+                logger.error("wrong checksum of file '%s' detected" % path)
+                retVal = False
+
     return retVal
 
 def unhandledExceptionMessage():
