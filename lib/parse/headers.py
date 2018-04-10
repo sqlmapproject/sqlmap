@@ -31,7 +31,7 @@ def headersParser(headers):
             "x-powered-by": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml"),
         }
 
-    for header in itertools.ifilter(lambda x: x in kb.headerPaths, headers):
+    for header in itertools.ifilter(lambda _: _ in kb.headerPaths, headers):
         value = headers[header]
         xmlfile = kb.headerPaths[header]
         handler = FingerprintHandler(value, kb.headersFp)

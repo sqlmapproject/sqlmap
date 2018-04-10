@@ -46,7 +46,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-3ae3e12c5183d4468fbeb1cb6f4e231c  lib/core/settings.py
+416a9d32cc0b6ee6281e0ec062a4d169  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
@@ -60,7 +60,7 @@ e772deb63270375e685fa5a7b775c382  lib/core/wordlist.py
 f667710f17b8447358ee7508a9d2faf1  lib/parse/cmdline.py
 fb2e2f05dde98caeac6ccf3e67192177  lib/parse/configfile.py
 3794ff139869f5ae8e81cfdbe5714f56  lib/parse/handler.py
-8d7321a1bc1a26ac55b2398bf445d78f  lib/parse/headers.py
+aaad2a0d80f05eaebe52c71519b3dfc7  lib/parse/headers.py
 33f21b11b7963062df8fa2292229df80  lib/parse/html.py
 1e5532ede194ac9c083891c2f02bca93  lib/parse/__init__.py
 ec4e56bbb1349176b2a22e0b99ba6a55  lib/parse/payloads.py
@@ -450,14 +450,14 @@ a687449cd4e45f69e33b13d41e021480  waf/uspses.py
 68e332530fab216d017ede506c3fec2f  waf/yundun.py
 bea35ba732ccc9548e6c4023cea6832b  waf/yunsuo.py
 705ac8663513c12150cb5623ef4a04fb  waf/zenedge.py
-e87d59af23b7b18cd56c9883e5f02d5c  xml/banner/generic.xml
+dc394c5b90ada0a5d5853b5ad1f7d56d  xml/banner/generic.xml
 d8925c034263bf1b83e7d8e1c78eec57  xml/banner/mssql.xml
-b8b56f4aa34bf65365808919b97119a7  xml/banner/mysql.xml
+7b21aeb3ad66d7686eacd23a6346292c  xml/banner/mysql.xml
 9b262a617b06af56b1267987d694bf6f  xml/banner/oracle.xml
-d90fe5a47b95dff3eb1797764c9db6c5  xml/banner/postgresql.xml
-b07b5c47c751787e136650ded060197f  xml/banner/server.xml
+c26cd4fa986ddc9f6d92dd87c8fc61cb  xml/banner/postgresql.xml
+4970709ca31bcaea5eb79547a132606a  xml/banner/server.xml
 d48c971769c6131e35bd52d2315a8d58  xml/banner/servlet-engine.xml
-2d53fdaca0d7b42edad5192661248d76  xml/banner/set-cookie.xml
+58be20a3b29a9108d043786907700469  xml/banner/set-cookie.xml
 d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 350605448f049cd982554123a75f11e1  xml/banner/x-aspnet-version.xml
 817078783e1edaa492773d3b34d8eef0  xml/banner/x-powered-by.xml
