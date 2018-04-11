@@ -1493,6 +1493,23 @@ def parseTargetUrl():
     if conf.url != originalUrl:
         kb.originalUrls[conf.url] = originalUrl
 
+def escapeJsonValue(value):
+    """
+    Escapes JSON value (used in payloads)
+
+    # Reference: https://stackoverflow.com/a/16652683
+    """
+
+    retVal = ""
+
+    for char in value:
+        if char < ' ' or char == '"':
+            retVal += json.dumps(char)[1:-1]
+        else:
+            retVal += char
+
+    return retVal
+
 def expandAsteriskForColumns(expression):
     """
     If the user provided an asterisk rather than the column(s)
