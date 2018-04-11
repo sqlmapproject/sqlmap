@@ -265,8 +265,15 @@ def main():
                 raise SystemExit
 
             elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
-                errMsg = "please update the 'sqlalchemy' package"
+                errMsg = "please update the 'sqlalchemy' package "
                 errMsg += "(Reference: https://github.com/apache/incubator-superset/issues/3447)"
+                logger.error(errMsg)
+                raise SystemExit
+
+            elif "must be pinned buffer, not bytearray" in excMsg:
+                errMsg = "error occurred at Python interpreter which "
+                errMsg += "is fixed in 2.7.x. Please update accordingly "
+                errMsg += "(Reference: https://bugs.python.org/issue8104)"
                 logger.error(errMsg)
                 raise SystemExit
 
