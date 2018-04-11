@@ -5,7 +5,7 @@ b0eb597c613afeff9d62898cf4c67a56  extra/cloak/cloak.py
 e0911386106b95d2ba4b12d651b2eb16  extra/dbgtool/dbgtool.py
 1e5532ede194ac9c083891c2f02bca93  extra/dbgtool/__init__.py
 acba8b5dc93db0fe6b2b04ff0138c33c  extra/icmpsh/icmpsh.exe_
-2176d964f2d5ba2d871383d6a1868b8f  extra/icmpsh/icmpsh_m.py
+fe39e5c315d63afff5cb99ec42fc883f  extra/icmpsh/icmpsh_m.py
 2d020d2bdcee1170805f48839fdb89df  extra/icmpsh/__init__.py
 1e5532ede194ac9c083891c2f02bca93  extra/__init__.py
 27629e01ba722271c990ad4b27151917  extra/mssqlsig/update.py
@@ -46,7 +46,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-416a9d32cc0b6ee6281e0ec062a4d169  lib/core/settings.py
+4130d34ca6a37e8944dfdf0b94643235  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
