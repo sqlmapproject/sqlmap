@@ -50,7 +50,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
     retVal = None
 
     @stackedmethod
-    def _orderByTechnique(lowerCount, upperCount):
+    def _orderByTechnique(lowerCount=None, upperCount=None):
         def _orderByTest(cols):
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
@@ -91,7 +91,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
         if lowerCount == 1 or conf.uCols:
-            found = kb.orderByColumns or _orderByTechnique(lowerCount, upperCount)
+            found = kb.orderByColumns or (_orderByTechnique(lowerCount, upperCount) if conf.uCols else _orderByTechnique())
             if found:
                 kb.orderByColumns = found
                 infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
