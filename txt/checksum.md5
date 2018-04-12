@@ -21,7 +21,7 @@ c88d66597f4aab719bde4542b0a1a6e0  extra/shutils/regressiontest.py
 1e5532ede194ac9c083891c2f02bca93  extra/sqlharvest/__init__.py
 b3e60ea4e18a65c48515d04aab28ff68  extra/sqlharvest/sqlharvest.py
 0f581182871148b0456a691ae85b04c0  lib/controller/action.py
-56d325f83671146c28ac300ff553420f  lib/controller/checks.py
+d9559f6c5053a7ccb524f3dd049e35f8  lib/controller/checks.py
 c414cecdb0472c92cf50ed5b01e4438c  lib/controller/controller.py
 c7443613a0a2505b1faec931cee2a6ef  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
@@ -46,7 +46,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-f01ac839011009e7c219fc11f528f348  lib/core/settings.py
+e854bd3a7ce6196a3ee3e3891473435e  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
