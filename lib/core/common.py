@@ -1015,8 +1015,11 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             elif answer is None and retVal:
                 retVal = "%s,%s" % (retVal, getUnicode(item, UNICODE_ENCODING))
 
+    if message and getattr(LOGGER_HANDLER, "is_tty", False):
+        message = "\r%s" % message
+
     if retVal:
-        dataToStdout("\r%s%s\n" % (message, retVal), forceOutput=not kb.wizardMode, bold=True)
+        dataToStdout("%s%s\n" % (message, retVal), forceOutput=not kb.wizardMode, bold=True)
 
         debugMsg = "used the given answer"
         logger.debug(debugMsg)
@@ -1030,7 +1033,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             else:
                 options = unicode()
 
-            dataToStdout("\r%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
+            dataToStdout("%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
 
             debugMsg = "used the default behavior, running in batch mode"
             logger.debug(debugMsg)
@@ -1043,7 +1046,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 if conf.get("beep"):
                     beep()
 
-                dataToStdout("\r%s" % message, forceOutput=not kb.wizardMode, bold=True)
+                dataToStdout("%s" % message, forceOutput=not kb.wizardMode, bold=True)
                 kb.prependFlag = False
 
                 retVal = raw_input().strip() or default
