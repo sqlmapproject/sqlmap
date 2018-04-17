@@ -46,7 +46,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-e854bd3a7ce6196a3ee3e3891473435e  lib/core/settings.py
+13d487ed576734ef3178720ec98ec406  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 a35efa7bec9f1e6cedf17c9830a79241  lib/core/target.py
@@ -57,7 +57,7 @@ af2d1810b6a7ebc61689a53c253ddbaa  lib/core/update.py
 e772deb63270375e685fa5a7b775c382  lib/core/wordlist.py
 1e5532ede194ac9c083891c2f02bca93  lib/__init__.py
 7620f1f4b8791e13c7184c06b5421754  lib/parse/banner.py
-f667710f17b8447358ee7508a9d2faf1  lib/parse/cmdline.py
+5e46fac7f824ba8ab8003a1cd47d8af3  lib/parse/cmdline.py
 fb2e2f05dde98caeac6ccf3e67192177  lib/parse/configfile.py
 3794ff139869f5ae8e81cfdbe5714f56  lib/parse/handler.py
 aaad2a0d80f05eaebe52c71519b3dfc7  lib/parse/headers.py
@@ -204,7 +204,7 @@ a3db8618eed5bb2807b6f77605cba9cc  plugins/dbms/sybase/__init__.py
 34d181a7086d6dfc7e72ae5f8a4cfe0f  plugins/generic/connector.py
 e6cd1c5a5244d83396b401f7db43d323  plugins/generic/custom.py
 79c6dbcb7e6ad5e993a44aa52fdc36ed  plugins/generic/databases.py
-a9c8637f0526d751cd1a6a18f91967f5  plugins/generic/entries.py
+4e2b366bb9cfdaaed719b219913357c6  plugins/generic/entries.py
 d82f2c78c1d4d7c6487e94fd3a68a908  plugins/generic/enumeration.py
 0c8abe66a78edca0660bfb8049d109e2  plugins/generic/filesystem.py
 f5d5419efddfe04648ea5e953c650793  plugins/generic/fingerprint.py

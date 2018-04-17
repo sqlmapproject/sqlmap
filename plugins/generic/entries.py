@@ -23,6 +23,7 @@ from lib.core.common import prioritySortColumns
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -184,7 +185,11 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            if Backend.isDbms(DBMS.MSSQL):
+                            if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
+                                warnMsg = "in case of table dumping problems (e.g. column entry order) "
+                                warnMsg += "you are advised to rerun with '--force-pivoting'"
+                                singleTimeWarnMessage(warnMsg)
+
                                 query = rootQuery.blind.count % table
                                 query = agent.whereQuery(query)
 
@@ -327,7 +332,11 @@ class Entries:
                         elif Backend.isDbms(DBMS.INFORMIX):
                             table = "%s:%s" % (conf.db, tbl)
 
-                        if Backend.isDbms(DBMS.MSSQL):
+                        if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
+                            warnMsg = "in case of table dumping problems (e.g. column entry order) "
+                            warnMsg += "you are advised to rerun with '--force-pivoting'"
+                            singleTimeWarnMessage(warnMsg)
+
                             try:
                                 indexRange = getLimitRange(count, plusOne=True)
 
