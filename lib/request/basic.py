@@ -334,7 +334,7 @@ def decodePage(page, contentEncoding, contentType):
 
             kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
 
-            if kb.pageEncoding and kb.pageEncoding.lower() == "utf-8-sig":
+            if (kb.pageEncoding or "").lower() == "utf-8-sig":
                 kb.pageEncoding = "utf-8"
                 if page and page.startswith("\xef\xbb\xbf"):  # Reference: https://docs.python.org/2/library/codecs.html (Note: noticed problems when "utf-8-sig" is left to Python for handling)
                     page = page[3:]
