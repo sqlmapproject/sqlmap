@@ -3893,7 +3893,7 @@ def asciifyUrl(url, forceQuote=False):
         #     urllib.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
         if getUnicode(s).encode("ascii", "replace") != s or forceQuote:
-            return urllib.quote(s.encode(UNICODE_ENCODING), safe=safe)
+            return urllib.quote(s.encode(UNICODE_ENCODING) if isinstance(s, unicode) else s, safe=safe)
         return s
 
     username = quote(parts.username, '')
