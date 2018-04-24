@@ -430,8 +430,10 @@ class Connect(object):
                     method = unicodeencode(method)
                     req = MethodRequest(url, post, headers)
                     req.set_method(method)
-                else:
+                elif url is not None:
                     req = urllib2.Request(url, post, headers)
+                else:
+                    return None, None, None
 
                 requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in req.header_items()])
 
