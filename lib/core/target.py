@@ -230,7 +230,7 @@ def _setRequestParams():
             if kb.customInjectionMark not in conf.data:  # in case that no usable parameter values has been found
                 conf.parameters[PLACE.POST] = conf.data
 
-    kb.processUserMarks = True if (kb.postHint and kb.customInjectionMark in conf.data) else kb.processUserMarks
+    kb.processUserMarks = True if (kb.postHint and kb.customInjectionMark in (conf.data or "")) else kb.processUserMarks
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint and kb.customInjectionMark not in (conf.data or "") and conf.url.startswith("http"):
         warnMsg = "you've provided target URL without any GET "
