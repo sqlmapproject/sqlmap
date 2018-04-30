@@ -675,13 +675,10 @@ class Metasploit:
             written = self.writeFile(self.shellcodeexecLocal, self.shellcodeexecRemote, "binary", forceCheck=True)
 
         if written is not True:
-            errMsg = "there has been a problem uploading shellcodeexec, it "
+            errMsg = "there has been a problem uploading shellcodeexec. It "
             errMsg += "looks like the binary file has not been written "
             errMsg += "on the database underlying file system or an AV has "
-            errMsg += "flagged it as malicious and removed it. In such a case "
-            errMsg += "it is recommended to recompile shellcodeexec with "
-            errMsg += "slight modification to the source code or pack it "
-            errMsg += "with an obfuscator software"
+            errMsg += "flagged it as malicious and removed it"
             logger.error(errMsg)
 
             return False
