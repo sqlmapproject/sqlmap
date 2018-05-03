@@ -1522,18 +1522,19 @@ def checkNullConnection():
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
-    if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
-        try:
-            debugMsg = "resolving hostname '%s'" % conf.hostname
-            logger.debug(debugMsg)
-            socket.getaddrinfo(conf.hostname, None)
-        except socket.gaierror:
-            errMsg = "host '%s' does not exist" % conf.hostname
-            raise SqlmapConnectionException(errMsg)
-        except socket.error, ex:
-            errMsg = "problem occurred while "
-            errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
-            raise SqlmapConnectionException(errMsg)
+    if not re.search(r"\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z", conf.hostname):
+        if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
+            try:
+                debugMsg = "resolving hostname '%s'" % conf.hostname
+                logger.debug(debugMsg)
+                socket.getaddrinfo(conf.hostname, None)
+            except socket.gaierror:
+                errMsg = "host '%s' does not exist" % conf.hostname
+                raise SqlmapConnectionException(errMsg)
+            except socket.error, ex:
+                errMsg = "problem occurred while "
+                errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
+                raise SqlmapConnectionException(errMsg)
 
     if not suppressOutput and not conf.dummy and not conf.offline:
         infoMsg = "testing connection to the target URL"
