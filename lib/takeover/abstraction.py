@@ -27,7 +27,6 @@ from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import XP_cmdshell
 
-
 class Abstraction(Web, UDF, XP_cmdshell):
     """
     This class defines an abstraction layer for OS takeover functionalities

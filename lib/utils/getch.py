@@ -22,7 +22,6 @@ class _Getch(object):
     def __call__(self):
         return self.impl()
 
-
 class _GetchUnix(object):
     def __init__(self):
         __import__("tty")
@@ -41,7 +40,6 @@ class _GetchUnix(object):
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
-
 class _GetchWindows(object):
     def __init__(self):
         __import__("msvcrt")
@@ -49,7 +47,6 @@ class _GetchWindows(object):
     def __call__(self):
         import msvcrt
         return msvcrt.getch()
-
 
 class _GetchMacCarbon(object):
     """
@@ -78,6 +75,5 @@ class _GetchMacCarbon(object):
             #
             (what, msg, when, where, mod) = Carbon.Evt.GetNextEvent(0x0008)[1]
             return chr(msg & 0x000000FF)
-
 
 getch = _Getch()

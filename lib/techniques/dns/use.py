@@ -33,7 +33,6 @@ from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 
-
 def dnsUse(payload, expression):
     """
     Retrieve the output of a SQL query taking advantage of the DNS

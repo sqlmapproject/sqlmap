@@ -120,7 +120,6 @@ from lib.request.methodrequest import MethodRequest
 from thirdparty.odict.odict import OrderedDict
 from thirdparty.socks.socks import ProxyError
 
-
 class Connect(object):
     """
     This class defines methods used to perform HTTP requests

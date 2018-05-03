@@ -36,7 +36,6 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
 from thirdparty.socks import socks
 
-
 def _search(dork):
     """
     This method performs the effective search on Google providing

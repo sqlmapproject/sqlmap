@@ -13,7 +13,6 @@ from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
 
-
 def headersParser(headers):
     """
     This function calls a class that parses the input HTTP headers to

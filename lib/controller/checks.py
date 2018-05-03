@@ -1562,7 +1562,6 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-
         threadData = getCurrentThreadData()
 
         if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:

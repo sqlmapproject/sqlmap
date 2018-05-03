@@ -108,7 +108,6 @@ def checkEnvironment():
         for _ in ("SqlmapBaseException", "SqlmapShellQuitException", "SqlmapSilentQuitException", "SqlmapUserQuitException"):
             globals()[_] = getattr(sys.modules["lib.core.exception"], _)
 
-
 def main():
     """
     Main function of sqlmap when running from command line.

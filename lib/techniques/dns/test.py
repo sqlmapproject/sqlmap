@@ -14,7 +14,6 @@ from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.techniques.dns.use import dnsUse
 
-
 def dnsTest(payload):
     logger.info("testing for data retrieval through DNS channel")
 

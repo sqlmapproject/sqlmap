@@ -104,9 +104,7 @@ class Database(object):
 
     def init(self):
         self.execute("CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, time TEXT, level TEXT, message TEXT)")
-
         self.execute("CREATE TABLE data(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, status INTEGER, content_type INTEGER, value TEXT)")
-
         self.execute("CREATE TABLE errors(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, error TEXT)")
 
 class Task(object):
@@ -198,7 +196,6 @@ class Task(object):
 
     def engine_has_terminated(self):
         return isinstance(self.engine_get_returncode(), int)
-
 
 # Wrapper functions for sqlmap engine
 class StdDbOut(object):
@@ -573,7 +570,6 @@ def scan_data(taskid):
     logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
-
 # Functions to handle scans' logs
 @get("/scan/<taskid>/log/<start>/<end>")
 def scan_log_limited(taskid, start, end):
@@ -601,7 +597,6 @@ def scan_log_limited(taskid, start, end):
     logger.debug("[%s] Retrieved scan log messages subset" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
-
 @get("/scan/<taskid>/log")
 def scan_log(taskid):
     """
@@ -620,7 +615,6 @@ def scan_log(taskid):
 
     logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
-
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
@@ -647,7 +641,6 @@ def download(taskid, target, filename):
     else:
         logger.warning("[%s] File does not exist %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
-
 
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None):
     """

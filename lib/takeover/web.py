@@ -53,7 +53,6 @@ from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
 from thirdparty.oset.pyoset import oset
 
-
 class Web:
     """
     This class defines web-oriented OS takeover functionalities for
