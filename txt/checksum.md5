@@ -32,7 +32,7 @@ f42e346d33199b4f663cff6efe2be775  lib/core/common.py
 0d082da16c388b3445e656e0760fb582  lib/core/convert.py
 9f87391b6a3395f7f50830b391264f27  lib/core/data.py
 72016ea5c994a711a262fd64572a0fcd  lib/core/datatype.py
-04638422b6ad1613238a9abf4fdf6491  lib/core/decorators.py
+93567739d591829c1fb9ff77a50bcc87  lib/core/decorators.py
 fbb55cc6100318ff922957b6577dc58f  lib/core/defaults.py
 da98f5288aad57855c6d287ba3b397a1  lib/core/dicts.py
 9ea8a043030796e6faef7f7e957729d5  lib/core/dump.py
@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-0f03fed8767ab10c9bf9789d4deb0bde  lib/core/settings.py
+8a8b9515cd98eb1e1b0701baf84e9d35  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
