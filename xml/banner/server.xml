@@ -89,6 +89,10 @@
         <info type="Linux" distrib="CentOS" release="6.8"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.6 \(CentOS\)">
+        <info type="Linux" distrib="CentOS" release="7-1708"/>
+    </regexp>
+
     <!-- Apache: Debian -->
 
     <regexp value="Apache/1\.0\.5 \(Unix\) Debian/GNU">
@@ -155,8 +159,8 @@
         <info type="Linux" distrib="Debian" release="8.0" codename="jessie"/>
     </regexp>
 
-    <regexp value="Apache/2\.4\.18 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="9.0" codename="jessie (testing)"/>
+    <regexp value="Apache/2\.4\.25 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="9.0" codename="stretch"/>
     </regexp>
 
     <!-- Apache: Fedora -->
@@ -273,6 +277,22 @@
         <info type="Linux" distrib="Fedora" release="23"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.18 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="24"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.23 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="25"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.25 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="26"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.28 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="27"/>
+    </regexp>
+
     <!-- Apache: FreeBSD -->
 
     <regexp value="Apache/2\.0\.16 \(FreeBSD\)">
@@ -377,6 +397,14 @@
 
     <regexp value="Apache/2\.4\.16 \(FreeBSD\)">
         <info type="FreeBSD" release="10.3"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.27 \(FreeBSD\)">
+        <info type="FreeBSD" release="10.4"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.26 \(FreeBSD\)">
+        <info type="FreeBSD" release="11.1"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
@@ -678,6 +706,14 @@
         <info type="Linux" distrib="SuSE" release="13.2"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.16 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="42.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.23 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="42.2|42.3"/>
+    </regexp>
+
     <!-- Apache: Ubuntu -->
 
     <regexp value="Apache/2\.0\.50 \(Ubuntu\)">
@@ -753,12 +789,26 @@
     </regexp>
 
     <regexp value="Apache/2\.4\.18 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="16.04" codename="xenial"/>
+        <info type="Linux" distrib="Ubuntu" release="16.04|16.10" codename="xenial|yakkety"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.25 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="17.04" codename="zesty"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.27 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="17.10" codename="artful"/>
     </regexp>
 
     <!-- Nginx -->
 
     <regexp value="nginx/([\w\.]+)">
         <info technology="Nginx"/>
+    </regexp>
+
+    <!-- Google Web Server -->
+
+    <regexp value="GWS/([\w\.]+)">
+        <info technology="Google Web Server"/>
     </regexp>
 </root>

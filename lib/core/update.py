@@ -5,21 +5,27 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import glob
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
+import urllib
+import zipfile
 
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import pollProcess
+from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.revision import getRevisionNumber
 from lib.core.settings import GIT_REPOSITORY
 from lib.core.settings import IS_WIN
+from lib.core.settings import ZIPBALL_PAGE
 from lib.core.settings import UNICODE_ENCODING
 
 def update():
@@ -29,9 +35,54 @@ def update():
     success = False
 
     if not os.path.exists(os.path.join(paths.SQLMAP_ROOT_PATH, ".git")):
-        errMsg = "not a git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
-        errMsg += "from GitHub (e.g. 'git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap')"
-        logger.error(errMsg)
+        warnMsg = "not a git repository. It is recommended to clone the 'sqlmapproject/sqlmap' repository "
+        warnMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
+        logger.warn(warnMsg)
+
+        message = "do you want to try to fetch the latest 'zipball' from repository and extract it (experimental) ? [y/N]"
+        if readInput(message, default='N', boolean=True):
+            directory = os.path.abspath(paths.SQLMAP_ROOT_PATH)
+
+            try:
+                open(os.path.join(directory, "sqlmap.py"), "w+b")
+            except Exception, ex:
+                errMsg = "unable to update content of directory '%s' ('%s')" % (directory, getSafeExString(ex))
+                logger.error(errMsg)
+            else:
+                for wildcard in ('*', ".*"):
+                    for _ in glob.glob(os.path.join(directory, wildcard)):
+                        try:
+                            if os.path.isdir(_):
+                                shutil.rmtree(_)
+                            else:
+                                os.remove(_)
+                        except:
+                            pass
+
+                if glob.glob(os.path.join(directory, '*')):
+                    errMsg = "unable to clear the content of directory '%s'" % directory
+                    logger.error(errMsg)
+                else:
+                    try:
+                        archive = urllib.urlretrieve(ZIPBALL_PAGE)[0]
+
+                        with zipfile.ZipFile(archive) as f:
+                            for info in f.infolist():
+                                info.filename = re.sub(r"\Asqlmap[^/]+", "", info.filename)
+                                if info.filename:
+                                    f.extract(info, directory)
+
+                        filepath = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "core", "settings.py")
+                        if os.path.isfile(filepath):
+                            with open(filepath, "rb") as f:
+                                version = re.search(r"(?m)^VERSION\s*=\s*['\"]([^'\"]+)", f.read()).group(1)
+                                logger.info("updated to the latest version '%s#dev'" % version)
+                                success = True
+                    except Exception, ex:
+                        logger.error("update could not be completed ('%s')" % getSafeExString(ex))
+                    else:
+                        if not success:
+                            logger.error("update could not be completed")
     else:
         infoMsg = "updating sqlmap to the latest development revision from the "
         infoMsg += "GitHub repository"
@@ -56,7 +107,7 @@ def update():
         else:
             if "Not a git repository" in stderr:
                 errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
-                errMsg += "from GitHub (e.g. 'git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap')"
+                errMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
                 logger.error(errMsg)
             else:
                 logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", stderr).strip())
@@ -69,7 +120,7 @@ def update():
             infoMsg += "download the latest snapshot from "
             infoMsg += "https://github.com/sqlmapproject/sqlmap/downloads"
         else:
-            infoMsg = "for Linux platform it's required "
+            infoMsg = "for Linux platform it's recommended "
             infoMsg += "to install a standard 'git' package (e.g.: 'sudo apt-get install git')"
 
         logger.info(infoMsg)

@@ -94,7 +94,7 @@ class Database(object):
                 else:
                     self.cursor.execute(statement)
             except sqlite3.OperationalError, ex:
-                if not "locked" in getSafeExString(ex):
+                if "locked" not in getSafeExString(ex):
                     raise
             else:
                 break
@@ -103,22 +103,9 @@ class Database(object):
             return self.cursor.fetchall()
 
     def init(self):
-        self.execute("CREATE TABLE logs("
-                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                  "taskid INTEGER, time TEXT, "
-                  "level TEXT, message TEXT"
-                  ")")
-
-        self.execute("CREATE TABLE data("
-                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                  "taskid INTEGER, status INTEGER, "
-                  "content_type INTEGER, value TEXT"
-                  ")")
-
-        self.execute("CREATE TABLE errors("
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    "taskid INTEGER, error TEXT"
-                    ")")
+        self.execute("CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, time TEXT, level TEXT, message TEXT)")
+        self.execute("CREATE TABLE data(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, status INTEGER, content_type INTEGER, value TEXT)")
+        self.execute("CREATE TABLE errors(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, error TEXT)")
 
 class Task(object):
     def __init__(self, taskid, remote_addr):
@@ -210,7 +197,6 @@ class Task(object):
     def engine_has_terminated(self):
         return isinstance(self.engine_get_returncode(), int)
 
-
 # Wrapper functions for sqlmap engine
 class StdDbOut(object):
     def __init__(self, taskid, messagetype="stdout"):
@@ -277,7 +263,7 @@ def setRestAPILog():
             conf.databaseCursor = Database(conf.database)
             conf.databaseCursor.connect("client")
         except sqlite3.OperationalError, ex:
-            raise SqlmapConnectionException, "%s ('%s')" % (ex, conf.database)
+            raise SqlmapConnectionException("%s ('%s')" % (ex, conf.database))
 
         # Set a logging handler that writes log messages to a IPC database
         logger.removeHandler(LOGGER_HANDLER)
@@ -584,7 +570,6 @@ def scan_data(taskid):
     logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
-
 # Functions to handle scans' logs
 @get("/scan/<taskid>/log/<start>/<end>")
 def scan_log_limited(taskid, start, end):
@@ -612,7 +597,6 @@ def scan_log_limited(taskid, start, end):
     logger.debug("[%s] Retrieved scan log messages subset" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
-
 @get("/scan/<taskid>/log")
 def scan_log(taskid):
     """
@@ -631,7 +615,6 @@ def scan_log(taskid):
 
     logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
-
 
 # Function to handle files inside the output directory
 @get("/download/<taskid>/<target>/<filename:path>")
@@ -658,7 +641,6 @@ def download(taskid, target, filename):
     else:
         logger.warning("[%s] File does not exist %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
-
 
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None):
     """
@@ -860,7 +842,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             return
 
         elif command in ("help", "?"):
-            msg =  "help           Show this help message\n"
+            msg = "help           Show this help message\n"
             msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
             msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
             msg += "data           Retrieve and show data for current task\n"

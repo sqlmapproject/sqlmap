@@ -27,7 +27,6 @@ from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import XP_cmdshell
 
-
 class Abstraction(Web, UDF, XP_cmdshell):
     """
     This class defines an abstraction layer for OS takeover functionalities
@@ -172,9 +171,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
                 inject.goStacked(expression)
 
         # TODO: add support for PostgreSQL
-        #elif Backend.isDbms(DBMS.PGSQL):
-        #    expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
-        #    inject.goStacked(expression)
+        # elif Backend.isDbms(DBMS.PGSQL):
+        #     expression = getSQLSnippet(DBMS.PGSQL, "configure_dblink", ENABLE="1")
+        #     inject.goStacked(expression)
 
     def initEnv(self, mandatory=True, detailed=False, web=False, forceInit=False):
         self._initRunAs()

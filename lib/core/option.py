@@ -337,7 +337,7 @@ def _feedTargetsDict(reqFile, addedTargetUrls):
 
                 if not host:
                     errMsg = "invalid format of a request file"
-                    raise SqlmapSyntaxException, errMsg
+                    raise SqlmapSyntaxException(errMsg)
 
                 if not url.startswith("http"):
                     url = "%s://%s:%s%s" % (scheme or "http", host, port or "80", url)
@@ -402,7 +402,7 @@ def _loadQueries():
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (paths.QUERIES_XML, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
-        raise SqlmapInstallationException, errMsg
+        raise SqlmapInstallationException(errMsg)
 
     for node in tree.findall("*"):
         queries[node.attrib['value']] = iterate(node)
@@ -687,7 +687,7 @@ def _setMetasploit():
 
     if IS_WIN:
         try:
-            import win32file
+            __import__("win32file")
         except ImportError:
             errMsg = "sqlmap requires third-party module 'pywin32' "
             errMsg += "in order to use Metasploit functionalities on "
@@ -700,7 +700,7 @@ def _setMetasploit():
                 retVal = None
 
                 try:
-                    from  _winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
+                    from _winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
                     _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
                     _ = OpenKey(_, key)
                     retVal = QueryValueEx(_, value)[0]
@@ -918,7 +918,7 @@ def _setTamperingFunctions():
             dirname, filename = os.path.split(script)
             dirname = os.path.abspath(dirname)
 
-            infoMsg = "loading tamper script '%s'" % filename[:-3]
+            infoMsg = "loading tamper module '%s'" % filename[:-3]
             logger.info(infoMsg)
 
             if not os.path.exists(os.path.join(dirname, "__init__.py")):
@@ -932,7 +932,7 @@ def _setTamperingFunctions():
             try:
                 module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
             except Exception, ex:
-                raise SqlmapSyntaxException("cannot import tamper script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
+                raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
 
@@ -962,7 +962,12 @@ def _setTamperingFunctions():
 
                     break
                 elif name == "dependencies":
-                    function()
+                    try:
+                        function()
+                    except Exception, ex:
+                        errMsg = "error occurred while checking dependencies "
+                        errMsg += "for tamper module '%s' ('%s')" % (filename[:-3], getSafeExString(ex))
+                        raise SqlmapGenericException(errMsg)
 
             if not found:
                 errMsg = "missing function 'tamper(payload, **kwargs)' "
@@ -1128,7 +1133,7 @@ def _setHTTPHandlers():
             _ = urlparse.urlsplit(conf.proxy)
         except Exception, ex:
             errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
 
         hostnamePort = _.netloc.split(":")
 
@@ -1255,7 +1260,7 @@ def _setSafeVisit():
                 kb.safeReq.post = None
         else:
             errMsg = "invalid format of a safe request file"
-            raise SqlmapSyntaxException, errMsg
+            raise SqlmapSyntaxException(errMsg)
     else:
         if not re.search(r"\Ahttp[s]*://", conf.safeUrl):
             if ":443/" in conf.safeUrl:
@@ -1580,7 +1585,7 @@ def _createTemporaryDirectory():
         except (OSError, IOError), ex:
             errMsg = "there has been a problem while accessing "
             errMsg += "temporary directory location(s) ('%s')" % getSafeExString(ex)
-            raise SqlmapSystemException, errMsg
+            raise SqlmapSystemException(errMsg)
     else:
         try:
             if not os.path.isdir(tempfile.gettempdir()):
@@ -1607,7 +1612,7 @@ def _createTemporaryDirectory():
         except (OSError, IOError, WindowsError), ex:
             errMsg = "there has been a problem while setting "
             errMsg += "temporary directory location ('%s')" % getSafeExString(ex)
-            raise SqlmapSystemException, errMsg
+            raise SqlmapSystemException(errMsg)
 
 def _cleanupOptions():
     """
@@ -1945,6 +1950,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.forcePartialUnion = False
     kb.forceWhere = None
     kb.futileUnion = None
+    kb.heavilyDynamic = False
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicExtendedDbms = None
@@ -2316,7 +2322,6 @@ def _setTorHttpProxySettings():
         errMsg = "can't establish connection with the Tor HTTP proxy. "
         errMsg += "Please make sure that you have Tor (bundle) installed and setup "
         errMsg += "so you could be able to successfully use switch '--tor' "
-
         raise SqlmapConnectionException(errMsg)
 
     if not conf.checkTor:
@@ -2337,7 +2342,6 @@ def _setTorSocksProxySettings():
         errMsg = "can't establish connection with the Tor SOCKS proxy. "
         errMsg += "Please make sure that you have Tor service installed and setup "
         errMsg += "so you could be able to successfully use switch '--tor' "
-
         raise SqlmapConnectionException(errMsg)
 
     # SOCKS5 to prevent DNS leaks (http://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
@@ -2350,7 +2354,7 @@ def _checkWebSocket():
             from websocket import ABNF
         except ImportError:
             errMsg = "sqlmap requires third-party module 'websocket-client' "
-            errMsg += "in order to use WebSocket funcionality"
+            errMsg += "in order to use WebSocket functionality"
             raise SqlmapMissingDependence(errMsg)
 
 def _checkTor():
@@ -2542,11 +2546,11 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.checkTor and not any((conf.tor, conf.proxy)):
-        errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address using Tor)"
+        errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address of Tor service)"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.torPort is not None and not (isinstance(conf.torPort, int) and conf.torPort >= 0 and conf.torPort <= 65535):
-        errMsg = "value for option '--tor-port' must be in range 0-65535"
+        errMsg = "value for option '--tor-port' must be in range [0, 65535]"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.torType not in getPublicTypeMembers(PROXY_TYPE, True):

@@ -135,7 +135,6 @@ def postgres_passwd(password, username, uppercase=False):
     'md599e5ea7a6f7c3269995cba3927fd0093'
     """
 
-
     if isinstance(username, unicode):
         username = unicode.encode(username, UNICODE_ENCODING)
 
@@ -380,7 +379,7 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     ctx = password + magic + salt
     final = md5(password + salt + password).digest()
 
-    for pl in xrange(len(password),0,-16):
+    for pl in xrange(len(password), 0, -16):
         if pl > 16:
             ctx = ctx + final[:16]
         else:
@@ -389,7 +388,7 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     i = len(password)
     while i:
         if i & 1:
-            ctx = ctx + chr(0)  #if ($i & 1) { $ctx->add(pack("C", 0)); }
+            ctx = ctx + chr(0)  # if ($i & 1) { $ctx->add(pack("C", 0)); }
         else:
             ctx = ctx + password[0]
         i = i >> 1
@@ -417,7 +416,7 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
 
         final = md5(ctx1).digest()
 
-    hash_ = _encode64((int(ord(final[0])) << 16) | (int(ord(final[6])) << 8) | (int(ord(final[12]))),4)
+    hash_ = _encode64((int(ord(final[0])) << 16) | (int(ord(final[6])) << 8) | (int(ord(final[12]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[1])) << 16) | (int(ord(final[7])) << 8) | (int(ord(final[13]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[2])) << 16) | (int(ord(final[8])) << 8) | (int(ord(final[14]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[3])) << 16) | (int(ord(final[9])) << 8) | (int(ord(final[15]))), 4)
@@ -522,38 +521,38 @@ def wordpress_passwd(password, salt, count, prefix, **kwargs):
     return "%s%s" % (prefix, _encode64(hash_, 16))
 
 __functions__ = {
-                    HASH.MYSQL: mysql_passwd,
-                    HASH.MYSQL_OLD: mysql_old_passwd,
-                    HASH.POSTGRES: postgres_passwd,
-                    HASH.MSSQL: mssql_passwd,
-                    HASH.MSSQL_OLD: mssql_old_passwd,
-                    HASH.MSSQL_NEW: mssql_new_passwd,
-                    HASH.ORACLE: oracle_passwd,
-                    HASH.ORACLE_OLD: oracle_old_passwd,
-                    HASH.MD5_GENERIC: md5_generic_passwd,
-                    HASH.SHA1_GENERIC: sha1_generic_passwd,
-                    HASH.SHA224_GENERIC: sha224_generic_passwd,
-                    HASH.SHA256_GENERIC: sha256_generic_passwd,
-                    HASH.SHA384_GENERIC: sha384_generic_passwd,
-                    HASH.SHA512_GENERIC: sha512_generic_passwd,
-                    HASH.CRYPT_GENERIC: crypt_generic_passwd,
-                    HASH.JOOMLA: joomla_passwd,
-                    HASH.DJANGO_MD5: django_md5_passwd,
-                    HASH.DJANGO_SHA1: django_sha1_passwd,
-                    HASH.WORDPRESS: wordpress_passwd,
-                    HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
-                    HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
-                    HASH.APACHE_SHA1: apache_sha1_passwd,
-                    HASH.VBULLETIN: vbulletin_passwd,
-                    HASH.VBULLETIN_OLD: vbulletin_passwd,
-                    HASH.SSHA: ssha_passwd,
-                    HASH.SSHA256: ssha256_passwd,
-                    HASH.SSHA512: ssha512_passwd,
-                    HASH.MD5_BASE64: md5_generic_passwd,
-                    HASH.SHA1_BASE64: sha1_generic_passwd,
-                    HASH.SHA256_BASE64: sha256_generic_passwd,
-                    HASH.SHA512_BASE64: sha512_generic_passwd,
-                }
+    HASH.MYSQL: mysql_passwd,
+    HASH.MYSQL_OLD: mysql_old_passwd,
+    HASH.POSTGRES: postgres_passwd,
+    HASH.MSSQL: mssql_passwd,
+    HASH.MSSQL_OLD: mssql_old_passwd,
+    HASH.MSSQL_NEW: mssql_new_passwd,
+    HASH.ORACLE: oracle_passwd,
+    HASH.ORACLE_OLD: oracle_old_passwd,
+    HASH.MD5_GENERIC: md5_generic_passwd,
+    HASH.SHA1_GENERIC: sha1_generic_passwd,
+    HASH.SHA224_GENERIC: sha224_generic_passwd,
+    HASH.SHA256_GENERIC: sha256_generic_passwd,
+    HASH.SHA384_GENERIC: sha384_generic_passwd,
+    HASH.SHA512_GENERIC: sha512_generic_passwd,
+    HASH.CRYPT_GENERIC: crypt_generic_passwd,
+    HASH.JOOMLA: joomla_passwd,
+    HASH.DJANGO_MD5: django_md5_passwd,
+    HASH.DJANGO_SHA1: django_sha1_passwd,
+    HASH.WORDPRESS: wordpress_passwd,
+    HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
+    HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
+    HASH.APACHE_SHA1: apache_sha1_passwd,
+    HASH.VBULLETIN: vbulletin_passwd,
+    HASH.VBULLETIN_OLD: vbulletin_passwd,
+    HASH.SSHA: ssha_passwd,
+    HASH.SSHA256: ssha256_passwd,
+    HASH.SSHA512: ssha512_passwd,
+    HASH.MD5_BASE64: md5_generic_passwd,
+    HASH.SHA1_BASE64: sha1_generic_passwd,
+    HASH.SHA256_BASE64: sha256_generic_passwd,
+    HASH.SHA512_BASE64: sha512_generic_passwd,
+}
 
 def storeHashesToFile(attack_dict):
     if not attack_dict:

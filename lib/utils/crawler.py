@@ -167,7 +167,7 @@ def crawl(target):
             if not conf.bulkFile:
                 logger.info("searching for links with depth %d" % (i + 1))
 
-            runThreads(numThreads, crawlThread, threadChoice=(i>0))
+            runThreads(numThreads, crawlThread, threadChoice=(i > 0))
             clearConsoleLine(True)
 
             if threadData.shared.deeper:

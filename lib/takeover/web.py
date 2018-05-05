@@ -53,7 +53,6 @@ from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
 from thirdparty.oset.pyoset import oset
 
-
 class Web:
     """
     This class defines web-oriented OS takeover functionalities for
@@ -112,10 +111,10 @@ class Web:
 
         if self.webApi in getPublicTypeMembers(WEB_API, True):
             multipartParams = {
-                                "upload":    "1",
-                                "file":      stream,
-                                "uploadDir": directory,
-                              }
+                "upload": "1",
+                "file": stream,
+                "uploadDir": directory,
+            }
 
             if self.webApi == WEB_API.ASPX:
                 multipartParams['__EVENTVALIDATION'] = kb.data.__EVENTVALIDATION

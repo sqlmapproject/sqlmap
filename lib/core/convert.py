@@ -80,7 +80,7 @@ def base64unpickle(value, unsafe=False):
         if len(self.stack) > 1:
             func = self.stack[-2]
             if func not in PICKLE_REDUCE_WHITELIST:
-                raise Exception, "abusing reduce() is bad, Mkay!"
+                raise Exception("abusing reduce() is bad, Mkay!")
         self.load_reduce()
 
     def loads(str):
@@ -94,7 +94,7 @@ def base64unpickle(value, unsafe=False):
 
     try:
         retVal = loads(base64decode(value))
-    except TypeError: 
+    except TypeError:
         retVal = loads(base64decode(bytes(value)))
 
     return retVal
@@ -174,7 +174,7 @@ def htmlunescape(value):
             pass
     return retVal
 
-def singleTimeWarnMessage(message):  # Cross-linked function
+def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.write(message)
     sys.stdout.write("\n")
     sys.stdout.flush()

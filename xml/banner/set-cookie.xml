@@ -11,7 +11,7 @@
         <info technology="ASP" type="Windows"/>
     </regexp>
 
-    <regexp value="ASP\.NET_SessionId">
+    <regexp value="ASP\.NET_SessionId|\.ASPXAUTH">
         <info technology="ASP.NET" type="Windows"/>
     </regexp>
 

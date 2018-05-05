@@ -27,6 +27,10 @@
         <info sp="4"/>
     </regexp>
 
+    <regexp value="Service Pack 5">
+        <info sp="5"/>
+    </regexp>
+
     <!-- Reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx -->
 
     <regexp value="Windows.*10\.0">

@@ -27,6 +27,7 @@ from lib.core.common import wasLastResponseDBMSError
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import PAYLOAD
 from lib.core.settings import LIMITED_ROWS_TEST_NUMBER
@@ -48,13 +49,14 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
     """
     retVal = None
 
-    def _orderByTechnique(lowerCount, upperCount):
+    @stackedmethod
+    def _orderByTechnique(lowerCount=None, upperCount=None):
         def _orderByTest(cols):
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
-            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order by", "unknown column", "failed")) and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I)
+            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order by", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
 
         if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
             infoMsg = "'ORDER BY' technique appears to be usable. "
@@ -89,7 +91,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
         if lowerCount == 1 or conf.uCols:
-            found = kb.orderByColumns or _orderByTechnique(lowerCount, upperCount)
+            found = kb.orderByColumns or (_orderByTechnique(lowerCount, upperCount) if conf.uCols else _orderByTechnique())
             if found:
                 kb.orderByColumns = found
                 infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
@@ -142,14 +144,16 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
             elif abs(max_ - min_) >= MIN_STATISTICAL_RANGE:
                     deviation = stdev(ratios)
-                    lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
 
-                    if min_ < lower:
-                        retVal = minItem[0]
+                    if deviation is not None:
+                        lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
 
-                    if max_ > upper:
-                        if retVal is None or abs(max_ - upper) > abs(min_ - lower):
-                            retVal = maxItem[0]
+                        if min_ < lower:
+                            retVal = minItem[0]
+
+                        if max_ > upper:
+                            if retVal is None or abs(max_ - upper) > abs(min_ - lower):
+                                retVal = maxItem[0]
     finally:
         kb.errorIsNone = popValue()
 

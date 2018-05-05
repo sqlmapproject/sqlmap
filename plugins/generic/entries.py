@@ -23,6 +23,7 @@ from lib.core.common import prioritySortColumns
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import singleTimeLogMessage
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
@@ -105,6 +106,9 @@ class Entries:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
 
         for tbl in tblList:
+            if kb.dumpKeyboardInterrupt:
+                break
+
             if conf.exclude and tbl in conf.exclude.split(','):
                 infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 singleTimeLogMessage(infoMsg)
@@ -181,7 +185,11 @@ class Entries:
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl)
 
-                            if Backend.isDbms(DBMS.MSSQL):
+                            if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
+                                warnMsg = "in case of table dumping problems (e.g. column entry order) "
+                                warnMsg += "you are advised to rerun with '--force-pivoting'"
+                                singleTimeWarnMessage(warnMsg)
+
                                 query = rootQuery.blind.count % table
                                 query = agent.whereQuery(query)
 
@@ -324,7 +332,11 @@ class Entries:
                         elif Backend.isDbms(DBMS.INFORMIX):
                             table = "%s:%s" % (conf.db, tbl)
 
-                        if Backend.isDbms(DBMS.MSSQL):
+                        if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
+                            warnMsg = "in case of table dumping problems (e.g. column entry order) "
+                            warnMsg += "you are advised to rerun with '--force-pivoting'"
+                            singleTimeWarnMessage(warnMsg)
+
                             try:
                                 indexRange = getLimitRange(count, plusOne=True)
 
@@ -470,7 +482,7 @@ class Entries:
 
         if kb.data.cachedTables:
             if isinstance(kb.data.cachedTables, list):
-                kb.data.cachedTables = { None: kb.data.cachedTables }
+                kb.data.cachedTables = {None: kb.data.cachedTables}
 
             for db, tables in kb.data.cachedTables.items():
                 conf.db = db

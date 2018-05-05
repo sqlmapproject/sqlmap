@@ -5,7 +5,6 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.data import conf
@@ -64,9 +63,9 @@ class Fingerprint(GenericFingerprint):
             value += DBMS.DB2
             return value
 
-        actVer      = Format.getDbms()
-        blank       = " " * 15
-        value      += "active fingerprint: %s" % actVer
+        actVer = Format.getDbms()
+        blank = " " * 15
+        value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
@@ -127,12 +126,14 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
 
         if result:
-            versions = { "2003": ("5.2", (2, 1)),
+            versions = {
+                "2003": ("5.2", (2, 1)),
                 "2008": ("7.0", (1,)),
                 "2000": ("5.0", (4, 3, 2, 1)),
                 "7": ("6.1", (1, 0)),
                 "XP": ("5.1", (2, 1)),
-                "NT": ("4.0", (6, 5, 4, 3, 2, 1)) }
+                "NT": ("4.0", (6, 5, 4, 3, 2, 1))
+            }
 
             # Get back-end DBMS underlying operating system version
             for version, data in versions.items():

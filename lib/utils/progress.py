@@ -62,8 +62,7 @@ class ProgressBar(object):
         elif numHashes == allFull:
             self._progBar = "[%s]" % ("=" * allFull)
         else:
-            self._progBar = "[%s>%s]" % ("=" * (numHashes - 1),
-                                          " " * (allFull - numHashes))
+            self._progBar = "[%s>%s]" % ("=" * (numHashes - 1), " " * (allFull - numHashes))
 
         # Add the percentage at the beginning of the progress bar
         percentString = getUnicode(percentDone) + "%"

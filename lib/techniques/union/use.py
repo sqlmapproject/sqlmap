@@ -44,6 +44,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapSyntaxException
@@ -89,11 +90,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             # Parse the returned page to get the exact UNION-based
             # SQL injection output
             def _(regex):
-                return reduce(lambda x, y: x if x is not None else y, (\
-                        extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), \
-                        extractRegexResult(regex, removeReflectiveValues(listToStrValue(headers.headers \
-                        if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), \
-                        None)
+                return reduce(lambda x, y: x if x is not None else y, (extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE), extractRegexResult(regex, removeReflectiveValues(listToStrValue((_ for _ in headers.headers if not _.startswith(HTTP_HEADER.URI)) if headers else None), payload, True), re.DOTALL | re.IGNORECASE)), None)
 
             # Automatically patching last char trimming cases
             if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
@@ -236,13 +233,7 @@ def unionUse(expression, unpack=True, dump=False):
     # SQL limiting the query output one entry at a time
     # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
-    if value is None and (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or \
-       kb.forcePartialUnion or \
-       (dump and (conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and \
-       " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() \
-       not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE \
-       and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) \
-       and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+    if value is None and (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or kb.forcePartialUnion or (dump and (conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) and not re.search(SQL_SCALAR_REGEX, expression, re.I):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:

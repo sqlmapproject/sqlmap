@@ -35,6 +35,22 @@
         <info dbms_version="1" type="Linux" distrib="Debian" release="6.0" codename="squeeze"/>
     </regexp>
 
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+wheezy">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="7.0" codename="wheezy"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+jessie">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="8.0" codename="jessie"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+stretch">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="9.0" codename="stretch"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+buster">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="10.0" codename="buster"/>
+    </regexp>
+
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+(sid|unstable)">
         <info dbms_version="1" type="Linux" distrib="Debian" codename="unstable"/>
     </regexp>

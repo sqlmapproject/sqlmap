@@ -142,7 +142,7 @@ def _setRequestParams():
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
-                    conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*"[^"]*)"', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
+                    conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*".+?)"(?<!\\")', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*)\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)((true|false|null))\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     match = re.search(r'(?P<name>[^"]+)"\s*:\s*\[([^\]]+)\]', conf.data)
@@ -230,9 +230,9 @@ def _setRequestParams():
             if kb.customInjectionMark not in conf.data:  # in case that no usable parameter values has been found
                 conf.parameters[PLACE.POST] = conf.data
 
-    kb.processUserMarks = True if (kb.postHint and kb.customInjectionMark in conf.data) else kb.processUserMarks
+    kb.processUserMarks = True if (kb.postHint and kb.customInjectionMark in (conf.data or "")) else kb.processUserMarks
 
-    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint and not kb.customInjectionMark in (conf.data or "") and conf.url.startswith("http"):
+    if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint and kb.customInjectionMark not in (conf.data or "") and conf.url.startswith("http"):
         warnMsg = "you've provided target URL without any GET "
         warnMsg += "parameters (e.g. 'http://www.site.com/article.php?id=1') "
         warnMsg += "and without providing any POST parameters "
@@ -377,7 +377,7 @@ def _setRequestParams():
                 if condition:
                     conf.parameters[PLACE.CUSTOM_HEADER] = str(conf.httpHeaders)
                     conf.paramDict[PLACE.CUSTOM_HEADER] = {httpHeader: "%s,%s%s" % (httpHeader, headerValue, kb.customInjectionMark)}
-                    conf.httpHeaders = [(header, value.replace(kb.customInjectionMark, "")) for header, value in conf.httpHeaders]
+                    conf.httpHeaders = [(_[0], _[1].replace(kb.customInjectionMark, "")) for _ in conf.httpHeaders]
                     testableParameters = True
 
     if not conf.parameters:
@@ -391,7 +391,7 @@ def _setRequestParams():
         raise SqlmapGenericException(errMsg)
 
     if conf.csrfToken:
-        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))) and not re.search(r"\b%s\b" % re.escape(conf.csrfToken), conf.data or "") and not conf.csrfToken in set(_[0].lower() for _ in conf.httpHeaders) and not conf.csrfToken in conf.paramDict.get(PLACE.COOKIE, {}):
+        if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))) and not re.search(r"\b%s\b" % re.escape(conf.csrfToken), conf.data or "") and conf.csrfToken not in set(_[0].lower() for _ in conf.httpHeaders) and conf.csrfToken not in conf.paramDict.get(PLACE.COOKIE, {}):
             errMsg = "anti-CSRF token parameter '%s' not " % conf.csrfToken
             errMsg += "found in provided GET, POST, Cookie or header values"
             raise SqlmapGenericException(errMsg)
@@ -449,13 +449,10 @@ def _resumeHashDBValues():
     conf.tmpPath = conf.tmpPath or hashDBRetrieve(HASHDB_KEYS.CONF_TMP_PATH)
 
     for injection in hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []:
-        if isinstance(injection, InjectionDict) and injection.place in conf.paramDict and \
-            injection.parameter in conf.paramDict[injection.place]:
-
+        if isinstance(injection, InjectionDict) and injection.place in conf.paramDict and injection.parameter in conf.paramDict[injection.place]:
             if not conf.tech or intersect(conf.tech, injection.data.keys()):
                 if intersect(conf.tech, injection.data.keys()):
                     injection.data = dict(_ for _ in injection.data.items() if _[0] in conf.tech)
-
                 if injection not in kb.injections:
                     kb.injections.append(injection)
 
@@ -581,7 +578,7 @@ def _createFilesDir():
 
     if not os.path.isdir(conf.filePath):
         try:
-            os.makedirs(conf.filePath, 0755)
+            os.makedirs(conf.filePath)
         except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
             warnMsg = "unable to create files directory "
@@ -603,7 +600,7 @@ def _createDumpDir():
 
     if not os.path.isdir(conf.dumpPath):
         try:
-            os.makedirs(conf.dumpPath, 0755)
+            os.makedirs(conf.dumpPath)
         except OSError, ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
@@ -624,7 +621,7 @@ def _createTargetDirs():
 
     try:
         if not os.path.isdir(paths.SQLMAP_OUTPUT_PATH):
-            os.makedirs(paths.SQLMAP_OUTPUT_PATH, 0755)
+            os.makedirs(paths.SQLMAP_OUTPUT_PATH)
 
         _ = os.path.join(paths.SQLMAP_OUTPUT_PATH, randomStr())
         open(_, "w+b").close()
@@ -654,7 +651,7 @@ def _createTargetDirs():
 
     try:
         if not os.path.isdir(conf.outputPath):
-            os.makedirs(conf.outputPath, 0755)
+            os.makedirs(conf.outputPath)
     except (OSError, IOError, TypeError), ex:
         try:
             tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")

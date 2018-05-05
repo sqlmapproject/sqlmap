@@ -108,7 +108,7 @@ class Enumeration(GenericEnumeration):
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if  ',' in conf.db:
+            if ',' in conf.db:
                 errMsg = "only one database name is allowed when enumerating "
                 errMsg += "the tables' columns"
                 raise SqlmapMissingMandatoryOptionException(errMsg)
@@ -184,9 +184,7 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[DBMS.MAXDB].columns
 
         for tbl in tblList:
-            if conf.db is not None and len(kb.data.cachedColumns) > 0 \
-              and conf.db in kb.data.cachedColumns and tbl in \
-              kb.data.cachedColumns[conf.db]:
+            if conf.db is not None and len(kb.data.cachedColumns) > 0 and conf.db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[conf.db]:
                 infoMsg = "fetched tables' columns on "
                 infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)

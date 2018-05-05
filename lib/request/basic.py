@@ -61,7 +61,7 @@ def forgeHeaders(items=None, base=None):
         if items[_] is None:
             del items[_]
 
-    headers = OrderedDict(base or conf.httpHeaders)
+    headers = OrderedDict(conf.httpHeaders if base is None else base)
     headers.update(items.items())
 
     class _str(str):
@@ -110,7 +110,9 @@ def forgeHeaders(items=None, base=None):
                         kb.mergeCookies = readInput(message, default='Y', boolean=True)
 
                     if kb.mergeCookies and kb.injection.place != PLACE.COOKIE:
-                        _ = lambda x: re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(getUnicode(cookie.name)), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value))).replace('\\', r'\\'), x)
+                        def _(value):
+                            return re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(getUnicode(cookie.name)), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value))).replace('\\', r'\\'), value)
+
                         headers[HTTP_HEADER.COOKIE] = _(headers[HTTP_HEADER.COOKIE])
 
                         if PLACE.COOKIE in conf.parameters:
@@ -161,7 +163,7 @@ def checkCharEncoding(encoding, warn=True):
         return encoding
 
     # Reference: http://www.destructor.de/charsets/index.htm
-    translate = {"windows-874": "iso-8859-11", "utf-8859-1": "utf8", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8",  "utc8": "utf8", "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1", "iso-8859-0": "iso8859-1", "ansi": "ascii", "gbk2312": "gbk", "windows-31j": "cp932", "en": "us"}
+    translate = {"windows-874": "iso-8859-11", "utf-8859-1": "utf8", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8", "utc8": "utf8", "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1", "iso-8859-0": "iso8859-1", "ansi": "ascii", "gbk2312": "gbk", "windows-31j": "cp932", "en": "us"}
 
     for delimiter in (';', ',', '('):
         if delimiter in encoding:
@@ -332,7 +334,7 @@ def decodePage(page, contentEncoding, contentType):
 
             kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
 
-            if kb.pageEncoding and kb.pageEncoding.lower() == "utf-8-sig":
+            if (kb.pageEncoding or "").lower() == "utf-8-sig":
                 kb.pageEncoding = "utf-8"
                 if page and page.startswith("\xef\xbb\xbf"):  # Reference: https://docs.python.org/2/library/codecs.html (Note: noticed problems when "utf-8-sig" is left to Python for handling)
                     page = page[3:]

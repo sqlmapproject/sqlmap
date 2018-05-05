@@ -88,12 +88,14 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.MSSQL
             logger.info(infoMsg)
 
-            for version, check in (("2000", "HOST_NAME()=HOST_NAME()"), \
-                                    ("2005", "XACT_STATE()=XACT_STATE()"), \
-                                    ("2008", "SYSDATETIME()=SYSDATETIME()"), \
-                                    ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)"), \
-                                    ("2014", "CHARINDEX('12.0.2000',@@version)>0"), \
-                                    ("2016", "ISJSON(NULL) IS NULL")):
+            for version, check in (
+                ("2000", "HOST_NAME()=HOST_NAME()"),
+                ("2005", "XACT_STATE()=XACT_STATE()"),
+                ("2008", "SYSDATETIME()=SYSDATETIME()"),
+                ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)"),
+                ("2014", "CHARINDEX('12.0.2000',@@version)>0"),
+                ("2016", "ISJSON(NULL) IS NULL")
+            ):
                 result = inject.checkBooleanExpression(check)
 
                 if result:
@@ -136,14 +138,16 @@ class Fingerprint(GenericFingerprint):
 
         # Reference: http://en.wikipedia.org/wiki/Comparison_of_Microsoft_Windows_versions
         # http://en.wikipedia.org/wiki/Windows_NT#Releases
-        versions = { "NT": ("4.0", (6, 5, 4, 3, 2, 1)),
-                     "2000": ("5.0", (4, 3, 2, 1)),
-                     "XP": ("5.1", (3, 2, 1)),
-                     "2003": ("5.2", (2, 1)),
-                     "Vista or 2008": ("6.0", (2, 1)),
-                     "7 or 2008 R2": ("6.1", (1, 0)),
-                     "8 or 2012": ("6.2", (0,)),
-                     "8.1 or 2012 R2": ("6.3", (0,)) }
+        versions = {
+            "NT": ("4.0", (6, 5, 4, 3, 2, 1)),
+            "2000": ("5.0", (4, 3, 2, 1)),
+            "XP": ("5.1", (3, 2, 1)),
+            "2003": ("5.2", (2, 1)),
+            "Vista or 2008": ("6.0", (2, 1)),
+            "7 or 2008 R2": ("6.1", (1, 0)),
+            "8 or 2012": ("6.2", (0,)),
+            "8.1 or 2012 R2": ("6.3", (0,))
+        }
 
         # Get back-end DBMS underlying operating system version
         for version, data in versions.items():

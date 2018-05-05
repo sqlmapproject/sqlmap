@@ -596,9 +596,7 @@ def paramToDict(place, parameters=None):
                 testableParameters[parameter] = "=".join(parts[1:])
                 if not conf.multipleTargets and not (conf.csrfToken and parameter == conf.csrfToken):
                     _ = urldecode(testableParameters[parameter], convall=True)
-                    if (_.endswith("'") and _.count("'") == 1
-                      or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _))\
-                      and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
+                    if (_.endswith("'") and _.count("'") == 1 or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _)) and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most likely leftover " % element
                         warnMsg += "chars/statements from manual SQL injection test(s). "
@@ -651,7 +649,7 @@ def paramToDict(place, parameters=None):
                                     message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
                                     message += "is JSON deserializable. Do you want to inject inside? [y/N] "
 
-                                    if not readInput(message, default='N', boolean=True):
+                                    if readInput(message, default='N', boolean=True):
                                         del testableParameters[parameter]
                                         testableParameters.update(candidates)
                                     break
@@ -1017,8 +1015,11 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             elif answer is None and retVal:
                 retVal = "%s,%s" % (retVal, getUnicode(item, UNICODE_ENCODING))
 
+    if message and getattr(LOGGER_HANDLER, "is_tty", False):
+        message = "\r%s" % message
+
     if retVal:
-        dataToStdout("\r%s%s\n" % (message, retVal), forceOutput=not kb.wizardMode, bold=True)
+        dataToStdout("%s%s\n" % (message, retVal), forceOutput=not kb.wizardMode, bold=True)
 
         debugMsg = "used the given answer"
         logger.debug(debugMsg)
@@ -1032,7 +1033,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             else:
                 options = unicode()
 
-            dataToStdout("\r%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
+            dataToStdout("%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
 
             debugMsg = "used the default behavior, running in batch mode"
             logger.debug(debugMsg)
@@ -1045,7 +1046,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 if conf.get("beep"):
                     beep()
 
-                dataToStdout("\r%s" % message, forceOutput=not kb.wizardMode, bold=True)
+                dataToStdout("%s" % message, forceOutput=not kb.wizardMode, bold=True)
                 kb.prependFlag = False
 
                 retVal = raw_input().strip() or default
@@ -1371,7 +1372,7 @@ def parseTargetDirect():
                     raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
-                    import _mssql
+                    __import__("_mssql")
                     import pymssql
 
                     if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
@@ -1381,17 +1382,17 @@ def parseTargetDirect():
                         raise SqlmapMissingDependence(errMsg)
 
                 elif dbmsName == DBMS.MYSQL:
-                    import pymysql
+                    __import__("pymysql")
                 elif dbmsName == DBMS.PGSQL:
-                    import psycopg2
+                    __import__("psycopg2")
                 elif dbmsName == DBMS.ORACLE:
-                    import cx_Oracle
+                    __import__("cx_Oracle")
                 elif dbmsName == DBMS.SQLITE:
-                    import sqlite3
+                    __import__("sqlite3")
                 elif dbmsName == DBMS.ACCESS:
-                    import pyodbc
+                    __import__("pyodbc")
                 elif dbmsName == DBMS.FIREBIRD:
-                    import kinterbasdb
+                    __import__("kinterbasdb")
             except:
                 if _sqlalchemy and data[3] in _sqlalchemy.dialects.__all__:
                     pass
@@ -1419,7 +1420,7 @@ def parseTargetUrl():
         raise SqlmapGenericException(errMsg)
 
     if not re.search(r"^http[s]*://", conf.url, re.I) and not re.search(r"^ws[s]*://", conf.url, re.I):
-        if ":443/" in conf.url:
+        if re.search(r":443\b", conf.url):
             conf.url = "https://%s" % conf.url
         else:
             conf.url = "http://%s" % conf.url
@@ -1445,13 +1446,14 @@ def parseTargetUrl():
     conf.hostname = conf.hostname.strip("[]").replace(kb.customInjectionMark, "")
 
     try:
-        _ = conf.hostname.encode("idna")
-    except LookupError:
-        _ = conf.hostname.encode(UNICODE_ENCODING)
-    except UnicodeError:
-        _ = None
+        conf.hostname.encode("idna")
+        conf.hostname.encode(UNICODE_ENCODING)
+    except (LookupError, UnicodeError):
+        invalid = True
+    else:
+        invalid = False
 
-    if any((_ is None, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
+    if any((invalid, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
         errMsg = "invalid target URL ('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
@@ -1493,6 +1495,23 @@ def parseTargetUrl():
 
     if conf.url != originalUrl:
         kb.originalUrls[conf.url] = originalUrl
+
+def escapeJsonValue(value):
+    """
+    Escapes JSON value (used in payloads)
+
+    # Reference: https://stackoverflow.com/a/16652683
+    """
+
+    retVal = ""
+
+    for char in value:
+        if char < ' ' or char == '"':
+            retVal += json.dumps(char)[1:-1]
+        else:
+            retVal += char
+
+    return retVal
 
 def expandAsteriskForColumns(expression):
     """
@@ -2005,7 +2024,7 @@ def parseXmlFile(xmlFile, handler):
         errMsg = "something appears to be wrong with "
         errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
         errMsg += "sure that you haven't made any changes to it"
-        raise SqlmapInstallationException, errMsg
+        raise SqlmapInstallationException(errMsg)
 
 def getSQLSnippet(dbms, sfile, **variables):
     """
@@ -2536,7 +2555,7 @@ def findMultipartPostBoundary(post):
 
     return retVal
 
-def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, plusspace=True):
+def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, spaceplus=True):
     """
     URL decodes given value
 
@@ -2554,14 +2573,14 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
             pass
         finally:
             if convall:
-                result = urllib.unquote_plus(value) if plusspace else urllib.unquote(value)
+                result = urllib.unquote_plus(value) if spaceplus else urllib.unquote(value)
             else:
                 def _(match):
                     charset = reduce(lambda x, y: x.replace(y, ""), unsafe, string.printable)
                     char = chr(ord(match.group(1).decode("hex")))
                     return char if char in charset else match.group(0)
                 result = value
-                if plusspace:
+                if spaceplus:
                     result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of urllib.unquote_plus in convall case)
                 result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
 
@@ -2663,7 +2682,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
             dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
             dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
-def getPageTemplate(payload, place):  # Cross-linked function
+def getPageTemplate(payload, place):  # Cross-referenced function
     raise NotImplementedError
 
 @cachedmethod
@@ -2996,7 +3015,7 @@ def setOptimize():
     Sets options turned on by switch '-o'
     """
 
-    #conf.predictOutput = True
+    # conf.predictOutput = True
     conf.keepAlive = True
     conf.threads = 3 if conf.threads < 3 else conf.threads
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
@@ -3200,9 +3219,7 @@ def showHttpErrorCodes():
 
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during run:\n"
-        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] \
-          if code in httplib.responses else '?', count) \
-          for code, count in kb.httpErrorCodes.items())
+        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] if code in httplib.responses else '?', count) for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
         if any((str(_).startswith('4') or str(_).startswith('5')) and _ != httplib.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
             msg = "too many 4xx and/or 5xx HTTP error codes "
@@ -3218,8 +3235,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", bu
         return codecs.open(filename, mode, encoding, errors, buffering)
     except IOError:
         errMsg = "there has been a file opening error for filename '%s'. " % filename
-        errMsg += "Please check %s permissions on a file " % ("write" if \
-          mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
+        errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
         errMsg += "and that it's not locked by another process."
         raise SqlmapSystemException(errMsg)
 
@@ -3284,14 +3300,17 @@ def checkIntegrity():
     logger.debug("running code integrity check")
 
     retVal = True
-    for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
-        path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
-        if not os.path.isfile(path):
-            logger.error("missing file detected '%s'" % path)
-            retVal = False
-        elif md5File(path) != checksum:
-            logger.error("wrong checksum of file '%s' detected" % path)
-            retVal = False
+
+    if os.path.isfile(paths.CHECKSUM_MD5):
+        for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
+            path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
+            if not os.path.isfile(path):
+                logger.error("missing file detected '%s'" % path)
+                retVal = False
+            elif md5File(path) != checksum:
+                logger.error("wrong checksum of file '%s' detected" % path)
+                retVal = False
+
     return retVal
 
 def unhandledExceptionMessage():
@@ -3874,7 +3893,7 @@ def asciifyUrl(url, forceQuote=False):
         #     urllib.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
         if getUnicode(s).encode("ascii", "replace") != s or forceQuote:
-            return urllib.quote(s.encode(UNICODE_ENCODING), safe=safe)
+            return urllib.quote(s.encode(UNICODE_ENCODING) if isinstance(s, unicode) else s, safe=safe)
         return s
 
     username = quote(parts.username, '')
@@ -3932,6 +3951,9 @@ def isAdminFromPrivileges(privileges):
 def findPageForms(content, url, raise_=False, addToTargets=False):
     """
     Parses given page content for possible forms
+
+    >>> findPageForms('<html><form action="/input.php" method="POST"><input type="text" name="id" value="1"><input type="submit" value="Submit"></form></html>', '')
+    set([(u'/input.php', 'POST', u'id=1', None, None)])
     """
 
     class _(StringIO):
@@ -3954,8 +3976,6 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     try:
         forms = ParseResponse(response, backwards_compat=False)
-    except (UnicodeError, ValueError):
-        pass
     except ParseError:
         if re.search(r"(?i)<!DOCTYPE html|<html", content or ""):
             warnMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
@@ -3971,6 +3991,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                         raise SqlmapGenericException(errMsg)
                     else:
                         logger.debug(errMsg)
+    except:
+        pass
 
     if forms:
         for form in forms:
@@ -4001,7 +4023,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 url = urldecode(request.get_full_url(), kb.pageEncoding)
                 method = request.get_method()
                 data = request.get_data() if request.has_data() else None
-                data = urldecode(data, kb.pageEncoding, plusspace=False)
+                data = urldecode(data, kb.pageEncoding, spaceplus=False)
 
                 if not data and method and method.upper() == HTTPMETHOD.POST:
                     debugMsg = "invalid POST form with blank data detected"
@@ -4352,7 +4374,9 @@ def prioritySortColumns(columns):
     ['userid', 'name', 'password']
     """
 
-    _ = lambda x: x and "id" in x.lower()
+    def _(column):
+        return column and "id" in column.lower()
+
     return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
 
 def getRequestHeader(request, name):

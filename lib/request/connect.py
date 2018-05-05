@@ -34,6 +34,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import checkSameHost
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import escapeJsonValue
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import findMultipartPostBoundary
@@ -63,6 +64,7 @@ from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import AUTH_TYPE
@@ -117,7 +119,6 @@ from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
 from thirdparty.odict.odict import OrderedDict
 from thirdparty.socks.socks import ProxyError
-
 
 class Connect(object):
     """
@@ -187,13 +188,13 @@ class Connect(object):
 
         if not kb.dnsMode and conn:
             headers = conn.info()
-            if headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate")\
-              or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
+            if kb.pageCompress and headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate") or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
                 retVal = conn.read(MAX_CONNECTION_TOTAL_SIZE)
                 if len(retVal) == MAX_CONNECTION_TOTAL_SIZE:
                     warnMsg = "large compressed response detected. Disabling compression"
                     singleTimeWarnMessage(warnMsg)
                     kb.pageCompress = False
+                    raise SqlmapCompressionException
             else:
                 while True:
                     if not conn:
@@ -241,27 +242,27 @@ class Connect(object):
             kb.requestCounter += 1
             threadData.lastRequestUID = kb.requestCounter
 
-        url = kwargs.get("url",                     None) or conf.url
-        get = kwargs.get("get",                     None)
-        post = kwargs.get("post",                   None)
-        method = kwargs.get("method",               None)
-        cookie = kwargs.get("cookie",               None)
-        ua = kwargs.get("ua",                       None) or conf.agent
-        referer = kwargs.get("referer",             None) or conf.referer
-        host = kwargs.get("host",                   None) or conf.host
-        direct_ = kwargs.get("direct",              False)
-        multipart = kwargs.get("multipart",         None)
-        silent = kwargs.get("silent",               False)
-        raise404 = kwargs.get("raise404",           True)
-        timeout = kwargs.get("timeout",             None) or conf.timeout
-        auxHeaders = kwargs.get("auxHeaders",       None)
-        response = kwargs.get("response",           False)
+        url = kwargs.get("url", None) or conf.url
+        get = kwargs.get("get", None)
+        post = kwargs.get("post", None)
+        method = kwargs.get("method", None)
+        cookie = kwargs.get("cookie", None)
+        ua = kwargs.get("ua", None) or conf.agent
+        referer = kwargs.get("referer", None) or conf.referer
+        host = kwargs.get("host", None) or conf.host
+        direct_ = kwargs.get("direct", False)
+        multipart = kwargs.get("multipart", None)
+        silent = kwargs.get("silent", False)
+        raise404 = kwargs.get("raise404", True)
+        timeout = kwargs.get("timeout", None) or conf.timeout
+        auxHeaders = kwargs.get("auxHeaders", None)
+        response = kwargs.get("response", False)
         ignoreTimeout = kwargs.get("ignoreTimeout", False) or kb.ignoreTimeout or conf.ignoreTimeouts
-        refreshing = kwargs.get("refreshing",       False)
-        retrying = kwargs.get("retrying",           False)
-        crawling = kwargs.get("crawling",           False)
-        checking = kwargs.get("checking",           False)
-        skipRead = kwargs.get("skipRead",           False)
+        refreshing = kwargs.get("refreshing", False)
+        retrying = kwargs.get("retrying", False)
+        crawling = kwargs.get("crawling", False)
+        checking = kwargs.get("checking", False)
+        skipRead = kwargs.get("skipRead", False)
 
         if multipart:
             post = multipart
@@ -346,7 +347,7 @@ class Connect(object):
             requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
-            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host})
+            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host}, base=None if target else {})
 
             if HTTP_HEADER.COOKIE in headers:
                 cookie = headers[HTTP_HEADER.COOKIE]
@@ -428,8 +429,10 @@ class Connect(object):
                     method = unicodeencode(method)
                     req = MethodRequest(url, post, headers)
                     req.set_method(method)
-                else:
+                elif url is not None:
                     req = urllib2.Request(url, post, headers)
+                else:
+                    return None, None, None
 
                 requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in req.header_items()])
 
@@ -494,7 +497,7 @@ class Connect(object):
                     responseHeaders = {}
 
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
-                status = getUnicode(conn.msg) if conn else None
+                status = getUnicode(conn.msg) if conn and getattr(conn, "msg", None) else None
 
             kb.connErrorCounter = 0
 
@@ -577,7 +580,7 @@ class Connect(object):
                 page = page if isinstance(page, unicode) else getUnicode(page)
 
             code = ex.code
-            status = getUnicode(ex.msg)
+            status = getSafeExString(ex)
 
             kb.originalCode = kb.originalCode or code
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
@@ -683,6 +686,9 @@ class Connect(object):
                 status = re.search(r"Handshake status ([\d]{3})", tbMsg)
                 errMsg = "websocket handshake status %s" % status.group(1) if status else "unknown"
                 raise SqlmapConnectionException(errMsg)
+            elif "SqlmapCompressionException" in tbMsg:
+                warnMsg = "problems with response (de)compression"
+                retrying = True
             else:
                 warnMsg = "unable to connect to the target URL"
 
@@ -765,7 +771,8 @@ class Connect(object):
         return page, responseHeaders, code
 
     @staticmethod
-    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True):
+    @stackedmethod
+    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True, disableTampering=False):
         """
         This method calls a function to get the target URL page content
         and returns its page ratio (0 <= ratio <= 1) or a boolean value
@@ -812,7 +819,7 @@ class Connect(object):
                 conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
 
         if payload:
-            if kb.tamperFunctions:
+            if not disableTampering and kb.tamperFunctions:
                 for function in kb.tamperFunctions:
                     try:
                         payload = function(payload=payload, headers=auxHeaders)
@@ -836,16 +843,10 @@ class Connect(object):
                     # with their HTML encoded counterparts
                     payload = payload.replace('>', "&gt;").replace('<', "&lt;")
                 elif kb.postHint == POST_HINT.JSON:
-                    if payload.startswith('"') and payload.endswith('"'):
-                        payload = json.dumps(payload[1:-1])
-                    else:
-                        payload = json.dumps(payload)[1:-1]
+                    payload = escapeJsonValue(payload)
                 elif kb.postHint == POST_HINT.JSON_LIKE:
                     payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
-                    if payload.startswith('"') and payload.endswith('"'):
-                        payload = json.dumps(payload[1:-1])
-                    else:
-                        payload = json.dumps(payload)[1:-1]
+                    payload = escapeJsonValue(payload)
                     payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
                 value = agent.replacePayload(value, payload)
             else:
@@ -861,9 +862,9 @@ class Connect(object):
                             skip = True
 
                     if not skip:
-                        spaceplus = kb.postSpaceToPlus and place in (PLACE.POST, PLACE.CUSTOM_POST)
-                        value = urlencode(value, spaceplus=spaceplus)
-                        payload = urlencode(payload, safe='%', spaceplus=spaceplus)
+                        if place in (PLACE.POST, PLACE.CUSTOM_POST):  # potential problems in other cases (e.g. URL encoding of whole URI - including path)
+                            value = urlencode(value, spaceplus=kb.postSpaceToPlus)
+                        payload = urlencode(payload, safe='%', spaceplus=kb.postSpaceToPlus)
                         value = agent.replacePayload(value, payload)
                         postUrlEncode = False
 
@@ -933,9 +934,9 @@ class Connect(object):
 
         if value and place == PLACE.CUSTOM_HEADER:
             if value.split(',')[0].capitalize() == PLACE.COOKIE:
-                cookie = value.split(',', 1)[1]
+                cookie = value.split(',', 1)[-1]
             else:
-                auxHeaders[value.split(',')[0]] = value.split(',', 1)[1]
+                auxHeaders[value.split(',')[0]] = value.split(',', 1)[-1]
 
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
@@ -982,7 +983,7 @@ class Connect(object):
                     if not conf.csrfUrl:
                         errMsg += ". You can try to rerun by providing "
                         errMsg += "a valid value for option '--csrf-url'"
-                    raise SqlmapTokenException, errMsg
+                    raise SqlmapTokenException(errMsg)
 
             if token:
                 token = token.strip("'\"")
@@ -1040,7 +1041,7 @@ class Connect(object):
                             name = safeVariableNaming(name)
                         elif name in keywords:
                             name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
-                        value = urldecode(value, convall=True, spaceplus=(item==post and kb.postSpaceToPlus))
+                        value = urldecode(value, convall=True, spaceplus=(item == post and kb.postSpaceToPlus))
                         variables[name] = value
 
             if cookie:
@@ -1262,7 +1263,11 @@ class Connect(object):
             page = removeReflectiveValues(page, payload)
 
         kb.maxConnectionsFlag = re.search(MAX_CONNECTIONS_REGEX, page or "", re.I) is not None
-        kb.permissionFlag = re.search(PERMISSION_DENIED_REGEX, page or "", re.I) is not None
+
+        message = extractRegexResult(PERMISSION_DENIED_REGEX, page or "", re.I)
+        if message:
+            kb.permissionFlag = True
+            singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
 
         if content or response:
             return page, headers, code
@@ -1272,5 +1277,5 @@ class Connect(object):
         else:
             return comparison(page, headers, code, getRatioValue, pageLength)
 
-def setHTTPHandlers():  # Cross-linked function
+def setHTTPHandlers():  # Cross-referenced function
     raise NotImplementedError

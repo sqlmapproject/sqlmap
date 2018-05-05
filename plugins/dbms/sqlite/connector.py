@@ -19,7 +19,6 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapMissingDependence
 from plugins.generic.connector import Connector as GenericConnector
 
-
 class Connector(GenericConnector):
     """
     Homepage: http://pysqlite.googlecode.com/ and http://packages.ubuntu.com/quantal/python-sqlite

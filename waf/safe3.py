@@ -23,4 +23,3 @@ def detect(get_page):
             break
 
     return retval
-
