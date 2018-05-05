@@ -264,8 +264,8 @@ def main():
                 raise SystemExit
 
             elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
-                errMsg = "please update the 'sqlalchemy' package "
-                errMsg += "(Reference: https://github.com/apache/incubator-superset/issues/3447)"
+                errMsg = "please update the 'sqlalchemy' package (>= 1.1.11) "
+                errMsg += "(Reference: https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe)"
                 logger.error(errMsg)
                 raise SystemExit
 
