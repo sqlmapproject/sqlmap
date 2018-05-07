@@ -90,8 +90,8 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         kb.errorIsNone = False
         lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
-        if lowerCount == 1 or conf.uCols:
-            found = kb.orderByColumns or (_orderByTechnique(lowerCount, upperCount) if conf.uCols else _orderByTechnique())
+        if kb.orderByColumns is None and (lowerCount == 1 or conf.uCols):  # ORDER BY is not bullet-proof
+            found = _orderByTechnique(lowerCount, upperCount) if conf.uCols else _orderByTechnique()
             if found:
                 kb.orderByColumns = found
                 infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
@@ -267,6 +267,8 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     validPayload = None
     vector = None
+    orderBy = kb.orderByColumns
+    uChars = (conf.uChar, kb.uChar)
 
     # In case that user explicitly stated number of columns affected
     if conf.uColsStop == conf.uColsStart:
@@ -300,6 +302,10 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
             if not all((validPayload, vector)) and not warnMsg.endswith("consider "):
                 singleTimeWarnMessage(warnMsg)
+
+    if count and orderBy is None and kb.orderByColumns is not None:  # discard ORDER BY results (not usable - e.g. maybe invalid altogether)
+        conf.uChar, kb.uChar = uChars
+        validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     return validPayload, vector
 

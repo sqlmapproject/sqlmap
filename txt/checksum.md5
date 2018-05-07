@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-2b1dd381a11c70766d31a272619dc356  lib/core/settings.py
+051375e24f79fe7967a7401d57e084cf  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -97,7 +97,7 @@ bad83c6386adf345fbc982bdafbe3b93  lib/techniques/dns/use.py
 f999f2e88dea9ac8831eb2f468478b5f  lib/techniques/error/use.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/union/__init__.py
-2075952d327723169de8fb7ac667c9c1  lib/techniques/union/test.py
+94d7a22bb6725a91e84ba2cd9973e96d  lib/techniques/union/test.py
 11ecf2effbe9f40b361843d546c3c521  lib/techniques/union/use.py
 8d99c07416df40350ff8836d9d79ebb5  lib/utils/api.py
 37dfb641358669f62c2acedff241348b  lib/utils/brute.py
