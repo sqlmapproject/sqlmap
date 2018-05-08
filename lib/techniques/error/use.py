@@ -414,7 +414,7 @@ def errorUse(expression, dump=False):
                                 break
 
                             if output and isListLike(output) and len(output) == 1:
-                                output = output[0]
+                                output = unArrayizeValue(output)
 
                             with kb.locks.value:
                                 index = None
@@ -446,7 +446,7 @@ def errorUse(expression, dump=False):
         value = _errorFields(expression, expressionFields, expressionFieldsList)
 
     if value and isListLike(value) and len(value) == 1 and isinstance(value[0], basestring):
-        value = value[0]
+        value = unArrayizeValue(value)
 
     duration = calculateDeltaSeconds(start)
 
