@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-f49b5204228e41b1cfab5ba231272f09  lib/core/settings.py
+0134616235193faba40a094cf7a4ba09  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -77,7 +77,7 @@ eee965d781546d05f36cfd14af050913  lib/request/httpshandler.py
 b188a11542a996276abbbc48913501c3  lib/request/inject.py
 aaf956c1e9855836c3f372e29d481393  lib/request/methodrequest.py
 51eeaa8abf5ba62aaaade66d46ff8b00  lib/request/pkihandler.py
-aa7cb67139bbc57d67a728fd2abf80ed  lib/request/rangehandler.py
+2c3774b72586985719035b195f144d7b  lib/request/rangehandler.py
 aa809d825b33bea76a63ecd97cf7792c  lib/request/redirecthandler.py
 7f12d8f3b6665ed7053954bba70ff718  lib/request/templates.py
 747f9941a68361bd779ec760f71568e9  lib/takeover/abstraction.py
@@ -124,7 +124,7 @@ c2428c5c73d049abf4442ec1b9404a25  plugins/dbms/access/fingerprint.py
 e657b1b7a295a38ac9ce515158164f00  plugins/dbms/access/__init__.py
 77686d7c7e287d5db0a9a87f2c7d4902  plugins/dbms/access/syntax.py
 2f1d8706b51497623b2b59c07b552bdc  plugins/dbms/access/takeover.py
-ead470b613e52e718a3062b63b518272  plugins/dbms/db2/connector.py
+8df07c2805aceb7d6fb4add40de84795  plugins/dbms/db2/connector.py
 4deeda463003ab71e7d2f34a263b5bbf  plugins/dbms/db2/enumeration.py
 da9dccd1f9ec2cf1e53295125dd983a0  plugins/dbms/db2/filesystem.py
 b54dbf44590a5cbefb2b4f8e9a01a383  plugins/dbms/db2/fingerprint.py
@@ -145,7 +145,7 @@ b7d693a6f5f39fee0a65f2d7b0830c5e  plugins/dbms/hsqldb/fingerprint.py
 fd369161778d6b48d7f1f7fc14dcdb5c  plugins/dbms/hsqldb/__init__.py
 4673ebfdce9859718c19e8a7765da8d3  plugins/dbms/hsqldb/syntax.py
 7c0535736215ca612756cf589adb249b  plugins/dbms/hsqldb/takeover.py
-9ceb9430031a26ecebe13ea49cb2a5fa  plugins/dbms/informix/connector.py
+97dac442190bd4ffac3ba292e2abfd4c  plugins/dbms/informix/connector.py
 c54d70e4847c6327bd3110c4d8723b04  plugins/dbms/informix/enumeration.py
 da9dccd1f9ec2cf1e53295125dd983a0  plugins/dbms/informix/filesystem.py
 35eac2f3837a72940eb50753dc4566e5  plugins/dbms/informix/fingerprint.py
@@ -160,13 +160,13 @@ ffd26f64142226d0b1ed1d70f7f294c0  plugins/dbms/maxdb/filesystem.py
 4321d7018f5121343460ebfd83bb69be  plugins/dbms/maxdb/__init__.py
 e7d44671ae26c0bcd5fe8448be070bbd  plugins/dbms/maxdb/syntax.py
 bf7842bb291e2297c3c8d1023eb3e550  plugins/dbms/maxdb/takeover.py
-9e64e67291a4c369bad8b8cf2cfa722a  plugins/dbms/mssqlserver/connector.py
+decc645344bb93aca504a71ba2e4cad4  plugins/dbms/mssqlserver/connector.py
 f1f1541a54faf67440179fa521f99849  plugins/dbms/mssqlserver/enumeration.py
 177e1d55d28ed3190bc0079b8126c6be  plugins/dbms/mssqlserver/filesystem.py
-51eb413ac62408965be20a812f2412c8  plugins/dbms/mssqlserver/fingerprint.py
+08914da79141713bd69a25c3cc7f06a8  plugins/dbms/mssqlserver/fingerprint.py
 f25c50a95e5390ecd32be5a011637349  plugins/dbms/mssqlserver/__init__.py
 612be1929108e7b4512a49a4a3837bbc  plugins/dbms/mssqlserver/syntax.py
-08fe8ac7acdfc0e3168b5b069a7c73bf  plugins/dbms/mssqlserver/takeover.py
+3c0845fa526e1bb7bbe636fcfcbcc4a6  plugins/dbms/mssqlserver/takeover.py
 f6e1f3f09f32b9cb2ca11c016d373423  plugins/dbms/mysql/connector.py
 445164daf59b890aeacc968af58fcb53  plugins/dbms/mysql/enumeration.py
 4578fa29f04d0a75499f9668466ded07  plugins/dbms/mysql/filesystem.py
@@ -174,7 +174,7 @@ fcbf7ff279c527b4aca0dac94c28d20c  plugins/dbms/mysql/fingerprint.py
 30065993f8300994e4658634121609e9  plugins/dbms/mysql/__init__.py
 0e2adbee217f5b94dcc124d24b8dde99  plugins/dbms/mysql/syntax.py
 403591e638b6bfdb840d52bd3138ee56  plugins/dbms/mysql/takeover.py
-999cb8d0d52820d30bdd4b3d658a765d  plugins/dbms/oracle/connector.py
+f772070dba85976a7894dac5046b93ea  plugins/dbms/oracle/connector.py
 e1ffee36fd18f33f34bb4bac4ae43f14  plugins/dbms/oracle/enumeration.py
 c326b0d8bed92be67888b0242f565ac8  plugins/dbms/oracle/filesystem.py
 e16cbf8abda91a906ca7bafb81d8866e  plugins/dbms/oracle/fingerprint.py
@@ -184,7 +184,7 @@ bcdbd9c04d7d5a911e0e31abe1a24f0f  plugins/dbms/oracle/takeover.py
 f99c23db4ee6a6b8c0edbf684d360ad3  plugins/dbms/postgresql/connector.py
 7cdb821884e5f15084d1bea7f8a50574  plugins/dbms/postgresql/enumeration.py
 c8bb829d45752b98e6a03817b92e0fe5  plugins/dbms/postgresql/filesystem.py
-603d533d924498378eccba4f0f196be6  plugins/dbms/postgresql/fingerprint.py
+29560cf78211888802c6e5c8681e7d71  plugins/dbms/postgresql/fingerprint.py
 470860d3e85d11a67f2220bffaa415e7  plugins/dbms/postgresql/__init__.py
 20e6f48f496348be45f3402ebc265dbb  plugins/dbms/postgresql/syntax.py
 1287acf330da86a93c8e64aff46e3b65  plugins/dbms/postgresql/takeover.py

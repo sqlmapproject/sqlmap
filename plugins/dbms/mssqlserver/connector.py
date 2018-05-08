@@ -21,9 +21,9 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     """
-    Homepage: http://pymssql.sourceforge.net/
-    User guide: http://pymssql.sourceforge.net/examples_pymssql.php
-    API: http://pymssql.sourceforge.net/ref_pymssql.php
+    Homepage: http://www.pymssql.org/en/stable/
+    User guide: http://www.pymssql.org/en/stable/pymssql_examples.html
+    API: http://www.pymssql.org/en/stable/ref/pymssql.html
     Debian package: python-pymssql
     License: LGPL
 

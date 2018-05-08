@@ -136,8 +136,8 @@ class Fingerprint(GenericFingerprint):
         self.createSupportTbl(self.fileTblName, self.tblField, "varchar(1000)")
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))
 
-        # Reference: http://en.wikipedia.org/wiki/Comparison_of_Microsoft_Windows_versions
-        # http://en.wikipedia.org/wiki/Windows_NT#Releases
+        # Reference: https://en.wikipedia.org/wiki/Comparison_of_Microsoft_Windows_versions
+        # https://en.wikipedia.org/wiki/Windows_NT#Releases
         versions = {
             "NT": ("4.0", (6, 5, 4, 3, 2, 1)),
             "2000": ("5.0", (4, 3, 2, 1)),

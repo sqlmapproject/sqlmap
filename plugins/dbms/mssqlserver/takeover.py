@@ -26,8 +26,8 @@ class Takeover(GenericTakeover):
     def spHeapOverflow(self):
         """
         References:
-        * http://www.microsoft.com/technet/security/bulletin/MS09-004.mspx
-        * http://support.microsoft.com/kb/959420
+        * https://docs.microsoft.com/en-us/security-updates/securitybulletins/2009/ms09-004
+        * https://support.microsoft.com/en-us/help/959420/ms09-004-vulnerabilities-in-microsoft-sql-server-could-allow-remote-co
         """
 
         returns = {

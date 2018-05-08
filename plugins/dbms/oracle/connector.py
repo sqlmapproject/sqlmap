@@ -24,10 +24,10 @@ os.environ["NLS_LANG"] = ".AL32UTF8"
 
 class Connector(GenericConnector):
     """
-    Homepage: http://cx-oracle.sourceforge.net/
-    User guide: http://cx-oracle.sourceforge.net/README.txt
-    API: http://cx-oracle.sourceforge.net/html/index.html
-    License: http://cx-oracle.sourceforge.net/LICENSE.txt
+    Homepage: https://oracle.github.io/python-cx_Oracle/
+    User https://cx-oracle.readthedocs.io/en/latest/
+    API: https://wiki.python.org/moin/DatabaseProgramming
+    License: https://cx-oracle.readthedocs.io/en/latest/license.html#license
     """
 
     def __init__(self):
