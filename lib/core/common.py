@@ -2156,7 +2156,7 @@ def initCommonOutputs():
                     if line not in kb.commonOutputs[key]:
                         kb.commonOutputs[key].add(line)
 
-def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, unique=False):
+def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
     Returns newline delimited items contained inside file
     """
@@ -2169,19 +2169,13 @@ def getFileItems(filename, commentPrefix='#', unicode_=True, lowercase=False, un
     checkFile(filename)
 
     try:
-        with openFile(filename, 'r', errors="ignore") if unicode_ else open(filename, 'r') as f:
-            for line in (f.readlines() if unicode_ else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
+        with openFile(filename, 'r', errors="ignore") if unicoded else open(filename, 'r') as f:
+            for line in (f.readlines() if unicoded else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
                 if commentPrefix:
                     if line.find(commentPrefix) != -1:
                         line = line[:line.find(commentPrefix)]
 
                 line = line.strip()
-
-                if not unicode_:
-                    try:
-                        line = str.encode(line)
-                    except UnicodeDecodeError:
-                        continue
 
                 if line:
                     if lowercase:
