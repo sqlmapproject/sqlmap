@@ -57,7 +57,7 @@ class SQLAlchemy(GenericConnector):
                 if self.dialect == "sqlite":
                     engine = _sqlalchemy.create_engine(conf.direct, connect_args={"check_same_thread": False})
                 elif self.dialect == "oracle":
-                    engine = _sqlalchemy.create_engine(conf.direct, connect_args={"allow_twophase": False})
+                    engine = _sqlalchemy.create_engine(conf.direct)
                 else:
                     engine = _sqlalchemy.create_engine(conf.direct, connect_args={})
 

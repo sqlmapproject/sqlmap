@@ -1387,6 +1387,10 @@ def parseTargetDirect():
                     __import__("psycopg2")
                 elif dbmsName == DBMS.ORACLE:
                     __import__("cx_Oracle")
+
+                    # Reference: http://itsiti.com/ora-28009-connection-sys-sysdba-sysoper
+                    if (conf.dbmsUser or "").upper() == "SYS":
+                        conf.direct = "%s?mode=SYSDBA" % conf.direct
                 elif dbmsName == DBMS.SQLITE:
                     __import__("sqlite3")
                 elif dbmsName == DBMS.ACCESS:
