@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-5685eacb5dd1a67c8e30b85b7ead70a9  lib/core/settings.py
+28b7ef08849aa6d4f652a9d1c58ca8f2  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -74,7 +74,7 @@ dd4598675027fae99f2e2475b05986da  lib/request/direct.py
 2044fce3f4ffa268fcfaaf63241b1e64  lib/request/dns.py
 eee965d781546d05f36cfd14af050913  lib/request/httpshandler.py
 1e5532ede194ac9c083891c2f02bca93  lib/request/__init__.py
-b188a11542a996276abbbc48913501c3  lib/request/inject.py
+c2fb1abbb7127ec6419bbf852c0a458d  lib/request/inject.py
 aaf956c1e9855836c3f372e29d481393  lib/request/methodrequest.py
 51eeaa8abf5ba62aaaade66d46ff8b00  lib/request/pkihandler.py
 2c3774b72586985719035b195f144d7b  lib/request/rangehandler.py
@@ -88,7 +88,7 @@ fb9e34d558293b5d6b9727f440712886  lib/takeover/registry.py
 48575dde7bb867b7937769f569a98309  lib/takeover/udf.py
 2665fa7eedb19a1b10ffe949999b75f1  lib/takeover/web.py
 f1decf0a987bd3a4bc757212cbe6a6c8  lib/takeover/xp_cmdshell.py
-2543e14cc7f6e239b49dd40f41bc34fa  lib/techniques/blind/inference.py
+4a7f231e597f754e9fcd116d13ad1a4d  lib/techniques/blind/inference.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/blind/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/dns/__init__.py
 799faf9008527d2e9da9d923e50f685a  lib/techniques/dns/test.py

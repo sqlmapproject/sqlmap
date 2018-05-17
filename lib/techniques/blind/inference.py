@@ -69,6 +69,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finalValue = None
     retrievedLength = 0
 
+    if payload is None:
+        return 0, None
+
     if charsetType is None and conf.charset:
         asciiTbl = sorted(set(ord(_) for _ in conf.charset))
     else:
@@ -187,7 +190,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             with hintlock:
                 hintValue = kb.hintValue
 
-            if hintValue is not None and len(hintValue) >= idx:
+            if payload is not None and hintValue is not None and len(hintValue) >= idx:
                 if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
                     posValue = hintValue[idx - 1]
                 else:

@@ -77,6 +77,9 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
 
     value = _goDns(payload, expression)
 
+    if payload is None:
+        return None
+
     if value is not None:
         return value
 
