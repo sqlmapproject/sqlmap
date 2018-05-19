@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-28b7ef08849aa6d4f652a9d1c58ca8f2  lib/core/settings.py
+d9c4c537aef395bbcf182a7f57bb510f  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -417,7 +417,7 @@ eb56ac34775cc3c5f721ec967d04b283  waf/generic.py
 5a5c9452b9779bf39c208ebe26c98fdb  waf/jiasule.py
 898f53c12133da3e946301f4aa97d538  waf/knownsec.py
 81e6bf619c7bb73c4b62e2439e60e95a  waf/kona.py
-4906ab7bea7f6715f5796933f1a89381  waf/modsecurity.py
+b17a154fe7959619eaafffa60e14199f  waf/modsecurity.py
 d09a50713daf3c0a2594ed4f50c57adb  waf/naxsi.py
 bf573d01d56e585f4ad57132bc594934  waf/netcontinuum.py
 cb2f1516867684042f580e02138463de  waf/netscaler.py
