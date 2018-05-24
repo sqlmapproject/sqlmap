@@ -220,10 +220,6 @@ def checkCharEncoding(encoding, warn=True):
     try:
         codecs.lookup(encoding.encode(UNICODE_ENCODING) if isinstance(encoding, unicode) else encoding)
     except (LookupError, ValueError):
-        if warn and ' ' not in encoding:
-            warnMsg = "unknown web page charset '%s'. " % encoding
-            warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
-            singleTimeLogMessage(warnMsg, logging.WARN, encoding)
         encoding = None
 
     if encoding:
