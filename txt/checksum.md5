@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-61a242f506d7e3374230b2e904ea309b  lib/core/settings.py
+428225201b9174a4c4432d9d2e528a91  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -115,7 +115,7 @@ cc1cfe36057f1d9bbdcba1bcc03359f9  lib/utils/hash.py
 2c5a655c8e94cbe2664ee497752ac1f2  lib/utils/search.py
 571884f530796534f03c49cf3f380a4c  lib/utils/sqlalchemy.py
 dcc25183c6bd85b172c87cfcbc305ab6  lib/utils/timeout.py
-3d230e342a6c8d60ac7c68c556fbba9b  lib/utils/versioncheck.py
+fad14adffa8b640a15b06db955031695  lib/utils/versioncheck.py
 7348ee704485651737ddbe3538271be9  lib/utils/xrange.py
 b9d2761f47fec3d98b88311a263fd5db  plugins/dbms/access/connector.py
 3f1c50a1507d1c2f69c20c706230e2e2  plugins/dbms/access/enumeration.py
