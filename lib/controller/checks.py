@@ -783,7 +783,7 @@ def checkSqlInjection(place, parameter, value):
 
             if conf.multipleTargets:
                 msg = "how do you want to proceed? [ne(X)t target/(s)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
-                choice = readInput(msg, default='T', checkBatch=False).upper()
+                choice = readInput(msg, default='X', checkBatch=False).upper()
             else:
                 msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
                 choice = readInput(msg, default='S', checkBatch=False).upper()
