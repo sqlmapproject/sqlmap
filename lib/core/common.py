@@ -3367,7 +3367,7 @@ def createGithubIssue(errMsg, excMsg):
     msg += "with the unhandled exception information at "
     msg += "the official Github repository? [y/N] "
     try:
-        choice = readInput(msg, default='N', boolean=True)
+        choice = readInput(msg, default='N', checkBatch=False, boolean=True)
     except:
         choice = None
 
