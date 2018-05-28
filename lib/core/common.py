@@ -3434,10 +3434,10 @@ def maskSensitiveData(msg):
             value = extractRegexResult(regex, retVal)
             retVal = retVal.replace(value, '*' * len(value))
 
-    if not conf.get("hostname"):
-        match = re.search(r"(?i)sqlmap.+(-u|--url)(\s+|=)([^ ]+)", retVal)
-        if match:
-            retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
+    # Just in case (for problematic parameters regarding user encoding)
+    match = re.search(r"(?i)[ -]-(u|url|data|cookie)( |=)(.*?)( -?-[a-z]|\Z)", retVal)
+    if match:
+        retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     if getpass.getuser():
         retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), '*' * len(getpass.getuser()), retVal)
