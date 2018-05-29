@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-2adfff188eafd6ea877686823cb44eb9  lib/core/settings.py
+2c8a4dcbdeec825ded4f27bd727379e5  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -356,7 +356,7 @@ ff80a22ee858f5331b0c088efa98b3ff  thirdparty/prettyprint/prettyprint.py
 5c70f8e5f7353aedc6d8d21d4fb72b37  thirdparty/pydes/__init__.py
 a7f735641c5b695f3d6220fe7c91b030  thirdparty/pydes/pyDes.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/socks/__init__.py
-74fcae36f5a2cc440c1717ae8e3f64c4  thirdparty/socks/socks.py
+afd97f26bffa0532ee4eb4f5f8ec1ab7  thirdparty/socks/socks.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/termcolor/__init__.py
 ea649aae139d8551af513769dd913dbf  thirdparty/termcolor/termcolor.py
 bf55909ad163b58236e44b86e8441b26  thirdparty/wininetpton/__init__.py
