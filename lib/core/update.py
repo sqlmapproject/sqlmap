@@ -49,6 +49,7 @@ def update():
                 errMsg = "unable to update content of directory '%s' ('%s')" % (directory, getSafeExString(ex))
                 logger.error(errMsg)
             else:
+                attrs = os.stat(os.path.join(directory, "sqlmap.py")).st_mode
                 for wildcard in ('*', ".*"):
                     for _ in glob.glob(os.path.join(directory, wildcard)):
                         try:
@@ -83,6 +84,8 @@ def update():
                     else:
                         if not success:
                             logger.error("update could not be completed")
+                        else:
+                            os.chmod(os.path.join(directory, "sqlmap.py"), attrs)
     else:
         infoMsg = "updating sqlmap to the latest development revision from the "
         infoMsg += "GitHub repository"

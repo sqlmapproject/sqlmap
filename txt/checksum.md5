@@ -47,14 +47,14 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-cd402ab35a20d44b7404bcc18f652a16  lib/core/settings.py
+993fd299707fdb019bfe4e12967da74c  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
 72d499ca8d792e90a1ebfb2ad2341a51  lib/core/testing.py
 de9922a29c71a235cb95a916ff925db2  lib/core/threads.py
 c40758411bb0bd68764d78e0bb72bd0f  lib/core/unescaper.py
-af2d1810b6a7ebc61689a53c253ddbaa  lib/core/update.py
+c54afa9950529a5974166464bfd4c34a  lib/core/update.py
 e772deb63270375e685fa5a7b775c382  lib/core/wordlist.py
 1e5532ede194ac9c083891c2f02bca93  lib/__init__.py
 7620f1f4b8791e13c7184c06b5421754  lib/parse/banner.py
