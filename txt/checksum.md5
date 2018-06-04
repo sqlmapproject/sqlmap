@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-240e554483cc86de3fc483858dc8cb7b  lib/core/settings.py
+8dc42e1cb53bbbac2172f1edd5077597  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -400,6 +400,7 @@ ef722d062564def381b1f96f5faadee3  waf/baidu.py
 6a2834daf767491d3331bd31e946d540  waf/binarysec.py
 41e399dbfe7b904d5aacfb37d85e1fbf  waf/blockdos.py
 2f3bbf43be94d4e9ffe9f80e8483d62f  waf/ciscoacexml.py
+e70fbe03e1338f3d3a412136b033e3d6  waf/cloudbric.py
 21b8203fdaaaac3cb7c84fa4dc0627f6  waf/cloudflare.py
 b16b1c15532103346d5e2f5b8bd1ed36  waf/cloudfront.py
 ac96f34c254951d301973617064eb1b5  waf/comodo.py
