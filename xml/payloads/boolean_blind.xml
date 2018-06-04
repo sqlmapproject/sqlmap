@@ -1361,6 +1361,23 @@ Tag: <test>
             <dbms>SAP MaxDB</dbms>
         </details>
     </test>
+
+    <!-- Works in MySQL, Oracle, etc. -->
+    <test>
+        <title>HAVING boolean-based blind - WHERE, GROUP BY clause</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2</clause>
+        <where>1</where>
+        <vector>HAVING [INFERENCE]</vector>
+        <request>
+            <payload>HAVING [RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>HAVING [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
     <!-- End of boolean-based blind tests - ORDER BY, GROUP BY clause -->
 
     <!-- Boolean-based blind tests - Stacked queries -->

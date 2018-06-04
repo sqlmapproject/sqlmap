@@ -68,23 +68,23 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.ORACLE
         logger.info(infoMsg)
 
-        # NOTE: SELECT ROWNUM=ROWNUM FROM DUAL does not work connecting
-        # directly to the Oracle database
+        # NOTE: SELECT LENGTH(SYSDATE)=LENGTH(SYSDATE) FROM DUAL does
+        # not work connecting directly to the Oracle database
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("ROWNUM=ROWNUM")
+            result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)")
 
         if result:
             infoMsg = "confirming %s" % DBMS.ORACLE
             logger.info(infoMsg)
 
-            # NOTE: SELECT LENGTH(SYSDATE)=LENGTH(SYSDATE) FROM DUAL does
+            # NOTE: SELECT NVL(RAWTOHEX([RANDNUM1]),[RANDNUM1])=RAWTOHEX([RANDNUM1]) FROM DUAL does
             # not work connecting directly to the Oracle database
             if conf.direct:
                 result = True
             else:
-                result = inject.checkBooleanExpression("LENGTH(SYSDATE)=LENGTH(SYSDATE)")
+                result = inject.checkBooleanExpression("NVL(RAWTOHEX([RANDNUM1]),[RANDNUM1])=RAWTOHEX([RANDNUM1])")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.ORACLE

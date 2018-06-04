@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-9d0f7b5da86733268cf0ee3bcce3fd0e  lib/core/settings.py
+ea76ddec1c3e65b63c217aaaf6e15e3c  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -177,7 +177,7 @@ fcbf7ff279c527b4aca0dac94c28d20c  plugins/dbms/mysql/fingerprint.py
 f772070dba85976a7894dac5046b93ea  plugins/dbms/oracle/connector.py
 e1ffee36fd18f33f34bb4bac4ae43f14  plugins/dbms/oracle/enumeration.py
 c326b0d8bed92be67888b0242f565ac8  plugins/dbms/oracle/filesystem.py
-e16cbf8abda91a906ca7bafb81d8866e  plugins/dbms/oracle/fingerprint.py
+538395c0e5ccb1b6befc17f129f45f29  plugins/dbms/oracle/fingerprint.py
 9cbce3d3747c67f18e65f9c1eb910b0e  plugins/dbms/oracle/__init__.py
 5c2f1611c3ceface38a7e95650391ae6  plugins/dbms/oracle/syntax.py
 bcdbd9c04d7d5a911e0e31abe1a24f0f  plugins/dbms/oracle/takeover.py
@@ -467,7 +467,7 @@ d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 fb93505ef0ab3b4a20900f3e5625260d  xml/boundaries.xml
 0d0d4bd0e06c99dd8eb4f92acc25caf3  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
-14a2abeb88b00ab489359d0dd7a3017f  xml/payloads/boolean_blind.xml
+3318571fac8df058f19ea85780606643  xml/payloads/boolean_blind.xml
 b5b8b0aebce810e6cdda1b7106c96427  xml/payloads/error_based.xml
 06b1a210b190d52477a9d492443725b5  xml/payloads/inline_query.xml
 3194e2688a7576e1f877d5b137f7c260  xml/payloads/stacked_queries.xml
