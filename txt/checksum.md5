@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-ea76ddec1c3e65b63c217aaaf6e15e3c  lib/core/settings.py
+def1ed8934e08b37d5e6455554cb2be8  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -444,7 +444,7 @@ dffa9cebad777308714aaf83b71635b4  waf/teros.py
 b37210459a13de40bf07722c4d032c33  waf/trafficshield.py
 fe01932df9acea7f6d23f03c6b698646  waf/urlscan.py
 a687449cd4e45f69e33b13d41e021480  waf/uspses.py
-814fcc4ab087fb181ddad5fc12bd3d53  waf/varnish.py
+f3a81da13ee098e94edd965ea4b37b04  waf/varnish.py
 20840afc269920826deac2b6c00d6b9c  waf/wallarm.py
 11205abf397ae9072adc3234b656ade9  waf/watchguard.py
 9bf34539f382987490d2239d8ef0a651  waf/webappsecure.py
