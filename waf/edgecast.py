@@ -10,7 +10,7 @@ import re
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "EdgeCast WAF (Verizon)"
+__product__ = "EdgeCast Web Application Firewall (Verizon)"
 
 def detect(get_page):
     retval = False
