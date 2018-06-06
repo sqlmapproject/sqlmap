@@ -400,7 +400,7 @@ def cmdLineParser(argv=None):
                                help="Search column(s), table(s) and/or database name(s)")
 
         enumeration.add_option("--comments", dest="getComments", action="store_true",
-                               help="Retrieve DBMS comments")
+                               help="Check for DBMS comments during enumeration")
 
         enumeration.add_option("-D", dest="db",
                                help="DBMS database to enumerate")
@@ -581,7 +581,7 @@ def cmdLineParser(argv=None):
                            help="Log all HTTP traffic into a HAR file")
 
         general.add_option("--hex", dest="hexConvert", action="store_true",
-                           help="Use DBMS hex function(s) for data retrieval")
+                           help="Use hex conversion during data retrieval")
 
         general.add_option("--output-dir", dest="outputDir", action="store",
                            help="Custom output directory path")
