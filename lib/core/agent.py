@@ -142,7 +142,7 @@ class Agent(object):
                     match = re.search(r"\A[^ ]+", newValue)
                     newValue = newValue[len(match.group() if match else ""):]
                     _ = randomInt(2)
-                    value = "%s%s AND %s=%s" % (origValue, match.group() if match else "", _, _ + 1)
+                    value = "%s%s AND %s LIKE %s" % (origValue, match.group() if match else "", _, _ + 1)
                 elif conf.invalidBignum:
                     value = randomInt(6)
                 elif conf.invalidString:
