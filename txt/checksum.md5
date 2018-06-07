@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-7912a54938f8d43bf6ad4adbd6de392c  lib/core/settings.py
+276640cf3fa694e3cf7e94c207ba14ef  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -99,7 +99,7 @@ f5fb02487edaf9adaa81d54324c84f8f  lib/techniques/error/use.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/union/__init__.py
 94d7a22bb6725a91e84ba2cd9973e96d  lib/techniques/union/test.py
 11ecf2effbe9f40b361843d546c3c521  lib/techniques/union/use.py
-8d99c07416df40350ff8836d9d79ebb5  lib/utils/api.py
+3e404b091e698cceadc1b9d2f1dae4d9  lib/utils/api.py
 37dfb641358669f62c2acedff241348b  lib/utils/brute.py
 31b1e7eb489eac837db6a2bc1dcb7da7  lib/utils/crawler.py
 de9620f03231d8329ee8434884b6bacd  lib/utils/deps.py
