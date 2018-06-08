@@ -47,7 +47,7 @@ c9a56e58984420a5abb7a3f7aadc196d  lib/core/optiondict.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-6f676678bbe92b0840e37eebbdd5c1e6  lib/core/settings.py
+9962d6781b4c6d216b2982d3c2e0aa6a  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 6306284edcccc185b2df085438572b0d  lib/core/target.py
@@ -72,7 +72,7 @@ c0cabedead14b8a23353b606672cff42  lib/request/comparison.py
 0ad9051e84e8fefe826f1a574b41b1b0  lib/request/connect.py
 dd4598675027fae99f2e2475b05986da  lib/request/direct.py
 2044fce3f4ffa268fcfaaf63241b1e64  lib/request/dns.py
-eee965d781546d05f36cfd14af050913  lib/request/httpshandler.py
+98535d0efca5551e712fcc4b34a3f772  lib/request/httpshandler.py
 1e5532ede194ac9c083891c2f02bca93  lib/request/__init__.py
 c2fb1abbb7127ec6419bbf852c0a458d  lib/request/inject.py
 aaf956c1e9855836c3f372e29d481393  lib/request/methodrequest.py
