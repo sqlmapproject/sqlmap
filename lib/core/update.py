@@ -85,7 +85,10 @@ def update():
                         if not success:
                             logger.error("update could not be completed")
                         else:
-                            os.chmod(os.path.join(directory, "sqlmap.py"), attrs)
+                            try:
+                                os.chmod(os.path.join(directory, "sqlmap.py"), attrs)
+                            except OSError:
+                                logger.warning("could not set the file attributes of '%s'" % os.path.join(directory, "sqlmap.py"))
     else:
         infoMsg = "updating sqlmap to the latest development revision from the "
         infoMsg += "GitHub repository"
