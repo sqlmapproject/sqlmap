@@ -148,8 +148,8 @@ def _setRequestParams():
                     match = re.search(r'(?P<name>[^"]+)"\s*:\s*\[([^\]]+)\]', conf.data)
                     if match and not (conf.testParameter and match.group("name") not in conf.testParameter):
                         _ = match.group(2)
-                        _ = re.sub(r'("[^"]+)"', '\g<1>%s"' % kb.customInjectionMark, _)
-                        _ = re.sub(r'(\A|,|\s+)(-?\d[\d\.]*\b)', '\g<0>%s' % kb.customInjectionMark, _)
+                        _ = re.sub(r'("[^"]+)"', r'\g<1>%s"' % kb.customInjectionMark, _)
+                        _ = re.sub(r'(\A|,|\s+)(-?\d[\d\.]*\b)', r'\g<0>%s' % kb.customInjectionMark, _)
                         conf.data = conf.data.replace(match.group(0), match.group(0).replace(match.group(2), _))
 
                 kb.postHint = POST_HINT.JSON

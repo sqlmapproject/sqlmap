@@ -1722,7 +1722,7 @@ def _cleanupOptions():
 
     if conf.testFilter:
         conf.testFilter = conf.testFilter.strip('*+')
-        conf.testFilter = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testFilter)
+        conf.testFilter = re.sub(r"([^.])([*+])", r"\g<1>.\g<2>", conf.testFilter)
 
         try:
             re.compile(conf.testFilter)
@@ -1731,7 +1731,7 @@ def _cleanupOptions():
 
     if conf.testSkip:
         conf.testSkip = conf.testSkip.strip('*+')
-        conf.testSkip = re.sub(r"([^.])([*+])", "\g<1>.\g<2>", conf.testSkip)
+        conf.testSkip = re.sub(r"([^.])([*+])", r"\g<1>.\g<2>", conf.testSkip)
 
         try:
             re.compile(conf.testSkip)

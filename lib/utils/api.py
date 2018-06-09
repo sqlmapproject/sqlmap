@@ -498,9 +498,7 @@ def scan_stop(taskid):
     Stop a scan
     """
 
-    if (taskid not in DataStore.tasks or
-            DataStore.tasks[taskid].engine_process() is None or
-            DataStore.tasks[taskid].engine_has_terminated()):
+    if (taskid not in DataStore.tasks or DataStore.tasks[taskid].engine_process() is None or DataStore.tasks[taskid].engine_has_terminated()):
         logger.warning("[%s] Invalid task ID provided to scan_stop()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
@@ -515,9 +513,7 @@ def scan_kill(taskid):
     Kill a scan
     """
 
-    if (taskid not in DataStore.tasks or
-            DataStore.tasks[taskid].engine_process() is None or
-            DataStore.tasks[taskid].engine_has_terminated()):
+    if (taskid not in DataStore.tasks or DataStore.tasks[taskid].engine_process() is None or DataStore.tasks[taskid].engine_has_terminated()):
         logger.warning("[%s] Invalid task ID provided to scan_kill()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 

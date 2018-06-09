@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 import binascii
 import compiler
 import httplib
-import json
 import keyword
 import logging
 import re
@@ -408,8 +407,10 @@ class Connect(object):
                 ws.close()
                 code = ws.status
                 status = httplib.responses[code]
+
                 class _(dict):
                     pass
+
                 responseHeaders = _(ws.getheaders())
                 responseHeaders.headers = ["%s: %s\r\n" % (_[0].capitalize(), _[1]) for _ in responseHeaders.items()]
 
@@ -736,10 +737,10 @@ class Connect(object):
         if conn and getattr(conn, "redurl", None):
             _ = urlparse.urlsplit(conn.redurl)
             _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
-            requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", "\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
+            requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
 
             if kb.resendPostOnRedirect is False:
-                requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", "\g<1>GET ", requestMsg)
+                requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", r"\g<1>GET ", requestMsg)
                 requestMsg = re.sub(r"(?i)Content-length: \d+\n", "", requestMsg)
                 requestMsg = re.sub(r"(?s)\n\n.+", "\n", requestMsg)
 
@@ -1104,33 +1105,33 @@ class Connect(object):
                             if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
                                 if re.search(r"<%s\b" % re.escape(name), post):
                                     found = True
-                                    post = re.sub(r"(?s)(<%s\b[^>]*>)(.*?)(</%s)" % (re.escape(name), re.escape(name)), "\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
+                                    post = re.sub(r"(?s)(<%s\b[^>]*>)(.*?)(</%s)" % (re.escape(name), re.escape(name)), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
                                 elif re.search(r"\b%s>" % re.escape(name), post):
                                     found = True
-                                    post = re.sub(r"(?s)(\b%s>)(.*?)(</[^<]*\b%s>)" % (re.escape(name), re.escape(name)), "\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
+                                    post = re.sub(r"(?s)(\b%s>)(.*?)(</[^<]*\b%s>)" % (re.escape(name), re.escape(name)), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
 
                             regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
                             if not found and re.search(regex, (post or "")):
                                 found = True
-                                post = re.sub(regex, "\g<1>\g<2>%s" % value.replace('\\', r'\\'), post)
+                                post = re.sub(regex, r"\g<1>\g<2>%s" % value.replace('\\', r'\\'), post)
 
                         regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
                         if not found and re.search(regex, (post or "")):
                             found = True
-                            post = re.sub(regex, "\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
+                            post = re.sub(regex, r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
 
                         if re.search(regex, (get or "")):
                             found = True
-                            get = re.sub(regex, "\g<1>%s\g<3>" % value.replace('\\', r'\\'), get)
+                            get = re.sub(regex, r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), get)
 
                         if re.search(regex, (query or "")):
                             found = True
-                            uri = re.sub(regex.replace(r"\A", r"\?"), "\g<1>%s\g<3>" % value.replace('\\', r'\\'), uri)
+                            uri = re.sub(regex.replace(r"\A", r"\?"), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), uri)
 
                         regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), re.escape(name), re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
                         if re.search(regex, (cookie or "")):
                             found = True
-                            cookie = re.sub(regex, "\g<1>%s\g<3>" % value.replace('\\', r'\\'), cookie)
+                            cookie = re.sub(regex, r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), cookie)
 
                         if not found:
                             if post is not None:

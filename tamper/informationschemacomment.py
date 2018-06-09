@@ -22,6 +22,6 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        retVal = re.sub(r"(?i)(information_schema)\.", "\g<1>/**/.", payload)
+        retVal = re.sub(r"(?i)(information_schema)\.", r"\g<1>/**/.", payload)
 
     return retVal

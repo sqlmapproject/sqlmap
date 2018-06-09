@@ -35,6 +35,6 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        retVal = re.sub(r"\b(\w+)\(", "\g<1>/**/(", retVal)
+        retVal = re.sub(r"\b(\w+)\(", r"\g<1>/**/(", retVal)
 
     return retVal

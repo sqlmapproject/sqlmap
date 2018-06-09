@@ -49,12 +49,10 @@ class xrange(object):
         return hash(self._slice)
 
     def __cmp__(self, other):
-        return (cmp(type(self), type(other)) or
-                cmp(self._slice, other._slice))
+        return (cmp(type(self), type(other)) or cmp(self._slice, other._slice))
 
     def __repr__(self):
-        return '%s(%r, %r, %r)' % (type(self).__name__,
-                                   self.start, self.stop, self.step)
+        return '%s(%r, %r, %r)' % (type(self).__name__, self.start, self.stop, self.step)
 
     def __len__(self):
         return self._len()

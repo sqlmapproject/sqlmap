@@ -4,16 +4,15 @@
 # Reference: http://rowinggolfer.blogspot.com/2009/08/pylint-recursively.html
 
 import os
-import re
 import sys
 
 def check(filepath):
     if filepath.endswith(".py"):
-        content = open(filepath, "rb").read()        
-        #if re.search(r"\r?\n\r?\n", content):
+        content = open(filepath, "rb").read()
+
         if "\n\n\n" in content:
             index = content.find("\n\n\n")
-            print filepath, repr(content[index-30:index+30])
+            print filepath, repr(content[index - 30:index + 30])
 
 if __name__ == "__main__":
     try:

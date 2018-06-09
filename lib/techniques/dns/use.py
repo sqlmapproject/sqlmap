@@ -83,7 +83,7 @@ def dnsUse(payload, expression):
                 _ = conf.dnsServer.pop(prefix, suffix)
 
                 if _:
-                    _ = extractRegexResult("%s\.(?P<result>.+)\.%s" % (prefix, suffix), _, re.I)
+                    _ = extractRegexResult(r"%s\.(?P<result>.+)\.%s" % (prefix, suffix), _, re.I)
                     _ = decodeHexValue(_)
                     output = (output or "") + _
                     offset += len(_)

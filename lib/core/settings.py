@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.2.6.15"
+VERSION = "1.2.6.16"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -364,7 +364,7 @@ URI_HTTP_HEADER = "URI"
 URI_INJECTABLE_REGEX = r"//[^/]*/([^\.*?]+)\Z"
 
 # Regex used for masking sensitive data
-SENSITIVE_DATA_REGEX = "(\s|=)(?P<result>[^\s=]*%s[^\s]*)\s"
+SENSITIVE_DATA_REGEX = r"(\s|=)(?P<result>[^\s=]*%s[^\s]*)\s"
 
 # Options to explicitly mask in anonymous (unhandled exception) reports (along with anything carrying the <hostname> inside)
 SENSITIVE_OPTIONS = ("hostname", "answers", "data", "dnsDomain", "googleDork", "authCred", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy", "rFile", "wFile", "dFile", "testParameter", "authCred")
@@ -388,7 +388,7 @@ CANDIDATE_SENTENCE_MIN_LENGTH = 10
 CUSTOM_INJECTION_MARK_CHAR = '*'
 
 # Other way to declare injection position
-INJECT_HERE_REGEX = '(?i)%INJECT[_ ]?HERE%'
+INJECT_HERE_REGEX = r"(?i)%INJECT[_ ]?HERE%"
 
 # Minimum chunk length used for retrieving data over error based payloads
 MIN_ERROR_CHUNK_LENGTH = 8
@@ -487,7 +487,7 @@ LEGAL_DISCLAIMER = "Usage of sqlmap for attacking targets without prior mutual c
 REFLECTIVE_MISS_THRESHOLD = 20
 
 # Regular expression used for extracting HTML title
-HTML_TITLE_REGEX = "<title>(?P<result>[^<]+)</title>"
+HTML_TITLE_REGEX = r"<title>(?P<result>[^<]+)</title>"
 
 # Table used for Base64 conversion in WordPress hash cracking routine
 ITOA64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -631,7 +631,7 @@ BANNER = re.sub(r"\[.\]", lambda _: "[\033[01;41m%s\033[01;49m]" % random.sample
 DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
 
 # Regular expression used for recognition of file inclusion errors
-FI_ERROR_REGEX = "(?i)[^\n]{0,100}(no such file|failed (to )?open)[^\n]{0,100}"
+FI_ERROR_REGEX = r"(?i)[^\n]{0,100}(no such file|failed (to )?open)[^\n]{0,100}"
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6

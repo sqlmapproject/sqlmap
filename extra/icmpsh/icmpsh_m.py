@@ -80,7 +80,7 @@ def main(src, dst):
         cmd = ''
 
         # Wait for incoming replies
-        if sock in select.select([ sock ], [], [])[0]:
+        if sock in select.select([sock], [], [])[0]:
             buff = sock.recv(4096)
 
             if 0 == len(buff):

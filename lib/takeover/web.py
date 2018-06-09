@@ -219,7 +219,7 @@ class Web:
                         finally:
                             been.add(url)
 
-                url = re.sub(r"(\.\w+)\Z", "~\g<1>", conf.url)
+                url = re.sub(r"(\.\w+)\Z", r"~\g<1>", conf.url)
                 if url not in been:
                     try:
                         page, _, _ = Request.getPage(url=url, raise404=False, silent=True)
@@ -231,7 +231,7 @@ class Web:
 
                 for place in (PLACE.GET, PLACE.POST):
                     if place in conf.parameters:
-                        value = re.sub(r"(\A|&)(\w+)=", "\g<2>[]=", conf.parameters[place])
+                        value = re.sub(r"(\A|&)(\w+)=", r"\g<2>[]=", conf.parameters[place])
                         if "[]" in value:
                             page, headers, _ = Request.queryPage(value=value, place=place, content=True, raise404=False, silent=True, noteResponseTime=False)
                             parseFilePaths(page)
@@ -243,12 +243,12 @@ class Web:
                     cookie = headers[HTTP_HEADER.SET_COOKIE]
 
                 if cookie:
-                    value = re.sub(r"(\A|;)(\w+)=[^;]*", "\g<2>=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", cookie)
+                    value = re.sub(r"(\A|;)(\w+)=[^;]*", r"\g<2>=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", cookie)
                     if value != cookie:
                         page, _, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
                         parseFilePaths(page)
 
-                    value = re.sub(r"(\A|;)(\w+)=[^;]*", "\g<2>=", cookie)
+                    value = re.sub(r"(\A|;)(\w+)=[^;]*", r"\g<2>=", cookie)
                     if value != cookie:
                         page, _, _ = Request.queryPage(value=value, place=PLACE.COOKIE, content=True, raise404=False, silent=True, noteResponseTime=False)
                         parseFilePaths(page)
