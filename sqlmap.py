@@ -57,6 +57,7 @@ try:
     from lib.core.exception import SqlmapUserQuitException
     from lib.core.option import initOptions
     from lib.core.option import init
+    from lib.core.patch import dirtyPatches
     from lib.core.settings import GIT_PAGE
     from lib.core.settings import IS_WIN
     from lib.core.settings import LEGAL_DISCLAIMER
@@ -114,6 +115,7 @@ def main():
     """
 
     try:
+        dirtyPatches()
         checkEnvironment()
         setPaths(modulePath())
         banner()

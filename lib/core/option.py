@@ -10,7 +10,6 @@ import cookielib
 import glob
 import inspect
 import logging
-import httplib
 import os
 import random
 import re
@@ -1816,16 +1815,6 @@ def _cleanupEnvironment():
     if hasattr(socket, "_ready"):
         socket._ready.clear()
 
-def _dirtyPatches():
-    """
-    Place for "dirty" Python related patches
-    """
-
-    httplib._MAXLINE = 1 * 1024 * 1024                          # accept overly long result lines (e.g. SQLi results in HTTP header responses)
-
-    if IS_WIN:
-        from thirdparty.wininetpton import win_inet_pton        # add support for inet_pton() on Windows OS
-
 def _purgeOutput():
     """
     Safely removes (purges) output directory.
@@ -2633,7 +2622,6 @@ def init():
     _setRequestFromFile()
     _cleanupOptions()
     _cleanupEnvironment()
-    _dirtyPatches()
     _purgeOutput()
     _checkDependencies()
     _createTemporaryDirectory()
