@@ -83,6 +83,7 @@ def _setRequestParams():
         conf.parameters[None] = "direct connection"
         return
 
+    hintNames = []
     testableParameters = False
 
     # Perform checks on GET parameters
@@ -101,7 +102,6 @@ def _setRequestParams():
 
     if conf.data is not None:
         conf.method = HTTPMETHOD.POST if not conf.method or conf.method == HTTPMETHOD.GET else conf.method
-        hintNames = []
 
         def process(match, repl):
             retVal = match.group(0)
