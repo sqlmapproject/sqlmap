@@ -4281,7 +4281,7 @@ def hashDBWrite(key, value, serialize=False):
     Helper function for writing session data to HashDB
     """
 
-    _ = '|'.join((conf.hostname, conf.path.strip('/') if conf.path is not None else str(conf.port), key, HASHDB_MILESTONE_VALUE))
+    _ = '|'.join((conf.hostname, conf.path.strip('/') if conf.path is not None else str(conf.port), str(key), str(HASHDB_MILESTONE_VALUE)))
     conf.hashDB.write(_, value, serialize)
 
 def hashDBRetrieve(key, unserialize=False, checkConf=False):
@@ -4289,7 +4289,7 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
     Helper function for restoring session data from HashDB
     """
 
-    _ = '|'.join((conf.hostname, conf.path.strip('/') if conf.path is not None else str(conf.port), key, HASHDB_MILESTONE_VALUE))
+    _ = '|'.join((conf.hostname, conf.path.strip('/') if conf.path is not None else str(conf.port), str(key), str(HASHDB_MILESTONE_VALUE)))
     retVal = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any((conf.flushSession, conf.freshQueries))) else None
 
     if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, basestring) and any(_ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
