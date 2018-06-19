@@ -40,7 +40,7 @@ bfffdc74a93ff647c49b79c215d96d8a  lib/core/enums.py
 cada93357a7321655927fc9625b3bfec  lib/core/exception.py
 1e5532ede194ac9c083891c2f02bca93  lib/core/__init__.py
 458a194764805cd8312c14ecd4be4d1e  lib/core/log.py
-262b62d685a2403586e6ca0aac2e41d8  lib/core/optiondict.py
+e9e32e5afe49ecd644b3a0ca9c9a36fc  lib/core/optiondict.py
 90a061be1a0658c2bdb197511b61d6fa  lib/core/option.py
 c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 7cfd04e583cca782b843f6f6d973981a  lib/core/profiling.py
@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-b78d172e50095c1d6612ed52b4c79a6b  lib/core/settings.py
+dc0d040df74bdf0d6a08f41d412b76e7  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 36bd2dc292c0e10e39bd9c43b77fe1bc  lib/core/target.py
@@ -59,7 +59,7 @@ c40758411bb0bd68764d78e0bb72bd0f  lib/core/unescaper.py
 e772deb63270375e685fa5a7b775c382  lib/core/wordlist.py
 1e5532ede194ac9c083891c2f02bca93  lib/__init__.py
 7620f1f4b8791e13c7184c06b5421754  lib/parse/banner.py
-d6ac9df0bafd0ee171380a7b0581f6d2  lib/parse/cmdline.py
+2b3b021a8e7e119d0553c02b110d07d9  lib/parse/cmdline.py
 fb2e2f05dde98caeac6ccf3e67192177  lib/parse/configfile.py
 3794ff139869f5ae8e81cfdbe5714f56  lib/parse/handler.py
 6bab53ea9d75bc9bb8169d3e8f3f149f  lib/parse/headers.py
@@ -70,7 +70,7 @@ ec4e56bbb1349176b2a22e0b99ba6a55  lib/parse/payloads.py
 30eed3a92a04ed2c29770e1b10d39dc0  lib/request/basicauthhandler.py
 2b81435f5a7519298c15c724e3194a0d  lib/request/basic.py
 c0cabedead14b8a23353b606672cff42  lib/request/comparison.py
-60c9d366d0f2173d8dc9f504a7e9d374  lib/request/connect.py
+607419fd07bcabc274782dbc7b238e8b  lib/request/connect.py
 dd4598675027fae99f2e2475b05986da  lib/request/direct.py
 2044fce3f4ffa268fcfaaf63241b1e64  lib/request/dns.py
 98535d0efca5551e712fcc4b34a3f772  lib/request/httpshandler.py

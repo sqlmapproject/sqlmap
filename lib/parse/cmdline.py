@@ -336,6 +336,9 @@ def cmdLineParser(argv=None):
         techniques.add_option("--second-url", dest="secondUrl",
                               help="Resulting page URL searched for second-order response")
 
+        techniques.add_option("--second-req", dest="secondReq",
+                              help="Load second-order HTTP request from file")
+
         # Fingerprint options
         fingerprint = OptionGroup(parser, "Fingerprint")
 

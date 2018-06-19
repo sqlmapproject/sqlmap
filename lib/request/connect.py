@@ -1237,6 +1237,8 @@ class Connect(object):
 
         if conf.secondUrl:
             page, headers, code = Connect.getPage(url=conf.secondUrl, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
+        elif conf.secondReq:
+            pass
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
         threadData.lastPage = page
