@@ -333,7 +333,7 @@ def cmdLineParser(argv=None):
         techniques.add_option("--dns-domain", dest="dnsDomain",
                               help="Domain name used for DNS exfiltration attack")
 
-        techniques.add_option("--second-order", dest="secondOrder",
+        techniques.add_option("--second-url", dest="secondUrl",
                               help="Resulting page URL searched for second-order response")
 
         # Fingerprint options

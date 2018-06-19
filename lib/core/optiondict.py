@@ -109,7 +109,7 @@ optDict = {
         "uChar": "string",
         "uFrom": "string",
         "dnsDomain": "string",
-        "secondOrder": "string",
+        "secondUrl": "string",
     },
 
     "Fingerprint": {

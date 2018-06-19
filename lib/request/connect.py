@@ -1235,8 +1235,8 @@ class Connect(object):
                     warnMsg += "behavior in custom WAF/IPS/IDS solutions"
                 singleTimeWarnMessage(warnMsg)
 
-        if conf.secondOrder:
-            page, headers, code = Connect.getPage(url=conf.secondOrder, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
+        if conf.secondUrl:
+            page, headers, code = Connect.getPage(url=conf.secondUrl, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
         threadData.lastPage = page

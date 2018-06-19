@@ -279,6 +279,7 @@ DEPRECATED_OPTIONS = {
     "--binary": "use '--binary-fields' instead",
     "--auth-private": "use '--auth-file' instead",
     "--ignore-401": "use '--ignore-code' instead",
+    "--second-order": "use '--second-url' instead",
     "--check-payload": None,
     "--check-waf": None,
     "--pickled-options": "use '--api -c ...' instead",
