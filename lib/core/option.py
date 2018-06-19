@@ -314,7 +314,7 @@ def _setRequestFromFile():
         infoMsg = "parsing second-order HTTP request from '%s'" % conf.secondReq
         logger.info(infoMsg)
 
-        target = parseRequestFile(conf.secondReq).next()
+        target = parseRequestFile(conf.secondReq, False).next()
         kb.secondReq = target
 
 def _setCrawler():
@@ -2222,6 +2222,10 @@ def _basicOptionValidation():
 
     if conf.eta and conf.verbose > defaults.verbose:
         errMsg = "switch '--eta' is incompatible with option '-v'"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.secondUrl and conf.secondReq:
+        errMsg = "option '--second-url' is incompatible with option '--second-req')"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.direct and conf.url:

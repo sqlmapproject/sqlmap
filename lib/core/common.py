@@ -4475,7 +4475,7 @@ def pollProcess(process, suppress_errors=False):
 
             break
 
-def parseRequestFile(reqFile):
+def parseRequestFile(reqFile, checkParams=True):
     """
     Parses WebScarab and Burp logs and adds results to the target URL list
     """
@@ -4624,7 +4624,7 @@ def parseRequestFile(reqFile):
 
             data = data.rstrip("\r\n") if data else data
 
-            if getPostReq and (params or cookie):
+            if getPostReq and (params or cookie or not checkParams):
                 if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
                     port = "443"
                 elif not scheme and port == "443":
