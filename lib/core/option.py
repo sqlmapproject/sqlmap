@@ -285,26 +285,37 @@ def _setRequestFromFile():
     textual file, parses it and saves the information into the knowledge base.
     """
 
-    if not conf.requestFile:
-        return
+    if conf.requestFile:
+        conf.requestFile = safeExpandUser(conf.requestFile)
+        seen = set()
 
-    seen = set()
+        if not os.path.isfile(conf.requestFile):
+            errMsg = "specified HTTP request file '%s' " % conf.requestFile
+            errMsg += "does not exist"
+            raise SqlmapFilePathException(errMsg)
 
-    conf.requestFile = safeExpandUser(conf.requestFile)
+        infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
+        logger.info(infoMsg)
 
-    if not os.path.isfile(conf.requestFile):
-        errMsg = "specified HTTP request file '%s' " % conf.requestFile
-        errMsg += "does not exist"
-        raise SqlmapFilePathException(errMsg)
+        for target in parseRequestFile(conf.requestFile):
+            url = target[0]
+            if url not in seen:
+                kb.targets.add(target)
+                seen.add(url)
 
-    infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
-    logger.info(infoMsg)
+    if conf.secondReq:
+        conf.secondReq = safeExpandUser(conf.secondReq)
 
-    for target in parseRequestFile(conf.requestFile):
-        url = target[0]
-        if url not in seen:
-            kb.targets.add(target)
-            seen.add(url)
+        if not os.path.isfile(conf.secondReq):
+            errMsg = "specified second-order HTTP request file '%s' " % onf.secondReq
+            errMsg += "does not exist"
+            raise SqlmapFilePathException(errMsg)
+
+        infoMsg = "parsing second-order HTTP request from '%s'" % conf.secondReq
+        logger.info(infoMsg)
+
+        target = parseRequestFile(conf.secondReq).next()
+        kb.secondReq = target
 
 def _setCrawler():
     if not conf.crawlDepth:
@@ -1823,6 +1834,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.rowXmlMode = False
     kb.safeCharEncode = False
     kb.safeReq = AttribDict()
+    kb.secondReq = None
     kb.singleLogFlags = set()
     kb.skipSeqMatcher = False
     kb.reduceTests = None

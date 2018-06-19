@@ -4504,7 +4504,7 @@ def parseRequestFile(reqFile):
                 continue
 
             if not(conf.scope and not re.search(conf.scope, url, re.I)):
-                yield (url, method, None, cookie, None)
+                yield (url, method, None, cookie, tuple())
 
     def _parseBurpLog(content):
         """
