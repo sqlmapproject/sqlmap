@@ -4102,6 +4102,7 @@ def checkDeprecatedOptions(args):
     """
 
     for _ in args:
+        _ = _.split('=')[0].strip()
         if _ in DEPRECATED_OPTIONS:
             errMsg = "switch/option '%s' is deprecated" % _
             if DEPRECATED_OPTIONS[_]:
