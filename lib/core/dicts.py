@@ -281,6 +281,7 @@ DEPRECATED_OPTIONS = {
     "--auth-private": "use '--auth-file' instead",
     "--ignore-401": "use '--ignore-code' instead",
     "--second-order": "use '--second-url' instead",
+    "--purge-output": "use '--purge' instead",
     "--check-payload": None,
     "--check-waf": None,
     "--pickled-options": "use '--api -c ...' instead",

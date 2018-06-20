@@ -1638,13 +1638,13 @@ def _cleanupEnvironment():
     if hasattr(socket, "_ready"):
         socket._ready.clear()
 
-def _purgeOutput():
+def _purge():
     """
-    Safely removes (purges) output directory.
+    Safely removes (purges) sqlmap data directory.
     """
 
-    if conf.purgeOutput:
-        purge(paths.SQLMAP_OUTPUT_PATH)
+    if conf.purge:
+        purge(paths.SQLMAP_HOME_PATH)
 
 def _setConfAttributes():
     """
@@ -2450,7 +2450,7 @@ def init():
     _setRequestFromFile()
     _cleanupOptions()
     _cleanupEnvironment()
-    _purgeOutput()
+    _purge()
     _checkDependencies()
     _createTemporaryDirectory()
     _basicOptionValidation()

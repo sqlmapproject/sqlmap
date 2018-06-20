@@ -1273,12 +1273,15 @@ def setPaths(rootPath):
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
+    # history files
+    paths.SQLMAP_HISTORY_PATH = getUnicode(os.path.join(_, "history"), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
+    paths.API_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "api.hst")
+    paths.OS_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "os.hst")
+    paths.SQL_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "sql.hst")
+    paths.SQLMAP_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "sqlmap.hst")
+    paths.GITHUB_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "github.hst")
+
     # sqlmap files
-    paths.API_SHELL_HISTORY = os.path.join(_, "api.hst")
-    paths.OS_SHELL_HISTORY = os.path.join(_, "os.hst")
-    paths.SQL_SHELL_HISTORY = os.path.join(_, "sql.hst")
-    paths.SQLMAP_SHELL_HISTORY = os.path.join(_, "sqlmap.hst")
-    paths.GITHUB_HISTORY = os.path.join(_, "github.hst")
     paths.CHECKSUM_MD5 = os.path.join(paths.SQLMAP_TXT_PATH, "checksum.md5")
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")

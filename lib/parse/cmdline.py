@@ -643,8 +643,8 @@ def cmdLineParser(argv=None):
         miscellaneous.add_option("--offline", dest="offline", action="store_true",
                                  help="Work in offline mode (only use session data)")
 
-        miscellaneous.add_option("--purge-output", dest="purgeOutput", action="store_true",
-                                 help="Safely remove all content from output directory")
+        miscellaneous.add_option("--purge", dest="purge", action="store_true",
+                                 help="Safely remove all content from sqlmap data directory")
 
         miscellaneous.add_option("--skip-waf", dest="skipWaf", action="store_true",
                                  help="Skip heuristic detection of WAF/IPS/IDS protection")
@@ -874,7 +874,7 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
-        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, args.purgeOutput, args.sitemapUrl)):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, args.purge, args.sitemapUrl)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help\n"
             parser.error(errMsg)

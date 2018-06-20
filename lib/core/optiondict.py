@@ -229,7 +229,7 @@ optDict = {
         "identifyWaf": "boolean",
         "mobile": "boolean",
         "offline": "boolean",
-        "purgeOutput": "boolean",
+        "purge": "boolean",
         "skipWaf": "boolean",
         "smart": "boolean",
         "tmpDir": "string",
