@@ -43,12 +43,12 @@ cada93357a7321655927fc9625b3bfec  lib/core/exception.py
 e9e32e5afe49ecd644b3a0ca9c9a36fc  lib/core/optiondict.py
 d2672b24ffa985523066613138fccbbd  lib/core/option.py
 c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
-945b313b8bb9713f570f5ebb05416799  lib/core/profiling.py
+6783160150b4711d02c56ee2beadffdb  lib/core/profiling.py
 6f654e1715571eff68a0f8af3d62dcf8  lib/core/readlineng.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-e5a223ce6a904c33c896cc6a6161eb01  lib/core/settings.py
+4a7888756dc009a582de9f4ed7dfd683  lib/core/settings.py
 0dfc2ed40adf72e302291f6ecd4406f6  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 36bd2dc292c0e10e39bd9c43b77fe1bc  lib/core/target.py
@@ -65,7 +65,7 @@ fb2e2f05dde98caeac6ccf3e67192177  lib/parse/configfile.py
 6bab53ea9d75bc9bb8169d3e8f3f149f  lib/parse/headers.py
 1bc6ddaeada0f2425fa9aae226854ca8  lib/parse/html.py
 1e5532ede194ac9c083891c2f02bca93  lib/parse/__init__.py
-ec4e56bbb1349176b2a22e0b99ba6a55  lib/parse/payloads.py
+f2af274126ce0a789027d35d367f2b9e  lib/parse/payloads.py
 492654567e72b6a14584651fcd9f16e6  lib/parse/sitemap.py
 30eed3a92a04ed2c29770e1b10d39dc0  lib/request/basicauthhandler.py
 2b81435f5a7519298c15c724e3194a0d  lib/request/basic.py
