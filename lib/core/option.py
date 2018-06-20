@@ -35,14 +35,11 @@ from lib.core.common import checkFile
 from lib.core.common import dataToStdout
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
-from lib.core.common import extractRegexResult
-from lib.core.common import filterStringValue
 from lib.core.common import findLocalPort
 from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
-from lib.core.common import getUnicode
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
@@ -307,7 +304,7 @@ def _setRequestFromFile():
         conf.secondReq = safeExpandUser(conf.secondReq)
 
         if not os.path.isfile(conf.secondReq):
-            errMsg = "specified second-order HTTP request file '%s' " % onf.secondReq
+            errMsg = "specified second-order HTTP request file '%s' " % conf.secondReq
             errMsg += "does not exist"
             raise SqlmapFilePathException(errMsg)
 
@@ -1623,6 +1620,9 @@ def _cleanupOptions():
 
     if any((conf.proxy, conf.proxyFile, conf.tor)):
         conf.disablePrecon = True
+
+    if conf.dummy:
+        conf.batch = True
 
     threadData = getCurrentThreadData()
     threadData.reset()

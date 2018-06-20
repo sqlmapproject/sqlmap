@@ -5,6 +5,7 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import POST_HINT
@@ -293,4 +294,32 @@ DUMP_DATA_PREPROCESS = {
 DEFAULT_DOC_ROOTS = {
     OS.WINDOWS: ("C:/xampp/htdocs/", "C:/wamp/www/", "C:/Inetpub/wwwroot/"),
     OS.LINUX: ("/var/www/", "/var/www/html", "/usr/local/apache2/htdocs", "/var/www/nginx-default", "/srv/www")  # Reference: https://wiki.apache.org/httpd/DistrosDefaultLayout
+}
+
+PART_RUN_CONTENT_TYPES = {
+    "checkDbms": CONTENT_TYPE.TECHNIQUES,
+    "getFingerprint": CONTENT_TYPE.DBMS_FINGERPRINT,
+    "getBanner": CONTENT_TYPE.BANNER,
+    "getCurrentUser": CONTENT_TYPE.CURRENT_USER,
+    "getCurrentDb": CONTENT_TYPE.CURRENT_DB,
+    "getHostname": CONTENT_TYPE.HOSTNAME,
+    "isDba": CONTENT_TYPE.IS_DBA,
+    "getUsers": CONTENT_TYPE.USERS,
+    "getPasswordHashes": CONTENT_TYPE.PASSWORDS,
+    "getPrivileges": CONTENT_TYPE.PRIVILEGES,
+    "getRoles": CONTENT_TYPE.ROLES,
+    "getDbs": CONTENT_TYPE.DBS,
+    "getTables": CONTENT_TYPE.TABLES,
+    "getColumns": CONTENT_TYPE.COLUMNS,
+    "getSchema": CONTENT_TYPE.SCHEMA,
+    "getCount": CONTENT_TYPE.COUNT,
+    "dumpTable": CONTENT_TYPE.DUMP_TABLE,
+    "search": CONTENT_TYPE.SEARCH,
+    "sqlQuery": CONTENT_TYPE.SQL_QUERY,
+    "tableExists": CONTENT_TYPE.COMMON_TABLES,
+    "columnExists": CONTENT_TYPE.COMMON_COLUMNS,
+    "readFile": CONTENT_TYPE.FILE_READ,
+    "writeFile": CONTENT_TYPE.FILE_WRITE,
+    "osCmd": CONTENT_TYPE.OS_CMD,
+    "regRead": CONTENT_TYPE.REG_READ
 }
