@@ -1031,7 +1031,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
         logger.debug(debugMsg)
 
     if retVal is None:
-        if checkBatch and conf.get("batch"):
+        if checkBatch and conf.get("batch") or conf.get("api"):
             if isListLike(default):
                 options = ','.join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
             elif default:
