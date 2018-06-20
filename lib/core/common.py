@@ -1274,6 +1274,7 @@ def setPaths(rootPath):
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
     # sqlmap files
+    paths.API_SHELL_HISTORY = os.path.join(_, "api.hst")
     paths.OS_SHELL_HISTORY = os.path.join(_, "os.hst")
     paths.SQL_SHELL_HISTORY = os.path.join(_, "sql.hst")
     paths.SQLMAP_SHELL_HISTORY = os.path.join(_, "sqlmap.hst")

@@ -60,6 +60,8 @@ def saveHistory(completion=None):
         historyPath = paths.SQL_SHELL_HISTORY
     elif completion == AUTOCOMPLETE_TYPE.OS:
         historyPath = paths.OS_SHELL_HISTORY
+    elif completion == AUTOCOMPLETE_TYPE.API:
+        historyPath = paths.API_SHELL_HISTORY
     else:
         historyPath = paths.SQLMAP_SHELL_HISTORY
 
@@ -86,6 +88,8 @@ def loadHistory(completion=None):
         historyPath = paths.SQL_SHELL_HISTORY
     elif completion == AUTOCOMPLETE_TYPE.OS:
         historyPath = paths.OS_SHELL_HISTORY
+    elif completion == AUTOCOMPLETE_TYPE.API:
+        historyPath = paths.API_SHELL_HISTORY
     else:
         historyPath = paths.SQLMAP_SHELL_HISTORY
 
