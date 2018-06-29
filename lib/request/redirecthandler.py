@@ -134,7 +134,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                         cookies[key] = value
                         last = key
                     elif last:
-                        cookies[key] += "%s%s" % (delimiter, part)
+                        cookies[last] += "%s%s" % (delimiter, part)
 
                 req.headers[HTTP_HEADER.COOKIE] = delimiter.join("%s=%s" % (key, cookies[key]) for key in cookies)
 
