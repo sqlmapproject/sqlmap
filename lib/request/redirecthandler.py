@@ -5,7 +5,6 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import re
 import time
 import types
 import urllib2
@@ -124,12 +123,21 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
             req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)
             if headers and HTTP_HEADER.SET_COOKIE in headers:
+                cookies = dict()
                 delimiter = conf.cookieDel or DEFAULT_COOKIE_DELIMITER
-                _ = headers[HTTP_HEADER.SET_COOKIE].split(delimiter)[0]
-                if HTTP_HEADER.COOKIE not in req.headers:
-                    req.headers[HTTP_HEADER.COOKIE] = _
-                else:
-                    req.headers[HTTP_HEADER.COOKIE] = re.sub(r"%s{2,}" % delimiter, delimiter, ("%s%s%s" % (re.sub(r"\b%s=[^%s]*%s?" % (re.escape(_.split('=')[0]), delimiter, delimiter), "", req.headers[HTTP_HEADER.COOKIE]), delimiter, _)).strip(delimiter))
+                last = None
+
+                for part in req.headers.get(HTTP_HEADER.COOKIE, "").split(delimiter) + headers.getheaders(HTTP_HEADER.SET_COOKIE):
+                    if '=' in part:
+                        part = part.strip()
+                        key, value = part.split('=', 1)
+                        cookies[key] = value
+                        last = key
+                    elif last:
+                        cookies[key] += "%s%s" % (delimiter, part)
+
+                req.headers[HTTP_HEADER.COOKIE] = delimiter.join("%s=%s" % (key, cookies[key]) for key in cookies)
+
             try:
                 result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
             except urllib2.HTTPError, e:
