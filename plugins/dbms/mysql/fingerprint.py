@@ -183,8 +183,15 @@ class Fingerprint(GenericFingerprint):
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855
 
+            # Determine if it is MySQL >= 8.0.0
+            if inject.checkBooleanExpression("ISNULL(JSON_STORAGE_FREE(NULL))"):
+                kb.data.has_information_schema = True
+                Backend.setVersion(">= 8.0.0")
+                setDbms("%s 8" % DBMS.MYSQL)
+                self.getBanner()
+
             # Determine if it is MySQL >= 5.0.0
-            if inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,[RANDNUM],NULL))"):
+            elif inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,[RANDNUM],NULL))"):
                 kb.data.has_information_schema = True
                 Backend.setVersion(">= 5.0.0")
                 setDbms("%s 5" % DBMS.MYSQL)
@@ -196,9 +203,17 @@ class Fingerprint(GenericFingerprint):
                 infoMsg = "actively fingerprinting %s" % DBMS.MYSQL
                 logger.info(infoMsg)
 
-                # Check if it is MySQL >= 5.5.0
-                if inject.checkBooleanExpression("TO_SECONDS(950501)>0"):
-                    Backend.setVersion(">= 5.5.0")
+                # Check if it is MySQL >= 5.7
+                if inject.checkBooleanExpression("ISNULL(JSON_QUOTE(NULL))"):
+                    Backend.setVersion(">= 5.7")
+
+                # Check if it is MySQL >= 5.6
+                elif inject.checkBooleanExpression("ISNULL(VALIDATE_PASSWORD_STRENGTH(NULL))"):
+                    Backend.setVersion(">= 5.6")
+
+                # Check if it is MySQL >= 5.5
+                elif inject.checkBooleanExpression("TO_SECONDS(950501)>0"):
+                    Backend.setVersion(">= 5.5")
 
                 # Check if it is MySQL >= 5.1.2 and < 5.5.0
                 elif inject.checkBooleanExpression("@@table_open_cache=@@table_open_cache"):

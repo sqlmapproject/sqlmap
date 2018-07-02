@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-2aab203a038a8c4d06794a9fdb878229  lib/core/settings.py
+9e328a8f6e8e76c8d78779a8041d47c7  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 95f04c1c1d8c3998d86e1bdf0e12771c  lib/core/target.py
@@ -171,7 +171,7 @@ f25c50a95e5390ecd32be5a011637349  plugins/dbms/mssqlserver/__init__.py
 f6e1f3f09f32b9cb2ca11c016d373423  plugins/dbms/mysql/connector.py
 445164daf59b890aeacc968af58fcb53  plugins/dbms/mysql/enumeration.py
 4578fa29f04d0a75499f9668466ded07  plugins/dbms/mysql/filesystem.py
-fcbf7ff279c527b4aca0dac94c28d20c  plugins/dbms/mysql/fingerprint.py
+4e23494d0a8f41c22ec3861fb404e9f7  plugins/dbms/mysql/fingerprint.py
 30065993f8300994e4658634121609e9  plugins/dbms/mysql/__init__.py
 0e2adbee217f5b94dcc124d24b8dde99  plugins/dbms/mysql/syntax.py
 403591e638b6bfdb840d52bd3138ee56  plugins/dbms/mysql/takeover.py
