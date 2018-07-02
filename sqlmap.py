@@ -325,7 +325,10 @@ def main():
                 file_ = match.group(1)
                 file_ = os.path.relpath(file_, os.path.dirname(__file__))
                 file_ = file_.replace("\\", '/')
-                file_ = re.sub(r"\.\./", '/', file_)
+                if "../" in file_:
+                    file_ = re.sub(r"(\.\./)+", '/', file_)
+                else:
+                    file_ = file_.lstrip('/')
                 file_ = re.sub(r"/{2,}", '/', file_)
                 excMsg = excMsg.replace(match.group(1), file_)
 
