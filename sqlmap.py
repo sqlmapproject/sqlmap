@@ -273,6 +273,12 @@ def main():
                 logger.error(errMsg)
                 raise SystemExit
 
+            elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
+                errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
+                errMsg += "(Reference: https://github.com/PyMySQL/PyMySQL/issues/700)"
+                logger.error(errMsg)
+                raise SystemExit
+
             elif "must be pinned buffer, not bytearray" in excMsg:
                 errMsg = "error occurred at Python interpreter which "
                 errMsg += "is fixed in 2.7.x. Please update accordingly "
