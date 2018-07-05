@@ -884,11 +884,7 @@ def setColor(message, bold=False):
             retVal = colored(message, color=None, on_color=None, attrs=("bold",))
         elif level:
             level = getattr(logging, level, None) if isinstance(level, basestring) else level
-            _ = LOGGER_HANDLER.level_map.get(level)
-            if _:
-                background, foreground, bold = _
-                retVal = colored(message, color=foreground, on_color="on_%s" % background if background else None, attrs=("bold",) if bold else None)
-
+            retVal = LOGGER_HANDLER.colorize(message, level)
             kb.stickyLevel = level if message and message[-1] != "\n" else None
 
     return retVal
