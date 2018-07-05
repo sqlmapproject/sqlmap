@@ -333,7 +333,7 @@ def unionUse(expression, unpack=True, dump=False):
                                         items = parseUnionPage(output)
 
                                         if threadData.shared.showEta:
-                                            threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
+                                            threadData.shared.progress.progress(threadData.shared.counter)
                                         if isListLike(items):
                                             # in case that we requested N columns and we get M!=N then we have to filter a bit
                                             if len(items) > 1 and len(expressionFieldsList) > 1:
@@ -355,7 +355,7 @@ def unionUse(expression, unpack=True, dump=False):
                                     else:
                                         index = None
                                         if threadData.shared.showEta:
-                                            threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
+                                            threadData.shared.progress.progress(threadData.shared.counter)
                                         for index in xrange(1 + len(threadData.shared.buffered)):
                                             if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
                                                 break

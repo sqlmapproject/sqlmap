@@ -419,7 +419,7 @@ def errorUse(expression, dump=False):
                             with kb.locks.value:
                                 index = None
                                 if threadData.shared.showEta:
-                                    threadData.shared.progress.progress(time.time() - valueStart, threadData.shared.counter)
+                                    threadData.shared.progress.progress(threadData.shared.counter)
                                 for index in xrange(1 + len(threadData.shared.buffered)):
                                     if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
                                         break

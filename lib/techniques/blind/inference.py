@@ -485,7 +485,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                         if kb.threadContinue:
                             if showEta:
-                                progress.progress(calculateDeltaSeconds(start), threadData.shared.index[0])
+                                progress.progress(threadData.shared.index[0])
                             elif conf.verbose >= 1:
                                 startCharIndex = 0
                                 endCharIndex = 0
@@ -578,7 +578,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # Did we have luck?
                         if result:
                             if showEta:
-                                progress.progress(calculateDeltaSeconds(start), len(commonValue))
+                                progress.progress(len(commonValue))
                             elif conf.verbose in (1, 2) or conf.api:
                                 dataToStdout(filterControlChars(commonValue[index - 1:]))
 
@@ -628,7 +628,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 threadData.shared.value = partialValue = partialValue + val
 
                 if showEta:
-                    progress.progress(calculateDeltaSeconds(start), index)
+                    progress.progress(index)
                 elif conf.verbose in (1, 2) or conf.api:
                     dataToStdout(filterControlChars(val))
 
