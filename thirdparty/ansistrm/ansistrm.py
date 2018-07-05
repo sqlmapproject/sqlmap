@@ -150,7 +150,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                 else:
                     prefix = ""
 
-                match = re.search(r"\[([A-Z]+)\]", message)
+                match = re.search(r"\[([A-Z ]+)\]", message)
                 if match:
                     level = match.group(1)
                     if message.startswith("\x1b[1m"):
@@ -173,6 +173,17 @@ class ColorizingStreamHandler(logging.StreamHandler):
                     else:
                         reset = self.reset
                     message = message.replace(time, ''.join((self.csi, str(self.color_map["cyan"] + 30), 'm', time, reset)), 1)
+
+                match = re.search(r"\[(#\d+)\]", message)
+                if match:
+                    counter = match.group(1)
+                    if not message.endswith(self.reset):
+                        reset = self.reset
+                    elif message.startswith("\x1b[1m"):  # bold
+                        reset = self.reset + "\x1b[1m"
+                    else:
+                        reset = self.reset
+                    message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, reset)), 1)
 
         return message
 

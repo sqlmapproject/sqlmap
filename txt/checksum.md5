@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-9f27c2f2abae2c21eb623f16abfeccf9  lib/core/settings.py
+f1e0cc7708df13f9f973dbcabfd77007  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 95f04c1c1d8c3998d86e1bdf0e12771c  lib/core/target.py
@@ -285,7 +285,7 @@ fd1bff6caefe5007444f7a0fabbc8ce9  tamper/space2mysqlblank.py
 929a2586dbb7b758a454eb09e13e5a73  tamper/versionedkeywords.py
 3aff4d344ebd4f38e033e73b63f84447  tamper/versionedmorekeywords.py
 ed1acafbac707bfa71c72f76b81c1bdd  tamper/xforwardedfor.py
-b743632abd4eee8654f98dcfdb753246  thirdparty/ansistrm/ansistrm.py
+2350c4ab8a9972980ad93466066294e9  thirdparty/ansistrm/ansistrm.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/ansistrm/__init__.py
 8e775c25bc9e84891ad6fcb4f0005c23  thirdparty/beautifulsoup/beautifulsoup.py
 cb2e1fe7c404dff41a2ae9132828f532  thirdparty/beautifulsoup/__init__.py
