@@ -45,6 +45,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
     }
     csi = '\x1b['
     reset = '\x1b[0m'
+    bold = "\x1b[1m"
     disable_coloring = False
 
     @property
@@ -150,40 +151,43 @@ class ColorizingStreamHandler(logging.StreamHandler):
                 else:
                     prefix = ""
 
-                match = re.search(r"\[([A-Z ]+)\]", message)
+                match = re.search(r"\[([A-Z ]+)\]", message)  # log level
                 if match:
                     level = match.group(1)
-                    if message.startswith("\x1b[1m"):
-                        message = message.replace("\x1b[1m", "")
-                        reset = self.reset + "\x1b[1m"
+                    if message.startswith(self.bold):
+                        message = message.replace(self.bold, "")
+                        reset = self.reset + self.bold
                         params.append('1')
                     else:
                         reset = self.reset
                     message = message.replace(level, ''.join((self.csi, ';'.join(params), 'm', level, reset)), 1)
+
+                    match = re.search(r"\A\s*\[([\d:]+)\]", message)  # time
+                    if match:
+                        time = match.group(1)
+                        if not message.endswith(self.reset):
+                            reset = self.reset
+                        elif message.startswith(self.bold):  # bold
+                            reset = self.reset + self.bold
+                        else:
+                            reset = self.reset
+                        message = message.replace(time, ''.join((self.csi, str(self.color_map["cyan"] + 30), 'm', time, reset)), 1)
+
+                    match = re.search(r"\[(#\d+)\]", message)  # counter
+                    if match:
+                        counter = match.group(1)
+                        if not message.endswith(self.reset):
+                            reset = self.reset
+                        elif message.startswith(self.bold):  # bold
+                            reset = self.reset + self.bold
+                        else:
+                            reset = self.reset
+                        message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, reset)), 1)
                 else:
-                    message = "%s%s" % (prefix, ''.join((self.csi, ';'.join(params), 'm', message, self.reset)))
+                    message = ''.join((self.csi, ';'.join(params), 'm', message, self.reset))
 
-                match = re.search(r"\A\s*\[([\d:]+)\]", message)
-                if match:
-                    time = match.group(1)
-                    if not message.endswith(self.reset):
-                        reset = self.reset
-                    elif message.startswith("\x1b[1m"):  # bold
-                        reset = self.reset + "\x1b[1m"
-                    else:
-                        reset = self.reset
-                    message = message.replace(time, ''.join((self.csi, str(self.color_map["cyan"] + 30), 'm', time, reset)), 1)
-
-                match = re.search(r"\[(#\d+)\]", message)
-                if match:
-                    counter = match.group(1)
-                    if not message.endswith(self.reset):
-                        reset = self.reset
-                    elif message.startswith("\x1b[1m"):  # bold
-                        reset = self.reset + "\x1b[1m"
-                    else:
-                        reset = self.reset
-                    message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, reset)), 1)
+                if prefix:
+                    message = "%s%s" % (prefix, message)
 
         return message
 
