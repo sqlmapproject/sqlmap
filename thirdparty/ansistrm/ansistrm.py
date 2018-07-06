@@ -145,11 +145,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
                 params.append('1')
 
             if params and message:
-                if message.lstrip() != message:
-                    prefix = re.search(r"\s+", message).group(0)
-                    message = message[len(prefix):]
-                else:
-                    prefix = ""
+                match = re.search(r"\A(\s+)", message)
+                prefix = match.group(1) if match else ""
 
                 match = re.search(r"\[([A-Z ]+)\]", message)  # log level
                 if match:
