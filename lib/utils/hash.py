@@ -7,7 +7,7 @@ See the file 'LICENSE' for copying permission
 
 try:
     from crypt import crypt
-except ImportError:
+except:  # removed ImportError because of https://github.com/sqlmapproject/sqlmap/issues/3171
     from thirdparty.fcrypt.fcrypt import crypt
 
 _multiprocessing = None
