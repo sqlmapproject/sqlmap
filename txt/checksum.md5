@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-f140b81ca26a2eb0e071cb6837352d28  lib/core/settings.py
+048446ac83a95b7b5d017366bcf4485d  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 95f04c1c1d8c3998d86e1bdf0e12771c  lib/core/target.py
@@ -185,7 +185,7 @@ bcdbd9c04d7d5a911e0e31abe1a24f0f  plugins/dbms/oracle/takeover.py
 f99c23db4ee6a6b8c0edbf684d360ad3  plugins/dbms/postgresql/connector.py
 7cdb821884e5f15084d1bea7f8a50574  plugins/dbms/postgresql/enumeration.py
 c8bb829d45752b98e6a03817b92e0fe5  plugins/dbms/postgresql/filesystem.py
-29560cf78211888802c6e5c8681e7d71  plugins/dbms/postgresql/fingerprint.py
+d30806e39996e6d273f0af888f5710a4  plugins/dbms/postgresql/fingerprint.py
 470860d3e85d11a67f2220bffaa415e7  plugins/dbms/postgresql/__init__.py
 20e6f48f496348be45f3402ebc265dbb  plugins/dbms/postgresql/syntax.py
 1287acf330da86a93c8e64aff46e3b65  plugins/dbms/postgresql/takeover.py

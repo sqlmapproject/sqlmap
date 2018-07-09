@@ -100,9 +100,9 @@ class Fingerprint(GenericFingerprint):
             if inject.checkBooleanExpression("XMLTABLE(NULL) IS NULL"):
                 Backend.setVersion(">= 10.0")
             elif inject.checkBooleanExpression("SIND(0)=0"):
-                Backend.setVersion(">= 9.6.0", "< 10.0")
+                Backend.setVersionList([">= 9.6.0", "< 10.0"])
             elif inject.checkBooleanExpression("TO_JSONB(1) IS NOT NULL"):
-                Backend.setVersion(">= 9.5.0", "< 9.6.0")
+                Backend.setVersionList([">= 9.5.0", "< 9.6.0"])
             elif inject.checkBooleanExpression("JSON_TYPEOF(NULL) IS NULL"):
                 Backend.setVersionList([">= 9.4.0", "< 9.5.0"])
             elif inject.checkBooleanExpression("ARRAY_REPLACE(NULL,1,1) IS NULL"):
