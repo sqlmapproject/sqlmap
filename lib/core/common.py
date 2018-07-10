@@ -2334,7 +2334,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
                 try:
                     return unicode(value, UNICODE_ENCODING)
                 except:
-                    value = getUnicode(value[:ex.start], UNICODE_ENCODING) + u"".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + getUnicode(value[ex.end:], UNICODE_ENCODING)
+                    value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
     elif isListLike(value):
         value = list(getUnicode(_, encoding, noneToNull) for _ in value)
         return value
