@@ -17,6 +17,7 @@ import zipfile
 
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
+from lib.core.common import getLatestRevision
 from lib.core.common import pollProcess
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -25,6 +26,7 @@ from lib.core.data import paths
 from lib.core.revision import getRevisionNumber
 from lib.core.settings import GIT_REPOSITORY
 from lib.core.settings import IS_WIN
+from lib.core.settings import VERSION
 from lib.core.settings import ZIPBALL_PAGE
 from lib.core.settings import UNICODE_ENCODING
 
@@ -38,6 +40,10 @@ def update():
         warnMsg = "not a git repository. It is recommended to clone the 'sqlmapproject/sqlmap' repository "
         warnMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
         logger.warn(warnMsg)
+
+        if VERSION == getLatestRevision():
+            logger.info("already at the latest revision '%s'" % getRevisionNumber())
+            return
 
         message = "do you want to try to fetch the latest 'zipball' from repository and extract it (experimental) ? [y/N]"
         if readInput(message, default='N', boolean=True):

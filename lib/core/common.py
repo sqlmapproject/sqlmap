@@ -3347,6 +3347,22 @@ def unhandledExceptionMessage():
 
     return errMsg
 
+def getLatestRevision():
+    """
+    Retrieves latest revision from the offical repository
+    """
+
+    retVal = None
+    req = urllib2.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py")
+
+    try:
+        content = urllib2.urlopen(req).read()
+        retVal = extractRegexResult(r"VERSION\s*=\s*[\"'](?P<result>[\d.]+)", content)
+    except:
+        pass
+
+    return retVal
+
 def createGithubIssue(errMsg, excMsg):
     """
     Automatically create a Github issue with unhandled exception information
