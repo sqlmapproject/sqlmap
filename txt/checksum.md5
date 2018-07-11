@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-2f2c4fe68780abcae94f5b4ea7650387  lib/core/settings.py
+2c474df57ac9d142f8747701b70082a5  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 95f04c1c1d8c3998d86e1bdf0e12771c  lib/core/target.py
@@ -465,7 +465,7 @@ d48c971769c6131e35bd52d2315a8d58  xml/banner/servlet-engine.xml
 d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 350605448f049cd982554123a75f11e1  xml/banner/x-aspnet-version.xml
 817078783e1edaa492773d3b34d8eef0  xml/banner/x-powered-by.xml
-fb93505ef0ab3b4a20900f3e5625260d  xml/boundaries.xml
+201b8bb7888f500294a9831bb47ce7a7  xml/boundaries.xml
 0d0d4bd0e06c99dd8eb4f92acc25caf3  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 3318571fac8df058f19ea85780606643  xml/payloads/boolean_blind.xml
