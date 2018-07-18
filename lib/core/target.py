@@ -671,6 +671,8 @@ def _createTargetDirs():
 
         conf.outputPath = tempDir
 
+    conf.outputPath = getUnicode(conf.outputPath)
+
     try:
         with codecs.open(os.path.join(conf.outputPath, "target.txt"), "w+", UNICODE_ENCODING) as f:
             f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
