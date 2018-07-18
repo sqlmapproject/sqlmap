@@ -164,7 +164,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                         time = match.group(1)
                         if not message.endswith(self.reset):
                             reset = self.reset
-                        elif message.startswith(self.bold):  # bold
+                        elif self.bold in message:  # bold
                             reset = self.reset + self.bold
                         else:
                             reset = self.reset
@@ -175,11 +175,22 @@ class ColorizingStreamHandler(logging.StreamHandler):
                         counter = match.group(1)
                         if not message.endswith(self.reset):
                             reset = self.reset
-                        elif message.startswith(self.bold):  # bold
+                        elif self.bold in message:  # bold
                             reset = self.reset + self.bold
                         else:
                             reset = self.reset
                         message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, reset)), 1)
+
+                    match = re.search(r"'([^']+)'", message)  # single-quoted
+                    if match:
+                        string = match.group(1)
+                        if not message.endswith(self.reset):
+                            reset = self.reset
+                        elif self.bold in message:  # bold
+                            reset = self.reset + self.bold
+                        else:
+                            reset = self.reset
+                        message = message.replace(string, ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, reset)), 1)
                 else:
                     message = ''.join((self.csi, ';'.join(params), 'm', message, self.reset))
 
