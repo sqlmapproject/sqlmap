@@ -168,6 +168,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
     except (KeyboardInterrupt, SqlmapUserQuitException), ex:
         print
+        kb.prependFlag = False
         kb.threadContinue = False
         kb.threadException = True
 
