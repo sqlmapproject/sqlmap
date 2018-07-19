@@ -1317,8 +1317,6 @@ def parseTargetDirect():
     if not conf.direct:
         return
 
-    conf.direct = conf.direct.encode(UNICODE_ENCODING)  # some DBMS connectors (e.g. pymssql) don't like Unicode with non-US letters
-
     details = None
     remote = False
 
