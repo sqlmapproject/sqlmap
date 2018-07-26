@@ -16,6 +16,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
 from lib.core.common import decodeHexValue
 from lib.core.common import extractRegexResult
+from lib.core.common import firstNotNone
 from lib.core.common import getConsoleWidth
 from lib.core.common import getPartRun
 from lib.core.common import getUnicode
@@ -102,7 +103,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
         try:
             while True:
                 check = r"(?si)%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop)
-                trimcheck = r"(?si)%s(?P<result>[^<\n]*)" % kb.chars.start
+                trimCheck = r"(?si)%s(?P<result>[^<\n]*)" % kb.chars.start
 
                 if field:
                     nulledCastedField = agent.nullAndCastField(field)
@@ -133,22 +134,21 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
 
                 # Parse the returned page to get the exact error-based
                 # SQL injection output
-                output = reduce(lambda x, y: x if x is not None else y, (
+                output = firstNotNone(
                     extractRegexResult(check, page),
                     extractRegexResult(check, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None),
                     extractRegexResult(check, listToStrValue((headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()) if headers else None)),
-                    extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)),
-                    None
+                    extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)
                 )
 
                 if output is not None:
                     output = getUnicode(output)
                 else:
-                    trimmed = (
-                        extractRegexResult(trimcheck, page) or
-                        extractRegexResult(trimcheck, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None) or
-                        extractRegexResult(trimcheck, listToStrValue((headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()) if headers else None)) or
-                        extractRegexResult(trimcheck, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)
+                    trimmed = firstNotNone(
+                        extractRegexResult(trimCheck, page),
+                        extractRegexResult(trimCheck, threadData.lastHTTPError[2] if wasLastResponseHTTPError() else None),
+                        extractRegexResult(trimCheck, listToStrValue((headers[header] for header in headers if header.lower() != HTTP_HEADER.URI.lower()) if headers else None)),
+                        extractRegexResult(trimCheck, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None)
                     )
 
                     if trimmed:
@@ -163,7 +163,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                             output = extractRegexResult(check, trimmed, re.IGNORECASE)
 
                             if not output:
-                                check = "(?P<result>[^\s<>'\"]+)"
+                                check = r"(?P<result>[^\s<>'\"]+)"
                                 output = extractRegexResult(check, trimmed, re.IGNORECASE)
                             else:
                                 output = output.rstrip()

@@ -4702,3 +4702,13 @@ def safeVariableNaming(value):
 
 def unsafeVariableNaming(value):
     return re.sub(r"%s([0-9a-f]{2})" % SAFE_VARIABLE_MARKER, lambda match: match.group(1).decode("hex"), value)
+
+def firstNotNone(*args):
+    retVal = None
+
+    for _ in args:
+        if _ is not None:
+            retVal = _
+            break
+
+    return retVal
