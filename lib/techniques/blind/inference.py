@@ -472,7 +472,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             currentCharIndex = threadData.shared.index[0]
 
                         if kb.threadContinue:
-                            start = time.time()
                             val = getChar(currentCharIndex, asciiTbl, not(charsetType is None and conf.charset))
                             if val is None:
                                 val = INFERENCE_UNKNOWN_CHAR
@@ -553,7 +552,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             while True:
                 index += 1
-                start = time.time()
 
                 # Common prediction feature (a.k.a. "good samaritan")
                 # NOTE: to be used only when multi-threading is not set for

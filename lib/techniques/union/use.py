@@ -312,7 +312,6 @@ def unionUse(expression, unpack=True, dump=False):
                         while kb.threadContinue:
                             with kb.locks.limit:
                                 try:
-                                    valueStart = time.time()
                                     threadData.shared.counter += 1
                                     num = threadData.shared.limits.next()
                                 except StopIteration:
