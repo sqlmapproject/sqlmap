@@ -136,7 +136,7 @@ class XP_cmdshell:
 
         for line in lines:
             echoedLine = "echo %s " % line
-            echoedLine += ">> \"%s\%s\"" % (tmpPath, randDestFile)
+            echoedLine += ">> \"%s\\%s\"" % (tmpPath, randDestFile)
             echoedLines.append(echoedLine)
 
         for echoedLine in echoedLines:

@@ -1297,7 +1297,7 @@ def setPaths(rootPath):
     paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
 
     for path in paths.values():
-        if any(path.endswith(_) for _ in (".txt", ".xml", ".zip")):
+        if any(path.endswith(_) for _ in (".md5", ".txt", ".xml", ".zip")):
             checkFile(path)
 
 def weAreFrozen():
@@ -1427,7 +1427,7 @@ def parseTargetUrl():
         errMsg += "on this platform"
         raise SqlmapGenericException(errMsg)
 
-    if not re.search(r"^http[s]*://", conf.url, re.I) and not re.search(r"^ws[s]*://", conf.url, re.I):
+    if not re.search(r"^https?://", conf.url, re.I) and not re.search(r"^wss?://", conf.url, re.I):
         if re.search(r":443\b", conf.url):
             conf.url = "https://%s" % conf.url
         else:
@@ -1528,14 +1528,14 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    asterisk = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+`?([^`\s()]+)", expression)
+    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+`?([^`\s()]+)", expression)
 
-    if asterisk:
+    if match:
         infoMsg = "you did not provide the fields in your query. "
         infoMsg += "sqlmap will retrieve the column names itself"
         logger.info(infoMsg)
 
-        _ = asterisk.group(2).replace("..", '.').replace(".dbo.", '.')
+        _ = match.group(2).replace("..", '.').replace(".dbo.", '.')
         db, conf.tbl = _.split('.', 1) if '.' in _ else (None, _)
 
         if db is None:
@@ -4284,9 +4284,11 @@ def extractExpectedValue(value, expected):
                 value = value.strip().lower()
                 if value in ("true", "false"):
                     value = value == "true"
+                elif value in ('t', 'f'):
+                    value = value == 't'
                 elif value in ("1", "-1"):
                     value = True
-                elif value == "0":
+                elif value == '0':
                     value = False
                 else:
                     value = None

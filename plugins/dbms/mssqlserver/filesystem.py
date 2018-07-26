@@ -67,11 +67,11 @@ class Filesystem(GenericFilesystem):
         chunkName = randomStr(lowercase=True)
         fileScrLines = self._dataToScr(fileContent, chunkName)
 
-        logger.debug("uploading debug script to %s\%s, please wait.." % (tmpPath, randScr))
+        logger.debug("uploading debug script to %s\\%s, please wait.." % (tmpPath, randScr))
 
         self.xpCmdshellWriteFile(fileScrLines, tmpPath, randScr)
 
-        logger.debug("generating chunk file %s\%s from debug script %s" % (tmpPath, chunkName, randScr))
+        logger.debug("generating chunk file %s\\%s from debug script %s" % (tmpPath, chunkName, randScr))
 
         commands = (
             "cd \"%s\"" % tmpPath,
@@ -174,10 +174,10 @@ class Filesystem(GenericFilesystem):
 
         encodedFileContent = base64encode(wFileContent)
         encodedBase64File = "tmpf%s.txt" % randomStr(lowercase=True)
-        encodedBase64FilePath = "%s\%s" % (tmpPath, encodedBase64File)
+        encodedBase64FilePath = "%s\\%s" % (tmpPath, encodedBase64File)
 
         randPSScript = "tmpps%s.ps1" % randomStr(lowercase=True)
-        randPSScriptPath = "%s\%s" % (tmpPath, randPSScript)
+        randPSScriptPath = "%s\\%s" % (tmpPath, randPSScript)
 
         wFileSize = len(encodedFileContent)
         chunkMaxSize = 1024
@@ -212,15 +212,15 @@ class Filesystem(GenericFilesystem):
         logger.info(infoMsg)
 
         dFileName = ntpath.basename(dFile)
-        sFile = "%s\%s" % (tmpPath, dFileName)
+        sFile = "%s\\%s" % (tmpPath, dFileName)
         wFileSize = os.path.getsize(wFile)
         debugSize = 0xFF00
 
         if wFileSize < debugSize:
             chunkName = self._updateDestChunk(wFileContent, tmpPath)
 
-            debugMsg = "renaming chunk file %s\%s to %s " % (tmpPath, chunkName, fileType)
-            debugMsg += "file %s\%s and moving it to %s" % (tmpPath, dFileName, dFile)
+            debugMsg = "renaming chunk file %s\\%s to %s " % (tmpPath, chunkName, fileType)
+            debugMsg += "file %s\\%s and moving it to %s" % (tmpPath, dFileName, dFile)
             logger.debug(debugMsg)
 
             commands = (
@@ -248,7 +248,7 @@ class Filesystem(GenericFilesystem):
                     debugMsg = "appending chunk "
                     copyCmd = "copy /B /Y %s+%s %s" % (dFileName, chunkName, dFileName)
 
-                debugMsg += "%s\%s to %s file %s\%s" % (tmpPath, chunkName, fileType, tmpPath, dFileName)
+                debugMsg += "%s\\%s to %s file %s\\%s" % (tmpPath, chunkName, fileType, tmpPath, dFileName)
                 logger.debug(debugMsg)
 
                 commands = (
@@ -275,7 +275,7 @@ class Filesystem(GenericFilesystem):
 
         randVbs = "tmps%s.vbs" % randomStr(lowercase=True)
         randFile = "tmpf%s.txt" % randomStr(lowercase=True)
-        randFilePath = "%s\%s" % (tmpPath, randFile)
+        randFilePath = "%s\\%s" % (tmpPath, randFile)
 
         vbs = """Dim inputFilePath, outputFilePath
         inputFilePath = "%s"
@@ -338,7 +338,7 @@ class Filesystem(GenericFilesystem):
 
         self.xpCmdshellWriteFile(encodedFileContent, tmpPath, randFile)
 
-        logger.debug("uploading a visual basic decoder stub %s\%s, please wait.." % (tmpPath, randVbs))
+        logger.debug("uploading a visual basic decoder stub %s\\%s, please wait.." % (tmpPath, randVbs))
 
         self.xpCmdshellWriteFile(vbs, tmpPath, randVbs)
 
@@ -359,7 +359,7 @@ class Filesystem(GenericFilesystem):
         chunkMaxSize = 500
 
         randFile = "tmpf%s.txt" % randomStr(lowercase=True)
-        randFilePath = "%s\%s" % (tmpPath, randFile)
+        randFilePath = "%s\\%s" % (tmpPath, randFile)
 
         encodedFileContent = base64encode(wFileContent)
 

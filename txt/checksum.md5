@@ -28,7 +28,7 @@ c7443613a0a2505b1faec931cee2a6ef  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
 0adf547455a76dc71e6a599e52da1ed9  lib/core/agent.py
 fd8f239e259afaf5f24bcf34a0ad187f  lib/core/bigarray.py
-2131176e2fca7d400ccd0e2da6f8b77b  lib/core/common.py
+de53dd81bda04541d0992852aee0f2b3  lib/core/common.py
 0d082da16c388b3445e656e0760fb582  lib/core/convert.py
 9f87391b6a3395f7f50830b391264f27  lib/core/data.py
 72016ea5c994a711a262fd64572a0fcd  lib/core/datatype.py
@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-475b8df4fbbb3b5108ccb1e856fe2a61  lib/core/settings.py
+9c991557b5b0a38f14c5667d627ead76  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 12bed9603b6fba3e5ffda11d584bc449  lib/core/target.py
@@ -88,7 +88,7 @@ acc1db3667bf910b809eb279b60595eb  lib/takeover/icmpsh.py
 fb9e34d558293b5d6b9727f440712886  lib/takeover/registry.py
 48575dde7bb867b7937769f569a98309  lib/takeover/udf.py
 f6f835e4190a55e42d13c1e7ca3f728f  lib/takeover/web.py
-f1decf0a987bd3a4bc757212cbe6a6c8  lib/takeover/xp_cmdshell.py
+debc36a3ff80ba915aeeee69b21a8ddc  lib/takeover/xp_cmdshell.py
 09beb19c2ec9fdd14329f1c0b59a2d05  lib/techniques/blind/inference.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/blind/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/dns/__init__.py
@@ -163,7 +163,7 @@ e7d44671ae26c0bcd5fe8448be070bbd  plugins/dbms/maxdb/syntax.py
 bf7842bb291e2297c3c8d1023eb3e550  plugins/dbms/maxdb/takeover.py
 decc645344bb93aca504a71ba2e4cad4  plugins/dbms/mssqlserver/connector.py
 f1f1541a54faf67440179fa521f99849  plugins/dbms/mssqlserver/enumeration.py
-177e1d55d28ed3190bc0079b8126c6be  plugins/dbms/mssqlserver/filesystem.py
+65911fdc86fa6322e72319e6488a0bb8  plugins/dbms/mssqlserver/filesystem.py
 08914da79141713bd69a25c3cc7f06a8  plugins/dbms/mssqlserver/fingerprint.py
 f25c50a95e5390ecd32be5a011637349  plugins/dbms/mssqlserver/__init__.py
 612be1929108e7b4512a49a4a3837bbc  plugins/dbms/mssqlserver/syntax.py
@@ -214,7 +214,7 @@ f5d5419efddfe04648ea5e953c650793  plugins/generic/fingerprint.py
 f7874230e5661910d5fd21544c7d1022  plugins/generic/misc.py
 b1d2a7f3170f9b69e71335aa47f9b08b  plugins/generic/search.py
 a70cc0ada4b0cc9e7df23cb6d48a4a0c  plugins/generic/syntax.py
-e522c294676ede15bee751107e9bb449  plugins/generic/takeover.py
+4adc07051b727f1525cf0a2d619221f8  plugins/generic/takeover.py
 4419b13a4b78d7e9e4a2632302344a1a  plugins/generic/users.py
 1e5532ede194ac9c083891c2f02bca93  plugins/__init__.py
 5dc693e22f5d020c5c568d7325bd4226  shell/backdoors/backdoor.asp_
