@@ -18,6 +18,9 @@ def tamper(payload, **kwargs):
     """
     Replaces each (MySQL) 0x<hex> encoded string with equivalent CONCAT(CHAR(),...) counterpart
 
+    Requirement:
+        * MySQL
+
     Tested against:
         * MySQL 4, 5.0 and 5.5
 
