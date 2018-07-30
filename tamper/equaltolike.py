@@ -19,7 +19,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces all occurrences of operator equal ('=') with operator 'LIKE'
+    Replaces all occurrences of operator equal ('=') with 'LIKE' counterpart
 
     Tested against:
         * Microsoft SQL Server 2005

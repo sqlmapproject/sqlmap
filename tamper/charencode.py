@@ -16,8 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Url-encodes all characters in a given payload (not processing already
-    encoded)
+    URL-encodes all characters in a given payload (not processing already encoded)
 
     Tested against:
         * Microsoft SQL Server 2005
@@ -26,10 +25,8 @@ def tamper(payload, **kwargs):
         * PostgreSQL 8.3, 8.4, 9.0
 
     Notes:
-        * Useful to bypass very weak web application firewalls that do not
-          url-decode the request before processing it through their ruleset
-        * The web server will anyway pass the url-decoded version behind,
-          hence it should work against any DBMS
+        * Useful to bypass very weak web application firewalls that do not url-decode the request before processing it through their ruleset
+        * The web server will anyway pass the url-decoded version behind, hence it should work against any DBMS
 
     >>> tamper('SELECT FIELD FROM%20TABLE')
     '%53%45%4C%45%43%54%20%46%49%45%4C%44%20%46%52%4F%4D%20%54%41%42%4C%45'

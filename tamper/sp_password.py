@@ -11,7 +11,7 @@ __priority__ = PRIORITY.HIGH
 
 def tamper(payload, **kwargs):
     """
-    Appends 'sp_password' to the end of the payload for automatic obfuscation from DBMS logs
+    Appends (MsSQL) function 'sp_password' to the end of the payload for automatic obfuscation from DBMS logs
 
     Requirement:
         * MSSQL

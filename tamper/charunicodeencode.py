@@ -18,8 +18,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Unicode-url-encodes non-encoded characters in a given payload (not
-    processing already encoded)
+    Unicode-URL-encodes all characters in a given payload (not processing already encoded)
 
     Requirement:
         * ASP
@@ -32,9 +31,7 @@ def tamper(payload, **kwargs):
         * PostgreSQL 9.0.3
 
     Notes:
-        * Useful to bypass weak web application firewalls that do not
-          unicode url-decode the request before processing it through their
-          ruleset
+        * Useful to bypass weak web application firewalls that do not unicode URL-decode the request before processing it through their ruleset
 
     >>> tamper('SELECT FIELD%20FROM TABLE')
     '%u0053%u0045%u004C%u0045%u0043%u0054%u0020%u0046%u0049%u0045%u004C%u0044%u0020%u0046%u0052%u004F%u004D%u0020%u0054%u0041%u0042%u004C%u0045'

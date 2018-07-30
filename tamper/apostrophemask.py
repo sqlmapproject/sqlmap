@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces apostrophe character with its UTF-8 full width counterpart
+    Replaces apostrophe character (') with its UTF-8 full width counterpart
 
     References:
         * http://www.utf8-chartable.de/unicode-utf8-table.pl?start=65280&number=128

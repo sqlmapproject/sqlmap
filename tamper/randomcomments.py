@@ -15,7 +15,7 @@ __priority__ = PRIORITY.LOW
 
 def tamper(payload, **kwargs):
     """
-    Add random comments to SQL keywords
+    Add random inline comments inside SQL keywords
 
     >>> import random
     >>> random.seed(0)

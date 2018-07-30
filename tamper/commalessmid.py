@@ -19,7 +19,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces instances like 'MID(A, B, C)' with 'MID(A FROM B FOR C)'
+    Replaces (MySQL) instances like 'MID(A, B, C)' with 'MID(A FROM B FOR C)' counterpart
 
     Requirement:
         * MySQL

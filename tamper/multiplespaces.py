@@ -18,7 +18,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Adds multiple spaces around SQL keywords
+    Adds multiple spaces (' ') around SQL keywords
 
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls

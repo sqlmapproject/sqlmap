@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Prepends (inline) comment before parentheses
+    Prepends (inline) comment before parentheses (e.g. ( -> /**/()
 
     Tested against:
         * Microsoft SQL Server

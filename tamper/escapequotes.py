@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Slash escape quotes (' and ")
+    Slash escape single and double quotes (e.g. ' -> \')
 
     >>> tamper('1" AND SLEEP(5)#')
     '1\\\\" AND SLEEP(5)#'

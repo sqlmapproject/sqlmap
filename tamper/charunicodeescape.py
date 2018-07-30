@@ -13,8 +13,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload, **kwargs):
     """
-    Unicode-escapes non-encoded characters in a given payload (not
-    processing already encoded)
+    Unicode-escapes non-encoded characters in a given payload (not processing already encoded)
 
     Notes:
         * Useful to bypass weak filtering and/or WAFs in JSON contexes

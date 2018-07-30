@@ -19,7 +19,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces instances like 'LIMIT M, N' with 'LIMIT N OFFSET M'
+    Replaces (MySQL) instances like 'LIMIT M, N' with 'LIMIT N OFFSET M' counterpart
 
     Requirement:
         * MySQL

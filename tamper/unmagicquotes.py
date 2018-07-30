@@ -16,8 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces quote character (') with a multi-byte combo %bf%27 together with
-    generic comment at the end (to make it work)
+    Replaces quote character (') with a multi-byte combo %BF%27 together with generic comment at the end (to make it work)
 
     Notes:
         * Useful for bypassing magic_quotes/addslashes feature

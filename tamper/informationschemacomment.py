@@ -13,7 +13,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload, **kwargs):
     """
-    Add a comment to the end of all occurrences of (blacklisted) "information_schema" identifier
+    Add a comment to the end of all occurrences of (MySQL) "information_schema" identifier
 
     >>> tamper('SELECT table_name FROM INFORMATION_SCHEMA.TABLES')
     'SELECT table_name FROM INFORMATION_SCHEMA/**/.TABLES'

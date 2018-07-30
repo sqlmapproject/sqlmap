@@ -15,8 +15,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload, **kwargs):
     """
-    Replaces predefined SQL keywords with representations
-    suitable for replacement (e.g. .replace("SELECT", "")) filters
+    Replaces predefined SQL keywords with representations suitable for replacement filters (e.g. SELECT -> SELSELECTECT)
 
     Notes:
         * Useful to bypass very weak custom filters

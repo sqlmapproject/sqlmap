@@ -17,8 +17,7 @@ def tamper(payload, **kwargs):
     Replaces space character (' ') with plus ('+')
 
     Notes:
-        * Is this any useful? The plus get's url-encoded by sqlmap engine
-          invalidating the query afterwards
+        * Is this any useful? The plus get's url-encoded by sqlmap engine invalidating the query afterwards
         * This tamper script works against all databases
 
     >>> tamper('SELECT id FROM users')

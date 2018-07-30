@@ -18,8 +18,9 @@ def tamper(payload, **kwargs):
     """
     Converts all characters in a given payload (not processing already encoded)
 
-    Reference: https://www.acunetix.com/vulnerabilities/unicode-transformation-issues/
-    Reference: https://www.thecodingforums.com/threads/newbie-question-about-character-encoding-what-does-0xc0-0x8a-have-in-common-with-0xe0-0x80-0x8a.170201/
+    Reference:
+        * https://www.acunetix.com/vulnerabilities/unicode-transformation-issues/
+        * https://www.thecodingforums.com/threads/newbie-question-about-character-encoding-what-does-0xc0-0x8a-have-in-common-with-0xe0-0x80-0x8a.170201/
 
     >>> tamper('SELECT FIELD FROM TABLE WHERE 2>1')
     '%C1%93%C1%85%C1%8C%C1%85%C1%83%C1%94%C0%A0%C1%86%C1%89%C1%85%C1%8C%C1%84%C0%A0%C1%86%C1%92%C1%8F%C1%8D%C0%A0%C1%94%C1%81%C1%82%C1%8C%C1%85%C0%A0%C1%97%C1%88%C1%85%C1%92%C1%85%C0%A0%C0%B2%C0%BE%C0%B1'

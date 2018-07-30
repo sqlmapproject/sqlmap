@@ -19,7 +19,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Embraces complete query with versioned comment
+    Embraces complete query with (MySQL) versioned comment
 
     Requirement:
         * MySQL

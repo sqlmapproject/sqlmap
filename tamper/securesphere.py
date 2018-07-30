@@ -14,11 +14,10 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Appends special crafted string
+    Appends special crafted string for bypassing Imperva SecureSphere WAF
 
-    Notes:
-        * Useful for bypassing Imperva SecureSphere WAF
-        * Reference: http://seclists.org/fulldisclosure/2011/May/163
+    Reference:
+        * http://seclists.org/fulldisclosure/2011/May/163
 
     >>> tamper('1 AND 1=1')
     "1 AND 1=1 and '0having'='0having'"

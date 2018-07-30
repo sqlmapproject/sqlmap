@@ -21,7 +21,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Adds versioned MySQL comment before each keyword
+    Adds (MySQL) versioned comment before each keyword
 
     Requirement:
         * MySQL < 5.1
