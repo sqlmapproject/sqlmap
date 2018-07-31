@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces instances like 'IFNULL(A, B)' with 'CASE WHEN ISNULL(A) THEN (B) ELSE (A) END'
+    Replaces instances like 'IFNULL(A, B)' with 'CASE WHEN ISNULL(A) THEN (B) ELSE (A) END' counterpart
 
     Requirement:
         * MySQL

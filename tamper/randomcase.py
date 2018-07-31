@@ -18,7 +18,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces each keyword character with random case value
+    Replaces each keyword character with random case value (e.g. SELECT -> SEleCt)
 
     Tested against:
         * Microsoft SQL Server 2005

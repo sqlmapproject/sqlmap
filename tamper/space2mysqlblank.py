@@ -19,8 +19,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces space character (' ') with a random blank character from a
-    valid set of alternate characters
+    Replaces (MySQL) instances of space character (' ') with a random blank character from a valid set of alternate characters
 
     Requirement:
         * MySQL

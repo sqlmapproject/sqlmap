@@ -13,7 +13,7 @@ __priority__ = PRIORITY.NORMAL
 
 def tamper(payload, **kwargs):
     """
-    Unicode-escapes non-encoded characters in a given payload (not processing already encoded)
+    Unicode-escapes non-encoded characters in a given payload (not processing already encoded) (e.g. SELECT -> \u0053\u0045\u004C\u0045\u0043\u0054)
 
     Notes:
         * Useful to bypass weak filtering and/or WAFs in JSON contexes

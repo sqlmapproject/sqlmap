@@ -17,7 +17,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces each keyword character with upper case value
+    Replaces each keyword character with upper case value (e.g. select -> SELECT)
 
     Tested against:
         * Microsoft SQL Server 2005

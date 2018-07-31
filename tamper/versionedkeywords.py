@@ -20,7 +20,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Encloses each non-function keyword with versioned MySQL comment
+    Encloses each non-function keyword with (MySQL) versioned comment
 
     Requirement:
         * MySQL

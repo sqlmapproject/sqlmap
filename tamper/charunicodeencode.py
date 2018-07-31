@@ -18,7 +18,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Unicode-URL-encodes all characters in a given payload (not processing already encoded)
+    Unicode-URL-encodes all characters in a given payload (not processing already encoded) (e.g. SELECT -> %u0053%u0045%u004C%u0045%u0043%u0054)
 
     Requirement:
         * ASP

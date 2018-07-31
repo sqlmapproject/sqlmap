@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    URL-encodes all characters in a given payload (not processing already encoded)
+    URL-encodes all characters in a given payload (not processing already encoded) (e.g. SELECT -> %53%45%4C%45%43%54)
 
     Tested against:
         * Microsoft SQL Server 2005

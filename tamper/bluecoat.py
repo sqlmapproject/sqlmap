@@ -17,8 +17,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces space character after SQL statement with a valid random blank character.
-    Afterwards replace character '=' with operator LIKE
+    Replaces space character after SQL statement with a valid random blank character. Afterwards replace character '=' with operator LIKE
 
     Requirement:
         * Blue Coat SGOS with WAF activated as documented in

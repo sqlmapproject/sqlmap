@@ -227,6 +227,7 @@ optDict = {
         "disableColoring": "boolean",
         "googlePage": "integer",
         "identifyWaf": "boolean",
+        "listTampers": "boolean",
         "mobile": "boolean",
         "offline": "boolean",
         "purge": "boolean",

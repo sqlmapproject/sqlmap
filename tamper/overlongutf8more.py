@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Converts all characters in a given payload (not processing already encoded)
+    Converts all characters in a given payload to overlong UTF8 (not processing already encoded) (e.g. SELECT -> %C1%93%C1%85%C1%8C%C1%85%C1%83%C1%94)
 
     Reference:
         * https://www.acunetix.com/vulnerabilities/unicode-transformation-issues/

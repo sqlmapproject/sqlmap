@@ -14,8 +14,7 @@ __priority__ = PRIORITY.LOW
 
 def tamper(payload, **kwargs):
     """
-    Replaces space character (' ') with a dash comment ('--') followed by
-    a random string and a new line ('\n')
+    Replaces space character (' ') with a dash comment ('--') followed by a random string and a new line ('\n')
 
     Requirement:
         * MSSQL

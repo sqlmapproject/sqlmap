@@ -20,7 +20,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces plus operator ('+') with (MsSQL) ODBC function {fn CONCAT()}
+    Replaces plus operator ('+') with (MsSQL) ODBC function {fn CONCAT()} counterpart
 
     Tested against:
         * Microsoft SQL Server 2008

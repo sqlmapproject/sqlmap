@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces space character (' ') with comments '/**_**/'
+    Replaces (MySQL) instances of space character (' ') with comments '/**_**/'
 
     Tested against:
         * MySQL 5.0 and 5.5

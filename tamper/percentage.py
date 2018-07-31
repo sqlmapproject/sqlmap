@@ -18,7 +18,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Adds a percentage sign ('%') infront of each character
+    Adds a percentage sign ('%') infront of each character (e.g. SELECT -> %S%E%L%E%C%T)
 
     Requirement:
         * ASP

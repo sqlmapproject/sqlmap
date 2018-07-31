@@ -20,8 +20,7 @@ def randomIP():
 
 def tamper(payload, **kwargs):
     """
-    Append a fake HTTP header 'X-Forwarded-For' to bypass
-    WAF (usually application based) protection
+    Append a fake HTTP header 'X-Forwarded-For'
     """
 
     headers = kwargs.get("headers", {})

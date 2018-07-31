@@ -18,14 +18,11 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces space character (' ') with a dash comment ('--') followed by
-    a new line ('\n')
+    Replaces space character (' ') with a dash comment ('--') followed by a new line ('\n')
 
     Requirement:
         * MySQL
         * MSSQL
-
-    Tested against:
 
     Notes:
         * Useful to bypass several web application firewalls.

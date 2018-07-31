@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Converts all (non-alphanum) characters in a given payload (not processing already encoded)
+    Converts all (non-alphanum) characters in a given payload to overlong UTF8 (not processing already encoded) (e.g. ' -> %C0%A7)
 
     Reference:
         * https://www.acunetix.com/vulnerabilities/unicode-transformation-issues/

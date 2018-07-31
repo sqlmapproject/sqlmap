@@ -20,8 +20,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces space character (' ') with a pound character ('#') followed by
-    a random string and a new line ('\n')
+    Replaces (MySQL) instances of space character (' ') with a pound character ('#') followed by a random string and a new line ('\n')
 
     Requirement:
         * MySQL

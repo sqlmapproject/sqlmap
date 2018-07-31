@@ -54,6 +54,7 @@ from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import safeExpandUser
 from lib.core.common import saveConfig
+from lib.core.common import setColor
 from lib.core.common import setOptimize
 from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
@@ -698,6 +699,22 @@ def _setDBMS():
             conf.dbms = dbms
 
             break
+
+def _listTamperingFunctions():
+    """
+    Lists available tamper functions
+    """
+
+    if conf.listTampers:
+        infoMsg = "listing available tamper scripts\n"
+        logger.info(infoMsg)
+
+        for script in sorted(glob.glob(os.path.join(paths.SQLMAP_TAMPER_PATH, "*.py"))):
+            content = openFile(script, "rb").read()
+            match = re.search(r'(?s)__priority__.+"""(.+)"""', content)
+            if match:
+                comment = match.group(1).strip()
+                dataToStdout("* %s - %s\n" % (setColor(os.path.basename(script), "yellow"), re.sub(r" *\n *", " ", comment.split("\n\n")[0].strip())))
 
 def _setTamperingFunctions():
     """
@@ -2459,6 +2476,7 @@ def init():
     _setDNSServer()
     _adjustLoggingFormatter()
     _setMultipleTargets()
+    _listTamperingFunctions()
     _setTamperingFunctions()
     _setWafFunctions()
     _setTrafficOutputFP()

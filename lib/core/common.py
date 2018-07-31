@@ -868,11 +868,11 @@ def boldifyMessage(message):
     retVal = message
 
     if any(_ in message for _ in BOLD_PATTERNS):
-        retVal = setColor(message, True)
+        retVal = setColor(message, bold=True)
 
     return retVal
 
-def setColor(message, bold=False):
+def setColor(message, color=None, bold=False):
     retVal = message
     level = extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message) or kb.get("stickyLevel")
 
@@ -880,8 +880,8 @@ def setColor(message, bold=False):
         level = unicodeencode(level)
 
     if message and getattr(LOGGER_HANDLER, "is_tty", False):  # colorizing handler
-        if bold:
-            retVal = colored(message, color=None, on_color=None, attrs=("bold",))
+        if bold or color:
+            retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
             level = getattr(logging, level, None) if isinstance(level, basestring) else level
             retVal = LOGGER_HANDLER.colorize(message, level)
@@ -925,7 +925,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
                 if conf.get("api"):
                     sys.stdout.write(message, status, content_type)
                 else:
-                    sys.stdout.write(setColor(message, bold))
+                    sys.stdout.write(setColor(message, bold=bold))
 
                 sys.stdout.flush()
             except IOError:
