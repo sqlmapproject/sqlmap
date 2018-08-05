@@ -20,6 +20,7 @@ def detect(get_page):
         retval = re.search(r"incap_ses|visid_incap", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= re.search(r"Incapsula", headers.get("X-CDN", ""), re.I) is not None
         retval |= "Incapsula incident ID" in (page or "")
+        retval |= headers.get("X-Iinfo") is not None
         if retval:
             break
 
