@@ -2908,15 +2908,15 @@ def filterStringValue(value, charRegex, replacement=""):
 
     return retVal
 
-def filterControlChars(value):
+def filterControlChars(value, replacement=' '):
     """
-    Returns string value with control chars being supstituted with ' '
+    Returns string value with control chars being supstituted with replacement character
 
     >>> filterControlChars(u'AND 1>(2+3)\\n--')
     u'AND 1>(2+3) --'
     """
 
-    return filterStringValue(value, PRINTABLE_CHAR_REGEX, ' ')
+    return filterStringValue(value, PRINTABLE_CHAR_REGEX, replacement)
 
 def isDBMSVersionAtLeast(version):
     """

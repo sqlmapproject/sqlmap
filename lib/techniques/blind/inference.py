@@ -501,7 +501,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 count = threadData.shared.start
 
                                 for i in xrange(startCharIndex, endCharIndex + 1):
-                                    output += '_' if currentValue[i] is None else currentValue[i]
+                                    output += '_' if currentValue[i] is None else filterControlChars(currentValue[i] if len(currentValue[i]) == 1 else ' ', replacement=' ')
 
                                 for i in xrange(length):
                                     count += 1 if currentValue[i] is not None else 0
@@ -518,7 +518,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     status = ' %d/%d (%d%%)' % (_, length, int(100.0 * _ / length))
                                     output += status if _ != length else " " * len(status)
 
-                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(output)))
+                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), output))
 
                 runThreads(numThreads, blindThread, startThreadMsg=False)
 
