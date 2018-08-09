@@ -490,7 +490,7 @@ class Connect(object):
                     page = Connect._connReadProxy(conn) if not skipRead else None
 
                 if conn:
-                    code = conn.code
+                    code = (code or conn.code) if conn.code == kb.originalCode else conn.code  # do not override redirection code (for comparison purposes)
                     responseHeaders = conn.info()
                     responseHeaders[URI_HTTP_HEADER] = conn.geturl()
                 else:
