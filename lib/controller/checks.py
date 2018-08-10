@@ -13,6 +13,7 @@ import random
 import re
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -90,6 +91,7 @@ from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.threads import getCurrentThreadData
@@ -761,7 +763,7 @@ def checkSqlInjection(place, parameter, value):
                                 infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
                                 logger.info(infoMsg)
 
-                                process = subprocess.Popen(conf.alert, shell=True)
+                                process = subprocess.Popen(conf.alert.encode(sys.getfilesystemencoding() or UNICODE_ENCODING), shell=True)
                                 process.wait()
 
                             kb.alerted = True
