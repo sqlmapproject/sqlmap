@@ -903,7 +903,7 @@ def dictionaryAttack(attack_dict):
 
                         if hash_regex in (HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
                             item = [(user, hash_.decode("base64").encode("hex")), {}]
-                        elif hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.APACHE_SHA1):
+                        elif hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
                             item = [(user, hash_), {}]
                         elif hash_regex in (HASH.SSHA,):
                             item = [(user, hash_), {"salt": hash_.decode("base64")[20:]}]
