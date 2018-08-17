@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-588c1f076627097ed858094309961af9  lib/core/settings.py
+2f3aba628e9e54988d510c5c1930e77a  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 5b7ff6f49ff3af62f8c12f74b6d49dd2  lib/core/target.py
@@ -204,7 +204,7 @@ a3db8618eed5bb2807b6f77605cba9cc  plugins/dbms/sybase/__init__.py
 36acb9a5966af21b32e8558b0d50653d  plugins/dbms/sybase/syntax.py
 79f6c7017db4ded8f74a0117188836ff  plugins/dbms/sybase/takeover.py
 34d181a7086d6dfc7e72ae5f8a4cfe0f  plugins/generic/connector.py
-e6cd1c5a5244d83396b401f7db43d323  plugins/generic/custom.py
+ce6a6ff713852b5eca7b78316cc941c4  plugins/generic/custom.py
 156c227dbe765da3d0fd2976fbe18d8b  plugins/generic/databases.py
 4e2b366bb9cfdaaed719b219913357c6  plugins/generic/entries.py
 d82f2c78c1d4d7c6487e94fd3a68a908  plugins/generic/enumeration.py

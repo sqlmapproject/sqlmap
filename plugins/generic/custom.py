@@ -88,6 +88,7 @@ class Custom:
             try:
                 query = raw_input("sql-shell> ")
                 query = getUnicode(query, encoding=sys.stdin.encoding)
+                query = query.strip("; ")
             except KeyboardInterrupt:
                 print
                 errMsg = "user aborted"
