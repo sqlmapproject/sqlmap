@@ -190,7 +190,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                                 reset = self.reset + self.bold
                             else:
                                 reset = self.reset
-                            message = message.replace(string, ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, reset)), 1)
+                            message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, reset)), 1)
                 else:
                     message = ''.join((self.csi, ';'.join(params), 'm', message, self.reset))
 
