@@ -1347,7 +1347,7 @@ def parseTargetDirect():
                 conf.hostname = "localhost"
                 conf.port = 0
 
-            conf.dbmsDb = details.group("db")
+            conf.dbmsDb = details.group("db").strip() if details.group("db") is not None else None
             conf.parameters[None] = "direct connection"
 
             break
