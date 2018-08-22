@@ -601,6 +601,8 @@ class Databases:
 
                     if values is None:
                         values = inject.getValue(query, blind=False, time=False)
+                        if values and isinstance(values[0], basestring):
+                            values = [values]
 
                 if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
                     index, values = 1, []
