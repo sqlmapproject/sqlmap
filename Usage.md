@@ -545,6 +545,79 @@ Option: `--auth-file`
 
 This option should be used in cases when the web server requires proper client-side certificate and a private key for authentication. Supplied value should be a PEM formatted `key_file` that contains your certificate and a private key.
 
+Example of generation of a `key_file.txt` that is compatible with `--auth-file`:
+```
+$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout auth_file.key -out auth_file.pem &&\
+cat auth_file.key auth_file.pem > auth_file.txt && cat auth_file.txt
+Generating a 2048 bit RSA private key
+.........+++
+...........+++
+writing new private key to 'auth_file.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCWM28J1ua2DINf
+VLU28oeJwQidL9vTRoGJR5pfBU6Mhu33Cv6RuVEJAfMWEKYDSbqbrEyy1zUiNTcG
+mEd026Peq0SPRvsKsVb6K+EHVF3r+6ExXHEctPRbh2GIzi2kCQMkdHDg+DhmieQ9
+9Haxk9IREJZTo2vC1ohvM5M/yubw4iwgMlDaW+4s82OgOcCLjewbPLFZU5gMV+8W
+XLKUttUYwV79duPbEvG9S1soNFHhu/MOcNiKJpH2zSegd9Dk5/OJRGX5xEiv7AyL
+4shQLpAqn5kuZcm2K+ib/4x/Rw2yT1Slh2tQIi8RcwlYyycOrSqvhW7vvdqkblbY
+mQQyR2ChAgMBAAECggEBAIqvMveC1cOCCksbi7cQeNVYxvtcFT0e/LwkwQS7gat/
+anmQTT2APrJyemEFPkQK76KNlMQMsaLEP+p28IOVydjvin5Aq8tTs1uK6Fw8Kfya
+elt5X3eCHZ3lgskuljW/nIcsfI08o9cJuxT5hB6yvmPDTQos+nMMYy1KEcv1LQd8
+Y+QAmVQqMF5Nyf8Q6op6hWZIIJY5NDbRE0zYzhGcHWg2798Dx1sO0HT6TD8cNP8H
+AVp/V21tzpmFpe0A7NajgYEjkij6fg+6mG0j0WZdWymYXDeiTdDpwzs/SPRevBLn
+Okp/6vqtdekMeYL591MNBl8GRZpJW9gNLRX7vQ6YYAECgYEAxGV9e85GpLUd/uUb
+1MvGajd+HtN/uoWH1ySG34vi3q/dDKBehry2yoDUosxXf9vbH0IrvaXnO8yXGflS
+wb2TELLezGWbw6kPaw2XIgL4elO5TPh2rNJwz1wOhv3FT2XSGJbXx/CED3mL7MGs
+qwRU/bRrNV7RmzV2veThlLCLjZECgYEAw8jm7vOzQQnqEjs0wlfJmzOyFqilYvEP
+8v7HxDv1M7e7M0TqLECET9VlQE5spGuzEWN7/iMtE8xxnz2n/vGnGAV8qv1LJYrA
+TWQMTIC6V9/jKM8wNOfT7Eh1rJ1cty87yokXpy/cdmkv7yxb1b2zuBk8/1nlYqA0
+5uqb345eWhECgYEAmoXv0TVfR8BpNWA2IZujJXc7+C0YVj0xwAixRbneaq+cEI8t
+UH2ypGnw45Y7UhI9ub5qg/DAmsBCMuGER4NM7tqNiex4Pd4Kj4RF4TDNKBIvvWvQ
+k/GPaNdZZsTMNcg7IbWtWVbX0QUlHsbTgEsMRAFsSLWt3ZyXLJmlE0REyMECgYEA
+oCqEscrwRC7GLK/+01ZZ+fvqnxrMYgrvj0zbRDAAwpR2MtUX9ae6Fk1vDZKa0k/B
+KGKIlzlTsTS5ZxpbivdKSR6EBKY+ibHe6/EDFrrgtu7TuRj2SPG2rz//9Hyv0rRz
+Z5eLoBxJcR1QN4vEfTE6C0uqWQPD4lFJtfcMGXEwwuECgYAK+4gwPBlrKClrRtDc
+7Fnq8RLYeZRbM5WEmTHfRnlYylniMsj2K20H8ln8pdOqCE4iJn0SezIQIaAtcwMP
+WQt15kgJgLwM/uBtqDeWRpTEotVMFXQbZImobjpXUhTqu0NWBwbypM/zarfRWPJ4
+fJkrlA16caVj3qGaX1lkm06OAA==
+-----END PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+MIIDXTCCAkWgAwIBAgIJALTHPlkIs/+KMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV
+BAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX
+aWRnaXRzIFB0eSBMdGQwHhcNMTgwODIyMDc0NTQxWhcNMTkwODIyMDc0NTQxWjBF
+MQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50
+ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEAljNvCdbmtgyDX1S1NvKHicEInS/b00aBiUeaXwVOjIbt9wr+kblRCQHz
+FhCmA0m6m6xMstc1IjU3BphHdNuj3qtEj0b7CrFW+ivhB1Rd6/uhMVxxHLT0W4dh
+iM4tpAkDJHRw4Pg4ZonkPfR2sZPSERCWU6NrwtaIbzOTP8rm8OIsIDJQ2lvuLPNj
+oDnAi43sGzyxWVOYDFfvFlyylLbVGMFe/Xbj2xLxvUtbKDRR4bvzDnDYiiaR9s0n
+oHfQ5OfziURl+cRIr+wMi+LIUC6QKp+ZLmXJtivom/+Mf0cNsk9UpYdrUCIvEXMJ
+WMsnDq0qr4Vu773apG5W2JkEMkdgoQIDAQABo1AwTjAdBgNVHQ4EFgQUVvHI/2qF
+kmRCEWlWB+ZvJzWTnUkwHwYDVR0jBBgwFoAUVvHI/2qFkmRCEWlWB+ZvJzWTnUkw
+DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAg5tmkM75/NEEymu0ublj
+c2R1/ZxwbKMjg98KxLqGFJbPVRG0qgIy+uc+Gvh6FEgPF22i4L9DROfuDQW3YSJ6
+x3JnJxLsU+jjXxtN7hNwoQziQkicKr0y47TjqOKLlBlKTbdnr74nJXSYQhi4qEFE
+qgrUG7ScitgLvcf2sDVf9L2SUsH5iRK+HlgYEtSKhUl5SkLapcUUF+GmectUOkm7
+m7Z8gelenVUerLojnQL2avKD07hWTTGkgX2PV8hdun0WIvBLWAcJN+6T9sdakJZZ
+qJjFQBXjcxwgVe0vB0vJmqa5lj9OymQnBMjp+3zpUtDJNH2M1qySbU6tGEX1wsW/
+VA==
+-----END CERTIFICATE-----
+```
 
 ### Ignore HTTP error 401 (Unauthorized)
 
