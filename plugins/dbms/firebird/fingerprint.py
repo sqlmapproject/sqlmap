@@ -50,7 +50,7 @@ class Fingerprint(GenericFingerprint):
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
-            banVer = kb.bannerFp["dbmsVersion"]
+            banVer = kb.bannerFp.get("dbmsVersion")
 
             if re.search(r"-log$", kb.data.banner):
                 banVer += ", logging enabled"

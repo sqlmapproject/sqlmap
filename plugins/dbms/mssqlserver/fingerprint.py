@@ -46,9 +46,9 @@ class Fingerprint(GenericFingerprint):
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
-            release = kb.bannerFp["dbmsRelease"] if 'dbmsRelease' in kb.bannerFp else None
-            version = kb.bannerFp["dbmsVersion"] if 'dbmsVersion' in kb.bannerFp else None
-            servicepack = kb.bannerFp["dbmsServicePack"] if 'dbmsServicePack' in kb.bannerFp else None
+            release = kb.bannerFp.get("dbmsRelease")
+            version = kb.bannerFp.get("dbmsVersion")
+            servicepack = kb.bannerFp.get("dbmsServicePack")
 
             if release and version and servicepack:
                 banVer = "%s %s " % (DBMS.MSSQL, release)
