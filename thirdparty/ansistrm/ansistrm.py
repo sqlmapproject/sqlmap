@@ -182,7 +182,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                         message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, reset)), 1)
 
                     if level != "PAYLOAD":
-                        for match in re.finditer(r"'([^']+)'", message):  # single-quoted
+                        for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
                             string = match.group(1)
                             if not message.endswith(self.reset):
                                 reset = self.reset
