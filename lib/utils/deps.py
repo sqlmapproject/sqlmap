@@ -65,7 +65,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'python-impacket' third-party library for "
         warnMsg += "out-of-band takeover feature. Download from "
-        warnMsg += "'http://code.google.com/p/impacket/'"
+        warnMsg += "'https://github.com/coresecurity/impacket'"
         logger.warn(warnMsg)
         missing_libraries.add('python-impacket')
 
@@ -76,7 +76,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'python-ntlm' third-party library "
         warnMsg += "if you plan to attack a web application behind NTLM "
-        warnMsg += "authentication. Download from 'http://code.google.com/p/python-ntlm/'"
+        warnMsg += "authentication. Download from 'https://github.com/mullender/python-ntlm'"
         logger.warn(warnMsg)
         missing_libraries.add('python-ntlm')
 
@@ -101,7 +101,7 @@ def checkDependencies():
             warnMsg += "be able to take advantage of the sqlmap TAB "
             warnMsg += "completion and history support features in the SQL "
             warnMsg += "shell and OS shell. Download from "
-            warnMsg += "'http://ipython.scipy.org/moin/PyReadline/Intro'"
+            warnMsg += "'https://pypi.org/project/pyreadline/'"
             logger.warn(warnMsg)
             missing_libraries.add('python-pyreadline')
 
