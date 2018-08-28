@@ -471,13 +471,13 @@ def cmdLineParser(argv=None):
         # File system options
         filesystem = OptionGroup(parser, "File system access", "These options can be used to access the back-end database management system underlying file system")
 
-        filesystem.add_option("--file-read", dest="rFile",
+        filesystem.add_option("--file-read", dest="fileRead",
                               help="Read a file from the back-end DBMS file system")
 
-        filesystem.add_option("--file-write", dest="wFile",
+        filesystem.add_option("--file-write", dest="fileWrite",
                               help="Write a local file on the back-end DBMS file system")
 
-        filesystem.add_option("--file-dest", dest="dFile",
+        filesystem.add_option("--file-dest", dest="fileDest",
                               help="Back-end DBMS absolute filepath to write to")
 
         # Takeover options

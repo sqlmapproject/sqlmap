@@ -165,9 +165,9 @@ optDict = {
     },
 
     "File system": {
-        "rFile": "string",
-        "wFile": "string",
-        "dFile": "string",
+        "fileRead": "string",
+        "fileWrite": "string",
+        "fileDest": "string",
     },
 
     "Takeover": {

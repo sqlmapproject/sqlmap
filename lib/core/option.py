@@ -608,22 +608,22 @@ def _setMetasploit():
         raise SqlmapFilePathException(errMsg)
 
 def _setWriteFile():
-    if not conf.wFile:
+    if not conf.fileWrite:
         return
 
     debugMsg = "setting the write file functionality"
     logger.debug(debugMsg)
 
-    if not os.path.exists(conf.wFile):
-        errMsg = "the provided local file '%s' does not exist" % conf.wFile
+    if not os.path.exists(conf.fileWrite):
+        errMsg = "the provided local file '%s' does not exist" % conf.fileWrite
         raise SqlmapFilePathException(errMsg)
 
-    if not conf.dFile:
+    if not conf.fileDest:
         errMsg = "you did not provide the back-end DBMS absolute path "
-        errMsg += "where you want to write the local file '%s'" % conf.wFile
+        errMsg += "where you want to write the local file '%s'" % conf.fileWrite
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    conf.wFileType = getFileType(conf.wFile)
+    conf.fileWriteType = getFileType(conf.fileWrite)
 
 def _setOS():
     """
@@ -1509,14 +1509,14 @@ def _cleanupOptions():
     if conf.url:
         conf.url = conf.url.strip()
 
-    if conf.rFile:
-        conf.rFile = ntToPosixSlashes(normalizePath(conf.rFile))
+    if conf.fileRead:
+        conf.fileRead = ntToPosixSlashes(normalizePath(conf.fileRead))
 
-    if conf.wFile:
-        conf.wFile = ntToPosixSlashes(normalizePath(conf.wFile))
+    if conf.fileWrite:
+        conf.fileWrite = ntToPosixSlashes(normalizePath(conf.fileWrite))
 
-    if conf.dFile:
-        conf.dFile = ntToPosixSlashes(normalizePath(conf.dFile))
+    if conf.fileDest:
+        conf.fileDest = ntToPosixSlashes(normalizePath(conf.fileDest))
 
     if conf.sitemapUrl and not conf.sitemapUrl.lower().startswith("http"):
         conf.sitemapUrl = "http%s://%s" % ('s' if conf.forceSSL else '', conf.sitemapUrl)
@@ -1699,7 +1699,7 @@ def _setConfAttributes():
     conf.tests = []
     conf.trafficFP = None
     conf.HARCollectorFactory = None
-    conf.wFileType = None
+    conf.fileWriteType = None
 
 def _setKnowledgeBaseAttributes(flushAll=True):
     """
