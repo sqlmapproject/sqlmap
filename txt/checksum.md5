@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-8b9c8ae316a1cdf5809b163d7d451ca5  lib/core/settings.py
+cf04fd985a50e6c7fc6b6d61b4b048b6  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -415,7 +415,7 @@ aade02eb8f6a4a214a53db0fd0f2aae6  waf/dosarrest.py
 a2ce6cde682f78e1fd561dc40611877e  waf/fortiweb.py
 eb56ac34775cc3c5f721ec967d04b283  waf/generic.py
 1c70655551b8296ceeb19292a342e620  waf/hyperguard.py
-2a52c09e4ce1f2a5976ce53b415ef496  waf/incapsula.py
+51aed66945f95641cb45c840e7132e3b  waf/incapsula.py
 1e5532ede194ac9c083891c2f02bca93  waf/__init__.py
 30ae98958fb35061d9a4145cc74c0489  waf/isaserver.py
 5a5c9452b9779bf39c208ebe26c98fdb  waf/jiasule.py
