@@ -1359,7 +1359,10 @@ def checkWaf():
         value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
         value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
 
+    pushValue(kb.redirectChoice)
     pushValue(conf.timeout)
+
+    kb.redirectChoice = REDIRECTION.YES
     conf.timeout = IDS_WAF_CHECK_TIMEOUT
 
     try:
@@ -1368,7 +1371,9 @@ def checkWaf():
         retVal = True
     finally:
         kb.matchRatio = None
+
         conf.timeout = popValue()
+        kb.redirectChoice = popValue()
 
     if retVal:
         warnMsg = "heuristics detected that the target "
