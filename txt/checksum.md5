@@ -48,7 +48,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-cdc31078e93dbf8f213c357f5a6ac00a  lib/core/settings.py
+7784e72dc2d0a290d2512f970dc7dc0f  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -390,7 +390,7 @@ d9006810684baf01ea33281d21522519  udf/postgresql/windows/32/8.3/lib_postgresqlud
 ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqludf_sys.dll_
 0d3fe0293573a4453463a0fa5a081de1  udf/postgresql/windows/32/9.0/lib_postgresqludf_sys.dll_
 336d0b0d2be333f5a6184042c85464fd  waf/360.py
-667cacdcd4ba650c9a436f081a79cd64  waf/airlock.py
+a73a40d201b39f3387714c59934331e4  waf/airlock.py
 7da7970b45512b0233450dbd8088fde0  waf/anquanbao.py
 b61329e8f8bdbf5625f9520ec010af1f  waf/armor.py
 dec64f18c23962d279cc1cde6469afed  waf/asm.py
