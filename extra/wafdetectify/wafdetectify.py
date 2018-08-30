@@ -48,6 +48,7 @@ def get_page(get=None, url=None, host=None, data=None):
     except Exception, ex:
         code = getattr(ex, "code", None)
         page = ex.read() if hasattr(ex, "read") else getattr(ex, "msg", "")
+        headers = ex.info() if hasattr(ex, "info") else {}
 
     result = CACHE[key] = page, headers, code
 
