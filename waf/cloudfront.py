@@ -19,7 +19,6 @@ def detect(get_page):
         _, headers, _ = get_page(get=vector)
 
         retval = re.search(r"Error from cloudfront", headers.get("X-Cache", ""), re.I) is not None
-        retval |= headers.get("X-Amz-Cf-Id") is not None
 
         if retval:
             break

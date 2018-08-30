@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-75a03c25cb625ee451394fea1fc4d7a6  lib/core/settings.py
+11c6b10e7e997c019a0837d1de1f23c0  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -405,7 +405,7 @@ ef722d062564def381b1f96f5faadee3  waf/baidu.py
 2f3bbf43be94d4e9ffe9f80e8483d62f  waf/ciscoacexml.py
 ba84f296cb52f5e78a0670b98d7763fa  waf/cloudbric.py
 94b50385a9d462492e3a639d71aaa1c3  waf/cloudflare.py
-8c8344b4f7e97c31f130f3d48da9b393  waf/cloudfront.py
+29ba81741fd7e220a95fe7c5fae76e1a  waf/cloudfront.py
 ac96f34c254951d301973617064eb1b5  waf/comodo.py
 56d58c982c2cf775e0f8dc6767f336fd  waf/datapower.py
 1538b661e35843074f4599be93b3fae9  waf/denyall.py
