@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-b5062827268f92056e6f87e3e03df5f6  lib/core/settings.py
+6f054fe13c3a24d17c82b35c96ca0ed0  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -395,7 +395,7 @@ ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqlud
 a73a40d201b39f3387714c59934331e4  waf/airlock.py
 7da7970b45512b0233450dbd8088fde0  waf/anquanbao.py
 b61329e8f8bdbf5625f9520ec010af1f  waf/armor.py
-dec64f18c23962d279cc1cde6469afed  waf/asm.py
+2fe5335fde7a7f5b19d2f363a55ce805  waf/asm.py
 6ea7b4ff5f111acb0b24186ef82c3f2d  waf/aws.py
 ef722d062564def381b1f96f5faadee3  waf/baidu.py
 07bc4b531d2353c9acfbfcada94ff12b  waf/barracuda.py
@@ -404,7 +404,7 @@ ef722d062564def381b1f96f5faadee3  waf/baidu.py
 41e399dbfe7b904d5aacfb37d85e1fbf  waf/blockdos.py
 2f3bbf43be94d4e9ffe9f80e8483d62f  waf/ciscoacexml.py
 ba84f296cb52f5e78a0670b98d7763fa  waf/cloudbric.py
-5987ef1e3f368f1f6cf5dad341db7159  waf/cloudflare.py
+94b50385a9d462492e3a639d71aaa1c3  waf/cloudflare.py
 b16b1c15532103346d5e2f5b8bd1ed36  waf/cloudfront.py
 ac96f34c254951d301973617064eb1b5  waf/comodo.py
 56d58c982c2cf775e0f8dc6767f336fd  waf/datapower.py

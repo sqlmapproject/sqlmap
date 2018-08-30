@@ -24,6 +24,7 @@ def detect(get_page):
             retval |= headers.get("cf-ray") is not None
             retval |= re.search(r"CloudFlare Ray ID:|var CloudFlare=", page or "") is not None
             retval |= all(_ in (page or "") for _ in ("Attention Required! | Cloudflare", "Please complete the security check to access"))
+            retval |= all(_ in (page or "") for _ in ("Attention Required! | Cloudflare", "Sorry, you have been blocked"))
 
         if retval:
             break
