@@ -17,12 +17,13 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = re.search(r"cloudflare", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
 
         if code >= 400:
+            retval |= re.search(r"cloudflare", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
             retval |= re.search(r"\A__cfduid=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
             retval |= headers.get("cf-ray") is not None
             retval |= re.search(r"CloudFlare Ray ID:|var CloudFlare=", page or "") is not None
+            retval |= all(_ in (page or "") for _ in ("Attention Required! | Cloudflare", "Please complete the security check to access"))
 
         if retval:
             break
