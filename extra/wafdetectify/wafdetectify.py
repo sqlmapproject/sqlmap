@@ -54,7 +54,7 @@ def get_page(get=None, url=None, host=None, data=None):
     return result
 
 def colorize(message):
-    if not subprocess.mswindows:
+    if not subprocess.mswindows and sys.stdout.isatty():
         message = re.sub(r"\[(.)\]", lambda match: "[%s%s\033[00;49m]" % (LEVEL_COLORS[match.group(1)], match.group(1)), message)
         message = message.replace("@sqlmap", "\033[00;96m@sqlmap\033[00;49m")
         message = message.replace(NAME, "\033[00;93m%s\033[00;49m" % NAME)
@@ -113,6 +113,8 @@ def main():
 
     if not found:
         print colorize("[o] nothing found")
+
+    print
 
 if __name__ == "__main__":
     main()
