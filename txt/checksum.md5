@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-fe3bc1dc84fcdfc26e552984f6c4b139  lib/core/settings.py
+676dac9284820f0949ec1f63e8827c4b  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -457,7 +457,7 @@ f3a81da13ee098e94edd965ea4b37b04  waf/varnish.py
 11a5c6b10ced11e505a74e36ee2503b3  waf/wordfence.py
 68e332530fab216d017ede506c3fec2f  waf/yundun.py
 bea35ba732ccc9548e6c4023cea6832b  waf/yunsuo.py
-705ac8663513c12150cb5623ef4a04fb  waf/zenedge.py
+47f8f6623841232a93c5229d6c1bebfe  waf/zenedge.py
 dc394c5b90ada0a5d5853b5ad1f7d56d  xml/banner/generic.xml
 d8925c034263bf1b83e7d8e1c78eec57  xml/banner/mssql.xml
 7b21aeb3ad66d7686eacd23a6346292c  xml/banner/mysql.xml
