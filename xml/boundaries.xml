@@ -497,6 +497,15 @@ Formats:
         <prefix>`</prefix>
         <suffix> AND `[ORIGINAL]</suffix>
     </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1</where>
+        <ptype>1</ptype>
+        <prefix>"=[ORIGINAL]</prefix>
+        <suffix> AND [ORIGINAL]="[ORIGINAL]</suffix>
+    </boundary>
     <!-- End of escaped column name boundaries -->
 
     <!-- AGAINST boolean full-text search boundaries (http://dev.mysql.com/doc/refman/5.5/en/fulltext-boolean.html) -->
