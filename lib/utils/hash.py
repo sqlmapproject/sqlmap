@@ -75,6 +75,7 @@ from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import HASH_EMPTY_PASSWORD_MARKER
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
 from lib.core.settings import HASH_RECOGNITION_QUIT_THRESHOLD
 from lib.core.settings import IS_WIN
@@ -684,7 +685,7 @@ def attackDumpedTable():
                         value = table[column]['values'][i]
 
                         if value and value.lower() in lut:
-                            table[column]['values'][i] = "%s (%s)" % (getUnicode(table[column]['values'][i]), getUnicode(lut[value.lower()]))
+                            table[column]['values'][i] = "%s (%s)" % (getUnicode(table[column]['values'][i]), getUnicode(lut[value.lower()] or HASH_EMPTY_PASSWORD_MARKER))
                             table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):

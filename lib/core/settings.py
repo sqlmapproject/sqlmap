@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.2.9.1"
+VERSION = "1.2.9.2"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -428,6 +428,9 @@ DEFAULT_MSSQL_SCHEMA = "dbo"
 
 # Display hash attack info every mod number of items
 HASH_MOD_ITEM_DISPLAY = 11
+
+# Display marker for (cracked) empty password
+HASH_EMPTY_PASSWORD_MARKER = "<empty>"
 
 # Maximum integer value
 MAX_INT = sys.maxint
