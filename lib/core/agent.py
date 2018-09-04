@@ -301,7 +301,8 @@ class Agent(object):
             ("[SPACE_REPLACE]", kb.chars.space),
             ("[DOLLAR_REPLACE]", kb.chars.dollar),
             ("[HASH_REPLACE]", kb.chars.hash_),
-            ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT)
+            ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT),
+            ("[ORIGINAL]", origValue or "")
         )
         payload = reduce(lambda x, y: x.replace(y[0], y[1]), replacements, payload)
 

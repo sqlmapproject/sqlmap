@@ -488,6 +488,17 @@ Formats:
     </boundary>
     <!-- End of pre-WHERE derived table boundaries -->
 
+    <!-- Escaped column name (e.g. SELECT `...` FROM table) boundaries -->
+    <boundary>
+        <level>4</level>
+        <clause>1</clause>
+        <where>1</where>
+        <ptype>1</ptype>
+        <prefix>`</prefix>
+        <suffix> AND `[ORIGINAL]</suffix>
+    </boundary>
+    <!-- End of escaped column name boundaries -->
+
     <!-- AGAINST boolean full-text search boundaries (http://dev.mysql.com/doc/refman/5.5/en/fulltext-boolean.html) -->
     <boundary>
         <level>4</level>

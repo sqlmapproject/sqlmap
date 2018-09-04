@@ -9,6 +9,7 @@
         <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
         <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
+        <error regexp="Unknown column '[^ ]+' in 'field list'"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc\.exceptions"/>
         <error regexp="Zend_Db_Statement_Mysqli_Exception"/>
