@@ -37,7 +37,7 @@ fd8f239e259afaf5f24bcf34a0ad187f  lib/core/bigarray.py
 4086fb55f42e27de5330505605baad0f  lib/core/decorators.py
 fbb55cc6100318ff922957b6577dc58f  lib/core/defaults.py
 db165596ef0a3e19ec59c24192bb318d  lib/core/dicts.py
-9ea8a043030796e6faef7f7e957729d5  lib/core/dump.py
+d4b3d448bcfd9f15d089fc81d38f4825  lib/core/dump.py
 ab3f4f3e3019add5f4a2e28f7e8748a4  lib/core/enums.py
 cada93357a7321655927fc9625b3bfec  lib/core/exception.py
 1e5532ede194ac9c083891c2f02bca93  lib/core/__init__.py
@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-5e2fea9a1e0cc3d12578dbcf079dba67  lib/core/settings.py
+f2ec47bbf669523c8e874eb63adf0126  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
