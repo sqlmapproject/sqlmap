@@ -1009,6 +1009,9 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
         kb.prependFlag = False
 
     if conf.get("answers"):
+        if not any(_ in conf.answers for _ in ",="):
+            return conf.answers
+
         for item in conf.answers.split(','):
             question = item.split('=')[0].strip()
             answer = item.split('=')[1] if len(item.split('=')) > 1 else None
