@@ -137,10 +137,14 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             seq1 = seq1.replace(REFLECTED_VALUE_MARKER, "")
             seq2 = seq2.replace(REFLECTED_VALUE_MARKER, "")
 
+            if kb.heavilyDynamic:
+                seq1 = seq1.split("\n")
+                seq2 = seq2.split("\n")
+
             seqMatcher.set_seq1(seq1)
             seqMatcher.set_seq2(seq2)
 
-            ratio = round(seqMatcher.quick_ratio(), 3)
+            ratio = round(seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio(), 3)
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
