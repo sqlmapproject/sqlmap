@@ -28,7 +28,7 @@ b3e60ea4e18a65c48515d04aab28ff68  extra/sqlharvest/sqlharvest.py
 c414cecdb0472c92cf50ed5b01e4438c  lib/controller/controller.py
 c7443613a0a2505b1faec931cee2a6ef  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
-0adf547455a76dc71e6a599e52da1ed9  lib/core/agent.py
+738e160412b3cb52bdeb7bc58dec91c9  lib/core/agent.py
 fd8f239e259afaf5f24bcf34a0ad187f  lib/core/bigarray.py
 6e73b39f7c51f75ae64a652dec69ab2f  lib/core/common.py
 0d082da16c388b3445e656e0760fb582  lib/core/convert.py
@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-daae048e858ee6f618e93bd0685dd1f4  lib/core/settings.py
+1e62a08b7dc32e7063ca5d981354c5fc  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -227,7 +227,7 @@ ec2ba8c757ac96425dcd2b97970edd3a  shell/stagers/stager.asp_
 4e6d2094bd6afe35032fb8bc8a86e83c  shell/stagers/stager.aspx_
 0c48ddb1feb7e38a951ef05a0d48e032  shell/stagers/stager.jsp_
 2f9e459a4cf6a58680978cdce5ff7971  shell/stagers/stager.php_
-4eaeef94314956e4517e5310a28d579a  sqlmapapi.py
+cd90da0474d7b1a67d7b40d208493375  sqlmapapi.py
 a35b5b83c12841fdf3925190c9d24299  sqlmap.py
 523dab9e1093eb59264c6beb366b255a  tamper/0x2char.py
 3a1697585ae4e7bf315e9dda97d6f321  tamper/apostrophemask.py
@@ -469,8 +469,8 @@ d48c971769c6131e35bd52d2315a8d58  xml/banner/servlet-engine.xml
 d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 350605448f049cd982554123a75f11e1  xml/banner/x-aspnet-version.xml
 817078783e1edaa492773d3b34d8eef0  xml/banner/x-powered-by.xml
-6debc049a8049b890ca109a731c60782  xml/boundaries.xml
-0d0d4bd0e06c99dd8eb4f92acc25caf3  xml/errors.xml
+8400e0dce3304eae2189fdff5813d7fe  xml/boundaries.xml
+6cffc395cd0280f5c1a84542da6642e5  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 3318571fac8df058f19ea85780606643  xml/payloads/boolean_blind.xml
 b5b8b0aebce810e6cdda1b7106c96427  xml/payloads/error_based.xml
