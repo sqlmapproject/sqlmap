@@ -1852,6 +1852,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.safeCharEncode = False
     kb.safeReq = AttribDict()
     kb.secondReq = None
+    kb.serverHeader = None
     kb.singleLogFlags = set()
     kb.skipSeqMatcher = False
     kb.reduceTests = None

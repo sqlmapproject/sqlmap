@@ -88,6 +88,7 @@ from lib.core.settings import IDS_WAF_CHECK_RATIO
 from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
+from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
@@ -1553,6 +1554,10 @@ def checkConnection(suppressOutput=False):
         kb.originalPage = kb.pageTemplate = page
 
         kb.errorIsNone = False
+
+        if any(_ in (kb.serverHeader or "") for _ in PRECONNECT_INCOMPATIBLE_SERVERS):
+            singleTimeWarnMessage("turning off pre-connect mechanism because of incompatible server ('%s')" % kb.serverHeader)
+            conf.disablePrecon = True
 
         if not kb.originalPage and wasLastResponseHTTPError():
             errMsg = "unable to retrieve page content"
