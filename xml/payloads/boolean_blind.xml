@@ -160,7 +160,7 @@ Tag: <test>
         <stype>1</stype>
         <level>1</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1,8,9</clause>
         <where>1</where>
         <vector>AND [INFERENCE]</vector>
         <request>
@@ -378,7 +378,7 @@ Tag: <test>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1,2,3</clause>
+        <clause>1,2,3,8</clause>
         <where>1</where>
         <vector>AND MAKE_SET([INFERENCE],[RANDNUM])</vector>
         <request>
@@ -416,7 +416,7 @@ Tag: <test>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>1,2,3</clause>
+        <clause>1,2,3,8</clause>
         <where>1</where>
         <vector>AND ELT([INFERENCE],[RANDNUM])</vector>
         <request>
@@ -454,7 +454,7 @@ Tag: <test>
         <stype>1</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>1,2,3</clause>
+        <clause>1,2,3,8</clause>
         <where>1</where>
         <vector>AND ([INFERENCE])*[RANDNUM]</vector>
         <request>
@@ -492,7 +492,7 @@ Tag: <test>
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
-        <clause>1</clause>
+        <clause>1,8</clause>
         <where>1</where>
         <vector>AND (SELECT (CASE WHEN ([INFERENCE]) THEN NULL ELSE CAST('[RANDSTR]' AS NUMERIC) END)) IS NULL</vector>
         <request>

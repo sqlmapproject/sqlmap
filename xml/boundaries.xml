@@ -54,6 +54,7 @@ Tag: <boundary>
             3: LIKE single quoted string
             4: Double quoted string
             5: LIKE double quoted string
+            6: Identifier (e.g. column name)
 
     Sub-tag: <prefix>
         A string to prepend to the payload.
@@ -491,20 +492,29 @@ Formats:
     <!-- Escaped column name (e.g. SELECT `...` FROM table) boundaries -->
     <boundary>
         <level>4</level>
-        <clause>1</clause>
+        <clause>8</clause>
         <where>1</where>
-        <ptype>1</ptype>
-        <prefix>`</prefix>
-        <suffix> AND `[ORIGINAL]</suffix>
+        <ptype>6</ptype>
+        <prefix>`=`[ORIGINAL]`</prefix>
+        <suffix> AND `[ORIGINAL]`=`[ORIGINAL]</suffix>
     </boundary>
 
     <boundary>
         <level>5</level>
-        <clause>1</clause>
+        <clause>8</clause>
         <where>1</where>
-        <ptype>1</ptype>
-        <prefix>"=[ORIGINAL]</prefix>
-        <suffix> AND [ORIGINAL]="[ORIGINAL]</suffix>
+        <ptype>6</ptype>
+        <prefix>"="[ORIGINAL]"</prefix>
+        <suffix> AND "[ORIGINAL]"="[ORIGINAL]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>5</level>
+        <clause>8</clause>
+        <where>1</where>
+        <ptype>6</ptype>
+        <prefix>]=[[ORIGINAL]]</prefix>
+        <suffix> AND [[ORIGINAL]]=[[ORIGINAL]</suffix>
     </boundary>
     <!-- End of escaped column name boundaries -->
 
