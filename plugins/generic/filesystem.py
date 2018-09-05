@@ -284,17 +284,23 @@ class Filesystem:
         if conf.direct or isStackingAvailable():
             if isStackingAvailable():
                 debugMsg = "going to upload the file '%s' with " % fileType
-                debugMsg += "stacked query SQL injection technique"
+                debugMsg += "stacked query technique"
                 logger.debug(debugMsg)
 
             written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to upload the file '%s' with " % fileType
-            debugMsg += "UNION query SQL injection technique"
+            debugMsg += "UNION query technique"
             logger.debug(debugMsg)
 
             written = self.unionWriteFile(localFile, remoteFile, fileType, forceCheck)
+        elif Backend.isDbms(DBMS.MYSQL):
+            debugMsg = "going to upload the file '%s' with " % fileType
+            debugMsg += "LINES TERMINATED BY technique"
+            logger.debug(debugMsg)
+
+            written = self.linesTerminatedWriteFile(localFile, remoteFile, fileType, forceCheck)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to write files to the underlying file "

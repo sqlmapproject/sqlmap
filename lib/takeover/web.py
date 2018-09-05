@@ -146,8 +146,7 @@ class Web:
                 query += "OR %d=%d " % (randInt, randInt)
 
         query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery, conf.encoding))
-        query = agent.prefixQuery(query)
-        query = agent.suffixQuery(query)
+        query = agent.prefixQuery(query)        # Note: No need for suffix as 'write_file_limit' already ends with comment (required)
         payload = agent.payload(newValue=query)
         page = Request.queryPage(payload)
 
