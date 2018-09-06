@@ -182,8 +182,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
                         message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, reset)), 1)
 
                     if level != "PAYLOAD":
-                        for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
-                            string = match.group(1)
+                        if any(_ in message for _ in ("parsed DBMS error message",)):
+                            string = re.search(r": '(.+)'", message).group(1)
                             if not message.endswith(self.reset):
                                 reset = self.reset
                             elif self.bold in message:  # bold
@@ -191,6 +191,16 @@ class ColorizingStreamHandler(logging.StreamHandler):
                             else:
                                 reset = self.reset
                             message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, reset)), 1)
+                        else:
+                            for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
+                                string = match.group(1)
+                                if not message.endswith(self.reset):
+                                    reset = self.reset
+                                elif self.bold in message:  # bold
+                                    reset = self.reset + self.bold
+                                else:
+                                    reset = self.reset
+                                message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, reset)), 1)
                 else:
                     message = ''.join((self.csi, ';'.join(params), 'm', message, self.reset))
 
