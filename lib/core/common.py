@@ -165,6 +165,7 @@ from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
@@ -1165,6 +1166,9 @@ def getHeader(headers, key):
 def checkFile(filename, raiseOnError=True):
     """
     Checks for file existence and readability
+
+    >>> checkFile(__file__)
+    True
     """
 
     valid = True
@@ -1647,6 +1651,9 @@ def parseUnionPage(page):
 def parseFilePaths(page):
     """
     Detects (possible) absolute system paths inside the provided page content
+
+    >>> _ = "/var/www/html/index.php"; parseFilePaths("<html>Error occurred at line 207 of: %s<br>Please contact your administrator</html>" % _); _ in kb.absFilePaths
+    True
     """
 
     if page:
@@ -2039,6 +2046,9 @@ def parseXmlFile(xmlFile, handler):
 def getSQLSnippet(dbms, sfile, **variables):
     """
     Returns content of SQL snippet located inside 'procs/' directory
+
+    >>> 'RECONFIGURE' in getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
+    True
     """
 
     if sfile.endswith('.sql') and os.path.exists(sfile):
@@ -2078,9 +2088,12 @@ def getSQLSnippet(dbms, sfile, **variables):
 
     return retVal
 
-def readCachedFileContent(filename, mode='rb'):
+def readCachedFileContent(filename, mode="rb"):
     """
     Cached reading of file content (avoiding multiple same file reading)
+
+    >>> "readCachedFileContent" in readCachedFileContent(__file__)
+    True
     """
 
     if filename not in kb.cache.content:
@@ -2137,6 +2150,9 @@ def average(values):
 def calculateDeltaSeconds(start):
     """
     Returns elapsed time from start till now
+
+    >>> calculateDeltaSeconds(0) > 1151721660
+    True
     """
 
     return time.time() - start
@@ -2144,6 +2160,9 @@ def calculateDeltaSeconds(start):
 def initCommonOutputs():
     """
     Initializes dictionary containing common output values used by "good samaritan" feature
+
+    >>> initCommonOutputs(); "information_schema" in kb.commonOutputs["Databases"]
+    True
     """
 
     kb.commonOutputs = {}
@@ -3351,6 +3370,9 @@ def unhandledExceptionMessage():
 def getLatestRevision():
     """
     Retrieves latest revision from the offical repository
+
+    >>> getLatestRevision() == VERSION
+    True
     """
 
     retVal = None
@@ -4149,6 +4171,9 @@ def checkSystemEncoding():
 def evaluateCode(code, variables=None):
     """
     Executes given python code given in a string form
+
+    >>> _ = {}; evaluateCode("a = 1; b = 2; c = a", _); _["c"]
+    1
     """
 
     try:
@@ -4202,6 +4227,9 @@ def incrementCounter(technique):
 def getCounter(technique):
     """
     Returns query counter for a given technique
+
+    >>> resetCounter(PAYLOAD.TECHNIQUE.STACKED); incrementCounter(PAYLOAD.TECHNIQUE.STACKED); getCounter(PAYLOAD.TECHNIQUE.STACKED)
+    1
     """
 
     return kb.counters.get(technique, 0)
@@ -4441,6 +4469,9 @@ def zeroDepthSearch(expression, value):
     """
     Searches occurrences of value inside expression at 0-depth level
     regarding the parentheses
+
+    >>> _ = "SELECT (SELECT id FROM users WHERE 2>1) AS result FROM DUAL"; _[zeroDepthSearch(_, "FROM")[0]:]
+    'FROM DUAL'
     """
 
     retVal = []
@@ -4476,7 +4507,7 @@ def pollProcess(process, suppress_errors=False):
     Checks for process status (prints . if still running)
     """
 
-    while True:
+    while process:
         dataToStdout(".")
         time.sleep(1)
 
@@ -4701,12 +4732,33 @@ def getSafeExString(ex, encoding=None):
     return getUnicode(retVal or "", encoding=encoding).strip()
 
 def safeVariableNaming(value):
+    """
+    Returns escaped safe-representation of a given variable name that can be used in Python evaluated code
+
+    >>> safeVariableNaming("foo bar")
+    'foo__SAFE__20bar'
+    """
+
     return re.sub(r"[^\w]", lambda match: "%s%02x" % (SAFE_VARIABLE_MARKER, ord(match.group(0))), value)
 
 def unsafeVariableNaming(value):
+    """
+    Returns unescaped safe-representation of a given variable name
+
+    >>> unsafeVariableNaming("foo__SAFE__20bar")
+    'foo bar'
+    """
+
     return re.sub(r"%s([0-9a-f]{2})" % SAFE_VARIABLE_MARKER, lambda match: match.group(1).decode("hex"), value)
 
 def firstNotNone(*args):
+    """
+    Returns first not-None value from a given list of arguments
+
+    >>> firstNotNone(None, None, 1, 2, 3)
+    1
+    """
+
     retVal = None
 
     for _ in args:
