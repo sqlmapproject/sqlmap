@@ -2,6 +2,10 @@
 
 ## 2017
 
+* **Jan 8**, stable version [1.2](https://github.com/sqlmapproject/sqlmap/releases/tag/1.2) released.
+
+## 2017
+
 * **Jan 2**, stable version [1.1](https://github.com/sqlmapproject/sqlmap/releases/tag/1.1) released.
 
 ## 2016
