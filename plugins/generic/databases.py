@@ -261,24 +261,28 @@ class Databases:
         rootQuery = queries[Backend.getIdentifiedDbms()].tables
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
-            query = rootQuery.inband.query
-            condition = rootQuery.inband.condition if 'condition' in rootQuery.inband else None
+            values = []
 
-            if condition:
-                if not Backend.isDbms(DBMS.SQLITE):
-                    query += " WHERE %s" % condition
+            for query, condition in ((rootQuery.inband.query, getattr(rootQuery.inband, "condition", None)), (getattr(rootQuery.inband, "query2", None), getattr(rootQuery.inband, "condition2", None))):
+                if not isNoneValue(values) or not query:
+                    break
 
-                    if conf.excludeSysDbs:
-                        infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
-                        logger.info(infoMsg)
-                        query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
-                    else:
-                        query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
+                if condition:
+                    if not Backend.isDbms(DBMS.SQLITE):
+                        query += " WHERE %s" % condition
 
-                if len(dbs) < 2 and ("%s," % condition) in query:
-                    query = query.replace("%s," % condition, "", 1)
+                        if conf.excludeSysDbs:
+                            infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
+                            logger.info(infoMsg)
+                            query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
+                        else:
+                            query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
-            values = inject.getValue(query, blind=False, time=False)
+                    if len(dbs) < 2 and ("%s," % condition) in query:
+                        query = query.replace("%s," % condition, "", 1)
+
+                if query:
+                    values = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(values):
                 values = filter(None, arrayizeValue(values))
