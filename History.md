@@ -1,6 +1,6 @@
 # History
 
-## 2017
+## 2018
 
 * **Jan 8**, stable version [1.2](https://github.com/sqlmapproject/sqlmap/releases/tag/1.2) released.
 
