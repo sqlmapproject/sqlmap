@@ -263,6 +263,10 @@ SQL_STATEMENTS = {
         "commit ",
         "rollback ",
     ),
+
+    "SQL administration": (
+        "set ",
+    ),
 }
 
 POST_HINT_CONTENT_TYPES = {

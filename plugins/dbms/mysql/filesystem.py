@@ -162,6 +162,8 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("inserting the hexadecimal encoded file to the support table")
 
+        inject.goStacked("SET GLOBAL max_allowed_packet = %d" % (1024 * 1024))  # 1MB (Note: https://github.com/sqlmapproject/sqlmap/issues/3230)
+
         for sqlQuery in sqlQueries:
             inject.goStacked(sqlQuery)
 
