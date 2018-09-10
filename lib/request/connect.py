@@ -1243,11 +1243,11 @@ class Connect(object):
             page, headers, code = Connect.getPage(url=conf.secondUrl, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
         elif kb.secondReq and IDS_WAF_CHECK_PAYLOAD not in urllib.unquote(value or ""):
             def _(value):
-                if CUSTOM_INJECTION_MARK_CHAR in (value or "") and kb.customInjectionMark:
+                if kb.customInjectionMark in (value or ""):
                     if payload is None:
-                        value = value.replace(CUSTOM_INJECTION_MARK_CHAR, "")
+                        value = value.replace(kb.customInjectionMark, "")
                     else:
-                        value = re.sub(r"\w*%s" % re.escape(CUSTOM_INJECTION_MARK_CHAR), payload, value)
+                        value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), payload, value)
                 return value
             page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
