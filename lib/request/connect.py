@@ -16,6 +16,7 @@ import string
 import struct
 import time
 import traceback
+import urllib
 import urllib2
 import urlparse
 
@@ -84,6 +85,7 @@ from lib.core.exception import SqlmapTokenException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
@@ -97,6 +99,7 @@ from lib.core.settings import MAX_CONSECUTIVE_CONNECTION_ERRORS
 from lib.core.settings import MAX_MURPHY_SLEEP_TIME
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -1238,8 +1241,15 @@ class Connect(object):
 
         if conf.secondUrl:
             page, headers, code = Connect.getPage(url=conf.secondUrl, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
-        elif kb.secondReq:
-            page, headers, code = Connect.getPage(url=kb.secondReq[0], post=kb.secondReq[2], method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
+        elif kb.secondReq and IDS_WAF_CHECK_PAYLOAD not in urllib.unquote(value or ""):
+            def _(value):
+                if CUSTOM_INJECTION_MARK_CHAR in (value or "") and kb.customInjectionMark:
+                    if payload is None:
+                        value = value.replace(CUSTOM_INJECTION_MARK_CHAR, "")
+                    else:
+                        value = re.sub(r"\w*%s" % re.escape(CUSTOM_INJECTION_MARK_CHAR), payload, value)
+                return value
+            page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
         threadData.lastPage = page
