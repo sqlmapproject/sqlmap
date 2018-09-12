@@ -1179,7 +1179,7 @@ def checkFile(filename, raiseOnError=True):
     try:
         if filename is None or not os.path.isfile(filename):
             valid = False
-    except UnicodeError:
+    except:
         valid = False
 
     if valid:
