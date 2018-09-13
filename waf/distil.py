@@ -5,9 +5,6 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import re
-
-from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "Distil Web Application Firewall Security (Distil Networks)"

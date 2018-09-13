@@ -125,8 +125,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 raise SqlmapMissingPrivileges(errMsg)
 
             try:
-                from impacket import ImpactDecoder
-                from impacket import ImpactPacket
+                __import__("impacket")
             except ImportError:
                 errMsg = "sqlmap requires 'python-impacket' third-party library "
                 errMsg += "in order to run icmpsh master. You can get it at "

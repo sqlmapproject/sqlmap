@@ -13,9 +13,7 @@ import os
 import re
 import subprocess
 import sys
-import urllib
 import urllib2
-import urlparse
 
 sys.dont_write_bytecode = True
 
