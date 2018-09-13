@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-9b9a0dbc9e47aa07545f1e157ebb3d4e  lib/core/settings.py
+ef7c758b79feb71ddb3376df9149d562  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 815d1cf27f0f8738d81531e73149867d  lib/core/target.py
@@ -392,6 +392,7 @@ d9006810684baf01ea33281d21522519  udf/postgresql/windows/32/8.3/lib_postgresqlud
 ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqludf_sys.dll_
 0d3fe0293573a4453463a0fa5a081de1  udf/postgresql/windows/32/9.0/lib_postgresqludf_sys.dll_
 336d0b0d2be333f5a6184042c85464fd  waf/360.py
+0ce8a335c7eb9cf14e645f64b3a5e91f  waf/aesecure.py
 a73a40d201b39f3387714c59934331e4  waf/airlock.py
 7da7970b45512b0233450dbd8088fde0  waf/anquanbao.py
 b61329e8f8bdbf5625f9520ec010af1f  waf/armor.py
@@ -407,6 +408,7 @@ ba84f296cb52f5e78a0670b98d7763fa  waf/cloudbric.py
 94b50385a9d462492e3a639d71aaa1c3  waf/cloudflare.py
 29ba81741fd7e220a95fe7c5fae76e1a  waf/cloudfront.py
 ac96f34c254951d301973617064eb1b5  waf/comodo.py
+c84e515440fe482476c1f2687bd9960f  waf/crawlprotect.py
 56d58c982c2cf775e0f8dc6767f336fd  waf/datapower.py
 1538b661e35843074f4599be93b3fae9  waf/denyall.py
 0182d23b34cf903537f77f4ec4b144bf  waf/distil.py
