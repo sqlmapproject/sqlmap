@@ -3,7 +3,7 @@
 * Implemented support for automatic decoding of page content through detected charset.
 * Implemented mechanism for proper data dumping on DBMSes not supporting `LIMIT/OFFSET` like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.).
 * Major improvements to program stabilization based on user reports.
-* Added new tampering scripts avoiding popular WAF/IPS/IDS mechanisms.
+* Added new tampering scripts avoiding popular WAF/IPS mechanisms.
 * Fixed major bug with DNS leaking in Tor mode.
 * Added wordlist compilation made of the most popular cracking dictionaries.
 * Implemented multi-processor hash cracking routine(s).
@@ -23,7 +23,7 @@
 * Added option `--csv-del` for manually setting delimiting character used in CSV output.
 * Added switch `--hex` for using DBMS hex conversion function(s) for data retrieval.
 * Added switch `--smart` for conducting through tests only in case of positive heuristic(s).
-* Added switch `--check-waf` for checking of existence of WAF/IPS/IDS protection.
+* Added switch `--check-waf` for checking of existence of WAF/IPS protection.
 * Added switch `--schema` to enumerate DBMS schema: shows all columns of all databases' tables.
 * Added switch `--count` to count the number of entries for a specific table or all database(s) tables.
 * Major improvements to switches `--tables` and `--columns`.
@@ -55,7 +55,7 @@
 * Added option `--host` to set the HTTP Host header value.
 * Added switch `--hostname` to turn on retrieval of DBMS server hostname.
 * Added switch `--hpp` to turn on the usage of HTTP parameter pollution WAF bypass method.
-* Added switch `--identify-waf` for turning on the thorough testing of WAF/IPS/IDS protection.
+* Added switch `--identify-waf` for turning on the thorough testing of WAF/IPS protection.
 * Added switch `--ignore-401` to ignore HTTP Error Code 401 (Unauthorized).
 * Added switch `--invalid-bignum` for usage of big numbers while invalidating values.
 * Added switch `--invalid-logical` for usage of logical operations while invalidating values.
@@ -78,7 +78,7 @@
 * Added option `--skip` to skip testing of given parameter(s).
 * Added switch `--skip-static` to skip testing parameters that not appear to be dynamic.
 * Added switch `--skip-urlencode` to skip URL encoding of payload data.
-* Added switch `--skip-waf` to skip heuristic detection of WAF/IPS/IDS protection.
+* Added switch `--skip-waf` to skip heuristic detection of WAF/IPS protection.
 * Added switch `--smart` to conduct thorough tests only if positive heuristic(s).
 * Added option `--sql-file` for setting file(s) holding SQL statements to be executed (in case of stacked SQLi).
 * Added switch `--sqlmap-shell` to turn on interactive sqlmap shell prompt.

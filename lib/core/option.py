@@ -824,7 +824,7 @@ def _setTamperingFunctions():
 
 def _setWafFunctions():
     """
-    Loads WAF/IPS/IDS detecting functions from script(s)
+    Loads WAF/IPS detecting functions from script(s)
     """
 
     if conf.identifyWaf:

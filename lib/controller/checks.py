@@ -896,7 +896,7 @@ def checkFalsePositives(injection):
 
         kb.injection = injection
 
-        for i in xrange(conf.level):
+        for level in xrange(conf.level):
             while True:
                 randInt1, randInt2, randInt3 = (_() for j in xrange(3))
 
@@ -1338,7 +1338,7 @@ def checkWaf():
     if _ is not None:
         if _:
             warnMsg = "previous heuristics detected that the target "
-            warnMsg += "is protected by some kind of WAF/IPS/IDS"
+            warnMsg += "is protected by some kind of WAF/IPS"
             logger.critical(warnMsg)
         return _
 
@@ -1346,7 +1346,7 @@ def checkWaf():
         return None
 
     infoMsg = "checking if the target is protected by "
-    infoMsg += "some kind of WAF/IPS/IDS"
+    infoMsg += "some kind of WAF/IPS"
     logger.info(infoMsg)
 
     retVal = False
@@ -1378,12 +1378,12 @@ def checkWaf():
 
     if retVal:
         warnMsg = "heuristics detected that the target "
-        warnMsg += "is protected by some kind of WAF/IPS/IDS"
+        warnMsg += "is protected by some kind of WAF/IPS"
         logger.critical(warnMsg)
 
         if not conf.identifyWaf:
             message = "do you want sqlmap to try to detect backend "
-            message += "WAF/IPS/IDS? [y/N] "
+            message += "WAF/IPS? [y/N] "
 
             if readInput(message, default='N', boolean=True):
                 conf.identifyWaf = True
@@ -1407,7 +1407,7 @@ def identifyWaf():
     kb.testMode = True
 
     infoMsg = "using WAF scripts to detect "
-    infoMsg += "backend WAF/IPS/IDS protection"
+    infoMsg += "backend WAF/IPS protection"
     logger.info(infoMsg)
 
     @cachedmethod
@@ -1434,7 +1434,7 @@ def identifyWaf():
             continue
 
         try:
-            logger.debug("checking for WAF/IPS/IDS product '%s'" % product)
+            logger.debug("checking for WAF/IPS product '%s'" % product)
             found = function(_)
         except Exception, ex:
             errMsg = "exception occurred while running "
@@ -1444,7 +1444,7 @@ def identifyWaf():
             found = False
 
         if found:
-            errMsg = "WAF/IPS/IDS identified as '%s'" % product
+            errMsg = "WAF/IPS identified as '%s'" % product
             logger.critical(errMsg)
 
             retVal.append(product)
@@ -1456,7 +1456,7 @@ def identifyWaf():
             with openFile(filename, "w+b") as f:
                 f.write(kb.wafSpecificResponse)
 
-            message = "WAF/IPS/IDS specific response can be found in '%s'. " % filename
+            message = "WAF/IPS specific response can be found in '%s'. " % filename
             message += "If you know the details on used protection please "
             message += "report it along with specific response "
             message += "to '%s'" % DEV_EMAIL_ADDRESS
@@ -1473,7 +1473,7 @@ def identifyWaf():
         if not choice:
             raise SqlmapUserQuitException
     else:
-        warnMsg = "WAF/IPS/IDS product hasn't been identified"
+        warnMsg = "WAF/IPS product hasn't been identified"
         logger.warn(warnMsg)
 
     kb.testType = None

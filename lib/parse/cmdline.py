@@ -635,7 +635,7 @@ def cmdLineParser(argv=None):
                                  help="Use Google dork results from specified page number")
 
         miscellaneous.add_option("--identify-waf", dest="identifyWaf", action="store_true",
-                                 help="Make a thorough testing for a WAF/IPS/IDS protection")
+                                 help="Make a thorough testing for a WAF/IPS protection")
 
         miscellaneous.add_option("--list-tampers", dest="listTampers", action="store_true",
                                  help="Display list of available tamper scripts")
@@ -650,7 +650,7 @@ def cmdLineParser(argv=None):
                                  help="Safely remove all content from sqlmap data directory")
 
         miscellaneous.add_option("--skip-waf", dest="skipWaf", action="store_true",
-                                 help="Skip heuristic detection of WAF/IPS/IDS protection")
+                                 help="Skip heuristic detection of WAF/IPS protection")
 
         miscellaneous.add_option("--smart", dest="smart", action="store_true",
                                  help="Conduct thorough tests only if positive heuristic(s)")

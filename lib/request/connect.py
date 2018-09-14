@@ -649,7 +649,7 @@ class Connect(object):
                 warnMsg = "connection was forcibly closed by the target URL"
             elif "timed out" in tbMsg:
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
-                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS/IDS) is dropping 'suspicious' requests")
+                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS) is dropping 'suspicious' requests")
                     kb.droppingRequests = True
                 warnMsg = "connection timed out to the target URL"
             elif "Connection reset" in tbMsg:
@@ -658,7 +658,7 @@ class Connect(object):
                     conf.disablePrecon = True
 
                 if kb.testMode:
-                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS/IDS) is resetting 'suspicious' requests")
+                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS) is resetting 'suspicious' requests")
                     kb.droppingRequests = True
                 warnMsg = "connection reset to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
@@ -1235,7 +1235,7 @@ class Connect(object):
                 warnMsg = "site returned insanely large response"
                 if kb.testMode:
                     warnMsg += " in testing phase. This is a common "
-                    warnMsg += "behavior in custom WAF/IPS/IDS solutions"
+                    warnMsg += "behavior in custom WAF/IPS solutions"
                 singleTimeWarnMessage(warnMsg)
 
         if conf.secondUrl:
