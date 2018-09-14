@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import os
+import re
 
 from xml.etree import ElementTree as et
 
@@ -17,6 +18,9 @@ from lib.core.exception import SqlmapInstallationException
 from lib.core.settings import PAYLOAD_XML_FILES
 
 def cleanupVals(text, tag):
+    if tag == "clause" and '-' in text:
+        text = re.sub(r"(\d+)-(\d+)", lambda match: ','.join(str(_) for _ in xrange(int(match.group(1)), int(match.group(2)) + 1)), text)
+
     if tag in ("clause", "where"):
         text = text.split(',')
 

