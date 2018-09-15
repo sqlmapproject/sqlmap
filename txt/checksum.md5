@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-94b6f9ade36d5622998a480dcea19946  lib/core/settings.py
+1d4a4c8a47f7d7ce2b5fa59548e84bc5  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 248bd121e0565318e1efaff54aa427bc  lib/core/target.py
@@ -455,7 +455,7 @@ a687449cd4e45f69e33b13d41e021480  waf/uspses.py
 20840afc269920826deac2b6c00d6b9c  waf/wallarm.py
 11205abf397ae9072adc3234b656ade9  waf/watchguard.py
 9bf34539f382987490d2239d8ef0a651  waf/webappsecure.py
-5b1eefdc39d449a74fce0564364b0e09  waf/webknight.py
+6802052ddae241e2f4f78974ed11904a  waf/webknight.py
 11a5c6b10ced11e505a74e36ee2503b3  waf/wordfence.py
 68e332530fab216d017ede506c3fec2f  waf/yundun.py
 bea35ba732ccc9548e6c4023cea6832b  waf/yunsuo.py
