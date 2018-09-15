@@ -25,6 +25,6 @@ def tamper(payload, **kwargs):
 
     headers = kwargs.get("headers", {})
     headers["X-Forwarded-For"] = randomIP()
-    headers["X-Clinet-Ip"] = randomIP()
+    headers["X-Client-Ip"] = randomIP()
     headers["X-Real-Ip"] = randomIP()
     return payload
