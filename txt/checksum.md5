@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-018e7c47d53529bd5a3eab2e3405436c  lib/core/settings.py
+94b6f9ade36d5622998a480dcea19946  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 248bd121e0565318e1efaff54aa427bc  lib/core/target.py
@@ -400,7 +400,7 @@ b61329e8f8bdbf5625f9520ec010af1f  waf/armor.py
 6ea7b4ff5f111acb0b24186ef82c3f2d  waf/aws.py
 ef722d062564def381b1f96f5faadee3  waf/baidu.py
 07bc4b531d2353c9acfbfcada94ff12b  waf/barracuda.py
-82efee4639f7be75041c0145a6bc8578  waf/bigip.py
+44f724ab7d333397975fecdf7e50be56  waf/bigip.py
 6a2834daf767491d3331bd31e946d540  waf/binarysec.py
 41e399dbfe7b904d5aacfb37d85e1fbf  waf/blockdos.py
 2f3bbf43be94d4e9ffe9f80e8483d62f  waf/ciscoacexml.py
