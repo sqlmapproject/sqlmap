@@ -56,7 +56,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
-            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order by", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
+            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order (by|clause)", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
 
         if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
             infoMsg = "'ORDER BY' technique appears to be usable. "
