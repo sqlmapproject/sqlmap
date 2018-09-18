@@ -1450,7 +1450,7 @@ def identifyWaf():
             retVal.append(product)
 
     if retVal:
-        if kb.wafSpecificResponse and len(retVal) == 1 and "unknown" in retVal[0].lower():
+        if kb.wafSpecificResponse and "You don't have permission to access" not in kb.wafSpecificResponse and len(retVal) == 1 and "unknown" in retVal[0].lower():
             handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.SPECIFIC_RESPONSE)
             os.close(handle)
             with openFile(filename, "w+b") as f:
