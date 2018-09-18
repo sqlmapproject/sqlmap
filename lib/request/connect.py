@@ -948,14 +948,26 @@ class Connect(object):
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s[\"']?[^>]*\bvalue=(?P<result>(\"([^\"]+)|'([^']+)|([^ >]+)))" % re.escape(conf.csrfToken), page or "")
+            token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
 
             if not token:
-                token = extractRegexResult(r"(?i)<input[^>]+\bvalue=(?P<result>(\"([^\"]+)|'([^']+)|([^ >]+)))[^>]+\bname=[\"']?%s[\"']?" % re.escape(conf.csrfToken), page or "")
+                token = extractRegexResult(r"(?i)<input[^>]+\bvalue=[\"']?(?P<result>[^>'\"]*)[\"']?[^>]*\bname=[\"']?%s\b" % re.escape(conf.csrfToken), page or "")
 
                 if not token:
                     match = re.search(r"%s[\"']:[\"']([^\"']+)" % re.escape(conf.csrfToken), page or "")
                     token = match.group(1) if match else None
+
+                    if not token:
+                        token = extractRegexResult(r"\b%s\s*[:=]\s*(?P<result>\w+)" % re.escape(conf.csrfToken), str(headers))
+
+                        if not token:
+                            token = extractRegexResult(r"\b%s\s*=\s*['\"]?(?P<result>[^;'\"]+)" % re.escape(conf.csrfToken), page or "")
+
+                            if token:
+                                match = re.search(r"String\.fromCharCode\(([\d+, ]+)\)", token)
+
+                                if match:
+                                    token = "".join(chr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
 
             if not token:
                 if conf.csrfUrl != conf.url and code == httplib.OK:

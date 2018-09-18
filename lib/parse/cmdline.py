@@ -207,7 +207,7 @@ def cmdLineParser(argv=None):
                            help="Parameter used to hold anti-CSRF token")
 
         request.add_option("--csrf-url", dest="csrfUrl",
-                           help="URL address to visit to extract anti-CSRF token")
+                           help="URL address to visit for extraction of anti-CSRF token")
 
         request.add_option("--force-ssl", dest="forceSSL", action="store_true",
                            help="Force usage of SSL/HTTPS")
