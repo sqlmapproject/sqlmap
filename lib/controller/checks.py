@@ -1232,7 +1232,7 @@ def checkStability():
             logger.error(errMsg)
 
     else:
-        warnMsg = "target URL content is not stable. sqlmap will base the page "
+        warnMsg = "target URL content is not stable (i.e. content differs). sqlmap will base the page "
         warnMsg += "comparison on a sequence matcher. If no dynamic nor "
         warnMsg += "injectable parameters are detected, or in case of "
         warnMsg += "junk results, refer to user's manual paragraph "
@@ -1317,9 +1317,8 @@ def checkRegexp():
     rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
     if not re.search(conf.regexp, rawResponse, re.I | re.M):
-        warnMsg = "you provided '%s' as the regular expression to " % conf.regexp
-        warnMsg += "match, but such a regular expression does not have any "
-        warnMsg += "match within the target URL raw response, sqlmap "
+        warnMsg = "you provided '%s' as the regular expression " % conf.regexp
+        warnMsg += "which does not have any match within the target URL raw response. sqlmap "
         warnMsg += "will carry on anyway"
         logger.warn(warnMsg)
 
