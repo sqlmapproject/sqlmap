@@ -204,7 +204,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>AND boolean-based blind - WHERE or HAVING clause (subquery) (Generic comment)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clause (subquery - comment)</title>
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
@@ -221,7 +221,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clause (subquery) (Generic comment)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause (subquery - comment)</title>
         <stype>1</stype>
         <level>2</level>
         <risk>3</risk>
@@ -238,7 +238,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>AND boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
+        <title>AND boolean-based blind - WHERE or HAVING clause (comment)</title>
         <stype>1</stype>
         <level>2</level>
         <risk>1</risk>
@@ -255,7 +255,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clause (Generic comment)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause (comment)</title>
         <stype>1</stype>
         <level>2</level>
         <risk>3</risk>
@@ -272,7 +272,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clause (Generic comment) (NOT)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause (NOT - comment)</title>
         <stype>1</stype>
         <level>4</level>
         <risk>3</risk>
@@ -329,7 +329,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>OR boolean-based blind - WHERE or HAVING clause (MySQL comment) (NOT)</title>
+        <title>OR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>3</risk>
@@ -981,7 +981,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>Boolean-based blind - Parameter replace (DUAL) (original value)</title>
+        <title>Boolean-based blind - Parameter replace (DUAL - original value)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
@@ -1015,7 +1015,7 @@ Tag: <test>
     </test>
 
     <test>
-        <title>Boolean-based blind - Parameter replace (CASE) (original value)</title>
+        <title>Boolean-based blind - Parameter replace (CASE - original value)</title>
         <stype>1</stype>
         <level>3</level>
         <risk>1</risk>
