@@ -38,7 +38,6 @@ class Enumeration(GenericEnumeration):
 
         rootQuery = queries[DBMS.SYBASE].users
 
-        randStr = randomStr()
         query = rootQuery.inband.query
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
@@ -47,7 +46,7 @@ class Enumeration(GenericEnumeration):
             blinds = (True,)
 
         for blind in blinds:
-            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
             if retVal:
                 kb.data.cachedUsers = retVal[0].values()[0]
@@ -94,7 +93,6 @@ class Enumeration(GenericEnumeration):
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.SYBASE].dbs
-        randStr = randomStr()
         query = rootQuery.inband.query
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
@@ -103,7 +101,7 @@ class Enumeration(GenericEnumeration):
             blinds = [True]
 
         for blind in blinds:
-            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
             if retVal:
                 kb.data.cachedDbs = retVal[0].values()[0]
@@ -146,9 +144,8 @@ class Enumeration(GenericEnumeration):
 
         for db in dbs:
             for blind in blinds:
-                randStr = randomStr()
                 query = rootQuery.inband.query % db
-                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr], blind=blind)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
                 if retVal:
                     for table in retVal[0].values()[0]:
@@ -278,15 +275,14 @@ class Enumeration(GenericEnumeration):
             logger.info(infoMsg)
 
             for blind in blinds:
-                randStr = randomStr()
                 query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
-                retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.name' % randStr, '%s.usertype' % randStr], blind=blind)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName, '%s.usertype' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
                 if retVal:
                     table = {}
                     columns = {}
 
-                    for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % randStr], retVal[0]["%s.usertype" % randStr])):
+                    for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
                         columns[name] = SYBASE_TYPES.get(int(type_) if isinstance(type_, basestring) and type_.isdigit() else type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl)] = columns

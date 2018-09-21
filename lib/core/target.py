@@ -692,6 +692,13 @@ def _createTargetDirs():
     _createFilesDir()
     _configureDumper()
 
+def _setAuxOptions():
+    """
+    Setup auxiliary (host-dependent) options
+    """
+
+    kb.aliasName = randomStr(seed=hash(conf.hostname or ""))
+
 def _restoreMergedOptions():
     """
     Restore merged options (command line, configuration file and default values)
@@ -745,3 +752,4 @@ def setupTargetEnv():
     _resumeHashDBValues()
     _setResultsFile()
     _setAuthCred()
+    _setAuxOptions()

@@ -43,9 +43,8 @@ class Enumeration(GenericEnumeration):
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.MAXDB].dbs
-        randStr = randomStr()
         query = rootQuery.inband.query
-        retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.schemaname' % randStr], blind=True)
+        retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.schemaname' % kb.aliasName], blind=True)
 
         if retVal:
             kb.data.cachedDbs = retVal[0].values()[0]
@@ -79,9 +78,8 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[DBMS.MAXDB].tables
 
         for db in dbs:
-            randStr = randomStr()
             query = rootQuery.inband.query % (("'%s'" % db) if db != "USER" else 'USER')
-            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.tablename' % randStr], blind=True)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.tablename' % kb.aliasName], blind=True)
 
             if retVal:
                 for table in retVal[0].values()[0]:
@@ -202,15 +200,14 @@ class Enumeration(GenericEnumeration):
             infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.info(infoMsg)
 
-            randStr = randomStr()
             query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), ("'%s'" % unsafeSQLIdentificatorNaming(conf.db)) if unsafeSQLIdentificatorNaming(conf.db) != "USER" else 'USER')
-            retVal = pivotDumpTable("(%s) AS %s" % (query, randStr), ['%s.columnname' % randStr, '%s.datatype' % randStr, '%s.len' % randStr], blind=True)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.columnname' % kb.aliasName, '%s.datatype' % kb.aliasName, '%s.len' % kb.aliasName], blind=True)
 
             if retVal:
                 table = {}
                 columns = {}
 
-                for columnname, datatype, length in zip(retVal[0]["%s.columnname" % randStr], retVal[0]["%s.datatype" % randStr], retVal[0]["%s.len" % randStr]):
+                for columnname, datatype, length in zip(retVal[0]["%s.columnname" % kb.aliasName], retVal[0]["%s.datatype" % kb.aliasName], retVal[0]["%s.len" % kb.aliasName]):
                     columns[safeSQLIdentificatorNaming(columnname)] = "%s(%s)" % (datatype, length)
 
                 table[tbl] = columns

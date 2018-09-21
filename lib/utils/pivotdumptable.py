@@ -32,7 +32,7 @@ from lib.core.settings import NULL
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
-def pivotDumpTable(table, colList, count=None, blind=True):
+def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     lengths = {}
     entries = {}
 
@@ -89,7 +89,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
     if not validPivotValue:
         for column in colList:
             infoMsg = "fetching number of distinct "
-            infoMsg += "values for column '%s'" % column
+            infoMsg += "values for column '%s'" % column.replace(("%s." % alias) if alias else "", "")
             logger.info(infoMsg)
 
             query = dumpNode.count2 % (column, table)
@@ -100,7 +100,7 @@ def pivotDumpTable(table, colList, count=None, blind=True):
                 validColumnList = True
 
                 if value == count:
-                    infoMsg = "using column '%s' as a pivot " % column
+                    infoMsg = "using column '%s' as a pivot " % column.replace(("%s." % alias) if alias else "", "")
                     infoMsg += "for retrieving row data"
                     logger.info(infoMsg)
 
