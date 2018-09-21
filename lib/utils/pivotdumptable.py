@@ -11,6 +11,7 @@ from extra.safe2bin.safe2bin import safechardecode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -174,10 +175,10 @@ def pivotDumpTable(table, colList, count=None, blind=True):
         warnMsg += "will display partial output"
         logger.warn(warnMsg)
 
-    except SqlmapConnectionException, e:
-        errMsg = "connection exception detected. sqlmap "
+    except SqlmapConnectionException, ex:
+        errMsg = "connection exception detected ('%s'). sqlmap " % getSafeExString(ex)
         errMsg += "will display partial output"
-        errMsg += "'%s'" % e
+
         logger.critical(errMsg)
 
     return entries, lengths

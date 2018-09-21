@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-85acbc0a45352eeb4ebe78dbef74918b  lib/core/settings.py
+de9fa04f019f5d14db8589e1a61b3064  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 248bd121e0565318e1efaff54aa427bc  lib/core/target.py
@@ -112,7 +112,7 @@ f7af65aa47329d021e2b2cc8521b42a4  lib/utils/getch.py
 d0f4d56c5d6a09a4635035e233d4a782  lib/utils/hash.py
 011d2dbf589e0faa0deca61a651239cc  lib/utils/htmlentities.py
 1e5532ede194ac9c083891c2f02bca93  lib/utils/__init__.py
-010d8327239d33af4ce9f25683cfc012  lib/utils/pivotdumptable.py
+b0105f091c2e919c3cdb549cb29fd194  lib/utils/pivotdumptable.py
 683c3bd05b6164f56a57ed495c162684  lib/utils/progress.py
 0ec5cec9d93d5ffd1eaeda6e942ecadf  lib/utils/purge.py
 2c5a655c8e94cbe2664ee497752ac1f2  lib/utils/search.py
