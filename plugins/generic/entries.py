@@ -129,10 +129,7 @@ class Entries:
                 else:
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
-                if not safeSQLIdentificatorNaming(conf.db) in kb.data.cachedColumns \
-                   or safeSQLIdentificatorNaming(tbl, True) not in \
-                   kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] \
-                   or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
+                if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
                     warnMsg = "unable to enumerate the columns for table "
                     warnMsg += "'%s' in database" % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(conf.db)

@@ -207,7 +207,7 @@ class Enumeration(GenericEnumeration):
                 raise SqlmapNoneDataException(errMsg)
 
         for tbl in tblList:
-            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl)
+            tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
 
         if bruteForce:
             resumeAvailable = False
@@ -265,7 +265,7 @@ class Enumeration(GenericEnumeration):
 
             if dumpMode and colList:
                 table = {}
-                table[safeSQLIdentificatorNaming(tbl)] = dict((_, None) for _ in colList)
+                table[safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
                 kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
                 continue
 
@@ -285,7 +285,7 @@ class Enumeration(GenericEnumeration):
                     for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
                         columns[name] = SYBASE_TYPES.get(int(type_) if isinstance(type_, basestring) and type_.isdigit() else type_, type_)
 
-                    table[safeSQLIdentificatorNaming(tbl)] = columns
+                    table[safeSQLIdentificatorNaming(tbl, True)] = columns
                     kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
                     break

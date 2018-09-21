@@ -191,7 +191,7 @@ class Enumeration(GenericEnumeration):
 
             if dumpMode and colList:
                 table = {}
-                table[safeSQLIdentificatorNaming(tbl)] = dict((_, None) for _ in colList)
+                table[safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
                 kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
                 continue
 
