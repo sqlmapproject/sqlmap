@@ -992,11 +992,6 @@ def checkFilteredChars(injection):
     kb.injection = popValue()
 
 def heuristicCheckSqlInjection(place, parameter):
-    if kb.nullConnection:
-        debugMsg = "heuristic check skipped because NULL connection used"
-        logger.debug(debugMsg)
-        return None
-
     if kb.heavilyDynamic:
         debugMsg = "heuristic check skipped because of heavy dynamicity"
         logger.debug(debugMsg)
