@@ -753,6 +753,7 @@ def cmdLineParser(argv=None):
         prompt = False
         advancedHelp = True
         extraHeaders = []
+        tamperIndex = None
 
         # Reference: https://stackoverflow.com/a/4012683 (Note: previously used "...sys.getfilesystemencoding() or UNICODE_ENCODING")
         for arg in argv:
@@ -824,6 +825,12 @@ def cmdLineParser(argv=None):
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
                 raise SystemExit
+            elif argv[i].startswith("--tamper"):
+                if tamperIndex is None:
+                    tamperIndex = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)
+                else:
+                    argv[tamperIndex] = "%s,%s" % (argv[tamperIndex], argv[i].split('=')[1] if '=' in argv[i] else (argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith('-') else ""))
+                    argv[i] = ""
             elif argv[i] == "-H":
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
