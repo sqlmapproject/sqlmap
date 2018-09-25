@@ -597,6 +597,7 @@ Carlos Gabriel Vergara, <carlosgabrielvergara(at)gmail.com>
 
 Patrick Webster, <patrick(at)aushack.com>
 * for suggesting an enhancement
+* for donating to sqlmap development (from OSI.Security)
 
 Ed Williams, <ed.williams(at)ngssecure.com>
 * for suggesting a minor enhancement
