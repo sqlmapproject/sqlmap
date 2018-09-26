@@ -50,12 +50,12 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-bae340b4a0f79271c0690deff7d849a1  lib/core/settings.py
+495854418b62c5ad47ae1eb0ac891976  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
 72d499ca8d792e90a1ebfb2ad2341a51  lib/core/testing.py
-e896992e4db26605ab1e73615b1f9434  lib/core/threads.py
+29efb66f3c444c09d29925cf552851cd  lib/core/threads.py
 c40758411bb0bd68764d78e0bb72bd0f  lib/core/unescaper.py
 b35636650cfe721f5cc47fb91737c061  lib/core/update.py
 e772deb63270375e685fa5a7b775c382  lib/core/wordlist.py
