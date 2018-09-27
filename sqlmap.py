@@ -5,37 +5,37 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import sys
-
-sys.dont_write_bytecode = True
-
 try:
-    __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
-except ImportError:
-    exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
+    import sys
 
-import bdb
-import distutils
-import glob
-import inspect
-import json
-import logging
-import os
-import re
-import shutil
-import sys
-import thread
-import threading
-import time
-import traceback
-import warnings
+    sys.dont_write_bytecode = True
 
-warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
-warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+    try:
+        __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
+    except ImportError:
+        exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
-from lib.core.data import logger
+    import bdb
+    import distutils
+    import glob
+    import inspect
+    import json
+    import logging
+    import os
+    import re
+    import shutil
+    import sys
+    import thread
+    import threading
+    import time
+    import traceback
+    import warnings
 
-try:
+    warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
+    warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+
+    from lib.core.data import logger
+
     from lib.core.common import banner
     from lib.core.common import checkIntegrity
     from lib.core.common import createGithubIssue
@@ -67,9 +67,13 @@ try:
     from lib.parse.cmdline import cmdLineParser
 except KeyboardInterrupt:
     errMsg = "user aborted"
-    logger.error(errMsg)
 
-    raise SystemExit
+    if "logger" in globals():
+        logger.error(errMsg)
+        raise SystemExit
+    else:
+        import time
+        exit("\r[%s] [ERROR] %s" % (time.strftime("%X"), errMsg))
 
 def modulePath():
     """

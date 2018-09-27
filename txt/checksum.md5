@@ -50,7 +50,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-495854418b62c5ad47ae1eb0ac891976  lib/core/settings.py
+59274b9acea517616aed86e58808e02d  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -118,7 +118,7 @@ d0f4d56c5d6a09a4635035e233d4a782  lib/utils/hash.py
 2c5a655c8e94cbe2664ee497752ac1f2  lib/utils/search.py
 571884f530796534f03c49cf3f380a4c  lib/utils/sqlalchemy.py
 dcc25183c6bd85b172c87cfcbc305ab6  lib/utils/timeout.py
-faa7536c4788ee118b19338f3e98e556  lib/utils/versioncheck.py
+4703ceeb32131a9a7a6561575644123b  lib/utils/versioncheck.py
 e9e73cd6bd814dd7823a9da913cea61c  lib/utils/xrange.py
 b9d2761f47fec3d98b88311a263fd5db  plugins/dbms/access/connector.py
 3f1c50a1507d1c2f69c20c706230e2e2  plugins/dbms/access/enumeration.py
@@ -228,7 +228,7 @@ ec2ba8c757ac96425dcd2b97970edd3a  shell/stagers/stager.asp_
 0c48ddb1feb7e38a951ef05a0d48e032  shell/stagers/stager.jsp_
 2f9e459a4cf6a58680978cdce5ff7971  shell/stagers/stager.php_
 cd90da0474d7b1a67d7b40d208493375  sqlmapapi.py
-a35b5b83c12841fdf3925190c9d24299  sqlmap.py
+5f30815ebe320e46e5898dc819e629a7  sqlmap.py
 523dab9e1093eb59264c6beb366b255a  tamper/0x2char.py
 3a1697585ae4e7bf315e9dda97d6f321  tamper/apostrophemask.py
 d7a119a74be9b385ee3884fb5e6af041  tamper/apostrophenullencode.py
