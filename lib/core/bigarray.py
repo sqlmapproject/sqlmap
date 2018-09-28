@@ -126,7 +126,7 @@ class BigArray(list):
             try:
                 with open(self.chunks[index], "rb") as f:
                     self.cache = Cache(index, pickle.loads(bz2.decompress(f.read())), False)
-            except IOError, ex:
+            except Exception, ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex.message
                 raise SqlmapSystemException(errMsg)
