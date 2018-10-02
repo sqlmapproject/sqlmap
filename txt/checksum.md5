@@ -8,7 +8,6 @@ acba8b5dc93db0fe6b2b04ff0138c33c  extra/icmpsh/icmpsh.exe_
 708e9fd35dabcbfcd10e91bbc14f091f  extra/icmpsh/icmpsh_m.py
 2d020d2bdcee1170805f48839fdb89df  extra/icmpsh/__init__.py
 1e5532ede194ac9c083891c2f02bca93  extra/__init__.py
-fe141ec3178a46e7151c7f34bb747c68  extra/mssqlsig/update.py
 ff90cb0366f7cefbdd6e573e27e6238c  extra/runcmd/runcmd.exe_
 1e5532ede194ac9c083891c2f02bca93  extra/safe2bin/__init__.py
 b6c0f2047e9bea90f4d5c5806c0f6a9a  extra/safe2bin/safe2bin.py
@@ -50,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-06e9273cc80dd4461dc5dc3518ca73a3  lib/core/settings.py
+a1ed8cb875f1b56683b2b320ccb63197  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
