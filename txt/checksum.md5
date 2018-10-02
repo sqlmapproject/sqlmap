@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-5f2410ec4abd6170ac6244321a959323  lib/core/settings.py
+501b38eaa341d98935b4fc3cecefaffc  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -265,7 +265,6 @@ a47aafcbc1de2deb85160e29de46f748  tamper/plus2concat.py
 759b86cf3bb1d7871dc6489538253f94  tamper/plus2fnconcat.py
 078494e1217400b485ef653108d32699  tamper/randomcase.py
 28626e4b8c673228dcfe4f1627a9e08b  tamper/randomcomments.py
-938bfac6e55a8823e4a66cd29166d980  tamper/securesphere.py
 cac8a56f8cc6c14524ee392daa5ae2fd  tamper/space2comment.py
 4e6da2aca962b6110652e5f83dce5cd7  tamper/space2dash.py
 7cdbae483262f66ef5d77521c59d9621  tamper/space2hash.py
@@ -278,14 +277,14 @@ b55ed15af74ffefc4dc303646c7c6482  tamper/space2mssqlblank.py
 72a547bc3bf32dba0d1c3093988df8af  tamper/space2plus.py
 a74cd6375c5d5d253e2e7014b00ecd33  tamper/space2randomblank.py
 93fc10b57586936cef05e88227c84ad0  tamper/sp_password.py
-041cb567dff6bb6e7389e12ab3fb84c6  tamper/symboliclogical.py
+690eb5200c9e61e54cd8952edaefda23  tamper/symboliclogical.py
 6679c4ffb7322315a738dcfa68c6fb7c  tamper/unionalltounion.py
-51d20b5cb5a50fc2e44d39087f865d23  tamper/unmagicquotes.py
+0a7e97374019321ffc606d41535f26d6  tamper/unmagicquotes.py
 cc212839f55692d422beef3a8e22a8d4  tamper/uppercase.py
 f2b9eac52d346315f5705f71beeda791  tamper/varnish.py
 0e40966a51d1eb5d42a2159d2015a8a4  tamper/versionedkeywords.py
 0fba004bf1be6edbefbda89f23f4e518  tamper/versionedmorekeywords.py
-bb87c2c0ec66927015c9709aaaf93561  tamper/xforwardedfor.py
+d8279aa1633e2485ed751eb0361d1c8e  tamper/xforwardedfor.py
 1ebf563bb2cb18b68ea952418bba0ec5  thirdparty/ansistrm/ansistrm.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/ansistrm/__init__.py
 8e775c25bc9e84891ad6fcb4f0005c23  thirdparty/beautifulsoup/beautifulsoup.py

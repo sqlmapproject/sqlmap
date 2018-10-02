@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import re
+import urllib
 
 from lib.core.enums import PRIORITY
 
@@ -25,6 +26,6 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        retVal = re.sub(r"(?i)\bAND\b", "%26%26", re.sub(r"(?i)\bOR\b", "%7C%7C", payload))
+        retVal = re.sub(r"(?i)\bAND\b", urllib.quote("&&"), re.sub(r"(?i)\bOR\b", urllib.quote("||"), payload))
 
     return retVal
