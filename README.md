@@ -29,7 +29,7 @@ Usage
 
 To get a list of basic options and switches use:
 
-    python sqlmap.py -h
+    ·python sqlmap.py -h·
 
 To get a list of all options and switches use:
 
