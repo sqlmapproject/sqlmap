@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-501b38eaa341d98935b4fc3cecefaffc  lib/core/settings.py
+2f0cd79e7e10a6e137f4748a589c4c0b  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -257,7 +257,6 @@ ef0639557a79e57b06296c4bc223ebef  tamper/htmlencode.py
 1c4d622d1c2c77fc3db1f8b3849467ee  tamper/modsecurityversioned.py
 f177a624c2cd3431c433769c6eb995e7  tamper/modsecurityzeroversioned.py
 91b63afdb96b1d51c12a14cbd425d310  tamper/multiplespaces.py
-efd1917c6ccc632f044084a30e0e0f98  tamper/nonrecursivereplacement.py
 dcf3458f9010ca41bc4b56804f15792c  tamper/overlongutf8more.py
 a3a3cef042b864c4226b63f89548f939  tamper/overlongutf8.py
 89f8753a0ef65d2bb860c8864e9e935a  tamper/percentage.py
