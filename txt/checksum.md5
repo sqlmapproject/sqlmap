@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-40d7d26b71f11cbc128a0ef7c67e2da0  lib/core/settings.py
+af9f01fd0d42d37f40e41f93907e2528  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -462,7 +462,7 @@ d8925c034263bf1b83e7d8e1c78eec57  xml/banner/mssql.xml
 7b21aeb3ad66d7686eacd23a6346292c  xml/banner/mysql.xml
 9b262a617b06af56b1267987d694bf6f  xml/banner/oracle.xml
 c26cd4fa986ddc9f6d92dd87c8fc61cb  xml/banner/postgresql.xml
-4970709ca31bcaea5eb79547a132606a  xml/banner/server.xml
+5f8975d03665aad58c3ee8acea85b06b  xml/banner/server.xml
 d48c971769c6131e35bd52d2315a8d58  xml/banner/servlet-engine.xml
 5fa1805d3007c68b051f2c70afcf41ed  xml/banner/set-cookie.xml
 d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml

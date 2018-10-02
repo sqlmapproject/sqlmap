@@ -802,13 +802,57 @@
 
     <!-- Nginx -->
 
-    <regexp value="nginx/([\w\.]+)">
+    <regexp value="nginx$">
         <info technology="Nginx"/>
+    </regexp>
+
+    <regexp value="nginx/([\w\.]+)">
+        <info technology="Nginx" tech_version="1"/>
     </regexp>
 
     <!-- Google Web Server -->
 
-    <regexp value="GWS/([\w\.]+)">
+    <regexp value="GWS$">
         <info technology="Google Web Server"/>
+    </regexp>
+
+    <regexp value="GWS/([\w\.]+)">
+        <info technology="Google Web Server" tech_version="1"/>
+    </regexp>
+
+    <!-- lighttpd -->
+
+    <regexp value="lighttpd$">
+        <info technology="lighttpd"/>
+    </regexp>
+
+    <regexp value="lighttpd/([\w\.]+)">
+        <info technology="lighttpd" tech_version="1"/>
+    </regexp>
+
+    <!-- OpenResty -->
+
+    <regexp value="openresty$">
+        <info technology="OpenResty"/>
+    </regexp>
+
+    <regexp value="openresty/([\w\.]+)">
+        <info technology="OpenResty" tech_version="1"/>
+    </regexp>
+
+    <!-- LiteSpeed -->
+
+    <regexp value="LiteSpeed$">
+        <info technology="LiteSpeed"/>
+    </regexp>
+
+    <regexp value="LiteSpeed/([\w\.]+)">
+        <info technology="LiteSpeed" tech_version="1"/>
+    </regexp>
+
+    <!-- Sun ONE -->
+
+    <regexp value="Sun-ONE-Web-Server/([\w\.]+)">
+        <info technology="Sun ONE" tech_version="1"/>
     </regexp>
 </root>
