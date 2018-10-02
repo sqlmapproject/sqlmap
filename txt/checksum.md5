@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-a1ed8cb875f1b56683b2b320ccb63197  lib/core/settings.py
+5f2410ec4abd6170ac6244321a959323  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -404,7 +404,7 @@ ef722d062564def381b1f96f5faadee3  waf/baidu.py
 41e399dbfe7b904d5aacfb37d85e1fbf  waf/blockdos.py
 2f3bbf43be94d4e9ffe9f80e8483d62f  waf/ciscoacexml.py
 ba84f296cb52f5e78a0670b98d7763fa  waf/cloudbric.py
-94b50385a9d462492e3a639d71aaa1c3  waf/cloudflare.py
+a1d16d7106c9c66072aa58530c288515  waf/cloudflare.py
 a8affab0838c6a1fe683d5b7333d7a69  waf/cloudfront.py
 ac96f34c254951d301973617064eb1b5  waf/comodo.py
 c84e515440fe482476c1f2687bd9960f  waf/crawlprotect.py

@@ -25,6 +25,7 @@ def detect(get_page):
             retval |= re.search(r"CloudFlare Ray ID:|var CloudFlare=", page or "") is not None
             retval |= all(_ in (page or "") for _ in ("Attention Required! | Cloudflare", "Please complete the security check to access"))
             retval |= all(_ in (page or "") for _ in ("Attention Required! | Cloudflare", "Sorry, you have been blocked"))
+            retval |= any(_ in (page or "") for _ in ("CLOUDFLARE_ERROR_500S_BOX", "::CAPTCHA_BOX::"))
 
         if retval:
             break
