@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Reference: http://www.http-stats.com/X-Powered-By -->
+<!-- Reference: https://publicwww.com/popular/powered/index.html -->
 
 <root>
     <regexp value="PHP[\-\_\/\ ]([\d\.]+)">
@@ -13,6 +13,22 @@
 
     <regexp value="ASP[\/\d\.]*$">
         <info technology="ASP" type="Windows"/>
+    </regexp>
+
+    <regexp value="EasyEngine ([\d\.]+)">
+        <info technology="EasyEngine" tech_version="1"/>
+    </regexp>
+
+    <regexp value="PleskLin">
+        <info technology="Plesk" type="Linux"/>
+    </regexp>
+
+    <regexp value="PleskWin">
+        <info technology="Plesk" type="Windows"/>
+    </regexp>
+
+    <regexp value="ThinkPHP">
+        <info technology="ThinkPHP"/>
     </regexp>
 
     <regexp value="ASP\.NET">

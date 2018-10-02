@@ -19,19 +19,35 @@
         <info technology="JSP"/>
     </regexp>
 
+    <regexp value="JServSessionId">
+        <info technology="JServ"/>
+    </regexp>
+
+    <regexp value="Ltpatoken">
+        <info technology="WebSphere"/>
+    </regexp>
+
     <regexp value="PHPSESSION">
         <info technology="PHP"/>
+    </regexp>
+
+    <regexp value="RoxenUserID">
+        <info technology="Roxen"/>
+    </regexp>
+
+    <regexp value="wiki\d+_session">
+        <info technology="MediaWiki"/>
     </regexp>
 
     <regexp value="Apache">
         <info technology="Apache"/>
     </regexp>
 
-    <regexp value="JServSessionId">
-        <info technology="Apache|JSP"/>
+    <regexp value="DomAuthSessID">
+        <info technology="Domino|Notes"/>
     </regexp>
 
-    <regexp value="CFID|CFTOKEN|CFMAGIC">
+    <regexp value="CFID|CFTOKEN|CFMAGIC|CFGLOBALS">
         <info technology="ColdFusion"/>
     </regexp>
 </root>
