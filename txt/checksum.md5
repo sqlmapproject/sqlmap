@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-af9f01fd0d42d37f40e41f93907e2528  lib/core/settings.py
+5192b4916a979e3fb249b72e3a89b3a6  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -284,7 +284,7 @@ f2b9eac52d346315f5705f71beeda791  tamper/varnish.py
 0e40966a51d1eb5d42a2159d2015a8a4  tamper/versionedkeywords.py
 0fba004bf1be6edbefbda89f23f4e518  tamper/versionedmorekeywords.py
 d8279aa1633e2485ed751eb0361d1c8e  tamper/xforwardedfor.py
-1ebf563bb2cb18b68ea952418bba0ec5  thirdparty/ansistrm/ansistrm.py
+b1c02296b4e3b0ebaa58b9dcd914cbf4  thirdparty/ansistrm/ansistrm.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/ansistrm/__init__.py
 8e775c25bc9e84891ad6fcb4f0005c23  thirdparty/beautifulsoup/beautifulsoup.py
 cb2e1fe7c404dff41a2ae9132828f532  thirdparty/beautifulsoup/__init__.py

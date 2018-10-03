@@ -181,8 +181,10 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
                     if level != "PAYLOAD":
                         if any(_ in message for _ in ("parsed DBMS error message",)):
-                            string = re.search(r": '(.+)'", message).group(1)
-                            message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                            match = re.search(r": '(.+)'", message)
+                            if match:
+                                string = match.group(1)
+                                message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                         else:
                             for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
                                 string = match.group(1)
