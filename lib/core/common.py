@@ -899,7 +899,7 @@ def clearColors(message):
 
     retVal = message
 
-    if message:
+    if isinstance(message, str):
         retVal = re.sub(r"\x1b\[[\d;]+m", "", message)
 
     return retVal
@@ -923,7 +923,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
 
             try:
                 if conf.get("api"):
-                    sys.stdout.write(message, status, content_type)
+                    sys.stdout.write(clearColors(message), status, content_type)
                 else:
                     sys.stdout.write(setColor(message, bold=bold))
 
