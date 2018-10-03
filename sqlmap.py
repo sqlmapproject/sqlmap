@@ -69,11 +69,11 @@ except KeyboardInterrupt:
     errMsg = "user aborted"
 
     if "logger" in globals():
-        logger.error(errMsg)
+        logger.critical(errMsg)
         raise SystemExit
     else:
         import time
-        exit("\r[%s] [ERROR] %s" % (time.strftime("%X"), errMsg))
+        exit("\r[%s] [CRITICAL] %s" % (time.strftime("%X"), errMsg))
 
 def modulePath():
     """
@@ -196,7 +196,7 @@ def main():
 
         errMsg = "user aborted"
         try:
-            logger.error(errMsg)
+            logger.critical(errMsg)
         except KeyboardInterrupt:
             pass
 

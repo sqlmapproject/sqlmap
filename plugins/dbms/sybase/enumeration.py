@@ -7,7 +7,6 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.common import filterPairValues
 from lib.core.common import isTechniqueAvailable
-from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unArrayizeValue

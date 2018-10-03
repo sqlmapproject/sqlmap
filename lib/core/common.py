@@ -165,7 +165,6 @@ from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.settings import VERSION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
@@ -3371,7 +3370,7 @@ def getLatestRevision():
     """
     Retrieves latest revision from the offical repository
 
-    >>> getLatestRevision() == VERSION
+    >>> from lib.core.settings import VERSION; getLatestRevision() == VERSION
     True
     """
 

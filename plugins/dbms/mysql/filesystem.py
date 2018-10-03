@@ -136,7 +136,7 @@ class Filesystem(GenericFilesystem):
         query = getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=dFile, HEXSTRING=fcEncodedStr)
         query = agent.prefixQuery(query)        # Note: No need for suffix as 'write_file_limit' already ends with comment (required)
         payload = agent.payload(newValue=query)
-        page = Request.queryPage(payload)
+        Request.queryPage(payload, content=False, raise404=False, silent=True, noteResponseTime=False)
 
         warnMsg = "expect junk characters inside the "
         warnMsg += "file as a leftover from original query"

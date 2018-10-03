@@ -29,7 +29,7 @@ c7443613a0a2505b1faec931cee2a6ef  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
 8eb0a5dbd79bd58fedac4c0cc344246b  lib/core/agent.py
 c347f085bd561adfa26d3a9512e5f3b9  lib/core/bigarray.py
-cbf9428039f52d8ee80fcf79b6583b7c  lib/core/common.py
+2f47247892e5d558bbbe97c6cec7121f  lib/core/common.py
 0d082da16c388b3445e656e0760fb582  lib/core/convert.py
 9f87391b6a3395f7f50830b391264f27  lib/core/data.py
 72016ea5c994a711a262fd64572a0fcd  lib/core/datatype.py
@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-5192b4916a979e3fb249b72e3a89b3a6  lib/core/settings.py
+16e697be36101880289e6095a0978a4b  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
@@ -156,7 +156,7 @@ aa77fec4fe6b2d7ca4a91aebd9ff4e21  plugins/dbms/informix/syntax.py
 25f0fb28e9defcab48a2e946fbb7550a  plugins/dbms/informix/takeover.py
 1e5532ede194ac9c083891c2f02bca93  plugins/dbms/__init__.py
 6917f9b045f6188b89e816dea9b46a3f  plugins/dbms/maxdb/connector.py
-53d1bf931baa6b76198ece861e2318a3  plugins/dbms/maxdb/enumeration.py
+1f3f9d4c7ec62452ed2465cd9cf50aa1  plugins/dbms/maxdb/enumeration.py
 ffd26f64142226d0b1ed1d70f7f294c0  plugins/dbms/maxdb/filesystem.py
 9f9f1c4c4c3150545c4b61d1cffc76a8  plugins/dbms/maxdb/fingerprint.py
 4321d7018f5121343460ebfd83bb69be  plugins/dbms/maxdb/__init__.py
@@ -171,7 +171,7 @@ f25c50a95e5390ecd32be5a011637349  plugins/dbms/mssqlserver/__init__.py
 3c0845fa526e1bb7bbe636fcfcbcc4a6  plugins/dbms/mssqlserver/takeover.py
 11a5724fdc0b0c0eb2626d952cda216a  plugins/dbms/mysql/connector.py
 445164daf59b890aeacc968af58fcb53  plugins/dbms/mysql/enumeration.py
-34216d44fe66ffc8c5b4a0714839cf9f  plugins/dbms/mysql/filesystem.py
+edec54520556a5eb66900fca697940ff  plugins/dbms/mysql/filesystem.py
 1c0175476b833a1b788550726be67c99  plugins/dbms/mysql/fingerprint.py
 30065993f8300994e4658634121609e9  plugins/dbms/mysql/__init__.py
 0e2adbee217f5b94dcc124d24b8dde99  plugins/dbms/mysql/syntax.py
@@ -198,7 +198,7 @@ f639120d42b33b6ca67930bddbf2ac1f  plugins/dbms/sqlite/__init__.py
 964e59d2eba619b068b0a15cea28efe0  plugins/dbms/sqlite/syntax.py
 3364b2938d7040c507cd622c323557dc  plugins/dbms/sqlite/takeover.py
 9e64e67291a4c369bad8b8cf2cfa722a  plugins/dbms/sybase/connector.py
-b856f677371a59d4a01b72bacac88032  plugins/dbms/sybase/enumeration.py
+4fe9ee0dfa50e9c46e6512128471cbee  plugins/dbms/sybase/enumeration.py
 74de450dd6d6d006aa9c7eed56e6b09a  plugins/dbms/sybase/filesystem.py
 0329ab09187614bea02398def59695ec  plugins/dbms/sybase/fingerprint.py
 a3db8618eed5bb2807b6f77605cba9cc  plugins/dbms/sybase/__init__.py
@@ -216,7 +216,7 @@ f7874230e5661910d5fd21544c7d1022  plugins/generic/misc.py
 b1d2a7f3170f9b69e71335aa47f9b08b  plugins/generic/search.py
 a70cc0ada4b0cc9e7df23cb6d48a4a0c  plugins/generic/syntax.py
 a37c21cc3fa5c0c220d33d450bf503ed  plugins/generic/takeover.py
-4db140069923afbae38fd93e37c00248  plugins/generic/users.py
+e762c77ff79e4c138145501f6fbb10cb  plugins/generic/users.py
 1e5532ede194ac9c083891c2f02bca93  plugins/__init__.py
 5dc693e22f5d020c5c568d7325bd4226  shell/backdoors/backdoor.asp_
 158bfa168128393dde8d6ed11fe9a1b8  shell/backdoors/backdoor.aspx_
@@ -227,7 +227,7 @@ ec2ba8c757ac96425dcd2b97970edd3a  shell/stagers/stager.asp_
 0c48ddb1feb7e38a951ef05a0d48e032  shell/stagers/stager.jsp_
 2f9e459a4cf6a58680978cdce5ff7971  shell/stagers/stager.php_
 cd90da0474d7b1a67d7b40d208493375  sqlmapapi.py
-5f30815ebe320e46e5898dc819e629a7  sqlmap.py
+c66cb57ef2d927d5e22a84413121b9ef  sqlmap.py
 523dab9e1093eb59264c6beb366b255a  tamper/0x2char.py
 3a1697585ae4e7bf315e9dda97d6f321  tamper/apostrophemask.py
 d7a119a74be9b385ee3884fb5e6af041  tamper/apostrophenullencode.py
