@@ -79,6 +79,8 @@ COLORS = dict(
             ))
         )
 
+COLORS.update(dict(("light%s" % color, COLORS[color] + 60) for color in COLORS))
+
 
 RESET = '\033[0m'
 

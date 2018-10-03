@@ -1198,7 +1198,7 @@ def banner():
     This function prints sqlmap banner with its version
     """
 
-    if not any(_ in sys.argv for _ in ("--version", "--api")):
+    if not any(_ in sys.argv for _ in ("--version", "--api")) and not conf.get("disableBanner"):
         _ = BANNER
 
         if not getattr(LOGGER_HANDLER, "is_tty", False) or "--disable-coloring" in sys.argv:

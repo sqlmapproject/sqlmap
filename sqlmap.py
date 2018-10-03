@@ -388,6 +388,7 @@ def main():
             cmdLineOptions.clear()
             conf.clear()
             kb.clear()
+            conf.disableBanner = True
             main()
 
         if conf.get("api"):
