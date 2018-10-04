@@ -1089,7 +1089,7 @@ class Agent(object):
         if conf.dumpWhere and query:
             prefix, suffix = query.split(" ORDER BY ") if " ORDER BY " in query else (query, "")
 
-            if "%s)" % conf.tbl.upper() in prefix.upper():
+            if conf.tbl and "%s)" % conf.tbl.upper() in prefix.upper():
                 prefix = re.sub(r"(?i)%s\)" % re.escape(conf.tbl), "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)
             elif re.search(r"(?i)\bWHERE\b", prefix):
                 prefix += " AND %s" % conf.dumpWhere
