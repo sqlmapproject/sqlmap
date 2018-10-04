@@ -4727,6 +4727,8 @@ def getSafeExString(ex, encoding=None):
         retVal = ex.message
     elif getattr(ex, "msg", None):
         retVal = ex.msg
+    elif isinstance(ex, (list, tuple)) and len(ex) > 1 and isinstance(ex[1], basestring):
+        retVal = ex[1]
 
     return getUnicode(retVal or "", encoding=encoding).strip()
 

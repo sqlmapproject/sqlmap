@@ -13,6 +13,7 @@ except:
 import logging
 import struct
 
+from lib.core.common import getSafeExString
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
@@ -37,10 +38,8 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
-        except (pymysql.OperationalError, pymysql.InternalError, pymysql.ProgrammingError), msg:
-            raise SqlmapConnectionException(msg[1])
-        except struct.error, msg:
-            raise SqlmapConnectionException(msg)
+        except (pymysql.OperationalError, pymysql.InternalError, pymysql.ProgrammingError, struct.error), msg:
+            raise SqlmapConnectionException(getSafeExString(msg))
 
         self.initCursor()
         self.printConnected()
@@ -49,7 +48,7 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except pymysql.ProgrammingError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
             return None
 
     def execute(self, query):
@@ -59,9 +58,9 @@ class Connector(GenericConnector):
             self.cursor.execute(query)
             retVal = True
         except (pymysql.OperationalError, pymysql.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
         except pymysql.InternalError, msg:
-            raise SqlmapConnectionException(msg[1])
+            raise SqlmapConnectionException(getSafeExString(msg))
 
         self.connector.commit()
 

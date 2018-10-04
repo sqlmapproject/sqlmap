@@ -12,6 +12,7 @@ except:
 
 import logging
 
+from lib.core.common import getSafeExString
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
@@ -35,7 +36,7 @@ class Connector(GenericConnector):
             database = "DATABASE=%s;HOSTNAME=%s;PORT=%s;PROTOCOL=TCPIP;" % (self.db, self.hostname, self.port)
             self.connector = ibm_db_dbi.connect(database, self.user, self.password)
         except ibm_db_dbi.OperationalError, msg:
-            raise SqlmapConnectionException(msg)
+            raise SqlmapConnectionException(getSafeExString(msg))
 
         self.initCursor()
         self.printConnected()
@@ -44,16 +45,16 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except ibm_db_dbi.ProgrammingError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
         except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
         except ibm_db_dbi.InternalError, msg:
-            raise SqlmapConnectionException(msg[1])
+            raise SqlmapConnectionException(getSafeExString(msg))
 
         self.connector.commit()
 
