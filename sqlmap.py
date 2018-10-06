@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+#SQLMAP
+#KONTRIBUSI JAGAD
 
 """
 Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
