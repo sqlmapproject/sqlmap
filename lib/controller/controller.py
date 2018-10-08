@@ -56,6 +56,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSkipTargetException
+from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
@@ -243,16 +244,20 @@ def _saveToResultsFile():
 
         results[key].extend(injection.data.keys())
 
-    for key, value in results.items():
-        place, parameter, notes = key
-        line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
-        conf.resultsFP.write(line)
+    try:
+        for key, value in results.items():
+            place, parameter, notes = key
+            line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
+            conf.resultsFP.write(line)
 
-    if not results:
-        line = "%s,,,,%s" % (conf.url, os.linesep)
-        conf.resultsFP.write(line)
+        if not results:
+            line = "%s,,,,%s" % (conf.url, os.linesep)
+            conf.resultsFP.write(line)
 
-    conf.resultsFP.flush()
+        conf.resultsFP.flush()
+    except IOError, ex:
+        errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFilename, getSafeExString(ex))
+        raise SqlmapSystemException(errMsg)
 
 @stackedmethod
 def start():
