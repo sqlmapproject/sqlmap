@@ -246,6 +246,9 @@ class Agent(object):
         else:
             query = kb.injection.prefix or prefix or ""
 
+            if "SELECT '[RANDSTR]'" in query:  # escaping of pre-WHERE prefixes
+                query = query.replace("'[RANDSTR]'", unescaper.escape(randomStr(), quote=False))
+
             if not (expression and expression[0] == ';') and not (query and query[-1] in ('(', ')') and expression and expression[0] in ('(', ')')) and not (query and query[-1] == '('):
                 query += " "
 
