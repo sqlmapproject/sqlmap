@@ -1355,9 +1355,11 @@ def checkWaf():
         value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
 
     pushValue(kb.redirectChoice)
+    pushValue(kb.resendPostOnRedirect)
     pushValue(conf.timeout)
 
     kb.redirectChoice = REDIRECTION.YES
+    kb.resendPostOnRedirect = False
     conf.timeout = IDS_WAF_CHECK_TIMEOUT
 
     try:
@@ -1368,6 +1370,7 @@ def checkWaf():
         kb.matchRatio = None
 
         conf.timeout = popValue()
+        kb.resendPostOnRedirect = popValue()
         kb.redirectChoice = popValue()
 
     if retVal:
