@@ -92,7 +92,7 @@ def exceptionHandledFunction(threadFunction, silent=False):
         kb.threadException = True
         raise
     except Exception, ex:
-        if not silent:
+        if not silent and kb.get("threadContinue"):
             logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
             if conf.get("verbose") > 1:

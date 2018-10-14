@@ -49,12 +49,12 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-ca4c50212724a4ea997265f419803db1  lib/core/settings.py
+bd070cf6683de2f9ed462d35eba1ead5  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 62bc180e3e828949ffb342a8f756c183  lib/core/target.py
 72d499ca8d792e90a1ebfb2ad2341a51  lib/core/testing.py
-29efb66f3c444c09d29925cf552851cd  lib/core/threads.py
+cd0067d1798e45f422ce44b98baf57db  lib/core/threads.py
 c40758411bb0bd68764d78e0bb72bd0f  lib/core/unescaper.py
 b35636650cfe721f5cc47fb91737c061  lib/core/update.py
 e772deb63270375e685fa5a7b775c382  lib/core/wordlist.py
@@ -227,7 +227,7 @@ ec2ba8c757ac96425dcd2b97970edd3a  shell/stagers/stager.asp_
 0c48ddb1feb7e38a951ef05a0d48e032  shell/stagers/stager.jsp_
 2f9e459a4cf6a58680978cdce5ff7971  shell/stagers/stager.php_
 cd90da0474d7b1a67d7b40d208493375  sqlmapapi.py
-c6f90d321b9ec7bff5b3be15cd4e19d8  sqlmap.py
+d94547672ec6dbc4c2adffbf62bd36d4  sqlmap.py
 523dab9e1093eb59264c6beb366b255a  tamper/0x2char.py
 3a1697585ae4e7bf315e9dda97d6f321  tamper/apostrophemask.py
 d7a119a74be9b385ee3884fb5e6af041  tamper/apostrophenullencode.py

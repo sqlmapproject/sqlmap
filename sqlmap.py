@@ -384,13 +384,6 @@ def main():
             with openFile(conf.harFile, "w+b") as f:
                 json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
 
-        if cmdLineOptions.get("sqlmapShell"):
-            cmdLineOptions.clear()
-            conf.clear()
-            kb.clear()
-            conf.disableBanner = True
-            main()
-
         if conf.get("api"):
             try:
                 conf.databaseCursor.disconnect()
@@ -405,6 +398,13 @@ def main():
             _ = time.time()
             while threading.activeCount() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
                 time.sleep(0.01)
+
+            if cmdLineOptions.get("sqlmapShell"):
+                cmdLineOptions.clear()
+                conf.clear()
+                kb.clear()
+                conf.disableBanner = True
+                main()
         except KeyboardInterrupt:
             pass
         finally:
