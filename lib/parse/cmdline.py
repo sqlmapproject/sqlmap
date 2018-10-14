@@ -626,7 +626,7 @@ def cmdLineParser(argv=None):
                                  help="Clean up the DBMS from sqlmap specific UDF and tables")
 
         miscellaneous.add_option("--dependencies", dest="dependencies", action="store_true",
-                                 help="Check for missing (non-core) sqlmap dependencies")
+                                 help="Check for missing (optional) sqlmap dependencies")
 
         miscellaneous.add_option("--disable-coloring", dest="disableColoring", action="store_true",
                                  help="Disable console output coloring")
