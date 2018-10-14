@@ -44,6 +44,7 @@ from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapMissingPrivileges
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.option import _setDBMS
@@ -466,7 +467,13 @@ def _resumeDBMS():
     value = hashDBRetrieve(HASHDB_KEYS.DBMS)
 
     if not value:
-        return
+        if conf.offline:
+            errMsg = "unable to continue in offline mode "
+            errMsg += "because of lack of usable "
+            errMsg += "session data"
+            raise SqlmapNoneDataException(errMsg)
+        else:
+            return
 
     dbms = value.lower()
     dbmsVersion = [UNKNOWN_DBMS_VERSION]
