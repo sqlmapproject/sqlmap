@@ -99,16 +99,16 @@ def cmdLineParser(argv=None):
                            help="Force usage of given HTTP method (e.g. PUT)")
 
         request.add_option("--data", dest="data",
-                           help="Data string to be sent through POST")
+                           help="Data string to be sent through POST (e.g. \"id=1\")")
 
         request.add_option("--param-del", dest="paramDel",
-                           help="Character used for splitting parameter values")
+                           help="Character used for splitting parameter values (e.g. &)")
 
         request.add_option("--cookie", dest="cookie",
-                           help="HTTP Cookie header value")
+                           help="HTTP Cookie header value (e.g. \"PHPSESSID=a8d127e..\")")
 
         request.add_option("--cookie-del", dest="cookieDel",
-                           help="Character used for splitting cookie values")
+                           help="Character used for splitting cookie values (e.g. ;)")
 
         request.add_option("--load-cookies", dest="loadCookies",
                            help="File containing cookies in Netscape/wget format")
@@ -144,7 +144,7 @@ def cmdLineParser(argv=None):
                            help="HTTP authentication PEM cert/private key file")
 
         request.add_option("--ignore-code", dest="ignoreCode", type="int",
-                           help="Ignore HTTP error code (e.g. 401)")
+                           help="Ignore (problematic) HTTP error code (e.g. 401)")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            help="Ignore system default proxy settings")
@@ -617,7 +617,7 @@ def cmdLineParser(argv=None):
                                  help="Run host OS command(s) when SQL injection is found")
 
         miscellaneous.add_option("--answers", dest="answers",
-                                 help="Set question answers (e.g. \"quit=N,follow=N\")")
+                                 help="Set predefined answers (e.g. \"quit=N,follow=N\")")
 
         miscellaneous.add_option("--beep", dest="beep", action="store_true",
                                  help="Beep on question and/or when SQL injection is found")
