@@ -739,7 +739,7 @@
         <hex query="RAWTOHEX(%s)"/>
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
         <banner query="H2VERSION()"/>
-        <current_user query="CURRENT_USER"/>mirek
+        <current_user query="CURRENT_USER"/>
         <current_db query="DATABASE()"/>
         <hostname/>
         <table_comment/>

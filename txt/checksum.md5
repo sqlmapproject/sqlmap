@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-5a5c0538e7464803ea3cd2b55b98f991  lib/core/settings.py
+dd0f57aae1f982454ab4ec1ba1dcbda2  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 47ad325975ab21fc9f11d90b46d0d143  lib/core/target.py
@@ -484,4 +484,4 @@ a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 82c65823a0af3fccbecf37f1c75f0b29  xml/payloads/stacked_queries.xml
 92c41925eba27afeed76bceba6b18be2  xml/payloads/time_blind.xml
 ac649aff0e7db413e4937e446e398736  xml/payloads/union_query.xml
-c83a948e23219f1d101d3b3aa7eb1391  xml/queries.xml
+67fa3c0ae62e866763be0dffebf19855  xml/queries.xml
