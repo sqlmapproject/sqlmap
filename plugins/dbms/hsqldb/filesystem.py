@@ -17,5 +17,5 @@ class Filesystem(GenericFilesystem):
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, wFile, dFile, fileType=None, forceCheck=False):
-        errMsg = "on HSQLDB it is not possible to read files"
+        errMsg = "on HSQLDB it is not possible to write files"
         raise SqlmapUnsupportedFeatureException(errMsg)
