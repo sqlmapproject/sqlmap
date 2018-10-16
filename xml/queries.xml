@@ -720,6 +720,74 @@
         </search_column>
     </dbms>
 
+    <dbms value="H2">
+        <cast query="CAST(%s AS LONGVARCHAR)"/>
+        <length query="CHAR_LENGTH(%s)"/>
+        <isnull query="IFNULL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="OFFSET %d LIMIT %d"/>
+        <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" OFFSET "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="//"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="CONCAT(%s,%s)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <hex query="RAWTOHEX(%s)"/>
+        <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
+        <banner query="H2VERSION()"/>
+        <current_user query="CURRENT_USER"/>
+        <current_db query="DATABASE()"/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER=CURRENT_USER"/>
+        <check_udf/>
+        <users>
+            <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
+            <blind query="SELECT LIMIT %d 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user" count="SELECT COUNT(DISTINCT(user)) FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
+            <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user"/>
+        </users>
+        <passwords>
+            <!-- Passwords only shown in later versions &gt;=2.0  -->
+            <blind query="SELECT LIMIT %d 1 DISTINCT(password_digest) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s' ORDER BY password_digest" count="SELECT COUNT(DISTINCT(password_digest)) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'"/>
+            <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user_name" condition="user_name"/>
+        </passwords>
+        <privileges/>
+        <roles/>
+        <dbs>
+            <inband query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA"/>
+            <blind query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA OFFSET %d LIMIT 1" count="SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLES" condition="TABLE_SCHEMA"/>
+            <blind query="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'"/>
+        </tables>
+        <columns>
+            <blind query="SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" query2="SELECT TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND TABLE_SCHEMA='%s'" count="SELECT COUNT(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s'" condition="COLUMN_NAME"/>
+            <inband query="SELECT COLUMN_NAME,TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" condition="COLUMN_NAME"/>
+        </columns>
+        <dump_table>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+        </dump_table>
+        <search_db>
+            <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" condition="table_schem"/>
+            <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS WHERE %s" condition="table_schem"/>
+        </search_db>
+        <search_table>
+            <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s'" count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_schem='%s'" condition="table_name" condition2="table_schem"/>
+            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" condition="table_name" condition2="table_schem"/>
+        </search_table>
+        <search_column>
+            <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s"  count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
+            <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
+        </search_column>
+    </dbms>
+
     <!-- Informix -->
     <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_11.70.0/com.ibm.sqlr.doc/ids_sqr_072.htm -->
     <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_12.1.0/com.ibm.sec.doc/ids_am_041.htm -->

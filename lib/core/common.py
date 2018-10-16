@@ -3649,7 +3649,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
                 retVal = "`%s`" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.INFORMIX, DBMS.HSQLDB):
+            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX):
                 retVal = "\"%s\"" % retVal
             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
                 retVal = "\"%s\"" % retVal.upper()
@@ -4275,7 +4275,7 @@ def decodeHexValue(value, raw=False):
                         retVal = retVal.decode("utf-16-le")
                     except UnicodeDecodeError:
                         pass
-                elif Backend.isDbms(DBMS.HSQLDB):
+                elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.H2):
                     try:
                         retVal = retVal.decode("utf-16-be")
                     except UnicodeDecodeError:

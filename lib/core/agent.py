@@ -43,6 +43,7 @@ from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
+from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.unescaper import unescaper
 
@@ -348,6 +349,7 @@ class Agent(object):
 
         if payload:
             payload = payload.replace(SLEEP_TIME_MARKER, str(conf.timeSec))
+            payload = payload.replace(SINGLE_QUOTE_MARKER, "'")
 
             for _ in set(re.findall(r"\[RANDNUM(?:\d+)?\]", payload, re.I)):
                 payload = payload.replace(_, str(randomInt()))
@@ -821,7 +823,7 @@ class Agent(object):
             limitRegExp2 = None
 
         if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2):
                 limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                 limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
@@ -911,7 +913,7 @@ class Agent(object):
         fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = None
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 

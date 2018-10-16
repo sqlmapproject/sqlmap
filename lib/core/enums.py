@@ -43,6 +43,7 @@ class DBMS:
     SQLITE = "SQLite"
     SYBASE = "Sybase"
     HSQLDB = "HSQLDB"
+    H2 = "H2"
     INFORMIX = "Informix"
 
 class DBMS_DIRECTORY_NAME:
@@ -57,6 +58,7 @@ class DBMS_DIRECTORY_NAME:
     SQLITE = "sqlite"
     SYBASE = "sybase"
     HSQLDB = "hsqldb"
+    H2 = "h2"
     INFORMIX = "informix"
 
 class CUSTOM_LOGGING:
