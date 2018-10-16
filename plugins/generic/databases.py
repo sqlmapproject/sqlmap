@@ -757,9 +757,13 @@ class Databases:
                             continue
 
                 for index in getLimitRange(count):
-                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
+                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
+                        field = None
+                    elif Backend.isDbms(DBMS.H2):
+                        query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                        query = query.replace(" ORDER BY ", "%s ORDER BY " % condQuery)
                         field = None
                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))

@@ -60,7 +60,7 @@ class Search:
             values = []
             db = safeSQLIdentificatorNaming(db)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
                 db = db.upper()
 
             infoMsg = "searching database"
@@ -167,8 +167,9 @@ class Search:
             values = []
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2):
                 tbl = tbl.upper()
+                conf.db = conf.db.upper() if conf.db else conf.db
 
             infoMsg = "searching table"
             if tblConsider == '1':
@@ -303,7 +304,9 @@ class Search:
                     for index in indexRange:
                         query = rootQuery.blind.query2
 
-                        if query.endswith("'%s')"):
+                        if " ORDER BY " in query:
+                            query = query.replace(" ORDER BY ", "%s ORDER BY " % (" AND %s" % tblQuery))
+                        elif query.endswith("'%s')"):
                             query = query[:-1] + " AND %s)" % tblQuery
                         else:
                             query += " AND %s" % tblQuery
@@ -387,8 +390,10 @@ class Search:
             conf.db = origDb
             conf.tbl = origTbl
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
                 column = column.upper()
+                conf.db = conf.db.upper() if conf.db else conf.db
+                conf.tbl = conf.tbl.upper() if conf.tbl else conf.tbl
 
             infoMsg = "searching column"
             if colConsider == "1":

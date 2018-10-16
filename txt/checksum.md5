@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-dd0f57aae1f982454ab4ec1ba1dcbda2  lib/core/settings.py
+daf454e49b91d6bed48ec832c4b6f727  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 47ad325975ab21fc9f11d90b46d0d143  lib/core/target.py
@@ -213,14 +213,14 @@ a3db8618eed5bb2807b6f77605cba9cc  plugins/dbms/sybase/__init__.py
 79f6c7017db4ded8f74a0117188836ff  plugins/dbms/sybase/takeover.py
 34d181a7086d6dfc7e72ae5f8a4cfe0f  plugins/generic/connector.py
 ce6a6ff713852b5eca7b78316cc941c4  plugins/generic/custom.py
-dd0875db408080c8192c5186d2d9c246  plugins/generic/databases.py
+3d75e831574c750ed58e24eaa562c056  plugins/generic/databases.py
 35546acab0eea406c23b84363df4d534  plugins/generic/entries.py
 d82f2c78c1d4d7c6487e94fd3a68a908  plugins/generic/enumeration.py
 0a67b8b46f69df7cfacc286b47a0d9a5  plugins/generic/filesystem.py
 f5d5419efddfe04648ea5e953c650793  plugins/generic/fingerprint.py
 1e5532ede194ac9c083891c2f02bca93  plugins/generic/__init__.py
 f7874230e5661910d5fd21544c7d1022  plugins/generic/misc.py
-b1d2a7f3170f9b69e71335aa47f9b08b  plugins/generic/search.py
+30b421f06dc98998ddc1923a9048b7fc  plugins/generic/search.py
 a70cc0ada4b0cc9e7df23cb6d48a4a0c  plugins/generic/syntax.py
 a37c21cc3fa5c0c220d33d450bf503ed  plugins/generic/takeover.py
 e762c77ff79e4c138145501f6fbb10cb  plugins/generic/users.py
@@ -484,4 +484,4 @@ a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 82c65823a0af3fccbecf37f1c75f0b29  xml/payloads/stacked_queries.xml
 92c41925eba27afeed76bceba6b18be2  xml/payloads/time_blind.xml
 ac649aff0e7db413e4937e446e398736  xml/payloads/union_query.xml
-67fa3c0ae62e866763be0dffebf19855  xml/queries.xml
+7bbf2a82593efffc68e8001299a5691f  xml/queries.xml
