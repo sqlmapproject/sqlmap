@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-e8b8aa7f54d6b6b57b34f933063c128f  lib/core/settings.py
+deced6d285dcd850e4e7d8e478527729  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 47ad325975ab21fc9f11d90b46d0d143  lib/core/target.py
@@ -143,7 +143,7 @@ c56f2dabe88fd761a1a9a51e4d104088  plugins/dbms/firebird/syntax.py
 271a7f16e781d56a0a31a3d5515a1945  plugins/dbms/hsqldb/connector.py
 95919592e5bb83df00b99bb9e8a70977  plugins/dbms/hsqldb/enumeration.py
 616595e74ecb644271cbbd31815d92e0  plugins/dbms/hsqldb/filesystem.py
-aabc2b877a3696b99912bdf362c0fb69  plugins/dbms/hsqldb/fingerprint.py
+b061bdbb9159c449072fde51b444f1c0  plugins/dbms/hsqldb/fingerprint.py
 fd369161778d6b48d7f1f7fc14dcdb5c  plugins/dbms/hsqldb/__init__.py
 4673ebfdce9859718c19e8a7765da8d3  plugins/dbms/hsqldb/syntax.py
 7c0535736215ca612756cf589adb249b  plugins/dbms/hsqldb/takeover.py
@@ -186,7 +186,7 @@ bcdbd9c04d7d5a911e0e31abe1a24f0f  plugins/dbms/oracle/takeover.py
 f99c23db4ee6a6b8c0edbf684d360ad3  plugins/dbms/postgresql/connector.py
 7cdb821884e5f15084d1bea7f8a50574  plugins/dbms/postgresql/enumeration.py
 c8bb829d45752b98e6a03817b92e0fe5  plugins/dbms/postgresql/filesystem.py
-c490b23b19e40e15cfbdbb026386bbd7  plugins/dbms/postgresql/fingerprint.py
+1449c89fa6dac9b62e814cc65233b9de  plugins/dbms/postgresql/fingerprint.py
 470860d3e85d11a67f2220bffaa415e7  plugins/dbms/postgresql/__init__.py
 20e6f48f496348be45f3402ebc265dbb  plugins/dbms/postgresql/syntax.py
 1287acf330da86a93c8e64aff46e3b65  plugins/dbms/postgresql/takeover.py

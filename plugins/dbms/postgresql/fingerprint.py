@@ -73,7 +73,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.PGSQL
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("[RANDNUM]::int=[RANDNUM]")
+        result = inject.checkBooleanExpression("QUOTE_IDENT(NULL) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.PGSQL

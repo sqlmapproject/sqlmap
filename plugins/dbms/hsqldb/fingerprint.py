@@ -106,6 +106,13 @@ class Fingerprint(GenericFingerprint):
 
                 return False
             else:
+                result = inject.checkBooleanExpression("ZERO() IS 0")   # Note: check for H2 DBMS (sharing majority of same functions)
+                if result:
+                    warnMsg = "the back-end DBMS is not %s" % DBMS.HSQLDB
+                    logger.warn(warnMsg)
+
+                    return False
+
                 kb.data.has_information_schema = True
                 Backend.setVersion(">= 1.7.2")
                 setDbms("%s 1.7.2" % DBMS.HSQLDB)
