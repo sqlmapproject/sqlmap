@@ -27,32 +27,28 @@ class Fingerprint(GenericFingerprint):
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
-        if wsOsFp and not conf.api:
+        if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
             dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
 
-            if dbmsOsFp and not conf.api:
+            if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
         value += "back-end DBMS: "
-        actVer = Format.getDbms()
 
         if not conf.extensiveFp:
-            value += actVer
+            value += DBMS.H2
             return value
 
+        actVer = Format.getDbms()
         blank = " " * 15
         value += "active fingerprint: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
-
-            if re.search(r"-log$", kb.data.banner):
-                banVer += ", logging enabled"
-
-            banVer = Format.getDbms([banVer] if banVer else None)
+            banVer = Format.getDbms([banVer])
             value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
@@ -65,9 +61,6 @@ class Fingerprint(GenericFingerprint):
     def checkDbms(self):
         if not conf.extensiveFp and Backend.isDbmsWithin(H2_ALIASES):
             setDbms("%s %s" % (DBMS.H2, Backend.getVersion()))
-
-            if Backend.isVersionGreaterOrEqualThan("1.7.2"):
-                kb.data.has_information_schema = True
 
             self.getBanner()
 
@@ -90,30 +83,14 @@ class Fingerprint(GenericFingerprint):
 
                 return False
             else:
-                kb.data.has_information_schema = True
-                Backend.setVersion(">= 1.7.2")
-                setDbms("%s 1.7.2" % DBMS.H2)
+                setDbms(DBMS.H2)
 
-                banner = self.getBanner()
-                if banner:
-                    Backend.setVersion("= %s" % banner)
-                else:
-                    if inject.checkBooleanExpression("(SELECT [RANDNUM] FROM (VALUES(0)))=[RANDNUM]"):
-                        Backend.setVersionList([">= 2.0.0", "< 2.3.0"])
-                    else:
-                        banner = unArrayizeValue(inject.getValue("\"org.hsqldbdb.Library.getDatabaseFullProductVersion\"()", safeCharEncode=True))
-                        if banner:
-                            Backend.setVersion("= %s" % banner)
-                        else:
-                            Backend.setVersionList([">= 1.7.2", "< 1.8.0"])
+                self.getBanner()
 
-            return True
+                return True
         else:
             warnMsg = "the back-end DBMS is not %s" % DBMS.H2
             logger.warn(warnMsg)
-
-            dbgMsg = "...or version is < 1.7.2"
-            logger.debug(dbgMsg)
 
             return False
 

@@ -12,6 +12,7 @@ from lib.core.data import logger
 from lib.core.data import queries
 from lib.core.common import unArrayizeValue
 from lib.core.enums import DBMS
+from lib.core.settings import H2_DEFAULT_SCHEMA
 from lib.request import inject
 
 class Enumeration(GenericEnumeration):
@@ -40,3 +41,12 @@ class Enumeration(GenericEnumeration):
     def getHostname(self):
         warnMsg = "on H2 it is not possible to enumerate the hostname"
         logger.warn(warnMsg)
+
+    def getCurrentDb(self):
+        return H2_DEFAULT_SCHEMA
+
+    def getPasswordHashes(self):
+        warnMsg = "on H2 it is not possible to list password hashes"
+        logger.warn(warnMsg)
+
+        return {}

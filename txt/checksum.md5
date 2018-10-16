@@ -27,7 +27,7 @@ c1bccc94522d3425a372dcd57f78418e  extra/wafdetectify/wafdetectify.py
 d6deacb76e1f479b3c690c215fad1c08  lib/controller/controller.py
 97a0f363bfc33a5ee4853cdf91515423  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
-a866dd953fdc4b5273a9c28f6b2361f1  lib/core/agent.py
+cb865cf6eff60118bc97a0f106af5e4d  lib/core/agent.py
 c347f085bd561adfa26d3a9512e5f3b9  lib/core/bigarray.py
 ce7fb7270b104f05d1e2be088b69c976  lib/core/common.py
 0d082da16c388b3445e656e0760fb582  lib/core/convert.py
@@ -36,7 +36,7 @@ ce7fb7270b104f05d1e2be088b69c976  lib/core/common.py
 4086fb55f42e27de5330505605baad0f  lib/core/decorators.py
 fbb55cc6100318ff922957b6577dc58f  lib/core/defaults.py
 56b79ee7acd2da19c1678250edfdafab  lib/core/dicts.py
-d4b3d448bcfd9f15d089fc81d38f4825  lib/core/dump.py
+760de985e09f5d11aacd3a8f2d8e9ff2  lib/core/dump.py
 ee7da34f4947739778a07d6c9c05ab54  lib/core/enums.py
 cada93357a7321655927fc9625b3bfec  lib/core/exception.py
 1e5532ede194ac9c083891c2f02bca93  lib/core/__init__.py
@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-1eb1c8d9bf5f38efc0625524d7dfa8ed  lib/core/settings.py
+5a5c0538e7464803ea3cd2b55b98f991  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 47ad325975ab21fc9f11d90b46d0d143  lib/core/target.py
@@ -140,10 +140,10 @@ bf98dbd666c162088f23ee697c065010  plugins/dbms/firebird/fingerprint.py
 d4ea3036492b8ae15340548b2936021f  plugins/dbms/firebird/__init__.py
 c56f2dabe88fd761a1a9a51e4d104088  plugins/dbms/firebird/syntax.py
 1522a29bd4b54ea78bb2855fc32b6c72  plugins/dbms/firebird/takeover.py
-271a7f16e781d56a0a31a3d5515a1945  plugins/dbms/h2/connector.py
-687005cf105ab50c62b6686866d6ef13  plugins/dbms/h2/enumeration.py
+79c44d8d0dffc140d38796a32e92a66a  plugins/dbms/h2/connector.py
+5b99e9a60409f54a140747ce1ca0342f  plugins/dbms/h2/enumeration.py
 b1ed542fff0aa53c54e8bc07658aeaf1  plugins/dbms/h2/filesystem.py
-443bc9ac09ce180360ff5a660ac3d6ba  plugins/dbms/h2/fingerprint.py
+4fe530d10b74210bd045205d9318b5d6  plugins/dbms/h2/fingerprint.py
 1de698e4cfddd754ffe31ea2640a481a  plugins/dbms/h2/__init__.py
 4673ebfdce9859718c19e8a7765da8d3  plugins/dbms/h2/syntax.py
 af746ef421cfefedc1aaa9dca1503de2  plugins/dbms/h2/takeover.py
@@ -162,7 +162,7 @@ b182f01c2ba82aa94fbe4948383ea98d  plugins/dbms/informix/fingerprint.py
 aa77fec4fe6b2d7ca4a91aebd9ff4e21  plugins/dbms/informix/syntax.py
 25f0fb28e9defcab48a2e946fbb7550a  plugins/dbms/informix/takeover.py
 1e5532ede194ac9c083891c2f02bca93  plugins/dbms/__init__.py
-6917f9b045f6188b89e816dea9b46a3f  plugins/dbms/maxdb/connector.py
+9c0307881fae556521bec393956664b0  plugins/dbms/maxdb/connector.py
 1f3f9d4c7ec62452ed2465cd9cf50aa1  plugins/dbms/maxdb/enumeration.py
 ffd26f64142226d0b1ed1d70f7f294c0  plugins/dbms/maxdb/filesystem.py
 9f9f1c4c4c3150545c4b61d1cffc76a8  plugins/dbms/maxdb/fingerprint.py
@@ -213,7 +213,7 @@ a3db8618eed5bb2807b6f77605cba9cc  plugins/dbms/sybase/__init__.py
 79f6c7017db4ded8f74a0117188836ff  plugins/dbms/sybase/takeover.py
 34d181a7086d6dfc7e72ae5f8a4cfe0f  plugins/generic/connector.py
 ce6a6ff713852b5eca7b78316cc941c4  plugins/generic/custom.py
-ca122ea307ed367a55b12a67a6079e74  plugins/generic/databases.py
+dd0875db408080c8192c5186d2d9c246  plugins/generic/databases.py
 35546acab0eea406c23b84363df4d534  plugins/generic/entries.py
 d82f2c78c1d4d7c6487e94fd3a68a908  plugins/generic/enumeration.py
 0a67b8b46f69df7cfacc286b47a0d9a5  plugins/generic/filesystem.py
@@ -484,4 +484,4 @@ a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 82c65823a0af3fccbecf37f1c75f0b29  xml/payloads/stacked_queries.xml
 92c41925eba27afeed76bceba6b18be2  xml/payloads/time_blind.xml
 ac649aff0e7db413e4937e446e398736  xml/payloads/union_query.xml
-39173640d6807991a6b78e9bea973339  xml/queries.xml
+c83a948e23219f1d101d3b3aa7eb1391  xml/queries.xml

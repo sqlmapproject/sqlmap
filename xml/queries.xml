@@ -676,7 +676,7 @@
         <hostname/>
         <table_comment/>
         <column_comment/>
-        <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER=CURRENT_USER"/>
+        <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.USERS WHERE NAME=CURRENT_USER"/>
         <check_udf/>
         <users>
             <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
@@ -739,23 +739,18 @@
         <hex query="RAWTOHEX(%s)"/>
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
         <banner query="H2VERSION()"/>
-        <current_user query="CURRENT_USER"/>
+        <current_user query="CURRENT_USER"/>mirek
         <current_db query="DATABASE()"/>
         <hostname/>
         <table_comment/>
         <column_comment/>
-        <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER=CURRENT_USER"/>
+        <is_dba query="SELECT CURRENT_USER='SA'"/>
         <check_udf/>
         <users>
-            <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
-            <blind query="SELECT LIMIT %d 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user" count="SELECT COUNT(DISTINCT(user)) FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
-            <inband query="SELECT user FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user"/>
+            <inband query="SELECT NAME FROM INFORMATION_SCHEMA.USERS"/>
+            <blind query="SELECT NAME FROM INFORMATION_SCHEMA.USERS OFFSET %d LIMIT 1" count="SELECT COUNT(NAME) FROM INFORMATION_SCHEMA.USERS"/>
         </users>
-        <passwords>
-            <!-- Passwords only shown in later versions &gt;=2.0  -->
-            <blind query="SELECT LIMIT %d 1 DISTINCT(password_digest) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s' ORDER BY password_digest" count="SELECT COUNT(DISTINCT(password_digest)) FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE user_name='%s'"/>
-            <inband query="SELECT user_name,password_digest FROM INFORMATION_SCHEMA.SYSTEM_USERS ORDER BY user_name" condition="user_name"/>
-        </passwords>
+        <passwords/>
         <privileges/>
         <roles/>
         <dbs>

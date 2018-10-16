@@ -438,7 +438,7 @@ class Databases:
                 raise SqlmapNoneDataException(errMsg)
 
         elif conf.db is not None:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
@@ -465,7 +465,7 @@ class Databases:
         colList = filter(None, colList)
 
         if conf.tbl:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(',')
