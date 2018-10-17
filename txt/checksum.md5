@@ -23,8 +23,8 @@ b3e60ea4e18a65c48515d04aab28ff68  extra/sqlharvest/sqlharvest.py
 1e5532ede194ac9c083891c2f02bca93  extra/wafdetectify/__init__.py
 c1bccc94522d3425a372dcd57f78418e  extra/wafdetectify/wafdetectify.py
 3459c562a6abb9b4bdcc36925f751f3e  lib/controller/action.py
-84316968d7235f53aac7e25069128725  lib/controller/checks.py
-d6deacb76e1f479b3c690c215fad1c08  lib/controller/controller.py
+fab20cff41611d4fcb4e426e2c7704da  lib/controller/checks.py
+250d3cf5ea54b8fe1e91fd611b0044ab  lib/controller/controller.py
 97a0f363bfc33a5ee4853cdf91515423  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
 cb865cf6eff60118bc97a0f106af5e4d  lib/core/agent.py
@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-ae5de169849869a08f920e52c0fadb8a  lib/core/settings.py
+72fce2cc366c9008550703643f8a6cc7  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 47ad325975ab21fc9f11d90b46d0d143  lib/core/target.py

@@ -529,7 +529,7 @@ def start():
 
                                     testSqlInj = False
                             else:
-                                infoMsg = "%s parameter '%s' is dynamic" % (paramType, parameter)
+                                infoMsg = "%s parameter '%s' appears to be dynamic" % (paramType, parameter)
                                 logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)

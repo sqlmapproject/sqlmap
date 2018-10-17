@@ -1117,14 +1117,6 @@ def checkDynParam(place, parameter, value):
     try:
         payload = agent.payload(place, parameter, value, getUnicode(randInt))
         dynResult = Request.queryPage(payload, place, raise404=False)
-
-        if not dynResult:
-            infoMsg = "confirming that %s parameter '%s' is dynamic" % (paramType, parameter)
-            logger.info(infoMsg)
-
-            randInt = randomInt()
-            payload = agent.payload(place, parameter, value, getUnicode(randInt))
-            dynResult = Request.queryPage(payload, place, raise404=False)
     except SqlmapConnectionException:
         pass
 
