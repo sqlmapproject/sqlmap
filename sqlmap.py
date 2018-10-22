@@ -234,60 +234,65 @@ def main():
                 dataToStdout(excMsg)
                 raise SystemExit
 
+            elif "ImportError" in excMsg:
+                errMsg = "invalid runtime environment ('%s')" % excMsg.split("ImportError: ")[-1].strip()
+                logger.critical(errMsg)
+                raise SystemExit
+
             elif "MemoryError" in excMsg:
                 errMsg = "memory exhaustion detected"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
                 errMsg = "no space left on output device"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif all(_ in excMsg for _ in ("No such file", "_'", "self.get_prog_name()")):
                 errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
                 errMsg += "You should retrieve the latest development version from official GitHub "
                 errMsg += "repository at '%s'" % GIT_PAGE
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "Read-only file system" in excMsg:
                 errMsg = "output device is mounted as read-only"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "OperationalError: disk I/O error" in excMsg:
                 errMsg = "I/O error on output device"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "Violation of BIDI" in excMsg:
                 errMsg = "invalid URL (violation of Bidi IDNA rule - RFC 5893)"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "_mkstemp_inner" in excMsg:
                 errMsg = "there has been a problem while accessing temporary files"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
                 errMsg = "please update the 'sqlalchemy' package (>= 1.1.11) "
                 errMsg += "(Reference: https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe)"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
                 errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
                 errMsg += "(Reference: https://github.com/PyMySQL/PyMySQL/issues/700)"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "must be pinned buffer, not bytearray" in excMsg:
                 errMsg = "error occurred at Python interpreter which "
                 errMsg += "is fixed in 2.7.x. Please update accordingly "
                 errMsg += "(Reference: https://bugs.python.org/issue8104)"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "can't start new thread" in excMsg:
@@ -295,34 +300,26 @@ def main():
                 errMsg += "Please make sure that you are not running too many processes"
                 if not IS_WIN:
                     errMsg += " (or increase the 'ulimit -u' value)"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
                 errMsg = "there has been a problem in enumeration. "
                 errMsg += "Because of a considerable chance of false-positive case "
                 errMsg += "you are advised to rerun with switch '--flush-session'"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif all(_ in excMsg for _ in ("pymysql", "configparser")):
                 errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif "bad marshal data (unknown type code)" in excMsg:
                 match = re.search(r"\s*(.+)\s+ValueError", excMsg)
                 errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
                 errMsg += ". Please delete .pyc files on your system to fix the problem"
-                logger.error(errMsg)
-                raise SystemExit
-
-            elif "url = url.strip()" in excMsg:
-                dataToStdout(excMsg)
-                print
-                errMsg = "please contact 'miroslav@sqlmap.org' with details for this issue "
-                errMsg += "as he is trying to reproduce it for long time"
-                logger.error(errMsg)
+                logger.critical(errMsg)
                 raise SystemExit
 
             elif kb.get("dumpKeyboardInterrupt"):
