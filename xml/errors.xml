@@ -135,4 +135,9 @@
         <error regexp="Unexpected token.*?in statement \["/>
     </dbms>
 
+    <!-- H2 -->
+    <dbms value="H2">
+        <error regexp="org\.h2\.jdbc"/>
+    </dbms>
+
 </root>
