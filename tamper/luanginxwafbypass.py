@@ -32,7 +32,7 @@ def tamper(payload, **kwargs):
     try:
         headers = kwargs.get("headers", {})
         randomParameter = randomParameterGenerator()
-        parameter = 'id'
+        parameter = conf["testParameter"]
 
         if conf["skipUrlEncode"] != True:
             print "\n[-] [ERROR] --skip-urlencode option must be activated"
