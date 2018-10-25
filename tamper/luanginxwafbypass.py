@@ -27,12 +27,18 @@ def randomParameterGenerator(size=6, chars=string.ascii_uppercase + string.digit
     output = ''.join(random.choice(chars) for _ in range(size))
     return output
 
-''' [Tamper] LUA-Nginx WAFs Bypass '''
+''' [Tamper] LUA-Nginx WAF Bypass '''
 def tamper(payload, **kwargs):
     try:
         headers = kwargs.get("headers", {})
         randomParameter = randomParameterGenerator()
-        parameter = conf["testParameter"]
+
+        ''' Get parameter name to test '''
+        parameter = conf["testParameter"][0]
+
+        if not parameter:
+            print "\n[-] [ERROR] Add an injectable parameter with -p option (-p param)"
+            sys.exit(0)
 
         if conf["skipUrlEncode"] != True:
             print "\n[-] [ERROR] --skip-urlencode option must be activated"
