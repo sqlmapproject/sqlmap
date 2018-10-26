@@ -842,7 +842,12 @@ class Connect(object):
                         value = "%s%s%s" % (value, delimiter, hints[HINT.APPEND])
 
                     if HINT.PREPEND in hints:
-                        value = "%s%s%s" % (hints[HINT.PREPEND], delimiter, value)
+                        if place == PLACE.URI:
+                            match = re.search(r"\w+\s*=\s*%s" % PAYLOAD_DELIMITER, value) or re.search(r"[^?%s/]=\s*%s" % (re.escape(delimiter), PAYLOAD_DELIMITER), value)
+                            if match:
+                                value = value.replace(match.group(0), "%s%s%s" % (hints[HINT.PREPEND], delimiter, match.group(0)))
+                        else:
+                            value = "%s%s%s" % (hints[HINT.PREPEND], delimiter, value)
 
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload.replace('\\', BOUNDARY_BACKSLASH_MARKER)).replace(BOUNDARY_BACKSLASH_MARKER, '\\'))
 
