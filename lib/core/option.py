@@ -45,7 +45,6 @@ from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
 from lib.core.common import parseRequestFile
 from lib.core.common import parseTargetDirect
-from lib.core.common import parseTargetUrl
 from lib.core.common import paths
 from lib.core.common import randomStr
 from lib.core.common import readCachedFileContent
@@ -104,7 +103,6 @@ from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORTS
 from lib.core.settings import DUMMY_URL
-from lib.core.settings import INJECT_HERE_REGEX
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
 from lib.core.settings import KB_CHARS_LOW_FREQUENCY_ALPHABET
@@ -1533,14 +1531,6 @@ def _cleanupOptions():
     if conf.optimize:
         setOptimize()
 
-    match = re.search(INJECT_HERE_REGEX, conf.data or "")
-    if match:
-        kb.customInjectionMark = match.group(0)
-
-    match = re.search(INJECT_HERE_REGEX, conf.url or "")
-    if match:
-        kb.customInjectionMark = match.group(0)
-
     if conf.os:
         conf.os = conf.os.capitalize()
 
@@ -2486,7 +2476,6 @@ def init():
     _resolveCrossReferences()
     _checkWebSocket()
 
-    parseTargetUrl()
     parseTargetDirect()
 
     if any((conf.url, conf.logFile, conf.bulkFile, conf.sitemapUrl, conf.requestFile, conf.googleDork, conf.liveTest)):
