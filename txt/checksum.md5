@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-31e606e7847cb86495bde3d5d0b18e8a  lib/core/settings.py
+12fb6b20891ff3949db01fa2c1c1286a  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 721198b5be72c8015a02acb116532a1f  lib/core/target.py
@@ -143,7 +143,7 @@ c56f2dabe88fd761a1a9a51e4d104088  plugins/dbms/firebird/syntax.py
 79c44d8d0dffc140d38796a32e92a66a  plugins/dbms/h2/connector.py
 5b99e9a60409f54a140747ce1ca0342f  plugins/dbms/h2/enumeration.py
 36522c36650afc43c1166ab68b297ecb  plugins/dbms/h2/filesystem.py
-4fe530d10b74210bd045205d9318b5d6  plugins/dbms/h2/fingerprint.py
+83255ebf7b1d23a408f0c68a7fa63422  plugins/dbms/h2/fingerprint.py
 1de698e4cfddd754ffe31ea2640a481a  plugins/dbms/h2/__init__.py
 4673ebfdce9859718c19e8a7765da8d3  plugins/dbms/h2/syntax.py
 af746ef421cfefedc1aaa9dca1503de2  plugins/dbms/h2/takeover.py
