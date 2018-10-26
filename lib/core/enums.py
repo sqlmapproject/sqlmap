@@ -378,3 +378,7 @@ class TIMEOUT_STATE:
     NORMAL = 0
     EXCEPTION = 1
     TIMEOUT = 2
+
+class HINT:
+    PREPEND = 0
+    APPEND = 1

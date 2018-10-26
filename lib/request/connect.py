@@ -69,6 +69,7 @@ from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import AUTH_TYPE
 from lib.core.enums import CUSTOM_LOGGING
+from lib.core.enums import HINT
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NULLCONNECTION
@@ -816,10 +817,14 @@ class Connect(object):
                 conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
 
         if payload:
+            delimiter = conf.paramDel or (DEFAULT_GET_POST_DELIMITER if place != PLACE.COOKIE else DEFAULT_COOKIE_DELIMITER)
+
             if not disableTampering and kb.tamperFunctions:
                 for function in kb.tamperFunctions:
+                    hints = {}
+
                     try:
-                        payload = function(payload=payload, headers=auxHeaders)
+                        payload = function(payload=payload, headers=auxHeaders, delimiter=delimiter, hints=hints)
                     except Exception, ex:
                         errMsg = "error occurred while running tamper "
                         errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
@@ -831,6 +836,13 @@ class Connect(object):
                         raise SqlmapValueException(errMsg)
 
                 value = agent.replacePayload(value, payload)
+
+                if hints:
+                    if HINT.APPEND in hints:
+                        value = "%s%s%s" % (value, delimiter, hints[HINT.APPEND])
+
+                    if HINT.PREPEND in hints:
+                        value = "%s%s%s" % (hints[HINT.PREPEND], delimiter, value)
 
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload.replace('\\', BOUNDARY_BACKSLASH_MARKER)).replace(BOUNDARY_BACKSLASH_MARKER, '\\'))
 
