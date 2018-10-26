@@ -8,14 +8,7 @@ See the file 'LICENSE' for copying permission
 
 '''
 [+] LUA-Nginx WAFs Bypass (Cloudflare)
-Vulnerability discovered by: Daniel Fariña Hernández
-Tamper created by: Jennifer Torres Fernández (@j4ckmln)
-
 Lua-Nginx WAFs doesn't support processing for more than 100 parameters.
-
-Open Data Security (@ODSops) [https://ods.es]
-PoC: https://www.youtube.com/watch?v=JUvro7cqidY
-Vulnerability information: https://opendatasecurity.io/cloudflare-vulnerability-allows-waf-be-disabled/
 
 Example: sqlmap -r file.txt --tamper=luanginxwafbypass.py --dbs --skip-urlencode -p vulnparameter
 Required options: --skip-urlencode, -p
@@ -33,7 +26,7 @@ def randomParameterGenerator(size=6, chars=string.ascii_uppercase + string.digit
     output = ''.join(random.choice(chars) for _ in range(size))
     return output
 
-''' [Tamper] LUA-Nginx WAF Bypass '''
+''' Tamper '''
 def tamper(payload, **kwargs):
     try:
         headers = kwargs.get("headers", {})
