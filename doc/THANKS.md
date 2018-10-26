@@ -566,7 +566,7 @@ Efrain Torres, <et(at)metasploit.com>
 * for his great Metasploit WMAP Framework
 
 Jennifer Torres, <jtorresf42(at)gmail.com>
-* for contributing a tamper script luanginxwafbypass.py
+* for contributing a tamper script luanginx.py
 
 Sandro Tosi, <matrixhasu(at)gmail.com>
 * for helping to create sqlmap Debian package correctly

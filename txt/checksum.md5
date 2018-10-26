@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-737cfceb9db54a600e3983ef350f939a  lib/core/settings.py
+47482757115424a7155720ee7d3e0ced  lib/core/settings.py
 dd68a9d02fccb4fa1428b20e15b0db5d  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 47ad325975ab21fc9f11d90b46d0d143  lib/core/target.py
@@ -261,6 +261,7 @@ ef0639557a79e57b06296c4bc223ebef  tamper/htmlencode.py
 1e5532ede194ac9c083891c2f02bca93  tamper/__init__.py
 2dc49bcd6c55f4e2322b07fa92685356  tamper/least.py
 40d1ea0796fd91cb3cdd602e36daed15  tamper/lowercase.py
+a54b361da0ac6988d0b97bc79463615d  tamper/luanginx.py
 1c4d622d1c2c77fc3db1f8b3849467ee  tamper/modsecurityversioned.py
 f177a624c2cd3431c433769c6eb995e7  tamper/modsecurityzeroversioned.py
 91b63afdb96b1d51c12a14cbd425d310  tamper/multiplespaces.py
