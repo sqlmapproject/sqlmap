@@ -60,6 +60,7 @@ from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
+from lib.core.settings import CSRF_TOKEN_PARAMETER_INFIXES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import IGNORE_PARAMETERS
@@ -510,7 +511,7 @@ def start():
                             logger.info(infoMsg)
 
                         # Ignore session-like parameters for --level < 4
-                        elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
+                        elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or any(_ in parameter.lower() for _ in CSRF_TOKEN_PARAMETER_INFIXES) or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
                             testSqlInj = False
 
                             infoMsg = "ignoring %s parameter '%s'" % (paramType, parameter)
