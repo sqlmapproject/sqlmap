@@ -1367,6 +1367,14 @@ def _setHTTPCookies():
 
         conf.httpHeaders.append((HTTP_HEADER.COOKIE, conf.cookie))
 
+def _setHostname():
+    """
+    Set value conf.hostname
+    """
+
+    if conf.url:
+        conf.hostname = urlparse.urlsplit(conf.url).netloc.split(':')[0]
+
 def _setHTTPTimeout():
     """
     Set the HTTP timeout
@@ -2479,6 +2487,7 @@ def init():
     parseTargetDirect()
 
     if any((conf.url, conf.logFile, conf.bulkFile, conf.sitemapUrl, conf.requestFile, conf.googleDork, conf.liveTest)):
+        _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
         _setHTTPCookies()
