@@ -169,6 +169,7 @@ def main():
                             raise SystemExit
                         else:
                             raise
+                            admin='=''OR'
 
     except SqlmapUserQuitException:
         errMsg = "user quit"
