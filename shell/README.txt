@@ -5,3 +5,4 @@ find backdoors/backdoor.* stagers/stager.* -type f -exec python ../extra/cloak/c
 
 To get back them into the original form use this:
 find backdoors/backdoor.*_ stagers/stager.*_ -type f -exec python ../extra/cloak/cloak.py -d -i '{}' \;
+find backdoors/backdoor.*_ stagers/stager.*_ -type f -exec python ../extra/cloak/cloak.py -d -i '{}' \;
