@@ -53,30 +53,33 @@ def clearHistory():
     readline.clear_history()
 
 def saveHistory(completion=None):
-    if not readlineAvailable():
-        return
-
-    if completion == AUTOCOMPLETE_TYPE.SQL:
-        historyPath = paths.SQL_SHELL_HISTORY
-    elif completion == AUTOCOMPLETE_TYPE.OS:
-        historyPath = paths.OS_SHELL_HISTORY
-    elif completion == AUTOCOMPLETE_TYPE.API:
-        historyPath = paths.API_SHELL_HISTORY
-    else:
-        historyPath = paths.SQLMAP_SHELL_HISTORY
-
     try:
-        with open(historyPath, "w+"):
+        if not readlineAvailable():
+            return
+
+        if completion == AUTOCOMPLETE_TYPE.SQL:
+            historyPath = paths.SQL_SHELL_HISTORY
+        elif completion == AUTOCOMPLETE_TYPE.OS:
+            historyPath = paths.OS_SHELL_HISTORY
+        elif completion == AUTOCOMPLETE_TYPE.API:
+            historyPath = paths.API_SHELL_HISTORY
+        else:
+            historyPath = paths.SQLMAP_SHELL_HISTORY
+
+        try:
+            with open(historyPath, "w+"):
+                pass
+        except:
             pass
-    except:
-        pass
 
-    readline.set_history_length(MAX_HISTORY_LENGTH)
-    try:
-        readline.write_history_file(historyPath)
-    except IOError, msg:
-        warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, msg)
-        logger.warn(warnMsg)
+        readline.set_history_length(MAX_HISTORY_LENGTH)
+        try:
+            readline.write_history_file(historyPath)
+        except IOError, msg:
+            warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, msg)
+            logger.warn(warnMsg)
+    except KeyboardInterrupt:
+        pass
 
 def loadHistory(completion=None):
     if not readlineAvailable():
