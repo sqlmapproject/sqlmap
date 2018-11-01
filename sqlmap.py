@@ -141,7 +141,7 @@ def main():
 
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
-        dataToStdout("[*] starting at %s\n\n" % time.strftime("%X"), forceOutput=True)
+        dataToStdout("[*] starting @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
 
         init()
 
@@ -357,7 +357,7 @@ def main():
         kb.threadContinue = False
 
         if conf.get("showTime"):
-            dataToStdout("\n[*] shutting down at %s\n\n" % time.strftime("%X"), forceOutput=True)
+            dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
 
         kb.threadException = True
 
