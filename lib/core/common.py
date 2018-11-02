@@ -1407,6 +1407,8 @@ def parseTargetDirect():
                     __import__("pyodbc")
                 elif dbmsName == DBMS.FIREBIRD:
                     __import__("kinterbasdb")
+            except (SqlmapSyntaxException, SqlmapMissingDependence):
+                raise
             except:
                 if _sqlalchemy and data[3] in _sqlalchemy.dialects.__all__:
                     pass
