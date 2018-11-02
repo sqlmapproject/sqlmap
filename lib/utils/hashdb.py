@@ -91,7 +91,7 @@ class HashDB(object):
                             raise
                     except sqlite3.DatabaseError, ex:
                         errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
-                        errMsg += "If the problem persists please rerun with `--flush-session`"
+                        errMsg += "If the problem persists please rerun with '--flush-session'"
                         raise SqlmapConnectionException(errMsg)
                     else:
                         break
@@ -104,7 +104,7 @@ class HashDB(object):
             except:
                 retVal = None
                 warnMsg = "error occurred while unserializing value for session key '%s'. " % key
-                warnMsg += "If the problem persists please rerun with `--flush-session`"
+                warnMsg += "If the problem persists please rerun with '--flush-session'"
                 logger.warn(warnMsg)
 
         return retVal

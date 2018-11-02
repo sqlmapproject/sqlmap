@@ -1410,7 +1410,7 @@ def parseTargetDirect():
             except (SqlmapSyntaxException, SqlmapMissingDependence):
                 raise
             except:
-                if _sqlalchemy and data[3] in _sqlalchemy.dialects.__all__:
+                if _sqlalchemy and data[3] and any(_ in _sqlalchemy.dialects.__all__ for _ in (data[3], data[3].split('+')[0])):
                     pass
                 else:
                     errMsg = "sqlmap requires '%s' third-party library " % data[1]

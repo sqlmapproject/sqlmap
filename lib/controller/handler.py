@@ -10,6 +10,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
+from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
@@ -94,21 +95,32 @@ def setHandler():
         conf.dbmsConnector = Connector()
 
         if conf.direct:
+            exception = None
             dialect = DBMS_DICT[dbms][3]
 
             if dialect:
-                sqlalchemy = SQLAlchemy(dialect=dialect)
-                sqlalchemy.connect()
+                try:
+                    sqlalchemy = SQLAlchemy(dialect=dialect)
+                    sqlalchemy.connect()
 
-                if sqlalchemy.connector:
-                    conf.dbmsConnector = sqlalchemy
-                else:
-                    try:
-                        conf.dbmsConnector.connect()
-                    except NameError:
-                        pass
-            else:
-                conf.dbmsConnector.connect()
+                    if sqlalchemy.connector:
+                        conf.dbmsConnector = sqlalchemy
+                except Exception, ex:
+                    exception = ex
+
+            if not dialect or exception:
+                try:
+                    conf.dbmsConnector.connect()
+                except Exception, ex:
+                    if exception:
+                        raise exception
+                    else:
+                        if not isinstance(ex, NameError):
+                            raise
+                        else:
+                            msg = "support for direct connection to '%s' is not available. " % dbms
+                            msg += "Please rerun with '--dependencies'"
+                            raise SqlmapConnectionException(msg)
 
         if conf.forceDbms == dbms or handler.checkDbms():
             if kb.resolutionDbms:
