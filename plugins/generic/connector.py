@@ -20,6 +20,7 @@ class Connector:
     def __init__(self):
         self.connector = None
         self.cursor = None
+        self.hostname = None
 
     def initConnection(self):
         self.user = conf.dbmsUser or ""
@@ -34,9 +35,10 @@ class Connector:
         logger.info(infoMsg)
 
     def closed(self):
-        infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
-        infoMsg += ":%d closed" % self.port
-        logger.info(infoMsg)
+        if self.hostname:
+            infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
+            infoMsg += ":%d closed" % self.port
+            logger.info(infoMsg)
 
         self.connector = None
         self.cursor = None
