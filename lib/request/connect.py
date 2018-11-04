@@ -591,7 +591,7 @@ class Connect(object):
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
             kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
 
-            responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, status)
+            responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
                 logHeaders = "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
@@ -750,7 +750,7 @@ class Connect(object):
 
             responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, conn.code, status)
         else:
-            responseMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, status)
+            responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
         if responseHeaders:
             logHeaders = "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
