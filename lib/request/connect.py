@@ -957,7 +957,7 @@ class Connect(object):
                 retVal = paramString
                 match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString)
                 if match:
-                    retVal = re.sub(re.escape(match.group(0)), "%s=%s" % (parameter, newValue), paramString)
+                    retVal = re.sub(re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
                 else:
                     match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString)
                     if match:
