@@ -2162,7 +2162,7 @@ In case that user uses switch `--beep` he'll be warned with a beep sound immedia
 
 Switch: `--cleanup`
 
-It is recommended to clean up the back-end database management system from sqlmap temporary table(s) and created user-defined function(s) when you are done taking over the underlying operating system or file system. Switch `--cleanup` will attempt to clean up the DBMS and the file system wherever possible. 
+It is recommended to clean up the back-end database management system from sqlmap temporary table(s) (e.g. `sqlmapoutput`) and created user-defined function(s) when you are done taking over the underlying operating system or file system. Switch `--cleanup` will attempt to clean up the DBMS and the file system wherever possible. 
 
 ### Check for dependencies
 
