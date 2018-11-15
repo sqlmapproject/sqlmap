@@ -437,25 +437,30 @@ def option_list(taskid):
 @post("/option/<taskid>/get")
 def option_get(taskid):
     """
-    Get the value of an option (command line switch) for a certain task ID
+    Get value of option(s) for a certain task ID
     """
     if taskid not in DataStore.tasks:
         logger.warning("[%s] Invalid task ID provided to option_get()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    option = request.json.get("option", "")
+    options = request.json or []
+    results = {}
 
-    if option in DataStore.tasks[taskid].options:
-        logger.debug("[%s] Retrieved value for option %s" % (taskid, option))
-        return jsonize({"success": True, option: DataStore.tasks[taskid].get_option(option)})
-    else:
-        logger.debug("[%s] Requested value for unknown option %s" % (taskid, option))
-        return jsonize({"success": False, "message": "Unknown option", option: "not set"})
+    for option in options:
+        if option in DataStore.tasks[taskid].options:
+            results[option] = DataStore.tasks[taskid].options[option]
+        else:
+            logger.debug("[%s] Requested value for unknown option '%s'" % (taskid, option))
+            return jsonize({"success": False, "message": "Unknown option '%s'" % option})
+
+    logger.debug("[%s] Retrieved values for option(s) '%s'" % (taskid, ",".join(options)))
+
+    return jsonize({"success": True, "options": results})
 
 @post("/option/<taskid>/set")
 def option_set(taskid):
     """
-    Set an option (command line switch) for a certain task ID
+    Set value of option(s) for a certain task ID
     """
 
     if taskid not in DataStore.tasks:
@@ -775,11 +780,11 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
                 logger.error("No task ID in use")
                 continue
             try:
-                command, option = command.split(" ")
+                command, option = command.split(" ", 1)
             except ValueError:
                 raw = _client("%s/option/%s/list" % (addr, taskid))
             else:
-                options = {"option": option}
+                options = re.split(r"\s*,\s*", option.strip())
                 raw = _client("%s/option/%s/get" % (addr, taskid), options)
             res = dejsonize(raw)
             if not res["success"]:
