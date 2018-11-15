@@ -1,0 +1,188 @@
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.2"
+  title: "sqlmap API (REST-JSON)"
+  contact:
+    email: "dev@sqlmap.org"
+  license:
+    name: "GPL 2.0"
+    url: "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+host: "0.0.0.0:8775"
+basePath: "/"
+tags:
+- name: "task"
+  description: "Task management functions"
+- name: "admin"
+  description: "Task administration functions"
+- name: "option"
+  description: "Task option handling functions"
+schemes:
+- "http"
+paths:
+  /task/new:
+    get:
+      tags:
+      - "task"
+      summary: "Create a new task"
+      description: ""
+      operationId: "taskNew"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Task successfully created"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              taskid:
+                type: string
+                example: "7e605b5d5a892b74"
+  /task/{taskid}/delete:
+    get:
+      tags:
+      - "task"
+      summary: "Delete an existing task"
+      description: ""
+      operationId: "taskDelete"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskid"
+        in: "path"
+        description: "ID of an existing task to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Task successfully deleted"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum: [true]
+        404:
+          description: "Task ID not found"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum: [false]
+              message:
+                type: string
+                enum: ["Non-existing task ID"]
+  /admin/list:
+    get:
+      tags:
+      - "admin"
+      summary: "Pull task list (locally)"
+      description: "Note: Use in cases when connecting to server from same IP (e.g. `localhost`)"
+      operationId: "adminList"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Task list successfully pulled"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum: [true]
+              tasks:
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  16a7a898e8eaaf45: running
+                  644fc063408e4f12: not running
+                  8e2eb10770d913cd: not running
+                  d59d1c69bdc06933: not running
+              tasks_num:
+                type: integer
+                example: 4
+  /admin/{token}/list:
+    get:
+      tags:
+      - "admin"
+      summary: "Pull task list (remotely)"
+      description: "Note: Use in cases when connecting to server from different IP"
+      operationId: "adminListToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "path"
+        description: "Secret token (Note: written to console during a server run - e.g. `2756d5b6e7d093ba49b5fd06a93aca7a`)"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Task list successfully pulled"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum: [true]
+              tasks:
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  5c911efa476b55f4: not running
+                  5ee038e153ffc534: not running
+                  e58c7a4de6bf7f51: not running
+              tasks_num:
+                type: integer
+                example: 4
+  /admin/flush:
+    get:
+      tags:
+      - "admin"
+      summary: "Flush task pool (locally)"
+      description: "Note: Use in cases when connecting to server from same IP (e.g. `localhost`)"
+      operationId: "adminFlush"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Task pool successfully flushed"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum: [true]
+  /admin/{token}/flush:
+    get:
+      tags:
+      - "admin"
+      summary: "Flush task pool (remotely)"
+      description: "Note: Use in cases when connecting to server from different IP"
+      operationId: "adminFlushToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "path"
+        description: "Secret token (Note: written to console during a server run - e.g. `2756d5b6e7d093ba49b5fd06a93aca7a`)"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Task pool successfully flushed"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                enum: [true]
+externalDocs:
+  description: "Find out more about sqlmap API (REST-JSON)"
+  url: "https://github.com/sqlmapproject/sqlmap/wiki/Usage#api-rest-json"

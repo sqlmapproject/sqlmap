@@ -58,7 +58,7 @@ from thirdparty.bottle.bottle import server_names
 
 # Global data storage
 class DataStore(object):
-    admin_id = ""
+    admin_token = ""
     current_db = None
     tasks = dict()
     username = None
@@ -275,8 +275,8 @@ def setRestAPILog():
         logger.addHandler(LOGGER_RECORDER)
 
 # Generic functions
-def is_admin(taskid):
-    return DataStore.admin_id == taskid
+def is_admin(token):
+    return DataStore.admin_token == token
 
 @hook('before_request')
 def check_authentication():
@@ -358,7 +358,7 @@ def path_401():
 @get("/task/new")
 def task_new():
     """
-    Create new task ID
+    Create a new task
     """
     taskid = hexencode(os.urandom(8))
     remote_addr = request.remote_addr
@@ -371,7 +371,7 @@ def task_new():
 @get("/task/<taskid>/delete")
 def task_delete(taskid):
     """
-    Delete own task ID
+    Delete an existing task
     """
     if taskid in DataStore.tasks:
         DataStore.tasks.pop(taskid)
@@ -379,39 +379,42 @@ def task_delete(taskid):
         logger.debug("[%s] Deleted task" % taskid)
         return jsonize({"success": True})
     else:
-        logger.warning("[%s] Invalid task ID provided to task_delete()" % taskid)
-        return jsonize({"success": False, "message": "Invalid task ID"})
+        response.status = 404
+        logger.warning("[%s] Non-existing task ID provided to task_delete()" % taskid)
+        return jsonize({"success": False, "message": "Non-existing task ID"})
 
 ###################
 # Admin functions #
 ###################
 
-@get("/admin/<taskid>/list")
-def task_list(taskid=None):
+@get("/admin/list")
+@get("/admin/<token>/list")
+def task_list(token=None):
     """
-    List task pull
+    Pull task list
     """
     tasks = {}
 
     for key in DataStore.tasks:
-        if is_admin(taskid) or DataStore.tasks[key].remote_addr == request.remote_addr:
+        if is_admin(token) or DataStore.tasks[key].remote_addr == request.remote_addr:
             tasks[key] = dejsonize(scan_status(key))["status"]
 
-    logger.debug("[%s] Listed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
+    logger.debug("[%s] Listed task pool (%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
 
-@get("/admin/<taskid>/flush")
-def task_flush(taskid):
+@get("/admin/flush")
+@get("/admin/<token>/flush")
+def task_flush(token=None):
     """
     Flush task spool (delete all tasks)
     """
 
     for key in list(DataStore.tasks):
-        if is_admin(taskid) or DataStore.tasks[key].remote_addr == request.remote_addr:
+        if is_admin(token) or DataStore.tasks[key].remote_addr == request.remote_addr:
             DataStore.tasks[key].engine_kill()
             del DataStore.tasks[key]
 
-    logger.debug("[%s] Flushed task pool (%s)" % (taskid, "admin" if is_admin(taskid) else request.remote_addr))
+    logger.debug("[%s] Flushed task pool (%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True})
 
 ##################################
@@ -647,7 +650,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     REST-JSON API server
     """
 
-    DataStore.admin_id = hexencode(os.urandom(16))
+    DataStore.admin_token = hexencode(os.urandom(16))
     DataStore.username = username
     DataStore.password = password
 
@@ -660,7 +663,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             port = s.getsockname()[1]
 
     logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
-    logger.info("Admin ID: %s" % DataStore.admin_id)
+    logger.info("Admin (secret) token: %s" % DataStore.admin_token)
     logger.debug("IPC database: '%s'" % Database.filepath)
 
     # Initialize IPC database
@@ -696,7 +699,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
         logger.critical(errMsg)
 
 def _client(url, options=None):
-    logger.debug("Calling %s" % url)
+    logger.debug("Calling '%s'" % url)
     try:
         data = None
         if options is not None:
@@ -833,7 +836,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             logger.info("Switching to task ID '%s' " % taskid)
 
         elif command in ("list", "flush"):
-            raw = _client("%s/admin/%s/%s" % (addr, taskid or 0, command))
+            raw = _client("%s/admin/%s" % (addr, command))
             res = dejsonize(raw)
             if not res["success"]:
                 logger.error("Failed to execute command %s" % command)
