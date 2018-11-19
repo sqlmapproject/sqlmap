@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-93eef5a012b79983815748224f41364f  lib/core/settings.py
+a30083ca6c21379bc31b931dca5b3464  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 721198b5be72c8015a02acb116532a1f  lib/core/target.py
@@ -270,7 +270,7 @@ a3a3cef042b864c4226b63f89548f939  tamper/overlongutf8.py
 89f8753a0ef65d2bb860c8864e9e935a  tamper/percentage.py
 a47aafcbc1de2deb85160e29de46f748  tamper/plus2concat.py
 759b86cf3bb1d7871dc6489538253f94  tamper/plus2fnconcat.py
-6522603955388256aee014334ebea22b  tamper/randomcase.py
+b9db4cc9fc4e0a586198340d1268fdaf  tamper/randomcase.py
 28626e4b8c673228dcfe4f1627a9e08b  tamper/randomcomments.py
 cac8a56f8cc6c14524ee392daa5ae2fd  tamper/space2comment.py
 4e6da2aca962b6110652e5f83dce5cd7  tamper/space2dash.py

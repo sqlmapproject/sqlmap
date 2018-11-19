@@ -25,6 +25,7 @@ def tamper(payload, **kwargs):
         * MySQL 4, 5.0 and 5.5
         * Oracle 10g
         * PostgreSQL 8.3, 8.4, 9.0
+        * SQLite 3
 
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
