@@ -285,6 +285,8 @@ class Users:
                                 query = rootQuery.blind.query % (user, index, user)
                         elif Backend.isDbms(DBMS.INFORMIX):
                             query = rootQuery.blind.query % (user,)
+                        elif Backend.isDbms(DBMS.HSQLDB):
+                            query = rootQuery.blind.query % (index, user)
                         else:
                             query = rootQuery.blind.query % (user, index)
 
