@@ -19,6 +19,9 @@ def dependencies():
 def tamper(payload, **kwargs):
     """
     Replaces each SQLite keyword and core functions character with mixed case value (e.g. SELECT -> SeLeCt)
+    
+    Requirement:
+        * SQLite
 
     Tested against:
         * SQLite 3
