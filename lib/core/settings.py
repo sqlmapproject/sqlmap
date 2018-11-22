@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.2.11.12"
+VERSION = "1.2.11.14"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -173,6 +173,9 @@ PUSH_VALUE_EXCEPTION_RETRY_COUNT = 3
 
 # Minimum time response set needed for time-comparison based on standard deviation
 MIN_TIME_RESPONSES = 30
+
+# Maximum time response set used during time-comparison based on standard deviation
+MAX_TIME_RESPONSES = 200
 
 # Minimum comparison ratio set needed for searching valid union column number based on standard deviation
 MIN_UNION_RESPONSES = 5

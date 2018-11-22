@@ -99,6 +99,7 @@ from lib.core.settings import MAX_CONSECUTIVE_CONNECTION_ERRORS
 from lib.core.settings import MAX_MURPHY_SLEEP_TIME
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
+from lib.core.settings import MAX_TIME_RESPONSES
 from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
@@ -1293,6 +1294,8 @@ class Connect(object):
         elif noteResponseTime:
             kb.responseTimes.setdefault(kb.responseTimeMode, [])
             kb.responseTimes[kb.responseTimeMode].append(threadData.lastQueryDuration)
+            if len(kb.responseTimes) > MAX_TIME_RESPONSES:
+                kb.responseTimes = kb.responseTimes[-MAX_TIME_RESPONSES:]
 
         if not response and removeReflection:
             page = removeReflectiveValues(page, payload)
