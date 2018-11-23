@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-668bbf57ac4603b3adf6308646c719dc  lib/core/settings.py
+95c2d218452e270a1a84849448d69110  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 721198b5be72c8015a02acb116532a1f  lib/core/target.py
@@ -222,7 +222,7 @@ f5d5419efddfe04648ea5e953c650793  plugins/generic/fingerprint.py
 f7874230e5661910d5fd21544c7d1022  plugins/generic/misc.py
 30b421f06dc98998ddc1923a9048b7fc  plugins/generic/search.py
 a70cc0ada4b0cc9e7df23cb6d48a4a0c  plugins/generic/syntax.py
-a37c21cc3fa5c0c220d33d450bf503ed  plugins/generic/takeover.py
+f990d799e578dfbc3cde5728655a7854  plugins/generic/takeover.py
 1265241e309da72bb82c3863a4c1b4bd  plugins/generic/users.py
 1e5532ede194ac9c083891c2f02bca93  plugins/__init__.py
 5dc693e22f5d020c5c568d7325bd4226  shell/backdoors/backdoor.asp_

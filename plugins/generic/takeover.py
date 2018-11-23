@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import os
 
 from lib.core.common import Backend
+from lib.core.common import getSafeExString
 from lib.core.common import isStackingAvailable
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
@@ -20,6 +21,7 @@ from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
 from lib.core.exception import SqlmapNotVulnerableException
+from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUndefinedMethod
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.takeover.abstraction import Abstraction
@@ -132,12 +134,16 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 errMsg += "http://code.google.com/p/impacket/downloads/list"
                 raise SqlmapMissingDependence(errMsg)
 
-            sysIgnoreIcmp = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
+            filename = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
 
-            if os.path.exists(sysIgnoreIcmp):
-                fp = open(sysIgnoreIcmp, "wb")
-                fp.write("1")
-                fp.close()
+            if os.path.exists(filename):
+                try:
+                    with open(filename, "wb") as f:
+                        f.write("1")
+                except IOError, ex:
+                    errMsg = "there has been a file opening/writing error "
+                    errMsg += "for filename '%s' ('%s')" % (filename, getSafeExString(ex))
+                    raise SqlmapSystemException(errMsg)
             else:
                 errMsg = "you need to disable ICMP replies by your machine "
                 errMsg += "system-wide. For example run on Linux/Unix:\n"
