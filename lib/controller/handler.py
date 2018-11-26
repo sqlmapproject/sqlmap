@@ -125,10 +125,11 @@ def setHandler():
         if conf.forceDbms == dbms or handler.checkDbms():
             if kb.resolutionDbms:
                 conf.dbmsHandler = max(_ for _ in items if _[0] == kb.resolutionDbms)[2]()
+                conf.dbmsHandler._dbms = kb.resolutionDbms
             else:
                 conf.dbmsHandler = handler
+                conf.dbmsHandler._dbms = dbms
 
-            conf.dbmsHandler._dbms = dbms
             break
         else:
             conf.dbmsConnector = None

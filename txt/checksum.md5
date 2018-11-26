@@ -25,7 +25,7 @@ c1bccc94522d3425a372dcd57f78418e  extra/wafdetectify/wafdetectify.py
 3459c562a6abb9b4bdcc36925f751f3e  lib/controller/action.py
 71334197c7ed28167cd66c17b2c21844  lib/controller/checks.py
 dd42ef140ffc0bd517128e6df369ab01  lib/controller/controller.py
-ba2717a410b21285d781ab42c4a797d0  lib/controller/handler.py
+988b548f6578adf9cec17afdeee8291c  lib/controller/handler.py
 1e5532ede194ac9c083891c2f02bca93  lib/controller/__init__.py
 cb865cf6eff60118bc97a0f106af5e4d  lib/core/agent.py
 c347f085bd561adfa26d3a9512e5f3b9  lib/core/bigarray.py
@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-95c2d218452e270a1a84849448d69110  lib/core/settings.py
+342e732d0772891804c7609578176997  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 721198b5be72c8015a02acb116532a1f  lib/core/target.py
