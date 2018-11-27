@@ -1071,7 +1071,7 @@ def _setSafeVisit():
                     key, value = line.split(':', 1)
                     value = value.strip()
                     kb.safeReq.headers[key] = value
-                    if key == HTTP_HEADER.HOST:
+                    if key.upper() == HTTP_HEADER.HOST.upper():
                         if not value.startswith("http"):
                             scheme = "http"
                             if value.endswith(":443"):
@@ -1303,7 +1303,7 @@ def _setHTTPUserAgent():
         _ = True
 
         for header, _ in conf.httpHeaders:
-            if header == HTTP_HEADER.USER_AGENT:
+            if header.upper() == HTTP_HEADER.USER_AGENT.upper():
                 _ = False
                 break
 

@@ -346,7 +346,7 @@ def _setRequestParams():
             # Url encoding of the header values should be avoided
             # Reference: http://stackoverflow.com/questions/5085904/is-ok-to-urlencode-the-value-in-headerlocation-value
 
-            if httpHeader.title() == HTTP_HEADER.USER_AGENT:
+            if httpHeader.upper() == HTTP_HEADER.USER_AGENT.upper():
                 conf.parameters[PLACE.USER_AGENT] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, USER_AGENT_ALIASES, True)))
@@ -355,7 +355,7 @@ def _setRequestParams():
                     conf.paramDict[PLACE.USER_AGENT] = {PLACE.USER_AGENT: headerValue}
                     testableParameters = True
 
-            elif httpHeader.title() == HTTP_HEADER.REFERER:
+            elif httpHeader.upper() == HTTP_HEADER.REFERER.upper():
                 conf.parameters[PLACE.REFERER] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, REFERER_ALIASES, True)))
@@ -364,7 +364,7 @@ def _setRequestParams():
                     conf.paramDict[PLACE.REFERER] = {PLACE.REFERER: headerValue}
                     testableParameters = True
 
-            elif httpHeader.title() == HTTP_HEADER.HOST:
+            elif httpHeader.upper() == HTTP_HEADER.HOST.upper():
                 conf.parameters[PLACE.HOST] = urldecode(headerValue)
 
                 condition = any((not conf.testParameter, intersect(conf.testParameter, HOST_ALIASES, True)))
