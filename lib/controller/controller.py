@@ -313,6 +313,7 @@ def start():
             conf.cookie = targetCookie
             conf.httpHeaders = list(initialHeaders)
             conf.httpHeaders.extend(targetHeaders or [])
+            conf.httpHeaders = [conf.httpHeaders[i] for i in xrange(len(conf.httpHeaders)) if conf.httpHeaders[i][0].upper() not in (__[0].upper() for __ in conf.httpHeaders[i + 1:])]
 
             initTargetEnv()
             parseTargetUrl()

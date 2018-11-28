@@ -102,6 +102,7 @@ from lib.core.settings import DBMS_ALIASES
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORTS
+from lib.core.settings import DEFAULT_USER_AGENT
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
@@ -112,7 +113,6 @@ from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PRECONNECT_CANDIDATE_TIMEOUT
-from lib.core.settings import SITE
 from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
 from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
@@ -122,7 +122,6 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNION_CHAR_REGEX
 from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX
-from lib.core.settings import VERSION_STRING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import setDaemon
 from lib.core.update import update
@@ -1256,14 +1255,6 @@ def _setHTTPExtraHeaders():
         # Reference: http://stackoverflow.com/a/1383359
         conf.httpHeaders.append((HTTP_HEADER.CACHE_CONTROL, "no-cache"))
 
-def _defaultHTTPUserAgent():
-    """
-    @return: default sqlmap HTTP User-Agent header
-    @rtype: C{str}
-    """
-
-    return "%s (%s)" % (VERSION_STRING, SITE)
-
 def _setHTTPUserAgent():
     """
     Set the HTTP User-Agent header.
@@ -1308,7 +1299,7 @@ def _setHTTPUserAgent():
                 break
 
         if _:
-            conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, _defaultHTTPUserAgent()))
+            conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, DEFAULT_USER_AGENT))
 
     else:
         if not kb.userAgents:
@@ -1323,10 +1314,10 @@ def _setHTTPUserAgent():
                 warnMsg += "file '%s'" % paths.USER_AGENTS
                 logger.warn(warnMsg)
 
-                conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, _defaultHTTPUserAgent()))
+                conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, DEFAULT_USER_AGENT))
                 return
 
-        userAgent = random.sample(kb.userAgents or [_defaultHTTPUserAgent()], 1)[0]
+        userAgent = random.sample(kb.userAgents or [DEFAULT_USER_AGENT], 1)[0]
 
         infoMsg = "fetched random HTTP User-Agent header value '%s' from " % userAgent
         infoMsg += "file '%s'" % paths.USER_AGENTS
