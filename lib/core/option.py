@@ -1795,6 +1795,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.injection = InjectionDict()
     kb.injections = []
     kb.laggingChecked = False
+    kb.lastInputMessage = None
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()

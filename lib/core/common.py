@@ -997,6 +997,11 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     retVal = None
     kb.stickyLevel = None
 
+    if kb.lastInputMessage == message:
+        checkBatch = False
+    else:
+        kb.lastInputMessage = message
+
     message = getUnicode(message)
 
     if "\n" in message:
