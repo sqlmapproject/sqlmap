@@ -41,6 +41,9 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
+        prefix, suffix = '+' * len(re.search(r"\A(\+*)", payload).group(0)), '+' * len(re.search(r"(\+*)\Z", payload).group(0))
+        retVal = retVal.strip('+')
+
         while True:
             indexes = zeroDepthSearch(retVal, '+')
 
@@ -75,5 +78,7 @@ def tamper(payload, **kwargs):
                     retVal = retVal.replace(part, replacement)
                 else:
                     break
+
+        retVal = "%s%s%s" % (prefix, retVal, suffix)
 
     return retVal
