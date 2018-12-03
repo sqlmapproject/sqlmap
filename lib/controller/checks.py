@@ -1530,7 +1530,7 @@ def checkConnection(suppressOutput=False):
             except socket.gaierror:
                 errMsg = "host '%s' does not exist" % conf.hostname
                 raise SqlmapConnectionException(errMsg)
-            except socket.error, ex:
+            except (socket.error, UnicodeError), ex:
                 errMsg = "problem occurred while "
                 errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
                 raise SqlmapConnectionException(errMsg)
