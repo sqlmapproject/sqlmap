@@ -82,6 +82,7 @@ from lib.core.enums import PROXY_TYPE
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import WIZARD
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapInstallationException
@@ -1364,7 +1365,12 @@ def _setHostname():
     """
 
     if conf.url:
-        conf.hostname = urlparse.urlsplit(conf.url).netloc.split(':')[0]
+        try:
+            conf.hostname = urlparse.urlsplit(conf.url).netloc.split(':')[0]
+        except ValueError, ex:
+            errMsg = "problem occurred while "
+            errMsg += "parsing an URL '%s' ('%s')" % (conf.url, getSafeExString(ex))
+            raise SqlmapDataException(errMsg)
 
 def _setHTTPTimeout():
     """
