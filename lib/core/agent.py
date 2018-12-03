@@ -920,7 +920,7 @@ class Agent(object):
         elif Backend.isDbms(DBMS.HSQLDB):
             match = re.search(r"ORDER BY [^ ]+", limitedQuery)
             if match:
-                limitedQuery = re.sub(r"\s*%s\s*" % match.group(0), " ", limitedQuery).strip()
+                limitedQuery = re.sub(r"\s*%s\s*" % re.escape(match.group(0)), " ", limitedQuery).strip()
                 limitedQuery += " %s" % match.group(0)
 
             if query.startswith("SELECT "):
