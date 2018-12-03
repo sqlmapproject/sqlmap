@@ -258,7 +258,7 @@ def unionUse(expression, unpack=True, dump=False):
                     stopLimit = int(count)
 
                     infoMsg = "used SQL query returns "
-                    infoMsg += "%d entries" % stopLimit
+                    infoMsg += "%d %s" % (stopLimit, "entries" if stopLimit > 1 else "entry")
                     logger.info(infoMsg)
 
             elif count and (not isinstance(count, basestring) or not count.isdigit()):
