@@ -444,8 +444,11 @@ def errorUse(expression, dump=False):
     if not value and not abortedFlag:
         value = _errorFields(expression, expressionFields, expressionFieldsList)
 
-    if value and isListLike(value) and len(value) == 1 and isinstance(value[0], basestring):
-        value = unArrayizeValue(value)
+    if value and isListLike(value):
+        if len(value) == 1 and isinstance(value[0], basestring):
+            value = unArrayizeValue(value)
+        elif len(value) > 1 and stopLimit == 1:
+            value = [value]
 
     duration = calculateDeltaSeconds(start)
 
