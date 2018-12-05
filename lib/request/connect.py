@@ -981,6 +981,8 @@ class Connect(object):
 
                 token = extractRegexResult(
                     r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % csrfTokenPattern, page or "")
+                conf.csrfToken = extractRegexResult(
+                    r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % csrfTokenPattern, page or "")[:-2]
             else:
                 token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
 
