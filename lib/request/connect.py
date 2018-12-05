@@ -61,6 +61,7 @@ from lib.core.common import unicodeencode
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
+from lib.core.common import paramToDict
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -983,6 +984,20 @@ class Connect(object):
                     r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % conf.csrfTokenPattern, page or "")
                 conf.csrfToken = extractRegexResult(
                     r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % conf.csrfTokenPattern, page or "")[:-2]
+
+                getParams = urlparse.parse_qs(conf.parameters[PLACE.GET])
+                for key, value in getParams.items():
+                    if re.search(r"\b%s\b" % conf.csrfTokenPattern, key):
+                        getParams[conf.csrfToken] = getParams[key]
+                        del getParams[key]
+
+                conf.parameters[PLACE.GET] = urllib.urlencode(getParams, doseq=True)
+
+                paramDict = paramToDict(PLACE.GET, conf.parameters[PLACE.GET])
+
+                if paramDict:
+                    conf.paramDict[PLACE.GET] = paramDict
+                print "ok"
             else:
                 token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
                 if not token:

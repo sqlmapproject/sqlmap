@@ -393,7 +393,7 @@ def _setRequestParams():
         raise SqlmapGenericException(errMsg)
 
     if conf.csrfToken:
-        csrfTokenPattern = ''
+        csrfTokenPattern = ""
         strings = conf.csrfToken.split("*")
         for index, string in enumerate(strings):
             csrfTokenPattern += re.escape(string)
