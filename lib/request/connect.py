@@ -972,19 +972,23 @@ class Connect(object):
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
 
             if "*" in conf.csrfToken:
-                csrfTokenPattern = ''
+                conf.csrfTokenPattern = ''
                 strings = conf.csrfToken.split("*")
                 for index, string in enumerate(strings):
-                    csrfTokenPattern += re.escape(string)
+                    conf.csrfTokenPattern += re.escape(string)
                     if index < len(strings) - 1:
-                        csrfTokenPattern += ".*"
+                        conf.csrfTokenPattern += ".*"
 
                 token = extractRegexResult(
-                    r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % csrfTokenPattern, page or "")
+                    r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % conf.csrfTokenPattern, page or "")
                 conf.csrfToken = extractRegexResult(
-                    r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % csrfTokenPattern, page or "")[:-2]
+                    r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % conf.csrfTokenPattern, page or "")[:-2]
             else:
                 token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
+                if not token:
+                    token = extractRegexResult(
+                        r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" %
+                            conf.csrfTokenPattern, page or "")
 
             if not token:
                 token = extractRegexResult(r"(?i)<input[^>]+\bvalue=[\"']?(?P<result>[^>'\"]*)[\"']?[^>]*\bname=[\"']?%s\b" % re.escape(conf.csrfToken), page or "")
