@@ -11,8 +11,8 @@
         <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
         <error regexp="Unknown column '[^ ]+' in 'field list'"/>
         <error regexp="MySqlClient\."/>
-        <error regexp="com\.mysql\.jdbc\.exceptions"/>
         <error regexp="Zend_Db_Statement_Mysqli_Exception"/>
+        <error regexp="com\.mysql\.jdbc"/>
     </dbms>
 
     <!-- PostgreSQL -->
@@ -24,6 +24,9 @@
         <error regexp="PG::SyntaxError:"/>
         <error regexp="org\.postgresql\.util\.PSQLException"/>
         <error regexp="ERROR:\s\ssyntax error at or near"/>
+        <error regexp="ERROR: parser: parse error at or near"/>
+        <error regexp="PostgreSQL query failed"/>
+        <error regexp="org\.postgresql\.jdbc"/>
     </dbms>
 
     <!-- Microsoft SQL Server -->
@@ -36,13 +39,14 @@
         <error regexp="System\.Data\.SqlClient\.SqlException"/>
         <error regexp="(?s)Exception.*?\WRoadhouse\.Cms\."/>
         <error regexp="Microsoft SQL Native Client error '[0-9a-fA-F]{8}"/>
-        <error regexp="com\.microsoft\.sqlserver\.jdbc\.SQLServerException"/>
+        <error regexp="\[SQL Server\]"/>
         <error regexp="ODBC SQL Server Driver"/>
         <error regexp="ODBC Driver \d+ for SQL Server"/>
         <error regexp="SQLServer JDBC Driver"/>
-        <error regexp="macromedia\.jdbc\.sqlserver"/>
         <error regexp="com\.jnetdirect\.jsql"/>
         <error regexp="SQLSrvException"/>
+        <error regexp="macromedia\.jdbc\.sqlserver"/>
+        <error regexp="com\.microsoft\.sqlserver\.jdbc"/>
     </dbms>
 
     <!-- Microsoft Access -->
@@ -61,9 +65,10 @@
         <error regexp="Oracle.*?Driver"/>
         <error regexp="Warning.*?\Woci_"/>
         <error regexp="Warning.*?\Wora_"/>
-        <error regexp="oracle\.jdbc\.driver"/>
         <error regexp="quoted string not properly terminated"/>
         <error regexp="SQL command not properly ended"/>
+        <error regexp="macromedia\.jdbc\.oracle"/>
+        <error regexp="oracle\.jdbc"/>
     </dbms>
 
     <!-- IBM DB2 -->
@@ -72,12 +77,14 @@
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
         <error regexp="SQLSTATE.+SQLCODE"/>
+        <error regexp="com\.ibm\.db2\.jcc"/>
     </dbms>
 
     <!-- Informix -->
     <dbms value="Informix">
         <error regexp="Exception.*?Informix"/>
         <error regexp="Informix ODBC Driver"/>
+        <error regexp="ODBC Informix driver"/>
         <error regexp="com\.informix\.jdbc"/>
         <error regexp="weblogic\.jdbc\.informix"/>
     </dbms>
@@ -86,6 +93,7 @@
     <dbms value="Firebird">
         <error regexp="Dynamic SQL Error"/>
         <error regexp="Warning.*?ibase_"/>
+        <error regexp="org\.firebirdsql\.jdbc"/>
     </dbms>
 
     <!-- SQLite -->
@@ -98,12 +106,16 @@
         <error regexp="\[SQLITE_ERROR\]"/>
         <error regexp="SQLite error \d+:"/>
         <error regexp="sqlite3.OperationalError:"/>
+        <error regexp="SQLite3::SQLException"/>
+        <error regexp="org\.sqlite\.JDBC"/>
     </dbms>
 
     <!-- SAP MaxDB -->
     <dbms value="SAP MaxDB">
         <error regexp="SQL error.*?POS([0-9]+)"/>
         <error regexp="Warning.*?maxdb"/>
+        <error regexp="DriverSapDB"/>
+        <error regexp="com\.sap\.dbtech\.jdbc"/>
     </dbms>
 
     <!-- Sybase -->
@@ -120,6 +132,7 @@
         <error regexp="Warning.*?ingres_"/>
         <error regexp="Ingres SQLSTATE"/>
         <error regexp="Ingres\W.*?Driver"/>
+        <error regexp="com\.ingres\.gcf\.jdbc"/>
     </dbms>
 
     <!-- Frontbase -->
@@ -130,14 +143,13 @@
 
     <!-- HSQLDB -->
     <dbms value="HSQLDB">
-        <error regexp="org\.hsqldb\.jdbc"/>
         <error regexp="Unexpected end of command in statement \["/>
         <error regexp="Unexpected token.*?in statement \["/>
+        <error regexp="org\.hsqldb\.jdbc"/>
     </dbms>
 
     <!-- H2 -->
     <dbms value="H2">
         <error regexp="org\.h2\.jdbc"/>
     </dbms>
-
 </root>
