@@ -772,6 +772,11 @@ class Connect(object):
         if not multipart:
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
+        if "Invalid csrf token." in page:
+            print "Invalid CSRF Token!"
+        else:
+            print "Valid CSRF Token!"
+
         return page, responseHeaders, code
 
     @staticmethod
@@ -971,39 +976,61 @@ class Connect(object):
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-
+            print 1
             if "*" in conf.csrfToken:
-                conf.csrfTokenPattern = ''
+                csrfTokenPattern = r""
                 strings = conf.csrfToken.split("*")
                 for index, string in enumerate(strings):
-                    conf.csrfTokenPattern += re.escape(string)
+                    csrfTokenPattern += re.escape(string)
                     if index < len(strings) - 1:
-                        conf.csrfTokenPattern += ".*"
+                        csrfTokenPattern += ".*"
 
-                token = extractRegexResult(
-                    r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % conf.csrfTokenPattern, page or "")
-                conf.csrfToken = extractRegexResult(
-                    r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % conf.csrfTokenPattern, page or "")[:-2]
+                tmp = extractRegexResult(
+                    r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % csrfTokenPattern,
+                    page or "")[:-2]
 
-                getParams = urlparse.parse_qs(conf.parameters[PLACE.GET])
-                for key, value in getParams.items():
-                    if re.search(r"\b%s\b" % conf.csrfTokenPattern, key):
-                        getParams[conf.csrfToken] = getParams[key]
-                        del getParams[key]
+                if not tmp:
+                    getParams = urlparse.parse_qs(conf.parameters[PLACE.GET])
+                    for key, value in getParams.items():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            tmp = key
+                            break
 
-                conf.parameters[PLACE.GET] = urllib.urlencode(getParams, doseq=True)
 
-                paramDict = paramToDict(PLACE.GET, conf.parameters[PLACE.GET])
+                if tmp: conf.csrfToken = tmp
 
-                if paramDict:
-                    conf.paramDict[PLACE.GET] = paramDict
-                print "ok"
-            else:
                 token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
-                if not token:
+
+                if tmp:
+
+                    getParams = dict(urlparse.parse_qsl(conf.parameters[PLACE.GET]))
+                    for key, value in getParams.iteritems():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            getParams[conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del getParams[key]
+                            break
+
+                    conf.parameters[PLACE.GET] = urllib.urlencode(getParams)
+
+                    for key, value in conf.paramDict[PLACE.GET].items():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            conf.paramDict[PLACE.GET][conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del conf.paramDict[PLACE.GET][key]
+                            break
+
+            else:
                     token = extractRegexResult(
-                        r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" %
-                            conf.csrfTokenPattern, page or "")
+                        r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken),
+                        page or "")
+
+            #print "###########################"
+            #print "- Token:         " + token
+            #print "- Token Name:    " + conf.csrfToken
+            #print "- Parameters:    " + conf.parameters[PLACE.GET]
+            #print "############################"
+
 
             if not token:
                 token = extractRegexResult(r"(?i)<input[^>]+\bvalue=[\"']?(?P<result>[^>'\"]*)[\"']?[^>]*\bname=[\"']?%s\b" % re.escape(conf.csrfToken), page or "")
@@ -1296,7 +1323,9 @@ class Connect(object):
 
         if not pageLength:
             try:
+                get = conf.parameters
                 page, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
+                print 2
             except MemoryError:
                 page, headers, code = None, None, None
                 warnMsg = "site returned insanely large response"
