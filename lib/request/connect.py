@@ -249,6 +249,7 @@ class Connect(object):
 
         url = kwargs.get("url", None) or conf.url
         get = kwargs.get("get", None)
+        print get
         post = kwargs.get("post", None)
         method = kwargs.get("method", None)
         cookie = kwargs.get("cookie", None)
@@ -772,10 +773,10 @@ class Connect(object):
         if not multipart:
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
-        if "Invalid csrf token." in page:
-            print "Invalid CSRF Token!"
-        else:
-            print "Valid CSRF Token!"
+        #if "Invalid csrf token." in page:
+        #    print "Invalid CSRF Token!"
+        #else:
+        #    print "Valid CSRF Token!"
 
         return page, responseHeaders, code
 
@@ -976,7 +977,8 @@ class Connect(object):
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            print 1
+
+            conf.csrfToken = conf.originalCsrfToken
             if "*" in conf.csrfToken:
                 csrfTokenPattern = r""
                 strings = conf.csrfToken.split("*")
@@ -1323,9 +1325,7 @@ class Connect(object):
 
         if not pageLength:
             try:
-                get = conf.parameters
                 page, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
-                print 2
             except MemoryError:
                 page, headers, code = None, None, None
                 warnMsg = "site returned insanely large response"
