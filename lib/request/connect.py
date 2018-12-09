@@ -249,7 +249,6 @@ class Connect(object):
 
         url = kwargs.get("url", None) or conf.url
         get = kwargs.get("get", None)
-        print get
         post = kwargs.get("post", None)
         method = kwargs.get("method", None)
         cookie = kwargs.get("cookie", None)
@@ -772,11 +771,6 @@ class Connect(object):
 
         if not multipart:
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-
-        #if "Invalid csrf token." in page:
-        #    print "Invalid CSRF Token!"
-        #else:
-        #    print "Valid CSRF Token!"
 
         return page, responseHeaders, code
 
