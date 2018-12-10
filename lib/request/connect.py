@@ -61,6 +61,7 @@ from lib.core.common import unicodeencode
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
+from lib.core.common import paramToDict
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -228,7 +229,6 @@ class Connect(object):
         This method connects to the target URL or proxy and returns
         the target URL page content
         """
-
         start = time.time()
 
         if isinstance(conf.delay, (int, float)) and conf.delay > 0:
@@ -771,6 +771,11 @@ class Connect(object):
         if not multipart:
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
+        #if "Invalid csrf token." in page:
+        #    print "INVALID CSRF TOKEN"
+        #else:
+        #    print "Valid CSRF Token"
+
         return page, responseHeaders, code
 
     @staticmethod
@@ -781,7 +786,7 @@ class Connect(object):
         and returns its page ratio (0 <= ratio <= 1) or a boolean value
         representing False/True match in case of !getRatioValue
         """
-
+        #print "queryPage()"
         if conf.direct:
             return direct(value, content)
 
@@ -970,7 +975,99 @@ class Connect(object):
                 return retVal
 
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
+
+            # Adjustments for csrf tokens with the star wildcard
+            conf.csrfToken = conf.originalCsrfToken
+            if "*" in conf.csrfToken:
+                csrfTokenPattern = r""
+                strings = conf.csrfToken.split("*")
+                for index, string in enumerate(strings):
+                    csrfTokenPattern += re.escape(string)
+                    if index < len(strings) - 1:
+                        csrfTokenPattern += ".*"
+
+                csrfTokenKey = extractRegexResult(
+                    r"(?i)<input[^>]+\bname=[\"']?(?P<result>%s)\b[^>]*\bvalue=[\"']?[^>'\"]*" % csrfTokenPattern,
+                    page or "")[:-2]
+
+                if not csrfTokenKey:
+                    if get:
+                        for key, value in urlparse.parse_qs(conf.parameters[PLACE.GET]).items():
+                            if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                                csrfTokenKey = key
+                                break
+                    elif post:
+                        for key, value in urlparse.parse_qs(conf.parameters[PLACE.POST]).items():
+                            if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                                csrfTokenKey = key
+                                break
+
+                if csrfTokenKey:
+                    conf.csrfToken = csrfTokenKey
+
+                token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
+
+                # A fix for urlencoder to give %20
+                # See: https://bugs.python.org/issue13866
+                urllib.quote_plus = urllib.quote
+
+                # Overwriting parameters for new csrf token key/ value...
+                if PLACE.GET in conf.parameters:
+                    getParamsDict = dict(urlparse.parse_qsl(conf.parameters[PLACE.GET]))
+                    for key, value in getParamsDict.iteritems():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            getParamsDict[conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del getParamsDict[key]
+                            break
+                    conf.parameters[PLACE.GET] = urllib.urlencode(getParamsDict)
+
+                    for key, value in conf.paramDict[PLACE.GET].items():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            conf.paramDict[PLACE.GET][conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del conf.paramDict[PLACE.GET][key]
+                            break
+
+                    getDict = dict(urlparse.parse_qsl(get))
+                    for key, value in getDict.iteritems():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            getDict[conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del getDict[key]
+                            break
+                    get = urllib.urlencode(getDict)
+
+                if PLACE.POST in conf.parameters:
+                    postParamsDict = dict(urlparse.parse_qsl(conf.parameters[PLACE.POST]))
+                    for key, value in postParamsDict.iteritems():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            postParamsDict[conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del postParamsDict[key]
+                            break
+                    conf.parameters[PLACE.POST] = urllib.urlencode(postParamsDict)
+
+                    for key, value in conf.paramDict[PLACE.POST].items():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            conf.paramDict[PLACE.POST][conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del conf.paramDict[PLACE.POST][key]
+                            break
+
+                    postDict = dict(urlparse.parse_qsl(post))
+                    for key, value in postDict.iteritems():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            postDict[conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del postDict[key]
+                            break
+                    post = urllib.urlencode(postDict)
+            else:
+                token = extractRegexResult(
+                    r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken),
+                    page or "")
+
 
             if not token:
                 token = extractRegexResult(r"(?i)<input[^>]+\bvalue=[\"']?(?P<result>[^>'\"]*)[\"']?[^>]*\bname=[\"']?%s\b" % re.escape(conf.csrfToken), page or "")

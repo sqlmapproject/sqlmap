@@ -470,7 +470,21 @@ def start():
 
                     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
+                    # Creating csrf token pattern
+                    csrfTokenPattern = r""
+                    strings = conf.csrfToken.split("*")
+                    for index, string in enumerate(strings):
+                        csrfTokenPattern += re.escape(string)
+                        if index < len(strings) - 1:
+                            csrfTokenPattern += ".*"
+
                     for parameter, value in paramDict.items():
+                        # Csrf parameter should never be injected
+                        if (re.match(csrfTokenPattern, parameter)):
+                            infoMsg = "skipping csrf parameter '%s'" % parameter
+                            logger.info(infoMsg)
+                            continue
+
                         if not proceed:
                             break
 

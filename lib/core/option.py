@@ -2341,6 +2341,7 @@ def _basicOptionValidation():
         errMsg = "option '--safe-req' is incompatible with option '--safe-url' and option '--safe-post'"
         raise SqlmapSyntaxException(errMsg)
 
+    conf.originalCsrfToken = conf.csrfToken
     if conf.csrfUrl and not conf.csrfToken:
         errMsg = "option '--csrf-url' requires usage of option '--csrf-token'"
         raise SqlmapSyntaxException(errMsg)
