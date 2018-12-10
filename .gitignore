@@ -4,3 +4,4 @@ output/
 traffic.txt
 *~
 .idea/
+venv/
