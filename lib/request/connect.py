@@ -229,7 +229,6 @@ class Connect(object):
         This method connects to the target URL or proxy and returns
         the target URL page content
         """
-
         start = time.time()
 
         if isinstance(conf.delay, (int, float)) and conf.delay > 0:
@@ -772,6 +771,11 @@ class Connect(object):
         if not multipart:
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
+        #if "Invalid csrf token." in page:
+        #    print "INVALID CSRF TOKEN"
+        #else:
+        #    print "Valid CSRF Token"
+
         return page, responseHeaders, code
 
     @staticmethod
@@ -782,7 +786,7 @@ class Connect(object):
         and returns its page ratio (0 <= ratio <= 1) or a boolean value
         representing False/True match in case of !getRatioValue
         """
-
+        #print "queryPage()"
         if conf.direct:
             return direct(value, content)
 
@@ -992,8 +996,8 @@ class Connect(object):
                             tmp = key
                             break
 
-
-                if tmp: conf.csrfToken = tmp
+                if tmp:
+                    conf.csrfToken = tmp
 
                 token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
 
@@ -1016,16 +1020,21 @@ class Connect(object):
                                 del conf.paramDict[PLACE.GET][key]
                             break
 
-            else:
-                    token = extractRegexResult(
-                        r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken),
-                        page or "")
 
-            #print "###########################"
-            #print "- Token:         " + token
-            #print "- Token Name:    " + conf.csrfToken
-            #print "- Parameters:    " + conf.parameters[PLACE.GET]
-            #print "############################"
+                    getParams = dict(urlparse.parse_qsl(get))
+                    for key, value in getParams.iteritems():
+                        if re.search(r"\b%s\b" % csrfTokenPattern, key):
+                            getParams[conf.csrfToken] = token
+                            if key != conf.csrfToken:
+                                del getParams[key]
+                            break
+
+                    urllib.quote_plus = urllib.quote  # A fix for urlencoder to give %20
+                    get = urllib.urlencode(getParams)
+            else:
+                token = extractRegexResult(
+                    r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken),
+                    page or "")
 
 
             if not token:
