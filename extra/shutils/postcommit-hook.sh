@@ -1,6 +1,6 @@
 #!/bin/bash
 
-"""
+: '
 cat > .git/hooks/post-commit << EOF
 #!/bin/bash
 
@@ -8,7 +8,7 @@ source ./extra/shutils/postcommit-hook.sh
 EOF
 
 chmod +x .git/hooks/post-commit
-"""
+'
 
 SETTINGS="../../lib/core/settings.py"
 
