@@ -997,11 +997,6 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     retVal = None
     kb.stickyLevel = None
 
-    if kb.lastInputMessage == message:
-        checkBatch = False
-    else:
-        kb.lastInputMessage = message
-
     message = getUnicode(message)
 
     if "\n" in message:
@@ -3514,9 +3509,9 @@ def listToStrValue(value):
 
     return retVal
 
-def intersect(valueA, valueB, lowerCase=False):
+def intersect(containerA, containerB, lowerCase=False):
     """
-    Returns intersection of the array-ized values
+    Returns intersection of the container-ized values
 
     >>> intersect([1, 2, 3], set([1,3]))
     [1, 3]
@@ -3524,15 +3519,15 @@ def intersect(valueA, valueB, lowerCase=False):
 
     retVal = []
 
-    if valueA and valueB:
-        valueA = arrayizeValue(valueA)
-        valueB = arrayizeValue(valueB)
+    if containerA and containerB:
+        containerA = arrayizeValue(containerA)
+        containerB = arrayizeValue(containerB)
 
         if lowerCase:
-            valueA = [val.lower() if isinstance(val, basestring) else val for val in valueA]
-            valueB = [val.lower() if isinstance(val, basestring) else val for val in valueB]
+            containerA = [val.lower() if isinstance(val, basestring) else val for val in containerA]
+            containerB = [val.lower() if isinstance(val, basestring) else val for val in containerB]
 
-        retVal = [val for val in valueA if val in valueB]
+        retVal = [val for val in containerA if val in containerB]
 
     return retVal
 

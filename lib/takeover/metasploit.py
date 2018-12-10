@@ -168,19 +168,8 @@ class Metasploit:
 
         choice = readInput(message, default="%d" % default)
 
-        if not choice:
-            if lst:
-                choice = getUnicode(default, UNICODE_ENCODING)
-            else:
-                return default
-
-        elif not choice.isdigit():
-            logger.warn("invalid value, only digits are allowed")
-            return self._skeletonSelection(msg, lst, maxValue, default)
-
-        elif int(choice) > maxValue or int(choice) < 1:
-            logger.warn("invalid value, it must be a digit between 1 and %d" % maxValue)
-            return self._skeletonSelection(msg, lst, maxValue, default)
+        if not choice or not choice.isdigit() or int(choice) > maxValue or int(choice) < 1:
+            choice = default
 
         choice = int(choice)
 

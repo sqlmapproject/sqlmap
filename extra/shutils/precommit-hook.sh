@@ -1,5 +1,15 @@
 #!/bin/bash
 
+: '
+cat > .git/hooks/pre-commit << EOF
+#!/bin/bash
+
+source ./extra/shutils/precommit-hook.sh
+EOF
+
+chmod +x .git/hooks/pre-commit
+'
+
 PROJECT="../../"
 SETTINGS="../../lib/core/settings.py"
 CHECKSUM="../../txt/checksum.md5"
