@@ -64,6 +64,7 @@ from lib.core.common import urlencode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import AttribDict
 from lib.core.decorators import stackedmethod
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import ADJUST_TIME_DELAY
@@ -960,75 +961,76 @@ class Connect(object):
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
                 retVal = paramString
-                match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString)
+                match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString, re.I)
                 if match:
-                    retVal = re.sub(re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
+                    retVal = re.sub(re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString, flags=re.I)
                 else:
-                    match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString)
+                    match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString, re.I)
                     if match:
-                        retVal = re.sub(re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
+                        retVal = re.sub(re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString, flags=re.I)
                 return retVal
 
+            token = AttribDict()
             page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.method if conf.csrfUrl == conf.url else None, cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            token = extractRegexResult(r"(?i)<input[^>]+\bname=[\"']?%s\b[^>]*\bvalue=[\"']?(?P<result>[^>'\"]*)" % re.escape(conf.csrfToken), page or "")
+            match = re.search(r"(?i)<input[^>]+\bname=[\"']?(?P<name>%s)\b[^>]*\bvalue=[\"']?(?P<value>[^>'\"]*)" % conf.csrfToken, page or "", re.I)
 
-            if not token:
-                token = extractRegexResult(r"(?i)<input[^>]+\bvalue=[\"']?(?P<result>[^>'\"]*)[\"']?[^>]*\bname=[\"']?%s\b" % re.escape(conf.csrfToken), page or "")
+            if not match:
+                match = re.search(r"(?i)<input[^>]+\bvalue=[\"']?(?P<value>[^>'\"]*)[\"']?[^>]*\bname=[\"']?(?P<name>%s)\b" % conf.csrfToken, page or "", re.I)
 
-                if not token:
-                    match = re.search(r"%s[\"']:[\"']([^\"']+)" % re.escape(conf.csrfToken), page or "")
-                    token = match.group(1) if match else None
+                if not match:
+                    match = re.search(r"(?P<name>%s)[\"']:[\"'](?P<value>[^\"']+)" % conf.csrfToken, page or "", re.I)
 
-                    if not token:
-                        token = extractRegexResult(r"\b%s\s*[:=]\s*(?P<result>\w+)" % re.escape(conf.csrfToken), str(headers))
+                    if not match:
+                        match = re.search(r"\b(?P<name>%s)\s*[:=]\s*(?P<value>\w+)" % conf.csrfToken, str(headers), re.I)
 
-                        if not token:
-                            token = extractRegexResult(r"\b%s\s*=\s*['\"]?(?P<result>[^;'\"]+)" % re.escape(conf.csrfToken), page or "")
+                        if not match:
+                            match = re.search(r"\b(?P<name>%s)\s*=\s*['\"]?(?P<value>[^;'\"]+)" % conf.csrfToken, page or "", re.I)
 
-                            if token:
-                                match = re.search(r"String\.fromCharCode\(([\d+, ]+)\)", token)
+            if match:
+                token.name, token.value = match.group("name"), match.group("value")
 
-                                if match:
-                                    token = "".join(chr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
+                match = re.search(r"String\.fromCharCode\(([\d+, ]+)\)", token.value)
+                if match:
+                    token.value = "".join(chr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
 
             if not token:
                 if conf.csrfUrl != conf.url and code == httplib.OK:
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                         token = page
 
-                if not token and conf.cj and any(_.name == conf.csrfToken for _ in conf.cj):
+                if not token and conf.cj and any(re.search(conf.csrfToken, _.name, re.I) for _ in conf.cj):
                     for _ in conf.cj:
-                        if _.name == conf.csrfToken:
-                            token = _.value
-                            if not any(conf.csrfToken in _ for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
+                        if re.search(conf.csrfToken, _.name, re.I):
+                            token.name, token.value = _.name, _.value
+                            if not any(re.search(conf.csrfToken, ' '.join(_), re.I) for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
                                 if post:
-                                    post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
+                                    post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, token.name, token.value)
                                 elif get:
-                                    get = "%s%s%s=%s" % (get, conf.paramDel or DEFAULT_GET_POST_DELIMITER, conf.csrfToken, token)
+                                    get = "%s%s%s=%s" % (get, conf.paramDel or DEFAULT_GET_POST_DELIMITER, token.name, token.value)
                                 else:
-                                    get = "%s=%s" % (conf.csrfToken, token)
+                                    get = "%s=%s" % (token.name, token.value)
                             break
 
                 if not token:
-                    errMsg = "anti-CSRF token '%s' can't be found at '%s'" % (conf.csrfToken, conf.csrfUrl or conf.url)
+                    errMsg = "anti-CSRF token '%s' can't be found at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
                     if not conf.csrfUrl:
                         errMsg += ". You can try to rerun by providing "
                         errMsg += "a valid value for option '--csrf-url'"
                     raise SqlmapTokenException(errMsg)
 
             if token:
-                token = token.strip("'\"")
+                token.value = token.value.strip("'\"")
 
                 for place in (PLACE.GET, PLACE.POST):
                     if place in conf.parameters:
                         if place == PLACE.GET and get:
-                            get = _adjustParameter(get, conf.csrfToken, token)
+                            get = _adjustParameter(get, token.name, token.value)
                         elif place == PLACE.POST and post:
-                            post = _adjustParameter(post, conf.csrfToken, token)
+                            post = _adjustParameter(post, token.name, token.value)
 
                 for i in xrange(len(conf.httpHeaders)):
-                    if conf.httpHeaders[i][0].lower() == conf.csrfToken.lower():
-                        conf.httpHeaders[i] = (conf.httpHeaders[i][0], token)
+                    if conf.httpHeaders[i][0].lower() == token.name.lower():
+                        conf.httpHeaders[i] = (conf.httpHeaders[i][0], token.value)
 
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):

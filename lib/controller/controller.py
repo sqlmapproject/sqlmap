@@ -505,7 +505,7 @@ def start():
                             infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
                             logger.info(infoMsg)
 
-                        elif parameter == conf.csrfToken:
+                        elif re.search(conf.csrfToken, parameter, re.I):
                             testSqlInj = False
 
                             infoMsg = "skipping anti-CSRF token parameter '%s'" % parameter
