@@ -994,9 +994,10 @@ class Connect(object):
                     token.value = "".join(chr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
 
             if not token:
-                if conf.csrfUrl != conf.url and code == httplib.OK:
+                if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == httplib.OK:
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
-                        token = page
+                        token.name = conf.csrfToken
+                        token.value = page
 
                 if not token and conf.cj and any(re.search(conf.csrfToken, _.name, re.I) for _ in conf.cj):
                     for _ in conf.cj:

@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-0c0d9162f3ec64208c203e7b7e7aaf01  lib/core/settings.py
+622797ad77a9cff4effe49b046170d50  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 1581be48127a3a7a9fd703359b6e7567  lib/core/target.py
@@ -71,7 +71,7 @@ f6b5957bf2103c3999891e4f45180bce  lib/parse/payloads.py
 30eed3a92a04ed2c29770e1b10d39dc0  lib/request/basicauthhandler.py
 2b81435f5a7519298c15c724e3194a0d  lib/request/basic.py
 859b6ad583e0ffba154f17ee179b5b89  lib/request/comparison.py
-9eb0cc48e7e4779e44f1641aa7d39a4d  lib/request/connect.py
+40c4cc791ec657b612ccecf5b3241651  lib/request/connect.py
 dd4598675027fae99f2e2475b05986da  lib/request/direct.py
 2044fce3f4ffa268fcfaaf63241b1e64  lib/request/dns.py
 98535d0efca5551e712fcc4b34a3f772  lib/request/httpshandler.py
@@ -478,7 +478,7 @@ d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 350605448f049cd982554123a75f11e1  xml/banner/x-aspnet-version.xml
 ccb5e02a692f75d11b7fd00f1db48bf5  xml/banner/x-powered-by.xml
 385570003bf7d84f2502191eae8268c6  xml/boundaries.xml
-e7c893dd4f3f1d6b5b6f5ffd717d38cc  xml/errors.xml
+78de3436ae5ad4b3882d59079f2012e4  xml/errors.xml
 a279656ea3fcb85c727249b02f828383  xml/livetests.xml
 11547289b99eaced5b55185a3230529a  xml/payloads/boolean_blind.xml
 0656ba4132cd02477be90e65a7ddf6ce  xml/payloads/error_based.xml
