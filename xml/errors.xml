@@ -4,7 +4,7 @@
     <!-- MySQL -->
     <dbms value="MySQL">
         <error regexp="SQL syntax.*?MySQL"/>
-        <error regexp="Warning.*?mysql_"/>
+        <error regexp="Warning.*?mysqli?_"/>
         <error regexp="MySqlException \(0x"/>
         <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
