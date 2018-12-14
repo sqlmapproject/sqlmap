@@ -194,12 +194,6 @@ def main():
     except KeyboardInterrupt:
         print
 
-        errMsg = "user aborted"
-        try:
-            logger.critical(errMsg)
-        except KeyboardInterrupt:
-            pass
-
     except EOFError:
         print
         errMsg = "exit"
