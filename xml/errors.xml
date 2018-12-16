@@ -4,7 +4,7 @@
     <!-- MySQL -->
     <dbms value="MySQL">
         <error regexp="SQL syntax.*?MySQL"/>
-        <error regexp="Warning.*?mysqli?_"/>
+        <error regexp="Warning.*?\Wmysqli?_"/>
         <error regexp="MySqlException \(0x"/>
         <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
@@ -36,10 +36,10 @@
         <error regexp="Driver.*? SQL[\-\_\ ]*Server"/>
         <error regexp="OLE DB.*? SQL Server"/>
         <error regexp="\bSQL Server[^&lt;&quot;]+Driver"/>
-        <error regexp="Warning.*?(mssql|sqlsrv)_"/>
+        <error regexp="Warning.*?\W(mssql|sqlsrv)_"/>
         <error regexp="\bSQL Server[^&lt;&quot;]+[0-9a-fA-F]{8}"/>
         <error regexp="System\.Data\.SqlClient\.SqlException"/>
-        <error regexp="(?s)Exception.*?\WRoadhouse\.Cms\."/>
+        <error regexp="(?s)Exception.*?\bRoadhouse\.Cms\."/>
         <error regexp="Microsoft SQL Native Client error '[0-9a-fA-F]{8}"/>
         <error regexp="\[SQL Server\]"/>
         <error regexp="ODBC SQL Server Driver"/>
@@ -67,8 +67,7 @@
         <error regexp="\bORA-\d{5}"/>
         <error regexp="Oracle error"/>
         <error regexp="Oracle.*?Driver"/>
-        <error regexp="Warning.*?\Woci_"/>
-        <error regexp="Warning.*?\Wora_"/>
+        <error regexp="Warning.*?\W(oci|ora)_"/>
         <error regexp="quoted string not properly terminated"/>
         <error regexp="SQL command not properly ended"/>
         <error regexp="macromedia\.jdbc\.oracle"/>
@@ -90,6 +89,7 @@
 
     <!-- Informix -->
     <dbms value="Informix">
+        <error regexp="Warning.*?\Wifx_"/>
         <error regexp="Exception.*?Informix"/>
         <error regexp="Informix ODBC Driver"/>
         <error regexp="ODBC Informix driver"/>
@@ -101,7 +101,7 @@
     <!-- Interbase/Firebird -->
     <dbms value="Firebird">
         <error regexp="Dynamic SQL Error"/>
-        <error regexp="Warning.*?ibase_"/>
+        <error regexp="Warning.*?\Wibase_"/>
         <error regexp="org\.firebirdsql\.jdbc"/>
         <error regexp="Pdo[./_\\]Firebird"/>
     </dbms>
@@ -111,8 +111,7 @@
         <error regexp="SQLite/JDBCDriver"/>
         <error regexp="SQLite\.Exception"/>
         <error regexp="(Microsoft|System)\.Data\.SQLite\.SQLiteException"/>
-        <error regexp="Warning.*?sqlite_"/>
-        <error regexp="Warning.*?SQLite3::"/>
+        <error regexp="Warning.*?\W(sqlite_|SQLite3::)"/>
         <error regexp="\[SQLITE_ERROR\]"/>
         <error regexp="SQLite error \d+:"/>
         <error regexp="sqlite3.OperationalError:"/>
@@ -124,14 +123,14 @@
     <!-- SAP MaxDB -->
     <dbms value="SAP MaxDB">
         <error regexp="SQL error.*?POS([0-9]+)"/>
-        <error regexp="Warning.*?maxdb"/>
+        <error regexp="Warning.*?\Wmaxdb_"/>
         <error regexp="DriverSapDB"/>
         <error regexp="com\.sap\.dbtech\.jdbc"/>
     </dbms>
 
     <!-- Sybase -->
     <dbms value="Sybase">
-        <error regexp="Warning.*?sybase"/>
+        <error regexp="Warning.*?\Wsybase_"/>
         <error regexp="Sybase message"/>
         <error regexp="Sybase.*?Server message"/>
         <error regexp="SybSQLException"/>
@@ -140,7 +139,7 @@
 
     <!-- Ingres -->
     <dbms value="Ingres">
-        <error regexp="Warning.*?ingres_"/>
+        <error regexp="Warning.*?\Wingres_"/>
         <error regexp="Ingres SQLSTATE"/>
         <error regexp="Ingres\W.*?Driver"/>
         <error regexp="com\.ingres\.gcf\.jdbc"/>
