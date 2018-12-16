@@ -5,7 +5,6 @@
     <dbms value="MySQL">
         <error regexp="SQL syntax.*?MySQL"/>
         <error regexp="Warning.*?\Wmysqli?_"/>
-        <error regexp="MySqlException \(0x"/>
         <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
         <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
@@ -14,6 +13,7 @@
         <error regexp="com\.mysql\.jdbc"/>
         <error regexp="Zend_Db_(Adapter|Statement)_Mysqli_Exception"/>
         <error regexp="Pdo[./_\\]Mysql"/>
+        <error regexp="MySqlException"/>
     </dbms>
 
     <!-- PostgreSQL -->
@@ -29,6 +29,7 @@
         <error regexp="PostgreSQL query failed"/>
         <error regexp="org\.postgresql\.jdbc"/>
         <error regexp="Pdo[./_\\]Pgsql"/>
+        <error regexp="PSQLException"/>
     </dbms>
 
     <!-- Microsoft SQL Server -->
@@ -46,11 +47,11 @@
         <error regexp="ODBC Driver \d+ for SQL Server"/>
         <error regexp="SQLServer JDBC Driver"/>
         <error regexp="com\.jnetdirect\.jsql"/>
-        <error regexp="SQLSrvException"/>
         <error regexp="macromedia\.jdbc\.sqlserver"/>
         <error regexp="Zend_Db_(Adapter|Statement)_Sqlsrv_Exception"/>
         <error regexp="com\.microsoft\.sqlserver\.jdbc"/>
         <error regexp="Pdo[./_\\](Mssql|SqlSrv)"/>
+        <error regexp="SQL(Srv|Server)Exception"/>
     </dbms>
 
     <!-- Microsoft Access -->
@@ -74,6 +75,7 @@
         <error regexp="oracle\.jdbc"/>
         <error regexp="Zend_Db_(Adapter|Statement)_Oracle_Exception"/>
         <error regexp="Pdo[./_\\](Oracle|OCI)"/>
+        <error regexp="OracleException"/>
     </dbms>
 
     <!-- IBM DB2 -->
@@ -85,6 +87,7 @@
         <error regexp="com\.ibm\.db2\.jcc"/>
         <error regexp="Zend_Db_(Adapter|Statement)_Db2_Exception"/>
         <error regexp="Pdo[./_\\]Ibm"/>
+        <error regexp="DB2Exception"/>
     </dbms>
 
     <!-- Informix -->
@@ -96,6 +99,7 @@
         <error regexp="com\.informix\.jdbc"/>
         <error regexp="weblogic\.jdbc\.informix"/>
         <error regexp="Pdo[./_\\]Informix"/>
+        <error regexp="IfxException"/>
     </dbms>
 
     <!-- Interbase/Firebird -->
@@ -118,6 +122,7 @@
         <error regexp="SQLite3::SQLException"/>
         <error regexp="org\.sqlite\.JDBC"/>
         <error regexp="Pdo[./_\\]Sqlite"/>
+        <error regexp="SQLiteException"/>
     </dbms>
 
     <!-- SAP MaxDB -->
@@ -134,6 +139,7 @@
         <error regexp="Sybase message"/>
         <error regexp="Sybase.*?Server message"/>
         <error regexp="SybSQLException"/>
+        <error regexp="Sybase\.Data\.AseClient"/>
         <error regexp="com\.sybase\.jdbc"/>
     </dbms>
 
