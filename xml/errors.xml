@@ -11,8 +11,9 @@
         <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
         <error regexp="Unknown column '[^ ]+' in 'field list'"/>
         <error regexp="MySqlClient\."/>
-        <error regexp="Zend_Db_Statement_Mysqli_Exception"/>
         <error regexp="com\.mysql\.jdbc"/>
+        <error regexp="Zend_Db_(Adapter|Statement)_Mysqli_Exception"/>
+        <error regexp="Pdo[./_\\]Mysql"/>
     </dbms>
 
     <!-- PostgreSQL -->
@@ -27,6 +28,7 @@
         <error regexp="ERROR: parser: parse error at or near"/>
         <error regexp="PostgreSQL query failed"/>
         <error regexp="org\.postgresql\.jdbc"/>
+        <error regexp="Pdo[./_\\]Pgsql"/>
     </dbms>
 
     <!-- Microsoft SQL Server -->
@@ -46,7 +48,9 @@
         <error regexp="com\.jnetdirect\.jsql"/>
         <error regexp="SQLSrvException"/>
         <error regexp="macromedia\.jdbc\.sqlserver"/>
+        <error regexp="Zend_Db_(Adapter|Statement)_Sqlsrv_Exception"/>
         <error regexp="com\.microsoft\.sqlserver\.jdbc"/>
+        <error regexp="Pdo[./_\\](Mssql|SqlSrv)"/>
     </dbms>
 
     <!-- Microsoft Access -->
@@ -69,6 +73,8 @@
         <error regexp="SQL command not properly ended"/>
         <error regexp="macromedia\.jdbc\.oracle"/>
         <error regexp="oracle\.jdbc"/>
+        <error regexp="Zend_Db_(Adapter|Statement)_Oracle_Exception"/>
+        <error regexp="Pdo[./_\\](Oracle|OCI)"/>
     </dbms>
 
     <!-- IBM DB2 -->
@@ -78,6 +84,8 @@
         <error regexp="\bdb2_\w+\("/>
         <error regexp="SQLSTATE.+SQLCODE"/>
         <error regexp="com\.ibm\.db2\.jcc"/>
+        <error regexp="Zend_Db_(Adapter|Statement)_Db2_Exception"/>
+        <error regexp="Pdo[./_\\]Ibm"/>
     </dbms>
 
     <!-- Informix -->
@@ -87,6 +95,7 @@
         <error regexp="ODBC Informix driver"/>
         <error regexp="com\.informix\.jdbc"/>
         <error regexp="weblogic\.jdbc\.informix"/>
+        <error regexp="Pdo[./_\\]Informix"/>
     </dbms>
 
     <!-- Interbase/Firebird -->
@@ -94,6 +103,7 @@
         <error regexp="Dynamic SQL Error"/>
         <error regexp="Warning.*?ibase_"/>
         <error regexp="org\.firebirdsql\.jdbc"/>
+        <error regexp="Pdo[./_\\]Firebird"/>
     </dbms>
 
     <!-- SQLite -->
@@ -108,6 +118,7 @@
         <error regexp="sqlite3.OperationalError:"/>
         <error regexp="SQLite3::SQLException"/>
         <error regexp="org\.sqlite\.JDBC"/>
+        <error regexp="Pdo[./_\\]Sqlite"/>
     </dbms>
 
     <!-- SAP MaxDB -->
