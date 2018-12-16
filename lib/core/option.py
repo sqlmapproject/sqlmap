@@ -1511,6 +1511,8 @@ def _cleanupOptions():
 
     if conf.url:
         conf.url = conf.url.strip()
+        if not re.search(r"\A\w+://", conf.url):
+            conf.url = "http://%s" % conf.url
 
     if conf.fileRead:
         conf.fileRead = ntToPosixSlashes(normalizePath(conf.fileRead))

@@ -4116,7 +4116,12 @@ def checkSameHost(*urls):
     elif len(urls) == 1:
         return True
     else:
-        return all(re.sub(r"(?i)\Awww\.", "", urlparse.urlparse(url or "").netloc.split(':')[0]) == re.sub(r"(?i)\Awww\.", "", urlparse.urlparse(urls[0] or "").netloc.split(':')[0]) for url in urls[1:])
+        def _(value):
+            if value and not re.search(r"\A\w+://", value):
+                value = "http://%s" % value
+            return value
+
+        return all(re.sub(r"(?i)\Awww\.", "", urlparse.urlparse(_(url) or "").netloc.split(':')[0]) == re.sub(r"(?i)\Awww\.", "", urlparse.urlparse(_(urls[0]) or "").netloc.split(':')[0]) for url in urls[1:])
 
 def getHostHeader(url):
     """
