@@ -670,7 +670,7 @@ def cmdLineParser(argv=None):
         # Hidden and/or experimental options
         parser.add_option("--crack", dest="hashFile",
                           help=SUPPRESS_HELP)
-                          #help="Load and crack hashes from a file")
+#                          help="Load and crack hashes from a file (standalone)")
 
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)

@@ -2438,7 +2438,7 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.liveTest, conf.wizard, conf.dependencies, conf.purge, conf.sitemapUrl, conf.listTampers)):
-        errMsg = "option '--crack' should be used as a stand-alone"
+        errMsg = "option '--crack' should be used as a standalone"
         raise SqlmapSyntaxException(errMsg)
 
     if isinstance(conf.uCols, basestring):
