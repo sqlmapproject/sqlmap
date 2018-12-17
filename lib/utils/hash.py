@@ -623,7 +623,7 @@ def attackDumpedTable():
         col_passwords = set()
         attack_dict = {}
 
-        for column in columns:
+        for column in sorted(columns, key=lambda _: len(_), reverse=True):
             if column and column.lower() in COMMON_USER_COLUMNS:
                 col_user = column
                 break
