@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-7bce3bb49e9a84585266da82e3a6fdb5  lib/core/settings.py
+06d86fa6e0530b5821793d63e8351f0a  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 1581be48127a3a7a9fd703359b6e7567  lib/core/target.py
