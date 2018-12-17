@@ -2437,6 +2437,10 @@ def _basicOptionValidation():
         errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.liveTest, conf.wizard, conf.dependencies, conf.purge, conf.sitemapUrl, conf.listTampers)):
+        errMsg = "option '--crack' should be used as a stand-alone"
+        raise SqlmapSyntaxException(errMsg)
+
     if isinstance(conf.uCols, basestring):
         if not conf.uCols.isdigit() and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
             errMsg = "value for option '--union-cols' must be a range with hyphon "
