@@ -1078,7 +1078,8 @@ def dictionaryAttack(attack_dict):
                         gc.enable()
 
                     if retVal:
-                        conf.hashDB.beginTransaction()
+                        if conf.hashDB:
+                            conf.hashDB.beginTransaction()
 
                         while not retVal.empty():
                             user, hash_, word = item = retVal.get(block=False)
@@ -1086,7 +1087,8 @@ def dictionaryAttack(attack_dict):
                             hashDBWrite(hash_, word)
                             results.append(item)
 
-                        conf.hashDB.endTransaction()
+                        if conf.hashDB:
+                            conf.hashDB.endTransaction()
 
             clearConsoleLine()
 
@@ -1171,15 +1173,17 @@ def dictionaryAttack(attack_dict):
                         if _multiprocessing:
                             gc.enable()
 
-                        if retVal:
-                            conf.hashDB.beginTransaction()
+                        if retVal and conf.hashDB:
+                            if conf.hashDB:
+                                conf.hashDB.beginTransaction()
 
                             while not retVal.empty():
                                 user, hash_, word = item = retVal.get(block=False)
                                 hashDBWrite(hash_, word)
                                 results.append(item)
 
-                            conf.hashDB.endTransaction()
+                            if conf.hashDB:
+                                conf.hashDB.endTransaction()
 
                 clearConsoleLine()
 
@@ -1194,3 +1198,17 @@ def dictionaryAttack(attack_dict):
         logger.warn(warnMsg)
 
     return results
+
+def crackHashFile(hashFile):
+    i = 0
+    attack_dict = {}
+
+    for line in getFileItems(conf.hashFile):
+        if ':' in line:
+            user, hash_ = line.split(':', 1)
+            attack_dict[user] = [hash_]
+        else:
+            attack_dict["%s%d" % (DUMMY_USER_PREFIX, i)] = [line]
+            i += 1
+
+    dictionaryAttack(attack_dict)

@@ -71,6 +71,7 @@ from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
+from lib.utils.hash import crackHashFile
 
 def _selectInjection():
     """
@@ -267,6 +268,9 @@ def start():
     stability and all GET, POST, Cookie and User-Agent parameters to
     check if they are dynamic and SQL injection affected
     """
+
+    if conf.hashFile:
+        crackHashFile(conf.hashFile)
 
     if conf.direct:
         initTargetEnv()

@@ -668,6 +668,10 @@ def cmdLineParser(argv=None):
                                  help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
+        parser.add_option("--crack", dest="hashFile",
+                          help=SUPPRESS_HELP)
+                          #help="Load and crack hashes from a file")
+
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)
 
@@ -884,7 +888,7 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
-        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, args.purge, args.sitemapUrl, args.listTampers)):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, args.purge, args.sitemapUrl, args.listTampers, args.hashFile)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --list-tampers, --wizard, --update, --purge or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
             parser.error(errMsg)
