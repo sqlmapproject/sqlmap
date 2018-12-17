@@ -642,6 +642,9 @@ def start():
                         errMsg += "involved (e.g. WAF) maybe you could try to use "
                         errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
 
+                        if not conf.randomAgent:
+                            errMsg += " and/or switch '--random-agent'"
+
                     raise SqlmapNotVulnerableException(errMsg.rstrip('.'))
             else:
                 # Flush the flag
