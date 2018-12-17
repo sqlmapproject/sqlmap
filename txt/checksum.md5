@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-1cf1beb635623adec866df474cebc88c  lib/core/settings.py
+b82a5d34d68888945c51c84810d4d4b3  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 1581be48127a3a7a9fd703359b6e7567  lib/core/target.py
@@ -101,7 +101,7 @@ db208ab47de010836c6bf044e2357861  lib/techniques/blind/inference.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/union/__init__.py
 f7813cdee00df8f98d6f811475e520a1  lib/techniques/union/test.py
 1f2ff182a28b2baf9f9fe7477c76618d  lib/techniques/union/use.py
-038ec99105c59acc2b1c6cb90e9e4043  lib/utils/api.py
+fd1ede20ec674518a54966eaf0c9f8c6  lib/utils/api.py
 37dfb641358669f62c2acedff241348b  lib/utils/brute.py
 31b1e7eb489eac837db6a2bc1dcb7da7  lib/utils/crawler.py
 f9867bbfcd6d31916ca73e72e95fd881  lib/utils/deps.py
