@@ -318,8 +318,24 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
     if conf.direct:
         return
 
+    negativeLogic = kb.negativeLogic
     kb.technique = PAYLOAD.TECHNIQUE.UNION
-    validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
+
+    try:
+        if negativeLogic:
+            pushValue(kb.negativeLogic)
+            pushValue(conf.string)
+            pushValue(conf.code)
+
+            kb.negativeLogic = False
+            conf.string = conf.code = None
+
+        validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
+    finally:
+        if negativeLogic:
+            conf.code = popValue()
+            conf.string = popValue()
+            kb.negativeLogic = popValue()
 
     if validPayload:
         validPayload = agent.removePayloadDelimiters(validPayload)

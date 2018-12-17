@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-06d86fa6e0530b5821793d63e8351f0a  lib/core/settings.py
+5192aa6feb4e6d598ec4334c39f9ba2f  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 1581be48127a3a7a9fd703359b6e7567  lib/core/target.py
@@ -99,7 +99,7 @@ db208ab47de010836c6bf044e2357861  lib/techniques/blind/inference.py
 686904374067047b521151301321b30a  lib/techniques/error/use.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/__init__.py
 1e5532ede194ac9c083891c2f02bca93  lib/techniques/union/__init__.py
-f7813cdee00df8f98d6f811475e520a1  lib/techniques/union/test.py
+7047a66c35ce0c820931fc5bf73008a3  lib/techniques/union/test.py
 1f2ff182a28b2baf9f9fe7477c76618d  lib/techniques/union/use.py
 fd1ede20ec674518a54966eaf0c9f8c6  lib/utils/api.py
 37dfb641358669f62c2acedff241348b  lib/utils/brute.py
