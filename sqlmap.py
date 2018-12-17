@@ -172,10 +172,7 @@ def main():
 
     except SqlmapUserQuitException:
         errMsg = "user quit"
-        try:
-            logger.error(errMsg)
-        except KeyboardInterrupt:
-            pass
+        logger.error(errMsg)
 
     except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
@@ -185,10 +182,8 @@ def main():
 
     except SqlmapBaseException as ex:
         errMsg = getSafeExString(ex)
-        try:
-            logger.critical(errMsg)
-        except KeyboardInterrupt:
-            pass
+        logger.critical(errMsg)
+
         raise SystemExit
 
     except KeyboardInterrupt:
@@ -196,12 +191,9 @@ def main():
 
     except EOFError:
         print
-        errMsg = "exit"
 
-        try:
-            logger.error(errMsg)
-        except KeyboardInterrupt:
-            pass
+        errMsg = "exit"
+        logger.error(errMsg)
 
     except SystemExit:
         pass
@@ -212,140 +204,136 @@ def main():
         excMsg = traceback.format_exc()
         valid = checkIntegrity()
 
-        try:
-            if valid is False:
-                errMsg = "code integrity check failed (turning off automatic issue creation). "
-                errMsg += "You should retrieve the latest development version from official GitHub "
-                errMsg += "repository at '%s'" % GIT_PAGE
-                logger.critical(errMsg)
-                print
-                dataToStdout(excMsg)
-                raise SystemExit
+        if valid is False:
+            errMsg = "code integrity check failed (turning off automatic issue creation). "
+            errMsg += "You should retrieve the latest development version from official GitHub "
+            errMsg += "repository at '%s'" % GIT_PAGE
+            logger.critical(errMsg)
+            print
+            dataToStdout(excMsg)
+            raise SystemExit
 
-            elif any(_ in excMsg for _ in ("tamper/", "waf/")):
-                logger.critical(errMsg)
-                print
-                dataToStdout(excMsg)
-                raise SystemExit
+        elif any(_ in excMsg for _ in ("tamper/", "waf/")):
+            logger.critical(errMsg)
+            print
+            dataToStdout(excMsg)
+            raise SystemExit
 
-            elif any(_ in excMsg for _ in ("ImportError", "Can't find file for module")):
-                errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
-                logger.critical(errMsg)
-                raise SystemExit
+        elif any(_ in excMsg for _ in ("ImportError", "Can't find file for module")):
+            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "MemoryError" in excMsg:
-                errMsg = "memory exhaustion detected"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "MemoryError" in excMsg:
+            errMsg = "memory exhaustion detected"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
-                errMsg = "no space left on output device"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
+            errMsg = "no space left on output device"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif all(_ in excMsg for _ in ("No such file", "_'", "self.get_prog_name()")):
-                errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
-                errMsg += "You should retrieve the latest development version from official GitHub "
-                errMsg += "repository at '%s'" % GIT_PAGE
-                logger.critical(errMsg)
-                raise SystemExit
+        elif all(_ in excMsg for _ in ("No such file", "_'", "self.get_prog_name()")):
+            errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
+            errMsg += "You should retrieve the latest development version from official GitHub "
+            errMsg += "repository at '%s'" % GIT_PAGE
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "Read-only file system" in excMsg:
-                errMsg = "output device is mounted as read-only"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "Read-only file system" in excMsg:
+            errMsg = "output device is mounted as read-only"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "OperationalError: disk I/O error" in excMsg:
-                errMsg = "I/O error on output device"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "OperationalError: disk I/O error" in excMsg:
+            errMsg = "I/O error on output device"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "Violation of BIDI" in excMsg:
-                errMsg = "invalid URL (violation of Bidi IDNA rule - RFC 5893)"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "Violation of BIDI" in excMsg:
+            errMsg = "invalid URL (violation of Bidi IDNA rule - RFC 5893)"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "_mkstemp_inner" in excMsg:
-                errMsg = "there has been a problem while accessing temporary files"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "_mkstemp_inner" in excMsg:
+            errMsg = "there has been a problem while accessing temporary files"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
-                errMsg = "please update the 'sqlalchemy' package (>= 1.1.11) "
-                errMsg += "(Reference: https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe)"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
+            errMsg = "please update the 'sqlalchemy' package (>= 1.1.11) "
+            errMsg += "(Reference: https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe)"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
-                errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
-                errMsg += "(Reference: https://github.com/PyMySQL/PyMySQL/issues/700)"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
+            errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
+            errMsg += "(Reference: https://github.com/PyMySQL/PyMySQL/issues/700)"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "must be pinned buffer, not bytearray" in excMsg:
-                errMsg = "error occurred at Python interpreter which "
-                errMsg += "is fixed in 2.7.x. Please update accordingly "
-                errMsg += "(Reference: https://bugs.python.org/issue8104)"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "must be pinned buffer, not bytearray" in excMsg:
+            errMsg = "error occurred at Python interpreter which "
+            errMsg += "is fixed in 2.7.x. Please update accordingly "
+            errMsg += "(Reference: https://bugs.python.org/issue8104)"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "can't start new thread" in excMsg:
-                errMsg = "there has been a problem while creating new thread instance. "
-                errMsg += "Please make sure that you are not running too many processes"
-                if not IS_WIN:
-                    errMsg += " (or increase the 'ulimit -u' value)"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "can't start new thread" in excMsg:
+            errMsg = "there has been a problem while creating new thread instance. "
+            errMsg += "Please make sure that you are not running too many processes"
+            if not IS_WIN:
+                errMsg += " (or increase the 'ulimit -u' value)"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
-                errMsg = "there has been a problem in enumeration. "
-                errMsg += "Because of a considerable chance of false-positive case "
-                errMsg += "you are advised to rerun with switch '--flush-session'"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
+            errMsg = "there has been a problem in enumeration. "
+            errMsg += "Because of a considerable chance of false-positive case "
+            errMsg += "you are advised to rerun with switch '--flush-session'"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif all(_ in excMsg for _ in ("pymysql", "configparser")):
-                errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif all(_ in excMsg for _ in ("pymysql", "configparser")):
+            errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif "bad marshal data (unknown type code)" in excMsg:
-                match = re.search(r"\s*(.+)\s+ValueError", excMsg)
-                errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
-                errMsg += ". Please delete .pyc files on your system to fix the problem"
-                logger.critical(errMsg)
-                raise SystemExit
+        elif "bad marshal data (unknown type code)" in excMsg:
+            match = re.search(r"\s*(.+)\s+ValueError", excMsg)
+            errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
+            errMsg += ". Please delete .pyc files on your system to fix the problem"
+            logger.critical(errMsg)
+            raise SystemExit
 
-            elif kb.get("dumpKeyboardInterrupt"):
-                raise SystemExit
+        elif kb.get("dumpKeyboardInterrupt"):
+            raise SystemExit
 
-            elif any(_ in excMsg for _ in ("Broken pipe",)):
-                raise SystemExit
+        elif any(_ in excMsg for _ in ("Broken pipe",)):
+            raise SystemExit
 
-            for match in re.finditer(r'File "(.+?)", line', excMsg):
-                file_ = match.group(1)
-                file_ = os.path.relpath(file_, os.path.dirname(__file__))
-                file_ = file_.replace("\\", '/')
-                if "../" in file_:
-                    file_ = re.sub(r"(\.\./)+", '/', file_)
-                else:
-                    file_ = file_.lstrip('/')
-                file_ = re.sub(r"/{2,}", '/', file_)
-                excMsg = excMsg.replace(match.group(1), file_)
-
-            errMsg = maskSensitiveData(errMsg)
-            excMsg = maskSensitiveData(excMsg)
-
-            if conf.get("api") or not valid:
-                logger.critical("%s\n%s" % (errMsg, excMsg))
+        for match in re.finditer(r'File "(.+?)", line', excMsg):
+            file_ = match.group(1)
+            file_ = os.path.relpath(file_, os.path.dirname(__file__))
+            file_ = file_.replace("\\", '/')
+            if "../" in file_:
+                file_ = re.sub(r"(\.\./)+", '/', file_)
             else:
-                logger.critical(errMsg)
-                kb.stickyLevel = logging.CRITICAL
-                dataToStdout(excMsg)
-                createGithubIssue(errMsg, excMsg)
+                file_ = file_.lstrip('/')
+            file_ = re.sub(r"/{2,}", '/', file_)
+            excMsg = excMsg.replace(match.group(1), file_)
 
-        except KeyboardInterrupt:
-            pass
+        errMsg = maskSensitiveData(errMsg)
+        excMsg = maskSensitiveData(excMsg)
+
+        if conf.get("api") or not valid:
+            logger.critical("%s\n%s" % (errMsg, excMsg))
+        else:
+            logger.critical(errMsg)
+            kb.stickyLevel = logging.CRITICAL
+            dataToStdout(excMsg)
+            createGithubIssue(errMsg, excMsg)
 
     finally:
         kb.threadContinue = False
@@ -366,45 +354,39 @@ def main():
                 shutil.rmtree(kb.tempDir, ignore_errors=True)
 
         if conf.get("hashDB"):
-            try:
-                conf.hashDB.flush(True)
-            except KeyboardInterrupt:
-                pass
+            conf.hashDB.flush(True)
 
         if conf.get("harFile"):
             with openFile(conf.harFile, "w+b") as f:
                 json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
 
         if conf.get("api"):
-            try:
-                conf.databaseCursor.disconnect()
-            except KeyboardInterrupt:
-                pass
+            conf.databaseCursor.disconnect()
 
         if conf.get("dumper"):
             conf.dumper.flush()
 
         # short delay for thread finalization
-        try:
-            _ = time.time()
-            while threading.activeCount() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
-                time.sleep(0.01)
+        _ = time.time()
+        while threading.activeCount() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
+            time.sleep(0.01)
 
-            if cmdLineOptions.get("sqlmapShell"):
-                cmdLineOptions.clear()
-                conf.clear()
-                kb.clear()
-                conf.disableBanner = True
-                main()
-        except KeyboardInterrupt:
-            pass
-        finally:
-            # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
-            if threading.activeCount() > 1:
-                os._exit(0)
+        if cmdLineOptions.get("sqlmapShell"):
+            cmdLineOptions.clear()
+            conf.clear()
+            kb.clear()
+            conf.disableBanner = True
+            main()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
+        if threading.activeCount() > 1:
+            os._exit(0)
 else:
     # cancelling postponed imports (because of Travis CI checks)
     from lib.controller.controller import start
