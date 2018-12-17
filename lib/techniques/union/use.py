@@ -373,7 +373,7 @@ def unionUse(expression, unpack=True, dump=False):
                                         del threadData.shared.buffered[0]
 
                                 if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
-                                    _ = ','.join("\"%s\"" % _ for _ in flattenValue(arrayizeValue(items))) if not isinstance(items, basestring) else items
+                                    _ = ','.join("'%s'" % _ for _ in (flattenValue(arrayizeValue(items)) if not isinstance(items, basestring) else [items]))
                                     status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
 
                                     if len(status) > width:
