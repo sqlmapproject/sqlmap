@@ -893,6 +893,12 @@ def _setSocketPreConnect():
                         family, type, proto, address = key
                         s = socket.socket(family, type, proto)
                         s._connect(address)
+                        try:
+                            if type == socket.SOCK_STREAM:
+                                # Reference: https://www.techrepublic.com/article/tcp-ip-options-for-high-performance-data-transmission/
+                                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                        except:
+                            pass
                         with kb.locks.socket:
                             socket._ready[key].append((s._sock, time.time()))
             except KeyboardInterrupt:
