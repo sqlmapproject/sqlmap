@@ -3659,11 +3659,15 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
                 retVal = "\"%s\"" % retVal.upper()
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                parts = retVal.split('.', 1)
-                for i in xrange(len(parts)):
-                    if ((parts[i] or " ")[0].isdigit() or not re.match(r"\A\w+\Z", parts[i], re.U)):
-                        parts[i] = "[%s]" % parts[i]
-                retVal = '.'.join(parts)
+                if isTable:
+                    parts = retVal.split('.', 1)
+                    for i in xrange(len(parts)):
+                        if parts[i] and (re.search(r"\A\d|[^\w]", parts[i], re.U) or parts[i].upper() in kb.keywords):
+                            parts[i] = "[%s]" % parts[i]
+                    retVal = '.'.join(parts)
+                else:
+                    if re.search(r"\A\d|[^\w]", retVal, re.U) or retVal.upper() in kb.keywords:
+                        retVal = "[%s]" % retVal
 
         if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
             retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
