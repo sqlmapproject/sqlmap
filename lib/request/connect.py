@@ -78,7 +78,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.enums import REDIRECTION
-from lib.core.enums import WEB_API
+from lib.core.enums import WEB_PLATFORM
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
@@ -889,7 +889,7 @@ class Connect(object):
                         postUrlEncode = False
 
             if conf.hpp:
-                if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_API.ASP, WEB_API.ASPX)):
+                if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_PLATFORM.ASP, WEB_PLATFORM.ASPX)):
                     warnMsg = "HTTP parameter pollution should work only against "
                     warnMsg += "ASP(.NET) targets"
                     singleTimeWarnMessage(warnMsg)

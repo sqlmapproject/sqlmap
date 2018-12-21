@@ -69,6 +69,7 @@ from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import REDIRECTION
+from lib.core.enums import WEB_PLATFORM
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNoneDataException
@@ -1052,9 +1053,19 @@ def heuristicCheckSqlInjection(place, parameter):
     kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
 
     if casting:
-        errMsg = "possible %s casting " % ("integer" if origValue.isdigit() else "type")
-        errMsg += "detected (e.g. \"$%s=intval($_REQUEST['%s'])\") " % (parameter, parameter)
-        errMsg += "at the back-end web application"
+        errMsg = "possible %s casting detected (e.g. '" % ("integer" if origValue.isdigit() else "type")
+
+        platform = conf.url.split('.')[-1].lower()
+        if platform == WEB_PLATFORM.ASP:
+            errMsg += "%s=CInt(request.querystring(\"%s\"))" % (parameter, parameter)
+        elif platform == WEB_PLATFORM.ASPX:
+            errMsg += "int.TryParse(Request.QueryString[\"%s\"], out %s)" % (parameter, parameter)
+        elif platform == WEB_PLATFORM.JSP:
+            errMsg += "%s=Integer.parseInt(request.getParameter(\"%s\"))" % (parameter, parameter)
+        else:
+            errMsg += "$%s=intval($_REQUEST[\"%s\"])" % (parameter, parameter)
+
+        errMsg += "') at the back-end web application"
         logger.error(errMsg)
 
         if kb.ignoreCasted is None:

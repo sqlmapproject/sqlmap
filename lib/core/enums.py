@@ -310,7 +310,7 @@ class ADJUST_TIME_DELAY:
     NO = 0
     YES = 1
 
-class WEB_API:
+class WEB_PLATFORM:
     PHP = "php"
     ASP = "asp"
     ASPX = "aspx"
