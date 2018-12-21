@@ -171,8 +171,9 @@ def main():
                             raise
 
     except SqlmapUserQuitException:
-        errMsg = "user quit"
-        logger.error(errMsg)
+        if not conf.batch:
+            errMsg = "user quit"
+            logger.error(errMsg)
 
     except (SqlmapSilentQuitException, bdb.BdbQuit):
         pass
