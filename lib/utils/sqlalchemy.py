@@ -32,6 +32,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapFilePathException
+from lib.core.exception import SqlmapMissingDependence
 from plugins.generic.connector import Connector as GenericConnector
 
 class SQLAlchemy(GenericConnector):
@@ -79,6 +80,8 @@ class SQLAlchemy(GenericConnector):
                 raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % msg[0])
 
             self.printConnected()
+        else:
+            raise SqlmapMissingDependence("SQLAlchemy not available")
 
     def fetchall(self):
         try:

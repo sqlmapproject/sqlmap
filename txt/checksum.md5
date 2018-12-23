@@ -49,7 +49,7 @@ c8c386d644d57c659d74542f5f57f632  lib/core/patch.py
 0c3eef46bdbf87e29a3f95f90240d192  lib/core/replication.py
 a7db43859b61569b601b97f187dd31c5  lib/core/revision.py
 fcb74fcc9577523524659ec49e2e964b  lib/core/session.py
-3afa2b42741332ce14a8c98befcfdff7  lib/core/settings.py
+29c9671c1f1e13c08b857885fffcbfd0  lib/core/settings.py
 a971ce157d04de96ba6e710d3d38a9a8  lib/core/shell.py
 a7edc9250d13af36ac0108f259859c19  lib/core/subprocessng.py
 1581be48127a3a7a9fd703359b6e7567  lib/core/target.py
@@ -115,7 +115,7 @@ eb2aa3fa9ebdf4cb6ac3e005f7df1e9b  lib/utils/hash.py
 683c3bd05b6164f56a57ed495c162684  lib/utils/progress.py
 0ec5cec9d93d5ffd1eaeda6e942ecadf  lib/utils/purge.py
 2c5a655c8e94cbe2664ee497752ac1f2  lib/utils/search.py
-571884f530796534f03c49cf3f380a4c  lib/utils/sqlalchemy.py
+cede46255b3c8f8d0b425b1c72cac75a  lib/utils/sqlalchemy.py
 dcc25183c6bd85b172c87cfcbc305ab6  lib/utils/timeout.py
 4703ceeb32131a9a7a6561575644123b  lib/utils/versioncheck.py
 e9e73cd6bd814dd7823a9da913cea61c  lib/utils/xrange.py
