@@ -342,7 +342,7 @@ def decodePage(page, contentEncoding, contentType):
                     retVal = match.group(0)
                     try:
                         retVal = unichr(int(match.group(1)))
-                    except ValueError:
+                    except (ValueError, OverflowError):
                         pass
                     return retVal
                 page = re.sub(r"&#(\d+);", _, page)
