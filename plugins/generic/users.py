@@ -201,6 +201,9 @@ class Users:
             else:
                 values = inject.getValue(query, blind=False, time=False)
 
+                if isNoneValue(values) and Backend.isDbms(DBMS.MSSQL):
+                    values = inject.getValue(query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr"), blind=False, time=False)
+
                 for user, password in filterPairValues(values):
                     if not user or user == " ":
                         continue
@@ -213,6 +216,8 @@ class Users:
                         kb.data.cachedUsersPasswords[user].append(password)
 
         if not kb.data.cachedUsersPasswords and isInferenceAvailable() and not conf.direct:
+            fallback = False
+
             if not len(users):
                 users = self.getUsers()
 
@@ -263,6 +268,10 @@ class Users:
 
                         count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
+                        if not isNumPosStrValue(count) and Backend.isDbms(DBMS.MSSQL):
+                            fallback = True
+                            count = inject.getValue(query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr"), union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
                         if not isNumPosStrValue(count):
                             warnMsg = "unable to retrieve the number of password "
                             warnMsg += "hashes for user '%s'" % user
@@ -283,10 +292,16 @@ class Users:
                                 query = rootQuery.blind.query2 % (user, index, user)
                             else:
                                 query = rootQuery.blind.query % (user, index, user)
+
+                            if fallback:
+                                query = query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr")
+
                         elif Backend.isDbms(DBMS.INFORMIX):
                             query = rootQuery.blind.query % (user,)
+
                         elif Backend.isDbms(DBMS.HSQLDB):
                             query = rootQuery.blind.query % (index, user)
+
                         else:
                             query = rootQuery.blind.query % (user, index)
 
