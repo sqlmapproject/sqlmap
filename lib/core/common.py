@@ -2121,6 +2121,16 @@ def readXmlFile(xmlFile):
 
     return retVal
 
+def average(values):
+    """
+    Computes the arithmetic mean of a list of numbers.
+
+    >>> average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
+    0.9
+    """
+
+    return (sum(values) / len(values)) if values else None
+
 @cachedmethod
 def stdev(values):
     """
@@ -2135,18 +2145,8 @@ def stdev(values):
         return None
     else:
         avg = average(values)
-        _ = reduce(lambda x, y: x + pow((y or 0) - avg, 2), values, 0.0)
+        _ = 1.0 * sum(pow((_ or 0) - avg, 2) for _ in values)
         return sqrt(_ / (len(values) - 1))
-
-def average(values):
-    """
-    Computes the arithmetic mean of a list of numbers.
-
-    >>> average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
-    0.9
-    """
-
-    return (sum(values) / len(values)) if values else None
 
 def calculateDeltaSeconds(start):
     """
