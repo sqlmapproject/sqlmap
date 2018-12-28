@@ -27,7 +27,7 @@ def tamper(payload, **kwargs):
         * MySQL 5.0
 
     Notes:
-        * Useful to bypass ModSecurity WAF/IDS
+        * Useful to bypass ModSecurity WAF
 
     >>> tamper('1 AND 2>1--')
     '1 /*!00000AND 2>1*/--'

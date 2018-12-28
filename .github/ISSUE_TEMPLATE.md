@@ -19,7 +19,7 @@
 * Client OS (e.g. `Microsoft Windows 10`)
 * Program version (`python sqlmap.py --version` or `sqlmap --version` depending on installation): 
 * Target DBMS (e.g. `Microsoft SQL Server`): 
-* Detected WAF/IDS/IPS protection (e.g. `ModSecurity` or `unknown`):
+* Detected WAF/IPS protection (e.g. `ModSecurity` or `unknown`):
 * SQLi techniques found by sqlmap (e.g. `error-based` and `boolean-based blind`):
 * Results of manual target assessment (e.g. found that the payload `query=test' AND 4113 IN ((SELECT 'foobar'))-- qKLV` works):
 * Relevant console output (if any):

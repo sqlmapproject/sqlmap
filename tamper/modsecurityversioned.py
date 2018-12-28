@@ -28,7 +28,7 @@ def tamper(payload, **kwargs):
         * MySQL 5.0
 
     Notes:
-        * Useful to bypass ModSecurity WAF/IDS
+        * Useful to bypass ModSecurity WAF
 
     >>> import random
     >>> random.seed(0)
