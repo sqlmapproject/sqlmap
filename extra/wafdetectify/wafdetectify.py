@@ -99,7 +99,7 @@ def main():
 
     WAF_FUNCTIONS = sorted(WAF_FUNCTIONS, key=lambda _: "generic" in _[1].lower())
 
-    print colorize("[i] %d WAF scripts loaded" % len(WAF_FUNCTIONS))
+    print colorize("[i] checking '%s'..." % sys.argv[1])
 
     found = False
     for function, product in WAF_FUNCTIONS:
@@ -114,6 +114,8 @@ def main():
         print colorize("[o] nothing found")
 
     print
+
+    exit(int(not found))
 
 if __name__ == "__main__":
     main()
