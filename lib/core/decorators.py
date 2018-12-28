@@ -5,6 +5,7 @@ Copyright (c) 2006-2018 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import functools
 import hashlib
 
 from lib.core.threads import getCurrentThreadData
@@ -16,6 +17,7 @@ def cachedmethod(f, cache={}):
     Reference: http://code.activestate.com/recipes/325205-cache-decorator-in-python-24/
     """
 
+    @functools.wraps(f)
     def _(*args, **kwargs):
         key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
         if key not in cache:
@@ -26,6 +28,11 @@ def cachedmethod(f, cache={}):
     return _
 
 def stackedmethod(f):
+    """
+    Method using pushValue/popValue functions (fallback function for stack realignment)
+    """
+
+    @functools.wraps(f)
     def _(*args, **kwargs):
         threadData = getCurrentThreadData()
         originalLevel = len(threadData.valueStack)
