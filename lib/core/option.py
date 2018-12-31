@@ -2271,6 +2271,10 @@ def _basicOptionValidation():
         errMsg = "option '-d' is incompatible with option '-u' ('--url')"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.direct and conf.dbms:
+        errMsg = "option '-d' is incompatible with option '--dbms'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.identifyWaf and conf.skipWaf:
         errMsg = "switch '--identify-waf' is incompatible with switch '--skip-waf'"
         raise SqlmapSyntaxException(errMsg)
