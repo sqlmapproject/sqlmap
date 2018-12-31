@@ -1266,7 +1266,7 @@ class Connect(object):
             finally:
                 kb.pageCompress = popValue()
 
-        if not pageLength:
+        if pageLength is None:
             try:
                 page, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
             except MemoryError:
