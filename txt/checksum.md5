@@ -49,11 +49,11 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-43ee2f1b9e898fa8e9788b921f278609  lib/core/settings.py
+c799d8dee38e2da35b8aff0638f21129  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
-a057a8ae12fd21f6c409feee1266e7ad  lib/core/testing.py
+2f87870562ac9a79a5105a0e20fdbf9a  lib/core/testing.py
 5ebd996b2a77449df90320847e30a073  lib/core/threads.py
 2c263c8610667fdc593c50a35ab20f57  lib/core/unescaper.py
 5bd7cd6553a4a1c85cbaaddc268108e4  lib/core/update.py

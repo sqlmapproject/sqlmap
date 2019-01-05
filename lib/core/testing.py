@@ -17,6 +17,7 @@ import traceback
 
 from extra.beep.beep import beep
 from lib.controller.controller import start
+from lib.core.common import checkIntegrity
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
@@ -51,41 +52,44 @@ def smokeTest():
     retVal = True
     count, length = 0, 0
 
-    for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if any(_ in root for _ in ("thirdparty", "extra")):
-            continue
+    if not checkIntegrity():
+        retVal = False
+    else:
+        for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
+            if any(_ in root for _ in ("thirdparty", "extra")):
+                continue
 
-        for filename in files:
-            if os.path.splitext(filename)[1].lower() == ".py" and filename != "__init__.py":
-                length += 1
+            for filename in files:
+                if os.path.splitext(filename)[1].lower() == ".py" and filename != "__init__.py":
+                    length += 1
 
-    for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if any(_ in root for _ in ("thirdparty", "extra")):
-            continue
+        for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
+            if any(_ in root for _ in ("thirdparty", "extra")):
+                continue
 
-        for filename in files:
-            if os.path.splitext(filename)[1].lower() == ".py" and filename != "__init__.py":
-                path = os.path.join(root, os.path.splitext(filename)[0])
-                path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
-                path = path.replace(os.sep, '.').lstrip('.')
-                try:
-                    __import__(path)
-                    module = sys.modules[path]
-                except Exception, msg:
-                    retVal = False
-                    dataToStdout("\r")
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), msg)
-                    logger.error(errMsg)
-                else:
-                    # Run doc tests
-                    # Reference: http://docs.python.org/library/doctest.html
-                    (failure_count, test_count) = doctest.testmod(module)
-                    if failure_count > 0:
+            for filename in files:
+                if os.path.splitext(filename)[1].lower() == ".py" and filename != "__init__.py":
+                    path = os.path.join(root, os.path.splitext(filename)[0])
+                    path = path.replace(paths.SQLMAP_ROOT_PATH, '.')
+                    path = path.replace(os.sep, '.').lstrip('.')
+                    try:
+                        __import__(path)
+                        module = sys.modules[path]
+                    except Exception, msg:
                         retVal = False
+                        dataToStdout("\r")
+                        errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), msg)
+                        logger.error(errMsg)
+                    else:
+                        # Run doc tests
+                        # Reference: http://docs.python.org/library/doctest.html
+                        (failure_count, test_count) = doctest.testmod(module)
+                        if failure_count > 0:
+                            retVal = False
 
-                count += 1
-                status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
-                dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+                    count += 1
+                    status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
+                    dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
     clearConsoleLine()
     if retVal:
