@@ -30,6 +30,11 @@ setup(
     author='Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar',
     author_email='bernardo@sqlmap.org, miroslav@sqlmap.org',
     url='http://sqlmap.org',
+    project_urls={
+        'Documentation': 'https://github.com/sqlmapproject/sqlmap/wiki',
+        'Source': 'https://github.com/sqlmapproject/sqlmap/',
+        'Tracker': 'https://github.com/sqlmapproject/sqlmap/issues',
+    },
     download_url='https://github.com/sqlmapproject/sqlmap/archive/$VERSION.zip',
     license='GNU General Public License v2 (GPLv2)',
     packages=find_packages(),
