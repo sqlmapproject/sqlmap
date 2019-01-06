@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-a7b1cd71be4ae51360d0d01293271e66  lib/core/settings.py
+0dd33e8fe128a0b3bf3f94a463d0a61a  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -423,7 +423,7 @@ dbe50bbcb1b4664d6cebfcca63e75125  waf/distil.py
 2e8bf326975edcb4d627493c46c6807c  waf/dosarrest.py
 886c6502a6a2aae49921efed8d439f7b  waf/dotdefender.py
 a8412619d7f26ed6bc9e0b20a57b2324  waf/edgecast.py
-17e7ac56629b25a9ea8cfe01c3604745  waf/expressionengine.py
+3f440d629b31052e675ee9d48d4ce370  waf/expressionengine.py
 588d2f9a8f201e120e74e508564cb487  waf/fortiweb.py
 0e9eb20967d2dde941cca8c663a63e1f  waf/generic.py
 2aa7775dac8df4a3cdb736fdf51dc9cb  waf/hyperguard.py
