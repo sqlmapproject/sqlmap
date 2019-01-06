@@ -100,6 +100,7 @@ from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DBMS_ALIASES
+from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORTS
@@ -223,10 +224,11 @@ def _setMultipleTargets():
 
     if os.path.isfile(conf.logFile):
         for target in parseRequestFile(conf.logFile):
-            url = target[0]
-            if url not in seen:
+            url, _, data, _, _ = target
+            key = re.sub(r"(\w+=)[^%s ]*" % (conf.paramDel or DEFAULT_GET_POST_DELIMITER), r"\g<1>", "%s %s" % (url, data))
+            if key not in seen:
                 kb.targets.add(target)
-                seen.add(url)
+                seen.add(key)
 
     elif os.path.isdir(conf.logFile):
         files = os.listdir(conf.logFile)
@@ -237,10 +239,11 @@ def _setMultipleTargets():
                 continue
 
             for target in parseRequestFile(os.path.join(conf.logFile, reqFile)):
-                url = target[0]
-                if url not in seen:
+                url, _, data, _, _ = target
+                key = re.sub(r"(\w+=)[^%s ]*" % (conf.paramDel or DEFAULT_GET_POST_DELIMITER), r"\g<1>", "%s %s" % (url, data))
+                if key not in seen:
                     kb.targets.add(target)
-                    seen.add(url)
+                    seen.add(key)
 
     else:
         errMsg = "the specified list of targets is not a file "
