@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-b1e0f0672f00611ad7f9d3a467d53649  lib/core/settings.py
+80e6760b8230a90372e15d7f18124974  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -464,7 +464,7 @@ ba0fb1e6b815446b9d6f30950900fc80  waf/trafficshield.py
 6aad5ef252bf428e9bbebe650c0cf67e  waf/watchguard.py
 c8dcaa89f6cde684a578fdc2e9ab2bb8  waf/webappsecure.py
 a7b8c4c3d1463409e0e204932f0ddff0  waf/webknight.py
-16e421475ff62b203298e669edca7b40  waf/wordfence.py
+ac9e4e3ced77012ed97284634a9ffc74  waf/wordfence.py
 e16122cb40e5f3a66cba359cfb672bd2  waf/yundun.py
 a560bee3e948b97af2c88805933dcaad  waf/yunsuo.py
 c8b6517da2c8a28d474956e3a6b8c1ed  waf/zenedge.py
