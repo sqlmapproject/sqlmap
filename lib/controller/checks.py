@@ -1418,7 +1418,7 @@ def identifyWaf():
         page, headers, code = None, None, None
         try:
             pushValue(kb.redirectChoice)
-            kb.redirectChoice = REDIRECTION.NO
+            kb.redirectChoice = REDIRECTION.YES
             if kwargs.get("get"):
                 kwargs["get"] = urlencode(kwargs["get"])
             kwargs["raise404"] = False
