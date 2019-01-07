@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-114e8b6f28ec0c03f083dd15bf257b28  lib/core/settings.py
+de869bb9eb40f7f621d766c6560d0c13  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -421,7 +421,6 @@ af079de99a8ec6988d28aa4c0aa32cf9  waf/cloudbric.py
 f20b14ca9f7c2442fd1e9432d933a75b  waf/datapower.py
 e49bb75985f60556b4481dc085f3c62b  waf/denyall.py
 dbe50bbcb1b4664d6cebfcca63e75125  waf/distil.py
-2e8bf326975edcb4d627493c46c6807c  waf/dosarrest.py
 886c6502a6a2aae49921efed8d439f7b  waf/dotdefender.py
 a8412619d7f26ed6bc9e0b20a57b2324  waf/edgecast.py
 3f440d629b31052e675ee9d48d4ce370  waf/expressionengine.py
