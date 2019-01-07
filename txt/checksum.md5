@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-885aad10b81d3eaee5218ffbe29db374  lib/core/settings.py
+f483f079c8682b64940e78c6b75bac77  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -412,6 +412,7 @@ ef8c5db49ad9973b59d6b9b65b001714  waf/blockdos.py
 2608fbe2c80fae99bb09db1f93d80cdd  waf/bluedon.py
 5ae64cad95b7f904c350cc81230c3bd1  waf/chinacache.py
 a05edf8f2962dfff0457b7a4fd5e169c  waf/ciscoacexml.py
+2565869c73a9a37f25deb317e8f5d9dd  waf/cleantalk.py
 af079de99a8ec6988d28aa4c0aa32cf9  waf/cloudbric.py
 8fec83056c8728076ab17ab3a2ebbe7b  waf/cloudflare.py
 8414f766b0171fbc264c46ad40dff237  waf/cloudfront.py
@@ -426,6 +427,7 @@ a8412619d7f26ed6bc9e0b20a57b2324  waf/edgecast.py
 3f440d629b31052e675ee9d48d4ce370  waf/expressionengine.py
 588d2f9a8f201e120e74e508564cb487  waf/fortiweb.py
 0e9eb20967d2dde941cca8c663a63e1f  waf/generic.py
+4ea580dd1b9679bd733866976ad5d81e  waf/godaddy.py
 2aa7775dac8df4a3cdb736fdf51dc9cb  waf/hyperguard.py
 256a7ea2c1cd2745fe788cf8f6123f8a  waf/immunify360.py
 1adbd0c470d1bbcec370722f05094255  waf/incapsula.py
@@ -434,10 +436,12 @@ a3ee375714987acccc26d1b07c2e8af7  waf/isaserver.py
 ce9cf35919a92d65347bb74ca0c5c86f  waf/jiasule.py
 f44ed04eeb4287c11ce277703ec7d72d  waf/knownsec.py
 d50d82bec48814eb5b699d302dbdae9a  waf/kona.py
+d4f36e44f496f4d51baa3241eabc60fd  waf/malcare.py
 4397c299d27a500851726444fb89759e  waf/modsecurity.py
 78af8e791207db9723a14bddeb7524af  waf/naxsi.py
 504ade4d32bdbbd2932eebb07f57c3eb  waf/netcontinuum.py
 84e9c68b6ecffafb5ec8cd96acaf62b9  waf/newdefend.py
+d03dfe93a14c966b88f5baf59ce2b091  waf/ninjafirewall.py
 69fc40e85751279e9018d643742db04e  waf/nsfocus.py
 a59aff03a5b3fb40ea0feb3489677040  waf/onmessage.py
 7ff3c93f2c77a984ebbf217c7c38a796  waf/paloalto.py
@@ -446,10 +450,12 @@ a59aff03a5b3fb40ea0feb3489677040  waf/onmessage.py
 ac60456fe7af4eb501d448910e98ee4b  waf/radware.py
 dba6a3b52851d2d7a0a1ab83a51caa5a  waf/reblaze.py
 987389e4f403b7615d6d8006420a6260  waf/requestvalidationmode.py
+8dae5619edafaaceccf1c4eb051c7d22  waf/rsfirewall.py
 2a7b234e903d13b3c21d6c17e05d1c46  waf/safe3.py
 4382cb217354d816580ee07178d0a8c7  waf/safedog.py
 ac0728ddb7a15b46b0eabd78cd661f8c  waf/secureiis.py
 ba37e1c37fa0e3688873f74183a9cb9c  waf/senginx.py
+2602a8baed4da643e606a379e4dc75db  waf/shieldsecurity.py
 4d79866c7cff0d7650a22d0a85126c05  waf/sitelock.py
 a840fcd2bb042694f9aab2859e7c9b30  waf/sonicwall.py
 45683bfe7a428f47745416c727a789bd  waf/sophos.py
@@ -461,8 +467,9 @@ ba0fb1e6b815446b9d6f30950900fc80  waf/trafficshield.py
 876c746d96193071271cb8b7e00e1422  waf/urlscan.py
 45f28286ffd89200d4c9b6d88a7a518f  waf/uspses.py
 2d9d9fa8359a9f721e4b977d3da52410  waf/varnish.py
+2be220869fae5a942a460428c84345af  waf/virusdie.py
 67df54343a85fe053226e2a5483b2c64  waf/wallarm.py
-6aad5ef252bf428e9bbebe650c0cf67e  waf/watchguard.py
+114000c53115fa8f4dd9b1b9122ec32a  waf/watchguard.py
 c8dcaa89f6cde684a578fdc2e9ab2bb8  waf/webappsecure.py
 a7b8c4c3d1463409e0e204932f0ddff0  waf/webknight.py
 ac9e4e3ced77012ed97284634a9ffc74  waf/wordfence.py

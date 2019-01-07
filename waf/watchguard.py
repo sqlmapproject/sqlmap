@@ -16,8 +16,9 @@ def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
-        _, headers, code = get_page(get=vector)
+        page, headers, code = get_page(get=vector)
         retval = code >= 400 and re.search(r"\AWatchGuard", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        retval |= "Request denied by WatchGuard Firewall" in (page or "")
         if retval:
             break
 
