@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-de869bb9eb40f7f621d766c6560d0c13  lib/core/settings.py
+9c1d73674867a376be098517216c6c05  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -402,11 +402,10 @@ ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqlud
 94eec6c5d02357596292d36a8533f08f  waf/anquanbao.py
 7ab1a7cd51a02899592f4f755d36a02e  waf/approach.py
 425f2599f57ab81b4fff67e6b442cccc  waf/armor.py
-fac23fc2e564edaf90a4346f3ee525b0  waf/asm.py
+f0aa6abf1f9af78374e58a64cb33c9de  waf/asm.py
 9dbec5d674ed4c762ffc9bc3ab402739  waf/aws.py
 29b14801171574a3d92a30542a32be54  waf/baidu.py
 4fd9a8e3aac364fe5509b23e7eb5a448  waf/barracuda.py
-2bb132ecea25e947e7e82e32e7dd6b3a  waf/bigip.py
 742f8c9b7f3a858e11dfd2ce3df65c6e  waf/binarysec.py
 ef8c5db49ad9973b59d6b9b65b001714  waf/blockdos.py
 2608fbe2c80fae99bb09db1f93d80cdd  waf/bluedon.py
