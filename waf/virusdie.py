@@ -14,6 +14,6 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("| Virusdie</title>", "http://cdn.virusdie.ru/splash/firewallstop.png", "&copy; Virusdie.ru</p>"))
+        retval = any(_ in (page or "") for _ in ("| Virusdie</title>", "http://cdn.virusdie.ru/splash/firewallstop.png", "&copy; Virusdie.ru</p>", '<meta name="FW_BLOCK"'))
 
     return retval
