@@ -18,7 +18,7 @@ def detect(get_page):
         page, headers, code = get_page(get=vector)
         retval = "The requested URL was rejected. Please consult with your administrator." in (page or "")
         retval |= all(_ in (page or "") for _ in ("This page can't be displayed. Contact support for additional information", "The incident ID is:"))
-        retval |= (code >= 400) and "ID" in (page or "") and re.search(r"\b\d{19}\b", page or "") is not None
+        retval |= re.search(r"(?i)Support.ID", page or "") and re.search(r"\b\d{19}\b", page or "") is not None
         if retval:
             break
 
