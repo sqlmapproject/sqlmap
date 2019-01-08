@@ -11,11 +11,16 @@ import httplib
 import inspect
 import os
 import re
+import socket
+import ssl
 import subprocess
 import sys
 import urllib2
 
 sys.dont_write_bytecode = True
+
+if hasattr(ssl, "_create_unverified_context"):
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 NAME, VERSION, AUTHOR = "WAF Detectify", "0.1", "sqlmap developers (@sqlmap)"
 TIMEOUT = 10
@@ -101,14 +106,20 @@ def main():
 
     print colorize("[i] checking '%s'..." % sys.argv[1])
 
+    hostname = sys.argv[1].split("//")[-1].split('/')[0]
+    try:
+        socket.getaddrinfo(hostname, None)
+    except socket.gaierror:
+        print colorize("[x] host '%s' does not exist" % hostname)
+        exit(1)
+
     found = False
     for function, product in WAF_FUNCTIONS:
         if found and "unknown" in product.lower():
             continue
 
         if function(get_page):
-            print colorize("[!] WAF/IPS identified as '%s'" % product)
-            found = True
+            exit(colorize("[!] WAF/IPS identified as '%s'" % product))
 
     if not found:
         print colorize("[o] nothing found")
