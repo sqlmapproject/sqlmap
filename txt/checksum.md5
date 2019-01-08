@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-31b674a0b6ac1a6ef4ceefa5553ec310  lib/core/settings.py
+a2e11fb9226d7b7348cff412042edd18  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -408,6 +408,7 @@ ca3ab78d6ed53b7f2c07ed2530d47efd  udf/postgresql/windows/32/8.4/lib_postgresqlud
 742f8c9b7f3a858e11dfd2ce3df65c6e  waf/binarysec.py
 ef8c5db49ad9973b59d6b9b65b001714  waf/blockdos.py
 2608fbe2c80fae99bb09db1f93d80cdd  waf/bluedon.py
+51c13712456699f23324f0a410ce6f93  waf/cerber.py
 5ae64cad95b7f904c350cc81230c3bd1  waf/chinacache.py
 a05edf8f2962dfff0457b7a4fd5e169c  waf/ciscoacexml.py
 2565869c73a9a37f25deb317e8f5d9dd  waf/cleantalk.py
@@ -426,7 +427,7 @@ a8412619d7f26ed6bc9e0b20a57b2324  waf/edgecast.py
 4ea580dd1b9679bd733866976ad5d81e  waf/godaddy.py
 2aa7775dac8df4a3cdb736fdf51dc9cb  waf/hyperguard.py
 256a7ea2c1cd2745fe788cf8f6123f8a  waf/imunify360.py
-1adbd0c470d1bbcec370722f05094255  waf/incapsula.py
+4c4d480c155ae99262043c80a76ec1d5  waf/incapsula.py
 fb6be55d21a70765e35549af2484f762  waf/__init__.py
 a3ee375714987acccc26d1b07c2e8af7  waf/isaserver.py
 ce9cf35919a92d65347bb74ca0c5c86f  waf/jiasule.py
@@ -452,7 +453,7 @@ ac60456fe7af4eb501d448910e98ee4b  waf/radware.py
 ac0728ddb7a15b46b0eabd78cd661f8c  waf/secureiis.py
 ba37e1c37fa0e3688873f74183a9cb9c  waf/senginx.py
 2602a8baed4da643e606a379e4dc75db  waf/shieldsecurity.py
-2e66f471c09149b56258e42883aae18d  waf/sitelock.py
+24f1cc66625e58e4c91c0cb4364a2202  waf/sitelock.py
 a840fcd2bb042694f9aab2859e7c9b30  waf/sonicwall.py
 45683bfe7a428f47745416c727a789bd  waf/sophos.py
 197bae9ee9b7e8d4f77e814a33cfd665  waf/stackpath.py
