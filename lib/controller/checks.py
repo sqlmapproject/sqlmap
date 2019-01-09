@@ -1423,6 +1423,7 @@ def identifyWaf():
                 kwargs["get"] = urlencode(kwargs["get"])
             kwargs["raise404"] = False
             kwargs["silent"] = True
+            kwargs["finalCode"] = True
             page, headers, code = Request.getPage(*args, **kwargs)
         except Exception:
             pass

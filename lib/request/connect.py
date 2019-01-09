@@ -270,6 +270,7 @@ class Connect(object):
         crawling = kwargs.get("crawling", False)
         checking = kwargs.get("checking", False)
         skipRead = kwargs.get("skipRead", False)
+        finalCode = kwargs.get("finalCode", False)
 
         if multipart:
             post = multipart
@@ -496,7 +497,7 @@ class Connect(object):
                 if hasattr(conn, "redurl"):
                     page = (threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO else Connect._connReadProxy(conn)) if not skipRead else None
                     skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
-                    code = conn.redcode
+                    code = conn.redcode if not finalCode else code
                 else:
                     page = Connect._connReadProxy(conn) if not skipRead else None
 
