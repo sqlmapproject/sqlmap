@@ -19,7 +19,7 @@ try:
 
     # problems with ctypes (Reference: https://github.com/sqlmapproject/sqlmap/issues/2952)
     _ = multiprocessing.Value('i')
-except (ImportError, OSError):
+except (ImportError, OSError, AttributeError):
     pass
 else:
     try:
