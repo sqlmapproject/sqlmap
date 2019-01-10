@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-ea3015b1f6bd7e4f462818ce2c11f6eb  lib/core/settings.py
+361ca22d9a342cf10e107b123f990733  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -463,7 +463,7 @@ ef6f83952ce6b5a7bbb19f9b903af2b6  waf/teros.py
 ba0fb1e6b815446b9d6f30950900fc80  waf/trafficshield.py
 876c746d96193071271cb8b7e00e1422  waf/urlscan.py
 45f28286ffd89200d4c9b6d88a7a518f  waf/uspses.py
-2d9d9fa8359a9f721e4b977d3da52410  waf/varnish.py
+879315dc70deadc55b345c9bc65fa1d5  waf/varnish.py
 455bb16f552e7943e0a5cf35e83a74ea  waf/virusdie.py
 67df54343a85fe053226e2a5483b2c64  waf/wallarm.py
 114000c53115fa8f4dd9b1b9122ec32a  waf/watchguard.py
