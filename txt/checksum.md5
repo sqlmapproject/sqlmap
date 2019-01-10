@@ -42,14 +42,14 @@ b7c912e2af7a3354f6d7c04f556a80b2  lib/core/decorators.py
 fb6be55d21a70765e35549af2484f762  lib/core/__init__.py
 18c896b157b03af716542e5fe9233ef9  lib/core/log.py
 fa9f24e88c81a6cef52da3dd5e637010  lib/core/optiondict.py
-95b2bc1fd01393771fc0cd239b2fe05a  lib/core/option.py
+8867c1cb5a045cea99d8a9a7ceea6abf  lib/core/option.py
 fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 0f1d79ada721cf6def611b21b03d68af  lib/core/profiling.py
 5e2c16a8e2daee22dd545df13386e7a3  lib/core/readlineng.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-16e7294b01b6e705cb5c209cc17f1563  lib/core/settings.py
+5c94f9b2587f21f2229248a832803f4a  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -414,7 +414,7 @@ a05edf8f2962dfff0457b7a4fd5e169c  waf/ciscoacexml.py
 2565869c73a9a37f25deb317e8f5d9dd  waf/cleantalk.py
 af079de99a8ec6988d28aa4c0aa32cf9  waf/cloudbric.py
 8fec83056c8728076ab17ab3a2ebbe7b  waf/cloudflare.py
-8414f766b0171fbc264c46ad40dff237  waf/cloudfront.py
+b2331b1b17cf0fad5ac0d991d1efdfa0  waf/cloudfront.py
 847ee97f6e0f8aeec61afd3e0c91543b  waf/comodo.py
 4ed76fdf2add2405bb6157ac025e01b9  waf/crawlprotect.py
 e49bb75985f60556b4481dc085f3c62b  waf/denyall.py
