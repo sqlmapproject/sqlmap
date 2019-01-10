@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-28e6d63edd15884c6f33ecbda6f399c6  lib/core/settings.py
+8013b106ba03ae4fbaef343f20a0fa86  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -447,6 +447,7 @@ ac60456fe7af4eb501d448910e98ee4b  waf/radware.py
 8dae5619edafaaceccf1c4eb051c7d22  waf/rsfirewall.py
 d2d9718de217dd07d9e66b2e6ad61380  waf/safe3.py
 4382cb217354d816580ee07178d0a8c7  waf/safedog.py
+34440ee94fcff88b4158e86635176547  waf/secureentry.py
 ac0728ddb7a15b46b0eabd78cd661f8c  waf/secureiis.py
 ba37e1c37fa0e3688873f74183a9cb9c  waf/senginx.py
 2602a8baed4da643e606a379e4dc75db  waf/shieldsecurity.py
@@ -459,7 +460,6 @@ a840fcd2bb042694f9aab2859e7c9b30  waf/sonicwall.py
 ef6f83952ce6b5a7bbb19f9b903af2b6  waf/teros.py
 ba0fb1e6b815446b9d6f30950900fc80  waf/trafficshield.py
 876c746d96193071271cb8b7e00e1422  waf/urlscan.py
-45f28286ffd89200d4c9b6d88a7a518f  waf/uspses.py
 80314083009c87d32bf32d84e8bbb7be  waf/varnish.py
 455bb16f552e7943e0a5cf35e83a74ea  waf/virusdie.py
 67df54343a85fe053226e2a5483b2c64  waf/wallarm.py
