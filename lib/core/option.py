@@ -2306,7 +2306,7 @@ def _basicOptionValidation():
         errMsg = "option '--not-string' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.notString and conf.nullConnection:
+    if conf.tor and conf.osPwn:
         errMsg = "option '--tor' is incompatible with switch '--os-pwn'"
         raise SqlmapSyntaxException(errMsg)
 
