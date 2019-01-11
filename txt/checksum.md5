@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-af9f5e98db9e56caf828065cbadecc6f  lib/core/settings.py
+df03aea681ed80e9850697b60db1b0eb  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -419,7 +419,7 @@ af079de99a8ec6988d28aa4c0aa32cf9  waf/cloudbric.py
 4254527ec80588f5289f56c7b52c4b30  waf/distil.py
 886c6502a6a2aae49921efed8d439f7b  waf/dotdefender.py
 a8412619d7f26ed6bc9e0b20a57b2324  waf/edgecast.py
-b65877b412a4c648aa442116ef94e2af  waf/expressionengine.py
+5df01dde939c0d22bc163730873e9854  waf/expressionengine.py
 588d2f9a8f201e120e74e508564cb487  waf/fortiweb.py
 0e9eb20967d2dde941cca8c663a63e1f  waf/generic.py
 4ea580dd1b9679bd733866976ad5d81e  waf/godaddy.py
