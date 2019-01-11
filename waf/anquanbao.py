@@ -5,8 +5,6 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import re
-
 from lib.core.settings import WAF_ATTACK_VECTORS
 
 __product__ = "Anquanbao Web Application Firewall (Anquanbao)"

@@ -7,15 +7,14 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "TrueShield Web Application Firewall (SiteLock)"
+__product__ = "SiteGuard (JP-Secure)"
 
-# Note: https://www.whitefirdesign.com/blog/2016/11/08/more-evidence-that-sitelocks-trueshield-web-application-firewall-is-really-incapsulas-waf/
 def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("SiteLock Incident ID", '<span class="value INCIDENT_ID">'))
+        retval = any(_ in (page or "") for _ in ("Powered by SiteGuard", "The server refuse to browse the page"))
         if retval:
             break
 
