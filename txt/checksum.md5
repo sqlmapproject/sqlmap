@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-0aa1b299611d496be282fd02f95f3cd4  lib/core/settings.py
+5e0f2b028357ec0b63678438fca8c4d5  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -434,7 +434,7 @@ d4f36e44f496f4d51baa3241eabc60fd  waf/malcare.py
 509af267f45485f3cb1c839fa040ff07  waf/modsecurity.py
 78af8e791207db9723a14bddeb7524af  waf/naxsi.py
 504ade4d32bdbbd2932eebb07f57c3eb  waf/netcontinuum.py
-84e9c68b6ecffafb5ec8cd96acaf62b9  waf/newdefend.py
+96e1902b7e4297173d519b00c86f6a02  waf/newdefend.py
 d03dfe93a14c966b88f5baf59ce2b091  waf/ninjafirewall.py
 69fc40e85751279e9018d643742db04e  waf/nsfocus.py
 a59aff03a5b3fb40ea0feb3489677040  waf/onmessageshield.py
@@ -446,7 +446,7 @@ ac60456fe7af4eb501d448910e98ee4b  waf/radware.py
 987389e4f403b7615d6d8006420a6260  waf/requestvalidationmode.py
 8dae5619edafaaceccf1c4eb051c7d22  waf/rsfirewall.py
 d2d9718de217dd07d9e66b2e6ad61380  waf/safe3.py
-4382cb217354d816580ee07178d0a8c7  waf/safedog.py
+213062db202a6eb0939a6674f96be551  waf/safedog.py
 34440ee94fcff88b4158e86635176547  waf/secureentry.py
 ac0728ddb7a15b46b0eabd78cd661f8c  waf/secureiis.py
 ba37e1c37fa0e3688873f74183a9cb9c  waf/senginx.py
@@ -470,7 +470,7 @@ ba0fb1e6b815446b9d6f30950900fc80  waf/trafficshield.py
 114000c53115fa8f4dd9b1b9122ec32a  waf/watchguard.py
 a7b8c4c3d1463409e0e204932f0ddff0  waf/webknight.py
 ac9e4e3ced77012ed97284634a9ffc74  waf/wordfence.py
-e16122cb40e5f3a66cba359cfb672bd2  waf/yundun.py
+e69f77220558564785f0b3c961782a93  waf/yundun.py
 a560bee3e948b97af2c88805933dcaad  waf/yunsuo.py
 c8b6517da2c8a28d474956e3a6b8c1ed  waf/zenedge.py
 e68f399aeaa5b516f043af88dd4871a0  xml/banner/generic.xml
