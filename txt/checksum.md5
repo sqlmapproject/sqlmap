@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-e6b4873ae0e82e43a62dcdfd670feb61  lib/core/settings.py
+4f9aafb24e5b12eb078b1b68719d9afe  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -457,7 +457,7 @@ c842d298e61a87b32668c8402a0d87b5  waf/sitelock.py
 a840fcd2bb042694f9aab2859e7c9b30  waf/sonicwall.py
 45683bfe7a428f47745416c727a789bd  waf/sophos.py
 ed1ecabfa8396e70494b0a3d70a22eb1  waf/squarespace.py
-4a11ba8e5f3995b35f5fc189b8c2692e  waf/stackpath.py
+8ace2ad70a4bba8825c8538e349839da  waf/stackpath.py
 74bd52941b606d15f1a6cdc7b52f761c  waf/sucuri.py
 205beb7ed5e70119f8700a9e295b6a4a  waf/tencent.py
 ef6f83952ce6b5a7bbb19f9b903af2b6  waf/teros.py
