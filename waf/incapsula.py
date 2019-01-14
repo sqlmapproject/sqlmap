@@ -19,8 +19,7 @@ def detect(get_page):
         page, headers, _ = get_page(get=vector)
         retval = re.search(r"incap_ses|visid_incap", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= re.search(r"Incapsula", headers.get("X-CDN", ""), re.I) is not None
-        retval |= any(_ in (page or "") for _ in ("Incapsula incident ID", "_Incapsula_Resource?", "?subject=WAF Block Page:"))
-        retval |= all(_ in (page or "") for _ in ("Application Firewall Error", "If you feel you have been blocked in error, please contact Customer Support"))
+        retval |= "Incapsula incident ID" in (page or "")
         retval |= all(_ in (page or "") for _ in ("Error code 15", "This request was blocked by the security rules"))
         retval |= re.search(r"(?i)incident.{1,100}?\b\d{19}\-\d{17}\b", page or "") is not None
         retval |= headers.get("X-Iinfo") is not None

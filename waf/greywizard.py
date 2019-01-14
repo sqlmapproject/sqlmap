@@ -10,16 +10,15 @@ import re
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "Barracuda Web Application Firewall (Barracuda Networks)"
+__product__ = "Greywizard (Grey Wizard)"
 
 def detect(get_page):
     retval = False
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
-        retval = re.search(r"\Abarra_counter_session=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
-        retval |= re.search(r"(\A|\b)barracuda_", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
-        retval |= "when this page occurred and the event ID found at the bottom of the page" in (page or "")
+        retval = re.search(r"\Agreywizard", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        retval |= any(_ in (page or "") for _ in ("We've detected attempted attack or non standard traffic from your IP address", "<title>Grey Wizard</title>"))
         if retval:
             break
 
