@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-540a2dab2853ea2599996b12183a7c2f  lib/core/settings.py
+d678e90ba0f7ce756b88a0540e5e7db9  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -402,7 +402,7 @@ b6bc83ae9ea69cf96e9389bde8250c7c  waf/airlock.py
 34b8ec9f438d7daa56aa016e6c09fadb  waf/anquanbao.py
 7ab1a7cd51a02899592f4f755d36a02e  waf/approach.py
 425f2599f57ab81b4fff67e6b442cccc  waf/armor.py
-33b6e6793ed3add457d7c909ec599ad3  waf/asm.py
+2d03af372a8e660e67437438264a144d  waf/asm.py
 9dbec5d674ed4c762ffc9bc3ab402739  waf/aws.py
 e57a22864477ad23ae6a3d308f9b5410  waf/barracuda.py
 742f8c9b7f3a858e11dfd2ce3df65c6e  waf/binarysec.py
@@ -454,6 +454,7 @@ d2d9718de217dd07d9e66b2e6ad61380  waf/safe3.py
 213062db202a6eb0939a6674f96be551  waf/safedog.py
 34440ee94fcff88b4158e86635176547  waf/secureentry.py
 ac0728ddb7a15b46b0eabd78cd661f8c  waf/secureiis.py
+c6cbe2de808d7a6b614a9ba3c85b4141  waf/securesphere.py
 ba37e1c37fa0e3688873f74183a9cb9c  waf/senginx.py
 2602a8baed4da643e606a379e4dc75db  waf/shieldsecurity.py
 fc21ce1e6e597e44818c03d9cb859e83  waf/siteground.py
