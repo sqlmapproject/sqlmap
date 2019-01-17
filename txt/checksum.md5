@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-d678e90ba0f7ce756b88a0540e5e7db9  lib/core/settings.py
+bba284b24e810f3f7b319ee06a7844bc  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -114,7 +114,7 @@ fb6be55d21a70765e35549af2484f762  lib/utils/__init__.py
 2a40a6bd1779f7db5199f089411b1c1c  lib/utils/pivotdumptable.py
 5a8902fd6fa94ea73cf44952f9ed5a57  lib/utils/progress.py
 a41136344768902f82b2855e88fd228d  lib/utils/purge.py
-b6e16ad8ea04e2c1ed65966fda1c66ac  lib/utils/search.py
+ba40e595754bc6e8ad16e944cb578d99  lib/utils/search.py
 8d6b244ca3d6f99a9d6cd8c1856ccfeb  lib/utils/sqlalchemy.py
 a90c568a9b88eaea832a77581bd39d85  lib/utils/timeout.py
 164f830baad3e13b226ee57d44d69dfa  lib/utils/versioncheck.py

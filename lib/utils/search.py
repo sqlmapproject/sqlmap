@@ -45,6 +45,7 @@ def _search(dork):
     if not dork:
         return None
 
+    data = None
     headers = {}
 
     headers[HTTP_HEADER.USER_AGENT] = dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT)
@@ -123,12 +124,12 @@ def _search(dork):
             url = "https://www.bing.com/search?q=%s&first=%d" % (urlencode(dork, convall=True), (gpage - 1) * 10 + 1)
             regex = BING_REGEX
         else:
-            url = "https://duckduckgo.com/d.js?"
-            url += "q=%s&p=%d&s=100" % (urlencode(dork, convall=True), gpage)
+            url = "https://duckduckgo.com/html/"
+            data = "q=%s&s=%d" % (urlencode(dork, convall=True), (gpage - 1) * 30)
             regex = DUCKDUCKGO_REGEX
 
         try:
-            req = urllib2.Request(url, headers=headers)
+            req = urllib2.Request(url, data=data, headers=headers)
             conn = urllib2.urlopen(req)
 
             requestMsg = "HTTP request:\nGET %s" % url
@@ -152,6 +153,7 @@ def _search(dork):
         except urllib2.HTTPError, e:
             try:
                 page = e.read()
+                page = decodePage(page, e.headers.get("Content-Encoding"), e.headers.get("Content-Type"))
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % e.code
@@ -162,6 +164,15 @@ def _search(dork):
             raise SqlmapConnectionException(errMsg)
 
         retVal = [urllib.unquote(match.group(1)) for match in re.finditer(regex, page, re.I | re.S)]
+
+        if not retVal and "issue with the Tor Exit Node you are currently using" in page:
+            warnMsg = "DuckDuckGo has detected 'unusual' traffic from "
+            warnMsg += "used (Tor) IP address"
+
+            if conf.proxyList:
+                raise SqlmapBaseException(warnMsg)
+            else:
+                logger.critical(warnMsg)
 
     return retVal
 
