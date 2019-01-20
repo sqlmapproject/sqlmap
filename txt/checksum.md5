@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-65d7f43d13347de8fe30238a082c2066  lib/core/settings.py
+318a4670831fc731de473681797042fb  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -435,7 +435,6 @@ f44ed04eeb4287c11ce277703ec7d72d  waf/knownsec.py
 d4f36e44f496f4d51baa3241eabc60fd  waf/malcare.py
 509af267f45485f3cb1c839fa040ff07  waf/modsecurity.py
 78af8e791207db9723a14bddeb7524af  waf/naxsi.py
-504ade4d32bdbbd2932eebb07f57c3eb  waf/netcontinuum.py
 8004b57e9b8e19060aae5b82ecb87472  waf/netscaler.py
 96e1902b7e4297173d519b00c86f6a02  waf/newdefend.py
 d03dfe93a14c966b88f5baf59ce2b091  waf/ninjafirewall.py
