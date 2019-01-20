@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-0a47c8e9c509d2e499ff60054b38d804  lib/core/settings.py
+0328a4b5e5880289b867aa143387b9a9  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -405,7 +405,6 @@ b6bc83ae9ea69cf96e9389bde8250c7c  waf/airlock.py
 2d03af372a8e660e67437438264a144d  waf/asm.py
 9dbec5d674ed4c762ffc9bc3ab402739  waf/aws.py
 e57a22864477ad23ae6a3d308f9b5410  waf/barracuda.py
-742f8c9b7f3a858e11dfd2ce3df65c6e  waf/binarysec.py
 1712d76bd4adb705f3317ff5908acdcd  waf/bitninja.py
 2608fbe2c80fae99bb09db1f93d80cdd  waf/bluedon.py
 8385218d8a1863dbfd4274db36880dfe  waf/cerber.py
