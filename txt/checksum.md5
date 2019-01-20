@@ -49,7 +49,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 9a7d68d5fa01561500423791f15cc676  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-318a4670831fc731de473681797042fb  lib/core/settings.py
+a6c91e706b0c752a7c89ed1a5737b8e6  lib/core/settings.py
 a8a7501d1e6b21669b858a62e921d191  lib/core/shell.py
 5dc606fdf0afefd4b305169c21ab2612  lib/core/subprocessng.py
 eec3080ba5baca44c6de4595f1c92a0d  lib/core/target.py
@@ -410,7 +410,6 @@ e57a22864477ad23ae6a3d308f9b5410  waf/barracuda.py
 8385218d8a1863dbfd4274db36880dfe  waf/cerber.py
 5ae64cad95b7f904c350cc81230c3bd1  waf/chinacache.py
 a05edf8f2962dfff0457b7a4fd5e169c  waf/ciscoacexml.py
-2565869c73a9a37f25deb317e8f5d9dd  waf/cleantalk.py
 af079de99a8ec6988d28aa4c0aa32cf9  waf/cloudbric.py
 8fec83056c8728076ab17ab3a2ebbe7b  waf/cloudflare.py
 9ae3dfb7c03da53fb67c6c3cb56b4827  waf/cloudfront.py
