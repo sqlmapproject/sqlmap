@@ -43,7 +43,7 @@ class Connector(GenericConnector):
         try:
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
-        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError), ex:
+        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
             if "Oracle Client library" in str(ex):
                 msg = re.sub(r"DPI-\d+:\s+", "", str(ex))
                 msg = re.sub(r': ("[^"]+")', r" (\g<1>)", msg)

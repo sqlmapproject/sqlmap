@@ -24,7 +24,7 @@ class HTTPSPKIAuthHandler(urllib2.HTTPSHandler):
         try:
             # Reference: https://docs.python.org/2/library/ssl.html#ssl.SSLContext.load_cert_chain
             return httplib.HTTPSConnection(host, cert_file=self.auth_file, key_file=self.auth_file, timeout=conf.timeout)
-        except IOError, ex:
+        except IOError as ex:
             errMsg = "error occurred while using key "
             errMsg += "file '%s' ('%s')" % (self.auth_file, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)

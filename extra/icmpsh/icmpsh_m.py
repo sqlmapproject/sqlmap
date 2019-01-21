@@ -128,7 +128,7 @@ def main(src, dst):
                 try:
                     # Send it to the target host
                     sock.sendto(ip.get_packet(), (dst, 0))
-                except socket.error, ex:
+                except socket.error as ex:
                     sys.stderr.write("'%s'\n" % ex)
                     sys.stderr.flush()
 

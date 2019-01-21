@@ -39,7 +39,7 @@ def configFileProxy(section, option, datatype):
                 value = config.getfloat(section, option) if config.get(section, option) else 0.0
             else:
                 value = config.get(section, option)
-        except ValueError, ex:
+        except ValueError as ex:
             errMsg = "error occurred while processing the option "
             errMsg += "'%s' in provided configuration file ('%s')" % (option, getUnicode(ex))
             raise SqlmapSyntaxException(errMsg)
@@ -71,7 +71,7 @@ def configFileParser(configFile):
     try:
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
-    except Exception, ex:
+    except Exception as ex:
         errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)
 

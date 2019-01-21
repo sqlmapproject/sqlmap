@@ -48,7 +48,7 @@ def get_page(get=None, url=None, host=None, data=None):
         conn = urllib2.urlopen(req, timeout=TIMEOUT)
         page = conn.read()
         headers = conn.info()
-    except Exception, ex:
+    except Exception as ex:
         code = getattr(ex, "code", None)
         page = ex.read() if hasattr(ex, "read") else getattr(ex, "msg", "")
         headers = ex.info() if hasattr(ex, "info") else {}

@@ -257,7 +257,7 @@ def _saveToResultsFile():
             conf.resultsFP.write(line)
 
         conf.resultsFP.flush()
-    except IOError, ex:
+    except IOError as ex:
         errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFilename, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
@@ -689,7 +689,7 @@ def start():
         except SqlmapSilentQuitException:
             raise
 
-        except SqlmapBaseException, ex:
+        except SqlmapBaseException as ex:
             errMsg = getSafeExString(ex)
 
             if conf.multipleTargets:

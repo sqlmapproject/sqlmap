@@ -43,7 +43,7 @@ class Wordlist(object):
             if os.path.splitext(self.current)[1].lower() == ".zip":
                 try:
                     _ = zipfile.ZipFile(self.current, 'r')
-                except zipfile.error, ex:
+                except zipfile.error as ex:
                     errMsg = "something appears to be wrong with "
                     errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                     errMsg += "sure that you haven't made any changes to it"
@@ -69,7 +69,7 @@ class Wordlist(object):
             self.counter += 1
             try:
                 retVal = self.iter.next().rstrip()
-            except zipfile.error, ex:
+            except zipfile.error as ex:
                 errMsg = "something appears to be wrong with "
                 errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                 errMsg += "sure that you haven't made any changes to it"

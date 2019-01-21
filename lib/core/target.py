@@ -558,7 +558,7 @@ def _setResultsFile():
         conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
         try:
             conf.resultsFP = openFile(conf.resultsFilename, "a", UNICODE_ENCODING, buffering=0)
-        except (OSError, IOError), ex:
+        except (OSError, IOError) as ex:
             try:
                 warnMsg = "unable to create results file '%s' ('%s'). " % (conf.resultsFilename, getUnicode(ex))
                 handle, conf.resultsFilename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.RESULTS, suffix=".csv")
@@ -590,7 +590,7 @@ def _createFilesDir():
     if not os.path.isdir(conf.filePath):
         try:
             os.makedirs(conf.filePath)
-        except OSError, ex:
+        except OSError as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
             warnMsg = "unable to create files directory "
             warnMsg += "'%s' (%s). " % (conf.filePath, getUnicode(ex))
@@ -612,7 +612,7 @@ def _createDumpDir():
     if not os.path.isdir(conf.dumpPath):
         try:
             os.makedirs(conf.dumpPath)
-        except OSError, ex:
+        except OSError as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
             warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))
@@ -643,7 +643,7 @@ def _createTargetDirs():
             if conf.outputDir and context == "output":
                 warnMsg = "using '%s' as the %s directory" % (directory, context)
                 logger.warn(warnMsg)
-        except (OSError, IOError), ex:
+        except (OSError, IOError) as ex:
             try:
                 tempDir = tempfile.mkdtemp(prefix="sqlmap%s" % context)
             except Exception, _:
@@ -665,7 +665,7 @@ def _createTargetDirs():
     try:
         if not os.path.isdir(conf.outputPath):
             os.makedirs(conf.outputPath)
-    except (OSError, IOError, TypeError), ex:
+    except (OSError, IOError, TypeError) as ex:
         try:
             tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
         except Exception, _:
@@ -691,7 +691,7 @@ def _createTargetDirs():
             f.write("  # %s" % getUnicode(subprocess.list2cmdline(sys.argv), encoding=sys.stdin.encoding))
             if conf.data:
                 f.write("\n\n%s" % getUnicode(conf.data))
-    except IOError, ex:
+    except IOError as ex:
         if "denied" in getUnicode(ex):
             errMsg = "you don't have enough permissions "
         else:

@@ -63,14 +63,14 @@ def crawl(target):
                 try:
                     if current:
                         content = Request.getPage(url=current, crawling=True, raise404=False)[0]
-                except SqlmapConnectionException, ex:
+                except SqlmapConnectionException as ex:
                     errMsg = "connection exception detected ('%s'). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
                 except SqlmapSyntaxException:
                     errMsg = "invalid URL detected. skipping '%s'" % current
                     logger.critical(errMsg)
-                except httplib.InvalidURL, ex:
+                except httplib.InvalidURL as ex:
                     errMsg = "invalid URL detected ('%s'). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current
                     logger.critical(errMsg)
@@ -138,7 +138,7 @@ def crawl(target):
                 url = urlparse.urljoin(target, "/sitemap.xml")
                 try:
                     items = parseSitemap(url)
-                except SqlmapConnectionException, ex:
+                except SqlmapConnectionException as ex:
                     if "page not found" in getSafeExString(ex):
                         found = False
                         logger.warn("'sitemap.xml' not found")

@@ -51,7 +51,7 @@ def update():
 
             try:
                 open(os.path.join(directory, "sqlmap.py"), "w+b")
-            except Exception, ex:
+            except Exception as ex:
                 errMsg = "unable to update content of directory '%s' ('%s')" % (directory, getSafeExString(ex))
                 logger.error(errMsg)
             else:
@@ -85,7 +85,7 @@ def update():
                                 version = re.search(r"(?m)^VERSION\s*=\s*['\"]([^'\"]+)", f.read()).group(1)
                                 logger.info("updated to the latest version '%s#dev'" % version)
                                 success = True
-                    except Exception, ex:
+                    except Exception as ex:
                         logger.error("update could not be completed ('%s')" % getSafeExString(ex))
                     else:
                         if not success:
@@ -110,7 +110,7 @@ def update():
             pollProcess(process, True)
             stdout, stderr = process.communicate()
             success = not process.returncode
-        except (IOError, OSError), ex:
+        except (IOError, OSError) as ex:
             success = False
             stderr = getSafeExString(ex)
 

@@ -140,7 +140,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                 try:
                     with open(filename, "wb") as f:
                         f.write("1")
-                except IOError, ex:
+                except IOError as ex:
                     errMsg = "there has been a file opening/writing error "
                     errMsg += "for filename '%s' ('%s')" % (filename, getSafeExString(ex))
                     raise SqlmapSystemException(errMsg)

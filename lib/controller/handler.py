@@ -105,13 +105,13 @@ def setHandler():
 
                     if sqlalchemy.connector:
                         conf.dbmsConnector = sqlalchemy
-                except Exception, ex:
+                except Exception as ex:
                     exception = ex
 
             if not dialect or exception:
                 try:
                     conf.dbmsConnector.connect()
-                except Exception, ex:
+                except Exception as ex:
                     if exception:
                         raise exception
                     else:
