@@ -364,7 +364,7 @@ class MutableSet(Set):
         """Return the popped value.  Raise KeyError if empty."""
         it = iter(self)
         try:
-            value = it.next()
+            value = next(it)
         except StopIteration:
             raise KeyError
         self.discard(value)
@@ -453,7 +453,7 @@ class OrderedSet(MutableSet):
     def pop(self, last=True):
         if not self:
             raise KeyError('set is empty')
-        key = reversed(self).next() if last else iter(self).next()
+        key = next(reversed(self)) if last else next(iter(self))
         self.discard(key)
         return key
 

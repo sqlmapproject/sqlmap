@@ -732,7 +732,7 @@ class XmlParser(Parser):
         self.consume()
 
     def consume(self):
-        self.token = self.tokenizer.next()
+        self.token = next(self.tokenizer)
 
     def match_element_start(self, name):
         return self.token.type == XML_ELEMENT_START and self.token.name_or_data == name
@@ -1719,7 +1719,7 @@ class XPerfParser(Parser):
             lineterminator = '\r\n',
             quoting = csv.QUOTE_NONE)
         it = iter(reader)
-        row = reader.next()
+        row = next(reader)
         self.parse_header(row)
         for row in it:
             self.parse_row(row)

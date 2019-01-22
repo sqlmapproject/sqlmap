@@ -59,7 +59,7 @@ class MultipartPostHandler(urllib2.BaseHandler):
                         v_vars.append((key, value))
             except TypeError:
                 systype, value, traceback = sys.exc_info()
-                raise SqlmapDataException, "not a valid non-string sequence or mapping object", traceback
+                raise SqlmapDataException("not a valid non-string sequence or mapping object '%s'" % traceback)
 
             if len(v_files) == 0:
                 data = urllib.urlencode(v_vars, doseq)

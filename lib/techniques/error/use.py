@@ -405,7 +405,7 @@ def errorUse(expression, dump=False):
                             with kb.locks.limit:
                                 try:
                                     threadData.shared.counter += 1
-                                    num = threadData.shared.limits.next()
+                                    num = next(threadData.shared.limits)
                                 except StopIteration:
                                     break
 

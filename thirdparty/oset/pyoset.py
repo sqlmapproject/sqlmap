@@ -62,7 +62,7 @@ class OrderedSet(MutableSet):
     def pop(self, last=True):
         if not self:
             raise KeyError('set is empty')
-        key = reversed(self).next() if last else iter(self).next()
+        key = next(reversed(self)) if last else next(iter(self))
         self.discard(key)
         return key
 

@@ -68,7 +68,7 @@ class Wordlist(object):
         while True:
             self.counter += 1
             try:
-                retVal = self.iter.next().rstrip()
+                retVal = next(self.iter).rstrip()
             except zipfile.error as ex:
                 errMsg = "something appears to be wrong with "
                 errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
@@ -76,7 +76,7 @@ class Wordlist(object):
                 raise SqlmapInstallationException(errMsg)
             except StopIteration:
                 self.adjust()
-                retVal = self.iter.next().rstrip()
+                retVal = next(self.iter).rstrip()
             if not self.proc_count or self.counter % self.proc_count == self.proc_id:
                 break
         return retVal

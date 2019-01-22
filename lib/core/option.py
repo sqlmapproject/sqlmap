@@ -313,7 +313,7 @@ def _setRequestFromFile():
         infoMsg = "parsing second-order HTTP request from '%s'" % conf.secondReq
         logger.info(infoMsg)
 
-        target = parseRequestFile(conf.secondReq, False).next()
+        target = next(parseRequestFile(conf.secondReq, False))
         kb.secondReq = target
 
 def _setCrawler():
