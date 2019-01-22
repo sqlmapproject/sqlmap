@@ -232,8 +232,13 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded")):
+        elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded", "Disk full while accessing")):
             errMsg = "no space left on output device"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif any(_ in excMsg for _ in ("The paging file is too small",)):
+            errMsg = "no space left for paging file"
             logger.critical(errMsg)
             raise SystemExit
 
