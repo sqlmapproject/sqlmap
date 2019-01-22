@@ -141,8 +141,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
             try:
                 result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-            except urllib2.HTTPError, e:
-                result = e
+            except urllib2.HTTPError as ex:
+                result = ex
 
                 # Dirty hack for http://bugs.python.org/issue15701
                 try:
@@ -154,7 +154,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
                 if not hasattr(result, "read"):
                     def _(self, length=None):
-                        return e.msg
+                        return ex.msg
                     result.read = types.MethodType(_, result)
 
                 if not getattr(result, "url", None):

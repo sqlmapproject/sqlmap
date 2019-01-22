@@ -88,12 +88,12 @@ def _search(dork):
             responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-    except urllib2.HTTPError, e:
+    except urllib2.HTTPError as ex:
         try:
-            page = e.read()
-        except Exception as ex:
+            page = ex.read()
+        except Exception as _:
             warnMsg = "problem occurred while trying to get "
-            warnMsg += "an error page information (%s)" % getSafeExString(ex)
+            warnMsg += "an error page information (%s)" % getSafeExString(_)
             logger.critical(warnMsg)
             return None
     except (urllib2.URLError, httplib.error, socket.error, socket.timeout, socks.ProxyError):
@@ -150,13 +150,13 @@ def _search(dork):
                 responseMsg += "%s\n%s\n" % (responseHeaders, page)
 
             logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as ex:
             try:
-                page = e.read()
-                page = decodePage(page, e.headers.get("Content-Encoding"), e.headers.get("Content-Type"))
+                page = ex.read()
+                page = decodePage(page, ex.headers.get("Content-Encoding"), ex.headers.get("Content-Type"))
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % e.code
+                warnMsg += "to get error page information (%d)" % ex.code
                 logger.critical(warnMsg)
                 return None
         except:

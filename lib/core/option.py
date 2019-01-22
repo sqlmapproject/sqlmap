@@ -846,8 +846,8 @@ def _setWafFunctions():
                 if filename[:-3] in sys.modules:
                     del sys.modules[filename[:-3]]
                 module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
-            except ImportError, msg:
-                raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], msg))
+            except ImportError as ex:
+                raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
             _ = dict(inspect.getmembers(module))
             if "detect" not in _:
@@ -1195,7 +1195,7 @@ def _setHTTPAuthentication():
         elif authType == AUTH_TYPE.NTLM:
             regExp = "^(.*\\\\.*):(.*?)$"
             errMsg = "HTTP NTLM authentication credentials value must "
-            errMsg += "be in format 'DOMAIN\username:password'"
+            errMsg += "be in format 'DOMAIN\\username:password'"
         elif authType == AUTH_TYPE.PKI:
             errMsg = "HTTP PKI authentication require "
             errMsg += "usage of option `--auth-pki`"
@@ -2136,9 +2136,9 @@ def _setDNSServer():
         try:
             conf.dnsServer = DNSServer()
             conf.dnsServer.run()
-        except socket.error, msg:
+        except socket.error as ex:
             errMsg = "there was an error while setting up "
-            errMsg += "DNS server instance ('%s')" % msg
+            errMsg += "DNS server instance ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
     else:
         errMsg = "you need to run sqlmap as an administrator "

@@ -14,6 +14,7 @@ import logging
 import os
 import re
 
+from lib.core.common import getSafeExString
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -44,16 +45,16 @@ class Connector(GenericConnector):
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
         except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
-            if "Oracle Client library" in str(ex):
-                msg = re.sub(r"DPI-\d+:\s+", "", str(ex))
+            if "Oracle Client library" in getSafeExString(ex):
+                msg = re.sub(r"DPI-\d+:\s+", "", getSafeExString(ex))
                 msg = re.sub(r': ("[^"]+")', r" (\g<1>)", msg)
                 msg = re.sub(r". See (http[^ ]+)", r'. See "\g<1>"', msg)
                 raise SqlmapConnectionException(msg)
 
             try:
                 self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password)
-            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError), msg:
-                raise SqlmapConnectionException(msg)
+            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
+                raise SqlmapConnectionException(ex)
 
         self.initCursor()
         self.printConnected()
@@ -61,8 +62,8 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except cx_Oracle.InterfaceError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
+        except cx_Oracle.InterfaceError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
             return None
 
     def execute(self, query):
@@ -71,8 +72,8 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(utf8encode(query))
             retVal = True
-        except cx_Oracle.DatabaseError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg)
+        except cx_Oracle.DatabaseError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
 
         self.connector.commit()
 

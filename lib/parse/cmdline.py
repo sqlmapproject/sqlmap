@@ -897,8 +897,8 @@ def cmdLineParser(argv=None):
 
         return args
 
-    except (OptionError, TypeError), e:
-        parser.error(e)
+    except (OptionError, TypeError) as ex:
+        parser.error(ex)
 
     except SystemExit:
         # Protection against Windows dummy double clicking

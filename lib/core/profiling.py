@@ -9,6 +9,7 @@ import codecs
 import os
 import cProfile
 
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.data import paths
@@ -25,8 +26,8 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         from thirdparty.xdot import xdot
         import gtk
         import pydot
-    except ImportError, e:
-        errMsg = "profiling requires third-party libraries ('%s') " % getUnicode(e, UNICODE_ENCODING)
+    except ImportError as ex:
+        errMsg = "profiling requires third-party libraries ('%s') " % getSafeExString(ex)
         errMsg += "(Hint: 'sudo apt-get install python-pydot python-pyparsing python-profiler graphviz')"
         logger.error(errMsg)
 

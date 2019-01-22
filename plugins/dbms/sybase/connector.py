@@ -13,6 +13,7 @@ except:
 
 import logging
 
+from lib.core.common import getSafeExString
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -41,8 +42,8 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user, password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
-        except (pymssql.Error, _mssql.MssqlDatabaseException), msg:
-            raise SqlmapConnectionException(msg)
+        except (pymssql.Error, _mssql.MssqlDatabaseException) as ex:
+            raise SqlmapConnectionException(ex)
         except ValueError:
             raise SqlmapConnectionException
 
@@ -52,8 +53,8 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except (pymssql.Error, _mssql.MssqlDatabaseException), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % str(msg).replace("\n", " "))
+        except (pymssql.Error, _mssql.MssqlDatabaseException) as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
             return None
 
     def execute(self, query):
@@ -62,10 +63,10 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(utf8encode(query))
             retVal = True
-        except (pymssql.OperationalError, pymssql.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % str(msg).replace("\n", " "))
-        except pymssql.InternalError, msg:
-            raise SqlmapConnectionException(msg)
+        except (pymssql.OperationalError, pymssql.ProgrammingError) as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
+        except pymssql.InternalError as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         return retVal
 

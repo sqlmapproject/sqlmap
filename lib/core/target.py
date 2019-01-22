@@ -427,8 +427,8 @@ def _setHashDB():
             try:
                 os.remove(conf.hashDBFile)
                 logger.info("flushing session file")
-            except OSError, msg:
-                errMsg = "unable to flush the session file (%s)" % msg
+            except OSError as ex:
+                errMsg = "unable to flush the session file ('%s')" % getSafeExString(ex)
                 raise SqlmapFilePathException(errMsg)
 
     conf.hashDB = HashDB(conf.hashDBFile)
@@ -566,7 +566,7 @@ def _setResultsFile():
                 conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
                 warnMsg += "Using temporary file '%s' instead" % conf.resultsFilename
                 logger.warn(warnMsg)
-            except IOError, _:
+            except IOError as _:
                 errMsg = "unable to write to the temporary directory ('%s'). " % _
                 errMsg += "Please make sure that your disk is not full and "
                 errMsg += "that you have sufficient write permissions to "

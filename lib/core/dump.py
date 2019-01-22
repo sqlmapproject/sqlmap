@@ -429,7 +429,7 @@ class Dump(object):
                         except Exception as ex:
                             try:
                                 tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
-                            except IOError, _:
+                            except IOError as _:
                                 errMsg = "unable to write to the temporary directory ('%s'). " % _
                                 errMsg += "Please make sure that your disk is not full and "
                                 errMsg += "that you have sufficient write permissions to "

@@ -35,8 +35,8 @@ class Connector(GenericConnector):
         try:
             database = "DATABASE=%s;HOSTNAME=%s;PORT=%s;PROTOCOL=TCPIP;" % (self.db, self.hostname, self.port)
             self.connector = ibm_db_dbi.connect(database, self.user, self.password)
-        except ibm_db_dbi.OperationalError, msg:
-            raise SqlmapConnectionException(getSafeExString(msg))
+        except ibm_db_dbi.OperationalError as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()
         self.printConnected()
@@ -44,17 +44,17 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except ibm_db_dbi.ProgrammingError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
+        except ibm_db_dbi.ProgrammingError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
-        except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
-        except ibm_db_dbi.InternalError, msg:
-            raise SqlmapConnectionException(getSafeExString(msg))
+        except (ibm_db_dbi.OperationalError, ibm_db_dbi.ProgrammingError) as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
+        except ibm_db_dbi.InternalError as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.connector.commit()
 

@@ -95,8 +95,8 @@ def main():
             if filename[:-3] in sys.modules:
                 del sys.modules[filename[:-3]]
             module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or "utf8"))
-        except ImportError, msg:
-            exit(colorize("[x] cannot import WAF script '%s' (%s)" % (filename[:-3], msg)))
+        except ImportError as ex:
+            exit(colorize("[x] cannot import WAF script '%s' (%s)" % (filename[:-3], ex)))
 
         _ = dict(inspect.getmembers(module))
         if "detect" not in _:

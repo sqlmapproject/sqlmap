@@ -31,7 +31,7 @@ def blockingReadFromFD(fd):
     while True:
         try:
             output += os.read(fd, 8192)
-        except (OSError, IOError), ioe:
+        except (OSError, IOError) as ioe:
             if ioe.args[0] in (errno.EAGAIN, errno.EINTR):
                 # Uncomment the following line if the process seems to
                 # take a huge amount of cpu time
@@ -52,7 +52,7 @@ def blockingWriteToFD(fd, data):
         try:
             data_length = len(data)
             wrote_data = os.write(fd, data)
-        except (OSError, IOError), io:
+        except (OSError, IOError) as io:
             if io.errno in (errno.EAGAIN, errno.EINTR):
                 continue
             else:
@@ -95,8 +95,8 @@ class Popen(subprocess.Popen):
                 (errCode, written) = WriteFile(x, input)
             except ValueError:
                 return self._close('stdin')
-            except (subprocess.pywintypes.error, Exception), why:
-                if why[0] in (109, errno.ESHUTDOWN):
+            except (subprocess.pywintypes.error, Exception) as ex:
+                if ex[0] in (109, errno.ESHUTDOWN):
                     return self._close('stdin')
                 raise
 
@@ -116,8 +116,8 @@ class Popen(subprocess.Popen):
                     (errCode, read) = ReadFile(x, nAvail, None)
             except (ValueError, NameError):
                 return self._close(which)
-            except (subprocess.pywintypes.error, Exception), why:
-                if why[0] in (109, errno.ESHUTDOWN):
+            except (subprocess.pywintypes.error, Exception) as ex:
+                if ex[0] in (109, errno.ESHUTDOWN):
                     return self._close(which)
                 raise
 
@@ -134,8 +134,8 @@ class Popen(subprocess.Popen):
 
             try:
                 written = os.write(self.stdin.fileno(), input)
-            except OSError, why:
-                if why[0] == errno.EPIPE:  # broken pipe
+            except OSError as ex:
+                if ex[0] == errno.EPIPE:  # broken pipe
                     return self._close('stdin')
                 raise
 

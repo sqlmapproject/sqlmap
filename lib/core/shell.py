@@ -9,6 +9,7 @@ import atexit
 import os
 
 from lib.core import readlineng as readline
+from lib.core.common import getSafeExString
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import AUTOCOMPLETE_TYPE
@@ -75,8 +76,8 @@ def saveHistory(completion=None):
         readline.set_history_length(MAX_HISTORY_LENGTH)
         try:
             readline.write_history_file(historyPath)
-        except IOError, msg:
-            warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, msg)
+        except IOError as ex:
+            warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
             logger.warn(warnMsg)
     except KeyboardInterrupt:
         pass
@@ -99,8 +100,8 @@ def loadHistory(completion=None):
     if os.path.exists(historyPath):
         try:
             readline.read_history_file(historyPath)
-        except IOError, msg:
-            warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, msg)
+        except IOError as ex:
+            warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
             logger.warn(warnMsg)
 
 def autoCompletion(completion=None, os=None, commands=None):

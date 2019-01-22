@@ -43,8 +43,8 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db)
-        except (pyodbc.Error, pyodbc.OperationalError), msg:
-            raise SqlmapConnectionException(getSafeExString(msg))
+        except (pyodbc.Error, pyodbc.OperationalError) as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()
         self.printConnected()
@@ -52,17 +52,17 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except pyodbc.ProgrammingError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
+        except pyodbc.ProgrammingError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
-        except (pyodbc.OperationalError, pyodbc.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
-        except pyodbc.Error, msg:
-            raise SqlmapConnectionException(getSafeExString(msg))
+        except (pyodbc.OperationalError, pyodbc.ProgrammingError) as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
+        except pyodbc.Error as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.connector.commit()
 

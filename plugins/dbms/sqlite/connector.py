@@ -12,6 +12,7 @@ except:
 
 import logging
 
+from lib.core.common import getSafeExString
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -45,7 +46,7 @@ class Connector(GenericConnector):
             cursor.execute("SELECT * FROM sqlite_master")
             cursor.close()
 
-        except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
+        except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError):
             warnMsg = "unable to connect using SQLite 3 library, trying with SQLite 2"
             logger.warn(warnMsg)
 
@@ -59,8 +60,8 @@ class Connector(GenericConnector):
 
                 self.__sqlite = sqlite
                 self.connector = self.__sqlite.connect(database=self.db, check_same_thread=False, timeout=conf.timeout)
-            except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError), msg:
-                raise SqlmapConnectionException(msg[0])
+            except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError) as ex:
+                raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()
         self.printConnected()
@@ -68,17 +69,17 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except self.__sqlite.OperationalError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
+        except self.__sqlite.OperationalError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(utf8encode(query))
-        except self.__sqlite.OperationalError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[0])
-        except self.__sqlite.DatabaseError, msg:
-            raise SqlmapConnectionException(msg[0])
+        except self.__sqlite.OperationalError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
+        except self.__sqlite.DatabaseError as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.connector.commit()
 

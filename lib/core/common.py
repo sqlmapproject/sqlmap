@@ -4409,9 +4409,9 @@ def resetCookieJar(cookieJar):
                 errMsg = "no valid cookies found"
                 raise SqlmapGenericException(errMsg)
 
-        except cookielib.LoadError, msg:
+        except cookielib.LoadError as ex:
             errMsg = "there was a problem loading "
-            errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", r"\g<1>", str(msg))
+            errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", r"\g<1>", getSafeExString(ex))
             raise SqlmapGenericException(errMsg)
 
 def decloakToTemp(filename):
@@ -4738,8 +4738,6 @@ def getSafeExString(ex, encoding=None):
     u'foobar'
     """
 
-    retVal = ex
-
     if getattr(ex, "message", None):
         retVal = ex.message
     elif getattr(ex, "msg", None):
@@ -4748,6 +4746,8 @@ def getSafeExString(ex, encoding=None):
         retVal = ex[1]
     elif isinstance(ex, (list, tuple)) and len(ex) > 0 and isinstance(ex[0], basestring):
         retVal = ex[0]
+    else:
+        retVal = str(ex)
 
     return getUnicode(retVal or "", encoding=encoding).strip()
 
