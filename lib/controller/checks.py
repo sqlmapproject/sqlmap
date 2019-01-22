@@ -426,11 +426,14 @@ def checkSqlInjection(place, parameter, value):
                     templatePayload = None
                     vector = None
 
+                    origValue = value
+                    if kb.customInjectionMark in origValue:
+                        origValue = origValue.split(kb.customInjectionMark)[0]
+                        origValue = re.search(r"(\w*)\Z", origValue).group(1)
+
                     # Threat the parameter original value according to the
                     # test's <where> tag
                     if where == PAYLOAD.WHERE.ORIGINAL or conf.prefix:
-                        origValue = value
-
                         if kb.tamperFunctions:
                             templatePayload = agent.payload(place, parameter, value="", newValue=origValue, where=where)
                     elif where == PAYLOAD.WHERE.NEGATIVE:
@@ -440,7 +443,7 @@ def checkSqlInjection(place, parameter, value):
 
                         if conf.invalidLogical:
                             _ = int(kb.data.randomInt[:2])
-                            origValue = "%s AND %s LIKE %s" % (value, _, _ + 1)
+                            origValue = "%s AND %s LIKE %s" % (origValue, _, _ + 1)
                         elif conf.invalidBignum:
                             origValue = kb.data.randomInt[:6]
                         elif conf.invalidString:
