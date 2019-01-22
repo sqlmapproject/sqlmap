@@ -58,7 +58,7 @@ class xrange(object):
         return self._len()
 
     def _len(self):
-        return max(0, int((self.stop - self.start) / self.step))
+        return max(0, int((self.stop - self.start) // self.step))
 
     def __contains__(self, value):
         return (self.start <= value < self.stop) and (value - self.start) % self.step == 0

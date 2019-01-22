@@ -2129,7 +2129,7 @@ def average(values):
     0.9
     """
 
-    return (sum(values) / len(values)) if values else None
+    return (1.0 * sum(values) / len(values)) if values else None
 
 @cachedmethod
 def stdev(values):
@@ -3555,7 +3555,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
 
                     if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                        regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS / 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS / 2:])))
+                        regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS // 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS // 2:])))
 
                     parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
 

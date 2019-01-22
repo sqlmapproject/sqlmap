@@ -74,7 +74,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
                     highCols += ORDER_BY_STEP
                 else:
                     while not found:
-                        mid = highCols - (highCols - lowCols) / 2
+                        mid = highCols - (highCols - lowCols) // 2
                         if _orderByTest(mid):
                             lowCols = mid
                         else:

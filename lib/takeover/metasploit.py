@@ -621,7 +621,7 @@ class Metasploit:
             payloadSize = int(match.group(2))
 
             if extra == "BufferRegister=EAX":
-                payloadSize = payloadSize / 2
+                payloadSize = payloadSize // 2
 
             debugMsg = "the shellcode size is %d bytes" % payloadSize
             logger.debug(debugMsg)

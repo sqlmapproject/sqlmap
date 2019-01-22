@@ -29,7 +29,7 @@ class ProgressBar(object):
 
     def _convertSeconds(self, value):
         seconds = value
-        minutes = seconds / 60
+        minutes = seconds // 60
         seconds = seconds - (minutes * 60)
 
         return "%.2d:%.2d" % (minutes, seconds)

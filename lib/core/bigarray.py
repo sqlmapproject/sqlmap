@@ -148,7 +148,7 @@ class BigArray(list):
         if y < 0:
             y += len(self)
 
-        index = y / self.chunk_length
+        index = y // self.chunk_length
         offset = y % self.chunk_length
         chunk = self.chunks[index]
 
@@ -159,7 +159,7 @@ class BigArray(list):
             return self.cache.data[offset]
 
     def __setitem__(self, y, value):
-        index = y / self.chunk_length
+        index = y // self.chunk_length
         offset = y % self.chunk_length
         chunk = self.chunks[index]
 

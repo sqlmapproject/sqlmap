@@ -94,7 +94,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                     candidate = len(result) - len(kb.chars.stop)
                     current = candidate if candidate != current else current - 1
             else:
-                current = current / 2
+                current = current // 2
 
         if kb.errorChunkLength:
             hashDBWrite(HASHDB_KEYS.KB_ERROR_CHUNK_LENGTH, kb.errorChunkLength)
