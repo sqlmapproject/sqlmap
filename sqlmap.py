@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
+
 try:
     import sys
 
@@ -188,10 +190,10 @@ def main():
         raise SystemExit
 
     except KeyboardInterrupt:
-        print
+        print()
 
     except EOFError:
-        print
+        print()
 
         errMsg = "exit"
         logger.error(errMsg)
@@ -200,7 +202,7 @@ def main():
         pass
 
     except:
-        print
+        print()
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
         valid = checkIntegrity()
@@ -210,13 +212,13 @@ def main():
             errMsg += "You should retrieve the latest development version from official GitHub "
             errMsg += "repository at '%s'" % GIT_PAGE
             logger.critical(errMsg)
-            print
+            print()
             dataToStdout(excMsg)
             raise SystemExit
 
         elif any(_ in excMsg for _ in ("tamper/", "waf/")):
             logger.critical(errMsg)
-            print
+            print()
             dataToStdout(excMsg)
             raise SystemExit
 

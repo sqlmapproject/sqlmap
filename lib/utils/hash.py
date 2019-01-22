@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
+
 try:
     from crypt import crypt
 except:  # removed ImportError because of https://github.com/sqlmapproject/sqlmap/issues/3171
@@ -1061,7 +1063,7 @@ def dictionaryAttack(attack_dict):
                         _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist, conf.api)
 
                 except KeyboardInterrupt:
-                    print
+                    print()
                     processException = True
                     warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                     logger.warn(warnMsg)
@@ -1157,7 +1159,7 @@ def dictionaryAttack(attack_dict):
                             found = found_.value
 
                     except KeyboardInterrupt:
-                        print
+                        print()
                         processException = True
                         warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                         logger.warn(warnMsg)

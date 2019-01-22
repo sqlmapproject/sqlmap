@@ -126,7 +126,7 @@ def main():
     if not found:
         print(colorize("[o] nothing found"))
 
-    print
+    print()
 
     exit(int(not found))
 
