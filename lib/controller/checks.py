@@ -1592,7 +1592,7 @@ def checkConnection(suppressOutput=False):
                 conf.url = re.sub(r"https?://", "https://", conf.url)
                 match = re.search(r":(\d+)", threadData.lastRedirectURL[1])
                 port = match.group(1) if match else 443
-                conf.url = re.sub(r":\d+(/|\Z)", ":%s\g<1>" % port, conf.url)
+                conf.url = re.sub(r":\d+(/|\Z)", r":%s\g<1>" % port, conf.url)
 
     except SqlmapConnectionException as ex:
         if conf.ipv6:

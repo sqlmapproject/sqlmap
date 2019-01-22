@@ -1551,7 +1551,7 @@ def expandAsteriskForColumns(expression):
             if expression != conf.query:
                 conf.db = db
             else:
-                expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), "\g<1>%s.%s" % (conf.db, conf.tbl), expression)
+                expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), r"\g<1>%s.%s" % (conf.db, conf.tbl), expression)
         else:
             conf.db = db
 
@@ -1950,18 +1950,18 @@ def isWindowsDriveLetterPath(filepath):
     return re.search(r"\A[\w]\:", filepath) is not None
 
 def posixToNtSlashes(filepath):
-    """
+    r"""
     Replaces all occurrences of Posix slashes (/) in provided
     filepath with NT ones (\)
 
     >>> posixToNtSlashes('C:/Windows')
-    'C:\\\\Windows'
+    'C:\\Windows'
     """
 
     return filepath.replace('/', '\\') if filepath else filepath
 
 def ntToPosixSlashes(filepath):
-    """
+    r"""
     Replaces all occurrences of NT slashes (\) in provided
     filepath with Posix ones (/)
 
