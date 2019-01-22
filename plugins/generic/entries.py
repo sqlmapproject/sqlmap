@@ -139,7 +139,7 @@ class Entries:
                     continue
 
                 columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]
-                colList = sorted(filter(None, columns.keys()))
+                colList = sorted(column for column in columns if column)
 
                 if conf.exclude:
                     colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
@@ -553,7 +553,7 @@ class Entries:
                     continue
 
                 conf.tbl = table
-                colList = filter(None, sorted(columns))
+                colList = filter(column for column in columns if column)
 
                 if conf.exclude:
                     colList = [_ for _ in colList if _ not in conf.exclude.split(',')]

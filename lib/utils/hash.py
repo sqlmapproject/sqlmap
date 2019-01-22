@@ -985,7 +985,7 @@ def dictionaryAttack(attack_dict):
                     else:
                         logger.info("using default dictionary")
 
-                    dictPaths = filter(None, dictPaths)
+                    dictPaths = [_ for _ in dictPaths if _]
 
                     for dictPath in dictPaths:
                         checkFile(dictPath)

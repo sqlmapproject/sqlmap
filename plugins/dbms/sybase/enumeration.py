@@ -128,7 +128,7 @@ class Enumeration(GenericEnumeration):
         for db in dbs:
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
-        dbs = filter(None, dbs)
+        dbs = [_ for _ in dbs if _]
 
         infoMsg = "fetching tables for database"
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))

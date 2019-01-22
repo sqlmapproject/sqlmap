@@ -179,7 +179,7 @@ class Databases:
             kb.data.cachedDbs.sort()
 
         if kb.data.cachedDbs:
-            kb.data.cachedDbs = filter(None, list(set(flattenValue(kb.data.cachedDbs))))
+            kb.data.cachedDbs = [_ for _ in set(flattenValue(kb.data.cachedDbs)) if _]
 
         return kb.data.cachedDbs
 
@@ -285,7 +285,7 @@ class Databases:
                     values = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(values):
-                values = filter(None, arrayizeValue(values))
+                values = [_ for _ in arrayizeValue(values) if _]
 
                 if len(values) > 0 and not isListLike(values[0]):
                     values = [(dbs[0], _) for _ in values]
@@ -462,7 +462,7 @@ class Databases:
         for col in colList:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)
 
-        colList = filter(None, colList)
+        colList = [_ for _ in colList if _]
 
         if conf.tbl:
             if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):

@@ -171,7 +171,7 @@ class Users:
         else:
             users = []
 
-        users = filter(None, users)
+        users = [_ for _ in users if _]
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
@@ -370,7 +370,7 @@ class Users:
         else:
             users = []
 
-        users = filter(None, users)
+        users = [_ for _ in users if _]
 
         # Set containing the list of DBMS administrators
         areAdmins = set()

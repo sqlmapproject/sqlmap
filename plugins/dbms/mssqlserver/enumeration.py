@@ -83,7 +83,7 @@ class Enumeration(GenericEnumeration):
         for db in dbs:
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
-        dbs = filter(None, dbs)
+        dbs = [_ for _ in dbs if _]
 
         infoMsg = "fetching tables for database"
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
@@ -110,7 +110,7 @@ class Enumeration(GenericEnumeration):
                         break
 
                 if not isNoneValue(value):
-                    value = filter(None, arrayizeValue(value))
+                    value = [_ for _ in arrayizeValue(value) if _]
                     value = [safeSQLIdentificatorNaming(unArrayizeValue(_), True) for _ in value]
                     kb.data.cachedTables[db] = value
 
@@ -340,7 +340,7 @@ class Enumeration(GenericEnumeration):
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
-            for db in filter(None, dbs.keys()):
+            for db in (_ for _ in dbs if _):
                 db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
