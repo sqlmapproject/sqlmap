@@ -553,7 +553,7 @@ class Entries:
                     continue
 
                 conf.tbl = table
-                colList = filter(column for column in columns if column)
+                colList = [_ for _ in columns if _]
 
                 if conf.exclude:
                     colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
