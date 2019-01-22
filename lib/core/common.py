@@ -913,7 +913,8 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
 
     if not kb.get("threadException"):
         if forceOutput or not (getCurrentThreadData().disableStdOut or kb.get("wizardMode")):
-            if kb.get("multiThreadMode"):
+            multiThreadMode = isMultiThreadMode()
+            if multiThreadMode:
                 logging._acquireLock()
 
             if isinstance(data, unicode):
@@ -931,7 +932,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             except IOError:
                 pass
 
-            if kb.get("multiThreadMode"):
+            if multiThreadMode:
                 logging._releaseLock()
 
             kb.prependFlag = isinstance(data, basestring) and (len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
@@ -1981,6 +1982,13 @@ def isHexEncodedString(subject):
     """
 
     return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
+
+def isMultiThreadMode():
+    """
+    Checks if running in multi-thread(ing) mode
+    """
+
+    return threading.activeCount() > 1
 
 @cachedmethod
 def getConsoleWidth(default=80):

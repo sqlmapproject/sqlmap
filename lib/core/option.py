@@ -1829,7 +1829,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.matchRatio = None
     kb.maxConnectionsFlag = False
     kb.mergeCookies = None
-    kb.multiThreadMode = False
     kb.negativeLogic = False
     kb.nullConnection = None
     kb.oldMsf = None

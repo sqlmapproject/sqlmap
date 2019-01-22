@@ -110,7 +110,6 @@ def setDaemon(thread):
 def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False, startThreadMsg=True):
     threads = []
 
-    kb.multiThreadMode = True
     kb.threadContinue = True
     kb.threadException = False
 
@@ -204,7 +203,6 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         traceback.print_exc()
 
     finally:
-        kb.multiThreadMode = False
         kb.bruteMode = False
         kb.threadContinue = True
         kb.threadException = False
