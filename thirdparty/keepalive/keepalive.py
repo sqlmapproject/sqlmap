@@ -238,7 +238,7 @@ class KeepAliveHandler:
                 self._cm.add(host, h, 0)
                 self._start_transaction(h, req)
                 r = h.getresponse()
-        except (socket.error, httplib.HTTPException), err:
+        except (socket.error, httplib.HTTPException) as err:
             raise urllib2.URLError(err)
 
         if DEBUG: DEBUG.info("STATUS: %s, %s", r.status, r.reason)
@@ -323,7 +323,7 @@ class KeepAliveHandler:
                     h.putrequest(req.get_method() or 'GET', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
                 else:
                     h.putrequest(req.get_method() or 'GET', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
-        except (socket.error, httplib.HTTPException), err:
+        except (socket.error, httplib.HTTPException) as err:
             raise urllib2.URLError(err)
 
         if not req.headers.has_key('Connection'):
@@ -495,7 +495,7 @@ def error_handler(url):
             fo.close()
             try: status, reason = fo.status, fo.reason
             except AttributeError: status, reason = None, None
-        except IOError, e:
+        except IOError as e:
             print "  EXCEPTION: %s" % e
             raise
         else:
@@ -613,7 +613,7 @@ def test_timeout(url):
 def test(url, N=10):
     print "checking error hander (do this on a non-200)"
     try: error_handler(url)
-    except IOError, e:
+    except IOError as e:
         print "exiting - exception will prevent further tests"
         sys.exit()
     print

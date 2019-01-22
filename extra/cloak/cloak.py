@@ -61,8 +61,8 @@ def main():
         if not args.inputFile:
             parser.error('Missing the input file, -h for help')
 
-    except (OptionError, TypeError), e:
-        parser.error(e)
+    except (OptionError, TypeError) as ex:
+        parser.error(ex)
 
     if not os.path.isfile(args.inputFile):
         print('ERROR: the provided input file \'%s\' is non existent' % args.inputFile)

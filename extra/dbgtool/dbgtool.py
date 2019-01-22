@@ -88,8 +88,8 @@ if __name__ == "__main__":
         if not args.inputFile:
             parser.error("Missing the input file, -h for help")
 
-    except (OptionError, TypeError), e:
-        parser.error(e)
+    except (OptionError, TypeError) as ex:
+        parser.error(ex)
 
     inputFile = args.inputFile
     outputFile = args.outputFile

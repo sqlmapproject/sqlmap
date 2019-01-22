@@ -180,7 +180,7 @@ class AnsiToWin32(object):
     def _write(self, text, retry=5):
         try:
             self.wrapped.write(text)
-        except IOError, err:
+        except IOError as err:
             if not (err.errno == 0 and retry > 0):
                 raise
             self._write(text, retry-1)

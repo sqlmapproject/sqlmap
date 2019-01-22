@@ -10,7 +10,6 @@ import os
 import cProfile
 
 from lib.core.common import getSafeExString
-from lib.core.common import getUnicode
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.settings import UNICODE_ENCODING
