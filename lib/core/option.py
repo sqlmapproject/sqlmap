@@ -1640,7 +1640,7 @@ def _cleanupOptions():
         map(lambda _: conf.__setitem__(_, True), WIZARD.ALL)
 
     if conf.noCast:
-        for _ in DUMP_REPLACEMENTS.keys():
+        for _ in list(DUMP_REPLACEMENTS.keys()):
             del DUMP_REPLACEMENTS[_]
 
     if conf.dumpFormat:

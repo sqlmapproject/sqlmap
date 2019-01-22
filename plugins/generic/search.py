@@ -273,7 +273,7 @@ class Search:
                     dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
                     foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
 
-                for db in foundTbls.keys():
+                for db in foundTbls:
                     db = safeSQLIdentificatorNaming(db)
 
                     infoMsg = "fetching number of table"
@@ -326,7 +326,7 @@ class Search:
                             foundTbl = safeSQLIdentificatorNaming(foundTbl, True)
                             foundTbls[db].append(foundTbl)
 
-        for db in foundTbls.keys():
+        for db in list(foundTbls.keys()):
             if isNoneValue(foundTbls[db]):
                 del foundTbls[db]
 

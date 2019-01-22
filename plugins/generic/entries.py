@@ -517,7 +517,7 @@ class Entries:
         choice = readInput(message, default='a')
 
         if not choice or choice in ('a', 'A'):
-            dumpFromDbs = dbs.keys()
+            dumpFromDbs = list(dbs.keys())
         elif choice in ('q', 'Q'):
             return
         else:
@@ -584,7 +584,7 @@ class Entries:
         choice = readInput(message, default='a')
 
         if not choice or choice.lower() == 'a':
-            dumpFromDbs = tables.keys()
+            dumpFromDbs = list(tables.keys())
         elif choice.lower() == 'q':
             return
         else:

@@ -57,7 +57,7 @@ def forgeHeaders(items=None, base=None):
 
     items = items or {}
 
-    for _ in items.keys():
+    for _ in list(items.keys()):
         if items[_] is None:
             del items[_]
 

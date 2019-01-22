@@ -415,7 +415,7 @@ class Databases:
                 kb.data.cachedTables[db] = sorted(tables) if tables else tables
 
         if kb.data.cachedTables:
-            for db in kb.data.cachedTables.keys():
+            for db in kb.data.cachedTables:
                 kb.data.cachedTables[db] = list(set(kb.data.cachedTables[db]))
 
         return kb.data.cachedTables

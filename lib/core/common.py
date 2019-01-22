@@ -688,7 +688,7 @@ def paramToDict(place, parameters=None):
                     debugMsg += "is not inside the %s" % place
                     logger.debug(debugMsg)
 
-        elif len(conf.testParameter) != len(testableParameters.keys()):
+        elif len(conf.testParameter) != len(testableParameters):
             for parameter in conf.testParameter:
                 if parameter not in testableParameters:
                     debugMsg = "provided parameter '%s' " % parameter
@@ -1560,7 +1560,7 @@ def expandAsteriskForColumns(expression):
         columnsDict = conf.dbmsHandler.getColumns(onlyColNames=True)
 
         if columnsDict and conf.db in columnsDict and conf.tbl in columnsDict[conf.db]:
-            columns = columnsDict[conf.db][conf.tbl].keys()
+            columns = list(columnsDict[conf.db][conf.tbl].keys())
             columns.sort()
             columnsStr = ", ".join(column for column in columns)
             expression = expression.replace('*', columnsStr, 1)
@@ -2064,7 +2064,7 @@ def getSQLSnippet(dbms, sfile, **variables):
     retVal = re.sub(r"#.+", "", retVal)
     retVal = re.sub(r";\s+", "; ", retVal).strip("\r\n")
 
-    for _ in variables.keys():
+    for _ in variables:
         retVal = re.sub(r"%%%s%%" % _, variables[_].replace('\\', r'\\'), retVal)
 
     for _ in re.findall(r"%RANDSTR\d+%", retVal, re.I):
@@ -2223,7 +2223,7 @@ def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, un
         errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
-    return retVal if not unique else retVal.keys()
+    return retVal if not unique else list(retVal.keys())
 
 def goGoodSamaritan(prevValue, originalCharset):
     """
@@ -3056,7 +3056,7 @@ def saveConfig(conf, filename):
     config = UnicodeRawConfigParser()
     userOpts = {}
 
-    for family in optDict.keys():
+    for family in optDict:
         userOpts[family] = []
 
     for option, value in conf.items():
@@ -3795,7 +3795,7 @@ def expandMnemonics(mnemonics, parser, args):
                 logger.debug(debugMsg)
             else:
                 found = sorted(options.keys(), key=lambda x: len(x))[0]
-                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (name, ", ".join("'%s'" % key for key in options.keys()))
+                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (name, ", ".join("'%s'" % key for key in options))
                 warnMsg += "Resolved to shortest of those ('%s')" % found
                 logger.warn(warnMsg)
 

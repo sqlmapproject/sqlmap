@@ -601,7 +601,7 @@ def attackCachedUsersPasswords():
         for (_, hash_, password) in results:
             lut[hash_.lower()] = password
 
-        for user in kb.data.cachedUsersPasswords.keys():
+        for user in kb.data.cachedUsersPasswords:
             for i in xrange(len(kb.data.cachedUsersPasswords[user])):
                 if (kb.data.cachedUsersPasswords[user][i] or "").strip():
                     value = kb.data.cachedUsersPasswords[user][i].lower().split()[0]
@@ -611,7 +611,7 @@ def attackCachedUsersPasswords():
 def attackDumpedTable():
     if kb.data.dumpedTable:
         table = kb.data.dumpedTable
-        columns = table.keys()
+        columns = list(table.keys())
         count = table["__infos__"]["count"]
 
         if not count:

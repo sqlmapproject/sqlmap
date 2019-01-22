@@ -817,7 +817,7 @@ class Connect(object):
 
         if conf.httpHeaders:
             headers = OrderedDict(conf.httpHeaders)
-            contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers.keys())
+            contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else None for _ in headers)
 
             if (kb.postHint or conf.skipUrlEncode) and postUrlEncode:
                 postUrlEncode = False
@@ -1125,7 +1125,7 @@ class Connect(object):
             originals.update(variables)
             evaluateCode(conf.evalCode, variables)
 
-            for variable in variables.keys():
+            for variable in list(variables.keys()):
                 if variable.endswith(EVALCODE_KEYWORD_SUFFIX):
                     value = variables[variable]
                     del variables[variable]
