@@ -3,6 +3,8 @@
 # Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 # See the file 'LICENSE' for copying permission
 
+from __future__ import print_function
+
 import codecs
 import inspect
 import os
@@ -56,8 +58,8 @@ def send_email(msg):
         s.sendmail(FROM, TO, msg.as_string())
         s.quit()
     # Catch all for SMTP exceptions
-    except smtplib.SMTPException, e:
-        print "Failure to send email: %s" % str(e)
+    except smtplib.SMTPException as ex:
+        print("Failure to send email: '%s" % ex)
 
 def failure_email(msg):
     msg = prepare_email(msg)
@@ -157,7 +159,7 @@ if __name__ == "__main__":
 
     try:
         main()
-    except Exception, e:
+    except Exception:
         log_fd.write("An exception has occurred:\n%s" % str(traceback.format_exc()))
 
     log_fd.write("Regression test finished at %s\n\n" % time.strftime("%H:%M:%S %d-%m-%Y", time.gmtime()))

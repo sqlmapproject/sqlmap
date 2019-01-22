@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
+
 import cookielib
 import re
 import socket
@@ -75,8 +77,8 @@ def main():
             except KeyboardInterrupt:
                 raise
 
-            except Exception, msg:
-                print msg
+            except Exception as ex:
+                print(ex)
 
             if abort:
                 break
@@ -86,7 +88,7 @@ def main():
             sys.stdout.write("---------------\n")
 
             for sqlfile in files:
-                print sqlfile
+                print(sqlfile)
 
                 try:
                     req = urllib2.Request(sqlfile)
@@ -118,8 +120,8 @@ def main():
                 except KeyboardInterrupt:
                     raise
 
-                except Exception, msg:
-                    print msg
+                except Exception as ex:
+                    print(ex)
 
             else:
                 i += 1

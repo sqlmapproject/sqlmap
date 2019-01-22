@@ -627,10 +627,10 @@ def checkSqlInjection(place, parameter, value):
 
                                         injectable = True
 
-                            except SqlmapConnectionException, msg:
+                            except SqlmapConnectionException as ex:
                                 debugMsg = "problem occurred most likely because the "
                                 debugMsg += "server hasn't recovered as expected from the "
-                                debugMsg += "error-based payload used ('%s')" % msg
+                                debugMsg += "error-based payload used ('%s')" % getSafeExString(ex)
                                 logger.debug(debugMsg)
 
                         # In case of time-based blind or stacked queries

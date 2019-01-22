@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
+
 import cookielib
 import glob
 import httplib
@@ -68,7 +70,7 @@ def colorize(message):
 def main():
     global WAF_FUNCTIONS
 
-    print colorize("%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR))
+    print(colorize("%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)))
 
     if len(sys.argv) < 2:
         exit(colorize("[x] usage: python %s <hostname>" % os.path.split(__file__)[-1]))
@@ -104,13 +106,13 @@ def main():
 
     WAF_FUNCTIONS = sorted(WAF_FUNCTIONS, key=lambda _: "generic" in _[1].lower())
 
-    print colorize("[i] checking '%s'..." % sys.argv[1])
+    print(colorize("[i] checking '%s'..." % sys.argv[1]))
 
     hostname = sys.argv[1].split("//")[-1].split('/')[0]
     try:
         socket.getaddrinfo(hostname, None)
     except socket.gaierror:
-        print colorize("[x] host '%s' does not exist" % hostname)
+        print(colorize("[x] host '%s' does not exist" % hostname))
         exit(1)
 
     found = False
@@ -122,7 +124,7 @@ def main():
             exit(colorize("[!] WAF/IPS identified as '%s'" % product))
 
     if not found:
-        print colorize("[o] nothing found")
+        print(colorize("[o] nothing found"))
 
     print
 

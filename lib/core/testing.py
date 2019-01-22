@@ -75,10 +75,10 @@ def smokeTest():
                 try:
                     __import__(path)
                     module = sys.modules[path]
-                except Exception, msg:
+                except Exception as ex:
                     retVal = False
                     dataToStdout("\r")
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), msg)
+                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), ex)
                     logger.error(errMsg)
                 else:
                     # Run doc tests
@@ -275,10 +275,10 @@ def runCase(parse):
         result = start()
     except KeyboardInterrupt:
         pass
-    except SqlmapBaseException, e:
-        handled_exception = e
-    except Exception, e:
-        unhandled_exception = e
+    except SqlmapBaseException as ex:
+        handled_exception = ex
+    except Exception as ex:
+        unhandled_exception = ex
     finally:
         sys.stdout.seek(0)
         console = sys.stdout.read()

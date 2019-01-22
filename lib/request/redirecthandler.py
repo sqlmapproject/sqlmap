@@ -16,6 +16,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.common import getHostHeader
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
@@ -75,9 +76,9 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
         try:
             content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
-        except Exception, msg:
+        except Exception as ex:
             dbgMsg = "there was a problem while retrieving "
-            dbgMsg += "redirect response content (%s)" % msg
+            dbgMsg += "redirect response content ('%s')" % getSafeExString(ex)
             logger.debug(dbgMsg)
         finally:
             if content:

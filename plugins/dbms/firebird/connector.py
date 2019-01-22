@@ -42,8 +42,8 @@ class Connector(GenericConnector):
         try:
             # Reference: http://www.daniweb.com/forums/thread248499.html
             self.connector = kinterbasdb.connect(host=self.hostname.encode(UNICODE_ENCODING), database=self.db.encode(UNICODE_ENCODING), user=self.user.encode(UNICODE_ENCODING), password=self.password.encode(UNICODE_ENCODING), charset="UTF8")
-        except kinterbasdb.OperationalError, msg:
-            raise SqlmapConnectionException(getSafeExString(msg))
+        except kinterbasdb.OperationalError as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()
         self.printConnected()
@@ -51,17 +51,17 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except kinterbasdb.OperationalError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
+        except kinterbasdb.OperationalError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             return None
 
     def execute(self, query):
         try:
             self.cursor.execute(query)
-        except kinterbasdb.OperationalError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(msg))
-        except kinterbasdb.Error, msg:
-            raise SqlmapConnectionException(getSafeExString(msg))
+        except kinterbasdb.OperationalError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
+        except kinterbasdb.Error as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.connector.commit()
 

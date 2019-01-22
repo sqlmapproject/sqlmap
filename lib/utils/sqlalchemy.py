@@ -76,8 +76,8 @@ class SQLAlchemy(GenericConnector):
                 raise
             except SqlmapFilePathException:
                 raise
-            except Exception, msg:
-                raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % msg[0])
+            except Exception as ex:
+                raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % ex[0])
 
             self.printConnected()
         else:
@@ -89,17 +89,17 @@ class SQLAlchemy(GenericConnector):
             for row in self.cursor.fetchall():
                 retVal.append(tuple(row))
             return retVal
-        except _sqlalchemy.exc.ProgrammingError, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg.message if hasattr(msg, "message") else msg)
+        except _sqlalchemy.exc.ProgrammingError as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % ex.message if hasattr(ex, "message") else ex)
             return None
 
     def execute(self, query):
         try:
             self.cursor = self.connector.execute(query)
-        except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError), msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg.message if hasattr(msg, "message") else msg)
-        except _sqlalchemy.exc.InternalError, msg:
-            raise SqlmapConnectionException(msg[1])
+        except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError) as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % ex.message if hasattr(ex, "message") else ex)
+        except _sqlalchemy.exc.InternalError as ex:
+            raise SqlmapConnectionException(ex[1])
 
     def select(self, query):
         self.execute(query)

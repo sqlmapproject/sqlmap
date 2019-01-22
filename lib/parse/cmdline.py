@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import print_function
+
 import os
 import re
 import shlex
@@ -842,7 +844,7 @@ def cmdLineParser(argv=None):
                 argv[i] = argv[i][:-1]
                 conf.skipThreadCheck = True
             elif argv[i] == "--version":
-                print VERSION_STRING.split('/')[-1]
+                print(VERSION_STRING.split('/')[-1])
                 raise SystemExit
             elif argv[i] in ("-h", "--help"):
                 advancedHelp = False

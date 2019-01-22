@@ -17,6 +17,7 @@ from lib.core.common import Backend
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import isListLike
 from lib.core.common import randomStr
@@ -280,10 +281,10 @@ def decodePage(page, contentEncoding, contentType):
                     raise Exception("size too large")
 
             page = data.read()
-        except Exception, msg:
+        except Exception as ex:
             if "<html" not in page:  # in some cases, invalid "Content-Encoding" appears for plain HTML (should be ignored)
                 errMsg = "detected invalid data for declared content "
-                errMsg += "encoding '%s' ('%s')" % (contentEncoding, msg)
+                errMsg += "encoding '%s' ('%s')" % (contentEncoding, getSafeExString(ex))
                 singleTimeLogMessage(errMsg, logging.ERROR)
 
                 warnMsg = "turning off page compression"

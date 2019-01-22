@@ -5,6 +5,8 @@
 
 # Removes duplicate entries in wordlist like files
 
+from __future__ import print_function
+
 import sys
 
 if len(sys.argv) > 0:
@@ -17,7 +19,7 @@ if len(sys.argv) > 0:
                 str.encode(item)
                 if item in items:
                     if item:
-                        print item
+                        print(item)
                 else:
                     items.append(item)
             except:

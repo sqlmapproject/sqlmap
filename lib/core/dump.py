@@ -624,8 +624,8 @@ class Dump(object):
                                 with open(filepath, "wb") as f:
                                     _ = safechardecode(value, True)
                                     f.write(_)
-                        except magic.MagicException, err:
-                            logger.debug(str(err))
+                        except magic.MagicException as ex:
+                            logger.debug(getSafeExString(ex))
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:
                         if field == fields:

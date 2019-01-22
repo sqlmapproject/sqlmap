@@ -3,6 +3,8 @@
 # Runs pylint on all python scripts found in a directory tree
 # Reference: http://rowinggolfer.blogspot.com/2009/08/pylint-recursively.html
 
+from __future__ import print_function
+
 import os
 import re
 import sys
@@ -17,26 +19,26 @@ def check(module):
 
     if module[-3:] == ".py":
 
-        print "CHECKING ", module
+        print("CHECKING ", module)
         pout = os.popen("pylint --rcfile=/dev/null %s" % module, 'r')
         for line in pout:
             if re.match(r"\AE:", line):
-                print line.strip()
+                print(line.strip())
             if __RATING__ and "Your code has been rated at" in line:
-                print line
+                print(line)
                 score = re.findall(r"\d.\d\d", line)[0]
                 total += float(score)
                 count += 1
 
 if __name__ == "__main__":
     try:
-        print sys.argv
+        print(sys.argv)
         BASE_DIRECTORY = sys.argv[1]
     except IndexError:
-        print "no directory specified, defaulting to current working directory"
+        print("no directory specified, defaulting to current working directory")
         BASE_DIRECTORY = os.getcwd()
 
-    print "looking for *.py scripts in subdirectories of ", BASE_DIRECTORY
+    print("looking for *.py scripts in subdirectories of ", BASE_DIRECTORY)
     for root, dirs, files in os.walk(BASE_DIRECTORY):
         if any(_ in root for _ in ("extra", "thirdparty")):
             continue
@@ -45,6 +47,6 @@ if __name__ == "__main__":
             check(filepath)
 
     if __RATING__:
-        print "==" * 50
-        print "%d modules found" % count
-        print "AVERAGE SCORE = %.02f" % (total / count)
+        print("==" * 50)
+        print("%d modules found" % count)
+        print("AVERAGE SCORE = %.02f" % (total / count))

@@ -14,6 +14,7 @@ except:
 import logging
 
 from lib.core.common import checkFile
+from lib.core.common import getSafeExString
 from lib.core.common import readInput
 from lib.core.data import conf
 from lib.core.data import logger
@@ -41,15 +42,15 @@ class Connector(GenericConnector):
             args = "-Djava.class.path=%s" % jar
             jvm_path = jpype.getDefaultJVMPath()
             jpype.startJVM(jvm_path, args)
-        except Exception, msg:
-            raise SqlmapConnectionException(msg[0])
+        except Exception as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         try:
             driver = 'org.hsqldb.jdbc.JDBCDriver'
             connection_string = 'jdbc:hsqldb:mem:.'  # 'jdbc:hsqldb:hsql://%s/%s' % (self.hostname, self.db)
             self.connector = jaydebeapi.connect(driver, connection_string, str(self.user), str(self.password))
-        except Exception, msg:
-            raise SqlmapConnectionException(msg[0])
+        except Exception as ex:
+            raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()
         self.printConnected()
@@ -57,8 +58,8 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except Exception, msg:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+        except Exception as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
             return None
 
     def execute(self, query):
@@ -67,8 +68,8 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(query)
             retVal = True
-        except Exception, msg:  # TODO: fix with specific error
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % msg[1])
+        except Exception as ex:
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
 
         self.connector.commit()
 
