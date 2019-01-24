@@ -39,4 +39,4 @@ then
 fi
 
 truncate -s 0 "$CHECKSUM_FULLPATH"
-cd $PROJECT_FULLPATH && for i in $(find . -name "*.py" -o -name "*.xml" -o -iname "*_" | sort); do git ls-files $i --error-unmatch &>/dev/null && md5sum $i | stdbuf -i0 -o0 -e0 sed 's/\.\///' >> "$CHECKSUM_FULLPATH"; git add "$CHECKSUM_FULLPATH"; done
+cd $PROJECT_FULLPATH && for i in $(find . -name "*.py" -o -name "*.xml" -o -name "*_" -o -type f -regex "./[^./]*" | sort); do git ls-files $i --error-unmatch &>/dev/null && md5sum $i | stdbuf -i0 -o0 -e0 sed 's/\.\///' >> "$CHECKSUM_FULLPATH"; git add "$CHECKSUM_FULLPATH"; done

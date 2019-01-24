@@ -1,3 +1,4 @@
+7ad922bcc16462a101862b1b0b15182f  COMMITMENT
 3d37032b2bd62ee37bd61c5b7ad31ab4  extra/beep/beep.py
 fb6be55d21a70765e35549af2484f762  extra/beep/__init__.py
 8b4237aae3b82c325e0b34f6adfa0bc3  extra/cloak/cloak.py
@@ -49,7 +50,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-4f46f6e3c01512d8e39aae2a61390a15  lib/core/settings.py
+f59bb60ed2e0a30ed73b1ff174e2d950  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 9c7b5c6397fb3da33e7a4d7876d159c6  lib/core/target.py
@@ -119,6 +120,7 @@ b79654e49850937ab2dc8e0d73625cab  lib/utils/purge.py
 68f90f633d812ca428d2f15f016b2d96  lib/utils/timeout.py
 164f830baad3e13b226ee57d44d69dfa  lib/utils/versioncheck.py
 a5007113e3cda726e1d131b99b927284  lib/utils/xrange.py
+28da82c0afa4d8a0e9848f7bd8e994b7  LICENSE
 b8656f4785d0945e68257107a171f945  plugins/dbms/access/connector.py
 b0e4f4aed8504f97d4044620d3a7d27d  plugins/dbms/access/enumeration.py
 58d664d680087596965f95b482157320  plugins/dbms/access/filesystem.py
