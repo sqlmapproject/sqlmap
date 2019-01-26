@@ -24,7 +24,7 @@ fb6be55d21a70765e35549af2484f762  extra/sqlharvest/__init__.py
 fb6be55d21a70765e35549af2484f762  extra/wafdetectify/__init__.py
 aec73042403993076f478da48066a79e  extra/wafdetectify/wafdetectify.py
 ec782b9cdb8d857a80b6ecf0f32db7f4  lib/controller/action.py
-9f12e798cb9b194a61f8e278c689fb22  lib/controller/checks.py
+d392dbccdb59ac36530c1182675a2609  lib/controller/checks.py
 b37a93767459162b30798bd9732a12a3  lib/controller/controller.py
 c1da277517c7ec4c23e953a51b51e203  lib/controller/handler.py
 fb6be55d21a70765e35549af2484f762  lib/controller/__init__.py
@@ -50,7 +50,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-f59bb60ed2e0a30ed73b1ff174e2d950  lib/core/settings.py
+4452b55a638f30718bddea46b64db046  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 9c7b5c6397fb3da33e7a4d7876d159c6  lib/core/target.py
@@ -72,7 +72,7 @@ adcecd2d6a8667b22872a563eb83eac0  lib/parse/payloads.py
 e4ea70bcd461f5176867dcd89d372386  lib/request/basicauthhandler.py
 97b7577fdfe3d8537fe9ea3a070d0507  lib/request/basic.py
 fc25d951217077fe655ed2a3a81552ae  lib/request/comparison.py
-27927a37edfa9c2dfb6e5de9e859d10f  lib/request/connect.py
+28faffc0aeb0d8a3e78063f195488536  lib/request/connect.py
 7cba86090b02558f04c6692cef66e772  lib/request/direct.py
 2b7509ba38a667c61cefff036ec4ca6f  lib/request/dns.py
 ceac6b3bf1f726f8ff43c6814e9d7281  lib/request/httpshandler.py
@@ -422,7 +422,7 @@ af079de99a8ec6988d28aa4c0aa32cf9  waf/cloudbric.py
 a8412619d7f26ed6bc9e0b20a57b2324  waf/edgecast.py
 5df01dde939c0d22bc163730873e9854  waf/expressionengine.py
 588d2f9a8f201e120e74e508564cb487  waf/fortiweb.py
-0e9eb20967d2dde941cca8c663a63e1f  waf/generic.py
+447f6d63b6f691a852ca198afaaac4a6  waf/generic.py
 4ea580dd1b9679bd733866976ad5d81e  waf/godaddy.py
 27385b15477031a3aff25df601a1ff51  waf/greywizard.py
 256a7ea2c1cd2745fe788cf8f6123f8a  waf/imunify360.py

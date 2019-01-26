@@ -86,7 +86,7 @@ from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
-from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
+from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IDS_WAF_CHECK_RATIO
 from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
@@ -1353,7 +1353,7 @@ def checkWaf():
     logger.info(infoMsg)
 
     retVal = False
-    payload = "%d %s" % (randomInt(), IDS_WAF_CHECK_PAYLOAD)
+    payload = "%d %s" % (randomInt(), IPS_WAF_CHECK_PAYLOAD)
 
     if PLACE.URI in conf.parameters:
         place = PLACE.POST

@@ -103,7 +103,7 @@ from lib.core.settings import MAX_MURPHY_SLEEP_TIME
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MAX_TIME_RESPONSES
-from lib.core.settings import IDS_WAF_CHECK_PAYLOAD
+from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_CHUNK_TRIM_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -1284,7 +1284,7 @@ class Connect(object):
 
         if conf.secondUrl:
             page, headers, code = Connect.getPage(url=conf.secondUrl, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
-        elif kb.secondReq and IDS_WAF_CHECK_PAYLOAD not in urllib.unquote(value or ""):
+        elif kb.secondReq and IPS_WAF_CHECK_PAYLOAD not in urllib.unquote(value or ""):
             def _(value):
                 if kb.customInjectionMark in (value or ""):
                     if payload is None:

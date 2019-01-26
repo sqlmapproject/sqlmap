@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.1.74"
+VERSION = "1.3.1.75"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -536,7 +536,7 @@ CHECK_INTERNET_ADDRESS = "https://ipinfo.io/"
 CHECK_INTERNET_VALUE = "IP Address Details"
 
 # Payload used for checking of existence of WAF/IPS (dummier the better)
-IDS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,NULL,'<script>alert(\"XSS\")</script>',table_name FROM information_schema.tables WHERE 2>1--/**/; EXEC xp_cmdshell('cat ../../../etc/passwd')#"
+IPS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,NULL,'<script>alert(\"XSS\")</script>',table_name FROM information_schema.tables WHERE 2>1--/**/; EXEC xp_cmdshell('cat ../../../etc/passwd')#"
 
 # Vectors used for provoking specific WAF/IPS behavior(s)
 WAF_ATTACK_VECTORS = (
@@ -544,7 +544,7 @@ WAF_ATTACK_VECTORS = (
     "search=<script>alert(1)</script>",
     "file=../../../../etc/passwd",
     "q=<invalid>foobar",
-    "id=1 %s" % IDS_WAF_CHECK_PAYLOAD
+    "id=1 %s" % IPS_WAF_CHECK_PAYLOAD
 )
 
 # Used for status representation in dictionary attack phase
