@@ -19,6 +19,7 @@ import traceback
 import urllib
 import urllib2
 import urlparse
+from plugins.response import response_tamper
 
 try:
     import websocket
@@ -1320,6 +1321,10 @@ class Connect(object):
         if message:
             kb.permissionFlag = True
             singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
+
+        page = response_tamper.tamper_page(page)
+        headers = response_tamper.tamper_headers(headers)
+        code = response_tamper.tamper_code(code)
 
         if content or response:
             return page, headers, code
