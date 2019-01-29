@@ -103,7 +103,7 @@ def update():
         debugMsg = "sqlmap will try to update itself using 'git' command"
         logger.debug(debugMsg)
 
-        dataToStdout("\r[%s] [INFO] update in progress " % time.strftime("%X"))
+        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
 
         try:
             process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=paths.SQLMAP_ROOT_PATH.encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
