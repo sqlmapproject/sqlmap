@@ -1308,8 +1308,8 @@ class Connect(object):
         elif noteResponseTime:
             kb.responseTimes.setdefault(kb.responseTimeMode, [])
             kb.responseTimes[kb.responseTimeMode].append(threadData.lastQueryDuration)
-            if len(kb.responseTimes) > MAX_TIME_RESPONSES:
-                kb.responseTimes = kb.responseTimes[-MAX_TIME_RESPONSES:]
+            if len(kb.responseTimes[kb.responseTimeMode]) > MAX_TIME_RESPONSES:
+                kb.responseTimes[kb.responseTimeMode] = kb.responseTimes[kb.responseTimeMode][-MAX_TIME_RESPONSES // 2:]
 
         if not response and removeReflection:
             page = removeReflectiveValues(page, payload)
