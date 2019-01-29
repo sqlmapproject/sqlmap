@@ -53,6 +53,7 @@ try:
     from lib.core.data import kb
     from lib.core.common import unhandledExceptionMessage
     from lib.core.common import MKSTEMP_PREFIX
+    from lib.core.common import setColor
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
     from lib.core.exception import SqlmapSilentQuitException
@@ -339,8 +340,7 @@ def main():
             logger.critical("%s\n%s" % (errMsg, excMsg))
         else:
             logger.critical(errMsg)
-            kb.stickyLevel = logging.CRITICAL
-            dataToStdout(excMsg)
+            dataToStdout("%s\n" % setColor(excMsg.strip(), level=logging.CRITICAL))
             createGithubIssue(errMsg, excMsg)
 
     finally:

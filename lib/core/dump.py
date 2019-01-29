@@ -112,8 +112,6 @@ class Dump(object):
         self._write(data, content_type=content_type)
 
     def string(self, header, data, content_type=None, sort=True):
-        kb.stickyLevel = None
-
         if conf.api:
             self._write(data, content_type=content_type)
             return

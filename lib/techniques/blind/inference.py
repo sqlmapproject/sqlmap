@@ -645,7 +645,6 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         abortedFlag = True
     finally:
         kb.prependFlag = False
-        kb.stickyLevel = None
         retrievedLength = len(finalValue or "")
 
         if finalValue is not None:

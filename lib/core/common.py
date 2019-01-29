@@ -872,9 +872,9 @@ def boldifyMessage(message):
 
     return retVal
 
-def setColor(message, color=None, bold=False):
+def setColor(message, color=None, bold=False, level=None):
     retVal = message
-    level = extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message) or kb.get("stickyLevel")
+    level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
     if isinstance(level, unicode):
         level = unicodeencode(level)
@@ -884,11 +884,7 @@ def setColor(message, color=None, bold=False):
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
             level = getattr(logging, level, None) if isinstance(level, basestring) else level
-            if message != '.':
-                retVal = LOGGER_HANDLER.colorize(message, level)
-                kb.stickyLevel = level if message and message[-1] != "\n" else None
-            else:
-                kb.stickyLevel = None
+            retVal = LOGGER_HANDLER.colorize(message, level)
 
     return retVal
 
@@ -999,7 +995,6 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     """
 
     retVal = None
-    kb.stickyLevel = None
 
     message = getUnicode(message)
 
@@ -2039,7 +2034,6 @@ def clearConsoleLine(forceOutput=False):
         dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
 
     kb.prependFlag = False
-    kb.stickyLevel = None
 
 def parseXmlFile(xmlFile, handler):
     """
@@ -3358,8 +3352,7 @@ def unhandledExceptionMessage():
     errMsg += "repository at '%s'. If the exception persists, please open a new issue " % GIT_PAGE
     errMsg += "at '%s' " % ISSUES_PAGE
     errMsg += "with the following text and any other information required to "
-    errMsg += "reproduce the bug. The "
-    errMsg += "developers will try to reproduce the bug, fix it accordingly "
+    errMsg += "reproduce the bug. Developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you\n"
     errMsg += "Running version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
     errMsg += "Python version: %s\n" % PYVERSION
@@ -3495,7 +3488,7 @@ def maskSensitiveData(msg):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     # Fail-safe substitution
-    retVal = re.sub(r"(?i)\bhttps?://[^ ]+", lambda match: '*' * len(match.group(0)), retVal)
+    retVal = re.sub(r"(?i)(Command line:.+)\b(https?://[^ ]+)", lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
 
     if getpass.getuser():
         retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), '*' * len(getpass.getuser()), retVal)
