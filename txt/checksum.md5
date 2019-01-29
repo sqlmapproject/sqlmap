@@ -50,7 +50,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-4452b55a638f30718bddea46b64db046  lib/core/settings.py
+be251fb51accf69378bd62ae3ebbe9e1  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 9c7b5c6397fb3da33e7a4d7876d159c6  lib/core/target.py
@@ -108,7 +108,7 @@ b27421eb57cea711050135f84be99258  lib/utils/crawler.py
 da4bc159e6920f1f7e45c92c39941690  lib/utils/deps.py
 f7c64515a3e4fcfe8266ca2be77be565  lib/utils/getch.py
 0d497906b06eb82d14da676e9f9c98f5  lib/utils/har.py
-d11f7f208ccf3a7753ccc417b4b01901  lib/utils/hashdb.py
+ce65061a15d7b609b36c672b8e824f78  lib/utils/hashdb.py
 07412688758500c3b4e46ae7e28e9709  lib/utils/hash.py
 17009289bb5c0dc0cceaa483113101e1  lib/utils/htmlentities.py
 fb6be55d21a70765e35549af2484f762  lib/utils/__init__.py

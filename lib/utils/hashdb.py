@@ -81,18 +81,16 @@ class HashDB(object):
                     try:
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
                             retVal = row[0]
-                    except sqlite3.OperationalError as ex:
+                    except (sqlite3.OperationalError, sqlite3.DatabaseError) as ex:
                         if any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
                             warnMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
                             singleTimeWarnMessage(warnMsg)
                         elif "Could not decode" in getSafeExString(ex):
                             break
                         else:
-                            raise
-                    except sqlite3.DatabaseError as ex:
-                        errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
-                        errMsg += "If the problem persists please rerun with '--flush-session'"
-                        raise SqlmapConnectionException(errMsg)
+                            errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
+                            errMsg += "If the problem persists please rerun with '--flush-session'"
+                            raise SqlmapConnectionException(errMsg)
                     else:
                         break
 
