@@ -621,7 +621,7 @@ class _OrderedDict(dict):
                 raise KeyError(key)
         return val
 
-    def popitem(self, i=-1):
+    def popitem(self, last=True):
         """
         Delete and return an item specified by index, not a random one as in
         dict. The index is -1 by default (the last item).
@@ -643,6 +643,7 @@ class _OrderedDict(dict):
         if not self._sequence:
             raise KeyError('popitem(): dictionary is empty')
         try:
+            i = -1 if last else 0
             key = self._sequence[i]
         except IndexError:
             raise IndexError('popitem(): index %s not valid' % i)

@@ -7,10 +7,15 @@ See the file 'LICENSE' for copying permission
 
 import functools
 import hashlib
+import threading
 
+from lib.core.settings import MAX_CACHE_ITEMS
+from lib.core.datatype import LRUDict
 from lib.core.threads import getCurrentThreadData
 
-def cachedmethod(f, cache={}):
+_lock = threading.Lock()
+
+def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
     """
     Method with a cached content
 
@@ -19,11 +24,12 @@ def cachedmethod(f, cache={}):
 
     @functools.wraps(f)
     def _(*args, **kwargs):
-        key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
-        if key not in cache:
-            cache[key] = f(*args, **kwargs)
+        with _lock:
+            key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
+            if key not in cache:
+                cache[key] = f(*args, **kwargs)
 
-        return cache[key]
+            return cache[key]
 
     return _
 

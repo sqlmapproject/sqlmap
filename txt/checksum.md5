@@ -33,8 +33,8 @@ a932126e7d80e545c5d44af178d0bc0c  lib/core/bigarray.py
 f97e6dc62b453cc787ef7f801ee1af5b  lib/core/common.py
 de8d27ae6241163ff9e97aa9e7c51a18  lib/core/convert.py
 abcb1121eb56d3401839d14e8ed06b6e  lib/core/data.py
-db60c6ebb63b72ed119e304b359fc1a6  lib/core/datatype.py
-b7c912e2af7a3354f6d7c04f556a80b2  lib/core/decorators.py
+e1f7758f433202c50426efde5eb96768  lib/core/datatype.py
+1646402a733e564f05025e848b323cf9  lib/core/decorators.py
 5f4680b769ae07f22157bd832c97cf8f  lib/core/defaults.py
 9dfc69ba47209a4ceca494dde9ee8183  lib/core/dicts.py
 4782353a3072e4d17c4e314daf918d8a  lib/core/dump.py
@@ -50,7 +50,7 @@ fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-18eeffa589e845f62a7c0452ba3c373a  lib/core/settings.py
+e9e5e6207591b134c0cf4ecf8e712ea9  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 9c7b5c6397fb3da33e7a4d7876d159c6  lib/core/target.py
@@ -358,7 +358,7 @@ bf318e0abbe6b2e1a167a233db7f744f  thirdparty/magic/magic.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/multipart/__init__.py
 82432cb4ef575aa16900ba221cc1dc98  thirdparty/multipart/multipartpost.py
 3e502b04f3849afbb7f0e13b5fd2b5c1  thirdparty/odict/__init__.py
-4174fad6be204761db349032341b7582  thirdparty/odict/odict.py
+74048dca0470bc78af73f0aafccfd069  thirdparty/odict/odict.py
 0105f1734f326704d2d68839084ca661  thirdparty/oset/_abc.py
 54a861de0f08bb80c2e8846579ec83bd  thirdparty/oset/__init__.py
 6c79e6d14e031beebe6de127b53c7c93  thirdparty/oset/pyoset.py

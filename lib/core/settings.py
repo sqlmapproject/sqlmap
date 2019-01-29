@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.1.80"
+VERSION = "1.3.1.81"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -165,6 +165,9 @@ MAX_TECHNIQUES_PER_VALUE = 2
 
 # In case of missing piece of partial union dump, buffered array must be flushed after certain size
 MAX_BUFFERED_PARTIAL_UNION_LENGTH = 1024
+
+# Maximum size of cache used in @cachedmethod decorator
+MAX_CACHE_ITEMS = 256
 
 # Suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX = "_masterdb"
