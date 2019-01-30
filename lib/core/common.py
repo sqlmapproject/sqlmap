@@ -4149,6 +4149,9 @@ def getHostHeader(url):
         elif any(retVal.endswith(':%d' % _) for _ in (80, 443)):
             retVal = retVal.split(':')[0]
 
+    if retVal and retVal.count(':') > 1 and not any(_ in retVal for _ in ('[', ']')):
+        retVal = "[%s]" % retVal
+
     return retVal
 
 def checkDeprecatedOptions(args):
