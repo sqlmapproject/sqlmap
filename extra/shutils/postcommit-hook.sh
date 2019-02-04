@@ -11,6 +11,7 @@ chmod +x .git/hooks/post-commit
 '
 
 SETTINGS="../../lib/core/settings.py"
+PYPI="../../extra/shutils/pypi.sh"
 
 declare -x SCRIPTPATH="${0}"
 
@@ -28,6 +29,6 @@ then
         git tag $NEW_TAG
         git push origin $NEW_TAG
         echo "Going to push PyPI package"
-        /bin/bash ${SCRIPTPATH%/*}/pypi.sh
+        /bin/bash ${SCRIPTPATH%/*}/$PYPI
     fi
 fi
