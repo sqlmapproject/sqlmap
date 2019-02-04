@@ -547,11 +547,11 @@ def _setMetasploit():
 
     if conf.msfPath:
         for path in (conf.msfPath, os.path.join(conf.msfPath, "bin")):
-            if any(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfcli", "msfconsole")):
+            if any(os.path.exists(normalizePath(os.path.join(path, "%s%s" % (_, ".bat" if IS_WIN else "")))) for _ in ("msfcli", "msfconsole")):
                 msfEnvPathExists = True
-                if all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfvenom",)):
+                if all(os.path.exists(normalizePath(os.path.join(path, "%s%s" % (_, ".bat" if IS_WIN else "")))) for _ in ("msfvenom",)):
                     kb.oldMsf = False
-                elif all(os.path.exists(normalizePath(os.path.join(path, _))) for _ in ("msfencode", "msfpayload")):
+                elif all(os.path.exists(normalizePath(os.path.join(path, "%s%s" % (_, ".bat" if IS_WIN else "")))) for _ in ("msfencode", "msfpayload")):
                     kb.oldMsf = True
                 else:
                     msfEnvPathExists = False
@@ -586,11 +586,11 @@ def _setMetasploit():
         for envPath in envPaths:
             envPath = envPath.replace(";", "")
 
-            if any(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfcli", "msfconsole")):
+            if any(os.path.exists(normalizePath(os.path.join(envPath, "%s%s" % (_, ".bat" if IS_WIN else "")))) for _ in ("msfcli", "msfconsole")):
                 msfEnvPathExists = True
-                if all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfvenom",)):
+                if all(os.path.exists(normalizePath(os.path.join(envPath, "%s%s" % (_, ".bat" if IS_WIN else "")))) for _ in ("msfvenom",)):
                     kb.oldMsf = False
-                elif all(os.path.exists(normalizePath(os.path.join(envPath, _))) for _ in ("msfencode", "msfpayload")):
+                elif all(os.path.exists(normalizePath(os.path.join(envPath, "%s%s" % (_, ".bat" if IS_WIN else "")))) for _ in ("msfencode", "msfpayload")):
                     kb.oldMsf = True
                 else:
                     msfEnvPathExists = False
