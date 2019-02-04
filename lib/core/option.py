@@ -33,6 +33,7 @@ from lib.core.common import Backend
 from lib.core.common import boldifyMessage
 from lib.core.common import checkFile
 from lib.core.common import dataToStdout
+from lib.core.common import decodeStringEscape
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
 from lib.core.common import findLocalPort
@@ -1500,11 +1501,8 @@ def _cleanupOptions():
     else:
         conf.rParam = []
 
-    if conf.paramDel and '\\' in conf.paramDel:
-        try:
-            conf.paramDel = conf.paramDel.decode("string_escape")
-        except ValueError:
-            pass
+    if conf.paramDel:
+        conf.paramDel = decodeStringEscape(conf.paramDel)
 
     if conf.skip:
         conf.skip = conf.skip.replace(" ", "")
@@ -1616,7 +1614,7 @@ def _cleanupOptions():
         conf.code = int(conf.code)
 
     if conf.csvDel:
-        conf.csvDel = conf.csvDel.decode("string_escape")  # e.g. '\\t' -> '\t'
+        conf.csvDel = decodeStringEscape(conf.csvDel)
 
     if conf.torPort and isinstance(conf.torPort, basestring) and conf.torPort.isdigit():
         conf.torPort = int(conf.torPort)
@@ -1629,12 +1627,7 @@ def _cleanupOptions():
         setPaths(paths.SQLMAP_ROOT_PATH)
 
     if conf.string:
-        try:
-            conf.string = conf.string.decode("unicode_escape")
-        except:
-            charset = string.whitespace.replace(" ", "")
-            for _ in charset:
-                conf.string = conf.string.replace(_.encode("string_escape"), _)
+        conf.string = decodeStringEscape(conf.string)
 
     if conf.getAll:
         map(lambda _: conf.__setitem__(_, True), WIZARD.ALL)

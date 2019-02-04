@@ -3535,6 +3535,32 @@ def intersect(containerA, containerB, lowerCase=False):
 
     return retVal
 
+def decodeStringEscape(value):
+    """
+    Decodes escaped string values (e.g. "\\t" -> "\t")
+    """
+
+    retVal = value
+
+    if value and '\\' in value:
+        if isinstance(value, unicode):
+            retVal = retVal.encode(UNICODE_ENCODING)
+
+        try:
+            retVal = codecs.escape_decode(retVal)[0]
+        except:
+            try:
+                retVal = retVal.decode("string_escape")
+            except:
+                charset = string.whitespace.replace(" ", "")
+                for _ in charset:
+                    retVal = retVal.replace(repr(_).strip("'"), _)
+
+        if isinstance(value, unicode):
+            retVal = getUnicode(retVal)
+
+    return retVal
+
 def removeReflectiveValues(content, payload, suppressWarning=False):
     """
     Neutralizes reflective values in a given content based on a payload
