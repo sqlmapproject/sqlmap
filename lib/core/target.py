@@ -630,36 +630,6 @@ def _createTargetDirs():
     Create the output directory.
     """
 
-    for context in "output", "history":
-        directory = paths["SQLMAP_%s_PATH" % context.upper()]
-        try:
-            if not os.path.isdir(directory):
-                os.makedirs(directory)
-
-            _ = os.path.join(directory, randomStr())
-            open(_, "w+b").close()
-            os.remove(_)
-
-            if conf.outputDir and context == "output":
-                warnMsg = "using '%s' as the %s directory" % (directory, context)
-                logger.warn(warnMsg)
-        except (OSError, IOError) as ex:
-            try:
-                tempDir = tempfile.mkdtemp(prefix="sqlmap%s" % context)
-            except Exception as _:
-                errMsg = "unable to write to the temporary directory ('%s'). " % _
-                errMsg += "Please make sure that your disk is not full and "
-                errMsg += "that you have sufficient write permissions to "
-                errMsg += "create temporary files and/or directories"
-                raise SqlmapSystemException(errMsg)
-
-            warnMsg = "unable to %s %s directory " % ("create" if not os.path.isdir(directory) else "write to the", context)
-            warnMsg += "'%s' (%s). " % (directory, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
-
-            paths["SQLMAP_%s_PATH" % context.upper()] = tempDir
-
     conf.outputPath = os.path.join(getUnicode(paths.SQLMAP_OUTPUT_PATH), normalizeUnicode(getUnicode(conf.hostname)))
 
     try:
