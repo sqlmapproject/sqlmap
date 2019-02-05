@@ -133,7 +133,7 @@ class Dump(object):
             if "\n" in _:
                 self._write("%s:\n---\n%s\n---" % (header, _))
             else:
-                self._write("%s:    %s" % (header, ("'%s'" % _) if isinstance(data, basestring) else _))
+                self._write("%s: %s" % (header, ("'%s'" % _) if isinstance(data, basestring) else _))
         else:
             self._write("%s:\tNone" % header)
 
