@@ -41,6 +41,7 @@ from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
+from lib.core.common import intersect
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
@@ -2416,8 +2417,14 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.skip and conf.testParameter:
-        errMsg = "option '--skip' is incompatible with option '-p'"
-        raise SqlmapSyntaxException(errMsg)
+        if intersect(conf.skip, conf.testParameter):
+            errMsg = "option '--skip' is incompatible with option '-p'"
+            raise SqlmapSyntaxException(errMsg)
+
+    if conf.rParam and conf.testParameter:
+        if intersect(conf.rParam, conf.testParameter):
+            errMsg = "option '--randomize' is incompatible with option '-p'"
+            raise SqlmapSyntaxException(errMsg)
 
     if conf.mobile and conf.agent:
         errMsg = "switch '--mobile' is incompatible with option '--user-agent'"

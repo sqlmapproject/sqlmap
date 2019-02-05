@@ -491,7 +491,7 @@ def start():
                         elif parameter in conf.testParameter:
                             pass
 
-                        elif parameter == conf.rParam:
+                        elif parameter in conf.rParam:
                             testSqlInj = False
 
                             infoMsg = "skipping randomizing %s parameter '%s'" % (paramType, parameter)
