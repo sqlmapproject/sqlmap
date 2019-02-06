@@ -129,7 +129,8 @@ class Entries:
                 else:
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
-                if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
+                if (safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)])\
+                    and conf.col == "":
                     warnMsg = "unable to enumerate the columns for table "
                     warnMsg += "'%s' in database" % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(conf.db)
@@ -140,6 +141,9 @@ class Entries:
 
                 columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]
                 colList = sorted(column for column in columns if column)
+
+                if not colList and conf.col != "":
+                    colList = conf.col.split(",")
 
                 if conf.exclude:
                     colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
