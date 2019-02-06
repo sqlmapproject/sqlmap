@@ -13,7 +13,6 @@ import os
 import random
 import re
 import socket
-import string
 import sys
 import tempfile
 import threading
@@ -36,6 +35,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import decodeStringEscape
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
+from lib.core.common import getUnicode
 from lib.core.common import findLocalPort
 from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth

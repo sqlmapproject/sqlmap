@@ -43,14 +43,14 @@ e1f7758f433202c50426efde5eb96768  lib/core/datatype.py
 fb6be55d21a70765e35549af2484f762  lib/core/__init__.py
 18c896b157b03af716542e5fe9233ef9  lib/core/log.py
 fa9f24e88c81a6cef52da3dd5e637010  lib/core/optiondict.py
-f479c164e44c766316205aa16cf3947b  lib/core/option.py
+fca2d30cc9f9f5906e53542b2a9c247e  lib/core/option.py
 fe370021c6bc99daf44b2bfc0d1effb3  lib/core/patch.py
 4b12aa67fbf6c973d12e54cf9cb54ea0  lib/core/profiling.py
 d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-91a39930f92053b07f6ba594b6691fb8  lib/core/settings.py
+92a41d5a203138d85c80e2ab76a744e4  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 43772ea73e9e3d446f782af591cb4eda  lib/core/target.py
