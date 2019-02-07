@@ -347,7 +347,12 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     """
 
     if conf.hexConvert:
-        charsetType = CHARSET_TYPE.HEXADECIMAL
+        if not hasattr(queries[Backend.getIdentifiedDbms()], "hex"):
+            warnMsg = "switch '--hex' is currently not supported on DBMS %s" % Backend.getIdentifiedDbms()
+            singleTimeWarnMessage(warnMsg)
+            conf.hexConvert = False
+        else:
+            charsetType = CHARSET_TYPE.HEXADECIMAL
 
     kb.safeCharEncode = safeCharEncode
     kb.resumeValues = resumeValue

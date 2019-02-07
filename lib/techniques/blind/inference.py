@@ -631,8 +631,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     dataToStdout(filterControlChars(val))
 
                 # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
-                if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace() and partialValue.strip(' ')[-1:] != '\n':
+                if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
                     finalValue = partialValue[:-INFERENCE_BLANK_BREAK]
+                    break
+                elif charsetType and partialValue[-1:].isspace():
                     break
 
                 if (lastChar > 0 and index >= lastChar):
