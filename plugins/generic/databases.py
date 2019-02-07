@@ -622,7 +622,13 @@ class Databases:
                             index += 1
 
                 if Backend.isDbms(DBMS.SQLITE):
-                    parseSqliteTableSchema(unArrayizeValue(values))
+                    if dumpMode and colList:
+                        if conf.db not in kb.data.cachedColumns:
+                            kb.data.cachedColumns[conf.db] = {}
+                        kb.data.cachedColumns[conf.db][safeSQLIdentificatorNaming(conf.tbl, True)] = dict((_,None) for _ in colList)
+                    else:
+                        parseSqliteTableSchema(unArrayizeValue(values))
+
                 elif not isNoneValue(values):
                     table = {}
                     columns = {}
@@ -718,9 +724,15 @@ class Databases:
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.SQLITE):
-                    query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl)
-                    value = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                    parseSqliteTableSchema(value)
+                    if dumpMode and colList:
+                        if conf.db not in kb.data.cachedColumns:
+                            kb.data.cachedColumns[conf.db] = {}
+                        kb.data.cachedColumns[conf.db][safeSQLIdentificatorNaming(conf.tbl, True)] = dict((_,None) for _ in colList)
+                    else:
+                        query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl)
+                        value = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                        parseSqliteTableSchema(unArrayizeValue(value))
+
                     return kb.data.cachedColumns
 
                 table = {}

@@ -2994,15 +2994,20 @@ def parseSqliteTableSchema(value):
     Parses table column names and types from specified SQLite table schema
     """
 
+    retVal = False
+
     if value:
         table = {}
         columns = {}
 
         for match in re.finditer(r"(\w+)[\"'`]?\s+(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED BIG INT|INT2|INT8|INTEGER|CHARACTER|VARCHAR|VARYING CHARACTER|NCHAR|NATIVE CHARACTER|NVARCHAR|TEXT|CLOB|LONGTEXT|BLOB|NONE|REAL|DOUBLE|DOUBLE PRECISION|FLOAT|REAL|NUMERIC|DECIMAL|BOOLEAN|DATE|DATETIME|NUMERIC)\b", value, re.I):
+            retVal = True
             columns[match.group(1)] = match.group(2)
 
-        table[conf.tbl] = columns
+        table[safeSQLIdentificatorNaming(conf.tbl, True)] = columns
         kb.data.cachedColumns[conf.db] = table
+
+    return retVal
 
 def getTechniqueData(technique=None):
     """
