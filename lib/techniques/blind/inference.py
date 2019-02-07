@@ -635,6 +635,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     finalValue = partialValue[:-INFERENCE_BLANK_BREAK]
                     break
                 elif charsetType and partialValue[-1:].isspace():
+                    finalValue = partialValue[:-1]
                     break
 
                 if (lastChar > 0 and index >= lastChar):
