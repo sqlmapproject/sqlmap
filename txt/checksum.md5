@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-0a6a0426799dcb447311887b30fc498c  lib/core/settings.py
+cb31ee4773d12d0041a2fabb1bbc9291  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 43772ea73e9e3d446f782af591cb4eda  lib/core/target.py
@@ -473,6 +473,7 @@ ba0fb1e6b815446b9d6f30950900fc80  waf/trafficshield.py
 67df54343a85fe053226e2a5483b2c64  waf/wallarm.py
 114000c53115fa8f4dd9b1b9122ec32a  waf/watchguard.py
 a7b8c4c3d1463409e0e204932f0ddff0  waf/webknight.py
+053c6b1ea20133bd9f563f1275ddb5a4  waf/webseal.py
 ac9e4e3ced77012ed97284634a9ffc74  waf/wordfence.py
 e69f77220558564785f0b3c961782a93  waf/yundun.py
 a560bee3e948b97af2c88805933dcaad  waf/yunsuo.py
