@@ -33,8 +33,8 @@ a932126e7d80e545c5d44af178d0bc0c  lib/core/bigarray.py
 964885db1ac028fa622ee5ba20f061b1  lib/core/common.py
 de8d27ae6241163ff9e97aa9e7c51a18  lib/core/convert.py
 abcb1121eb56d3401839d14e8ed06b6e  lib/core/data.py
-e1f7758f433202c50426efde5eb96768  lib/core/datatype.py
-1646402a733e564f05025e848b323cf9  lib/core/decorators.py
+00828c4455321b6987e3f882f4ef4f92  lib/core/datatype.py
+3ec93893ad8b1e060540753b7f8a8caf  lib/core/decorators.py
 5f4680b769ae07f22157bd832c97cf8f  lib/core/defaults.py
 9dfc69ba47209a4ceca494dde9ee8183  lib/core/dicts.py
 4ba141124699fd7a763dea82f17fe523  lib/core/dump.py
@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-8aa51078439218dacde3c4283ed22845  lib/core/settings.py
+75098335768c0cfa062995a83ceaef78  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 43772ea73e9e3d446f782af591cb4eda  lib/core/target.py

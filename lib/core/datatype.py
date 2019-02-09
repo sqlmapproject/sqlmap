@@ -120,15 +120,12 @@ class LRUDict(object):
         return key in self.cache
 
     def __getitem__(self, key):
-        try:
-            value = self.cache.pop(key)
-            self.cache[key] = value
-            return value
-        except KeyError:
-            return -1
+        value = self.cache.pop(key)
+        self.cache[key] = value
+        return value
 
     def get(self, key):
-        return self.__getitem__(self, key)
+        return self.__getitem__(key)
 
     def __setitem__(self, key, value):
         try:

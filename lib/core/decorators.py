@@ -24,12 +24,17 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
 
     @functools.wraps(f)
     def _(*args, **kwargs):
-        with _lock:
-            key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
-            if key not in cache:
-                cache[key] = f(*args, **kwargs)
+        key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
 
-            return cache[key]
+        try:
+            result = cache[key]
+        except KeyError:
+            result = f(*args, **kwargs)
+
+            with _lock:
+                cache[key] = result
+
+        return result
 
     return _
 
