@@ -77,7 +77,7 @@ class Web:
         if not cmd:
             cmd = conf.osCmd
 
-        cmdUrl = "%s?cmd=%s" % (self.webBackdoorUrl, cmd)
+        cmdUrl = "%s?cmd=%s" % (self.webBackdoorUrl, getUnicode(cmd))
         page, _, _ = Request.getPage(url=cmdUrl, direct=True, silent=True, timeout=BACKDOOR_RUN_CMD_TIMEOUT)
 
         if page is not None:
