@@ -715,7 +715,7 @@
             <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE %s" condition="table_name" condition2="table_schem"/>
         </search_table>
         <search_column>
-            <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s"  count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
+            <blind query="SELECT DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_schem='%s'" count="SELECT COUNT(DISTINCT(table_schem)) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_schem='%s'" condition="column_name" condition2="table_schem" condition3="table_name"/>
             <inband query="SELECT table_schem,table_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE %s" condition="column_name" condition2="table_schem" condition3="table_name"/>
         </search_column>
     </dbms>
