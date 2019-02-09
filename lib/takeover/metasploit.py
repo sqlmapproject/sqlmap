@@ -558,7 +558,7 @@ class Metasploit:
 
                 # For --os-pwn and --os-bof
                 pwnBofCond = self.connectionStr.startswith("reverse")
-                pwnBofCond &= "Starting the payload handler" in out
+                pwnBofCond &= any(_ in out for _ in ("Starting the payload handler", "Started reverse"))
 
                 # For --os-smbrelay
                 smbRelayCond = "Server started" in out
