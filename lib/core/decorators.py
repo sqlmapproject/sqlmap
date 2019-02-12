@@ -27,7 +27,8 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
         key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
 
         try:
-            result = cache[key]
+            with _lock:
+                result = cache[key]
         except KeyError:
             result = f(*args, **kwargs)
 
