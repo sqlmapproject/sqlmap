@@ -84,6 +84,7 @@ from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import SORT_ORDER
+from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapNoneDataException
@@ -4784,6 +4785,8 @@ def getSafeExString(ex, encoding=None):
     u'foobar'
     """
 
+    retVal = None
+
     if getattr(ex, "message", None):
         retVal = ex.message
     elif getattr(ex, "msg", None):
@@ -4792,8 +4795,11 @@ def getSafeExString(ex, encoding=None):
         retVal = ex[1]
     elif isinstance(ex, (list, tuple)) and len(ex) > 0 and isinstance(ex[0], basestring):
         retVal = ex[0]
-    else:
+
+    if retVal is None:
         retVal = str(ex)
+    elif not isinstance(ex, SqlmapBaseException):
+        retVal = "%s: %s" % (type(ex).__name__, retVal)
 
     return getUnicode(retVal or "", encoding=encoding).strip()
 

@@ -18,6 +18,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD
+from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUserQuitException
@@ -95,7 +96,8 @@ def exceptionHandledFunction(threadFunction, silent=False):
         raise
     except Exception as ex:
         if not silent and kb.get("threadContinue"):
-            logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
+            errMsg = ex.message if isinstance(ex, SqlmapBaseException) else "%s: %s" % (type(ex).__name__, ex.message)
+            logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
 
             if conf.get("verbose") > 1:
                 traceback.print_exc()
