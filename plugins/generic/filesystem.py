@@ -28,6 +28,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUndefinedMethod
+from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
@@ -37,7 +38,7 @@ class Filesystem:
     """
 
     def __init__(self):
-        self.fileTblName = "sqlmapfile"
+        self.fileTblName = "%sfile" % TAKEOVER_TABLE_PREFIX
         self.tblField = "data"
 
     def _checkFileLength(self, localFile, remoteFile, fileRead=False):

@@ -24,6 +24,7 @@ from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUndefinedMethod
 from lib.core.exception import SqlmapUnsupportedDBMSException
+from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.takeover.abstraction import Abstraction
 from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
@@ -37,7 +38,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
     """
 
     def __init__(self):
-        self.cmdTblName = "sqlmapoutput"
+        self.cmdTblName = ("%soutput" % TAKEOVER_TABLE_PREFIX)
         self.tblField = "data"
 
         Abstraction.__init__(self)

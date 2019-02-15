@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.2.21"
+VERSION = "1.3.2.22"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -773,6 +773,9 @@ BRUTE_DOC_ROOT_PREFIXES = {
     OS.WINDOWS: ("/xampp", "/Program Files/xampp", "/wamp", "/Program Files/wampp", "/apache", "/Program Files/Apache Group/Apache", "/Program Files/Apache Group/Apache2", "/Program Files/Apache Group/Apache2.2", "/Program Files/Apache Group/Apache2.4", "/Inetpub/wwwroot", "/Inetpub/wwwroot/%TARGET%", "/Inetpub/vhosts/%TARGET%")
 }
 
+# Table prefix to use in "takeover" functionalities (i.e. auxiliary tables used by sqlmap at the vulnerable DBMS)
+TAKEOVER_TABLE_PREFIX = "sqlmap"
+
 # Suffixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_SUFFIXES = ("", "html", "htdocs", "httpdocs", "php", "public", "src", "site", "build", "web", "www", "data", "sites/all", "www/build")
 
@@ -809,3 +812,11 @@ th{
     font-size:12px;
 }
 </style>"""
+
+# Leaving (dirty) possibility to change values from here (e.g. `export SQLMAP__MAX_NUMBER_OF_THREADS=20`)
+
+for key, value in os.environ.items():
+    if key.upper().startswith("%s_" % SQLMAP_ENVIRONMENT_PREFIX):
+        _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
+        if _ in globals():
+            globals()[_] = value
