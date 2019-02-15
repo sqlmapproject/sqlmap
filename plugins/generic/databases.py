@@ -910,6 +910,7 @@ class Databases:
         else:
             query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
 
+        query = agent.whereQuery(query)
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if isNumPosStrValue(count):
