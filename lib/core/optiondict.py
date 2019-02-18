@@ -211,6 +211,7 @@ optDict = {
         "hexConvert": "boolean",
         "outputDir": "string",
         "parseErrors": "boolean",
+        "repair": "boolean",
         "saveConfig": "string",
         "scope": "string",
         "testFilter": "string",

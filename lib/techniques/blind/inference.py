@@ -82,7 +82,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     retVal = hashDBRetrieve(expression, checkConf=True)
 
     if retVal:
-        if PARTIAL_HEX_VALUE_MARKER in retVal:
+        if conf.repair and INFERENCE_UNKNOWN_CHAR in retVal:
+            pass
+        elif PARTIAL_HEX_VALUE_MARKER in retVal:
             retVal = retVal.replace(PARTIAL_HEX_VALUE_MARKER, "")
 
             if retVal and conf.hexConvert:

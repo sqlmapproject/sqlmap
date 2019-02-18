@@ -31,6 +31,7 @@ from lib.core.exception import SqlmapShellQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
+from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
 from lib.core.settings import VERSION_STRING
@@ -593,6 +594,9 @@ def cmdLineParser(argv=None):
 
         general.add_option("--parse-errors", dest="parseErrors", action="store_true",
                            help="Parse and display DBMS error messages from responses")
+
+        general.add_option("--repair", dest="repair", action="store_true",
+                           help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
 
         general.add_option("--save", dest="saveConfig",
                            help="Save options to a configuration INI file")
