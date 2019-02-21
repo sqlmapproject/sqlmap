@@ -313,43 +313,40 @@ def decodePage(page, contentEncoding, contentType):
 
     # can't do for all responses because we need to support binary files too
     if not isinstance(page, unicode) and "text/" in contentType:
-        if kb.heuristicMode:
-            kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
-            page = getUnicode(page, kb.pageEncoding)
-        else:
-            # e.g. &#195;&#235;&#224;&#226;&#224;
-            if "&#" in page:
-                page = re.sub(r"&#(\d{1,3});", lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
+        # e.g. &#x9;&#195;&#235;&#224;&#226;&#224;
+        if "&#" in page:
+            page = re.sub(r"&#x([0-9a-f]{1,2});", lambda _: (_.group(1) if len(_.group(1)) == 2 else "0%s" % _.group(1)).decode("hex"), page)
+            page = re.sub(r"&#(\d{1,3});", lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
 
-            # e.g. %20%28%29
-            if "%" in page:
-                page = re.sub(r"%([0-9a-fA-F]{2})", lambda _: _.group(1).decode("hex"), page)
+        # e.g. %20%28%29
+        if "%" in page:
+            page = re.sub(r"%([0-9a-fA-F]{2})", lambda _: _.group(1).decode("hex"), page)
 
-            # e.g. &amp;
-            page = re.sub(r"&([^;]+);", lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
+        # e.g. &amp;
+        page = re.sub(r"&([^;]+);", lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
 
-            kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
+        kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
 
-            if (kb.pageEncoding or "").lower() == "utf-8-sig":
-                kb.pageEncoding = "utf-8"
-                if page and page.startswith("\xef\xbb\xbf"):  # Reference: https://docs.python.org/2/library/codecs.html (Note: noticed problems when "utf-8-sig" is left to Python for handling)
-                    page = page[3:]
+        if (kb.pageEncoding or "").lower() == "utf-8-sig":
+            kb.pageEncoding = "utf-8"
+            if page and page.startswith("\xef\xbb\xbf"):  # Reference: https://docs.python.org/2/library/codecs.html (Note: noticed problems when "utf-8-sig" is left to Python for handling)
+                page = page[3:]
 
-            page = getUnicode(page, kb.pageEncoding)
+        page = getUnicode(page, kb.pageEncoding)
 
-            # e.g. &#8217;&#8230;&#8482;
-            if "&#" in page:
-                def _(match):
-                    retVal = match.group(0)
-                    try:
-                        retVal = unichr(int(match.group(1)))
-                    except (ValueError, OverflowError):
-                        pass
-                    return retVal
-                page = re.sub(r"&#(\d+);", _, page)
+        # e.g. &#8217;&#8230;&#8482;
+        if "&#" in page:
+            def _(match):
+                retVal = match.group(0)
+                try:
+                    retVal = unichr(int(match.group(1)))
+                except (ValueError, OverflowError):
+                    pass
+                return retVal
+            page = re.sub(r"&#(\d+);", _, page)
 
-            # e.g. &zeta;
-            page = re.sub(r"&([^;]+);", lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
+        # e.g. &zeta;
+        page = re.sub(r"&([^;]+);", lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
     return page
 
