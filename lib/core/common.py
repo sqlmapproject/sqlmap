@@ -4781,7 +4781,7 @@ def getSafeExString(ex, encoding=None):
     Safe way how to get the proper exception represtation as a string
     (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
 
-    >>> getSafeExString(Exception('foobar'))
+    >>> getSafeExString(SqlmapBaseException('foobar'))
     u'foobar'
     """
 
