@@ -228,7 +228,7 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif "MemoryError" in excMsg:
+        elif any(_ in excMsg for _ in ("MemoryError", "Cannot allocate memory")):
             errMsg = "memory exhaustion detected"
             logger.critical(errMsg)
             raise SystemExit
