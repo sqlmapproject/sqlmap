@@ -1040,10 +1040,10 @@ class Connect(object):
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):
                 retVal = paramString
-                match = re.search(r"(\A|\b)%s=(?P<value>[^&;]+)" % re.escape(randomParameter), paramString)
+                match = re.search(r"(\A|\b)%s=(?P<value>[^&;]*)" % re.escape(randomParameter), paramString)
                 if match:
                     origValue = match.group("value")
-                    retVal = re.sub(r"(\A|\b)%s=[^&;]+" % re.escape(randomParameter), "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
+                    retVal = re.sub(r"(\A|\b)%s=[^&;]*" % re.escape(randomParameter), "%s=%s" % (randomParameter, randomizeParameterValue(origValue)), paramString)
                 return retVal
 
             for randomParameter in conf.rParam:

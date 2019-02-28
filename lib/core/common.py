@@ -3947,6 +3947,9 @@ def randomizeParameterValue(value):
         parts[-1] = random.sample(RANDOMIZATION_TLDS, 1)[0]
         retVal = '.'.join(parts)
 
+    if not retVal:
+        retVal = randomStr(lowercase=True)
+
     return retVal
 
 @cachedmethod
