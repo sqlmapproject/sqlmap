@@ -346,7 +346,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     affected parameter.
     """
 
-    if conf.hexConvert:
+    if conf.hexConvert and expected != EXPECTED.BOOL and Backend.getIdentifiedDbms():
         if not hasattr(queries[Backend.getIdentifiedDbms()], "hex"):
             warnMsg = "switch '--hex' is currently not supported on DBMS %s" % Backend.getIdentifiedDbms()
             singleTimeWarnMessage(warnMsg)
