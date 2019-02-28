@@ -147,6 +147,7 @@ from lib.core.settings import PRINTABLE_CHAR_REGEX
 from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
 from lib.core.settings import PUSH_VALUE_EXCEPTION_RETRY_COUNT
 from lib.core.settings import PYVERSION
+from lib.core.settings import RANDOMIZATION_TLDS
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import REFLECTED_BORDER_REGEX
 from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
@@ -3940,6 +3941,11 @@ def randomizeParameterValue(value):
                 break
 
         retVal = retVal.replace(original, candidate)
+
+    if re.match(r"\A[^@]+@.+\.[a-z]+\Z", value):
+        parts = retVal.split('.')
+        parts[-1] = random.sample(RANDOMIZATION_TLDS, 1)[0]
+        retVal = '.'.join(parts)
 
     return retVal
 
