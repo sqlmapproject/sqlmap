@@ -1278,28 +1278,32 @@ def _setHTTPUserAgent():
           file choosed as user option
     """
 
+    debugMsg = "setting the HTTP User-Agent header"
+    logger.debug(debugMsg)
+
     if conf.mobile:
-        message = "which smartphone do you want sqlmap to imitate "
-        message += "through HTTP User-Agent header?\n"
-        items = sorted(getPublicTypeMembers(MOBILES, True))
+        if conf.randomAgent:
+            _ = random.sample([_[1] for _ in getPublicTypeMembers(MOBILES, True)], 1)[0]
+            conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, _))
+        else:
+            message = "which smartphone do you want sqlmap to imitate "
+            message += "through HTTP User-Agent header?\n"
+            items = sorted(getPublicTypeMembers(MOBILES, True))
 
-        for count in xrange(len(items)):
-            item = items[count]
-            message += "[%d] %s%s\n" % (count + 1, item[0], " (default)" if item == MOBILES.IPHONE else "")
+            for count in xrange(len(items)):
+                item = items[count]
+                message += "[%d] %s%s\n" % (count + 1, item[0], " (default)" if item == MOBILES.IPHONE else "")
 
-        test = readInput(message.rstrip('\n'), default=items.index(MOBILES.IPHONE) + 1)
+            test = readInput(message.rstrip('\n'), default=items.index(MOBILES.IPHONE) + 1)
 
-        try:
-            item = items[int(test) - 1]
-        except:
-            item = MOBILES.IPHONE
+            try:
+                item = items[int(test) - 1]
+            except:
+                item = MOBILES.IPHONE
 
-        conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, item[1]))
+            conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, item[1]))
 
     elif conf.agent:
-        debugMsg = "setting the HTTP User-Agent header"
-        logger.debug(debugMsg)
-
         conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, conf.agent))
 
     elif not conf.randomAgent:
