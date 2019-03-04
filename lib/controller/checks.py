@@ -1421,17 +1421,24 @@ def identifyWaf():
         page, headers, code = None, None, None
         try:
             pushValue(kb.redirectChoice)
+            pushValue(kb.resendPostOnRedirect)
+
             kb.redirectChoice = REDIRECTION.YES
+            kb.resendPostOnRedirect = True
+
             if kwargs.get("get"):
                 kwargs["get"] = urlencode(kwargs["get"])
             kwargs["raise404"] = False
             kwargs["silent"] = True
             kwargs["finalCode"] = True
+
             page, headers, code = Request.getPage(*args, **kwargs)
         except Exception:
             pass
         finally:
+            kb.resendPostOnRedirect = popValue()
             kb.redirectChoice = popValue()
+
         return page or "", headers or {}, code
 
     retVal = []

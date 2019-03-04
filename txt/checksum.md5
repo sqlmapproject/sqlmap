@@ -24,7 +24,7 @@ fb6be55d21a70765e35549af2484f762  extra/sqlharvest/__init__.py
 fb6be55d21a70765e35549af2484f762  extra/wafdetectify/__init__.py
 aec73042403993076f478da48066a79e  extra/wafdetectify/wafdetectify.py
 e6909a3b32fc09c0373101eb58c76538  lib/controller/action.py
-d392dbccdb59ac36530c1182675a2609  lib/controller/checks.py
+0fce185e63b1b743b3ef0a3dbe640366  lib/controller/checks.py
 8581acf56b8fb0def50af3707490a834  lib/controller/controller.py
 c1da277517c7ec4c23e953a51b51e203  lib/controller/handler.py
 fb6be55d21a70765e35549af2484f762  lib/controller/__init__.py
@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-dd5a87792c98d150cd5d9c85bc086d13  lib/core/settings.py
+9dbce20566a1964f650b8986885ae370  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 43772ea73e9e3d446f782af591cb4eda  lib/core/target.py
