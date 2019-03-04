@@ -2074,6 +2074,19 @@ ers (0x80040E14)
 [...]
 ```
 
+### Preprocess response data
+
+Option `--preprocess`
+
+Using this option it is possible to use a preprocessing script for (HTTP) response data prior being used by the sqlmap detection engine (e.g. to decode data or to remove junk). For example, preprocessing script that transforms all lowercase characters to uppercase could be:
+
+```
+#!/usr/bin/env
+
+def preprocess(page, headers=None, code=None):
+    return page.upper() if page else page, headers, code
+```
+
 ### Save options in a configuration INI file
 
 Option: `--save`
