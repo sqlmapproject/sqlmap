@@ -22,7 +22,7 @@ a32e12410e0f86c1d035db6daae84680  extra/shutils/duplicates.py
 fb6be55d21a70765e35549af2484f762  extra/sqlharvest/__init__.py
 4f82e97b09cc530cb9a92472d0835cea  extra/sqlharvest/sqlharvest.py
 fb6be55d21a70765e35549af2484f762  extra/wafdetectify/__init__.py
-aec73042403993076f478da48066a79e  extra/wafdetectify/wafdetectify.py
+4dc5e7c5400204159baaf10a0a9124f0  extra/wafdetectify/wafdetectify.py
 e6909a3b32fc09c0373101eb58c76538  lib/controller/action.py
 0fce185e63b1b743b3ef0a3dbe640366  lib/controller/checks.py
 8581acf56b8fb0def50af3707490a834  lib/controller/controller.py
@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-430c1a61f8acb571e755a3ddab1c1591  lib/core/settings.py
+918a8651a9872a33ddb04f82ac3360c3  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 43772ea73e9e3d446f782af591cb4eda  lib/core/target.py
@@ -118,7 +118,7 @@ b79654e49850937ab2dc8e0d73625cab  lib/utils/purge.py
 503637fbdabaad5bc7f87dfcfbea4dd3  lib/utils/search.py
 272a538a3d36186113191f4c543bb34b  lib/utils/sqlalchemy.py
 68f90f633d812ca428d2f15f016b2d96  lib/utils/timeout.py
-164f830baad3e13b226ee57d44d69dfa  lib/utils/versioncheck.py
+e0cecb6efea4dbd6ac389f6162808283  lib/utils/versioncheck.py
 a5007113e3cda726e1d131b99b927284  lib/utils/xrange.py
 28da82c0afa4d8a0e9848f7bd8e994b7  LICENSE
 b8656f4785d0945e68257107a171f945  plugins/dbms/access/connector.py
@@ -236,7 +236,7 @@ ec2ba8c757ac96425dcd2b97970edd3a  shell/stagers/stager.asp_
 0c48ddb1feb7e38a951ef05a0d48e032  shell/stagers/stager.jsp_
 2f9e459a4cf6a58680978cdce5ff7971  shell/stagers/stager.php_
 41522f8ad02ac133ca0aeaab374c36a8  sqlmapapi.py
-9693388e705f68e0e307dc225c64ae42  sqlmap.py
+a436dd078b06bf664637b27f42889a35  sqlmap.py
 772fb3dd15edc9d4055ab9f9dee0c203  tamper/0x2char.py
 3d89a5c4c33d4d1d9303f5e3bd11f0ae  tamper/apostrophemask.py
 1fd0eec63970728c1e6628b2e4c21d81  tamper/apostrophenullencode.py

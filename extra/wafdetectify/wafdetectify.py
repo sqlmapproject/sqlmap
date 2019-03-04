@@ -73,7 +73,7 @@ def main():
     print(colorize("%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)))
 
     if len(sys.argv) < 2:
-        exit(colorize("[x] usage: python %s <hostname>" % os.path.split(__file__)[-1]))
+        sys.exit(colorize("[x] usage: python %s <hostname>" % os.path.split(__file__)[-1]))
 
     cookie_jar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie_jar))
@@ -96,11 +96,11 @@ def main():
                 del sys.modules[filename[:-3]]
             module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or "utf8"))
         except ImportError as ex:
-            exit(colorize("[x] cannot import WAF script '%s' (%s)" % (filename[:-3], ex)))
+            sys.exit(colorize("[x] cannot import WAF script '%s' (%s)" % (filename[:-3], ex)))
 
         _ = dict(inspect.getmembers(module))
         if "detect" not in _:
-            exit(colorize("[x] missing function 'detect(get_page)' in WAF script '%s'" % found))
+            sys.exit(colorize("[x] missing function 'detect(get_page)' in WAF script '%s'" % found))
         else:
             WAF_FUNCTIONS.append((_["detect"], _.get("__product__", filename[:-3])))
 
@@ -113,7 +113,7 @@ def main():
         socket.getaddrinfo(hostname, None)
     except socket.gaierror:
         print(colorize("[x] host '%s' does not exist" % hostname))
-        exit(1)
+        sys.exit(1)
 
     found = False
     for function, product in WAF_FUNCTIONS:
@@ -121,14 +121,14 @@ def main():
             continue
 
         if function(get_page):
-            exit(colorize("[!] WAF/IPS identified as '%s'" % product))
+            sys.exit(colorize("[!] WAF/IPS identified as '%s'" % product))
 
     if not found:
         print(colorize("[o] nothing found"))
 
     print()
 
-    exit(int(not found))
+    sys.exit(int(not found))
 
 if __name__ == "__main__":
     main()

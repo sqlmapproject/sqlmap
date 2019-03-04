@@ -15,7 +15,7 @@ try:
     try:
         __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
     except ImportError:
-        exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
+        sys.exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
     import bdb
     import distutils
@@ -76,7 +76,7 @@ except KeyboardInterrupt:
         raise SystemExit
     else:
         import time
-        exit("\r[%s] [CRITICAL] %s" % (time.strftime("%X"), errMsg))
+        sys.exit("\r[%s] [CRITICAL] %s" % (time.strftime("%X"), errMsg))
 
 def modulePath():
     """

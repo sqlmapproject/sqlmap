@@ -11,7 +11,7 @@ import time
 PYVERSION = sys.version.split()[0]
 
 if PYVERSION >= "3" or PYVERSION < "2.6":
-    exit("[%s] [CRITICAL] incompatible Python version detected ('%s'). To successfully run sqlmap you'll have to use version 2.6.x or 2.7.x (visit 'https://www.python.org/downloads/')" % (time.strftime("%X"), PYVERSION))
+    sys.exit("[%s] [CRITICAL] incompatible Python version detected ('%s'). To successfully run sqlmap you'll have to use version 2.6.x or 2.7.x (visit 'https://www.python.org/downloads/')" % (time.strftime("%X"), PYVERSION))
 
 errors = []
 extensions = ("bz2", "gzip", "pyexpat", "ssl", "sqlite3", "zlib")
@@ -25,4 +25,4 @@ if errors:
     errMsg = "missing one or more core extensions (%s) " % (", ".join("'%s'" % _ for _ in errors))
     errMsg += "most likely because current version of Python has been "
     errMsg += "built without appropriate dev packages"
-    exit(errMsg)
+    sys.exit(errMsg)
