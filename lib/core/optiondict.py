@@ -192,7 +192,6 @@ optDict = {
     },
 
     "General": {
-        # "xmlFile": "string",
         "trafficFile": "string",
         "batch": "boolean",
         "binaryFields": "string",
@@ -211,6 +210,7 @@ optDict = {
         "hexConvert": "boolean",
         "outputDir": "string",
         "parseErrors": "boolean",
+        "preprocess": "string",
         "repair": "boolean",
         "saveConfig": "string",
         "scope": "string",
