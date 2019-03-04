@@ -746,6 +746,14 @@ class Connect(object):
                     page = getUnicode(page)
             socket.setdefaulttimeout(conf.timeout)
 
+        for function in kb.preprocessFunctions:
+            try:
+                page, responseHeaders, code = function(page, responseHeaders, code)
+            except Exception as ex:
+                errMsg = "error occurred while running preprocess "
+                errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
+                raise SqlmapGenericException(errMsg)
+
         processResponse(page, responseHeaders, status)
 
         if conn and getattr(conn, "redurl", None):

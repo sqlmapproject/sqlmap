@@ -595,6 +595,9 @@ def cmdLineParser(argv=None):
         general.add_option("--parse-errors", dest="parseErrors", action="store_true",
                            help="Parse and display DBMS error messages from responses")
 
+        general.add_option("--preprocess", dest="preprocess",
+                             help="Use given script(s) for preprocessing of response data")
+
         general.add_option("--repair", dest="repair", action="store_true",
                            help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
 
