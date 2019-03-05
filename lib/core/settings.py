@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.3.4"
+VERSION = "1.3.3.5"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -761,8 +761,8 @@ METASPLOIT_SESSION_TIMEOUT = 120
 # Reference: http://www.postgresql.org/docs/9.0/static/catalog-pg-largeobject.html
 LOBLKSIZE = 2048
 
-# Suffix used to mark variables having keyword names
-EVALCODE_KEYWORD_SUFFIX = "_KEYWORD"
+# Prefix used to mark special variables (e.g. keywords, having special chars, etc.)
+EVALCODE_ENCODED_PREFIX = "EVAL_"
 
 # Reference: http://www.cookiecentral.com/faq/#3.5
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."

@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 import binascii
 import compiler
 import httplib
-import keyword
 import logging
 import re
 import socket
@@ -92,7 +91,7 @@ from lib.core.settings import DEFAULT_CONTENT_TYPE
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_USER_AGENT
-from lib.core.settings import EVALCODE_KEYWORD_SUFFIX
+from lib.core.settings import EVALCODE_ENCODED_PREFIX
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
@@ -1070,7 +1069,6 @@ class Connect(object):
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
             variables = {"uri": uri, "lastPage": threadData.lastPage, "_locals": locals()}
             originals = {}
-            keywords = keyword.kwlist
 
             if not get and PLACE.URI in conf.parameters:
                 query = urlparse.urlsplit(uri).query or ""
@@ -1085,8 +1083,6 @@ class Connect(object):
                         if safeVariableNaming(name) != name:
                             conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
                             name = safeVariableNaming(name)
-                        elif name in keywords:
-                            name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True, spaceplus=(item == post and kb.postSpaceToPlus))
                         variables[name] = value
 
@@ -1098,8 +1094,6 @@ class Connect(object):
                         if safeVariableNaming(name) != name:
                             conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
                             name = safeVariableNaming(name)
-                        elif name in keywords:
-                            name = "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX)
                         value = urldecode(value, convall=True)
                         variables[name] = value
 
@@ -1109,20 +1103,20 @@ class Connect(object):
                 except SyntaxError as ex:
                     if ex.text:
                         original = replacement = ex.text.strip()
+
                         if '=' in original:
                             name, value = original.split('=', 1)
                             name = name.strip()
                             if safeVariableNaming(name) != name:
                                 replacement = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), replacement)
-                            elif name in keywords:
-                                replacement = re.sub(r"\b%s\b" % re.escape(name), "%s%s" % (name, EVALCODE_KEYWORD_SUFFIX), replacement)
                         else:
                             for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
-                                if _ in keywords:
-                                    replacement = replacement.replace(_, "%s%s" % (_, EVALCODE_KEYWORD_SUFFIX))
+                                if safeVariableNaming(_) != _:
+                                    replacement = replacement.replace(_, safeVariableNaming(_))
                                     break
+
                         if original == replacement:
-                            conf.evalCode = conf.evalCode.replace(EVALCODE_KEYWORD_SUFFIX, "")
+                            conf.evalCode = conf.evalCode.replace(EVALCODE_ENCODED_PREFIX, "")
                             break
                         else:
                             conf.evalCode = conf.evalCode.replace(getUnicode(ex.text.strip(), UNICODE_ENCODING), replacement)
@@ -1135,11 +1129,6 @@ class Connect(object):
             evaluateCode(conf.evalCode, variables)
 
             for variable in list(variables.keys()):
-                if variable.endswith(EVALCODE_KEYWORD_SUFFIX):
-                    value = variables[variable]
-                    del variables[variable]
-                    variables[variable.replace(EVALCODE_KEYWORD_SUFFIX, "")] = value
-
                 if unsafeVariableNaming(variable) != variable:
                     value = variables[variable]
                     del variables[variable]

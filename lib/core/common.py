@@ -16,6 +16,7 @@ import hashlib
 import httplib
 import inspect
 import json
+import keyword
 import locale
 import logging
 import ntpath
@@ -115,6 +116,7 @@ from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_BOUNDARY_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
+from lib.core.settings import EVALCODE_ENCODED_PREFIX
 from lib.core.settings import FILE_PATH_REGEXES
 from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
@@ -4816,21 +4818,27 @@ def safeVariableNaming(value):
     """
     Returns escaped safe-representation of a given variable name that can be used in Python evaluated code
 
-    >>> safeVariableNaming("foo bar")
-    'foo__SAFE__20bar'
+    >>> safeVariableNaming("class.id")
+    'EVAL_636c6173732e6964'
     """
 
-    return re.sub(r"[^\w]", lambda match: "%s%02x" % (SAFE_VARIABLE_MARKER, ord(match.group(0))), value)
+    if value in keyword.kwlist or re.search(r"\A[^a-zA-Z]|[^\w]", value):
+        value = "%s%s" % (EVALCODE_ENCODED_PREFIX, value.encode(UNICODE_ENCODING).encode("hex"))
+
+    return value
 
 def unsafeVariableNaming(value):
     """
     Returns unescaped safe-representation of a given variable name
 
-    >>> unsafeVariableNaming("foo__SAFE__20bar")
-    'foo bar'
+    >>> unsafeVariableNaming("EVAL_636c6173732e6964")
+    u'class.id'
     """
 
-    return re.sub(r"%s([0-9a-f]{2})" % SAFE_VARIABLE_MARKER, lambda match: match.group(1).decode("hex"), value)
+    if value.startswith(EVALCODE_ENCODED_PREFIX):
+        value = value[len(EVALCODE_ENCODED_PREFIX):].decode("hex").decode(UNICODE_ENCODING)
+
+    return value
 
 def firstNotNone(*args):
     """
