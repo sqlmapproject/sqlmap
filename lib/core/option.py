@@ -1690,8 +1690,8 @@ def _cleanupOptions():
             re.compile(conf.csrfToken)
 
             if re.escape(conf.csrfToken) != conf.csrfToken:
-                message = "provided value for option '--csrf-token' is a regular expression? [Y/n] "
-                if not readInput(message, default='Y', boolean=True):
+                message = "provided value for option '--csrf-token' is a regular expression? [y/N] "
+                if not readInput(message, default='N', boolean=True):
                     conf.csrfToken = re.escape(conf.csrfToken)
         except re.error:
             conf.csrfToken = re.escape(conf.csrfToken)
