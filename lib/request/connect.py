@@ -603,7 +603,7 @@ class Connect(object):
             responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+                logHeaders = "".join(responseHeaders.headers).strip()
 
             logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]), start, time.time())
 
@@ -770,7 +770,7 @@ class Connect(object):
             responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
         if responseHeaders:
-            logHeaders = "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+            logHeaders = "".join(responseHeaders.headers).strip()
 
         if not skipLogTraffic:
             logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]), start, time.time())
