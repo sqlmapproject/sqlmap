@@ -50,10 +50,10 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-d4e63b95ac045f4adce348b6b30fb780  lib/core/settings.py
+10052581ade5d3c9d98d735eff8fb9b7  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
-43772ea73e9e3d446f782af591cb4eda  lib/core/target.py
+0a5b0a97a36c19022665f66858fd7450  lib/core/target.py
 7857b24b7865ccb4a05283faa596974d  lib/core/testing.py
 5c369aefa7c5af85dee9212acdf94bbc  lib/core/threads.py
 2c263c8610667fdc593c50a35ab20f57  lib/core/unescaper.py
