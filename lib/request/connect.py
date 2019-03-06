@@ -972,6 +972,10 @@ class Connect(object):
         if conf.csrfToken:
             def _adjustParameter(paramString, parameter, newValue):
                 retVal = paramString
+
+                if urlencode(parameter) in paramString:
+                    parameter = urlencode(parameter)
+
                 match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString, re.I)
                 if match:
                     retVal = re.sub("(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
@@ -979,6 +983,7 @@ class Connect(object):
                     match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString, re.I)
                     if match:
                         retVal = re.sub("(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
+
                 return retVal
 
             token = AttribDict()
