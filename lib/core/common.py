@@ -3501,7 +3501,7 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(value, '*' * len(value))
 
     # Just in case (for problematic parameters regarding user encoding)
-    for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
+    for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie|auth-\w+|proxy)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     # Fail-safe substitution

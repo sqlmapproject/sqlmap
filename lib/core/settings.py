@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.3.10"
+VERSION = "1.3.3.11"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -378,7 +378,7 @@ URI_HTTP_HEADER = "URI"
 URI_INJECTABLE_REGEX = r"//[^/]*/([^\.*?]+)\Z"
 
 # Regex used for masking sensitive data
-SENSITIVE_DATA_REGEX = r"(\s|=)(?P<result>[^\s=]*%s[^\s]*)\s"
+SENSITIVE_DATA_REGEX = r"(\s|=)(?P<result>[^\s=]*\b%s\b[^\s]*)\s"
 
 # Options to explicitly mask in anonymous (unhandled exception) reports (along with anything carrying the <hostname> inside)
 SENSITIVE_OPTIONS = ("hostname", "answers", "data", "dnsDomain", "googleDork", "authCred", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy", "fileRead", "fileWrite", "fileDest", "testParameter", "authCred")
