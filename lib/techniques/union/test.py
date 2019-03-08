@@ -303,9 +303,9 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
             if not all((validPayload, vector)) and not warnMsg.endswith("consider "):
                 singleTimeWarnMessage(warnMsg)
 
-    if count and orderBy is None and kb.orderByColumns is not None:  # discard ORDER BY results (not usable - e.g. maybe invalid altogether)
-        conf.uChar, kb.uChar = uChars
-        validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
+        if orderBy is None and kb.orderByColumns is not None and not all((validPayload, vector)):  # discard ORDER BY results (not usable - e.g. maybe invalid altogether)
+            conf.uChar, kb.uChar = uChars
+            validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     return validPayload, vector
 
