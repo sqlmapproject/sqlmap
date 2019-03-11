@@ -2237,7 +2237,7 @@ Default sqlmap behavior with option `-g` is to do a Google search and use the fi
 
 Switch: `--hpp`
 
-HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS/IDS protection mechanisms (explained [here](http://www.imperva.com/resources/glossary/http_parameter_pollution_hpp.html)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
+HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS/IDS protection mechanisms (explained [here](https://www.imperva.com/resources/glossary/http-parameter-pollution)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
 
 ### Make a through testing for a WAF/IPS/IDS protection
 
