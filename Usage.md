@@ -26,10 +26,10 @@ Options:
     These options can be used to specify how to connect to the target URL
 
     --method=METHOD     Force usage of given HTTP method (e.g. PUT)
-    --data=DATA         Data string to be sent through POST
-    --param-del=PARA..  Character used for splitting parameter values
-    --cookie=COOKIE     HTTP Cookie header value
-    --cookie-del=COO..  Character used for splitting cookie values
+    --data=DATA         Data string to be sent through POST (e.g. "id=1")
+    --param-del=PARA..  Character used for splitting parameter values (e.g. &)
+    --cookie=COOKIE     HTTP Cookie header value (e.g. "PHPSESSID=a8d127e..")
+    --cookie-del=COO..  Character used for splitting cookie values (e.g. ;)
     --load-cookies=L..  File containing cookies in Netscape/wget format
     --drop-set-cookie   Ignore Set-Cookie header from response
     --user-agent=AGENT  HTTP User-Agent header value
@@ -41,7 +41,7 @@ Options:
     --auth-type=AUTH..  HTTP authentication type (Basic, Digest, NTLM or PKI)
     --auth-cred=AUTH..  HTTP authentication credentials (name:password)
     --auth-file=AUTH..  HTTP authentication PEM cert/private key file
-    --ignore-code=IG..  Ignore HTTP error code (e.g. 401)
+    --ignore-code=IG..  Ignore (problematic) HTTP error code (e.g. 401)
     --ignore-proxy      Ignore system default proxy settings
     --ignore-redirects  Ignore redirection attempts
     --ignore-timeouts   Ignore connection timeouts
@@ -62,7 +62,7 @@ Options:
     --safe-freq=SAFE..  Test requests between two visits to a given safe URL
     --skip-urlencode    Skip URL encoding of payload data
     --csrf-token=CSR..  Parameter used to hold anti-CSRF token
-    --csrf-url=CSRFURL  URL address to visit to extract anti-CSRF token
+    --csrf-url=CSRFURL  URL address to visit for extraction of anti-CSRF token
     --force-ssl         Force usage of SSL/HTTPS
     --hpp               Use HTTP parameter pollution method
     --eval=EVALCODE     Evaluate provided Python code before the request (e.g.
@@ -85,9 +85,9 @@ Options:
     --skip=SKIP         Skip testing for given parameter(s)
     --skip-static       Skip testing parameters that not appear to be dynamic
     --param-exclude=..  Regexp to exclude parameters from testing (e.g. "ses")
-    --dbms=DBMS         Force back-end DBMS to this value
+    --dbms=DBMS         Force back-end DBMS to provided value
     --dbms-cred=DBMS..  DBMS authentication credentials (user:password)
-    --os=OS             Force back-end DBMS operating system to this value
+    --os=OS             Force back-end DBMS operating system to provided value
     --invalid-bignum    Use big numbers for invalidating values
     --invalid-logical   Use logical operations for invalidating values
     --invalid-string    Use random strings for invalidating values
@@ -119,7 +119,8 @@ Options:
     --union-char=UCHAR  Character to use for bruteforcing number of columns
     --union-from=UFROM  Table to use in FROM part of UNION query SQL injection
     --dns-domain=DNS..  Domain name used for DNS exfiltration attack
-    --second-order=S..  Resulting page URL searched for second-order response
+    --second-url=SEC..  Resulting page URL searched for second-order response
+    --second-req=SEC..  Load second-order HTTP request from file
 
   Fingerprint:
     -f, --fingerprint   Perform an extensive DBMS version fingerprint
@@ -147,11 +148,11 @@ Options:
     --dump              Dump DBMS database table entries
     --dump-all          Dump all DBMS databases tables entries
     --search            Search column(s), table(s) and/or database name(s)
-    --comments          Retrieve DBMS comments
+    --comments          Check for DBMS comments during enumeration
     -D DB               DBMS database to enumerate
     -T TBL              DBMS database table(s) to enumerate
     -C COL              DBMS database table column(s) to enumerate
-    -X EXCLUDECOL       DBMS database table column(s) to not enumerate
+    -X EXCLUDE          DBMS database identifier(s) to not enumerate
     -U USER             DBMS user to enumerate
     --exclude-sysdbs    Exclude DBMS system databases when enumerating tables
     --pivot-column=P..  Pivot column name
@@ -180,9 +181,9 @@ Options:
     These options can be used to access the back-end database management
     system underlying file system
 
-    --file-read=RFILE   Read a file from the back-end DBMS file system
-    --file-write=WFILE  Write a local file on the back-end DBMS file system
-    --file-dest=DFILE   Back-end DBMS absolute filepath to write to
+    --file-read=FILE..  Read a file from the back-end DBMS file system
+    --file-write=FIL..  Write a local file on the back-end DBMS file system
+    --file-dest=FILE..  Back-end DBMS absolute filepath to write to
 
   Operating system access:
     These options can be used to access the back-end database management
@@ -214,7 +215,7 @@ Options:
 
     -s SESSIONFILE      Load session from a stored (.sqlite) file
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
-    --batch             Never ask for user input, use the default behaviour
+    --batch             Never ask for user input, use the default behavior
     --binary-fields=..  Result fields having binary values (e.g. "digest")
     --check-internet    Check Internet connection before assessing the target
     --crawl=CRAWLDEPTH  Crawl the website starting from the target URL
@@ -228,9 +229,11 @@ Options:
     --forms             Parse and test forms on target URL
     --fresh-queries     Ignore query results stored in session file
     --har=HARFILE       Log all HTTP traffic into a HAR file
-    --hex               Use DBMS hex function(s) for data retrieval
+    --hex               Use hex conversion during data retrieval
     --output-dir=OUT..  Custom output directory path
     --parse-errors      Parse and display DBMS error messages from responses
+    --preprocess=PRE..  Use given script(s) for preprocessing of response data
+    --repair            Redump entries having unknown character marker (?)
     --save=SAVECONFIG   Save options to a configuration INI file
     --scope=SCOPE       Regexp to filter targets from provided proxy log
     --test-filter=TE..  Select tests by payloads and/or titles (e.g. ROW)
@@ -240,13 +243,14 @@ Options:
   Miscellaneous:
     -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
     --alert=ALERT       Run host OS command(s) when SQL injection is found
-    --answers=ANSWERS   Set question answers (e.g. "quit=N,follow=N")
+    --answers=ANSWERS   Set predefined answers (e.g. "quit=N,follow=N")
     --beep              Beep on question and/or when SQL injection is found
     --cleanup           Clean up the DBMS from sqlmap specific UDF and tables
-    --dependencies      Check for missing (non-core) sqlmap dependencies
+    --dependencies      Check for missing (optional) sqlmap dependencies
     --disable-coloring  Disable console output coloring
     --gpage=GOOGLEPAGE  Use Google dork results from specified page number
     --identify-waf      Make a thorough testing for a WAF/IPS protection
+    --list-tampers      Display list of available tamper scripts
     --mobile            Imitate smartphone through HTTP User-Agent header
     --offline           Work in offline mode (only use session data)
     --purge             Safely remove all content from sqlmap data directory
@@ -1092,11 +1096,11 @@ If user is controlling a machine registered as a DNS domain server (e.g. domain 
 
 ### Second-order attack
 
-Option: `--second-order`
+Options: `--second-url` and `--second-req`
 
 Second-order SQL injection attack is an attack where result(s) of an injected payload in one vulnerable page is shown (reflected) at the other (e.g. frame). Usually that's happening because of database storage of user provided input at the original vulnerable page.
 
-You can manually tell sqlmap to test for this type of SQL injection by using option `--second-order` with the URL address of the web page where results are being shown.
+You can manually tell sqlmap to test for this type of SQL injection by using option `--second-order` with the URL address or `--second-req` with request file for sending to the server where results are being shown.
 
 ## Fingerprint
 
