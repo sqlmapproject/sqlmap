@@ -73,7 +73,7 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.utils.hashdb import HashDB
-from thirdparty.odict.odict import OrderedDict
+from thirdparty.odict import OrderedDict
 
 def _setRequestParams():
     """

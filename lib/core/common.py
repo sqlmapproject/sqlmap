@@ -177,7 +177,7 @@ from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
-from thirdparty.odict.odict import OrderedDict
+from thirdparty.odict import OrderedDict
 from thirdparty.termcolor.termcolor import colored
 
 class UnicodeRawConfigParser(RawConfigParser):

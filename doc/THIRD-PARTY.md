@@ -15,8 +15,6 @@ This file lists bundled packages and their associated licensing terms.
   Copyright (C) 2013, Jonathan Hartley.
 * The Fcrypt library located under thirdparty/fcrypt/.
   Copyright (C) 2000, 2001, 2004 Carey Evans.
-* The Odict library located under thirdparty/odict/.
-  Copyright (C) 2005, Nicola Larosa, Michael Foord.
 * The Oset library located under thirdparty/oset/.
   Copyright (C) 2010, BlueDynamics Alliance, Austria.
   Copyright (C) 2009, Raymond Hettinger, and others.
@@ -281,6 +279,8 @@ be bound by the terms and conditions of this License Agreement.
 
 * The bottle web framework library located under thirdparty/bottle/.
   Copyright (C) 2012, Marcel Hellkamp.
+* The ordereddict library located under thirdparty/odict/.
+  Copyright (C) 2009, Raymond Hettinger.
 * The Termcolor library located under thirdparty/termcolor/.
   Copyright (C) 2008-2011, Volvox Development Team.
 

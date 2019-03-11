@@ -8,7 +8,7 @@ See the file 'LICENSE' for copying permission
 import copy
 import types
 
-from thirdparty.odict.odict import OrderedDict
+from thirdparty.odict import OrderedDict
 
 class AttribDict(dict):
     """

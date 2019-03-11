@@ -59,7 +59,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
-from thirdparty.odict.odict import OrderedDict
+from thirdparty.odict import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
     retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression), checkConf=True)  # as UNION data is stored raw unconverted

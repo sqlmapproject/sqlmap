@@ -30,10 +30,10 @@ c1da277517c7ec4c23e953a51b51e203  lib/controller/handler.py
 fb6be55d21a70765e35549af2484f762  lib/controller/__init__.py
 ed7874be0d2d3802f3d20184f2b280d5  lib/core/agent.py
 a932126e7d80e545c5d44af178d0bc0c  lib/core/bigarray.py
-a929b8d7bb1ad777e882fa21d1795d98  lib/core/common.py
+180f4f2863d45504ec0585ea72ee9924  lib/core/common.py
 de8d27ae6241163ff9e97aa9e7c51a18  lib/core/convert.py
 abcb1121eb56d3401839d14e8ed06b6e  lib/core/data.py
-00828c4455321b6987e3f882f4ef4f92  lib/core/datatype.py
+f89512ef3ebea85611c5dde6c891b657  lib/core/datatype.py
 3d547dedebef3be749cf38e4e798e120  lib/core/decorators.py
 5f4680b769ae07f22157bd832c97cf8f  lib/core/defaults.py
 9dfc69ba47209a4ceca494dde9ee8183  lib/core/dicts.py
@@ -50,10 +50,10 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-70d40f6779a871d6cd824aa8827426a8  lib/core/settings.py
+af7e2a1ab764cbe6c47e81c09035ad81  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
-0a5b0a97a36c19022665f66858fd7450  lib/core/target.py
+d9483455ff80d33a55db46ae2fa34a05  lib/core/target.py
 7857b24b7865ccb4a05283faa596974d  lib/core/testing.py
 5c369aefa7c5af85dee9212acdf94bbc  lib/core/threads.py
 2c263c8610667fdc593c50a35ab20f57  lib/core/unescaper.py
@@ -70,9 +70,9 @@ fb6be55d21a70765e35549af2484f762  lib/parse/__init__.py
 adcecd2d6a8667b22872a563eb83eac0  lib/parse/payloads.py
 993104046c7d97120613409ef7780c76  lib/parse/sitemap.py
 e4ea70bcd461f5176867dcd89d372386  lib/request/basicauthhandler.py
-b23163d485e0dbc038cbf1ba80be11da  lib/request/basic.py
+bd4b654767eab19cd4dcd4520a68eed5  lib/request/basic.py
 fc25d951217077fe655ed2a3a81552ae  lib/request/comparison.py
-1ffa945c2f907b85a3ece90fb3c60d4f  lib/request/connect.py
+e6792ea3cdbcbe17a7fa8cf856d2b956  lib/request/connect.py
 43005bd6a78e9cf0f3ed2283a1cb122e  lib/request/direct.py
 2b7509ba38a667c61cefff036ec4ca6f  lib/request/dns.py
 ceac6b3bf1f726f8ff43c6814e9d7281  lib/request/httpshandler.py
@@ -101,7 +101,7 @@ fb6be55d21a70765e35549af2484f762  lib/techniques/error/__init__.py
 fb6be55d21a70765e35549af2484f762  lib/techniques/__init__.py
 fb6be55d21a70765e35549af2484f762  lib/techniques/union/__init__.py
 54d077ef49056031fe746bcc53b1f081  lib/techniques/union/test.py
-e141fb96f2a136bafd6bb2350f02d33b  lib/techniques/union/use.py
+664f79ca6397e880aee143fff721fa67  lib/techniques/union/use.py
 8e9ddc7220f6beda89cc45c65e51e72b  lib/utils/api.py
 544dee96e782560fe4355cbf6ee19b8c  lib/utils/brute.py
 b27421eb57cea711050135f84be99258  lib/utils/crawler.py
@@ -358,8 +358,8 @@ d41d8cd98f00b204e9800998ecf8427e  thirdparty/magic/__init__.py
 bf318e0abbe6b2e1a167a233db7f744f  thirdparty/magic/magic.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/multipart/__init__.py
 82432cb4ef575aa16900ba221cc1dc98  thirdparty/multipart/multipartpost.py
-3e502b04f3849afbb7f0e13b5fd2b5c1  thirdparty/odict/__init__.py
-74048dca0470bc78af73f0aafccfd069  thirdparty/odict/odict.py
+0a0a5f8f5519cf9dd2c5120f62aabe83  thirdparty/odict/__init__.py
+8d8f91e1d87cb301fdb50db79dfe4d48  thirdparty/odict/ordereddict.py
 0105f1734f326704d2d68839084ca661  thirdparty/oset/_abc.py
 54a861de0f08bb80c2e8846579ec83bd  thirdparty/oset/__init__.py
 6c79e6d14e031beebe6de127b53c7c93  thirdparty/oset/pyoset.py

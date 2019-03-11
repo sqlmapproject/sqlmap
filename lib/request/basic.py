@@ -47,7 +47,7 @@ from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 from lib.utils.htmlentities import htmlEntities
 from thirdparty.chardet import detect
-from thirdparty.odict.odict import OrderedDict
+from thirdparty.odict import OrderedDict
 
 def forgeHeaders(items=None, base=None):
     """

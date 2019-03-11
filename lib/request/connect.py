@@ -122,7 +122,7 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
-from thirdparty.odict.odict import OrderedDict
+from thirdparty.odict import OrderedDict
 from thirdparty.socks.socks import ProxyError
 
 class Connect(object):
