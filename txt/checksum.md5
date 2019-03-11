@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-e0e8419f3e68202e2cb336544c83c6cc  lib/core/settings.py
+70d40f6779a871d6cd824aa8827426a8  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 0a5b0a97a36c19022665f66858fd7450  lib/core/target.py
@@ -286,6 +286,7 @@ a308787c9dad835cb21498defcd218e6  tamper/space2mysqlblank.py
 dc99c639a9bdef91a4225d884c29bb40  tamper/space2plus.py
 190bc9adca68e4a628298b78e8e455e8  tamper/space2randomblank.py
 eec5c82c86f5108f9e08fb4207a8a9b1  tamper/sp_password.py
+abfdf3a9f02d0755b3c9db768bd87f9a  tamper/substring2leftright.py
 64b9486995d38c99786f7ceefa22fbce  tamper/symboliclogical.py
 08f2ce540ee1f73b6a211bffde18e697  tamper/unionalltounion.py
 628f74fc6049dd1450c832cabb28e0da  tamper/unmagicquotes.py
