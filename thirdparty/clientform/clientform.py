@@ -290,7 +290,7 @@ def isstringlike(x):
 def choose_boundary():
     """Return a string usable as a multipart boundary."""
     # follow IE and firefox
-    nonce = "".join([str(random.randint(0, sys.maxint-1)) for i in 0,1,2])
+    nonce = "".join([str(random.randint(0, sys.maxint-1)) for i in (0,1,2)])
     return "-"*27 + nonce
 
 # This cut-n-pasted MimeWriter from standard library is here so can add

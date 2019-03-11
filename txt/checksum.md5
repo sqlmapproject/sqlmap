@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-af7e2a1ab764cbe6c47e81c09035ad81  lib/core/settings.py
+d6314e6d993f8d858c158f05fe5db3dd  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 d9483455ff80d33a55db46ae2fa34a05  lib/core/target.py
@@ -297,7 +297,7 @@ fc571c746951a5306591e04f70ddc46e  tamper/versionedmorekeywords.py
 d39ce1f99e268dc7f92b602656f49461  tamper/xforwardedfor.py
 b1c02296b4e3b0ebaa58b9dcd914cbf4  thirdparty/ansistrm/ansistrm.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/ansistrm/__init__.py
-7abd52c4381afd8ac07d5978c8897c2b  thirdparty/beautifulsoup/beautifulsoup.py
+87e30550efec58d857da6c69930cd466  thirdparty/beautifulsoup/beautifulsoup.py
 cb2e1fe7c404dff41a2ae9132828f532  thirdparty/beautifulsoup/__init__.py
 ff54a1d98f0ab01ba7b58b068d2ebd26  thirdparty/bottle/bottle.py
 4528e6a7bb9341c36c425faf40ef32c3  thirdparty/bottle/__init__.py
@@ -339,7 +339,7 @@ ee25f2a03587e2c283eab0b36c9e5783  thirdparty/chardet/sbcsgroupprober.py
 c9349824f2647962175d321cc0c52134  thirdparty/chardet/sjisprober.py
 bcae4c645a737d3f0e7c96a66528ca4a  thirdparty/chardet/universaldetector.py
 6f8b3e25472c02fb45a75215a175991f  thirdparty/chardet/utf8prober.py
-1dd9a97cef4c8e7da7082c1f0518a19b  thirdparty/clientform/clientform.py
+be496c4cf7e3eff945d33de5051ac57d  thirdparty/clientform/clientform.py
 722281d87fb13ec22555480f8f4c715b  thirdparty/clientform/__init__.py
 0b625ccefa6b066f79d3cbb3639267e6  thirdparty/colorama/ansi.py
 7ec474bef2432a1b45001bb87f2ab25f  thirdparty/colorama/ansitowin32.py
