@@ -246,11 +246,11 @@ Options:
     --dependencies      Check for missing (non-core) sqlmap dependencies
     --disable-coloring  Disable console output coloring
     --gpage=GOOGLEPAGE  Use Google dork results from specified page number
-    --identify-waf      Make a thorough testing for a WAF/IPS/IDS protection
+    --identify-waf      Make a thorough testing for a WAF/IPS protection
     --mobile            Imitate smartphone through HTTP User-Agent header
     --offline           Work in offline mode (only use session data)
     --purge             Safely remove all content from sqlmap data directory
-    --skip-waf          Skip heuristic detection of WAF/IPS/IDS protection
+    --skip-waf          Skip heuristic detection of WAF/IPS protection
     --smart             Conduct thorough tests only if positive heuristic(s)
     --sqlmap-shell      Prompt for an interactive sqlmap shell
     --tmp-dir=TMPDIR    Local directory for storing temporary files
@@ -2237,13 +2237,13 @@ Default sqlmap behavior with option `-g` is to do a Google search and use the fi
 
 Switch: `--hpp`
 
-HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS/IDS protection mechanisms (explained [here](https://www.imperva.com/resources/glossary/http-parameter-pollution)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
+HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS protection mechanisms (explained [here](https://www.imperva.com/resources/glossary/http-parameter-pollution)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
 
-### Make a through testing for a WAF/IPS/IDS protection
+### Make a through testing for a WAF/IPS protection
 
 Switch: `--identify-waf`
 
-sqlmap can try to identify backend WAF/IPS/IDS protection (if any) so user could do appropriate steps (e.g. use tamper scripts with `--tamper`). Currently around 30 different products are supported (Airlock, Barracuda WAF, etc.) and their respective WAF scripts can be found inside `waf` directory.
+sqlmap can try to identify backend WAF/IPS protection (if any) so user could do appropriate steps (e.g. use tamper scripts with `--tamper`). Currently around 30 different products are supported (Airlock, Barracuda WAF, etc.) and their respective WAF scripts can be found inside `waf` directory.
 
 Example against a MySQL target protected by the ModSecurity WAF:
 
@@ -2253,50 +2253,50 @@ dentify-waf -v 3
 [...]
 [xx:xx:23] [INFO] testing connection to the target URL
 [xx:xx:23] [INFO] heuristics detected web page charset 'ascii'
-[xx:xx:23] [INFO] using WAF scripts to detect backend WAF/IPS/IDS protection
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'USP Secure Entry Server (Un
+[xx:xx:23] [INFO] using WAF scripts to detect backend WAF/IPS protection
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'USP Secure Entry Server (Un
 ited Security Providers)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'BinarySEC Web Application F
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'BinarySEC Web Application F
 irewall (BinarySEC)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetContinuum Web Applicatio
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'NetContinuum Web Applicatio
 n Firewall (NetContinuum/Barracuda Networks)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Hyperguard Web Application 
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Hyperguard Web Application 
 Firewall (art of defence Inc.)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Cisco ACE XML Gateway (Cisc
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Cisco ACE XML Gateway (Cisc
 o Systems)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'TrafficShield (F5 Networks)
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'TrafficShield (F5 Networks)
 '
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Teros/Citrix Application Fi
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Teros/Citrix Application Fi
 rewall Enterprise (Teros/Citrix Systems)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KONA Security Solutions (Ak
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'KONA Security Solutions (Ak
 amai Technologies)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Incapsula Web Application F
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Incapsula Web Application F
 irewall (Incapsula/Imperva)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'CloudFlare Web Application 
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'CloudFlare Web Application 
 Firewall (CloudFlare)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Barracuda Web Application F
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Barracuda Web Application F
 irewall (Barracuda Networks)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'webApp.secure (webScurity)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Proventia Web Application S
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'webApp.secure (webScurity)'
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Proventia Web Application S
 ecurity (IBM)'
 [xx:xx:23] [DEBUG] declared web page charset 'iso-8859-1'
 [xx:xx:23] [DEBUG] page not found (404)
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'KS-WAF (Knownsec)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'NetScaler (Citrix Systems)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'Jiasule Web Application Fir
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'KS-WAF (Knownsec)'
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'NetScaler (Citrix Systems)'
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Jiasule Web Application Fir
 ewall (Jiasule)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'WebKnight Application Firew
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'WebKnight Application Firew
 all (AQTRONIX)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'AppWall (Radware)'
-[xx:xx:23] [DEBUG] checking for WAF/IDS/IPS product 'ModSecurity: Open Source We
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'AppWall (Radware)'
+[xx:xx:23] [DEBUG] checking for WAF/IPS product 'ModSecurity: Open Source We
 b Application Firewall (Trustwave)'
-[xx:xx:23] [CRITICAL] WAF/IDS/IPS identified 'ModSecurity: Open Source Web Appli
+[xx:xx:23] [CRITICAL] WAF/IPS identified 'ModSecurity: Open Source Web Appli
 cation Firewall (Trustwave)'. Please consider usage of tamper scripts (option '-
 -tamper')
 [...]
 ```
 
-Skip heuristic detection of WAF/IPS/IDS protection
+Skip heuristic detection of WAF/IPS protection
 
 Switch: `--skip-waf`
 
@@ -2813,7 +2813,7 @@ api (a42ddaef02e976f0)> log
         }, 
         {
             "message": "checking if the target is protected by some kind of WAF/
-IPS/IDS", 
+IPS", 
             "level": "INFO", 
             "time": "12:48:10"
         }, 
