@@ -3140,7 +3140,7 @@ def initTechnique(technique=None):
             for key, value in kb.injection.conf.items():
                 if value and (not hasattr(conf, key) or (hasattr(conf, key) and not getattr(conf, key))):
                     setattr(conf, key, value)
-                    debugMsg = "resuming configuration option '%s' (%s)" % (key, value)
+                    debugMsg = "resuming configuration option '%s' (%s)" % (key, ("'%s'" % value) if isinstance(value, basestring) else value)
                     logger.debug(debugMsg)
 
                     if value and key == "optimize":
