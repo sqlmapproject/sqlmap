@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-2b13a6e41ad1b354ff2a3f60a6fba723  lib/core/settings.py
+a6370a4c60104413c514c021f8409a44  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 d9483455ff80d33a55db46ae2fa34a05  lib/core/target.py
@@ -181,7 +181,7 @@ a5aa91bd7248d4f7ad508cf69f45696d  plugins/dbms/mssqlserver/takeover.py
 dbd6121fcc92249ee0c023ee28e30274  plugins/dbms/mysql/connector.py
 a94bde2f4dcf3a5f166302d07ea32907  plugins/dbms/mysql/enumeration.py
 81c762ceba0892d0d6d78d70f513d20a  plugins/dbms/mysql/filesystem.py
-fd79ec2504b6bada7d2da233a549af53  plugins/dbms/mysql/fingerprint.py
+24088cb4e6f163b4eaf9310a7bc6907d  plugins/dbms/mysql/fingerprint.py
 040835bde6be85ebc1a6667dcd08940e  plugins/dbms/mysql/__init__.py
 dd6bd1d3d561755b96e953ede16cb8fc  plugins/dbms/mysql/syntax.py
 6c91ef5b5a6cd29cef4bd9bc3c369454  plugins/dbms/mysql/takeover.py
@@ -195,7 +195,7 @@ c7bb3f112aad2ea7ea92e036e9aab6a7  plugins/dbms/oracle/__init__.py
 393a17dc8cb982ebb27665ead6b84bf1  plugins/dbms/postgresql/connector.py
 86f0e0c9c4bc155c93277e879e3c3311  plugins/dbms/postgresql/enumeration.py
 d68b5a9d6e608f15fbe2c520613ece4a  plugins/dbms/postgresql/filesystem.py
-2af014c49f103cb27bc547cc12641e2b  plugins/dbms/postgresql/fingerprint.py
+a2ac0498d89797041bf65e4990cf8430  plugins/dbms/postgresql/fingerprint.py
 fb018fd23dcebdb36dddd22ac92efa2c  plugins/dbms/postgresql/__init__.py
 290ea28e1215565d9d12ede3422a4dcf  plugins/dbms/postgresql/syntax.py
 339bc65824b5c946ec40a12cd0257df1  plugins/dbms/postgresql/takeover.py

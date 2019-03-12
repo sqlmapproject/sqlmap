@@ -97,8 +97,10 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            if inject.checkBooleanExpression("XMLTABLE(NULL) IS NULL"):
-                Backend.setVersion(">= 10.0")
+            if inject.checkBooleanExpression("SHA256(NULL) IS NULL"):
+                Backend.setVersion(">= 11.0")
+            elif inject.checkBooleanExpression("XMLTABLE(NULL) IS NULL"):
+                Backend.setVersionList([">= 10.0", "< 11.0"])
             elif inject.checkBooleanExpression("SIND(0)=0"):
                 Backend.setVersionList([">= 9.6.0", "< 10.0"])
             elif inject.checkBooleanExpression("TO_JSONB(1) IS NOT NULL"):
