@@ -252,7 +252,7 @@ class PAYLOAD:
         2: "error-based",
         3: "inline query",
         4: "stacked queries",
-        5: "AND/OR time-based blind",
+        5: "time-based blind",
         6: "UNION query",
     }
 

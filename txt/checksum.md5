@@ -38,7 +38,7 @@ f89512ef3ebea85611c5dde6c891b657  lib/core/datatype.py
 5f4680b769ae07f22157bd832c97cf8f  lib/core/defaults.py
 9dfc69ba47209a4ceca494dde9ee8183  lib/core/dicts.py
 4ba141124699fd7a763dea82f17fe523  lib/core/dump.py
-1226fed38d1175aee8907e31ddf0cab2  lib/core/enums.py
+347817fbbb35b245b762dd7ee8a47fe7  lib/core/enums.py
 84ef8f32e4582fcc294dc14e1997131d  lib/core/exception.py
 fb6be55d21a70765e35549af2484f762  lib/core/__init__.py
 18c896b157b03af716542e5fe9233ef9  lib/core/log.py
@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-d6314e6d993f8d858c158f05fe5db3dd  lib/core/settings.py
+a668a19d79ebd1048c60b4a47c0abc1d  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 d9483455ff80d33a55db46ae2fa34a05  lib/core/target.py
@@ -493,7 +493,7 @@ d989813ee377252bca2103cea524c06b  xml/banner/sharepoint.xml
 ccb5e02a692f75d11b7fd00f1db48bf5  xml/banner/x-powered-by.xml
 385570003bf7d84f2502191eae8268c6  xml/boundaries.xml
 4df7176815d874cf99649201caf10642  xml/errors.xml
-a279656ea3fcb85c727249b02f828383  xml/livetests.xml
+e2b842d6cda0fb007211656a037dd277  xml/livetests.xml
 11547289b99eaced5b55185a3230529a  xml/payloads/boolean_blind.xml
 0656ba4132cd02477be90e65a7ddf6ce  xml/payloads/error_based.xml
 06b1a210b190d52477a9d492443725b5  xml/payloads/inline_query.xml

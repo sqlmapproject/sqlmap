@@ -3320,7 +3320,7 @@
             <timeSec value="2"/>
         </switches>
         <parse>
-            <item value="Type: AND/OR time-based blind"/>
+            <item value="Type: time-based blind"/>
             <item value="Title: MySQL &lt; 5.0.12 AND time-based blind (heavy query)"/>
         </parse>
     </case>
