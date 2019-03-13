@@ -2378,6 +2378,22 @@ def getUnicode(value, encoding=None, noneToNull=False):
     if isinstance(value, unicode):
         return value
     elif isinstance(value, basestring):
+        # Heuristics (if encoding not explicitly specified)
+        if all(_ in value for _ in ('<', '>')):
+            candidates = filter(None, (encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), sys.getfilesystemencoding(), UNICODE_ENCODING))
+        elif any(_ in value for _ in (":\\", '/', '.')) and '\n' not in value:
+            candidates = filter(None, (encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
+        elif conf.get("encoding") and '\n' not in value:
+            candidates = filter(None, (encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
+        else:
+            candidates = filter(None, (encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding"), sys.getfilesystemencoding()))
+
+        for candidate in candidates:
+            try:
+                return unicode(value, candidate)
+            except UnicodeDecodeError:
+                pass
+
         while True:
             try:
                 return unicode(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
