@@ -773,7 +773,7 @@ def _setTamperingFunctions():
             try:
                 module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
-                raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
+                raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
 
@@ -807,7 +807,7 @@ def _setTamperingFunctions():
                         function()
                     except Exception as ex:
                         errMsg = "error occurred while checking dependencies "
-                        errMsg += "for tamper module '%s' ('%s')" % (filename[:-3], getSafeExString(ex))
+                        errMsg += "for tamper module '%s' ('%s')" % (getUnicode(filename[:-3]), getSafeExString(ex))
                         raise SqlmapGenericException(errMsg)
 
             if not found:
@@ -870,7 +870,7 @@ def _setPreprocessFunctions():
             try:
                 module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
-                raise SqlmapSyntaxException("cannot import preprocess module '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
+                raise SqlmapSyntaxException("cannot import preprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
@@ -925,7 +925,7 @@ def _setWafFunctions():
                     del sys.modules[filename[:-3]]
                 module = __import__(safeFilepathEncode(filename[:-3]))
             except ImportError as ex:
-                raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
+                raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             _ = dict(inspect.getmembers(module))
             if "detect" not in _:

@@ -1810,6 +1810,10 @@ def normalizePath(filepath):
     return retVal
 
 def safeFilepathEncode(filepath):
+    """
+    Returns filepath in (ASCII) format acceptable for OS handling (e.g. reading)
+    """
+
     retVal = filepath
 
     if filepath and isinstance(filepath, unicode):
