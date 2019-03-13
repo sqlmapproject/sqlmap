@@ -54,6 +54,7 @@ from lib.core.common import readInput
 from lib.core.common import resetCookieJar
 from lib.core.common import runningAsAdmin
 from lib.core.common import safeExpandUser
+from lib.core.common import safeFilepathEncode
 from lib.core.common import saveConfig
 from lib.core.common import setColor
 from lib.core.common import setOptimize
@@ -734,8 +735,8 @@ def _setTamperingFunctions():
         for script in re.split(PARAMETER_SPLITTING_REGEX, conf.tamper):
             found = False
 
-            path = paths.SQLMAP_TAMPER_PATH.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
-            script = script.strip().encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
+            path = safeFilepathEncode(paths.SQLMAP_TAMPER_PATH)
+            script = safeFilepathEncode(script.strip())
 
             try:
                 if not script:
@@ -770,7 +771,7 @@ def _setTamperingFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
+                module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
                 raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
@@ -835,7 +836,7 @@ def _setPreprocessFunctions():
         for script in re.split(PARAMETER_SPLITTING_REGEX, conf.preprocess):
             found = False
 
-            script = script.strip().encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
+            script = safeFilepathEncode(script.strip())
 
             try:
                 if not script:
@@ -867,7 +868,7 @@ def _setPreprocessFunctions():
                 sys.path.insert(0, dirname)
 
             try:
-                module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
+                module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
                 raise SqlmapSyntaxException("cannot import preprocess module '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 
@@ -922,7 +923,7 @@ def _setWafFunctions():
             try:
                 if filename[:-3] in sys.modules:
                     del sys.modules[filename[:-3]]
-                module = __import__(filename[:-3].encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
+                module = __import__(safeFilepathEncode(filename[:-3]))
             except ImportError as ex:
                 raise SqlmapSyntaxException("cannot import WAF script '%s' (%s)" % (filename[:-3], getSafeExString(ex)))
 

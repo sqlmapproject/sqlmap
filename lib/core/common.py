@@ -1809,6 +1809,15 @@ def normalizePath(filepath):
 
     return retVal
 
+def safeFilepathEncode(filepath):
+    retVal = filepath
+
+    if filepath and isinstance(filepath, unicode):
+        retVal = filepath.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
+
+    return retVal
+
+
 def safeExpandUser(filepath):
     """
     Patch for a Python Issue18171 (http://bugs.python.org/issue18171)
