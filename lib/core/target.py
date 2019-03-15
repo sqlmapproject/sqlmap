@@ -212,7 +212,7 @@ def _setRequestParams():
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
-                    conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*[\"']?(?P<name>[^\"'\r\n]+)[\"']?).+?)(((\r)?\n)+--)", functools.partial(process, repl=r"\g<1>%s\g<4>" % kb.customInjectionMark), conf.data)
+                    conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*[\"']?(?P<name>[^\"'\r\n]+)[\"']?).+?)((%s)+--)" % ("\r\n" if "\r\n" in conf.data else '\n'), functools.partial(process, repl=r"\g<1>%s\g<4>" % kb.customInjectionMark), conf.data)
 
                 kb.postHint = POST_HINT.MULTIPART
 
