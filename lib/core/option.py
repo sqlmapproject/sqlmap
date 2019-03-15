@@ -226,7 +226,7 @@ def _setMultipleTargets():
         errMsg = "the specified list of targets does not exist"
         raise SqlmapFilePathException(errMsg)
 
-    if os.path.isfile(conf.logFile):
+    if checkFile(conf.logFile, False):
         for target in parseRequestFile(conf.logFile):
             url, _, data, _, _ = target
             key = re.sub(r"(\w+=)[^%s ]*" % (conf.paramDel or DEFAULT_GET_POST_DELIMITER), r"\g<1>", "%s %s" % (url, data))
@@ -292,7 +292,7 @@ def _setRequestFromFile():
         conf.requestFile = safeExpandUser(conf.requestFile)
         seen = set()
 
-        if not os.path.isfile(conf.requestFile):
+        if not checkFile(conf.requestFile, False):
             errMsg = "specified HTTP request file '%s' " % conf.requestFile
             errMsg += "does not exist"
             raise SqlmapFilePathException(errMsg)
@@ -309,7 +309,7 @@ def _setRequestFromFile():
     if conf.secondReq:
         conf.secondReq = safeExpandUser(conf.secondReq)
 
-        if not os.path.isfile(conf.secondReq):
+        if not checkFile(conf.secondReq, False):
             errMsg = "specified second-order HTTP request file '%s' " % conf.secondReq
             errMsg += "does not exist"
             raise SqlmapFilePathException(errMsg)
@@ -411,7 +411,7 @@ def _setBulkMultipleTargets():
     infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
     logger.info(infoMsg)
 
-    if not os.path.isfile(conf.bulkFile):
+    if not checkFile(conf.bulkFile, False):
         errMsg = "the specified bulk file "
         errMsg += "does not exist"
         raise SqlmapFilePathException(errMsg)

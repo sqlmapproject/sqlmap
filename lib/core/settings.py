@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.3.29"
+VERSION = "1.3.3.30"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -221,6 +221,9 @@ try:
     unicode(DEFAULT_PAGE_ENCODING, DEFAULT_PAGE_ENCODING)
 except LookupError:
     DEFAULT_PAGE_ENCODING = "utf8"
+
+# Marker for program piped input
+STDIN_PIPE_DASH = '-'
 
 # URL used in dummy runs
 DUMMY_URL = "http://foo/bar?id=1"

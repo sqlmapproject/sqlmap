@@ -40,6 +40,7 @@ try:
 
     from lib.core.common import banner
     from lib.core.common import checkIntegrity
+    from lib.core.common import checkPipedInput
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
     from lib.core.common import getSafeExString
@@ -130,6 +131,9 @@ def main():
         # Store original command line options for possible later restoration
         cmdLineOptions.update(cmdLineParser().__dict__)
         initOptions(cmdLineOptions)
+
+        if checkPipedInput():
+            conf.batch = True
 
         if conf.get("api"):
             # heavy imports

@@ -160,6 +160,7 @@ from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
 from lib.core.settings import SAFE_VARIABLE_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
+from lib.core.settings import STDIN_PIPE_DASH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import TIME_STDEV_COEFF
@@ -1165,6 +1166,14 @@ def getHeader(headers, key):
             break
     return retVal
 
+def checkPipedInput():
+    """
+    Checks whether input to program has been provided via standard input (e.g. cat /tmp/req.txt | python sqlmap.py -r -)
+    # Reference: https://stackoverflow.com/a/33873570
+    """
+
+    return not os.isatty(sys.stdin.fileno())
+
 def checkFile(filename, raiseOnError=True):
     """
     Checks for file existence and readability
@@ -1178,18 +1187,21 @@ def checkFile(filename, raiseOnError=True):
     if filename:
         filename = filename.strip('"\'')
 
-    try:
-        if filename is None or not os.path.isfile(filename):
-            valid = False
-    except:
-        valid = False
-
-    if valid:
+    if filename == STDIN_PIPE_DASH:
+        return checkPipedInput()
+    else:
         try:
-            with open(filename, "rb"):
-                pass
+            if filename is None or not os.path.isfile(filename):
+                valid = False
         except:
             valid = False
+
+        if valid:
+            try:
+                with open(filename, "rb"):
+                    pass
+            except:
+                valid = False
 
     if not valid and raiseOnError:
         raise SqlmapSystemException("unable to read file '%s'" % filename)
@@ -3305,13 +3317,19 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", bu
     Returns file handle of a given filename
     """
 
-    try:
-        return codecs.open(filename, mode, encoding, errors, buffering)
-    except IOError:
-        errMsg = "there has been a file opening error for filename '%s'. " % filename
-        errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
-        errMsg += "and that it's not locked by another process."
-        raise SqlmapSystemException(errMsg)
+    if filename == STDIN_PIPE_DASH:
+        if filename not in kb.cache.content:
+            kb.cache.content[filename] = sys.stdin.read()
+
+        return contextlib.closing(StringIO(readCachedFileContent(filename)))
+    else:
+        try:
+            return codecs.open(filename, mode, encoding, errors, buffering)
+        except IOError:
+            errMsg = "there has been a file opening error for filename '%s'. " % filename
+            errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
+            errMsg += "and that it's not locked by another process."
+            raise SqlmapSystemException(errMsg)
 
 def decodeIntToUnicode(value):
     """
@@ -4797,14 +4815,7 @@ def parseRequestFile(reqFile, checkParams=True):
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     yield (url, conf.method or method, data, cookie, tuple(headers))
 
-    checkFile(reqFile)
-    try:
-        with openFile(reqFile, "rb") as f:
-            content = f.read()
-    except (IOError, OSError, MemoryError) as ex:
-        errMsg = "something went wrong while trying "
-        errMsg += "to read the content of file '%s' ('%s')" % (reqFile, getSafeExString(ex))
-        raise SqlmapSystemException(errMsg)
+    content = readCachedFileContent(reqFile)
 
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)
