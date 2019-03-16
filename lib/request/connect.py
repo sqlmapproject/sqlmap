@@ -277,6 +277,7 @@ class Connect(object):
         if multipart:
             post = multipart
         if chunked:
+            post = urllib.unquote(post)
             post = generateChunkDdata(post)
 
         websocket_ = url.lower().startswith("ws")
@@ -471,12 +472,10 @@ class Connect(object):
                 requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
-                    if chunked:
-                        requestMsg += getUnicode(post)
-                    else:
-                        requestMsg += "\r\n\r\n%s" % getUnicode(post)
+                    requestMsg += "\r\n\r\n%s" % getUnicode(post)
 
-                requestMsg += "\r\n"
+                if not chunked:
+                    requestMsg += "\r\n"
 
                 if not multipart:
                     threadData.lastRequestMsg = requestMsg

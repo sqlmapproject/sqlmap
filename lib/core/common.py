@@ -98,7 +98,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
-from lib.core.settings import BANNER
+from lib.core.settings import BANNER, CHUNKED_KEYWORDS
 from lib.core.settings import BOLD_PATTERNS
 from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
@@ -4919,7 +4919,7 @@ def generateChunkDdata(data):
     """
     dl = len(data)
     ret = ""
-    keywords = CHUNK_KEYWORDS
+    keywords = CHUNKED_KEYWORDS
     index = 0
     while index < dl:
         chunk_size = random.randint(1, 9)
