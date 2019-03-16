@@ -61,6 +61,7 @@ from lib.core.common import unicodeencode
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
+from lib.core.common import generateChunkDdata
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -271,9 +272,12 @@ class Connect(object):
         checking = kwargs.get("checking", False)
         skipRead = kwargs.get("skipRead", False)
         finalCode = kwargs.get("finalCode", False)
+        chunked = conf.chunk
 
         if multipart:
             post = multipart
+        if chunked:
+            post = generateChunkDdata(post)
 
         websocket_ = url.lower().startswith("ws")
 
@@ -396,6 +400,9 @@ class Connect(object):
 
             if conf.keepAlive:
                 headers[HTTP_HEADER.CONNECTION] = "keep-alive"
+            
+            if chunked:
+                headers[HTTP_HEADER.TRANSFER_ENCODING] = "Chunked"
 
             if auxHeaders:
                 headers = forgeHeaders(auxHeaders, headers)
@@ -455,7 +462,7 @@ class Connect(object):
                     requestHeaders += "\r\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
 
                 if post is not None:
-                    if not getRequestHeader(req, HTTP_HEADER.CONTENT_LENGTH):
+                    if not getRequestHeader(req, HTTP_HEADER.CONTENT_LENGTH) and not chunked:
                         requestHeaders += "\r\n%s: %d" % (string.capwords(HTTP_HEADER.CONTENT_LENGTH), len(post))
 
                 if not getRequestHeader(req, HTTP_HEADER.CONNECTION):
@@ -464,7 +471,10 @@ class Connect(object):
                 requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
-                    requestMsg += "\r\n\r\n%s" % getUnicode(post)
+                    if chunked:
+                        requestMsg += getUnicode(post)
+                    else:
+                        requestMsg += "\r\n\r\n%s" % getUnicode(post)
 
                 requestMsg += "\r\n"
 
