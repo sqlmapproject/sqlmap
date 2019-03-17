@@ -559,7 +559,7 @@ class Tag(PageElement):
         self.escapeUnrecognizedEntities = parser.escapeUnrecognizedEntities
 
         # Convert any HTML, XML, or numeric entities in the attribute values.
-        convert = lambda k, val: (k,
+        convert = lambda (k, val): (k,
                                    re.sub("&(#\d+|#x[0-9a-fA-F]+|\w+);",
                                           self._convertEntities,
                                           val))

@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-2d4b155258f2ae85c7f287c58742e1fb  lib/core/settings.py
+858db5e54ce928b2ae4ed7fe55c25c12  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 10d7e4f7ba2502cce5cf69223c52eddc  lib/core/target.py
@@ -297,7 +297,7 @@ fc571c746951a5306591e04f70ddc46e  tamper/versionedmorekeywords.py
 d39ce1f99e268dc7f92b602656f49461  tamper/xforwardedfor.py
 b1c02296b4e3b0ebaa58b9dcd914cbf4  thirdparty/ansistrm/ansistrm.py
 d41d8cd98f00b204e9800998ecf8427e  thirdparty/ansistrm/__init__.py
-87e30550efec58d857da6c69930cd466  thirdparty/beautifulsoup/beautifulsoup.py
+3ebe11e5ad9bbe608b1caae540b6fe97  thirdparty/beautifulsoup/beautifulsoup.py
 cb2e1fe7c404dff41a2ae9132828f532  thirdparty/beautifulsoup/__init__.py
 ff54a1d98f0ab01ba7b58b068d2ebd26  thirdparty/bottle/bottle.py
 4528e6a7bb9341c36c425faf40ef32c3  thirdparty/bottle/__init__.py
