@@ -1,14 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# @Time    : 2019/3/16 2:48 PM
-# @Author  : w8ay
-# @File    : httphandler.py
+#!/usr/bin/env python
+
+"""
+Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+See the file 'LICENSE' for copying permission
+"""
+
 import urllib2
 import httplib
 from lib.core.data import conf
 
 
 class HTTPHandler(urllib2.HTTPHandler):
+    """
+    The hook http_requests function ensures that the chunk function is working properly.
+    """
 
     def _hook(self, request):
         host = request.get_host()
