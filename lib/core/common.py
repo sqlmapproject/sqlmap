@@ -4900,6 +4900,10 @@ def firstNotNone(*args):
 def chunkSplitPostData(data):
     """
     Convert POST data to chunked transfer-encoded data (Note: splitting done by SQL keywords)
+
+    >>> random.seed(0)
+    >>> chunkSplitPostData("SELECT username,password FROM users")
+    '5;UAqFz\\r\\nSELEC\\r\\n8;sDK4F\\r\\nT userna\\r\\n3;UMp48\\r\\nme,\\r\\n8;3tT3Q\\r\\npassword\\r\\n4;gAL47\\r\\n FRO\\r\\n5;1qXIa\\r\\nM use\\r\\n2;yZPaE\\r\\nrs\\r\\n0\\r\\n\\r\\n'
     """
 
     length = len(data)
