@@ -2606,11 +2606,13 @@ def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     _mergeOptions(inputOptions, overrideOptions)
 
 def _setHttpChunked():
+    conf.chunk = conf.chunk and conf.data
     if conf.chunk:
         def hook(self, a, b):
             pass
 
         httplib.HTTPConnection._set_content_length = hook
+
 
 def init():
     """
