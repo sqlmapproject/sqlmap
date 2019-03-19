@@ -795,7 +795,7 @@ KB_CHARS_BOUNDARY_CHAR = 'q'
 KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
 
 # Keywords that need to be cut in the chunked
-CHUNKED_KEYWORDS = ['select', 'update', 'insert', 'from', 'load_file', 'sysdatabases', 'msysaccessobjects', 'msysqueries', 'sysmodules', 'information_schema']
+CHUNKED_KEYWORDS = ['select', 'update', 'insert', 'from', 'load_file', 'sysdatabases', 'msysaccessobjects', 'msysqueries', 'sysmodules', 'information_schema', 'union']
 
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
