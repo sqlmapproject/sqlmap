@@ -216,7 +216,7 @@ def cmdLineParser(argv=None):
                            help="Force usage of SSL/HTTPS")
 
         request.add_option("--chunked", dest="chunked", action="store_true",
-                           help="Use HTTP Chunked transfer encoding method")
+                           help="Use HTTP chunked transfer encoded (POST) requests")
 
         request.add_option("--hpp", dest="hpp", action="store_true",
                            help="Use HTTP parameter pollution method")

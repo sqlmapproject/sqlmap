@@ -764,6 +764,9 @@ ultramegaman, <seclists(at)ultramegaman.com>
 Vinicius, <viniciusmaxdaloop(at)gmail.com>
 * for reporting a minor bug
 
+w8ay
+* for contributing an implementation for chunked transfer-encoding (switch --chunked)
+
 wanglei, <wanglei(at)17uxi.cn>
 * for reporting a minor bug
 

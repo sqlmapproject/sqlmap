@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-728fe41a387ae86ee7eaee259bb2b078  lib/core/settings.py
+5721a679b6d62ad8fe5aa7c9934c1a80  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 10d7e4f7ba2502cce5cf69223c52eddc  lib/core/target.py
@@ -61,7 +61,7 @@ d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
 5b3f08208be0579356f78ce5805d37b2  lib/core/wordlist.py
 fb6be55d21a70765e35549af2484f762  lib/__init__.py
 4881480d0c1778053908904e04570dc3  lib/parse/banner.py
-79777f4f934f3b0a436fdd6600f7d3b8  lib/parse/cmdline.py
+3d8163ecaa25321c87241368b97bb79f  lib/parse/cmdline.py
 06ccbccb63255c8f1c35950a4c8a6f6b  lib/parse/configfile.py
 d34df646508c2dceb25205e1316673d1  lib/parse/handler.py
 43deb2400e269e602e916efaec7c0903  lib/parse/headers.py
