@@ -98,7 +98,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
-from lib.core.settings import BANNER
+from lib.core.settings import BANNER, CHUNKED_KEYWORDS
 from lib.core.settings import BOLD_PATTERNS
 from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
@@ -4895,3 +4895,50 @@ def firstNotNone(*args):
             break
 
     return retVal
+
+def generateChunkDdata(data):
+    """
+    Convert post data to chunked format data. If the keyword is in a block, the keyword will be cut.
+
+    >>> generateChunkDdata('select 1,2,3,4 from admin')
+    4;AZdYz
+    sele
+    2;fJS4D
+    ct
+    5;qbCOT
+    1,2,
+    7;KItpi
+    3,4 fro
+    2;pFu1R
+    m 
+    5;uRoYZ
+    admin
+    0
+
+
+    """
+    dl = len(data)
+    ret = ""
+    keywords = CHUNKED_KEYWORDS
+    index = 0
+    while index < dl:
+        chunk_size = random.randint(1, 9)
+        if index + chunk_size >= dl:
+            chunk_size = dl - index
+        salt = ''.join(random.sample(string.ascii_letters + string.digits, 5))
+        while 1:
+            tmp_chunk = data[index:index + chunk_size]
+            tmp_bool = True
+            for k in keywords:
+                if k in tmp_chunk:
+                    chunk_size -= 1
+                    tmp_bool = False
+                    break
+            if tmp_bool:
+                break
+        index += chunk_size
+        ret += "%s;%s\r\n" % (hex(chunk_size)[2:], salt)
+        ret += "%s\r\n" % tmp_chunk
+
+    ret += "0\r\n\r\n"
+    return ret

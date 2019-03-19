@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import cookielib
 import glob
+import httplib
 import inspect
 import logging
 import os
@@ -139,6 +140,7 @@ from lib.request.basic import checkCharEncoding
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
+from lib.request.httphandler import HTTPHandler
 from lib.request.httpshandler import HTTPSHandler
 from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
@@ -156,6 +158,7 @@ from thirdparty.socks import socks
 from xml.etree.ElementTree import ElementTree
 
 authHandler = urllib2.BaseHandler()
+httpHandler = HTTPHandler()
 httpsHandler = HTTPSHandler()
 keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.ProxyHandler()
@@ -1106,7 +1109,7 @@ def _setHTTPHandlers():
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
 
-    handlers = filter(None, [multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, httpsHandler])
+    handlers = filter(None, [multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, httpHandler, httpsHandler])
 
     if not conf.dropSetCookie:
         if not conf.loadCookies:
@@ -2602,6 +2605,15 @@ def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)
 
+def _setHttpChunked():
+    conf.chunk = conf.chunk and conf.data
+    if conf.chunk:
+        def hook(self, a, b):
+            pass
+
+        httplib.HTTPConnection._set_content_length = hook
+
+
 def init():
     """
     Set attributes into both configuration and knowledge base singletons
@@ -2627,6 +2639,7 @@ def init():
     _listTamperingFunctions()
     _setTamperingFunctions()
     _setPreprocessFunctions()
+    _setHttpChunked()
     _setWafFunctions()
     _setTrafficOutputFP()
     _setupHTTPCollector()
