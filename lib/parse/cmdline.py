@@ -215,14 +215,15 @@ def cmdLineParser(argv=None):
         request.add_option("--force-ssl", dest="forceSSL", action="store_true",
                            help="Force usage of SSL/HTTPS")
 
+        request.add_option("--chunked", dest="chunked", action="store_true",
+                           help="Use HTTP Chunked transfer encoding method")
+
         request.add_option("--hpp", dest="hpp", action="store_true",
                            help="Use HTTP parameter pollution method")
 
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
-        
-        request.add_option("--chunk", dest="chunk", action="store_true", help="all requests will be added headers with 'Transfer-Encoding: Chunked' and sent by transcoding")
-
+       
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These options can be used to optimize the performance of sqlmap")
 

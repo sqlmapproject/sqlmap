@@ -31,6 +31,7 @@ from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import checkSameHost
+from lib.core.common import chunkSplitPostData
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import escapeJsonValue
@@ -61,7 +62,6 @@ from lib.core.common import unicodeencode
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
-from lib.core.common import generateChunkDdata
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -272,13 +272,14 @@ class Connect(object):
         checking = kwargs.get("checking", False)
         skipRead = kwargs.get("skipRead", False)
         finalCode = kwargs.get("finalCode", False)
-        chunked = conf.chunk
+        chunked = kwargs.get("chunked", False) or conf.chunked
 
         if multipart:
             post = multipart
+
         if chunked:
             post = urllib.unquote(post)
-            post = generateChunkDdata(post)
+            post = chunkSplitPostData(post)
 
         websocket_ = url.lower().startswith("ws")
 
@@ -403,7 +404,7 @@ class Connect(object):
                 headers[HTTP_HEADER.CONNECTION] = "keep-alive"
             
             if chunked:
-                headers[HTTP_HEADER.TRANSFER_ENCODING] = "Chunked"
+                headers[HTTP_HEADER.TRANSFER_ENCODING] = "chunked"
 
             if auxHeaders:
                 headers = forgeHeaders(auxHeaders, headers)

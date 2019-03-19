@@ -61,6 +61,7 @@ optDict = {
         "csrfToken": "string",
         "csrfUrl": "string",
         "forceSSL": "boolean",
+        "chunked": "boolean",
         "hpp": "boolean",
         "evalCode": "string",
     },

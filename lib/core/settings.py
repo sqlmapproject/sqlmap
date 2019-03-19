@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.3.31"
+VERSION = "1.3.3.32"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -794,8 +794,8 @@ KB_CHARS_BOUNDARY_CHAR = 'q'
 # Letters of lower frequency used in kb.chars
 KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
 
-# Keywords that need to be cut in the chunked
-CHUNKED_KEYWORDS = ['select', 'update', 'insert', 'from', 'load_file', 'sysdatabases', 'msysaccessobjects', 'msysqueries', 'sysmodules', 'information_schema', 'union']
+# SQL keywords used for splitting in HTTP Chunked encoding (switch --chunk)
+HTTP_CHUNKED_SPLIT_KEYWORDS = ("SELECT", "UPDATE", "INSERT", "FROM", "LOAD_FILE", "UNION", "information_schema", "sysdatabases", "msysaccessobjects", "msysqueries", "sysmodules")
 
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>

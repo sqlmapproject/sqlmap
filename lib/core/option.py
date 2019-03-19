@@ -140,7 +140,7 @@ from lib.request.basic import checkCharEncoding
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
-from lib.request.httphandler import HTTPHandler
+from lib.request.chunkedhandler import ChunkedHandler
 from lib.request.httpshandler import HTTPSHandler
 from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
@@ -158,7 +158,7 @@ from thirdparty.socks import socks
 from xml.etree.ElementTree import ElementTree
 
 authHandler = urllib2.BaseHandler()
-httpHandler = HTTPHandler()
+chunkedHandler = ChunkedHandler()
 httpsHandler = HTTPSHandler()
 keepAliveHandler = keepalive.HTTPHandler()
 proxyHandler = urllib2.ProxyHandler()
@@ -1109,7 +1109,7 @@ def _setHTTPHandlers():
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
 
-    handlers = filter(None, [multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, httpHandler, httpsHandler])
+    handlers = filter(None, [multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
 
     if not conf.dropSetCookie:
         if not conf.loadCookies:
@@ -2314,6 +2314,10 @@ def _setTorSocksProxySettings():
     socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, port)
     socks.wrapmodule(urllib2)
 
+def _setHttpChunked():
+    if conf.chunked and conf.data:
+        httplib.HTTPConnection._set_content_length = lambda self, a, b: None
+
 def _checkWebSocket():
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
@@ -2399,6 +2403,10 @@ def _basicOptionValidation():
 
     if conf.dumpTable and conf.search:
         errMsg = "switch '--dump' is incompatible with switch '--search'"
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.chunked and not any((conf.data, conf.requestFile)):
+        errMsg = "switch '--chunked' requires usage of option '--data' or '-r'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.api and not conf.configFile:
@@ -2605,15 +2613,6 @@ def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     _setKnowledgeBaseAttributes()
     _mergeOptions(inputOptions, overrideOptions)
 
-def _setHttpChunked():
-    conf.chunk = conf.chunk and conf.data
-    if conf.chunk:
-        def hook(self, a, b):
-            pass
-
-        httplib.HTTPConnection._set_content_length = hook
-
-
 def init():
     """
     Set attributes into both configuration and knowledge base singletons
@@ -2639,11 +2638,11 @@ def init():
     _listTamperingFunctions()
     _setTamperingFunctions()
     _setPreprocessFunctions()
-    _setHttpChunked()
     _setWafFunctions()
     _setTrafficOutputFP()
     _setupHTTPCollector()
     _resolveCrossReferences()
+    _setHttpChunked()
     _checkWebSocket()
 
     parseTargetDirect()

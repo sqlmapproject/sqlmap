@@ -6,16 +6,15 @@ See the file 'LICENSE' for copying permission
 """
 
 import urllib2
-import httplib
+
 from lib.core.data import conf
 
-
-class HTTPHandler(urllib2.HTTPHandler):
+class ChunkedHandler(urllib2.HTTPHandler):
     """
-    The hook http_requests function ensures that the chunk function is working properly.
+    Ensures that urllib2.HTTPHandler is working properly in case of Chunked Transfer-Encoding
     """
 
-    def _hook(self, request):
+    def _http_request(self, request):
         host = request.get_host()
         if not host:
             raise urllib2.URLError('no host given')
@@ -26,7 +25,7 @@ class HTTPHandler(urllib2.HTTPHandler):
                 request.add_unredirected_header(
                     'Content-type',
                     'application/x-www-form-urlencoded')
-            if not request.has_header('Content-length') and not conf.chunk:
+            if not request.has_header('Content-length') and not conf.chunked:
                 request.add_unredirected_header(
                     'Content-length', '%d' % len(data))
 
@@ -43,4 +42,4 @@ class HTTPHandler(urllib2.HTTPHandler):
                 request.add_unredirected_header(name, value)
         return request
 
-    http_request = _hook
+    http_request = _http_request
