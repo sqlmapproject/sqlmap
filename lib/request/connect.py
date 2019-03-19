@@ -277,7 +277,7 @@ class Connect(object):
         if multipart:
             post = multipart
 
-        if chunked:
+        if chunked and post:
             post = urllib.unquote(post)
             post = chunkSplitPostData(post)
 
