@@ -1277,6 +1277,7 @@ def setPaths(rootPath):
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
     paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "procs")
     paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
+    paths.SQLMAP_SETTINGS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "core", "settings.py")
     paths.SQLMAP_TAMPER_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "tamper")
     paths.SQLMAP_WAF_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "waf")
     paths.SQLMAP_TXT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
@@ -1308,7 +1309,6 @@ def setPaths(rootPath):
     paths.GITHUB_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "github.hst")
 
     # sqlmap files
-    paths.CHECKSUM_MD5 = os.path.join(paths.SQLMAP_TXT_PATH, "checksum.md5")
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
@@ -1327,7 +1327,7 @@ def setPaths(rootPath):
     paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
 
     for path in paths.values():
-        if any(path.endswith(_) for _ in (".md5", ".txt", ".xml", ".zip")):
+        if any(path.endswith(_) for _ in (".txt", ".xml", ".zip")):
             checkFile(path)
 
 def weAreFrozen():
@@ -3394,15 +3394,14 @@ def checkIntegrity():
 
     retVal = True
 
-    if os.path.isfile(paths.CHECKSUM_MD5):
-        for checksum, _ in (re.split(r'\s+', _) for _ in getFileItems(paths.CHECKSUM_MD5)):
-            path = os.path.normpath(os.path.join(paths.SQLMAP_ROOT_PATH, _))
-            if not os.path.isfile(path):
-                logger.error("missing file detected '%s'" % path)
-                retVal = False
-            elif md5File(path) != checksum:
-                logger.error("wrong checksum of file '%s' detected" % path)
-                retVal = False
+    baseTime = os.path.getmtime(paths.SQLMAP_SETTINGS_PATH)
+    for root, dirnames, filenames in os.walk(paths.SQLMAP_ROOT_PATH):
+        for filename in filenames:
+            if re.search(r"(\.py|\.xml|_)\Z", filename):
+                filepath = os.path.join(root, filename)
+                if os.path.getmtime(filepath) > baseTime:
+                    logger.error("wrong modification time of '%s'" % filepath)
+                    retVal = False
 
     return retVal
 
