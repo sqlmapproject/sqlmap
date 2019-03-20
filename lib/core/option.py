@@ -2406,7 +2406,7 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.chunked and not any((conf.data, conf.requestFile)):
-        errMsg = "switch '--chunked' requires usage of option '--data' or '-r'"
+        errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r' or '--forms'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.api and not conf.configFile:
