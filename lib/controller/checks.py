@@ -1337,6 +1337,9 @@ def checkWaf():
     if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline, conf.skipWaf)):
         return None
 
+    if kb.originalCode == httplib.NOT_FOUND:
+        return None
+
     _ = hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_RESULT, True)
     if _ is not None:
         if _:
@@ -1544,6 +1547,8 @@ def checkNullConnection():
     return kb.nullConnection is not None
 
 def checkConnection(suppressOutput=False):
+    threadData = getCurrentThreadData()
+
     if not re.search(r"\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z", conf.hostname):
         if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
             try:
@@ -1568,8 +1573,7 @@ def checkConnection(suppressOutput=False):
 
     try:
         kb.originalPageTime = time.time()
-        page, headers, _ = Request.queryPage(content=True, noteResponseTime=False)
-        kb.originalPage = kb.pageTemplate = page
+        Request.queryPage(content=True, noteResponseTime=False)
 
         kb.errorIsNone = False
 
@@ -1591,8 +1595,6 @@ def checkConnection(suppressOutput=False):
                 logger.warn(warnMsg)
         else:
             kb.errorIsNone = True
-
-        threadData = getCurrentThreadData()
 
         if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
             if (threadData.lastRedirectURL[1] or "").startswith("https://") and unicodeencode(conf.hostname) in threadData.lastRedirectURL[1]:
@@ -1624,6 +1626,9 @@ def checkConnection(suppressOutput=False):
                 kb.ignoreNotFound = True
         else:
             raise
+    finally:
+        kb.originalPage = kb.pageTemplate = threadData.lastPage
+        kb.originalCode = threadData.lastCode
 
     return True
 

@@ -753,15 +753,19 @@ class Connect(object):
                     page = unicode(page, errors="ignore")
                 else:
                     page = getUnicode(page)
-            socket.setdefaulttimeout(conf.timeout)
 
-        for function in kb.preprocessFunctions:
-            try:
-                page, responseHeaders, code = function(page, responseHeaders, code)
-            except Exception as ex:
-                errMsg = "error occurred while running preprocess "
-                errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
-                raise SqlmapGenericException(errMsg)
+            for function in kb.preprocessFunctions:
+                try:
+                    page, responseHeaders, code = function(page, responseHeaders, code)
+                except Exception as ex:
+                    errMsg = "error occurred while running preprocess "
+                    errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
+                    raise SqlmapGenericException(errMsg)
+
+            threadData.lastPage = page
+            threadData.lastCode = code
+
+            socket.setdefaulttimeout(conf.timeout)
 
         processResponse(page, responseHeaders, status)
 
@@ -1309,10 +1313,9 @@ class Connect(object):
             page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
         threadData.lastQueryDuration = calculateDeltaSeconds(start)
-        threadData.lastPage = page
-        threadData.lastCode = code
 
-        kb.originalCode = kb.originalCode or code
+        kb.originalCode = code if kb.originalCode is None else kb.originalCode
+        kb.originalPage = page if kb.originalPage is None else kb.originalPage
 
         if kb.testMode:
             kb.testQueryCount += 1
