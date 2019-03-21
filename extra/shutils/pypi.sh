@@ -177,7 +177,6 @@ Links
 EOF
 sed -i "s/^VERSION =.*/VERSION = \"$VERSION\"/g" sqlmap/lib/core/settings.py
 sed -i "s/^TYPE =.*/TYPE = \"$TYPE\"/g" sqlmap/lib/core/settings.py
-sed -i "s/.*lib\/core\/settings\.py/`md5sum sqlmap/lib/core/settings.py | cut -d ' ' -f 1`  lib\/core\/settings\.py/g" sqlmap/txt/checksum.md5
 for file in $(find sqlmap -type f | grep -v -E "\.(git|yml)"); do echo include $file >> MANIFEST.in; done
 python setup.py sdist upload
 rm -rf $TMP_DIR

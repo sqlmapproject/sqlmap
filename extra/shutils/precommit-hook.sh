@@ -12,13 +12,11 @@ chmod +x .git/hooks/pre-commit
 
 PROJECT="../../"
 SETTINGS="../../lib/core/settings.py"
-CHECKSUM="../../txt/checksum.md5"
 
 declare -x SCRIPTPATH="${0}"
 
 PROJECT_FULLPATH=${SCRIPTPATH%/*}/$PROJECT
 SETTINGS_FULLPATH=${SCRIPTPATH%/*}/$SETTINGS
-CHECKSUM_FULLPATH=${SCRIPTPATH%/*}/$CHECKSUM
 
 git diff $SETTINGS_FULLPATH | grep "VERSION =" > /dev/null && exit 0
 
@@ -37,6 +35,3 @@ then
     fi
     git add "$SETTINGS_FULLPATH"
 fi
-
-truncate -s 0 "$CHECKSUM_FULLPATH"
-cd $PROJECT_FULLPATH && for i in $(find . -name "*.py" -o -name "*.xml" -o -name "*_" -o -type f -regex "./[^./]*" | sort); do git ls-files $i --error-unmatch &>/dev/null && md5sum $i | stdbuf -i0 -o0 -e0 sed 's/\.\///' >> "$CHECKSUM_FULLPATH"; git add "$CHECKSUM_FULLPATH"; done
