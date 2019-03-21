@@ -2575,7 +2575,7 @@ def extractErrorMessage(page):
 
     if isinstance(page, basestring):
         for regex in ERROR_PARSING_REGEXES:
-            match = re.search(regex, page, re.DOTALL | re.IGNORECASE)
+            match = re.search(regex, page, re.IGNORECASE)
 
             if match:
                 retVal = htmlunescape(match.group("result")).replace("<br>", "\n").strip()
