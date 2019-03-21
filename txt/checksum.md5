@@ -50,7 +50,7 @@ d5ef43fe3cdd6c2602d7db45651f9ceb  lib/core/readlineng.py
 7d8a22c582ad201f65b73225e4456170  lib/core/replication.py
 3179d34f371e0295dd4604568fb30bcd  lib/core/revision.py
 d6269c55789f78cf707e09a0f5b45443  lib/core/session.py
-e785996e0f9edd8e309094048dc40d05  lib/core/settings.py
+068159b771eef31a3852da30eba31ccd  lib/core/settings.py
 4483b4a5b601d8f1c4281071dff21ecc  lib/core/shell.py
 10fd19b0716ed261e6d04f311f6f527c  lib/core/subprocessng.py
 10d7e4f7ba2502cce5cf69223c52eddc  lib/core/target.py
@@ -199,7 +199,7 @@ d68b5a9d6e608f15fbe2c520613ece4a  plugins/dbms/postgresql/filesystem.py
 a2ac0498d89797041bf65e4990cf8430  plugins/dbms/postgresql/fingerprint.py
 fb018fd23dcebdb36dddd22ac92efa2c  plugins/dbms/postgresql/__init__.py
 290ea28e1215565d9d12ede3422a4dcf  plugins/dbms/postgresql/syntax.py
-339bc65824b5c946ec40a12cd0257df1  plugins/dbms/postgresql/takeover.py
+cee109ef785cd1ebbc1df5311246094d  plugins/dbms/postgresql/takeover.py
 014968f7b28abe3ca8e533843a017453  plugins/dbms/sqlite/connector.py
 6a0784e3ce46b6aa23dde813c6bc177f  plugins/dbms/sqlite/enumeration.py
 3c0adec05071fbe655a9c2c7afe52721  plugins/dbms/sqlite/filesystem.py
