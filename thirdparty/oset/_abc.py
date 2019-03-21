@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- mode:python; tab-width: 2; coding: utf-8 -*-
 
 """Partially backported python ABC classes"""
