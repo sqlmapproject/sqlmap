@@ -169,7 +169,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
                     msg = "how do you want to execute the Metasploit shellcode "
                     msg += "on the back-end database underlying operating system?"
                     msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
-                    msg += "\n[2] Via shellcodeexec (file system way, preferred on 64-bit systems)"
+                    msg += "\n[2] Via 'shellcodeexec' (file system way, preferred on 64-bit systems)"
 
                     while True:
                         choice = readInput(msg, default='1')

@@ -140,6 +140,9 @@ class Miscellaneous:
         if not isStackingAvailable() and not conf.direct:
             return
 
+        if any((conf.osCmd, conf.osShell)) and Backend.isDbms(DBMS.PGSQL) and kb.copyExecTest:
+            return
+
         if Backend.isOs(OS.WINDOWS):
             libtype = "dynamic-link library"
 

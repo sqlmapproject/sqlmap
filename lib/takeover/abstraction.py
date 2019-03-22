@@ -44,7 +44,10 @@ class Abstraction(Web, UDF, XP_cmdshell):
         XP_cmdshell.__init__(self)
 
     def execCmd(self, cmd, silent=False):
-        if self.webBackdoorUrl and not isStackingAvailable():
+        if Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
+            self.copyExecCmd(cmd)
+
+        elif self.webBackdoorUrl and not isStackingAvailable():
             self.webBackdoorRunCmd(cmd)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -60,7 +63,10 @@ class Abstraction(Web, UDF, XP_cmdshell):
     def evalCmd(self, cmd, first=None, last=None):
         retVal = None
 
-        if self.webBackdoorUrl and not isStackingAvailable():
+        if Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
+            retVal = self.copyExecCmd(cmd)
+
+        elif self.webBackdoorUrl and not isStackingAvailable():
             retVal = self.webBackdoorRunCmd(cmd)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -103,14 +109,19 @@ class Abstraction(Web, UDF, XP_cmdshell):
             logger.info(infoMsg)
 
         else:
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                infoMsg = "going to use injected sys_eval and sys_exec "
-                infoMsg += "user-defined functions for operating system "
+            if Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
+                infoMsg = "going to use 'COPY ... FROM PROGRAM ...' "
+                infoMsg += "command execution"
+                logger.info(infoMsg)
+
+            elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+                infoMsg = "going to use injected user-defined functions "
+                infoMsg += "'sys_eval' and 'sys_exec' for operating system "
                 infoMsg += "command execution"
                 logger.info(infoMsg)
 
             elif Backend.isDbms(DBMS.MSSQL):
-                infoMsg = "going to use xp_cmdshell extended procedure for "
+                infoMsg = "going to use extended procedure 'xp_cmdshell' for "
                 infoMsg += "operating system command execution"
                 logger.info(infoMsg)
 
@@ -200,7 +211,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
 
                 logger.warn(warnMsg)
 
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
+            if any((conf.osCmd, conf.osShell)) and Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
+                success = True
+            elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 success = self.udfInjectSys()
 
                 if success is not True:

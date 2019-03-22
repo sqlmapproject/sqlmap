@@ -1882,6 +1882,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.connErrorChoice = None
     kb.connErrorCounter = 0
     kb.cookieEncodeChoice = None
+    kb.copyExecTest = None
     kb.counters = {}
     kb.customInjectionMark = CUSTOM_INJECTION_MARK_CHAR
     kb.data = AttribDict()
