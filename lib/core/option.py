@@ -1148,14 +1148,14 @@ def _setSafeVisit():
         checkFile(conf.safeReqFile)
 
         raw = readCachedFileContent(conf.safeReqFile)
-        match = re.search(r"\A([A-Z]+) ([^ ]+) HTTP/[0-9.]+\Z", raw[:raw.find('\n')])
+        match = re.search(r"\A([A-Z]+) ([^ ]+) HTTP/[0-9.]+\Z", raw.split('\n')[0].strip())
 
         if match:
             kb.safeReq.method = match.group(1)
             kb.safeReq.url = match.group(2)
             kb.safeReq.headers = {}
 
-            for line in raw[raw.find('\n') + 1:].split('\n'):
+            for line in raw.split('\n')[1:]:
                 line = line.strip()
                 if line and ':' in line:
                     key, value = line.split(':', 1)
