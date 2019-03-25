@@ -2406,7 +2406,7 @@ def _basicOptionValidation():
         errMsg = "switch '--dump' is incompatible with switch '--search'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.chunked and not any((conf.data, conf.requestFile)):
+    if conf.chunked and not any((conf.data, conf.requestFile, conf.forms)):
         errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r' or '--forms'"
         raise SqlmapSyntaxException(errMsg)
 
