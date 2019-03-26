@@ -67,6 +67,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.decorators import stackedmethod
+from lib.core.dicts import HTTP_RESPONSES
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import AUTH_TYPE
@@ -427,7 +428,7 @@ class Connect(object):
                 page = ws.recv()
                 ws.close()
                 code = ws.status
-                status = httplib.responses[code]
+                status = HTTP_RESPONSES[code]
 
                 class _(dict):
                     pass
@@ -643,7 +644,7 @@ class Connect(object):
                     if ignoreTimeout:
                         return None if not conf.ignoreTimeouts else "", None, None
                     else:
-                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, httplib.responses[ex.code])
+                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, HTTP_RESPONSES[ex.code])
                         if threadData.retriesCount < conf.retries and not kb.threadException:
                             warnMsg += ". sqlmap is going to retry the request"
                             logger.critical(warnMsg)

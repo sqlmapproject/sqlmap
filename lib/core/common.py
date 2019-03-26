@@ -8,12 +8,10 @@ See the file 'LICENSE' for copying permission
 import binascii
 import codecs
 import contextlib
-import cookielib
 import copy
 import distutils
 import getpass
 import hashlib
-import httplib
 import inspect
 import io
 import json
@@ -52,10 +50,6 @@ from extra.beep.beep import beep
 from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import paths
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
 from lib.core.convert import hexdecode
@@ -63,11 +57,16 @@ from lib.core.convert import htmlunescape
 from lib.core.convert import stdoutencode
 from lib.core.convert import unicodeencode
 from lib.core.convert import utf8encode
+from lib.core.data import conf
+from lib.core.data import kb
+from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.decorators import cachedmethod
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEFAULT_DOC_ROOTS
 from lib.core.dicts import DEPRECATED_OPTIONS
+from lib.core.dicts import HTTP_RESPONSES
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CONTENT_STATUS
@@ -3305,9 +3304,9 @@ def showHttpErrorCodes():
 
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during run:\n"
-        warnMsg += ", ".join("%d (%s) - %d times" % (code, httplib.responses[code] if code in httplib.responses else '?', count) for code, count in kb.httpErrorCodes.items())
+        warnMsg += ", ".join("%d (%s) - %d times" % (code, HTTP_RESPONSES[code] if code in HTTP_RESPONSES else '?', count) for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
-        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != httplib.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
+        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != 500 and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
             msg = "too many 4xx and/or 5xx HTTP error codes "
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.debug(msg)
@@ -4512,7 +4511,7 @@ def resetCookieJar(cookieJar):
                 errMsg = "no valid cookies found"
                 raise SqlmapGenericException(errMsg)
 
-        except cookielib.LoadError as ex:
+        except Exception as ex:
             errMsg = "there was a problem loading "
             errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", r"\g<1>", getSafeExString(ex))
             raise SqlmapGenericException(errMsg)

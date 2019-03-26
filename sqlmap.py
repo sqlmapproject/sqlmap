@@ -27,7 +27,6 @@ try:
     import re
     import shutil
     import sys
-    import thread
     import threading
     import time
     import traceback
@@ -169,7 +168,7 @@ def main():
                 else:
                     try:
                         start()
-                    except thread.error as ex:
+                    except Exception as ex:
                         if "can't start new thread" in getSafeExString(ex):
                             errMsg = "unable to start new threads. Please check OS (u)limits"
                             logger.critical(errMsg)

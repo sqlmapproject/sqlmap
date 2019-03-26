@@ -5,10 +5,10 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import codecs
 import os
 import random
 import re
-import subprocess
 import string
 import sys
 import types
@@ -19,7 +19,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.3.50"
+VERSION = "1.3.3.51"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -218,7 +218,7 @@ DUMMY_USER_PREFIX = "__dummy__"
 DEFAULT_PAGE_ENCODING = "iso-8859-1"
 
 try:
-    unicode(DEFAULT_PAGE_ENCODING, DEFAULT_PAGE_ENCODING)
+    codecs.lookup(DEFAULT_PAGE_ENCODING)
 except LookupError:
     DEFAULT_PAGE_ENCODING = "utf8"
 
@@ -228,12 +228,10 @@ STDIN_PIPE_DASH = '-'
 # URL used in dummy runs
 DUMMY_URL = "http://foo/bar?id=1"
 
-# System variables
-IS_WIN = subprocess.mswindows
-
 # The name of the operating system dependent module imported. The following names have currently been registered: 'posix', 'nt', 'mac', 'os2', 'ce', 'java', 'riscos'
 PLATFORM = os.name
 PYVERSION = sys.version.split()[0]
+IS_WIN = PLATFORM == "nt"
 
 # DBMS system databases
 MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb")
@@ -448,7 +446,7 @@ HASH_MOD_ITEM_DISPLAY = 11
 HASH_EMPTY_PASSWORD_MARKER = "<empty>"
 
 # Maximum integer value
-MAX_INT = sys.maxint
+MAX_INT = sys.maxsize
 
 # Replacement for unsafe characters in dump table filenames
 UNSAFE_DUMP_FILEPATH_REPLACEMENT = '_'
