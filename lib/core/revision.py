@@ -44,9 +44,12 @@ def getRevisionNumber():
             break
 
     if not retVal:
-        process = subprocess.Popen("git rev-parse --verify HEAD", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, _ = process.communicate()
-        match = re.search(r"(?i)[0-9a-f]{32}", stdout or "")
-        retVal = match.group(0) if match else None
+        try:
+            process = subprocess.Popen("git rev-parse --verify HEAD", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, _ = process.communicate()
+            match = re.search(r"(?i)[0-9a-f]{32}", stdout or "")
+            retVal = match.group(0) if match else None
+        except:
+            pass
 
     return retVal[:7] if retVal else None
