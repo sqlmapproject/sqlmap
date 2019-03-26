@@ -20,11 +20,11 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
+import io
 import mimetools
 import mimetypes
 import os
 import stat
-import StringIO
 import sys
 import urllib
 import urllib2
@@ -53,7 +53,7 @@ class MultipartPostHandler(urllib2.BaseHandler):
 
             try:
                 for(key, value) in data.items():
-                    if isinstance(value, file) or hasattr(value, "file") or isinstance(value, StringIO.StringIO):
+                    if isinstance(value, file) or hasattr(value, "file") or isinstance(value, io.IOBase):
                         v_files.append((key, value))
                     else:
                         v_vars.append((key, value))

@@ -15,6 +15,7 @@ import getpass
 import hashlib
 import httplib
 import inspect
+import io
 import json
 import keyword
 import locale
@@ -40,7 +41,6 @@ import unicodedata
 
 from ConfigParser import DEFAULTSECT
 from ConfigParser import RawConfigParser
-from StringIO import StringIO
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
@@ -158,7 +158,6 @@ from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
-from lib.core.settings import SAFE_VARIABLE_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
 from lib.core.settings import STDIN_PIPE_DASH
@@ -2079,7 +2078,7 @@ def parseXmlFile(xmlFile, handler):
     """
 
     try:
-        with contextlib.closing(StringIO(readCachedFileContent(xmlFile))) as stream:
+        with contextlib.closing(io.StringIO(readCachedFileContent(xmlFile))) as stream:
             parse(stream, handler)
     except (SAXParseException, UnicodeError) as ex:
         errMsg = "something appears to be wrong with "
@@ -3322,7 +3321,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", bu
         if filename not in kb.cache.content:
             kb.cache.content[filename] = sys.stdin.read()
 
-        return contextlib.closing(StringIO(readCachedFileContent(filename)))
+        return contextlib.closing(io.StringIO(readCachedFileContent(filename)))
     else:
         try:
             return codecs.open(filename, mode, encoding, errors, buffering)
@@ -4107,9 +4106,9 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     set([(u'/input.php', 'POST', u'id=1', None, None)])
     """
 
-    class _(StringIO):
+    class _(io.BytesIO):
         def __init__(self, content, url):
-            StringIO.__init__(self, unicodeencode(content, kb.pageEncoding) if isinstance(content, unicode) else content)
+            io.BytesIO.__init__(self, unicodeencode(content, kb.pageEncoding) if isinstance(content, unicode) else content)
             self._url = url
 
         def geturl(self):

@@ -5,10 +5,10 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import io
 import os
 import posixpath
 import re
-import StringIO
 import tempfile
 import urlparse
 
@@ -97,7 +97,7 @@ class Web:
                     content = f.read()
 
         if content is not None:
-            stream = StringIO.StringIO(content)  # string content
+            stream = io.BytesIO(content)  # string content
 
         return self._webFileStreamUpload(stream, destFileName, directory)
 

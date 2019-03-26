@@ -7,9 +7,9 @@ See the file 'LICENSE' for copying permission
 
 import codecs
 import gzip
+import io
 import logging
 import re
-import StringIO
 import struct
 import zlib
 
@@ -273,9 +273,9 @@ def decodePage(page, contentEncoding, contentType):
 
         try:
             if contentEncoding == "deflate":
-                data = StringIO.StringIO(zlib.decompress(page, -15))  # Reference: http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
+                data = io.BytesIO(zlib.decompress(page, -15))  # Reference: http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
             else:
-                data = gzip.GzipFile("", "rb", 9, StringIO.StringIO(page))
+                data = gzip.GzipFile("", "rb", 9, io.BytesIO(page))
                 size = struct.unpack("<l", page[-4:])[0]  # Reference: http://pydoc.org/get.cgi/usr/local/lib/python2.5/gzip.py
                 if size > MAX_CONNECTION_TOTAL_SIZE:
                     raise Exception("size too large")

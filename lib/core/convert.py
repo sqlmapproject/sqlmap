@@ -13,9 +13,9 @@ finally:
     import pickle as picklePy
 
 import base64
+import io
 import json
 import re
-import StringIO
 import sys
 
 from lib.core.settings import IS_WIN
@@ -84,7 +84,7 @@ def base64unpickle(value, unsafe=False):
         self.load_reduce()
 
     def loads(str):
-        f = StringIO.StringIO(str)
+        f = io.BytesIO(str)
         if unsafe:
             unpickler = picklePy.Unpickler(f)
             unpickler.dispatch[picklePy.REDUCE] = _

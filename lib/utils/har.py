@@ -9,8 +9,8 @@ import base64
 import BaseHTTPServer
 import datetime
 import httplib
+import io
 import re
-import StringIO
 import time
 
 from lib.core.bigarray import BigArray
@@ -149,11 +149,11 @@ class Response:
         comment = ""
 
         if altered.startswith("HTTP response [") or altered.startswith("HTTP redirect ["):
-            io = StringIO.StringIO(raw)
-            first_line = io.readline()
+            stream = io.StringIO(raw)
+            first_line = stream.readline()
             parts = cls.extract_status.search(first_line)
             status_line = "HTTP/1.0 %s %s" % (parts.group(1), parts.group(2))
-            remain = io.read()
+            remain = stream.read()
             altered = status_line + "\r\n" + remain
             comment = first_line
 
@@ -203,7 +203,7 @@ class FakeSocket:
     # https://stackoverflow.com/questions/24728088/python-parse-http-response-string
 
     def __init__(self, response_text):
-        self._file = StringIO.StringIO(response_text)
+        self._file = io.StringIO(response_text)
 
     def makefile(self, *args, **kwargs):
         return self._file
@@ -214,7 +214,7 @@ class HTTPRequest(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def __init__(self, request_text):
         self.comment = None
-        self.rfile = StringIO.StringIO(request_text)
+        self.rfile = io.StringIO(request_text)
         self.raw_requestline = self.rfile.readline()
 
         if self.raw_requestline.startswith("HTTP request ["):

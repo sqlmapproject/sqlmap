@@ -5,12 +5,11 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import io
 import time
 import types
 import urllib2
 import urlparse
-
-from StringIO import StringIO
 
 from lib.core.data import conf
 from lib.core.data import kb
@@ -165,7 +164,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             except:
                 redurl = None
                 result = fp
-                fp.read = StringIO("").read
+                fp.read = io.BytesIO("").read
         else:
             result = fp
 
