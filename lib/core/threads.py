@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import difflib
-import random
 import threading
 import time
 import traceback

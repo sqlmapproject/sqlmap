@@ -14,6 +14,7 @@ import time
 from lib.core.bigarray import BigArray
 from lib.core.settings import VERSION
 from thirdparty.six.moves import BaseHTTPServer as _BaseHTTPServer
+from thirdparty.six.moves import http_client as _http_client
 
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
 #            http://www.softwareishard.com/har/viewer/
