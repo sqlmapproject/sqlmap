@@ -32,11 +32,8 @@ import tempfile
 import threading
 import time
 import types
-import urllib
 import unicodedata
 
-from ConfigParser import DEFAULTSECT
-from ConfigParser import RawConfigParser
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
@@ -176,10 +173,11 @@ from thirdparty.clientform.clientform import ParseError
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict import OrderedDict
+from thirdparty.six.moves import configparser as _configparser
 from thirdparty.six.moves import urllib as _urllib
 from thirdparty.termcolor.termcolor import colored
 
-class UnicodeRawConfigParser(RawConfigParser):
+class UnicodeRawConfigParser(_configparser.RawConfigParser):
     """
     RawConfigParser with unicode writing support
     """
@@ -190,7 +188,7 @@ class UnicodeRawConfigParser(RawConfigParser):
         """
 
         if self._defaults:
-            fp.write("[%s]\n" % DEFAULTSECT)
+            fp.write("[%s]\n" % _configparser.DEFAULTSECT)
 
             for (key, value) in self._defaults.items():
                 fp.write("%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING).replace('\n', '\n\t')))
