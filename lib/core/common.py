@@ -33,8 +33,6 @@ import threading
 import time
 import types
 import urllib
-import urllib2
-import urlparse
 import unicodedata
 
 from ConfigParser import DEFAULTSECT
@@ -178,6 +176,7 @@ from thirdparty.clientform.clientform import ParseError
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict import OrderedDict
+from thirdparty.six.moves import urllib as _urllib
 from thirdparty.termcolor.termcolor import colored
 
 class UnicodeRawConfigParser(RawConfigParser):
@@ -1467,7 +1466,7 @@ def parseTargetUrl():
         conf.url = conf.url.replace('?', URI_QUESTION_MARKER)
 
     try:
-        urlSplit = urlparse.urlsplit(conf.url)
+        urlSplit = _urllib.parse.urlsplit(conf.url)
     except ValueError as ex:
         errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, getSafeExString(ex))
         errMsg += "Please be sure that you don't have any leftover characters (e.g. '[' or ']') "
@@ -2653,7 +2652,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
             pass
         finally:
             if convall:
-                result = urllib.unquote_plus(value) if spaceplus else urllib.unquote(value)
+                result = _urllib.parse.unquote_plus(value) if spaceplus else _urllib.parse.unquote(value)
             else:
                 def _(match):
                     charset = reduce(lambda x, y: x.replace(y, ""), unsafe, string.printable)
@@ -2661,7 +2660,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                     return char if char in charset else match.group(0)
                 result = value
                 if spaceplus:
-                    result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of urllib.unquote_plus in convall case)
+                    result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
                 result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
 
     if isinstance(result, str):
@@ -2700,7 +2699,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
             value = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", value)
 
         while True:
-            result = urllib.quote(utf8encode(value), safe)
+            result = _urllib.parse.quote(utf8encode(value), safe)
 
             if limit and len(result) > URLENCODE_CHAR_LIMIT:
                 if count >= len(URLENCODE_FAILSAFE_CHARS):
@@ -2715,7 +2714,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
                 break
 
         if spaceplus:
-            result = result.replace(urllib.quote(' '), '+')
+            result = result.replace(_urllib.parse.quote(' '), '+')
 
     return result
 
@@ -3442,10 +3441,10 @@ def getLatestRevision():
     """
 
     retVal = None
-    req = urllib2.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py")
+    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py")
 
     try:
-        content = urllib2.urlopen(req).read()
+        content = _urllib.request.urlopen(req).read()
         retVal = extractRegexResult(r"VERSION\s*=\s*[\"'](?P<result>[\d.]+)", content)
     except:
         pass
@@ -3485,10 +3484,10 @@ def createGithubIssue(errMsg, excMsg):
         ex = None
         errMsg = errMsg[errMsg.find("\n"):]
 
-        req = urllib2.Request(url="https://api.github.com/search/issues?q=%s" % urllib.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key))
+        req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key))
 
         try:
-            content = urllib2.urlopen(req).read()
+            content = _urllib.request.urlopen(req).read()
             _ = json.loads(content)
             duplicate = _["total_count"] > 0
             closed = duplicate and _["items"][0]["state"] == "closed"
@@ -3503,10 +3502,10 @@ def createGithubIssue(errMsg, excMsg):
             pass
 
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
-        req = urllib2.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN.decode("base64")})
+        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN.decode("base64")})
 
         try:
-            content = urllib2.urlopen(req).read()
+            content = _urllib.request.urlopen(req).read()
         except Exception as ex:
             content = None
 
@@ -4018,7 +4017,7 @@ def asciifyUrl(url, forceQuote=False):
     u'http://www.xn--uuraj-gxa24d.com'
     """
 
-    parts = urlparse.urlsplit(url)
+    parts = _urllib.parse.urlsplit(url)
     if not parts.scheme or not parts.netloc:
         # apparently not an url
         return url
@@ -4039,10 +4038,10 @@ def asciifyUrl(url, forceQuote=False):
     def quote(s, safe):
         s = s or ''
         # Triggers on non-ascii characters - another option would be:
-        #     urllib.quote(s.replace('%', '')) != s.replace('%', '')
+        #     _urllib.parse.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
         if getUnicode(s).encode("ascii", "replace") != s or forceQuote:
-            return urllib.quote(s.encode(UNICODE_ENCODING) if isinstance(s, unicode) else s, safe=safe)
+            return _urllib.parse.quote(s.encode(UNICODE_ENCODING) if isinstance(s, unicode) else s, safe=safe)
         return s
 
     username = quote(parts.username, '')
@@ -4066,7 +4065,7 @@ def asciifyUrl(url, forceQuote=False):
     if port:
         netloc += ':' + str(port)
 
-    return urlparse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment]) or url
+    return _urllib.parse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment]) or url
 
 def isAdminFromPrivileges(privileges):
     """
@@ -4224,7 +4223,7 @@ def checkSameHost(*urls):
                 value = "http://%s" % value
             return value
 
-        return all(re.sub(r"(?i)\Awww\.", "", urlparse.urlparse(_(url) or "").netloc.split(':')[0]) == re.sub(r"(?i)\Awww\.", "", urlparse.urlparse(_(urls[0]) or "").netloc.split(':')[0]) for url in urls[1:])
+        return all(re.sub(r"(?i)\Awww\.", "", _urllib.parse.urlparse(_(url) or "").netloc.split(':')[0]) == re.sub(r"(?i)\Awww\.", "", _urllib.parse.urlparse(_(urls[0]) or "").netloc.split(':')[0]) for url in urls[1:])
 
 def getHostHeader(url):
     """
@@ -4237,7 +4236,7 @@ def getHostHeader(url):
     retVal = url
 
     if url:
-        retVal = urlparse.urlparse(url).netloc
+        retVal = _urllib.parse.urlparse(url).netloc
 
         if re.search(r"http(s)?://\[.+\]", url, re.I):
             retVal = extractRegexResult(r"http(s)?://\[(?P<result>.+)\]", url)
