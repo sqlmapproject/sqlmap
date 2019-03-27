@@ -45,7 +45,6 @@ from hashlib import sha224
 from hashlib import sha256
 from hashlib import sha384
 from hashlib import sha512
-from Queue import Queue
 
 from lib.core.common import Backend
 from lib.core.common import checkFile
@@ -68,6 +67,7 @@ from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import OrderedSet
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
 from lib.core.enums import MKSTEMP_PREFIX
@@ -87,9 +87,9 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
 from thirdparty.colorama.initialise import init as coloramainit
-from thirdparty.oset.pyoset import oset
 from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
+from thirdparty.six.moves import queue as _queue
 
 def mysql_passwd(password, uppercase=True):
     """
@@ -561,7 +561,7 @@ def storeHashesToFile(attack_dict):
     if not attack_dict:
         return
 
-    items = oset()
+    items = OrderedSet()
 
     for user, hashes in attack_dict.items():
         for hash_ in hashes:
@@ -1059,7 +1059,7 @@ def dictionaryAttack(attack_dict):
                         warnMsg += "not supported on this platform"
                         singleTimeWarnMessage(warnMsg)
 
-                        retVal = Queue()
+                        retVal = _queue.Queue()
                         _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, 0, 1, kb.wordlists, custom_wordlist, conf.api)
 
                 except KeyboardInterrupt:
@@ -1150,7 +1150,7 @@ def dictionaryAttack(attack_dict):
                             class Value():
                                 pass
 
-                            retVal = Queue()
+                            retVal = _queue.Queue()
                             found_ = Value()
                             found_.value = False
 

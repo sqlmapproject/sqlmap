@@ -15,9 +15,6 @@ This file lists bundled packages and their associated licensing terms.
   Copyright (C) 2013, Jonathan Hartley.
 * The Fcrypt library located under thirdparty/fcrypt/.
   Copyright (C) 2000, 2001, 2004 Carey Evans.
-* The Oset library located under thirdparty/oset/.
-  Copyright (C) 2010, BlueDynamics Alliance, Austria.
-  Copyright (C) 2009, Raymond Hettinger, and others.
 * The PrettyPrint library located under thirdparty/prettyprint/.
   Copyright (C) 2010, Chris Hall.
 * The SocksiPy library located under thirdparty/socks/.

@@ -85,7 +85,7 @@ class Popen(subprocess.Popen):
         getattr(self, which).close()
         setattr(self, which, None)
 
-    if subprocess.mswindows:
+    if IS_WIN:
         def send(self, input):
             if not self.stdin:
                 return None

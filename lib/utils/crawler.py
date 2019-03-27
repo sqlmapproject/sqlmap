@@ -22,6 +22,7 @@ from lib.core.common import urldecode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import OrderedSet
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapSyntaxException
@@ -31,7 +32,6 @@ from lib.core.threads import runThreads
 from lib.parse.sitemap import parseSitemap
 from lib.request.connect import Connect as Request
 from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
-from thirdparty.oset.pyoset import oset
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 
@@ -39,7 +39,7 @@ def crawl(target):
     try:
         visited = set()
         threadData = getCurrentThreadData()
-        threadData.shared.value = oset()
+        threadData.shared.value = OrderedSet()
 
         def crawlThread():
             threadData = getCurrentThreadData()

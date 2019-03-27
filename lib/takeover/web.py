@@ -37,6 +37,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.datatype import OrderedSet
 from lib.core.enums import DBMS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import OS
@@ -50,7 +51,6 @@ from lib.core.settings import SHELL_RUNCMD_EXE_TAG
 from lib.core.settings import SHELL_WRITABLE_DIR_TAG
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
-from thirdparty.oset.pyoset import oset
 from thirdparty.six.moves import urllib as _urllib
 
 class Web:
@@ -254,7 +254,7 @@ class Web:
 
         directories = list(arrayizeValue(getManualDirectories()))
         directories.extend(getAutoDirectories())
-        directories = list(oset(directories))
+        directories = list(OrderedSet(directories))
 
         path = _urllib.parse.urlparse(conf.url).path or '/'
         path = re.sub(r"/[^/]*\.\w+\Z", '/', path)

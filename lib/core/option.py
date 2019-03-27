@@ -16,7 +16,6 @@ import sys
 import tempfile
 import threading
 import time
-import urllib2
 
 import lib.controller.checks
 import lib.core.common
@@ -66,6 +65,7 @@ from lib.core.data import mergedOptions
 from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
+from lib.core.datatype import OrderedSet
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DUMP_REPLACEMENTS
@@ -149,7 +149,6 @@ from lib.utils.search import search
 from lib.utils.purge import purge
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost
-from thirdparty.oset.pyoset import oset
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import http_cookiejar as _http_cookiejar
 from thirdparty.six.moves import urllib as _urllib
@@ -2023,7 +2022,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.preprocessFunctions = []
         kb.skipVulnHost = None
         kb.tamperFunctions = []
-        kb.targets = oset()
+        kb.targets = OrderedSet()
         kb.testedParams = set()
         kb.userAgents = None
         kb.vainRun = True

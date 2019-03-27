@@ -10,9 +10,9 @@ import re
 from lib.core.common import readInput
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.datatype import OrderedSet
 from lib.core.exception import SqlmapSyntaxException
 from lib.request.connect import Connect as Request
-from thirdparty.oset.pyoset import oset
 from thirdparty.six.moves import http_client as _http_client
 
 abortedFlag = None
@@ -26,7 +26,7 @@ def parseSitemap(url, retVal=None):
     try:
         if retVal is None:
             abortedFlag = False
-            retVal = oset()
+            retVal = OrderedSet()
 
         try:
             content = Request.getPage(url=url, raise404=True)[0] if not abortedFlag else ""
