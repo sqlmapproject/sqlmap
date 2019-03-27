@@ -26,10 +26,10 @@
 >>> import urllib2
 >>> from keepalive import HTTPHandler
 >>> keepalive_handler = HTTPHandler()
->>> opener = urllib2.build_opener(keepalive_handler)
->>> urllib2.install_opener(opener)
+>>> opener = _urllib.request.build_opener(keepalive_handler)
+>>> _urllib.request.install_opener(opener)
 >>> 
->>> fo = urllib2.urlopen('http://www.python.org')
+>>> fo = _urllib.request.urlopen('http://www.python.org')
 
 If a connection to a given host is requested, and all of the existing
 connections are still in use, another connection will be opened.  If
@@ -105,8 +105,13 @@ EXTRA ATTRIBUTES AND METHODS
 
 from __future__ import print_function
 
-import urllib2
-import httplib
+try:
+    from thirdparty.six.moves import http_client as _http_client
+    from thirdparty.six.moves import urllib as _urllib
+except ImportError:
+    from six.moves import http_client as _http_client
+    from six.moves import urllib as _urllib
+
 import socket
 import thread
 
@@ -214,7 +219,7 @@ class KeepAliveHandler:
     def do_open(self, req):
         host = req.host
         if not host:
-            raise urllib2.URLError('no host given')
+            raise _urllib.error.URLError('no host given')
 
         try:
             h = self._cm.get_ready_conn(host)
@@ -238,8 +243,8 @@ class KeepAliveHandler:
                 self._cm.add(host, h, 0)
                 self._start_transaction(h, req)
                 r = h.getresponse()
-        except (socket.error, httplib.HTTPException) as err:
-            raise urllib2.URLError(err)
+        except (socket.error, _http_client.HTTPException) as err:
+            raise _urllib.error.URLError(err)
 
         if DEBUG: DEBUG.info("STATUS: %s, %s", r.status, r.reason)
 
@@ -274,7 +279,7 @@ class KeepAliveHandler:
             r = h.getresponse()
             # note: just because we got something back doesn't mean it
             # worked.  We'll check the version below, too.
-        except (socket.error, httplib.HTTPException):
+        except (socket.error, _http_client.HTTPException):
             r = None
         except:
             # adding this block just in case we've missed
@@ -323,8 +328,8 @@ class KeepAliveHandler:
                     h.putrequest(req.get_method() or 'GET', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
                 else:
                     h.putrequest(req.get_method() or 'GET', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
-        except (socket.error, httplib.HTTPException) as err:
-            raise urllib2.URLError(err)
+        except (socket.error, _http_client.HTTPException) as err:
+            raise _urllib.error.URLError(err)
 
         if not req.headers.has_key('Connection'):
             req.headers['Connection'] = 'keep-alive'
@@ -341,7 +346,7 @@ class KeepAliveHandler:
     def _get_connection(self, host):
         return NotImplementedError
 
-class HTTPHandler(KeepAliveHandler, urllib2.HTTPHandler):
+class HTTPHandler(KeepAliveHandler, _urllib.request.HTTPHandler):
     def __init__(self):
         KeepAliveHandler.__init__(self)
 
@@ -351,7 +356,7 @@ class HTTPHandler(KeepAliveHandler, urllib2.HTTPHandler):
     def _get_connection(self, host):
         return HTTPConnection(host)
 
-class HTTPSHandler(KeepAliveHandler, urllib2.HTTPSHandler):
+class HTTPSHandler(KeepAliveHandler, _urllib.request.HTTPSHandler):
     def __init__(self, ssl_factory=None):
         KeepAliveHandler.__init__(self)
         if not ssl_factory:
@@ -369,7 +374,7 @@ class HTTPSHandler(KeepAliveHandler, urllib2.HTTPSHandler):
         try: return self._ssl_factory.get_https_connection(host)
         except AttributeError: return HTTPSConnection(host)
 
-class HTTPResponse(httplib.HTTPResponse):
+class HTTPResponse(_http_client.HTTPResponse):
     # we need to subclass HTTPResponse in order to
     # 1) add readline() and readlines() methods
     # 2) add close_connection() methods
@@ -391,9 +396,9 @@ class HTTPResponse(httplib.HTTPResponse):
 
     def __init__(self, sock, debuglevel=0, strict=0, method=None):
         if method: # the httplib in python 2.3 uses the method arg
-            httplib.HTTPResponse.__init__(self, sock, debuglevel, method)
+            _http_client.HTTPResponse.__init__(self, sock, debuglevel, method)
         else: # 2.2 doesn't
-            httplib.HTTPResponse.__init__(self, sock, debuglevel)
+            _http_client.HTTPResponse.__init__(self, sock, debuglevel)
         self.fileno = sock.fileno
         self.code = None
         self._method = method
@@ -404,7 +409,7 @@ class HTTPResponse(httplib.HTTPResponse):
         self._url = None     # (same)
         self._connection = None # (same)
 
-    _raw_read = httplib.HTTPResponse.read
+    _raw_read = _http_client.HTTPResponse.read
 
     def close(self):
         if self.fp:
@@ -468,11 +473,11 @@ class HTTPResponse(httplib.HTTPResponse):
         return list
 
 
-class HTTPConnection(httplib.HTTPConnection):
+class HTTPConnection(_http_client.HTTPConnection):
     # use the modified response class
     response_class = HTTPResponse
 
-class HTTPSConnection(httplib.HTTPSConnection):
+class HTTPSConnection(_http_client.HTTPSConnection):
     response_class = HTTPResponse
 
 #########################################################################
@@ -483,14 +488,14 @@ def error_handler(url):
     global HANDLE_ERRORS
     orig = HANDLE_ERRORS
     keepalive_handler = HTTPHandler()
-    opener = urllib2.build_opener(keepalive_handler)
-    urllib2.install_opener(opener)
+    opener = _urllib.request.build_opener(keepalive_handler)
+    _urllib.request.install_opener(opener)
     pos = {0: 'off', 1: 'on'}
     for i in (0, 1):
         print("  fancy error handling %s (HANDLE_ERRORS = %i)" % (pos[i], i))
         HANDLE_ERRORS = i
         try:
-            fo = urllib2.urlopen(url)
+            fo = _urllib.request.urlopen(url)
             foo = fo.read()
             fo.close()
             try: status, reason = fo.status, fo.reason
@@ -510,25 +515,25 @@ def continuity(url):
     format = '%25s: %s'
 
     # first fetch the file with the normal http handler
-    opener = urllib2.build_opener()
-    urllib2.install_opener(opener)
-    fo = urllib2.urlopen(url)
+    opener = _urllib.request.build_opener()
+    _urllib.request.install_opener(opener)
+    fo = _urllib.request.urlopen(url)
     foo = fo.read()
     fo.close()
     m = md5.new(foo)
     print(format % ('normal urllib', m.hexdigest()))
 
     # now install the keepalive handler and try again
-    opener = urllib2.build_opener(HTTPHandler())
-    urllib2.install_opener(opener)
+    opener = _urllib.request.build_opener(HTTPHandler())
+    _urllib.request.install_opener(opener)
 
-    fo = urllib2.urlopen(url)
+    fo = _urllib.request.urlopen(url)
     foo = fo.read()
     fo.close()
     m = md5.new(foo)
     print(format % ('keepalive read', m.hexdigest()))
 
-    fo = urllib2.urlopen(url)
+    fo = _urllib.request.urlopen(url)
     foo = ''
     while 1:
         f = fo.readline()
@@ -543,15 +548,15 @@ def comp(N, url):
 
     sys.stdout.write('  first using the normal urllib handlers')
     # first use normal opener
-    opener = urllib2.build_opener()
-    urllib2.install_opener(opener)
+    opener = _urllib.request.build_opener()
+    _urllib.request.install_opener(opener)
     t1 = fetch(N, url)
     print('  TIME: %.3f s' % t1)
 
     sys.stdout.write('  now using the keepalive handler       ')
     # now install the keepalive handler and try again
-    opener = urllib2.build_opener(HTTPHandler())
-    urllib2.install_opener(opener)
+    opener = _urllib.request.build_opener(HTTPHandler())
+    _urllib.request.install_opener(opener)
     t2 = fetch(N, url)
     print('  TIME: %.3f s' % t2)
     print('  improvement factor: %.2f' % (t1/t2, ))
@@ -562,7 +567,7 @@ def fetch(N, url, delay=0):
     starttime = time.time()
     for i in range(N):
         if delay and i > 0: time.sleep(delay)
-        fo = urllib2.urlopen(url)
+        fo = _urllib.request.urlopen(url)
         foo = fo.read()
         fo.close()
         lens.append(len(foo))
@@ -584,7 +589,7 @@ def test_timeout(url):
         info = warning = error = debug
     DEBUG = FakeLogger()
     print("  fetching the file to establish a connection")
-    fo = urllib2.urlopen(url)
+    fo = _urllib.request.urlopen(url)
     data1 = fo.read()
     fo.close()
 
@@ -598,7 +603,7 @@ def test_timeout(url):
     sys.stderr.write('\r')
 
     print("  fetching the file a second time")
-    fo = urllib2.urlopen(url)
+    fo = _urllib.request.urlopen(url)
     data2 = fo.read()
     fo.close()
 
