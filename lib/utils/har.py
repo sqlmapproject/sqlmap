@@ -6,7 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 import base64
-import BaseHTTPServer
 import datetime
 import io
 import re
@@ -14,6 +13,7 @@ import time
 
 from lib.core.bigarray import BigArray
 from lib.core.settings import VERSION
+from thirdparty.six.moves import BaseHTTPServer as _BaseHTTPServer
 
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
 #            http://www.softwareishard.com/har/viewer/
@@ -207,7 +207,7 @@ class FakeSocket:
     def makefile(self, *args, **kwargs):
         return self._file
 
-class HTTPRequest(BaseHTTPServer.BaseHTTPRequestHandler):
+class HTTPRequest(_BaseHTTPServer.BaseHTTPRequestHandler):
     # Original source:
     # https://stackoverflow.com/questions/4685217/parse-raw-http-headers
 

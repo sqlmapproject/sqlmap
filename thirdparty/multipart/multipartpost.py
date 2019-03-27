@@ -29,8 +29,8 @@ import sys
 import urllib
 import urllib2
 
+from lib.core.compat import choose_boundary
 from lib.core.exception import SqlmapDataException
-
 
 class Callable:
     def __init__(self, anycallable):
@@ -75,7 +75,7 @@ class MultipartPostHandler(urllib2.BaseHandler):
 
     def multipart_encode(vars, files, boundary=None, buf=None):
         if boundary is None:
-            boundary = mimetools.choose_boundary()
+            boundary = choose_boundary()
 
         if buf is None:
             buf = ""

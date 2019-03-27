@@ -24,3 +24,11 @@ def dirtyPatches():
 
     # Reference: https://github.com/nodejs/node/issues/12786#issuecomment-298652440
     codecs.register(lambda name: codecs.lookup("utf-8") if name == "cp65001" else None)
+
+    # Reference: http://bugs.python.org/issue17849
+    if hasattr(_http_client, "LineAndFileWrapper"):
+        def _(self, *args):
+            return self._readline()
+
+        _http_client.LineAndFileWrapper._readline = _http_client.LineAndFileWrapper.readline
+        _http_client.LineAndFileWrapper.readline = _

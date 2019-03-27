@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import binascii
 import os
 import random
+import uuid
 
 class WichmannHill(random.Random):
     """
@@ -159,3 +160,7 @@ class WichmannHill(random.Random):
         y = (y + a) % 256 or 1
         z = (z + a) % 256 or 1
         self.__whseed(x, y, z)
+
+# Reference: https://github.com/urllib3/urllib3/blob/master/src/urllib3/filepost.py
+def choose_boundary():
+    return uuid.uuid4().hex
