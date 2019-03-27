@@ -9,9 +9,6 @@ from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
-    def __init__(self):
-        GenericEnumeration.__init__(self)
-
     def searchDb(self):
         warnMsg = "on Informix searching of databases is not implemented"
         logger.warn(warnMsg)

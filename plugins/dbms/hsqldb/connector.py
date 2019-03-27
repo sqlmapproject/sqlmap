@@ -30,9 +30,6 @@ class Connector(GenericConnector):
     License: LGPL & Apache License 2.0
     """
 
-    def __init__(self):
-        GenericConnector.__init__(self)
-
     def connect(self):
         self.initConnection()
         try:

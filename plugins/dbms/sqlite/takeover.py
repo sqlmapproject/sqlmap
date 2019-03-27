@@ -9,9 +9,6 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
-    def __init__(self):
-        GenericTakeover.__init__(self)
-
     def osCmd(self):
         errMsg = "on SQLite it is not possible to execute commands"
         raise SqlmapUnsupportedFeatureException(errMsg)

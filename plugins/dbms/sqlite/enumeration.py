@@ -10,9 +10,6 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
-    def __init__(self):
-        GenericEnumeration.__init__(self)
-
     def getCurrentUser(self):
         warnMsg = "on SQLite it is not possible to enumerate the current user"
         logger.warn(warnMsg)

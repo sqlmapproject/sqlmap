@@ -30,9 +30,7 @@ from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
 
-from plugins.generic.misc import Miscellaneous
-
-class Takeover(Abstraction, Metasploit, ICMPsh, Registry, Miscellaneous):
+class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
     """
     This class defines generic OS takeover functionalities for plugins.
     """

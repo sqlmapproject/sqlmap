@@ -23,11 +23,7 @@ class AccessMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Tak
     def __init__(self):
         self.excludeDbsList = ACCESS_SYSTEM_DBS
 
-        Syntax.__init__(self)
-        Fingerprint.__init__(self)
-        Enumeration.__init__(self)
-        Filesystem.__init__(self)
-        Miscellaneous.__init__(self)
-        Takeover.__init__(self)
+        for cls in self.__class__.__bases__:
+            cls.__init__(self)
 
     unescaper[DBMS.ACCESS] = Syntax.escape

@@ -30,9 +30,6 @@ class Connector(GenericConnector):
     Possible connectors: http://wiki.python.org/moin/MySQL
     """
 
-    def __init__(self):
-        GenericConnector.__init__(self)
-
     def connect(self):
         self.initConnection()
 

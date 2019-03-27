@@ -23,9 +23,6 @@ from lib.request import inject
 from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
-    def __init__(self):
-        GenericTakeover.__init__(self)
-
     def udfSetRemotePath(self):
         # On Windows
         if Backend.isOs(OS.WINDOWS):

@@ -31,9 +31,6 @@ class Connector(GenericConnector):
     License: https://cx-oracle.readthedocs.io/en/latest/license.html#license
     """
 
-    def __init__(self):
-        GenericConnector.__init__(self)
-
     def connect(self):
         self.initConnection()
         self.__dsn = cx_Oracle.makedsn(self.hostname, self.port, self.db)

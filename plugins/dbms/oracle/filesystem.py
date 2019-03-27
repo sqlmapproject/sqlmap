@@ -9,9 +9,6 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
-    def __init__(self):
-        GenericFilesystem.__init__(self)
-
     def readFile(self, rFile):
         errMsg = "File system read access not yet implemented for "
         errMsg += "Oracle"

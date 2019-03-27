@@ -29,9 +29,6 @@ class Connector(GenericConnector):
     License: MIT
     """
 
-    def __init__(self):
-        GenericConnector.__init__(self)
-
     def connect(self):
         if not IS_WIN:
             errMsg = "currently, direct connection to Microsoft Access database(s) "

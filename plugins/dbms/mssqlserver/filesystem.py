@@ -28,9 +28,6 @@ from lib.request import inject
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
-    def __init__(self):
-        GenericFilesystem.__init__(self)
-
     def _dataToScr(self, fileContent, chunkName):
         fileLines = []
         fileSize = len(fileContent)

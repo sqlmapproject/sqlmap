@@ -28,9 +28,6 @@ from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
-    def __init__(self):
-        GenericEnumeration.__init__(self)
-
     def getUsers(self):
         infoMsg = "fetching database users"
         logger.info(infoMsg)

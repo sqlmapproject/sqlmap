@@ -9,9 +9,6 @@ from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
-    def __init__(self):
-        GenericEnumeration.__init__(self)
-
     def getDbs(self):
         warnMsg = "on Firebird it is not possible to enumerate databases (use only '--tables')"
         logger.warn(warnMsg)

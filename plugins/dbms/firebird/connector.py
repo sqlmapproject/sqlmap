@@ -27,9 +27,6 @@ class Connector(GenericConnector):
     License: BSD
     """
 
-    def __init__(self):
-        GenericConnector.__init__(self)
-
     # sample usage:
     # ./sqlmap.py -d "firebird://sysdba:testpass@/opt/firebird/testdb.fdb"
     # ./sqlmap.py -d "firebird://sysdba:testpass@127.0.0.1:3050//opt/firebird/testdb.fdb"

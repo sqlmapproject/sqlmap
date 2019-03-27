@@ -34,9 +34,6 @@ class Connector(GenericConnector):
     to work, get it from http://sourceforge.net/projects/pymssql/files/pymssql/1.0.2/
     """
 
-    def __init__(self):
-        GenericConnector.__init__(self)
-
     def connect(self):
         self.initConnection()
 

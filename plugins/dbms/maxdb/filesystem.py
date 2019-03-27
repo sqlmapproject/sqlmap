@@ -9,9 +9,6 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
-    def __init__(self):
-        GenericFilesystem.__init__(self)
-
     def readFile(self, rFile):
         errMsg = "on SAP MaxDB reading of files is not supported"
         raise SqlmapUnsupportedFeatureException(errMsg)

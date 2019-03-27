@@ -9,9 +9,6 @@ from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
-    def __init__(self):
-        GenericEnumeration.__init__(self)
-
     def getBanner(self):
         warnMsg = "on Microsoft Access it is not possible to get a banner"
         logger.warn(warnMsg)
