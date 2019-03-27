@@ -8,8 +8,6 @@ See the file 'LICENSE' for copying permission
 import io
 import time
 import types
-import urllib2
-import urlparse
 
 from lib.core.data import conf
 from lib.core.data import kb
@@ -32,8 +30,9 @@ from lib.core.settings import MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import parseResponse
+from thirdparty.six.moves import urllib as _urllib
 
-class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
+class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
     def _get_header_redirect(self, headers):
         retVal = None
 
@@ -66,7 +65,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
         newurl = newurl.replace(' ', '%20')
-        return urllib2.Request(newurl, data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
+        return _urllib.request.Request(newurl, data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
 
     def http_error_302(self, req, fp, code, msg, headers):
         start = time.time()
@@ -109,8 +108,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
         if redurl:
             try:
-                if not urlparse.urlsplit(redurl).netloc:
-                    redurl = urlparse.urljoin(req.get_full_url(), redurl)
+                if not _urllib.parse.urlsplit(redurl).netloc:
+                    redurl = _urllib.parse.urljoin(req.get_full_url(), redurl)
 
                 self._infinite_loop_check(req)
                 self._ask_redirect_choice(code, redurl, req.get_method())
@@ -139,8 +138,8 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 req.headers[HTTP_HEADER.COOKIE] = delimiter.join("%s=%s" % (key, cookies[key]) for key in cookies)
 
             try:
-                result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-            except urllib2.HTTPError as ex:
+                result = _urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+            except _urllib.error.HTTPError as ex:
                 result = ex
 
                 # Dirty hack for http://bugs.python.org/issue15701

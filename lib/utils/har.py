@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 import base64
 import BaseHTTPServer
 import datetime
-import httplib
 import io
 import re
 import time
@@ -157,12 +156,12 @@ class Response:
             altered = status_line + "\r\n" + remain
             comment = first_line
 
-        response = httplib.HTTPResponse(FakeSocket(altered))
+        response = _http_client.HTTPResponse(FakeSocket(altered))
         response.begin()
 
         try:
             content = response.read(-1)
-        except httplib.IncompleteRead:
+        except _http_client.IncompleteRead:
             content = raw[raw.find("\r\n\r\n") + 4:].rstrip("\r\n")
 
         return cls(httpVersion="HTTP/1.1" if response.version == 11 else "HTTP/1.0",

@@ -6,7 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 import copy
-import httplib
 import logging
 import os
 import random
@@ -106,6 +105,7 @@ from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
+from thirdparty.six.moves import http_client as _http_client
 
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
@@ -1337,7 +1337,7 @@ def checkWaf():
     if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline, conf.skipWaf)):
         return None
 
-    if kb.originalCode == httplib.NOT_FOUND:
+    if kb.originalCode == _http_client.NOT_FOUND:
         return None
 
     _ = hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_RESULT, True)
@@ -1623,7 +1623,7 @@ def checkConnection(suppressOutput=False):
             warnMsg += "any addressing issues"
             singleTimeWarnMessage(warnMsg)
 
-        if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
+        if any(code in kb.httpErrorCodes for code in (_http_client.NOT_FOUND, )):
             errMsg = getSafeExString(ex)
             logger.critical(errMsg)
 

@@ -5,9 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import cookielib
 import glob
-import httplib
 import inspect
 import logging
 import os
@@ -19,7 +17,6 @@ import tempfile
 import threading
 import time
 import urllib2
-import urlparse
 
 import lib.controller.checks
 import lib.core.common
@@ -153,14 +150,17 @@ from lib.utils.purge import purge
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost
 from thirdparty.oset.pyoset import oset
+from thirdparty.six.moves import http_client as _http_client
+from thirdparty.six.moves import http_cookiejar as _http_cookiejar
+from thirdparty.six.moves import urllib as _urllib
 from thirdparty.socks import socks
 from xml.etree.ElementTree import ElementTree
 
-authHandler = urllib2.BaseHandler()
+authHandler = _urllib.request.BaseHandler()
 chunkedHandler = ChunkedHandler()
 httpsHandler = HTTPSHandler()
 keepAliveHandler = keepalive.HTTPHandler()
-proxyHandler = urllib2.ProxyHandler()
+proxyHandler = _urllib.request.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
 multipartPostHandler = multipartpost.MultipartPostHandler()
@@ -1053,7 +1053,7 @@ def _setHTTPHandlers():
         logger.debug(debugMsg)
 
         try:
-            _ = urlparse.urlsplit(conf.proxy)
+            _ = _urllib.parse.urlsplit(conf.proxy)
         except Exception as ex:
             errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
@@ -1090,9 +1090,9 @@ def _setHTTPHandlers():
             proxyHandler.proxies = {}
 
             socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
-            socks.wrapmodule(urllib2)
+            socks.wrapmodule(_http_client)
         else:
-            socks.unwrapmodule(urllib2)
+            socks.unwrapmodule(_http_client)
 
             if conf.proxyCred:
                 # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
@@ -1112,12 +1112,12 @@ def _setHTTPHandlers():
 
     if not conf.dropSetCookie:
         if not conf.loadCookies:
-            conf.cj = cookielib.CookieJar()
+            conf.cj = _http_cookiejar.CookieJar()
         else:
-            conf.cj = cookielib.MozillaCookieJar()
+            conf.cj = _http_cookiejar.MozillaCookieJar()
             resetCookieJar(conf.cj)
 
-        handlers.append(urllib2.HTTPCookieProcessor(conf.cj))
+        handlers.append(_urllib.request.HTTPCookieProcessor(conf.cj))
 
     # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
     if conf.keepAlive:
@@ -1133,8 +1133,8 @@ def _setHTTPHandlers():
         else:
             handlers.append(keepAliveHandler)
 
-    opener = urllib2.build_opener(*handlers)
-    urllib2.install_opener(opener)
+    opener = _urllib.request.build_opener(*handlers)
+    _urllib.request.install_opener(opener)
 
 def _setSafeVisit():
     """
@@ -1166,7 +1166,7 @@ def _setSafeVisit():
                             if value.endswith(":443"):
                                 scheme = "https"
                             value = "%s://%s" % (scheme, value)
-                        kb.safeReq.url = urlparse.urljoin(value, kb.safeReq.url)
+                        kb.safeReq.url = _urllib.parse.urljoin(value, kb.safeReq.url)
                 else:
                     break
 
@@ -1289,7 +1289,7 @@ def _setHTTPAuthentication():
         conf.authUsername = aCredRegExp.group(1)
         conf.authPassword = aCredRegExp.group(2)
 
-        kb.passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        kb.passwordMgr = _urllib.request.HTTPPasswordMgrWithDefaultRealm()
 
         _setAuthCred()
 
@@ -1297,7 +1297,7 @@ def _setHTTPAuthentication():
             authHandler = SmartHTTPBasicAuthHandler(kb.passwordMgr)
 
         elif authType == AUTH_TYPE.DIGEST:
-            authHandler = urllib2.HTTPDigestAuthHandler(kb.passwordMgr)
+            authHandler = _urllib.request.HTTPDigestAuthHandler(kb.passwordMgr)
 
         elif authType == AUTH_TYPE.NTLM:
             try:
@@ -1459,7 +1459,7 @@ def _setHostname():
 
     if conf.url:
         try:
-            conf.hostname = urlparse.urlsplit(conf.url).netloc.split(':')[0]
+            conf.hostname = _urllib.parse.urlsplit(conf.url).netloc.split(':')[0]
         except ValueError as ex:
             errMsg = "problem occurred while "
             errMsg += "parsing an URL '%s' ('%s')" % (conf.url, getSafeExString(ex))
@@ -1783,8 +1783,8 @@ def _cleanupEnvironment():
     Cleanup environment (e.g. from leftovers after --sqlmap-shell).
     """
 
-    if issubclass(urllib2.socket.socket, socks.socksocket):
-        socks.unwrapmodule(urllib2)
+    if issubclass(_http_client.socket.socket, socks.socksocket):
+        socks.unwrapmodule(_http_client)
 
     if hasattr(socket, "_ready"):
         socket._ready.clear()
@@ -2312,11 +2312,11 @@ def _setTorSocksProxySettings():
 
     # SOCKS5 to prevent DNS leaks (http://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
     socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, port)
-    socks.wrapmodule(urllib2)
+    socks.wrapmodule(_http_client)
 
 def _setHttpChunked():
     if conf.chunked and conf.data:
-        httplib.HTTPConnection._set_content_length = lambda self, a, b: None
+        _http_client.HTTPConnection._set_content_length = lambda self, a, b: None
 
 def _checkWebSocket():
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):

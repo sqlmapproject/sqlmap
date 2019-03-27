@@ -10,7 +10,6 @@ import os
 import posixpath
 import re
 import tempfile
-import urlparse
 
 from extra.cloak.cloak import decloak
 from lib.core.agent import agent
@@ -52,6 +51,7 @@ from lib.core.settings import SHELL_WRITABLE_DIR_TAG
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
 from thirdparty.oset.pyoset import oset
+from thirdparty.six.moves import urllib as _urllib
 
 class Web:
     """
@@ -256,7 +256,7 @@ class Web:
         directories.extend(getAutoDirectories())
         directories = list(oset(directories))
 
-        path = urlparse.urlparse(conf.url).path or '/'
+        path = _urllib.parse.urlparse(conf.url).path or '/'
         path = re.sub(r"/[^/]*\.\w+\Z", '/', path)
         if path != '/':
             _ = []
@@ -295,7 +295,7 @@ class Web:
 
             for match in re.finditer('/', directory):
                 self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
-                self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
+                self.webStagerUrl = _urllib.parse.urljoin(self.webBaseUrl, stagerName)
                 debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                 logger.debug(debugMsg)
 
@@ -332,7 +332,7 @@ class Web:
 
                     for match in re.finditer('/', directory):
                         self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
-                        self.webStagerUrl = urlparse.urljoin(self.webBaseUrl, stagerName)
+                        self.webStagerUrl = _urllib.parse.urljoin(self.webBaseUrl, stagerName)
 
                         debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
                         logger.debug(debugMsg)

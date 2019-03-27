@@ -61,7 +61,6 @@ from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEFAULT_DOC_ROOTS
 from lib.core.dicts import DEPRECATED_OPTIONS
-from lib.core.dicts import HTTP_RESPONSES
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CONTENT_STATUS
@@ -174,6 +173,7 @@ from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import configparser as _configparser
+from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 from thirdparty.termcolor.termcolor import colored
 
@@ -3301,9 +3301,9 @@ def showHttpErrorCodes():
 
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during run:\n"
-        warnMsg += ", ".join("%d (%s) - %d times" % (code, HTTP_RESPONSES[code] if code in HTTP_RESPONSES else '?', count) for code, count in kb.httpErrorCodes.items())
+        warnMsg += ", ".join("%d (%s) - %d times" % (code, _http_client.responses[code] if code in _http_client.responses else '?', count) for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
-        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != 500 and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
+        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
             msg = "too many 4xx and/or 5xx HTTP error codes "
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.debug(msg)

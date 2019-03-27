@@ -6,10 +6,8 @@ See the file 'LICENSE' for copying permission
 """
 
 import distutils.version
-import httplib
 import re
 import socket
-import urllib2
 
 from lib.core.common import getSafeExString
 from lib.core.data import conf
@@ -17,6 +15,8 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import PYVERSION
+from thirdparty.six.moves import http_client as _http_client
+from thirdparty.six.moves import urllib as _urllib
 
 ssl = None
 try:
@@ -27,7 +27,7 @@ except ImportError:
 
 _protocols = filter(None, (getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2")))
 
-class HTTPSConnection(httplib.HTTPSConnection):
+class HTTPSConnection(_http_client.HTTPSConnection):
     """
     Connection class that enables usage of newer SSL protocols.
 
@@ -35,7 +35,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
     """
 
     def __init__(self, *args, **kwargs):
-        httplib.HTTPSConnection.__init__(self, *args, **kwargs)
+        _http_client.HTTPSConnection.__init__(self, *args, **kwargs)
 
     def connect(self):
         def create_sock():
@@ -63,7 +63,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
                         break
                     else:
                         sock.close()
-                except (ssl.SSLError, socket.error, httplib.BadStatusLine) as ex:
+                except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
                     logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
@@ -83,7 +83,7 @@ class HTTPSConnection(httplib.HTTPSConnection):
                         break
                     else:
                         sock.close()
-                except (ssl.SSLError, socket.error, httplib.BadStatusLine) as ex:
+                except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
                     logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
 
@@ -94,14 +94,14 @@ class HTTPSConnection(httplib.HTTPSConnection):
                 errMsg += " (please retry with Python >= 2.7.9)"
             raise SqlmapConnectionException(errMsg)
 
-class HTTPSHandler(urllib2.HTTPSHandler):
+class HTTPSHandler(_urllib.request.HTTPSHandler):
     def https_open(self, req):
-        return self.do_open(HTTPSConnection if ssl else httplib.HTTPSConnection, req)
+        return self.do_open(HTTPSConnection if ssl else _http_client.HTTPSConnection, req)
 
 # Bug fix (http://bugs.python.org/issue17849)
 
 def _(self, *args):
     return self._readline()
 
-httplib.LineAndFileWrapper._readline = httplib.LineAndFileWrapper.readline
-httplib.LineAndFileWrapper.readline = _
+_http_client.LineAndFileWrapper._readline = _http_client.LineAndFileWrapper.readline
+_http_client.LineAndFileWrapper.readline = _

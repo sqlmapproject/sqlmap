@@ -13,6 +13,7 @@ import threading
 import time
 import traceback
 
+from lib.core.compat import WichmannHill
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -57,7 +58,7 @@ class _ThreadData(threading.local):
         self.lastRequestMsg = None
         self.lastRequestUID = 0
         self.lastRedirectURL = None
-        self.random = random.WichmannHill()
+        self.random = WichmannHill()
         self.resumed = False
         self.retriesCount = 0
         self.seqMatcher = difflib.SequenceMatcher(None)

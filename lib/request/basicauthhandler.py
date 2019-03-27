@@ -5,15 +5,15 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import urllib2
+from thirdparty.six.moves import urllib as _urllib
 
-class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
+class SmartHTTPBasicAuthHandler(_urllib.request.HTTPBasicAuthHandler):
     """
     Reference: http://selenic.com/hg/rev/6c51a5056020
     Fix for a: http://bugs.python.org/issue8797
     """
     def __init__(self, *args, **kwargs):
-        urllib2.HTTPBasicAuthHandler.__init__(self, *args, **kwargs)
+        _urllib.request.HTTPBasicAuthHandler.__init__(self, *args, **kwargs)
         self.retried_req = set()
         self.retried_count = 0
 
@@ -30,8 +30,8 @@ class SmartHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
             self.retried_count = 0
         else:
             if self.retried_count > 5:
-                raise urllib2.HTTPError(req.get_full_url(), 401, "basic auth failed", headers, None)
+                raise _urllib.error.HTTPError(req.get_full_url(), 401, "basic auth failed", headers, None)
             else:
                 self.retried_count += 1
 
-        return urllib2.HTTPBasicAuthHandler.http_error_auth_reqed(self, auth_header, host, req, headers)
+        return _urllib.request.HTTPBasicAuthHandler.http_error_auth_reqed(self, auth_header, host, req, headers)

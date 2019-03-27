@@ -9,7 +9,6 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import contextlib
-import httplib
 import logging
 import os
 import re
@@ -19,7 +18,6 @@ import sqlite3
 import sys
 import tempfile
 import time
-import urllib2
 
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
@@ -57,6 +55,8 @@ from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
 from thirdparty.bottle.bottle import server_names
+from thirdparty.six.moves import http_client as _http_client
+from thirdparty.six.moves import urllib as _urllib
 
 # Global data storage
 class DataStore(object):
@@ -716,8 +716,8 @@ def _client(url, options=None):
         if DataStore.username or DataStore.password:
             headers["Authorization"] = "Basic %s" % base64encode("%s:%s" % (DataStore.username or "", DataStore.password or ""))
 
-        req = urllib2.Request(url, data, headers)
-        response = urllib2.urlopen(req)
+        req = _urllib.request.Request(url, data, headers)
+        response = _urllib.request.urlopen(req)
         text = response.read()
     except:
         if options:
@@ -746,7 +746,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     try:
         _client(addr)
     except Exception as ex:
-        if not isinstance(ex, urllib2.HTTPError) or ex.code == httplib.UNAUTHORIZED:
+        if not isinstance(ex, _urllib.error.HTTPError) or ex.code == _http_client.UNAUTHORIZED:
             errMsg = "There has been a problem while connecting to the "
             errMsg += "REST-JSON API server at '%s' " % addr
             errMsg += "(%s)" % ex

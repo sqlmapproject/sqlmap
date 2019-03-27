@@ -66,17 +66,6 @@ __all__ = ['AmbiguityError', 'CheckboxControl', 'Control',
            'SubmitButtonControl', 'SubmitControl', 'TextControl',
            'TextareaControl', 'XHTMLCompatibleFormParser']
 
-try: True
-except NameError:
-    True = 1
-    False = 0
-
-try: bool
-except NameError:
-    def bool(expr):
-        if expr: return True
-        else: return False
-
 try:
     import logging
     import inspect
@@ -792,7 +781,7 @@ else:
         def feed(self, data):
             try:
                 HTMLParser.HTMLParser.feed(self, data)
-            except HTMLParser.HTMLParseError, exc:
+            except HTMLParser.HTMLParseError as exc:
                 raise ParseError(exc)
 
         def start_option(self, attrs):
@@ -870,7 +859,7 @@ class FormParser(_AbstractSgmllibParser, sgmllib.SGMLParser):
     def feed(self, data):
         try:
             sgmllib.SGMLParser.feed(self, data)
-        except SGMLLIB_PARSEERROR, exc:
+        except SGMLLIB_PARSEERROR as exc:
             raise ParseError(exc)
 
     def close(self):
@@ -896,7 +885,7 @@ def _create_bs_classes(bs,
         def feed(self, data):
             try:
                 self.bs_base_class.feed(self, data)
-            except SGMLLIB_PARSEERROR, exc:
+            except SGMLLIB_PARSEERROR as exc:
                 raise ParseError(exc)
         def close(self):
             self.bs_base_class.close(self)

@@ -6,9 +6,9 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
-import httplib
 
 from lib.core.settings import IS_WIN
+from thirdparty.six.moves import http_client as _http_client
 
 def dirtyPatches():
     """
@@ -16,7 +16,7 @@ def dirtyPatches():
     """
 
     # accept overly long result lines (e.g. SQLi results in HTTP header responses)
-    httplib._MAXLINE = 1 * 1024 * 1024
+    _http_client._MAXLINE = 1 * 1024 * 1024
 
     # add support for inet_pton() on Windows OS
     if IS_WIN:
