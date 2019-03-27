@@ -6,12 +6,12 @@
 import logging
 import os
 import re
-import subprocess
 import sys
 
 from lib.core.convert import stdoutencode
+from lib.core.settings import IS_WIN
 
-if subprocess.mswindows:
+if IS_WIN:
     import ctypes
     import ctypes.wintypes
 
@@ -74,7 +74,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
         except:
             self.handleError(record)
 
-    if not subprocess.mswindows:
+    if not IS_WIN:
         def output_colorized(self, message):
             self.stream.write(message)
     else:
