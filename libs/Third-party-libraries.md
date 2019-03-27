@@ -20,7 +20,6 @@
 | [thirdparty/magic/](http://pypi.python.org/pypi/python-magic/) | PSF | Used to identify and show the file type in log messages | --file-write |
 | [thirdparty/multipartpost/](http://pipe.scs.fsu.edu/PostHandler/MultipartPostHandler.py) | LGPL | Used to upload files via web file stager | --os-cmd, --os-shell, --os-pwn |
 | [thirdparty/odict/](http://www.voidspace.org.uk/python/odict.html) | BSD | Used internally | - |
-| [thirdparty/oset/](http://pypi.python.org/pypi/oset/0.1.1) | BSD | Used to keep multiple targets sorted as they are provided | -l, -m and -g |
 | [thirdparty/pagerank/](http://code.google.com/p/corey-projects/) | MIT | Used to display page rank for Google dork results | -g |
 | [thirdparty/prettyprint/](http://code.google.com/p/python-httpclient-gui/) | MIT | Used to generate XML output | --xml, to be replaced by --report (#14) |
 | [thirdparty/pydes/](http://twhiteman.netfirms.com/des.html) | Free, public domain | Used to crack the Oracle old password format | --passwords |
