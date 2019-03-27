@@ -109,7 +109,11 @@ def wrapmodule(module):
     """
     if _defaultproxy != None:
         module.socket.socket = socksocket
-        module.socket.create_connection = create_connection
+        if _defaultproxy[0] == PROXY_TYPE_SOCKS4:
+            # Note: unable to prevent DNS leakage in SOCKS4 (Reference: https://security.stackexchange.com/a/171280)
+            pass
+        else:
+            module.socket.create_connection = create_connection
     else:
         raise GeneralProxyError((4, "no proxy specified"))
 

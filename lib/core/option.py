@@ -1089,6 +1089,10 @@ def _setHTTPHandlers():
         if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
             proxyHandler.proxies = {}
 
+            if scheme == PROXY_TYPE.SOCKS4:
+                warnMsg = "SOCKS4 does not support resolving (DNS) names (i.e. causing DNS leakage)"
+                singleTimeWarnMessage(warnMsg)
+
             socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
             socks.wrapmodule(_http_client)
         else:
