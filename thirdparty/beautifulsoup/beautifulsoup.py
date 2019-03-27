@@ -77,18 +77,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE, DAMMIT.
 
 """
 from __future__ import generators
+from __future__ import print_function
 
 __author__ = "Leonard Richardson (leonardr@segfault.org)"
 __version__ = "3.2.1"
 __copyright__ = "Copyright (c) 2004-2012 Leonard Richardson"
 __license__ = "New-style BSD"
 
-from sgmllib import SGMLParser, SGMLParseError
 import codecs
-import markupbase
 import types
 import re
-import sgmllib
+
 try:
   from htmlentitydefs import name2codepoint
 except ImportError:
@@ -97,6 +96,16 @@ try:
     set
 except NameError:
     from sets import Set as set
+
+try:
+    import sgmllib
+except ImportError:
+    from lib.utils import sgmllib
+
+try:
+    import markupbase
+except ImportError:
+    import _markupbase as markupbase
 
 #These hacks make Beautiful Soup able to parse XML with namespaces
 sgmllib.tagfind = re.compile('[a-zA-Z][-_.:a-zA-Z0-9]*')
@@ -559,10 +568,11 @@ class Tag(PageElement):
         self.escapeUnrecognizedEntities = parser.escapeUnrecognizedEntities
 
         # Convert any HTML, XML, or numeric entities in the attribute values.
-        convert = lambda (k, val): (k,
-                                   re.sub("&(#\d+|#x[0-9a-fA-F]+|\w+);",
-                                          self._convertEntities,
-                                          val))
+        # Reference: https://github.com/pkrumins/xgoogle/pull/16/commits/3dba1165c436b0d6e5bdbd09e53ca0dbf8a043f8
+        convert = lambda k_val: (k_val[0],
+                                 re.sub("&(#\d+|#x[0-9a-fA-F]+|\w+);",
+                                     self._convertEntities,
+                                     k_val[1]))
         self.attrs = map(convert, self.attrs)
 
     def getString(self):
@@ -1040,7 +1050,7 @@ def buildTagMap(default, *args):
 
 # Now, the parser classes.
 
-class BeautifulStoneSoup(Tag, SGMLParser):
+class BeautifulStoneSoup(Tag, sgmllib.SGMLParser):
 
     """This class contains the basic parser and search code. It defines
     a parser that knows nothing about tag behavior except for the
@@ -1141,7 +1151,7 @@ class BeautifulStoneSoup(Tag, SGMLParser):
             self.escapeUnrecognizedEntities = False
 
         self.instanceSelfClosingTags = buildTagMap(None, selfClosingTags)
-        SGMLParser.__init__(self)
+        sgmllib.SGMLParser.__init__(self)
 
         if hasattr(markup, 'read'):        # It's a file-type object.
             markup = markup.read()
@@ -1190,7 +1200,7 @@ class BeautifulStoneSoup(Tag, SGMLParser):
                 del(self.markupMassage)
         self.reset()
 
-        SGMLParser.feed(self, markup)
+        sgmllib.SGMLParser.feed(self, markup)
         # Close out any unfinished strings and close all the open tags.
         self.endData()
         while self.currentTag.name != self.ROOT_TAG_NAME:
@@ -1203,7 +1213,7 @@ class BeautifulStoneSoup(Tag, SGMLParser):
 
         if methodName.startswith('start_') or methodName.startswith('end_') \
                or methodName.startswith('do_'):
-            return SGMLParser.__getattr__(self, methodName)
+            return sgmllib.SGMLParser.__getattr__(self, methodName)
         elif not methodName.startswith('__'):
             return Tag.__getattr__(self, methodName)
         else:
@@ -1218,7 +1228,7 @@ class BeautifulStoneSoup(Tag, SGMLParser):
     def reset(self):
         Tag.__init__(self, self, self.ROOT_TAG_NAME)
         self.hidden = 1
-        SGMLParser.reset(self)
+        sgmllib.SGMLParser.reset(self)
         self.currentData = []
         self.currentTag = None
         self.tagStack = []
@@ -1464,8 +1474,8 @@ class BeautifulStoneSoup(Tag, SGMLParser):
              self._toStringSubclass(data, CData)
         else:
             try:
-                j = SGMLParser.parse_declaration(self, i)
-            except SGMLParseError:
+                j = sgmllib.SGMLParser.parse_declaration(self, i)
+            except sgmllib.SGMLParseError:
                 toHandle = self.rawdata[i:]
                 self.handle_data(toHandle)
                 j = i + len(toHandle)
@@ -2018,4 +2028,4 @@ class UnicodeDammit:
 if __name__ == '__main__':
     import sys
     soup = BeautifulSoup(sys.stdin)
-    print soup.prettify()
+    print(soup.prettify())

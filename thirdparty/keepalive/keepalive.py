@@ -103,7 +103,7 @@ EXTRA ATTRIBUTES AND METHODS
 
 """
 
-# $Id: keepalive.py,v 1.17 2006/12/08 00:14:16 mstenner Exp $
+from __future__ import print_function
 
 import urllib2
 import httplib
@@ -487,7 +487,7 @@ def error_handler(url):
     urllib2.install_opener(opener)
     pos = {0: 'off', 1: 'on'}
     for i in (0, 1):
-        print "  fancy error handling %s (HANDLE_ERRORS = %i)" % (pos[i], i)
+        print("  fancy error handling %s (HANDLE_ERRORS = %i)" % (pos[i], i))
         HANDLE_ERRORS = i
         try:
             fo = urllib2.urlopen(url)
@@ -496,13 +496,13 @@ def error_handler(url):
             try: status, reason = fo.status, fo.reason
             except AttributeError: status, reason = None, None
         except IOError as e:
-            print "  EXCEPTION: %s" % e
+            print("  EXCEPTION: %s" % e)
             raise
         else:
-            print "  status = %s, reason = %s" % (status, reason)
+            print("  status = %s, reason = %s" % (status, reason))
     HANDLE_ERRORS = orig
     hosts = keepalive_handler.open_connections()
-    print "open connections:", hosts
+    print("open connections:", hosts)
     keepalive_handler.close_all()
 
 def continuity(url):
@@ -516,7 +516,7 @@ def continuity(url):
     foo = fo.read()
     fo.close()
     m = md5.new(foo)
-    print format % ('normal urllib', m.hexdigest())
+    print(format % ('normal urllib', m.hexdigest()))
 
     # now install the keepalive handler and try again
     opener = urllib2.build_opener(HTTPHandler())
@@ -526,7 +526,7 @@ def continuity(url):
     foo = fo.read()
     fo.close()
     m = md5.new(foo)
-    print format % ('keepalive read', m.hexdigest())
+    print(format % ('keepalive read', m.hexdigest()))
 
     fo = urllib2.urlopen(url)
     foo = ''
@@ -536,25 +536,25 @@ def continuity(url):
         else: break
     fo.close()
     m = md5.new(foo)
-    print format % ('keepalive readline', m.hexdigest())
+    print(format % ('keepalive readline', m.hexdigest()))
 
 def comp(N, url):
-    print '  making %i connections to:\n  %s' % (N, url)
+    print('  making %i connections to:\n  %s' % (N, url))
 
     sys.stdout.write('  first using the normal urllib handlers')
     # first use normal opener
     opener = urllib2.build_opener()
     urllib2.install_opener(opener)
     t1 = fetch(N, url)
-    print '  TIME: %.3f s' % t1
+    print('  TIME: %.3f s' % t1)
 
     sys.stdout.write('  now using the keepalive handler       ')
     # now install the keepalive handler and try again
     opener = urllib2.build_opener(HTTPHandler())
     urllib2.install_opener(opener)
     t2 = fetch(N, url)
-    print '  TIME: %.3f s' % t2
-    print '  improvement factor: %.2f' % (t1/t2, )
+    print('  TIME: %.3f s' % t2)
+    print('  improvement factor: %.2f' % (t1/t2, ))
 
 def fetch(N, url, delay=0):
     import time
@@ -572,7 +572,7 @@ def fetch(N, url, delay=0):
     for i in lens[1:]:
         j = j + 1
         if not i == lens[0]:
-            print "WARNING: inconsistent length on read %i: %i" % (j, i)
+            print("WARNING: inconsistent length on read %i: %i" % (j, i))
 
     return diff
 
@@ -580,16 +580,16 @@ def test_timeout(url):
     global DEBUG
     dbbackup = DEBUG
     class FakeLogger:
-        def debug(self, msg, *args): print msg % args
+        def debug(self, msg, *args): print(msg % args)
         info = warning = error = debug
     DEBUG = FakeLogger()
-    print "  fetching the file to establish a connection"
+    print("  fetching the file to establish a connection")
     fo = urllib2.urlopen(url)
     data1 = fo.read()
     fo.close()
 
     i = 20
-    print "  waiting %i seconds for the server to close the connection" % i
+    print("  waiting %i seconds for the server to close the connection" % i)
     while i > 0:
         sys.stdout.write('\r  %2i' % i)
         sys.stdout.flush()
@@ -597,33 +597,33 @@ def test_timeout(url):
         i -= 1
     sys.stderr.write('\r')
 
-    print "  fetching the file a second time"
+    print("  fetching the file a second time")
     fo = urllib2.urlopen(url)
     data2 = fo.read()
     fo.close()
 
     if data1 == data2:
-        print '  data are identical'
+        print('  data are identical')
     else:
-        print '  ERROR: DATA DIFFER'
+        print('  ERROR: DATA DIFFER')
 
     DEBUG = dbbackup
 
 
 def test(url, N=10):
-    print "checking error hander (do this on a non-200)"
+    print("checking error hander (do this on a non-200)")
     try: error_handler(url)
     except IOError as e:
-        print "exiting - exception will prevent further tests"
+        print("exiting - exception will prevent further tests")
         sys.exit()
-    print
-    print "performing continuity test (making sure stuff isn't corrupted)"
+    print()
+    print("performing continuity test (making sure stuff isn't corrupted)")
     continuity(url)
-    print
-    print "performing speed comparison"
+    print()
+    print("performing speed comparison")
     comp(N, url)
-    print
-    print "performing dropped-connection check"
+    print()
+    print("performing dropped-connection check")
     test_timeout(url)
 
 if __name__ == '__main__':
@@ -633,6 +633,6 @@ if __name__ == '__main__':
         N = int(sys.argv[1])
         url = sys.argv[2]
     except:
-        print "%s <integer> <url>" % sys.argv[0]
+        print("%s <integer> <url>" % sys.argv[0])
     else:
         test(url, N)
