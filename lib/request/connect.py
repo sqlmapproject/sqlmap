@@ -6,8 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 import binascii
-import compiler
-import httplib
 import logging
 import re
 import socket
@@ -15,9 +13,6 @@ import string
 import struct
 import time
 import traceback
-import urllib
-import urllib2
-import urlparse
 
 try:
     import websocket
@@ -125,6 +120,8 @@ from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
 from thirdparty.odict import OrderedDict
+from thirdparty.six.moves import http_client as _http_client
+from thirdparty.six.moves import urllib as _urllib
 from thirdparty.socks.socks import ProxyError
 
 class Connect(object):
@@ -279,13 +276,13 @@ class Connect(object):
             post = multipart
 
         if chunked and post:
-            post = urllib.unquote(post)
+            post = _urllib.parse.unquote(post)
             post = chunkSplitPostData(post)
 
         websocket_ = url.lower().startswith("ws")
 
-        if not urlparse.urlsplit(url).netloc:
-            url = urlparse.urljoin(conf.url, url)
+        if not _urllib.parse.urlsplit(url).netloc:
+            url = _urllib.parse.urljoin(conf.url, url)
 
         # flag to know if we are dealing with the same target host
         target = checkSameHost(url, conf.url)
@@ -306,7 +303,7 @@ class Connect(object):
         code = None
         status = None
 
-        _ = urlparse.urlsplit(url)
+        _ = _urllib.parse.urlsplit(url)
         requestMsg = u"HTTP request [#%d]:\r\n%s " % (threadData.lastRequestUID, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET))
         requestMsg += getUnicode(("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else "")) if not any((refreshing, crawling, checking)) else url)
         responseMsg = u"HTTP response "
@@ -334,7 +331,7 @@ class Connect(object):
                 pass
 
             elif target:
-                if conf.forceSSL and urlparse.urlparse(url).scheme != "https":
+                if conf.forceSSL and _urllib.parse.urlparse(url).scheme != "https":
                     url = re.sub(r"(?i)\Ahttp:", "https:", url)
                     url = re.sub(r"(?i):80/", ":443/", url)
 
@@ -359,7 +356,7 @@ class Connect(object):
                 url = "%s?%s" % (url, get)
                 requestMsg += "?%s" % get
 
-            requestMsg += " %s" % httplib.HTTPConnection._http_vsn_str
+            requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
             headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host}, base=None if target else {})
@@ -453,7 +450,7 @@ class Connect(object):
                     req = MethodRequest(url, post, headers)
                     req.set_method(method)
                 elif url is not None:
-                    req = urllib2.Request(url, post, headers)
+                    req = _urllib.request.Request(url, post, headers)
                 else:
                     return None, None, None
 
@@ -492,7 +489,7 @@ class Connect(object):
                             for char in (r"\r", r"\n"):
                                 cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
 
-                conn = urllib2.urlopen(req)
+                conn = _urllib.request.urlopen(req)
 
                 if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
                     kb.authHeader = getRequestHeader(req, HTTP_HEADER.AUTHORIZATION)
@@ -548,7 +545,7 @@ class Connect(object):
                         if re.search(r"\Ahttps?://", refresh, re.I):
                             url = refresh
                         else:
-                            url = urlparse.urljoin(url, refresh)
+                            url = _urllib.parse.urljoin(url, refresh)
 
                         threadData.lastRedirectMsg = (threadData.lastRequestUID, page)
                         kwargs["refreshing"] = True
@@ -580,7 +577,7 @@ class Connect(object):
             else:
                 raise
 
-        except urllib2.HTTPError as ex:
+        except _urllib.error.HTTPError as ex:
             page = None
             responseHeaders = None
 
@@ -629,18 +626,18 @@ class Connect(object):
                 logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
             if ex.code != conf.ignoreCode:
-                if ex.code == httplib.UNAUTHORIZED:
+                if ex.code == _http_client.UNAUTHORIZED:
                     errMsg = "not authorized, try to provide right HTTP "
                     errMsg += "authentication type and valid credentials (%d)" % code
                     raise SqlmapConnectionException(errMsg)
-                elif ex.code == httplib.NOT_FOUND:
+                elif ex.code == _http_client.NOT_FOUND:
                     if raise404:
                         errMsg = "page not found (%d)" % code
                         raise SqlmapConnectionException(errMsg)
                     else:
                         debugMsg = "page not found (%d)" % code
                         singleTimeLogMessage(debugMsg, logging.DEBUG)
-                elif ex.code == httplib.GATEWAY_TIMEOUT:
+                elif ex.code == _http_client.GATEWAY_TIMEOUT:
                     if ignoreTimeout:
                         return None if not conf.ignoreTimeouts else "", None, None
                     else:
@@ -658,7 +655,7 @@ class Connect(object):
                     debugMsg = "got HTTP error code: %d (%s)" % (code, status)
                     logger.debug(debugMsg)
 
-        except (urllib2.URLError, socket.error, socket.timeout, httplib.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError):
+        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError):
             tbMsg = traceback.format_exc()
 
             if checking:
@@ -771,7 +768,7 @@ class Connect(object):
         processResponse(page, responseHeaders, status)
 
         if conn and getattr(conn, "redurl", None):
-            _ = urlparse.urlsplit(conn.redurl)
+            _ = _urllib.parse.urlsplit(conn.redurl)
             _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
             requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
 
@@ -1027,7 +1024,7 @@ class Connect(object):
                     token.value = "".join(chr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
 
             if not token:
-                if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == httplib.OK:
+                if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == _http_client.OK:
                     if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                         token.name = conf.csrfToken
                         token.value = page
@@ -1093,7 +1090,7 @@ class Connect(object):
             originals = {}
 
             if not get and PLACE.URI in conf.parameters:
-                query = urlparse.urlsplit(uri).query or ""
+                query = _urllib.parse.urlsplit(uri).query or ""
             else:
                 query = None
 
@@ -1121,7 +1118,7 @@ class Connect(object):
 
             while True:
                 try:
-                    compiler.parse(unicodeencode(conf.evalCode.replace(';', '\n')))
+                    compile(unicodeencode(conf.evalCode.replace(';', '\n')), "", "exec")
                 except SyntaxError as ex:
                     if ex.text:
                         original = replacement = ex.text.strip()
@@ -1303,7 +1300,7 @@ class Connect(object):
 
         if conf.secondUrl:
             page, headers, code = Connect.getPage(url=conf.secondUrl, cookie=cookie, ua=ua, silent=silent, auxHeaders=auxHeaders, response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
-        elif kb.secondReq and IPS_WAF_CHECK_PAYLOAD not in urllib.unquote(value or ""):
+        elif kb.secondReq and IPS_WAF_CHECK_PAYLOAD not in _urllib.parse.unquote(value or ""):
             def _(value):
                 if kb.customInjectionMark in (value or ""):
                     if payload is None:
