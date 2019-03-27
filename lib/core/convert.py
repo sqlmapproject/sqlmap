@@ -9,18 +9,14 @@ try:
     import cPickle as pickle
 except:
     import pickle
-finally:
-    import pickle as picklePy
 
 import base64
-import io
 import json
 import re
 import sys
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import PICKLE_REDUCE_WHITELIST
 
 def base64decode(value):
     """
@@ -66,7 +62,7 @@ def base64pickle(value):
 
     return retVal
 
-def base64unpickle(value, unsafe=False):
+def base64unpickle(value):
     """
     Decodes value from Base64 to plain format and deserializes (with pickle) its content
 
@@ -76,26 +72,10 @@ def base64unpickle(value, unsafe=False):
 
     retVal = None
 
-    def _(self):
-        if len(self.stack) > 1:
-            func = self.stack[-2]
-            if func not in PICKLE_REDUCE_WHITELIST:
-                raise Exception("abusing reduce() is bad, Mkay!")
-        self.load_reduce()
-
-    def loads(str):
-        f = io.BytesIO(str)
-        if unsafe:
-            unpickler = picklePy.Unpickler(f)
-            unpickler.dispatch[picklePy.REDUCE] = _
-        else:
-            unpickler = pickle.Unpickler(f)
-        return unpickler.load()
-
     try:
-        retVal = loads(base64decode(value))
+        retVal = pickle.loads(base64decode(value))
     except TypeError:
-        retVal = loads(base64decode(bytes(value)))
+        retVal = pickle.loads(base64decode(bytes(value)))
 
     return retVal
 
