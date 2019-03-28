@@ -47,6 +47,7 @@ from lib.request import inject
 from lib.techniques.union.use import unionUse
 from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
+from thirdparty import six
 
 class Databases:
     """
