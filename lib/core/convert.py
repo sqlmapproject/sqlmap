@@ -27,7 +27,7 @@ def base64decode(value):
     'foobar'
     """
 
-    return base64.b64decode(value)
+    return base64.b64decode(unicodeencode(value))
 
 def base64encode(value):
     """
@@ -37,7 +37,7 @@ def base64encode(value):
     'Zm9vYmFy'
     """
 
-    return base64.b64encode(value)
+    return base64.b64encode(unicodeencode(value))
 
 def base64pickle(value):
     """
@@ -89,7 +89,14 @@ def hexdecode(value):
     """
 
     value = value.lower()
-    return (value[2:] if value.startswith("0x") else value).decode("hex")
+    value = value[2:] if value.startswith("0x") else value
+
+    if six.PY2:
+        retVal = value.decode("hex")
+    else:
+        retVal = bytes.fromhex(value)
+
+    return retVal
 
 def hexencode(value, encoding=None):
     """
@@ -99,7 +106,14 @@ def hexencode(value, encoding=None):
     '666f6f626172'
     """
 
-    return unicodeencode(value, encoding).encode("hex")
+    retVal = unicodeencode(value, encoding)
+
+    if six.PY2:
+        retVal = retVal.encode("hex")
+    else:
+        retVal = retVal.hex()
+
+    return retVal
 
 def unicodeencode(value, encoding=None):
     """
@@ -110,11 +124,13 @@ def unicodeencode(value, encoding=None):
     """
 
     retVal = value
-    if isinstance(value, unicode):
+
+    if isinstance(value, six.text_type):
         try:
             retVal = value.encode(encoding or UNICODE_ENCODING)
         except UnicodeEncodeError:
-            retVal = value.encode(UNICODE_ENCODING, "replace")
+            retVal = value.encode(encoding or UNICODE_ENCODING, "replace")
+
     return retVal
 
 def utf8encode(value):
@@ -164,13 +180,11 @@ def stdoutencode(data):
     retVal = None
 
     try:
-        data = data or ""
+        retVal = unicodeencode(data or "", sys.stdout.encoding)
 
         # Reference: http://bugs.python.org/issue1602
         if IS_WIN:
-            output = data.encode(sys.stdout.encoding, "replace")
-
-            if '?' in output and '?' not in data:
+            if '?' in retVal and '?' not in retVal:
                 warnMsg = "cannot properly display Unicode characters "
                 warnMsg += "inside Windows OS command prompt "
                 warnMsg += "(http://bugs.python.org/issue1602). All "
@@ -180,11 +194,8 @@ def stdoutencode(data):
                 warnMsg += "corresponding output files. "
                 singleTimeWarnMessage(warnMsg)
 
-            retVal = output
-        else:
-            retVal = data.encode(sys.stdout.encoding)
     except:
-        retVal = data.encode(UNICODE_ENCODING) if isinstance(data, unicode) else data
+        retVal = unicodeencode(data or "")
 
     return retVal
 
