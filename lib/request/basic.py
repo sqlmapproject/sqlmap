@@ -257,12 +257,12 @@ def decodePage(page, contentEncoding, contentType):
     if not page or (conf.nullConnection and len(page) < 2):
         return getUnicode(page)
 
-    if isinstance(contentEncoding, basestring) and contentEncoding:
+    if hasattr(contentEncoding, "lower"):
         contentEncoding = contentEncoding.lower()
     else:
         contentEncoding = ""
 
-    if isinstance(contentType, basestring) and contentType:
+    if hasattr(contentType, "lower"):
         contentType = contentType.lower()
     else:
         contentType = ""

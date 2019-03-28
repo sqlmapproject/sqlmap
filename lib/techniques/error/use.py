@@ -57,6 +57,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from thirdparty import six
 
 def _oneShotErrorUse(expression, field=None, chunkTest=False):
     offset = 1
@@ -201,7 +202,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
 
         retVal = decodeHexValue(retVal) if conf.hexConvert else retVal
 
-        if isinstance(retVal, basestring):
+        if isinstance(retVal, six.string_types):
             retVal = htmlunescape(retVal).replace("<br>", "\n")
 
         retVal = _errorReplaceChars(retVal)
@@ -277,7 +278,7 @@ def _formatPartialContent(value):
     Prepares (possibly hex-encoded) partial content for safe console output
     """
 
-    if value and isinstance(value, basestring):
+    if value and isinstance(value, six.string_types):
         try:
             value = hexdecode(value)
         except:
@@ -447,7 +448,7 @@ def errorUse(expression, dump=False):
         value = _errorFields(expression, expressionFields, expressionFieldsList)
 
     if value and isListLike(value):
-        if len(value) == 1 and isinstance(value[0], basestring):
+        if len(value) == 1 and isinstance(value[0], six.string_types):
             value = unArrayizeValue(value)
         elif len(value) > 1 and stopLimit == 1:
             value = [value]

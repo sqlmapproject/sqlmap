@@ -28,8 +28,8 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
-
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
+from thirdparty import six
 
 class Enumeration(GenericEnumeration):
     def getPrivileges(self, *args):
@@ -83,7 +83,7 @@ class Enumeration(GenericEnumeration):
         dbs = [_ for _ in dbs if _]
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.MSSQL].tables
@@ -219,7 +219,7 @@ class Enumeration(GenericEnumeration):
                     values = inject.getValue(query, blind=False, time=False)
 
                     if not isNoneValue(values):
-                        if isinstance(values, basestring):
+                        if isinstance(values, six.string_types):
                             values = [values]
 
                         for foundTbl in values:
@@ -353,7 +353,7 @@ class Enumeration(GenericEnumeration):
                     values = inject.getValue(query, blind=False, time=False)
 
                     if not isNoneValue(values):
-                        if isinstance(values, basestring):
+                        if isinstance(values, six.string_types):
                             values = [values]
 
                         for foundTbl in values:

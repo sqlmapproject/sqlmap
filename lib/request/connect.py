@@ -118,6 +118,7 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
+from thirdparty import six
 from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
@@ -432,7 +433,7 @@ class Connect(object):
                 responseHeaders = _(ws.getheaders())
                 responseHeaders.headers = ["%s: %s\r\n" % (_[0].capitalize(), _[1]) for _ in responseHeaders.items()]
 
-                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
                 requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
@@ -453,7 +454,7 @@ class Connect(object):
                 else:
                     return None, None, None
 
-                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in req.header_items()])
+                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in req.header_items()])
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
                     conf.cj._policy._now = conf.cj._now = int(time.time())
@@ -745,7 +746,7 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
-            if isinstance(page, basestring) and not isinstance(page, unicode):
+            if isinstance(six.binary_type):
                 if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
                     page = unicode(page, errors="ignore")
                 else:
@@ -858,7 +859,7 @@ class Connect(object):
                         errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
                         raise SqlmapGenericException(errMsg)
 
-                    if not isinstance(payload, basestring):
+                    if not isinstance(payload, six.string_types):
                         errMsg = "tamper function '%s' returns " % function.func_name
                         errMsg += "invalid payload type ('%s')" % type(payload)
                         raise SqlmapValueException(errMsg)
@@ -1156,7 +1157,7 @@ class Connect(object):
 
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:
-                    if isinstance(value, (basestring, int)):
+                    if isinstance(value, (int, six.string_types)):
                         found = False
                         value = getUnicode(value, UNICODE_ENCODING)
 

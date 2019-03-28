@@ -95,11 +95,11 @@ else:
 
 try:
     from thirdparty.six.moves import cStringIO as _cStringIO
-    from thirdparty.six.moves import http_client as _html_entities
+    from thirdparty.six.moves import html_entities as _html_entities
     from thirdparty.six.moves import urllib as _urllib
 except ImportError:
     from six.moves import cStringIO as _cStringIO
-    from six.moves import urllib as _html_entities
+    from six.moves import html_entities as _html_entities
     from six.moves import urllib as _urllib
 
 try:

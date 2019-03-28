@@ -24,8 +24,8 @@ def cleanupVals(text, tag):
     if tag in ("clause", "where"):
         text = text.split(',')
 
-    if isinstance(text, basestring):
-        text = int(text) if text.isdigit() else text
+    if hasattr(text, "isdigit") and text.isdigit():
+        text = int(text)
 
     elif isinstance(text, list):
         count = 0

@@ -17,6 +17,7 @@ import sys
 
 from lib.core.settings import IS_WIN
 from lib.core.settings import UNICODE_ENCODING
+from thirdparty import six
 
 def base64decode(value):
     """
@@ -145,7 +146,7 @@ def htmlunescape(value):
     """
 
     retVal = value
-    if value and isinstance(value, basestring):
+    if value and isinstance(value, six.string_types):
         codes = (("&lt;", '<'), ("&gt;", '>'), ("&quot;", '"'), ("&nbsp;", ' '), ("&amp;", '&'), ("&apos;", "'"))
         retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
         try:

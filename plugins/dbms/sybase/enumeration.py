@@ -26,6 +26,7 @@ from lib.core.settings import CURRENT_DB
 from lib.utils.brute import columnExists
 from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
+from thirdparty import six
 
 class Enumeration(GenericEnumeration):
     def getUsers(self):
@@ -128,7 +129,7 @@ class Enumeration(GenericEnumeration):
         dbs = [_ for _ in dbs if _]
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, basestring) else db[0] for db in sorted(dbs)))
+        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
@@ -279,7 +280,7 @@ class Enumeration(GenericEnumeration):
                     columns = {}
 
                     for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
-                        columns[name] = SYBASE_TYPES.get(int(type_) if isinstance(type_, basestring) and type_.isdigit() else type_, type_)
+                        columns[name] = SYBASE_TYPES.get(int(type_) if hasattr(type_, "isdigit") and type_.isdigit() else type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl, True)] = columns
                     kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table

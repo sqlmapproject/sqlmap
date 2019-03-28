@@ -59,6 +59,7 @@ from lib.techniques.dns.test import dnsTest
 from lib.techniques.dns.use import dnsUse
 from lib.techniques.error.use import errorUse
 from lib.techniques.union.use import unionUse
+from thirdparty import six
 
 def _goDns(payload, expression):
     value = None
@@ -334,7 +335,7 @@ def _goUnion(expression, unpack=True, dump=False):
 
     output = unionUse(expression, unpack=unpack, dump=dump)
 
-    if isinstance(output, basestring):
+    if isinstance(output, six.string_types):
         output = parseUnionPage(output)
 
     return output

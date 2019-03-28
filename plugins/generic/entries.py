@@ -45,6 +45,7 @@ from lib.core.settings import NULL
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
 from lib.utils.pivotdumptable import pivotDumpTable
+from thirdparty import six
 
 class Entries:
     """
@@ -244,7 +245,7 @@ class Entries:
                             logger.warn(warnMsg)
 
                     if not isNoneValue(entries):
-                        if isinstance(entries, basestring):
+                        if isinstance(entries, six.string_types):
                             entries = [entries]
                         elif not isListLike(entries):
                             entries = []
@@ -259,7 +260,7 @@ class Entries:
                                 if entry is None or len(entry) == 0:
                                     continue
 
-                                if isinstance(entry, basestring):
+                                if isinstance(entry, six.string_types):
                                     colEntry = entry
                                 else:
                                     colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''

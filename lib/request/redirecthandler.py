@@ -95,7 +95,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         redirectMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
         if headers:
-            logHeaders = "\r\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in headers.items())
+            logHeaders = "\r\n".join("%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in headers.items())
         else:
             logHeaders = ""
 

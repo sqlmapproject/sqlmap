@@ -117,20 +117,20 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             firstChar = len(partialValue)
         elif re.search(r"(?i)\b(LENGTH|LEN)\(", expression):
             firstChar = 0
-        elif (kb.fileReadMode or dump) and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (isinstance(conf.firstChar, basestring) and conf.firstChar.isdigit())):
+        elif (kb.fileReadMode or dump) and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (hasattr(conf.firstChar, "isdigit") and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
             if kb.fileReadMode:
                 firstChar <<= 1
-        elif isinstance(firstChar, basestring) and firstChar.isdigit() or isinstance(firstChar, int):
+        elif hasattr(firstChar, "isdigit") and firstChar.isdigit() or isinstance(firstChar, int):
             firstChar = int(firstChar) - 1
         else:
             firstChar = 0
 
         if re.search(r"(?i)\b(LENGTH|LEN)\(", expression):
             lastChar = 0
-        elif dump and conf.lastChar is not None and (isinstance(conf.lastChar, int) or (isinstance(conf.lastChar, basestring) and conf.lastChar.isdigit())):
+        elif dump and conf.lastChar is not None and (isinstance(conf.lastChar, int) or (hasattr(conf.lastChar, "isdigit") and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
-        elif isinstance(lastChar, basestring) and lastChar.isdigit() or isinstance(lastChar, int):
+        elif hasattr(lastChar, "isdigit") and lastChar.isdigit() or isinstance(lastChar, int):
             lastChar = int(lastChar)
         else:
             lastChar = 0
@@ -143,7 +143,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             expressionUnescaped = unescaper.escape(expression)
 
-        if isinstance(length, basestring) and length.isdigit() or isinstance(length, int):
+        if hasattr(length, "isdigit") and length.isdigit() or isinstance(length, int):
             length = int(length)
         else:
             length = None

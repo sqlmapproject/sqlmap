@@ -86,6 +86,7 @@ from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
+from thirdparty import six
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
@@ -695,7 +696,7 @@ def hashRecognition(value):
 
     isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         for name, regex in getPublicTypeMembers(HASH):
             # Hashes for Oracle and old MySQL look the same hence these checks
             if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
@@ -726,7 +727,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
             count += 1
 
-            if not isinstance(word, basestring):
+            if not isinstance(word, six.string_types):
                 continue
 
             if suffix:
@@ -801,7 +802,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
             count += 1
 
-            if not isinstance(word, basestring):
+            if not isinstance(word, six.string_types):
                 continue
 
             if suffix:

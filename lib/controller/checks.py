@@ -105,6 +105,7 @@ from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
+from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 
 def checkSqlInjection(place, parameter, value):
@@ -692,7 +693,7 @@ def checkSqlInjection(place, parameter, value):
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
-                            if isinstance(reqPayload, basestring):
+                            if isinstance(reqPayload, six.string_types):
                                 infoMsg = "%s parameter '%s' is '%s' injectable" % (paramType, parameter, title)
                                 logger.info(infoMsg)
 

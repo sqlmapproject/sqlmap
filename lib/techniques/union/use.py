@@ -59,6 +59,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from thirdparty import six
 from thirdparty.odict import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
@@ -163,7 +164,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
 def configUnion(char=None, columns=None):
     def _configUnionChar(char):
-        if not isinstance(char, basestring):
+        if not isinstance(char, six.string_types):
             return
 
         kb.uChar = char
@@ -172,7 +173,7 @@ def configUnion(char=None, columns=None):
             kb.uChar = char.replace("[CHAR]", conf.uChar if conf.uChar.isdigit() else "'%s'" % conf.uChar.strip("'"))
 
     def _configUnionCols(columns):
-        if not isinstance(columns, basestring):
+        if not isinstance(columns, six.string_types):
             return
 
         columns = columns.replace(" ", "")
@@ -261,7 +262,7 @@ def unionUse(expression, unpack=True, dump=False):
                     infoMsg += "%d %s" % (stopLimit, "entries" if stopLimit > 1 else "entry")
                     logger.info(infoMsg)
 
-            elif count and (not isinstance(count, basestring) or not count.isdigit()):
+            elif count and (not isinstance(count, six.string_types) or not count.isdigit()):
                 warnMsg = "it was not possible to count the number "
                 warnMsg += "of entries for the SQL query provided. "
                 warnMsg += "sqlmap will assume that it returns only "
@@ -373,7 +374,7 @@ def unionUse(expression, unpack=True, dump=False):
                                         del threadData.shared.buffered[0]
 
                                 if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta:
-                                    _ = ','.join("'%s'" % _ for _ in (flattenValue(arrayizeValue(items)) if not isinstance(items, basestring) else [items]))
+                                    _ = ','.join("'%s'" % _ for _ in (flattenValue(arrayizeValue(items)) if not isinstance(items, six.string_types) else [items]))
                                     status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
 
                                     if len(status) > width:

@@ -300,7 +300,7 @@ class UDF:
             while True:
                 retType = readInput(msg, default=defaultType)
 
-                if isinstance(retType, basestring) and retType.isdigit():
+                if hasattr(retType, "isdigit") and retType.isdigit():
                     logger.warn("you need to specify the data-type of the return value")
                 else:
                     self.udfs[udfName]["return"] = retType
@@ -338,7 +338,7 @@ class UDF:
 
                 if choice == 'Q':
                     break
-                elif isinstance(choice, basestring) and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
+                elif hasattr(choice, "isdigit") and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)
                     break
                 elif isinstance(choice, int) and choice > 0 and choice <= len(udfList):

@@ -147,6 +147,7 @@ from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.search import search
 from lib.utils.purge import purge
+from thirdparty import six
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost
 from thirdparty.six.moves import http_client as _http_client
@@ -658,7 +659,7 @@ def _setTechnique():
     validTechniques = sorted(getPublicTypeMembers(PAYLOAD.TECHNIQUE), key=lambda x: x[1])
     validLetters = [_[0][0].upper() for _ in validTechniques]
 
-    if conf.tech and isinstance(conf.tech, basestring):
+    if conf.tech and isinstance(conf.tech, six.string_types):
         _ = []
 
         for letter in conf.tech.upper():
@@ -1737,7 +1738,7 @@ def _cleanupOptions():
     if conf.csvDel:
         conf.csvDel = decodeStringEscape(conf.csvDel)
 
-    if conf.torPort and isinstance(conf.torPort, basestring) and conf.torPort.isdigit():
+    if conf.torPort and hasattr(conf.torPort, "isdigit") and conf.torPort.isdigit():
         conf.torPort = int(conf.torPort)
 
     if conf.torType:
@@ -2576,7 +2577,7 @@ def _basicOptionValidation():
         errMsg = "option '--crack' should be used as a standalone"
         raise SqlmapSyntaxException(errMsg)
 
-    if isinstance(conf.uCols, basestring):
+    if isinstance(conf.uCols, six.string_types):
         if not conf.uCols.isdigit() and ("-" not in conf.uCols or len(conf.uCols.split("-")) != 2):
             errMsg = "value for option '--union-cols' must be a range with hyphon "
             errMsg += "(e.g. 1-10) or integer value (e.g. 5)"

@@ -35,6 +35,7 @@ from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
+from thirdparty import six
 
 class Search:
     """
@@ -204,7 +205,7 @@ class Search:
                 if values and Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     newValues = []
 
-                    if isinstance(values, basestring):
+                    if isinstance(values, six.string_types):
                         values = [values]
                     for value in values:
                         dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"

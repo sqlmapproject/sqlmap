@@ -167,6 +167,7 @@ from lib.core.settings import VERSION_STRING
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
 from lib.utils.sqlalchemy import _sqlalchemy
+from thirdparty import six
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
 from thirdparty.colorama.initialise import init as coloramainit
@@ -355,7 +356,7 @@ class Backend:
 
     @staticmethod
     def setVersion(version):
-        if isinstance(version, basestring):
+        if isinstance(version, six.string_types):
             kb.dbmsVersion = [version]
 
         return kb.dbmsVersion
@@ -364,7 +365,7 @@ class Backend:
     def setVersionList(versionsList):
         if isinstance(versionsList, list):
             kb.dbmsVersion = versionsList
-        elif isinstance(versionsList, basestring):
+        elif isinstance(versionsList, six.string_types):
             Backend.setVersion(versionsList)
         else:
             logger.error("invalid format of versionsList")
@@ -387,7 +388,7 @@ class Backend:
             return None
 
         # Little precaution, in theory this condition should always be false
-        elif kb.os is not None and isinstance(os, basestring) and kb.os.lower() != os.lower():
+        elif kb.os is not None and isinstance(os, six.string_types) and kb.os.lower() != os.lower():
             msg = "sqlmap previously fingerprinted back-end DBMS "
             msg += "operating system %s. However now it has " % kb.os
             msg += "been fingerprinted to be %s. " % os
@@ -406,7 +407,7 @@ class Backend:
                     warnMsg = "invalid value"
                     logger.warn(warnMsg)
 
-        elif kb.os is None and isinstance(os, basestring):
+        elif kb.os is None and isinstance(os, six.string_types):
             kb.os = os.capitalize()
 
         return kb.os
@@ -416,7 +417,7 @@ class Backend:
         if version is None:
             return None
 
-        elif kb.osVersion is None and isinstance(version, basestring):
+        elif kb.osVersion is None and isinstance(version, six.string_types):
             kb.osVersion = version
 
     @staticmethod
@@ -436,7 +437,7 @@ class Backend:
         while True:
             choice = readInput(msg, default='1')
 
-            if isinstance(choice, basestring) and choice.isdigit() and int(choice) in (1, 2):
+            if hasattr(choice, "isdigit") and choice.isdigit() and int(choice) in (1, 2):
                 kb.arch = 32 if int(choice) == 1 else 64
                 break
             else:
@@ -640,7 +641,7 @@ def paramToDict(place, parameters=None):
                                             if isinstance(value, (list, tuple, set, dict)):
                                                 if value:
                                                     walk(head, value)
-                                            elif isinstance(value, (bool, int, float, basestring)):
+                                            elif isinstance(value, (bool, int, float, six.string_types)):
                                                 original = current[key]
                                                 if isinstance(value, bool):
                                                     current[key] = "%s%s" % (getUnicode(value).lower(), BOUNDED_INJECTION_MARKER)
@@ -884,7 +885,7 @@ def setColor(message, color=None, bold=False, level=None):
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
-            level = getattr(logging, level, None) if isinstance(level, basestring) else level
+            level = getattr(logging, level, None) if isinstance(level, six.string_types) else level
             retVal = LOGGER_HANDLER.colorize(message, level)
 
     return retVal
@@ -935,7 +936,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             if multiThreadMode:
                 logging._releaseLock()
 
-            kb.prependFlag = isinstance(data, basestring) and (len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
+            kb.prependFlag = isinstance(data, six.string_types) and (len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
 
 def dataToTrafficFile(data):
     if not conf.trafficFile:
@@ -1068,7 +1069,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             finally:
                 logging._releaseLock()
 
-    if retVal and default and isinstance(default, basestring) and len(default) == 1:
+    if retVal and default and isinstance(default, six.string_types) and len(default) == 1:
         retVal = retVal.strip()
 
     if boolean:
@@ -1663,7 +1664,7 @@ def parseUnionPage(page):
     else:
         data = page
 
-    if len(data) == 1 and isinstance(data[0], basestring):
+    if len(data) == 1 and isinstance(data[0], six.string_types):
         data = data[0]
 
     return data
@@ -1861,7 +1862,7 @@ def safeStringFormat(format_, params):
     else:
         retVal = re.sub(r"(\A|[^A-Za-z0-9])(%d)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>", format_)
 
-    if isinstance(params, basestring):
+    if isinstance(params, six.string_types):
         retVal = retVal.replace("%s", params, 1)
     elif not isListLike(params):
         retVal = retVal.replace("%s", getUnicode(params), 1)
@@ -2383,9 +2384,9 @@ def getUnicode(value, encoding=None, noneToNull=False):
     if noneToNull and value is None:
         return NULL
 
-    if isinstance(value, unicode):
+    if isinstance(value, six.text_type):
         return value
-    elif isinstance(value, basestring):
+    elif isinstance(value, six.binary_type):
         # Heuristics (if encoding not explicitly specified)
         candidates = filter(None, (encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
         if all(_ in value for _ in ('<', '>')):
@@ -2397,16 +2398,16 @@ def getUnicode(value, encoding=None, noneToNull=False):
 
         for candidate in candidates:
             try:
-                return unicode(value, candidate)
+                return six.text_type(value, candidate)
             except UnicodeDecodeError:
                 pass
 
         while True:
             try:
-                return unicode(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
+                return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
             except UnicodeDecodeError as ex:
                 try:
-                    return unicode(value, UNICODE_ENCODING)
+                    return six.text_type(value, UNICODE_ENCODING)
                 except:
                     value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
     elif isListLike(value):
@@ -2414,9 +2415,9 @@ def getUnicode(value, encoding=None, noneToNull=False):
         return value
     else:
         try:
-            return unicode(value)
+            return six.text_type(value)
         except UnicodeDecodeError:
-            return unicode(str(value), errors="ignore")  # encoding ignored for non-basestring instances
+            return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
 def longestCommonPrefix(*sequences):
     """
@@ -2568,7 +2569,7 @@ def extractErrorMessage(page):
 
     retVal = None
 
-    if isinstance(page, basestring):
+    if isinstance(page, six.string_types):
         for regex in ERROR_PARSING_REGEXES:
             match = re.search(regex, page, re.IGNORECASE)
 
@@ -2867,7 +2868,7 @@ def isNumPosStrValue(value):
     False
     """
 
-    return (value and isinstance(value, basestring) and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)
+    return (hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
@@ -3015,7 +3016,7 @@ def isDBMSVersionAtLeast(version):
 
         value = filterStringValue(value, '[0-9.><=]')
 
-        if value and isinstance(value, basestring):
+        if value and isinstance(value, six.string_types):
             if value.startswith(">="):
                 value = float(value.replace(">=", ""))
             elif value.startswith(">"):
@@ -3145,7 +3146,7 @@ def saveConfig(conf, filename):
                 elif datatype == OPTION_TYPE.STRING:
                     value = ""
 
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 value = value.replace("\n", "\n ")
 
             config.set(family, option, value)
@@ -3176,7 +3177,7 @@ def initTechnique(technique=None):
             for key, value in kb.injection.conf.items():
                 if value and (not hasattr(conf, key) or (hasattr(conf, key) and not getattr(conf, key))):
                     setattr(conf, key, value)
-                    debugMsg = "resuming configuration option '%s' (%s)" % (key, ("'%s'" % value) if isinstance(value, basestring) else value)
+                    debugMsg = "resuming configuration option '%s' (%s)" % (key, ("'%s'" % value) if isinstance(value, six.string_types) else value)
                     logger.debug(debugMsg)
 
                     if value and key == "optimize":
@@ -3586,8 +3587,8 @@ def intersect(containerA, containerB, lowerCase=False):
         containerB = arrayizeValue(containerB)
 
         if lowerCase:
-            containerA = [val.lower() if isinstance(val, basestring) else val for val in containerA]
-            containerB = [val.lower() if isinstance(val, basestring) else val for val in containerB]
+            containerA = [val.lower() if hasattr(val, "lower") else val for val in containerA]
+            containerB = [val.lower() if hasattr(val, "lower") else val for val in containerB]
 
         retVal = [val for val in containerA if val in containerB]
 
@@ -3730,7 +3731,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
     retVal = name
 
-    if isinstance(name, basestring):
+    if isinstance(name, six.string_types):
         retVal = getUnicode(name)
         _ = isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE)
 
@@ -3769,7 +3770,7 @@ def unsafeSQLIdentificatorNaming(name):
 
     retVal = name
 
-    if isinstance(name, basestring):
+    if isinstance(name, six.string_types):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
             retVal = name.replace("`", "")
         elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.INFORMIX, DBMS.HSQLDB):
@@ -3800,7 +3801,7 @@ def isNoneValue(value):
     False
     """
 
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return value in ("None", "")
     elif isListLike(value):
         return all(isNoneValue(_) for _ in value)
@@ -3819,7 +3820,7 @@ def isNullValue(value):
     False
     """
 
-    return isinstance(value, basestring) and value.upper() == NULL
+    return hasattr(value, "upper") and value.upper() == NULL
 
 def expandMnemonics(mnemonics, parser, args):
     """
@@ -3921,7 +3922,7 @@ def safeCSValue(value):
 
     retVal = value
 
-    if retVal and isinstance(retVal, basestring):
+    if retVal and isinstance(retVal, six.string_types):
         if not (retVal[0] == retVal[-1] == '"'):
             if any(_ in retVal for _ in (conf.get("csvDel", defaults.csvDel), '"', '\n')):
                 retVal = '"%s"' % retVal.replace('"', '""')
@@ -4375,7 +4376,7 @@ def decodeHexValue(value, raw=False):
 
     def _(value):
         retVal = value
-        if value and isinstance(value, basestring):
+        if value and isinstance(value, six.string_types):
             if len(value) % 2 != 0:
                 retVal = "%s?" % hexdecode(value[:-1]) if len(value) > 1 else value
                 singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
@@ -4423,7 +4424,7 @@ def extractExpectedValue(value, expected):
         elif expected == EXPECTED.BOOL:
             if isinstance(value, int):
                 value = bool(value)
-            elif isinstance(value, basestring):
+            elif isinstance(value, six.string_types):
                 value = value.strip().lower()
                 if value in ("true", "false"):
                     value = value == "true"
@@ -4436,7 +4437,7 @@ def extractExpectedValue(value, expected):
                 else:
                     value = None
         elif expected == EXPECTED.INT:
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 value = int(value) if value.isdigit() else None
 
     return value
@@ -4447,7 +4448,7 @@ def hashDBWrite(key, value, serialize=False):
     """
 
     if conf.hashDB:
-        _ = '|'.join((str(_) if not isinstance(_, basestring) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
+        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
         conf.hashDB.write(_, value, serialize)
 
 def hashDBRetrieve(key, unserialize=False, checkConf=False):
@@ -4458,10 +4459,10 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
     retVal = None
 
     if conf.hashDB:
-        _ = '|'.join((str(_) if not isinstance(_, basestring) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
+        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
         retVal = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any((conf.flushSession, conf.freshQueries))) else None
 
-        if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, basestring) and any(_ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
+        if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, six.string_types) and any(_ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
             retVal = None
 
     return retVal
@@ -4697,7 +4698,7 @@ def parseRequestFile(reqFile, checkParams=True):
             reqResList = re.finditer(BURP_REQUEST_REGEX, content, re.I | re.S)
 
         for match in reqResList:
-            request = match if isinstance(match, basestring) else match.group(1)
+            request = match if isinstance(match, six.string_types) else match.group(1)
             request = re.sub(r"\A[^\w]+", "", request)
             schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
 
@@ -4789,7 +4790,7 @@ def parseRequestFile(reqFile, checkParams=True):
             data = data.rstrip("\r\n") if data else data
 
             if getPostReq and (params or cookie or not checkParams):
-                if not port and isinstance(scheme, basestring) and scheme.lower() == "https":
+                if not port and hasattr(scheme, "lower") and scheme.lower() == "https":
                     port = "443"
                 elif not scheme and port == "443":
                     scheme = "https"
@@ -4836,9 +4837,9 @@ def getSafeExString(ex, encoding=None):
         retVal = ex.message
     elif getattr(ex, "msg", None):
         retVal = ex.msg
-    elif isinstance(ex, (list, tuple)) and len(ex) > 1 and isinstance(ex[1], basestring):
+    elif isinstance(ex, (list, tuple)) and len(ex) > 1 and isinstance(ex[1], six.string_types):
         retVal = ex[1]
-    elif isinstance(ex, (list, tuple)) and len(ex) > 0 and isinstance(ex[0], basestring):
+    elif isinstance(ex, (list, tuple)) and len(ex) > 0 and isinstance(ex[0], six.string_types):
         retVal = ex[0]
 
     if retVal is None:

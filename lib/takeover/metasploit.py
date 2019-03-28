@@ -45,6 +45,7 @@ from lib.core.subprocessng import blockingWriteToFD
 from lib.core.subprocessng import Popen as execute
 from lib.core.subprocessng import send_all
 from lib.core.subprocessng import recv_some
+from thirdparty import six
 
 if IS_WIN:
     import msvcrt
@@ -186,7 +187,7 @@ class Metasploit:
         # choose which encoder to use. When called from --os-pwn the encoder
         # is always x86/alpha_mixed - used for sys_bineval() and
         # shellcodeexec
-        if isinstance(encode, basestring):
+        if isinstance(encode, six.string_types):
             return encode
 
         elif encode:
