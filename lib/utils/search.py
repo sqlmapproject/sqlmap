@@ -70,7 +70,7 @@ def _search(dork):
         conn = _urllib.request.urlopen(req)
 
         requestMsg = "HTTP request:\nGET %s" % url
-        requestMsg += " %s" % _http_client.HTTPException._http_vsn_str
+        requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str
         logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
         page = conn.read()
@@ -132,7 +132,7 @@ def _search(dork):
             conn = _urllib.request.urlopen(req)
 
             requestMsg = "HTTP request:\nGET %s" % url
-            requestMsg += " %s" % _http_client.HTTPException._http_vsn_str
+            requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str
             logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
             page = conn.read()
