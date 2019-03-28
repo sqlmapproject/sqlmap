@@ -34,7 +34,7 @@ def convert(inputFile):
     fileContent = fp.read()
 
     for fileChar in fileContent:
-        unsignedFileChar = fileChar if sys.version_info.major > 2 else ord(fileChar)
+        unsignedFileChar = fileChar if sys.version_info >= (3, 0) else ord(fileChar)
 
         if unsignedFileChar != 0:
             counter2 += 1

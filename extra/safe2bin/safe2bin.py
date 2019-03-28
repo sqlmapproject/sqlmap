@@ -18,7 +18,7 @@ import sys
 from optparse import OptionError
 from optparse import OptionParser
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 # Regex used for recognition of hex encoded characters

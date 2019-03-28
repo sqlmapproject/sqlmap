@@ -109,7 +109,7 @@ except ImportError:
 
 import sys, types, copy, re, random
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 # monkeypatch to fix http://www.python.org/sf/803422 :-(

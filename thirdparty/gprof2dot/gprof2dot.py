@@ -32,7 +32,7 @@ import optparse
 import sys
 import xml.parsers.expat
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 try:

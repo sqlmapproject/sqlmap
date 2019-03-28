@@ -166,7 +166,7 @@ class WichmannHill(random.Random):
 def choose_boundary():
     return uuid.uuid4().hex
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 else:
     xrange = xrange

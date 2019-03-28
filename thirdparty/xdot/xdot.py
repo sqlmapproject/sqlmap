@@ -39,7 +39,7 @@ import cairo
 import pango
 import pangocairo
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 # See http://www.graphviz.org/pub/scm/graphviz-cairo/plugin/cairo/gvrender_cairo.c

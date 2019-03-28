@@ -33,7 +33,7 @@ from .jpcntx import SJISContextAnalysis
 from .mbcssm import SJISSMModel
 from . import constants
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 class SJISProber(MultiByteCharSetProber):

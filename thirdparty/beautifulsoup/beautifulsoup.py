@@ -89,7 +89,7 @@ import types
 import re
 import sys
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 try:

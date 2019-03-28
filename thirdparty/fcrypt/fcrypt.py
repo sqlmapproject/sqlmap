@@ -121,7 +121,7 @@ __all__ = ['crypt']
 
 import string, struct, sys
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 _ITERATIONS = 16

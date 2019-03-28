@@ -31,7 +31,7 @@ from .charsetprober import CharSetProber
 from .codingstatemachine import CodingStateMachine
 from .mbcssm import UTF8SMModel
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 ONE_CHAR_PROB = 0.5

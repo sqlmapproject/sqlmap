@@ -17,7 +17,7 @@ import zlib
 from optparse import OptionError
 from optparse import OptionParser
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 def hideAscii(data):

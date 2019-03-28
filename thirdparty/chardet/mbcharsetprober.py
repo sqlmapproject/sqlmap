@@ -31,7 +31,7 @@ import sys
 from . import constants
 from .charsetprober import CharSetProber
 
-if sys.version_info.major > 2:
+if sys.version_info >= (3, 0):
     xrange = range
 
 class MultiByteCharSetProber(CharSetProber):
