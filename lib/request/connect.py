@@ -746,9 +746,9 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
-            if isinstance(six.binary_type):
+            if isinstance(page, six.binary_type):
                 if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
-                    page = unicode(page, errors="ignore")
+                    page = six.text_type(page, errors="ignore")
                 else:
                     page = getUnicode(page)
 
