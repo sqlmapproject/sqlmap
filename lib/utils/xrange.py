@@ -12,6 +12,20 @@ class xrange(object):
     Advanced (re)implementation of xrange (supports slice/copy/etc.)
     Reference: http://code.activestate.com/recipes/521885-a-pythonic-implementation-of-xrange/
 
+    >>> list(xrange(1, 9)) == range(1, 9)
+    True
+    >>> list(xrange(8, 0, -16)) == range(8, 0, -16)
+    True
+    >>> list(xrange(0, 8, 16)) == range(0, 8, 16)
+    True
+    >>> list(xrange(0, 4, 5)) == range(0, 4, 5)
+    True
+    >>> list(xrange(4, 0, 3)) == range(4, 0, 3)
+    True
+    >>> list(xrange(0, -3)) == range(0, -3)
+    True
+    >>> list(xrange(0, 7, 2)) == range(0, 7, 2)
+    True
     >>> foobar = xrange(1, 10)
     >>> 7 in foobar
     True
@@ -60,7 +74,7 @@ class xrange(object):
         return self._len()
 
     def _len(self):
-        return max(0, int((self.stop - self.start) // self.step))
+        return max(0, 1 + int((self.stop - 1 - self.start) // self.step))
 
     def __contains__(self, value):
         return (self.start <= value < self.stop) and (value - self.start) % self.step == 0
