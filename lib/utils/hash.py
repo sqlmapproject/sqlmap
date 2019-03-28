@@ -61,6 +61,7 @@ from lib.core.common import paths
 from lib.core.common import readInput
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
+from lib.core.compat import xrange
 from lib.core.convert import hexdecode
 from lib.core.convert import hexencode
 from lib.core.convert import utf8encode
@@ -86,7 +87,6 @@ from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
-from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.pydes.pyDes import des

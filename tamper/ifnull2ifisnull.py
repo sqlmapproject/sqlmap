@@ -5,8 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from lib.core.compat import xrange
 from lib.core.enums import PRIORITY
-from lib.utils.xrange import xrange
 
 __priority__ = PRIORITY.HIGHEST
 

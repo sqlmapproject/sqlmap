@@ -24,6 +24,7 @@ from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastResponseDBMSError
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -42,7 +43,6 @@ from lib.core.settings import ORDER_BY_STEP
 from lib.core.unescaper import unescaper
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
-from lib.utils.xrange import xrange
 
 def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=PAYLOAD.WHERE.ORIGINAL):
     """

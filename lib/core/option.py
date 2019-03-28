@@ -58,6 +58,7 @@ from lib.core.common import setOptimize
 from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -147,7 +148,6 @@ from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.search import search
 from lib.utils.purge import purge
-from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost

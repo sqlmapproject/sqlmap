@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 # Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 # See the file 'LICENSE' for copying permission
@@ -10,7 +10,7 @@ from __future__ import print_function
 import sys
 
 if __name__ == "__main__":
-    if len(sys.argv) > 0:
+    if len(sys.argv) > 1:
         items = list()
 
         with open(sys.argv[1], 'r') as f:

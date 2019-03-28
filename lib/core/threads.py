@@ -13,6 +13,7 @@ import time
 import traceback
 
 from lib.core.compat import WichmannHill
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -25,7 +26,6 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PYVERSION
-from lib.utils.xrange import xrange
 
 shared = AttribDict()
 

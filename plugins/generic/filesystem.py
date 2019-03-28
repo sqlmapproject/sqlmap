@@ -20,6 +20,7 @@ from lib.core.common import isListLike
 from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -31,7 +32,6 @@ from lib.core.exception import SqlmapUndefinedMethod
 from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
-from lib.utils.xrange import xrange
 
 class Filesystem:
     """

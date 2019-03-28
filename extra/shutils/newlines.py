@@ -1,7 +1,4 @@
-#! /usr/bin/env python2
-
-# Runs pylint on all python scripts found in a directory tree
-# Reference: http://rowinggolfer.blogspot.com/2009/08/pylint-recursively.html
+#! /usr/bin/env python
 
 from __future__ import print_function
 
@@ -11,9 +8,10 @@ import sys
 def check(filepath):
     if filepath.endswith(".py"):
         content = open(filepath, "rb").read()
+        pattern = "\n\n\n".encode("ascii")
 
-        if "\n\n\n" in content:
-            index = content.find("\n\n\n")
+        if pattern in content:
+            index = content.find(pattern)
             print(filepath, repr(content[index - 30:index + 30]))
 
 if __name__ == "__main__":

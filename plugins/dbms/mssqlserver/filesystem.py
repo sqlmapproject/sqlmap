@@ -14,6 +14,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.compat import xrange
 from lib.core.convert import base64encode
 from lib.core.convert import hexencode
 from lib.core.data import conf
@@ -24,7 +25,6 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
-from lib.utils.xrange import xrange
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 

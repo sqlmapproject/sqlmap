@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.common import Backend
 from lib.core.common import Format
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -15,7 +16,6 @@ from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import DB2_ALIASES
 from lib.request import inject
-from lib.utils.xrange import xrange
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

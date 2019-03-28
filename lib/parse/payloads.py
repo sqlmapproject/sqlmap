@@ -11,12 +11,12 @@ import re
 from xml.etree import ElementTree as et
 
 from lib.core.common import getSafeExString
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import paths
 from lib.core.datatype import AttribDict
 from lib.core.exception import SqlmapInstallationException
 from lib.core.settings import PAYLOAD_XML_FILES
-from lib.utils.xrange import xrange
 
 def cleanupVals(text, tag):
     if tag == "clause" and '-' in text:

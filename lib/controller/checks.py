@@ -47,6 +47,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
+from lib.core.compat import xrange
 from lib.core.convert import unicodeencode
 from lib.core.defaults import defaults
 from lib.core.data import conf
@@ -105,7 +106,6 @@ from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
-from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 

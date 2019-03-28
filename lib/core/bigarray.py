@@ -16,11 +16,11 @@ import os
 import sys
 import tempfile
 
+from lib.core.compat import xrange
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_SIZE
 from lib.core.settings import BIGARRAY_COMPRESS_LEVEL
-from lib.utils.xrange import xrange
 
 DEFAULT_SIZE_OF = sys.getsizeof(object())
 

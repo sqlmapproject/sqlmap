@@ -31,6 +31,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import singleTimeWarnMessage
+from lib.core.compat import xrange
 from lib.core.convert import hexencode
 from lib.core.convert import utf8encode
 from lib.core.data import conf
@@ -51,7 +52,6 @@ from lib.core.settings import SHELL_RUNCMD_EXE_TAG
 from lib.core.settings import SHELL_WRITABLE_DIR_TAG
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
-from lib.utils.xrange import xrange
 from thirdparty.six.moves import urllib as _urllib
 
 class Web:

@@ -8,10 +8,10 @@ See the file 'LICENSE' for copying permission
 import string
 import random
 
+from lib.core.compat import xrange
 from lib.core.enums import HINT
 from lib.core.enums import PRIORITY
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.utils.xrange import xrange
 
 __priority__ = PRIORITY.NORMAL
 

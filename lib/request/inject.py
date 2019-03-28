@@ -31,6 +31,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import singleTimeWarnMessage
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -59,7 +60,6 @@ from lib.techniques.dns.test import dnsTest
 from lib.techniques.dns.use import dnsUse
 from lib.techniques.error.use import errorUse
 from lib.techniques.union.use import unionUse
-from lib.utils.xrange import xrange
 from thirdparty import six
 
 def _goDns(payload, expression):

@@ -17,6 +17,7 @@ from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -28,7 +29,6 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
-from lib.utils.xrange import xrange
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 from thirdparty import six
 

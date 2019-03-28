@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 """
 cloak.py - Simple file encryption/compression utility
@@ -10,6 +10,7 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import os
+import struct
 import sys
 import zlib
 
@@ -20,12 +21,10 @@ if sys.version_info.major > 2:
     xrange = range
 
 def hideAscii(data):
-    retVal = ""
+    retVal = b""
     for i in xrange(len(data)):
-        if ord(data[i]) < 128:
-            retVal += chr(ord(data[i]) ^ 127)
-        else:
-            retVal += data[i]
+        value = data[i] if isinstance(data[i], int) else ord(data[i])
+        retVal += struct.pack('B', value ^ (127 if value < 128 else 0))
 
     return retVal
 
@@ -42,7 +41,8 @@ def decloak(inputFile=None, data=None):
             data = f.read()
     try:
         data = zlib.decompress(hideAscii(data))
-    except:
+    except Exception as ex:
+        print(ex)
         print('ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile)
         sys.exit(1)
     finally:

@@ -18,6 +18,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -31,7 +32,6 @@ from lib.core.settings import MAX_INT
 from lib.core.settings import NULL
 from lib.core.unescaper import unescaper
 from lib.request import inject
-from lib.utils.xrange import xrange
 
 def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     lengths = {}

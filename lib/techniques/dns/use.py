@@ -22,6 +22,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -32,7 +33,6 @@ from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
-from lib.utils.xrange import xrange
 
 def dnsUse(payload, expression):
     """

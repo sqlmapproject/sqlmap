@@ -8,9 +8,9 @@ See the file 'LICENSE' for copying permission
 import os
 
 from lib.core.common import singleTimeWarnMessage
+from lib.core.compat import xrange
 from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
-from lib.utils.xrange import xrange
 
 __priority__ = PRIORITY.LOW
 

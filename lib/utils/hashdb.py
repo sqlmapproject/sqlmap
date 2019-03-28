@@ -16,6 +16,7 @@ from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unserializeObject
+from lib.core.compat import xrange
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
@@ -25,7 +26,6 @@ from lib.core.settings import HASHDB_RETRIEVE_RETRIES
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
-from lib.utils.xrange import xrange
 
 class HashDB(object):
     def __init__(self, filepath):

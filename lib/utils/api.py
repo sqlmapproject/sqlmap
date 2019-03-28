@@ -23,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import saveConfig
 from lib.core.common import unArrayizeValue
+from lib.core.compat import xrange
 from lib.core.convert import base64encode
 from lib.core.convert import hexencode
 from lib.core.convert import dejsonize
@@ -47,7 +48,6 @@ from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.core.shell import autoCompletion
 from lib.core.subprocessng import Popen
 from lib.parse.cmdline import cmdLineParser
-from lib.utils.xrange import xrange
 from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
 from thirdparty.bottle.bottle import hook

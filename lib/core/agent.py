@@ -23,6 +23,7 @@ from lib.core.common import splitFields
 from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import zeroDepthSearch
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
@@ -46,7 +47,6 @@ from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.unescaper import unescaper
-from lib.utils.xrange import xrange
 
 class Agent(object):
     """

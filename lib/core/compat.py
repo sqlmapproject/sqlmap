@@ -9,6 +9,7 @@ import binascii
 import os
 import random
 import uuid
+import sys
 
 class WichmannHill(random.Random):
     """
@@ -164,3 +165,8 @@ class WichmannHill(random.Random):
 # Reference: https://github.com/urllib3/urllib3/blob/master/src/urllib3/filepost.py
 def choose_boundary():
     return uuid.uuid4().hex
+
+if sys.version_info.major > 2:
+    xrange = range
+else:
+    xrange = xrange

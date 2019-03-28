@@ -21,6 +21,7 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
+from lib.core.compat import xrange
 from lib.core.convert import hexencode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -42,7 +43,6 @@ from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
 from lib.utils.hash import storeHashesToFile
 from lib.utils.pivotdumptable import pivotDumpTable
-from lib.utils.xrange import xrange
 
 class Users:
     """

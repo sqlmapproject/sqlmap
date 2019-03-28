@@ -32,6 +32,7 @@ from lib.core.common import listToStrValue
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseHTTPError
+from lib.core.compat import xrange
 from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
@@ -57,7 +58,6 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
-from lib.utils.xrange import xrange
 from thirdparty import six
 
 def _oneShotErrorUse(expression, field=None, chunkTest=False):

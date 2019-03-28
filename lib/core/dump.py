@@ -28,6 +28,7 @@ from lib.core.common import randomInt
 from lib.core.common import safeCSValue
 from lib.core.common import unicodeencode
 from lib.core.common import unsafeSQLIdentificatorNaming
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -50,7 +51,6 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNSAFE_DUMP_FILEPATH_REPLACEMENT
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WINDOWS_RESERVED_NAMES
-from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.magic import magic
 

@@ -38,6 +38,7 @@ from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseDBMSError
+from lib.core.compat import xrange
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
@@ -59,7 +60,6 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
-from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.odict import OrderedDict
 
