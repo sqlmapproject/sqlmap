@@ -19,6 +19,7 @@ from lib.core.session import setDbms
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
+from lib.utils.xrange import xrange
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

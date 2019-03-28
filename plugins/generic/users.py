@@ -42,6 +42,7 @@ from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
 from lib.utils.hash import storeHashesToFile
 from lib.utils.pivotdumptable import pivotDumpTable
+from lib.utils.xrange import xrange
 
 class Users:
     """

@@ -29,8 +29,11 @@ import os.path
 import re
 import textwrap
 import optparse
+import sys
 import xml.parsers.expat
 
+if sys.version_info.major > 2:
+    xrange = range
 
 try:
     # Debugging helper module

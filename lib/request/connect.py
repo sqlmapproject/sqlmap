@@ -118,6 +118,7 @@ from lib.request.basic import processResponse
 from lib.request.direct import direct
 from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import http_client as _http_client

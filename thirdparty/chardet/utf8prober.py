@@ -25,10 +25,14 @@
 # 02110-1301  USA
 ######################### END LICENSE BLOCK #########################
 
+import sys
 from . import constants
 from .charsetprober import CharSetProber
 from .codingstatemachine import CodingStateMachine
 from .mbcssm import UTF8SMModel
+
+if sys.version_info.major > 2:
+    xrange = range
 
 ONE_CHAR_PROB = 0.5
 

@@ -51,6 +51,7 @@ from lib.core.settings import SHELL_RUNCMD_EXE_TAG
 from lib.core.settings import SHELL_WRITABLE_DIR_TAG
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
+from lib.utils.xrange import xrange
 from thirdparty.six.moves import urllib as _urllib
 
 class Web:

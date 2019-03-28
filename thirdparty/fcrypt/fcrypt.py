@@ -119,8 +119,10 @@ __all__ = ['crypt']
 # ----- END fcrypt.c LICENSE -----
 
 
-import string, struct
+import string, struct, sys
 
+if sys.version_info.major > 2:
+    xrange = range
 
 _ITERATIONS = 16
 

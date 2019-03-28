@@ -18,6 +18,9 @@ import sys
 from optparse import OptionError
 from optparse import OptionParser
 
+if sys.version_info.major > 2:
+    xrange = range
+
 # Regex used for recognition of hex encoded characters
 HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
 

@@ -26,6 +26,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.request import inject
 from lib.request.connect import Connect as Request
 from lib.techniques.union.use import unionUse
+from lib.utils.xrange import xrange
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):

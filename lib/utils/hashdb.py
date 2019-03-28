@@ -25,6 +25,7 @@ from lib.core.settings import HASHDB_RETRIEVE_RETRIES
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
+from lib.utils.xrange import xrange
 
 class HashDB(object):
     def __init__(self, filepath):

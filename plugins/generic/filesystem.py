@@ -31,6 +31,7 @@ from lib.core.exception import SqlmapUndefinedMethod
 from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
+from lib.utils.xrange import xrange
 
 class Filesystem:
     """
@@ -70,7 +71,7 @@ class Filesystem:
             sameFile = None
 
             if isNumPosStrValue(remoteFileSize):
-                remoteFileSize = long(remoteFileSize)
+                remoteFileSize = int(remoteFileSize)
                 localFile = getUnicode(localFile, encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
                 sameFile = False
 

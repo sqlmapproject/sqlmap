@@ -147,6 +147,7 @@ from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
 from lib.utils.search import search
 from lib.utils.purge import purge
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost

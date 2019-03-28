@@ -105,6 +105,7 @@ from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 

@@ -16,6 +16,9 @@ import zlib
 from optparse import OptionError
 from optparse import OptionParser
 
+if sys.version_info.major > 2:
+    xrange = range
+
 def hideAscii(data):
     retVal = ""
     for i in xrange(len(data)):

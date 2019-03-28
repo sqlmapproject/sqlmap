@@ -29,6 +29,7 @@ import colorsys
 import time
 import re
 import optparse
+import sys
 
 import gobject
 import gtk
@@ -38,6 +39,8 @@ import cairo
 import pango
 import pangocairo
 
+if sys.version_info.major > 2:
+    xrange = range
 
 # See http://www.graphviz.org/pub/scm/graphviz-cairo/plugin/cairo/gvrender_cairo.c
 

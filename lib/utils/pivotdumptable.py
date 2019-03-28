@@ -31,6 +31,7 @@ from lib.core.settings import MAX_INT
 from lib.core.settings import NULL
 from lib.core.unescaper import unescaper
 from lib.request import inject
+from lib.utils.xrange import xrange
 
 def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     lengths = {}

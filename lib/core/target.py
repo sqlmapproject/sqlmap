@@ -72,6 +72,7 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.utils.hashdb import HashDB
+from lib.utils.xrange import xrange
 from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import urllib as _urllib
 

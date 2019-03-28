@@ -16,6 +16,7 @@ from lib.core.session import setDbms
 from lib.core.settings import MAXDB_ALIASES
 from lib.request import inject
 from lib.request.connect import Connect as Request
+from lib.utils.xrange import xrange
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

@@ -15,6 +15,7 @@ from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import DB2_ALIASES
 from lib.request import inject
+from lib.utils.xrange import xrange
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):

@@ -39,6 +39,7 @@ from lib.core.shell import autoCompletion
 from lib.core.shell import clearHistory
 from lib.core.shell import loadHistory
 from lib.core.shell import saveHistory
+from lib.utils.xrange import xrange
 
 def cmdLineParser(argv=None):
     """

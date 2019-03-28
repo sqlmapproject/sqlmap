@@ -32,6 +32,7 @@ from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
+from lib.utils.xrange import xrange
 
 def dnsUse(payload, expression):
     """

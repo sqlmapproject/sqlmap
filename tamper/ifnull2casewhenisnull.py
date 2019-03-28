@@ -6,6 +6,7 @@ See the file 'doc/COPYING' for copying permission
 """
 
 from lib.core.enums import PRIORITY
+from lib.utils.xrange import xrange
 
 __priority__ = PRIORITY.HIGHEST
 

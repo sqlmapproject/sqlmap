@@ -87,6 +87,10 @@ __license__ = "New-style BSD"
 import codecs
 import types
 import re
+import sys
+
+if sys.version_info.major > 2:
+    xrange = range
 
 try:
   from htmlentitydefs import name2codepoint

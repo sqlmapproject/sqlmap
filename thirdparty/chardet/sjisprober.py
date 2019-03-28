@@ -33,6 +33,8 @@ from .jpcntx import SJISContextAnalysis
 from .mbcssm import SJISSMModel
 from . import constants
 
+if sys.version_info.major > 2:
+    xrange = range
 
 class SJISProber(MultiByteCharSetProber):
     def __init__(self):

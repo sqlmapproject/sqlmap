@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import random
 
 from lib.core.enums import PRIORITY
+from lib.utils.xrange import xrange
 
 __priority__ = PRIORITY.LOW
 

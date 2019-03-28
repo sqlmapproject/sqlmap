@@ -12,6 +12,7 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import LOBLKSIZE
 from lib.request import inject
+from lib.utils.xrange import xrange
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):

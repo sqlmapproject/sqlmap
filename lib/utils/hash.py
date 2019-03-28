@@ -86,6 +86,7 @@ from lib.core.settings import NULL
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
 from lib.core.wordlist import Wordlist
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.pydes.pyDes import des

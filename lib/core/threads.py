@@ -25,6 +25,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import PYVERSION
+from lib.utils.xrange import xrange
 
 shared = AttribDict()
 

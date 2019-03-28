@@ -42,6 +42,7 @@ from lib.core.settings import ORDER_BY_STEP
 from lib.core.unescaper import unescaper
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
+from lib.utils.xrange import xrange
 
 def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=PAYLOAD.WHERE.ORIGINAL):
     """

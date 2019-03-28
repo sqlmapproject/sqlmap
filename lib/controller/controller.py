@@ -72,6 +72,7 @@ from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.utils.hash import crackHashFile
+from lib.utils.xrange import xrange
 
 def _selectInjection():
     """

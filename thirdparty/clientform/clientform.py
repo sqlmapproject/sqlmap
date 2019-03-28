@@ -109,6 +109,9 @@ except ImportError:
 
 import sys, types, copy, re, random
 
+if sys.version_info.major > 2:
+    xrange = range
+
 # monkeypatch to fix http://www.python.org/sf/803422 :-(
 sgmllib.charref = re.compile("&#(x?[0-9a-fA-F]+)[^0-9a-fA-F]")
 

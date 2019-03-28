@@ -31,6 +31,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.parse.sitemap import parseSitemap
 from lib.request.connect import Connect as Request
+from lib.utils.xrange import xrange
 from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib

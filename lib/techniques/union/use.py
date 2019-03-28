@@ -59,6 +59,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.odict import OrderedDict
 

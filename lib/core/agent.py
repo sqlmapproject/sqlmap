@@ -46,6 +46,7 @@ from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.unescaper import unescaper
+from lib.utils.xrange import xrange
 
 class Agent(object):
     """

@@ -167,6 +167,7 @@ from lib.core.settings import VERSION_STRING
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
 from lib.utils.sqlalchemy import _sqlalchemy
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError

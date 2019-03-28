@@ -15,6 +15,7 @@ from lib.core.data import kb
 from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 from lib.core.settings import IGNORE_SPACE_AFFECTED_KEYWORDS
+from lib.utils.xrange import xrange
 
 __priority__ = PRIORITY.LOW
 

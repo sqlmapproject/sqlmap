@@ -50,6 +50,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNSAFE_DUMP_FILEPATH_REPLACEMENT
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WINDOWS_RESERVED_NAMES
+from lib.utils.xrange import xrange
 from thirdparty import six
 from thirdparty.magic import magic
 

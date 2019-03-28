@@ -27,6 +27,7 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.unescaper import unescaper
 from lib.request import inject
+from lib.utils.xrange import xrange
 
 class UDF:
     """

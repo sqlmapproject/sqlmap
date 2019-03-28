@@ -5,8 +5,11 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import random
+
 from lib.core.enums import PRIORITY
-from random import sample
+from lib.utils.xrange import xrange
+
 __priority__ = PRIORITY.NORMAL
 
 def dependencies():
@@ -16,7 +19,7 @@ def randomIP():
     numbers = []
 
     while not numbers or numbers[0] in (10, 172, 192):
-        numbers = sample(xrange(1, 255), 4)
+        numbers = random.sample(xrange(1, 255), 4)
 
     return '.'.join(str(_) for _ in numbers)
 

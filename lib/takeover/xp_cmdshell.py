@@ -32,6 +32,7 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.threads import getCurrentThreadData
+from lib.utils.xrange import xrange
 from lib.request import inject
 
 class XP_cmdshell:

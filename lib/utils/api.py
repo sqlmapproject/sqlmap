@@ -47,6 +47,7 @@ from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.core.shell import autoCompletion
 from lib.core.subprocessng import Popen
 from lib.parse.cmdline import cmdLineParser
+from lib.utils.xrange import xrange
 from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
 from thirdparty.bottle.bottle import hook

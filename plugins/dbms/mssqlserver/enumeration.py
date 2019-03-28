@@ -28,6 +28,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import CURRENT_DB
 from lib.request import inject
+from lib.utils.xrange import xrange
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 from thirdparty import six
 

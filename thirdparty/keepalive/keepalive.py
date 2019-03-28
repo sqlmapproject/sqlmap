@@ -113,7 +113,7 @@ except ImportError:
     from six.moves import urllib as _urllib
 
 import socket
-import thread
+import threading
 
 DEBUG = None
 
@@ -127,7 +127,7 @@ class ConnectionManager:
       * keep track of all existing
       """
     def __init__(self):
-        self._lock = thread.allocate_lock()
+        self._lock = threading.Lock()
         self._hostmap = {} # map hosts to a list of connections
         self._connmap = {} # map connections to host
         self._readymap = {} # map connection to ready state

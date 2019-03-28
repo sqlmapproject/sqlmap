@@ -33,6 +33,8 @@ from .chardistribution import EUCJPDistributionAnalysis
 from .jpcntx import EUCJPContextAnalysis
 from .mbcssm import EUCJPSMModel
 
+if sys.version_info.major > 2:
+    xrange = range
 
 class EUCJPProber(MultiByteCharSetProber):
     def __init__(self):
