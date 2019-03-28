@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  icmpsh - simple icmp command shell (port of icmpsh-m.pl written in
 #  Perl by Nico Leidecker <nico@leidecker.info>)
@@ -22,7 +22,6 @@
 import os
 import select
 import socket
-import subprocess
 import sys
 
 def setNonBlocking(fd):
@@ -37,7 +36,7 @@ def setNonBlocking(fd):
     fcntl.fcntl(fd, fcntl.F_SETFL, flags)
 
 def main(src, dst):
-    if subprocess.mswindows:
+    if sys.platform == "nt":
         sys.stderr.write('icmpsh master can only run on Posix systems\n')
         sys.exit(255)
 
