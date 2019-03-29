@@ -835,6 +835,7 @@ class Tag(PageElement):
                 s.append(text)
                 if prettyPrint:
                     s.append("\n")
+
         return ''.join(s)
 
     #Soup methods
@@ -1226,8 +1227,8 @@ class BeautifulStoneSoup(Tag, sgmllib.SGMLParser):
     def isSelfClosingTag(self, name):
         """Returns true iff the given string is the name of a
         self-closing tag according to this parser."""
-        return self.SELF_CLOSING_TAGS.has_key(name) \
-               or self.instanceSelfClosingTags.has_key(name)
+        return name in self.SELF_CLOSING_TAGS \
+               or name in self.instanceSelfClosingTags
 
     def reset(self):
         Tag.__init__(self, self, self.ROOT_TAG_NAME)
@@ -1319,7 +1320,7 @@ class BeautifulStoneSoup(Tag, sgmllib.SGMLParser):
 
         nestingResetTriggers = self.NESTABLE_TAGS.get(name)
         isNestable = nestingResetTriggers != None
-        isResetNesting = self.RESET_NESTING_TAGS.has_key(name)
+        isResetNesting = name in self.RESET_NESTING_TAGS
         popTo = None
         inclusive = True
         for i in xrange(len(self.tagStack)-1, 0, -1):
@@ -1534,7 +1535,7 @@ class BeautifulSoup(BeautifulStoneSoup):
     BeautifulStoneSoup before writing your own subclass."""
 
     def __init__(self, *args, **kwargs):
-        if not kwargs.has_key('smartQuotesTo'):
+        if 'smartQuotesTo' not in kwargs:
             kwargs['smartQuotesTo'] = self.HTML_ENTITIES
         kwargs['isHTML'] = True
         BeautifulStoneSoup.__init__(self, *args, **kwargs)
