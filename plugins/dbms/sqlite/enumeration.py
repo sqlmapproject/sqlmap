@@ -22,6 +22,8 @@ class Enumeration(GenericEnumeration):
         warnMsg = "on SQLite the current user has all privileges"
         logger.warn(warnMsg)
 
+        return True
+
     def getUsers(self):
         warnMsg = "on SQLite it is not possible to enumerate the users"
         logger.warn(warnMsg)
