@@ -9,6 +9,7 @@ import distutils.version
 import re
 import socket
 
+from lib.core.common import filterNone
 from lib.core.common import getSafeExString
 from lib.core.data import conf
 from lib.core.data import kb
@@ -25,7 +26,7 @@ try:
 except ImportError:
     pass
 
-_protocols = filter(None, (getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2")))
+_protocols = filterNone(getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2"))
 
 class HTTPSConnection(_http_client.HTTPSConnection):
     """

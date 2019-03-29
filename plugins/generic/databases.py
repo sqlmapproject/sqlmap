@@ -9,6 +9,7 @@ from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
+from lib.core.common import filterNone
 from lib.core.common import filterPairValues
 from lib.core.common import flattenValue
 from lib.core.common import getLimitRange
@@ -490,7 +491,7 @@ class Databases:
             else:
                 return kb.data.cachedColumns
 
-        tblList = filter(None, (safeSQLIdentificatorNaming(_, True) for _ in tblList))
+        tblList = filterNone(safeSQLIdentificatorNaming(_, True) for _ in tblList)
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:

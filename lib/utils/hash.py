@@ -956,7 +956,7 @@ def dictionaryAttack(attack_dict):
 
             if regex and regex not in hash_regexes:
                 hash_regexes.append(regex)
-                infoMsg = "using hash method '%s'" % __functions__[regex].func_name
+                infoMsg = "using hash method '%s'" % __functions__[regex].__name__
                 logger.info(infoMsg)
 
     for hash_regex in hash_regexes:
@@ -1084,7 +1084,7 @@ def dictionaryAttack(attack_dict):
             if readInput(message, default='N', boolean=True):
                 suffix_list += COMMON_PASSWORD_SUFFIXES
 
-        infoMsg = "starting dictionary-based cracking (%s)" % __functions__[hash_regex].func_name
+        infoMsg = "starting dictionary-based cracking (%s)" % __functions__[hash_regex].__name__
         logger.info(infoMsg)
 
         for item in attack_info:

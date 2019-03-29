@@ -16,6 +16,7 @@ import zlib
 from lib.core.common import Backend
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
+from lib.core.common import filterNone
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
@@ -100,7 +101,7 @@ def forgeHeaders(items=None, base=None):
 
                 if ("%s=" % getUnicode(cookie.name)) in getUnicode(headers[HTTP_HEADER.COOKIE]):
                     if conf.loadCookies:
-                        conf.httpHeaders = filter(None, ((item if item[0] != HTTP_HEADER.COOKIE else None) for item in conf.httpHeaders))
+                        conf.httpHeaders = filterNone((item if item[0] != HTTP_HEADER.COOKIE else None) for item in conf.httpHeaders)
                     elif kb.mergeCookies is None:
                         message = "you provided a HTTP %s header value. " % HTTP_HEADER.COOKIE
                         message += "The target URL provided its own cookies within "

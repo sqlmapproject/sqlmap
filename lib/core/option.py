@@ -33,6 +33,7 @@ from lib.core.common import decodeStringEscape
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
+from lib.core.common import filterNone
 from lib.core.common import findLocalPort
 from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
@@ -784,7 +785,7 @@ def _setTamperingFunctions():
                 if name == "tamper" and inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs":
                     found = True
                     kb.tamperFunctions.append(function)
-                    function.func_name = module.__name__
+                    function.__name__ = module.__name__
 
                     if check_priority and priority > last_priority:
                         message = "it appears that you might have mixed "
@@ -880,7 +881,7 @@ def _setPreprocessFunctions():
                     found = True
 
                     kb.preprocessFunctions.append(function)
-                    function.func_name = module.__name__
+                    function.__name__ = module.__name__
 
                     break
 
@@ -1113,7 +1114,7 @@ def _setHTTPHandlers():
     debugMsg = "creating HTTP requests opener object"
     logger.debug(debugMsg)
 
-    handlers = filter(None, [multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
+    handlers = filterNone([multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
 
     if not conf.dropSetCookie:
         if not conf.loadCookies:

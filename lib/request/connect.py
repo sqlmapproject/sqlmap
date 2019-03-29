@@ -32,6 +32,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import escapeJsonValue
 from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
+from lib.core.common import filterNone
 from lib.core.common import findMultipartPostBoundary
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getHeader
@@ -600,7 +601,7 @@ class Connect(object):
             except:
                 pass
             finally:
-                page = page if isinstance(page, unicode) else getUnicode(page)
+                page = getUnicode(page)
 
             code = ex.code
             status = getSafeExString(ex)
@@ -758,7 +759,7 @@ class Connect(object):
                     page, responseHeaders, code = function(page, responseHeaders, code)
                 except Exception as ex:
                     errMsg = "error occurred while running preprocess "
-                    errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
+                    errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
 
             threadData.lastPage = page
@@ -857,11 +858,11 @@ class Connect(object):
                         payload = function(payload=payload, headers=auxHeaders, delimiter=delimiter, hints=hints)
                     except Exception as ex:
                         errMsg = "error occurred while running tamper "
-                        errMsg += "function '%s' ('%s')" % (function.func_name, getSafeExString(ex))
+                        errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                         raise SqlmapGenericException(errMsg)
 
                     if not isinstance(payload, six.string_types):
-                        errMsg = "tamper function '%s' returns " % function.func_name
+                        errMsg = "tamper function '%s' returns " % function.__name__
                         errMsg += "invalid payload type ('%s')" % type(payload)
                         raise SqlmapValueException(errMsg)
 
@@ -1095,7 +1096,7 @@ class Connect(object):
             else:
                 query = None
 
-            for item in filter(None, (get, post if not kb.postHint else None, query)):
+            for item in filterNone((get, post if not kb.postHint else None, query)):
                 for part in item.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)

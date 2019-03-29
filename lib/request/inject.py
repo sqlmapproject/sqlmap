@@ -17,6 +17,7 @@ from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
 from lib.core.common import expandAsteriskForColumns
 from lib.core.common import extractExpectedValue
+from lib.core.common import filterNone
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getTechniqueData
 from lib.core.common import hashDBRetrieve
@@ -431,7 +432,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
                 if found and conf.dnsDomain:
-                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {'E': PAYLOAD.TECHNIQUE.ERROR, 'Q': PAYLOAD.TECHNIQUE.QUERY, 'U': PAYLOAD.TECHNIQUE.UNION}.items())))
+                    _ = "".join(filterNone(key if isTechniqueAvailable(value) else None for key, value in {'E': PAYLOAD.TECHNIQUE.ERROR, 'Q': PAYLOAD.TECHNIQUE.QUERY, 'U': PAYLOAD.TECHNIQUE.UNION}.items()))
                     warnMsg = "option '--dns-domain' will be ignored "
                     warnMsg += "as faster techniques are usable "
                     warnMsg += "(%s) " % _

@@ -11,7 +11,6 @@ from __future__ import print_function
 
 import os
 import sys
-import struct
 
 from optparse import OptionError
 from optparse import OptionParser

@@ -9,6 +9,7 @@ import re
 
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
+from lib.core.common import filterNone
 from lib.core.common import getSQLSnippet
 from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
@@ -106,7 +107,7 @@ class Agent(object):
             if place == PLACE.URI:
                 origValue = origValue.split(kb.customInjectionMark)[0]
             else:
-                origValue = filter(None, (re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z")))[0].group(0)
+                origValue = filterNone(re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z"))[0].group(0)
             origValue = origValue[origValue.rfind('/') + 1:]
             for char in ('?', '=', ':', ',', '&'):
                 if char in origValue:

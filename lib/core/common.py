@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import binascii
 import codecs
+import collections
 import contextlib
 import copy
 import distutils
@@ -228,7 +229,7 @@ class Format(object):
         if versions is None and Backend.getVersionList():
             versions = Backend.getVersionList()
 
-        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(filter(None, versions)))
+        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(filterNone(versions)))
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -501,7 +502,7 @@ class Backend:
 
     @staticmethod
     def getVersion():
-        versions = filter(None, flattenValue(kb.dbmsVersion))
+        versions = filterNone(flattenValue(kb.dbmsVersion))
         if not isNoneValue(versions):
             return versions[0]
         else:
@@ -509,7 +510,7 @@ class Backend:
 
     @staticmethod
     def getVersionList():
-        versions = filter(None, flattenValue(kb.dbmsVersion))
+        versions = filterNone(flattenValue(kb.dbmsVersion))
         if not isNoneValue(versions):
             return versions
         else:
@@ -787,7 +788,7 @@ def getManualDirectories():
             else:
                 targets.add('.'.join(_[:-1]))
 
-            targets = filter(None, targets)
+            targets = filterNone(targets)
 
             for prefix in BRUTE_DOC_ROOT_PREFIXES.get(Backend.getOs(), DEFAULT_DOC_ROOTS[OS.LINUX]):
                 if BRUTE_DOC_ROOT_TARGET_MARK in prefix and re.match(IP_ADDRESS_REGEX, conf.hostname):
@@ -1473,7 +1474,7 @@ def parseTargetUrl():
         errMsg += "in the hostname part"
         raise SqlmapGenericException(errMsg)
 
-    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filter(None, (re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
+    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
     conf.scheme = (urlSplit.scheme.strip().lower() or "http") if not conf.forceSSL else "https"
     conf.path = urlSplit.path.strip()
@@ -2389,13 +2390,13 @@ def getUnicode(value, encoding=None, noneToNull=False):
         return value
     elif isinstance(value, six.binary_type):
         # Heuristics (if encoding not explicitly specified)
-        candidates = filter(None, (encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
+        candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
         if all(_ in value for _ in ('<', '>')):
             pass
         elif any(_ in value for _ in (":\\", '/', '.')) and '\n' not in value:
-            candidates = filter(None, (encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
+            candidates = filterNone((encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
         elif conf.get("encoding") and '\n' not in value:
-            candidates = filter(None, (encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
+            candidates = filterNone((encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
 
         for candidate in candidates:
             try:
@@ -2837,7 +2838,7 @@ def extractTextTagContent(page):
         except MemoryError:
             page = page.replace(REFLECTED_VALUE_MARKER, "")
 
-    return filter(None, (_.group("result").strip() for _ in re.finditer(TEXT_TAG_REGEX, page)))
+    return filterNone(_.group("result").strip() for _ in re.finditer(TEXT_TAG_REGEX, page))
 
 def trimAlphaNum(value):
     """
@@ -2995,6 +2996,21 @@ def filterControlChars(value, replacement=' '):
     """
 
     return filterStringValue(value, PRINTABLE_CHAR_REGEX, replacement)
+
+def filterNone(values):
+    """
+    Emulates filterNone([...]) functionality
+
+    >>> filterNone([1, 2, "", None, 3])
+    [1, 2, 3]
+    """
+
+    retVal = values
+
+    if isinstance(values, collections.Iterable):
+        retVal = [_ for _ in values if _]
+
+    return retVal
 
 def isDBMSVersionAtLeast(version):
     """
@@ -3537,7 +3553,7 @@ def maskSensitiveData(msg):
 
     retVal = getUnicode(msg)
 
-    for item in filter(None, (conf.get(_) for _ in SENSITIVE_OPTIONS)):
+    for item in filterNone(conf.get(_) for _ in SENSITIVE_OPTIONS):
         regex = SENSITIVE_DATA_REGEX % re.sub(r"(\W)", r"\\\1", getUnicode(item))
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
@@ -3640,14 +3656,14 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
             regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string_escape")))
 
             if regex != payload:
-                if all(part.lower() in content.lower() for part in filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
+                if all(part.lower() in content.lower() for part in filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
                     parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
                     retVal = content.replace(payload, REFLECTED_VALUE_MARKER)  # dummy approach
 
                     if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
                         regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS // 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS // 2:])))
 
-                    parts = filter(None, regex.split(REFLECTED_REPLACEMENT_REGEX))
+                    parts = filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))
 
                     if regex.startswith(REFLECTED_REPLACEMENT_REGEX):
                         regex = r"%s%s" % (REFLECTED_BORDER_REGEX, regex[len(REFLECTED_REPLACEMENT_REGEX):])
@@ -4482,7 +4498,7 @@ def resetCookieJar(cookieJar):
                 logger.info(infoMsg)
 
                 content = readCachedFileContent(conf.loadCookies)
-                lines = filter(None, (line.strip() for line in content.split("\n") if not line.startswith('#')))
+                lines = filterNone(line.strip() for line in content.split("\n") if not line.startswith('#'))
                 handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.COOKIE_JAR)
                 os.close(handle)
 

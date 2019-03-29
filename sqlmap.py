@@ -42,6 +42,7 @@ try:
     from lib.core.common import checkPipedInput
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
+    from lib.core.common import filterNone
     from lib.core.common import getSafeExString
     from lib.core.common import getUnicode
     from lib.core.common import maskSensitiveData
@@ -362,7 +363,7 @@ def main():
                         os.remove(filepath)
                     except OSError:
                         pass
-            if not filter(None, (filepath for filepath in glob.glob(os.path.join(kb.tempDir, '*')) if not any(filepath.endswith(_) for _ in ('.lock', '.exe', '_')))):
+            if not filterNone(filepath for filepath in glob.glob(os.path.join(kb.tempDir, '*')) if not any(filepath.endswith(_) for _ in ('.lock', '.exe', '_'))):
                 shutil.rmtree(kb.tempDir, ignore_errors=True)
 
         if conf.get("hashDB"):

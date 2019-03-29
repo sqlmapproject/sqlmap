@@ -21,6 +21,7 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
+from lib.core.common import filterNone
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getFilteredPageContent
@@ -581,7 +582,7 @@ def checkSqlInjection(place, parameter, value):
                                         else:
                                             errorSet = set()
 
-                                        candidates = filter(None, (_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet - errorSet)))
+                                        candidates = filterNone(_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet - errorSet))
 
                                         if candidates:
                                             candidates = sorted(candidates, key=lambda _: len(_))
@@ -595,7 +596,7 @@ def checkSqlInjection(place, parameter, value):
                                             logger.info(infoMsg)
 
                                         if not any((conf.string, conf.notString)):
-                                            candidates = filter(None, (_.strip() if _.strip() in falseRawResponse and _.strip() not in trueRawResponse else None for _ in (falseSet - trueSet)))
+                                            candidates = filterNone(_.strip() if _.strip() in falseRawResponse and _.strip() not in trueRawResponse else None for _ in (falseSet - trueSet))
 
                                             if candidates:
                                                 candidates = sorted(candidates, key=lambda _: len(_))
