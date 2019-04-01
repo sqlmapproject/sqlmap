@@ -100,6 +100,12 @@ class Web:
         if content is not None:
             stream = io.BytesIO(content)  # string content
 
+            # Reference: https://github.com/sqlmapproject/sqlmap/issues/3560
+            # Reference: https://stackoverflow.com/a/4677542
+            stream.seek(0, os.SEEK_END)
+            stream.len = stream.tell()
+            stream.seek(0, os.SEEK_SET)
+
         return self._webFileStreamUpload(stream, destFileName, directory)
 
     def _webFileStreamUpload(self, stream, destFileName, directory):
