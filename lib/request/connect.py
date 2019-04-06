@@ -82,6 +82,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapTokenException
+from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
@@ -725,8 +726,11 @@ class Connect(object):
 
                     kb.connErrorChoice = readInput(message, default='N', boolean=True)
 
-                if kb.connErrorChoice is False:
-                    raise SqlmapConnectionException(warnMsg)
+                if kb.connErrorChoice is not None:
+                    if kb.connErrorChoice:
+                        raise SqlmapConnectionException(warnMsg)
+                    else:
+                        raise SqlmapUserQuitException
 
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
