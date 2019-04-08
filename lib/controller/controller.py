@@ -48,6 +48,7 @@ from lib.core.decorators import stackedmethod
 from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NOTE
 from lib.core.enums import PAYLOAD
@@ -318,6 +319,13 @@ def start():
             conf.cookie = targetCookie
             conf.httpHeaders = list(initialHeaders)
             conf.httpHeaders.extend(targetHeaders or [])
+
+            if conf.randomAgent or conf.mobile:
+                for header, value in initialHeaders:
+                    if header.upper() == HTTP_HEADER.USER_AGENT.upper():
+                        conf.httpHeaders.append((header, value))
+                        break
+
             conf.httpHeaders = [conf.httpHeaders[i] for i in xrange(len(conf.httpHeaders)) if conf.httpHeaders[i][0].upper() not in (__[0].upper() for __ in conf.httpHeaders[i + 1:])]
 
             initTargetEnv()
