@@ -764,6 +764,9 @@ ultramegaman, <seclists(at)ultramegaman.com>
 Vinicius, <viniciusmaxdaloop(at)gmail.com>
 * for reporting a minor bug
 
+virusdefender
+* for contributing WAF scripts safeline.py
+
 w8ay
 * for contributing an implementation for chunked transfer-encoding (switch --chunked)
 
