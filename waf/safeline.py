@@ -7,7 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.settings import WAF_ATTACK_VECTORS
 
-__product__ = "SafeLine (Chaitin Tech)"
+__product__ = "SafeLine Next Gen WAF (Chaitin Tech)"
 
 def detect(get_page):
     retval = False
