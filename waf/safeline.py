@@ -15,5 +15,7 @@ def detect(get_page):
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
         retval = all(_ in (page or "") for _ in ("SafeLine", "<!-- event_id:"))
+        if retval:
+            break
 
     return retval
