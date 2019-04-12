@@ -3483,6 +3483,9 @@ def createGithubIssue(errMsg, excMsg):
     _ = re.sub(r"\s+line \d+", "", _)
     _ = re.sub(r'File ".+?/(\w+\.py)', r"\g<1>", _)
     _ = re.sub(r".+\Z", "", _)
+    _ = re.sub(r"(Unicode[^:]*Error:).+", r"\g<1>", _)
+    _ = re.sub(r"= _", "= ", _)
+
     key = hashlib.md5(_).hexdigest()[:8]
 
     if key in issues:
