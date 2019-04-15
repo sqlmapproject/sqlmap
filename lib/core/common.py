@@ -3622,21 +3622,23 @@ def decodeStringEscape(value):
     retVal = value
 
     if value and '\\' in value:
-        if isinstance(value, unicode):
-            retVal = retVal.encode(UNICODE_ENCODING)
+        charset = "\\%s" % string.whitespace.replace(" ", "")
+        for _ in charset:
+            retVal = retVal.replace(repr(_).strip("'"), _)
 
-        try:
-            retVal = codecs.escape_decode(retVal)[0]
-        except:
-            try:
-                retVal = retVal.decode("string_escape")
-            except:
-                charset = string.whitespace.replace(" ", "")
-                for _ in charset:
-                    retVal = retVal.replace(repr(_).strip("'"), _)
+    return retVal
 
-        if isinstance(value, unicode):
-            retVal = getUnicode(retVal)
+def encodeStringEscape(value):
+    """
+    Encodes escaped string values (e.g. "\t" -> "\\t")
+    """
+
+    retVal = value
+
+    if value:
+        charset = "\\%s" % string.whitespace.replace(" ", "")
+        for _ in charset:
+            retVal = retVal.replace(_, repr(_).strip("'"))
 
     return retVal
 
@@ -3656,7 +3658,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                 return value
 
             payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ""), convall=True))
-            regex = _(filterStringValue(payload, r"[A-Za-z0-9]", REFLECTED_REPLACEMENT_REGEX.encode("string_escape")))
+            regex = _(filterStringValue(payload, r"[A-Za-z0-9]", encodeStringEscape(REFLECTED_REPLACEMENT_REGEX)))
 
             if regex != payload:
                 if all(part.lower() in content.lower() for part in filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
