@@ -3418,6 +3418,16 @@ def checkIntegrity():
 
     return retVal
 
+def getDaysFromLastUpdate():
+    """
+    Get total number of days from last update
+    """
+
+    if not paths:
+        return
+
+    return int(time.time() - os.path.getmtime(paths.SQLMAP_SETTINGS_PATH)) // (3600 * 24)
+
 def unhandledExceptionMessage():
     """
     Returns detailed message about occurred unhandled exception

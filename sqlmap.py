@@ -43,6 +43,7 @@ try:
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
     from lib.core.common import filterNone
+    from lib.core.common import getDaysFromLastUpdate
     from lib.core.common import getSafeExString
     from lib.core.common import getUnicode
     from lib.core.common import maskSensitiveData
@@ -64,6 +65,7 @@ try:
     from lib.core.patch import dirtyPatches
     from lib.core.settings import GIT_PAGE
     from lib.core.settings import IS_WIN
+    from lib.core.settings import LAST_UPDATE_NAGGING_DAYS
     from lib.core.settings import LEGAL_DISCLAIMER
     from lib.core.settings import THREAD_FINALIZATION_TIMEOUT
     from lib.core.settings import UNICODE_ENCODING
@@ -350,6 +352,11 @@ def main():
 
     finally:
         kb.threadContinue = False
+
+        _ = getDaysFromLastUpdate()
+        if _ > LAST_UPDATE_NAGGING_DAYS:
+            warnMsg = "you haven't updated sqlmap for more than %d days!!!" % _
+            logger.warn(warnMsg)
 
         if conf.get("showTime"):
             dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
