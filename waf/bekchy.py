@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("<title>Bekchy - Access Denided</title>", "<a class=\"btn\" href=\"https://bekchy.com/report\">"))
+        retval |= any(_ in (page or "") for _ in ("<title>Bekchy - Access Denided</title>", "<a class=\"btn\" href=\"https://bekchy.com/report\">"))
         if retval:
             break
 

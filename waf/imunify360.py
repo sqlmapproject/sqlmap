@@ -17,8 +17,8 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
-        retval = re.search(r"\Aimunify360", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
-        retval = any(_ in (page or "") for _ in ("protected by Imunify360", "Powered by Imunify360", "imunify360 preloader"))
+        retval |= re.search(r"\Aimunify360", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        retval |= any(_ in (page or "") for _ in ("protected by Imunify360", "Powered by Imunify360", "imunify360 preloader"))
         if retval:
             break
 

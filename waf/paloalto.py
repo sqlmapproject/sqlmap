@@ -16,7 +16,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = re.search(r"has been blocked in accordance with company policy", page or "", re.I) is not None
+        retval |= re.search(r"has been blocked in accordance with company policy", page or "", re.I) is not None
         retval |= all(_ in (page or "") for _ in ("Palo Alto Next Generation Security Platform", "Download Blocked"))
         if retval:
             break

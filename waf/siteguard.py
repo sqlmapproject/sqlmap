@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("Powered by SiteGuard", "The server refuse to browse the page"))
+        retval |= any(_ in (page or "") for _ in ("Powered by SiteGuard", "The server refuse to browse the page"))
         if retval:
             break
 

@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = code >= 400 and re.search(r"AkamaiGHost", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        retval |= code >= 400 and re.search(r"AkamaiGHost", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         if retval:
             break
 

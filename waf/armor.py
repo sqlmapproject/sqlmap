@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "This request has been blocked by website protection from Armor" in (page or "")
+        retval |= "This request has been blocked by website protection from Armor" in (page or "")
         if retval:
             break
 

@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, code = get_page(get=vector)
-        retval = code >= 400 and all(_ in (page or "") for _ in ("UrlMaster", "UrlRewriteModule", "SecurityCheck"))
+        retval |= code >= 400 and all(_ in (page or "") for _ in ("UrlMaster", "UrlRewriteModule", "SecurityCheck"))
         if retval:
             break
 

@@ -16,7 +16,9 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "Blocked because of Malicious Activities" in (page or "")
+        retval |= "Blocked because of Malicious Activities" in (page or "")
         retval |= re.search(r"Firewall(<[^>]+>)*powered by(<[^>]+>)*MalCare", page or "") is not None
+        if retval:
+            break
 
     return retval

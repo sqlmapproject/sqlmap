@@ -16,7 +16,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = re.search(r"SecureIIS[^<]+Web Server Protection", page or "") is not None
+        retval |= re.search(r"SecureIIS[^<]+Web Server Protection", page or "") is not None
         retval |= "http://www.eeye.com/SecureIIS/" in (page or "")
         retval |= re.search(r"\?subject=[^>]*SecureIIS Error", page or "") is not None
         if retval:

@@ -14,7 +14,9 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "<title>NinjaFirewall: 403 Forbidden" in (page or "")
+        retval |= "<title>NinjaFirewall: 403 Forbidden" in (page or "")
         retval |= all(_ in (page or "") for _ in ("For security reasons, it was blocked and logged", "NinjaFirewall"))
+        if retval:
+            break
 
     return retval

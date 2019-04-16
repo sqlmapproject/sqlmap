@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = code >= 400 and re.search(r"\AZENEDGE", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        retval |= code >= 400 and re.search(r"\AZENEDGE", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= all(_ in (page or "") for _ in ("Your request has been blocked", "Incident ID", "/__zenedge/assets/"))
         if retval:
             break

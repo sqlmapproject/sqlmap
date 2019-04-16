@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = all(_ in (page or "") for _ in ("You performed an action that triggered the service and blocked your request",))
+        retval |= all(_ in (page or "") for _ in ("You performed an action that triggered the service and blocked your request",))
         if retval:
             break
 

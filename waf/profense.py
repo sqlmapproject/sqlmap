@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         _, headers, _ = get_page(get=vector)
-        retval = re.search(r"\APLBSID=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
+        retval |= re.search(r"\APLBSID=", headers.get(HTTP_HEADER.SET_COOKIE, ""), re.I) is not None
         retval |= re.search(r"Profense", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         if retval:
             break

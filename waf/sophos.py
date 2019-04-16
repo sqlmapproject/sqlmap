@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "Powered by UTM Web Protection" in (page or "")
+        retval |= "Powered by UTM Web Protection" in (page or "")
         if retval:
             break
 

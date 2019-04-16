@@ -14,6 +14,8 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "Something in the URL, Form or Cookie data wasn't appropriate" in (page or "")
+        retval |= "Something in the URL, Form or Cookie data wasn't appropriate" in (page or "")
+        if retval:
+            break
 
     return retval

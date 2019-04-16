@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
-        retval = headers.get("aeSecure-code") is not None
+        retval |= headers.get("aeSecure-code") is not None
         retval |= all(_ in (page or "") for _ in ("aeSecure", "aesecure_denied.png"))
         if retval:
             break

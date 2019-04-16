@@ -15,7 +15,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("SiteLock Incident ID", '<span class="value INCIDENT_ID">'))
+        retval |= any(_ in (page or "") for _ in ("SiteLock Incident ID", '<span class="value INCIDENT_ID">'))
         if retval:
             break
 

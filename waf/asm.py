@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = "The requested URL was rejected. Please consult with your administrator." in (page or "")
+        retval |= "The requested URL was rejected. Please consult with your administrator." in (page or "")
         retval |= all(_ in (page or "") for _ in ("security.f5aas.com", "Please enable JavaScript to view the page content"))
         if retval:
             break

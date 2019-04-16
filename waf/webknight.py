@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval = code == 999
+        retval |= code == 999
         retval |= re.search(r"WebKnight", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= any(_ in (page or "") for _ in ("WebKnight Application Firewall Alert", "AQTRONIX WebKnight"))
         if retval:

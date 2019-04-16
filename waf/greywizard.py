@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
-        retval = re.search(r"\Agreywizard", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
+        retval |= re.search(r"\Agreywizard", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         retval |= any(_ in (page or "") for _ in ("We've detected attempted attack or non standard traffic from your IP address", "<title>Grey Wizard</title>"))
         if retval:
             break

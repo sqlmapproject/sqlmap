@@ -14,6 +14,8 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = "https://www.perimeterx.com/whywasiblocked" in (page or "")
+        retval |= "https://www.perimeterx.com/whywasiblocked" in (page or "")
+        if retval:
+            break
 
     return retval

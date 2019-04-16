@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
-        retval = headers.get("x-distil-cs") is not None
+        retval |= headers.get("x-distil-cs") is not None
         retval |= any(_ in (page or "") for _ in ("distilCaptchaForm", "distilCallbackGuard", "cdn.distilnetworks.com/images/anomaly-detected.png"))
         if retval:
             break

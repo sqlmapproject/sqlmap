@@ -14,6 +14,8 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("COM_RSFIREWALL_403_FORBIDDEN", "COM_RSFIREWALL_EVENT"))
+        retval |= any(_ in (page or "") for _ in ("COM_RSFIREWALL_403_FORBIDDEN", "COM_RSFIREWALL_EVENT"))
+        if retval:
+            break
 
     return retval

@@ -17,7 +17,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, _ = get_page(get=vector)
-        retval = ">WTS-WAF" in (page or "")
+        retval |= ">WTS-WAF" in (page or "")
         retval |= re.search(r"\Awts/", headers.get(HTTP_HEADER.SERVER, ""), re.I) is not None
         if retval:
             break

@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval =  "The page you are trying to access is restricted due to a security rule" in (page or "")
+        retval |= "The page you are trying to access is restricted due to a security rule" in (page or "")
         if retval:
             break
 

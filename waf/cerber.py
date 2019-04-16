@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, _ = get_page(get=vector)
-        retval = any(_ in (page or "") for _ in ("We're sorry, you are not allowed to proceed", "Your request looks suspicious or similar to automated requests from spam posting software"))
+        retval |= any(_ in (page or "") for _ in ("We're sorry, you are not allowed to proceed", "Your request looks suspicious or similar to automated requests from spam posting software"))
         if retval:
             break
 

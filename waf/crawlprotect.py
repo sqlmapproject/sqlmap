@@ -14,7 +14,9 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, _, code = get_page(get=vector)
-        retval = code >= 400 and "This site is protected by CrawlProtect" in (page or "")
+        retval |= code >= 400 and "This site is protected by CrawlProtect" in (page or "")
         retval |= "<title>CrawlProtect" in (page or "")
+        if retval:
+            break
 
     return retval
