@@ -2419,17 +2419,10 @@ def getUnicode(value, encoding=None, noneToNull=False):
             except UnicodeDecodeError:
                 pass
 
-        while True:
-            try:
-                return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
-            except UnicodeDecodeError as ex:
-                try:
-                    return six.text_type(value, UNICODE_ENCODING)
-                except:
-                    if INVALID_UNICODE_PRIVATE_AREA:
-                        value = value[:ex.start] + "".join(unichr(int('000f00%2x' % ord(_), 16)).encode(UNICODE_ENCODING) for _ in value[ex.start:ex.end]) + value[ex.end:]
-                    else:
-                        value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
+        try:
+            return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
+        except UnicodeDecodeError as ex:
+            return six.text_type(value, UNICODE_ENCODING, errors="reversible")
     elif isListLike(value):
         value = list(getUnicode(_, encoding, noneToNull) for _ in value)
         return value
