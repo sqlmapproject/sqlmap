@@ -603,7 +603,20 @@ def paramToDict(place, parameters=None):
             condition |= place == PLACE.COOKIE and len(intersect((PLACE.COOKIE,), conf.testParameter, True)) > 0
 
             if condition:
-                testableParameters[parameter] = "=".join(parts[1:])
+                value = "=".join(parts[1:])
+
+                if parameter in (conf.base64Parameter or []):
+                    try:
+                        oldValue = value
+                        value = value.decode("base64")
+                        parameters = re.sub(r"\b%s\b" % re.escape(oldValue), value, parameters)
+                    except:
+                        errMsg = "parameter '%s' does not contain " % parameter
+                        errMsg += "valid Base64 encoded value ('%s')" % value
+                        raise SqlmapValueException(errMsg)
+
+                testableParameters[parameter] = value
+
                 if not conf.multipleTargets and not (conf.csrfToken and re.search(conf.csrfToken, parameter, re.I)):
                     _ = urldecode(testableParameters[parameter], convall=True)
                     if (_.endswith("'") and _.count("'") == 1 or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _)) and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):

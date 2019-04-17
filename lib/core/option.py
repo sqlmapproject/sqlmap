@@ -1613,6 +1613,13 @@ def _cleanupOptions():
     else:
         conf.testParameter = []
 
+    if conf.base64Parameter:
+        conf.base64Parameter = urldecode(conf.base64Parameter)
+        conf.base64Parameter = conf.base64Parameter.replace(" ", "")
+        conf.base64Parameter = re.split(PARAMETER_SPLITTING_REGEX, conf.base64Parameter)
+    else:
+        conf.base64Parameter = []
+
     if conf.agent:
         conf.agent = re.sub(r"[\r\n]", "", conf.agent)
 

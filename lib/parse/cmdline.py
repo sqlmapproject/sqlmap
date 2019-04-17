@@ -681,6 +681,10 @@ def cmdLineParser(argv=None):
                                  help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
+        parser.add_option("--base64", dest="base64Parameter",
+                          help=SUPPRESS_HELP)
+#                          help="Parameter(s) containing Base64 encoded values")
+
         parser.add_option("--crack", dest="hashFile",
                           help=SUPPRESS_HELP)
 #                          help="Load and crack hashes from a file (standalone)")
