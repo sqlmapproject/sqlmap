@@ -95,8 +95,8 @@ def safechardecode(value, binary=False):
                 retVal = retVal.encode("utf8")
 
     elif isinstance(value, (list, tuple)):
-        for i in xrange(len(value)):
-            retVal[i] = safechardecode(value[i])
+        for idx, element in enumerate(xrange(value)):
+            retVal[idx] = safechardecode(element)
 
     return retVal
 
