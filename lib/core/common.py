@@ -125,6 +125,7 @@ from lib.core.settings import HTTP_CHUNKED_SPLIT_KEYWORDS
 from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
+from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
 from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
@@ -153,6 +154,7 @@ from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
+from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
 from lib.core.settings import STDIN_PIPE_DASH
@@ -2424,7 +2426,10 @@ def getUnicode(value, encoding=None, noneToNull=False):
                 try:
                     return six.text_type(value, UNICODE_ENCODING)
                 except:
-                    value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
+                    if INVALID_UNICODE_PRIVATE_AREA:
+                        value = value[:ex.start] + "".join(unichr(int('000f00%2x' % ord(_), 16)).encode(UNICODE_ENCODING) for _ in value[ex.start:ex.end]) + value[ex.end:]
+                    else:
+                        value = value[:ex.start] + "".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in value[ex.start:ex.end]) + value[ex.end:]
     elif isListLike(value):
         value = list(getUnicode(_, encoding, noneToNull) for _ in value)
         return value
@@ -2433,6 +2438,30 @@ def getUnicode(value, encoding=None, noneToNull=False):
             return six.text_type(value)
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
+
+def getASCII(value):
+    """
+    Returns ASCII representation of provided Unicode value
+
+    >>> getASCII(getUnicode("foo\x01\x83\xffbar")) == "foo\x01\x83\xffbar"
+    True
+    """
+
+    retVal = value
+
+    if isinstance(value, six.text_type):
+        if INVALID_UNICODE_PRIVATE_AREA:
+            for char in xrange(0xF0000, 0xF00FF + 1):
+                value = value.replace(unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
+
+            retVal = value.encode(UNICODE_ENCODING)
+
+            retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: _.group(1).decode("hex"), retVal)
+        else:
+            retVal = value.encode(UNICODE_ENCODING)
+            retVal = re.sub(r"\\x([0-9a-f]{2})", lambda _: _.group(1).decode("hex"), retVal)
+
+    return retVal
 
 def longestCommonPrefix(*sequences):
     """
@@ -3339,7 +3368,7 @@ def showHttpErrorCodes():
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.debug(msg)
 
-def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="replace", buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
+def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible", buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
     """
     Returns file handle of a given filename
     """

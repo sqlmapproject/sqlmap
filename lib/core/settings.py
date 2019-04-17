@@ -17,7 +17,7 @@ from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.4.14"
+VERSION = "1.3.4.15"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -65,6 +65,7 @@ ASTERISK_MARKER = "__ASTERISK_MARK__"
 REPLACEMENT_MARKER = "__REPLACEMENT_MARK__"
 BOUNDED_INJECTION_MARKER = "__BOUNDED_INJECTION_MARK__"
 SAFE_VARIABLE_MARKER = "__SAFE__"
+SAFE_HEX_MARKER = "__SAFE_HEX__"
 
 RANDOM_INTEGER_MARKER = "[RANDINT]"
 RANDOM_STRING_MARKER = "[RANDSTR]"
@@ -714,6 +715,9 @@ RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 # Default REST-JSON API server listen port
 RESTAPI_DEFAULT_PORT = 8775
 
+# Use "Supplementary Private Use Area-A"
+INVALID_UNICODE_PRIVATE_AREA = False
+
 # Format used for representing invalid unicode characters
 INVALID_UNICODE_CHAR_FORMAT = r"\x%02x"
 
@@ -827,3 +831,11 @@ for key, value in os.environ.items():
         _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
         if _ in globals():
             globals()[_] = value
+
+# Installing "reversible" unicode (decoding) error handler
+
+def reversible(ex):
+    if isinstance(ex, UnicodeDecodeError):
+        return ("".join(INVALID_UNICODE_CHAR_FORMAT % ord(_) for _ in ex.object[ex.start:ex.end]).decode(UNICODE_ENCODING), ex.end)
+
+codecs.register_error("reversible", reversible)
