@@ -124,7 +124,6 @@ from lib.core.settings import HOST_ALIASES
 from lib.core.settings import HTTP_CHUNKED_SPLIT_KEYWORDS
 from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
 from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
@@ -2421,7 +2420,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
 
         try:
             return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
-        except UnicodeDecodeError as ex:
+        except UnicodeDecodeError:
             return six.text_type(value, UNICODE_ENCODING, errors="reversible")
     elif isListLike(value):
         value = list(getUnicode(_, encoding, noneToNull) for _ in value)
