@@ -608,7 +608,7 @@ class Connect(object):
                 page = getUnicode(page)
 
             code = ex.code
-            status = getattr(ex, "reason", None) or getSafeExString(ex).split(": ")[-1]
+            status = getattr(ex, "reason", None) or getSafeExString(ex).split(": ", 1)[-1]
 
             kb.originalCode = kb.originalCode or code
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
@@ -782,33 +782,33 @@ class Connect(object):
 
         processResponse(page, responseHeaders, status)
 
-        if conn and getattr(conn, "redurl", None):
-            _ = _urllib.parse.urlsplit(conn.redurl)
-            _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
-            requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
-
-            if kb.resendPostOnRedirect is False:
-                requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", r"\g<1>GET ", requestMsg)
-                requestMsg = re.sub(r"(?i)Content-length: \d+\n", "", requestMsg)
-                requestMsg = re.sub(r"(?s)\n\n.+", "\n", requestMsg)
-
-            responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, conn.code, status)
-        else:
-            responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
-
-        if responseHeaders:
-            logHeaders = getUnicode("".join(responseHeaders.headers).strip())
-
         if not skipLogTraffic:
+            if conn and getattr(conn, "redurl", None):
+                _ = _urllib.parse.urlsplit(conn.redurl)
+                _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
+                requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
+
+                if kb.resendPostOnRedirect is False:
+                    requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", r"\g<1>GET ", requestMsg)
+                    requestMsg = re.sub(r"(?i)Content-length: \d+\n", "", requestMsg)
+                    requestMsg = re.sub(r"(?s)\n\n.+", "\n", requestMsg)
+
+                responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, conn.code, status)
+            elif "\n" not in responseMsg:
+                responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
+
+            if responseHeaders:
+                logHeaders = getUnicode("".join(responseHeaders.headers).strip())
+
             logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]), start, time.time())
 
-        if conf.verbose <= 5:
-            responseMsg += getUnicode(logHeaders)
-        elif conf.verbose > 5:
-            responseMsg += "%s\r\n\r\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
+            if conf.verbose <= 5:
+                responseMsg += getUnicode(logHeaders)
+            elif conf.verbose > 5:
+                responseMsg += "%s\r\n\r\n%s" % (logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE])
 
-        if not multipart:
-            logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
+            if not multipart:
+                logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
         return page, responseHeaders, code
 
