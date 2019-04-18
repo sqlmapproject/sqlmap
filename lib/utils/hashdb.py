@@ -11,6 +11,7 @@ import sqlite3
 import threading
 import time
 
+from lib.core.common import getBytes
 from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import serializeObject
@@ -23,9 +24,9 @@ from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD
 from lib.core.settings import HASHDB_RETRIEVE_RETRIES
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
+from thirdparty import six
 
 class HashDB(object):
     def __init__(self, filepath):
@@ -67,7 +68,7 @@ class HashDB(object):
 
     @staticmethod
     def hashKey(key):
-        key = key.encode(UNICODE_ENCODING) if isinstance(key, unicode) else repr(key)
+        key = getBytes(key if isinstance(key, six.text_type) else repr(key))
         retVal = int(hashlib.md5(key).hexdigest(), 16) & 0x7fffffffffffffff  # Reference: http://stackoverflow.com/a/4448400
         return retVal
 

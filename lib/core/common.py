@@ -52,7 +52,6 @@ from lib.core.convert import base64unpickle
 from lib.core.convert import hexdecode
 from lib.core.convert import htmlunescape
 from lib.core.convert import stdoutencode
-from lib.core.convert import unicodeencode
 from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -894,14 +893,14 @@ def setColor(message, color=None, bold=False, level=None):
     retVal = message
     level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
-    if isinstance(level, unicode):
-        level = unicodeencode(level)
-
     if message and getattr(LOGGER_HANDLER, "is_tty", False):  # colorizing handler
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
-            level = getattr(logging, level, None) if isinstance(level, six.string_types) else level
+            try:
+                level = getattr(logging, level, None)
+            except UnicodeError:
+                level = None
             retVal = LOGGER_HANDLER.colorize(message, level)
 
     return retVal
@@ -989,7 +988,7 @@ def dataToOutFile(filename, data):
 
             try:
                 with open(retVal, "w+b") as f:  # has to stay as non-codecs because data is raw ASCII encoded data
-                    f.write(unicodeencode(data))
+                    f.write(getBytes(data))
             except UnicodeEncodeError as ex:
                 _ = normalizeUnicode(filename)
                 if filename != _:
@@ -2431,7 +2430,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
-def getBytes(value):
+def getBytes(value, encoding=UNICODE_ENCODING):
     """
     Returns byte representation of provided Unicode value
 
@@ -2446,11 +2445,11 @@ def getBytes(value):
             for char in xrange(0xF0000, 0xF00FF + 1):
                 value = value.replace(unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
 
-            retVal = value.encode(UNICODE_ENCODING)
+            retVal = value.encode(encoding)
 
             retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: _.group(1).decode("hex"), retVal)
         else:
-            retVal = value.encode(UNICODE_ENCODING)
+            retVal = value.encode(encoding)
             retVal = re.sub(r"\\x([0-9a-f]{2})", lambda _: _.group(1).decode("hex"), retVal)
 
     return retVal
@@ -4171,7 +4170,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     class _(io.BytesIO):
         def __init__(self, content, url):
-            io.BytesIO.__init__(self, unicodeencode(content, kb.pageEncoding) if isinstance(content, unicode) else content)
+            io.BytesIO.__init__(self, getBytes(content, kb.pageEncoding))
             self._url = url
 
         def geturl(self):

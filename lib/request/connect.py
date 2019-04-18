@@ -55,7 +55,6 @@ from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
 from lib.core.common import wasLastResponseDelayed
-from lib.core.common import unicodeencode
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
@@ -416,10 +415,9 @@ class Connect(object):
 
             for key, value in headers.items():
                 del headers[key]
-                value = unicodeencode(value, kb.pageEncoding)
                 for char in (r"\r", r"\n"):
                     value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
-                headers[unicodeencode(key, kb.pageEncoding)] = value.strip("\r\n")
+                headers[getBytes(key)] = getBytes(value.strip("\r\n"))
 
             url = getBytes(url)
             post = getBytes(post)
@@ -1134,7 +1132,7 @@ class Connect(object):
 
             while True:
                 try:
-                    compile(unicodeencode(conf.evalCode.replace(';', '\n')), "", "exec")
+                    compile(getBytes(conf.evalCode.replace(';', '\n')), "", "exec")
                 except SyntaxError as ex:
                     if ex.text:
                         original = replacement = ex.text.strip()

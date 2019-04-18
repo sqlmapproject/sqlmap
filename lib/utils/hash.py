@@ -50,6 +50,7 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getBytes
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
@@ -102,8 +103,7 @@ def mysql_passwd(password, uppercase=True):
     '*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = "*%s" % sha1(sha1(password).digest()).hexdigest()
 
@@ -143,11 +143,8 @@ def postgres_passwd(password, username, uppercase=False):
     'md599e5ea7a6f7c3269995cba3927fd0093'
     """
 
-    if isinstance(username, six.text_type):
-        username = username.encode(UNICODE_ENCODING)
-
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    username = getBytes(username)
+    password = getBytes(password)
 
     retVal = "md5%s" % md5(password + username).hexdigest()
 
@@ -232,11 +229,8 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
 
     IV, pad = "\0" * 8, "\0"
 
-    if isinstance(username, six.text_type):
-        username = username.encode(UNICODE_ENCODING)
-
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    username = getBytes(username)
+    password = getBytes(password)
 
     unistr = "".join("\0%s" % c for c in (username + password).upper())
 
@@ -255,8 +249,7 @@ def md5_generic_passwd(password, uppercase=False):
     '179ad45c6ce2cb97cf1029e212046e81'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = md5(password).hexdigest()
 
@@ -268,8 +261,7 @@ def sha1_generic_passwd(password, uppercase=False):
     '206c80413b9a96c1312cc346b7d2517b84463edd'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = sha1(password).hexdigest()
 
@@ -281,8 +273,7 @@ def apache_sha1_passwd(password, **kwargs):
     '{SHA}IGyAQTualsExLMNGt9JRe4RGPt0='
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     return "{SHA}%s" % base64.b64encode(sha1(password).digest())
 
@@ -292,11 +283,8 @@ def ssha_passwd(password, salt, **kwargs):
     '{SSHA}mU1HPTvnmoXOhE4ROHP6sWfbfoRzYWx0'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "{SSHA}%s" % base64.b64encode(sha1(password + salt).digest() + salt)
 
@@ -306,11 +294,8 @@ def ssha256_passwd(password, salt, **kwargs):
     '{SSHA256}hhubsLrO/Aje9F/kJrgv5ZLE40UmTrVWvI7Dt6InP99zYWx0'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "{SSHA256}%s" % base64.b64encode(sha256(password + salt).digest() + salt)
 
@@ -320,11 +305,8 @@ def ssha512_passwd(password, salt, **kwargs):
     '{SSHA512}mCUSLfPMhXCQOJl9WHW/QMn9v9sjq7Ht/Wk7iVau8vLOfh+PeynkGMikqIE8sStFd0khdfcCD8xZmC6UyjTxsHNhbHQ='
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "{SSHA512}%s" % base64.b64encode(sha512(password + salt).digest() + salt)
 
@@ -334,8 +316,7 @@ def sha224_generic_passwd(password, uppercase=False):
     '648db6019764b598f75ab6b7616d2e82563a00eb1531680e19ac4c6f'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = sha224(password).hexdigest()
 
@@ -347,8 +328,7 @@ def sha256_generic_passwd(password, uppercase=False):
     '13d249f2cb4127b40cfa757866850278793f814ded3c587fe5889e889a7a9f6c'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = sha256(password).hexdigest()
 
@@ -360,8 +340,7 @@ def sha384_generic_passwd(password, uppercase=False):
     '6823546e56adf46849343be991d4b1be9b432e42ed1b4bb90635a0e4b930e49b9ca007bc3e04bf0a4e0df6f1f82769bf'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = sha384(password).hexdigest()
 
@@ -373,8 +352,7 @@ def sha512_generic_passwd(password, uppercase=False):
     '78ddc8555bb1677ff5af75ba5fc02cb30bb592b0610277ae15055e189b77fe3fda496e5027a3d99ec85d54941adee1cc174b50438fdc21d82d0a79f85b58cf44'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     retVal = sha512(password).hexdigest()
 
@@ -392,11 +370,8 @@ def crypt_generic_passwd(password, salt, **kwargs):
     'rl.3StKT.4T8M'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return crypt(password, salt)
 
@@ -419,14 +394,9 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
 
         return output
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(magic, six.text_type):
-        magic = magic.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    magic = getBytes(magic)
+    salt = getBytes(salt)
 
     salt = salt[:8]
     ctx = password + magic + salt
@@ -486,11 +456,8 @@ def joomla_passwd(password, salt, **kwargs):
     'e3d5794da74e917637332e0d21b76328:6GGlnaquVXI80b3HRmSyE3K1wEFFaBIf'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "%s:%s" % (md5("%s%s" % (password, salt)).hexdigest(), salt)
 
@@ -502,11 +469,8 @@ def django_md5_passwd(password, salt, **kwargs):
     'md5$salt$972141bcbcb6a0acc96e92309175b3c5'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "md5$%s$%s" % (salt, md5("%s%s" % (salt, password)).hexdigest())
 
@@ -518,11 +482,8 @@ def django_sha1_passwd(password, salt, **kwargs):
     'sha1$salt$6ce0e522aba69d8baa873f01420fccd0250fc5b2'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "sha1$%s$%s" % (salt, sha1("%s%s" % (salt, password)).hexdigest())
 
@@ -534,11 +495,8 @@ def vbulletin_passwd(password, salt, **kwargs):
     '85c4d8ea77ebef2236fb7e9d24ba9482:salt'
     """
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
-
-    if isinstance(salt, six.text_type):
-        salt = salt.encode(UNICODE_ENCODING)
+    password = getBytes(password)
+    salt = getBytes(salt)
 
     return "%s:%s" % (md5("%s%s" % (md5(password).hexdigest(), salt)).hexdigest(), salt)
 
@@ -583,8 +541,7 @@ def wordpress_passwd(password, salt, count, prefix, **kwargs):
 
         return output
 
-    if isinstance(password, six.text_type):
-        password = password.encode(UNICODE_ENCODING)
+    password = getBytes(password)
 
     cipher = md5(salt)
     cipher.update(password)
