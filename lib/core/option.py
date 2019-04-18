@@ -1143,6 +1143,7 @@ def _setHTTPHandlers():
             handlers.append(keepAliveHandler)
 
     opener = _urllib.request.build_opener(*handlers)
+    opener.addheaders = []  # Note: clearing default "User-Agent: Python-urllib/X.Y"
     _urllib.request.install_opener(opener)
 
 def _setSafeVisit():
