@@ -34,6 +34,7 @@ from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import findMultipartPostBoundary
+from lib.core.common import getBytes
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getHeader
 from lib.core.common import getHostHeader
@@ -420,8 +421,8 @@ class Connect(object):
                     value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
                 headers[unicodeencode(key, kb.pageEncoding)] = value.strip("\r\n")
 
-            url = unicodeencode(url)
-            post = unicodeencode(post)
+            url = getBytes(url)
+            post = getBytes(post)
 
             if websocket_:
                 ws = websocket.WebSocket()
@@ -452,7 +453,7 @@ class Connect(object):
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
             else:
                 if method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
-                    method = unicodeencode(method)
+                    method = getBytes(method)
                     req = MethodRequest(url, post, headers)
                     req.set_method(method)
                 elif url is not None:

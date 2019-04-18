@@ -2431,11 +2431,11 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
-def getASCII(value):
+def getBytes(value):
     """
-    Returns ASCII representation of provided Unicode value
+    Returns byte representation of provided Unicode value
 
-    >>> getASCII(getUnicode("foo\x01\x83\xffbar")) == "foo\x01\x83\xffbar"
+    >>> getBytes(getUnicode("foo\x01\x83\xffbar")) == "foo\x01\x83\xffbar"
     True
     """
 
