@@ -636,6 +636,11 @@ class Connect(object):
                     errMsg = "not authorized, try to provide right HTTP "
                     errMsg += "authentication type and valid credentials (%d)" % code
                     raise SqlmapConnectionException(errMsg)
+                elif chunked and ex.code in (_http_client.METHOD_NOT_ALLOWED, _http_client.LENGTH_REQUIRED):
+                    errMsg = "it seems that target site doesn't support "
+                    errMsg += "HTTP chunking (%d). " % code
+                    errMsg += "Please try to rerun without the switch '--chunked'"
+                    raise SqlmapConnectionException(errMsg)
                 elif ex.code == _http_client.NOT_FOUND:
                     if raise404:
                         errMsg = "page not found (%d)" % code
