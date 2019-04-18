@@ -855,6 +855,14 @@ def cmdLineParser(argv=None):
             elif argv[i] == "-H":
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
+            elif argv[i] == "-r":
+                for j in xrange(i + 2, len(argv)):
+                    value = argv[j]
+                    if os.path.isfile(value):
+                        argv[i + 1] += ",%s" % value
+                        argv[j] = ''
+                    else:
+                        break
             elif re.match(r"\A\d+!\Z", argv[i]) and argv[max(0, i - 1)] == "--threads" or re.match(r"\A--threads.+\d+!\Z", argv[i]):
                 argv[i] = argv[i][:-1]
                 conf.skipThreadCheck = True
