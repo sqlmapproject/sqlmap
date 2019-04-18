@@ -293,22 +293,25 @@ def _setRequestFromFile():
     """
 
     if conf.requestFile:
-        conf.requestFile = safeExpandUser(conf.requestFile)
-        seen = set()
+        for requestFile in re.split(PARAMETER_SPLITTING_REGEX, conf.requestFile):
+            requestFile = safeExpandUser(requestFile)
+            seen = set()
 
-        if not checkFile(conf.requestFile, False):
-            errMsg = "specified HTTP request file '%s' " % conf.requestFile
-            errMsg += "does not exist"
-            raise SqlmapFilePathException(errMsg)
+            if not checkFile(requestFile, False):
+                errMsg = "specified HTTP request file '%s' " % requestFile
+                errMsg += "does not exist"
+                raise SqlmapFilePathException(errMsg)
 
-        infoMsg = "parsing HTTP request from '%s'" % conf.requestFile
-        logger.info(infoMsg)
+            infoMsg = "parsing HTTP request from '%s'" % requestFile
+            logger.info(infoMsg)
 
-        for target in parseRequestFile(conf.requestFile):
-            url = target[0]
-            if url not in seen:
-                kb.targets.add(target)
-                seen.add(url)
+            for target in parseRequestFile(requestFile):
+                url = target[0]
+                if url not in seen:
+                    kb.targets.add(target)
+                    if len(kb.targets) > 1:
+                        conf.multipleTargets = True
+                    seen.add(url)
 
     if conf.secondReq:
         conf.secondReq = safeExpandUser(conf.secondReq)
