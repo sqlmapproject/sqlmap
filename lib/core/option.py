@@ -1716,7 +1716,7 @@ def _cleanupOptions():
         except re.error:
             conf.csrfToken = re.escape(conf.csrfToken)
         finally:
-            class _(unicode):
+            class _(six.text_type):
                 pass
             conf.csrfToken = _(conf.csrfToken)
             conf.csrfToken._original = original

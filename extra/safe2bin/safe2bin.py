@@ -20,6 +20,9 @@ from optparse import OptionParser
 
 if sys.version_info >= (3, 0):
     xrange = range
+    text_type = str
+else:
+    text_type = unicode
 
 # Regex used for recognition of hex encoded characters
 HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
@@ -52,14 +55,14 @@ def safecharencode(value):
     retVal = value
 
     if isinstance(value, basestring):
-        if any([_ not in SAFE_CHARS for _ in value]):
+        if any(_ not in SAFE_CHARS for _ in value):
             retVal = retVal.replace(HEX_ENCODED_PREFIX, HEX_ENCODED_PREFIX_MARKER)
             retVal = retVal.replace('\\', SLASH_MARKER)
 
             for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
                 retVal = retVal.replace(char, repr(char).strip('\''))
 
-            retVal = reduce(lambda x, y: x + (y if (y in string.printable or isinstance(value, unicode) and ord(y) >= 160) else '\\x%02x' % ord(y)), retVal, (unicode if isinstance(value, unicode) else str)())
+            retVal = reduce(lambda x, y: x + (y if (y in string.printable or isinstance(value, text_type) and ord(y) >= 160) else '\\x%02x' % ord(y)), retVal, type(value)())
 
             retVal = retVal.replace(SLASH_MARKER, "\\\\")
             retVal = retVal.replace(HEX_ENCODED_PREFIX_MARKER, HEX_ENCODED_PREFIX)
@@ -81,7 +84,7 @@ def safechardecode(value, binary=False):
         while True:
             match = re.search(HEX_ENCODED_CHAR_REGEX, retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), (unichr if isinstance(value, unicode) else chr)(ord(binascii.unhexlify(match.group("result").lstrip("\\x")))))
+                retVal = retVal.replace(match.group("result"), (unichr if isinstance(value, text_type) else chr)(ord(binascii.unhexlify(match.group("result").lstrip("\\x")))))
             else:
                 break
 
@@ -91,7 +94,7 @@ def safechardecode(value, binary=False):
         retVal = retVal.replace(SLASH_MARKER, '\\')
 
         if binary:
-            if isinstance(retVal, unicode):
+            if isinstance(retVal, text_type):
                 retVal = retVal.encode("utf8")
 
     elif isinstance(value, (list, tuple)):

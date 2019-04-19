@@ -882,6 +882,16 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         logger.log(level, message)
 
 def boldifyMessage(message):
+    """
+    Sets ANSI bold marking on entire message if parts found in predefined BOLD_PATTERNS
+
+    >>> boldifyMessage("Hello World")
+    'Hello World'
+
+    >>> boldifyMessage("GET parameter id is not injectable")
+    '\\x1b[1mGET parameter id is not injectable\\x1b[0m'
+    """
+
     retVal = message
 
     if any(_ in message for _ in BOLD_PATTERNS):
@@ -890,6 +900,13 @@ def boldifyMessage(message):
     return retVal
 
 def setColor(message, color=None, bold=False, level=None):
+    """
+    Sets ANSI color codes
+
+    >>> setColor("Hello World", "red")
+    '\\x1b[31mHello World\\x1b[0m'
+    """
+
     retVal = message
     level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
@@ -933,7 +950,7 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             if multiThreadMode:
                 logging._acquireLock()
 
-            if isinstance(data, unicode):
+            if isinstance(data, six.text_type):
                 message = stdoutencode(data)
             else:
                 message = data
@@ -1840,7 +1857,7 @@ def safeFilepathEncode(filepath):
 
     retVal = filepath
 
-    if filepath and isinstance(filepath, unicode):
+    if filepath and isinstance(filepath, six.text_type):
         retVal = filepath.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
 
     return retVal
@@ -1927,7 +1944,7 @@ def getFilteredPageContent(page, onlyText=True, split=" "):
     retVal = page
 
     # only if the page's charset has been successfully identified
-    if isinstance(page, unicode):
+    if isinstance(page, six.text_type):
         retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), split, page)
         retVal = re.sub(r"%s{2,}" % split, split, retVal)
         retVal = htmlunescape(retVal.strip().strip(split))
@@ -1945,7 +1962,7 @@ def getPageWordSet(page):
     retVal = set()
 
     # only if the page's charset has been successfully identified
-    if isinstance(page, unicode):
+    if isinstance(page, six.text_type):
         retVal = set(_.group(0) for _ in re.finditer(r"\w+", getFilteredPageContent(page)))
 
     return retVal
@@ -2430,7 +2447,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
-def getBytes(value, encoding=UNICODE_ENCODING):
+def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
     """
     Returns byte representation of provided Unicode value
 
@@ -2445,11 +2462,11 @@ def getBytes(value, encoding=UNICODE_ENCODING):
             for char in xrange(0xF0000, 0xF00FF + 1):
                 value = value.replace(unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
 
-            retVal = value.encode(encoding)
+            retVal = value.encode(encoding, errors)
 
             retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: _.group(1).decode("hex"), retVal)
         else:
-            retVal = value.encode(encoding)
+            retVal = value.encode(encoding, errors)
             retVal = re.sub(r"\\x([0-9a-f]{2})", lambda _: _.group(1).decode("hex"), retVal)
 
     return retVal
@@ -3694,7 +3711,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     retVal = content
 
     try:
-        if all((content, payload)) and isinstance(content, unicode) and kb.reflectiveMechanism and not kb.heuristicMode:
+        if all((content, payload)) and isinstance(content, six.text_type) and kb.reflectiveMechanism and not kb.heuristicMode:
             def _(value):
                 while 2 * REFLECTED_REPLACEMENT_REGEX in value:
                     value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
@@ -3786,7 +3803,7 @@ def normalizeUnicode(value):
     'sucuraj'
     """
 
-    return unicodedata.normalize("NFKD", value).encode("ascii", "ignore") if isinstance(value, unicode) else value
+    return unicodedata.normalize("NFKD", value).encode("ascii", "ignore") if isinstance(value, six.text_type) else value
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
@@ -4105,7 +4122,7 @@ def asciifyUrl(url, forceQuote=False):
         #     _urllib.parse.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
         if getUnicode(s).encode("ascii", "replace") != s or forceQuote:
-            return _urllib.parse.quote(s.encode(UNICODE_ENCODING) if isinstance(s, unicode) else s, safe=safe)
+            return _urllib.parse.quote(s.encode(UNICODE_ENCODING) if isinstance(s, six.text_type) else s, safe=safe)
         return s
 
     username = quote(parts.username, '')
@@ -4459,8 +4476,8 @@ def decodeHexValue(value, raw=False):
                         retVal = retVal.decode("utf-16-be")
                     except UnicodeDecodeError:
                         pass
-                if not isinstance(retVal, unicode):
-                    retVal = getUnicode(retVal, conf.encoding or "utf8")
+                if not isinstance(retVal, six.text_type):
+                    retVal = getUnicode(retVal, conf.encoding or UNICODE_ENCODING)
 
         return retVal
 

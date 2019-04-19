@@ -486,7 +486,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         singleTimeWarnMessage(warnMsg)
 
     # Dirty patch (safe-encoded unicode characters)
-    if isinstance(value, unicode) and "\\x" in value:
+    if isinstance(value, six.text_type) and "\\x" in value:
         try:
             candidate = eval(repr(value).replace("\\\\x", "\\x").replace("u'", "'", 1)).decode(conf.encoding or UNICODE_ENCODING)
             if "\\x" not in candidate:

@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import re
 
 from lib.core.common import extractRegexResult
+from lib.core.common import getBytes
 from lib.core.common import getFilteredPageContent
 from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
@@ -28,6 +29,7 @@ from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
+from thirdparty import six
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
@@ -105,10 +107,10 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     else:
         # Preventing "Unicode equal comparison failed to convert both arguments to Unicode"
         # (e.g. if one page is PDF and the other is HTML)
-        if isinstance(seqMatcher.a, str) and isinstance(page, unicode):
-            page = page.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
-        elif isinstance(seqMatcher.a, unicode) and isinstance(page, str):
-            seqMatcher.a = seqMatcher.a.encode(kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
+        if isinstance(seqMatcher.a, six.binary_type) and isinstance(page, six.text_type):
+            page = getBytes(page, kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
+        elif isinstance(seqMatcher.a, six.text_type) and isinstance(page, six.binary_type):
+            seqMatcher.a = getBytes(seqMatcher.a, kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
 
         if any(_ is None for _ in (page, seqMatcher.a)):
             return None

@@ -17,6 +17,7 @@ from lib.core.common import Backend
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
+from lib.core.common import getBytes
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
@@ -42,11 +43,11 @@ from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
 from lib.core.settings import SELECT_FROM_TABLE_REGEX
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
 from lib.utils.htmlentities import htmlEntities
+from thirdparty import six
 from thirdparty.chardet import detect
 from thirdparty.odict import OrderedDict
 
@@ -219,13 +220,13 @@ def checkCharEncoding(encoding, warn=True):
     # Reference: http://www.iana.org/assignments/character-sets
     # Reference: http://docs.python.org/library/codecs.html
     try:
-        codecs.lookup(encoding.encode(UNICODE_ENCODING) if isinstance(encoding, unicode) else encoding)
-    except (LookupError, ValueError):
+        codecs.lookup(encoding)
+    except:
         encoding = None
 
     if encoding:
         try:
-            unicode(randomStr(), encoding)
+            six.text_type(getBytes(randomStr()), encoding)
         except:
             if warn:
                 warnMsg = "invalid web page charset '%s'" % encoding
@@ -313,7 +314,7 @@ def decodePage(page, contentEncoding, contentType):
         kb.pageEncoding = conf.encoding
 
     # can't do for all responses because we need to support binary files too
-    if not isinstance(page, unicode) and "text/" in contentType:
+    if isinstance(page, six.binary_type) and "text/" in contentType:
         # e.g. &#x9;&#195;&#235;&#224;&#226;&#224;
         if "&#" in page:
             page = re.sub(r"&#x([0-9a-f]{1,2});", lambda _: (_.group(1) if len(_.group(1)) == 2 else "0%s" % _.group(1)).decode("hex"), page)

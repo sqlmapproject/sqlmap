@@ -7,8 +7,8 @@ See the file 'LICENSE' for copying permission
 
 import binascii
 
+from lib.core.common import getBytes
 from lib.core.common import isDBMSVersionAtLeast
-from lib.core.settings import UNICODE_ENCODING
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -28,7 +28,7 @@ class Syntax(GenericSyntax):
 
         def escaper(value):
             # Reference: http://stackoverflow.com/questions/3444335/how-do-i-quote-a-utf-8-string-literal-in-sqlite3
-            return "CAST(X'%s' AS TEXT)" % binascii.hexlify(value.encode(UNICODE_ENCODING) if isinstance(value, unicode) else value)
+            return "CAST(X'%s' AS TEXT)" % binascii.hexlify(getBytes(value))
 
         retVal = expression
 
