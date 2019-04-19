@@ -117,7 +117,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                             output += "<td>%s</td>" % value
                         output += "</tr>\n"
                     output += "</table>\n"
-                    output += "</body></html>";
+                    output += "</body></html>"
                 except Exception as ex:
                     output = "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex)
 

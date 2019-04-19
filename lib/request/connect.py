@@ -406,7 +406,7 @@ class Connect(object):
 
             if conf.keepAlive:
                 headers[HTTP_HEADER.CONNECTION] = "keep-alive"
-            
+
             if chunked:
                 headers[HTTP_HEADER.TRANSFER_ENCODING] = "chunked"
 

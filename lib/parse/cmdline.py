@@ -224,7 +224,7 @@ def cmdLineParser(argv=None):
 
         request.add_option("--eval", dest="evalCode",
                            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
-       
+
         # Optimization options
         optimization = OptionGroup(parser, "Optimization", "These options can be used to optimize the performance of sqlmap")
 
@@ -600,7 +600,7 @@ def cmdLineParser(argv=None):
                            help="Parse and display DBMS error messages from responses")
 
         general.add_option("--preprocess", dest="preprocess",
-                             help="Use given script(s) for preprocessing of response data")
+                           help="Use given script(s) for preprocessing of response data")
 
         general.add_option("--repair", dest="repair", action="store_true",
                            help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)

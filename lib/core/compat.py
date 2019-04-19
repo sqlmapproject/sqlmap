@@ -37,7 +37,7 @@ class WichmannHill(random.Random):
                 a = int(binascii.hexlify(os.urandom(16)), 16)
             except NotImplementedError:
                 import time
-                a = int(time.time() * 256) # use fractional seconds
+                a = int(time.time() * 256)  # use fractional seconds
 
         if not isinstance(a, int):
             a = hash(a)
@@ -45,7 +45,7 @@ class WichmannHill(random.Random):
         a, x = divmod(a, 30268)
         a, y = divmod(a, 30306)
         a, z = divmod(a, 30322)
-        self._seed = int(x)+1, int(y)+1, int(z)+1
+        self._seed = int(x) + 1, int(y) + 1, int(z) + 1
 
         self.gauss_next = None
 
@@ -78,7 +78,7 @@ class WichmannHill(random.Random):
 
         # Note:  on a platform using IEEE-754 double arithmetic, this can
         # never return 0.0 (asserted by Tim; proof too long for a comment).
-        return (x/30269.0 + y/30307.0 + z/30323.0) % 1.0
+        return (x / 30269.0 + y / 30307.0 + z / 30323.0) % 1.0
 
     def getstate(self):
         """Return internal state; can be passed to setstate() later."""
@@ -130,7 +130,7 @@ class WichmannHill(random.Random):
             # Initialize from current time
             import time
             t = int(time.time() * 256)
-            t = int((t&0xffffff) ^ (t>>24))
+            t = int((t & 0xffffff) ^ (t >> 24))
             t, x = divmod(t, 256)
             t, y = divmod(t, 256)
             t, z = divmod(t, 256)
