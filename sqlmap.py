@@ -160,6 +160,9 @@ def main():
             if conf.smokeTest:
                 from lib.core.testing import smokeTest
                 smokeTest()
+            elif conf.vulnTest:
+                from lib.core.testing import vulnTest
+                vulnTest()
             elif conf.liveTest:
                 from lib.core.testing import liveTest
                 liveTest()

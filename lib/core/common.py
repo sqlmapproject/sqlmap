@@ -2091,6 +2091,19 @@ def getConsoleWidth(default=80):
 
     return width or default
 
+def shellExec(cmd):
+    """
+    Executes arbitrary shell command
+
+    >>> shellExec('echo 1').strip()
+    '1'
+    """
+
+    try:
+        return subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0] or ""
+    except Exception as ex:
+        return six.text_type(ex)
+
 def clearConsoleLine(forceOutput=False):
     """
     Clears current console line
@@ -2597,11 +2610,12 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
         kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
 
         if all((_ == candidate for _ in kb.delayCandidates)) and candidate < conf.timeSec:
-            conf.timeSec = candidate
+            if lastQueryDuration / (1.0 * conf.timeSec / candidate) > MIN_VALID_DELAYED_RESPONSE:  # Note: to prevent problems with fast responses for heavy-queries like RANDOMBLOB
+                conf.timeSec = candidate
 
-            infoMsg = "adjusting time delay to "
-            infoMsg += "%d second%s due to good response times" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-            logger.info(infoMsg)
+                infoMsg = "adjusting time delay to "
+                infoMsg += "%d second%s due to good response times" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                logger.info(infoMsg)
 
 def getLastRequestHTTPError():
     """

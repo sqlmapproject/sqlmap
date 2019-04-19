@@ -10,12 +10,15 @@ import doctest
 import os
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
+import threading
 import time
 import traceback
 
 from extra.beep.beep import beep
+from extra.vulnserver import vulnserver
 from lib.controller.controller import start
 from lib.core.common import checkIntegrity
 from lib.core.common import clearConsoleLine
@@ -23,6 +26,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
 from lib.core.common import randomStr
 from lib.core.common import readXmlFile
+from lib.core.common import shellExec
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths
@@ -43,6 +47,43 @@ class Failures(object):
     failedTraceBack = None
 
 _failures = Failures()
+
+def vulnTest():
+    """
+    Runs the testing against 'vulnserver'
+    """
+
+    retVal = True
+    count, length = 0, 5
+
+    def _thread():
+        vulnserver.init(quiet=True)
+        vulnserver.run()
+
+    thread = threading.Thread(target=_thread)
+    thread.daemon = True
+    thread.start()
+
+    for options, checks in (
+        ("--flush-session", ("Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
+        ("--banner --schema --dump -T users --binary-fields=surname --where 'id>3'", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
+        ("--all", ("5 entries", "luther", "blisset", "fluffy", "ming", "NULL", "nameisnull")),
+        ("--technique=B --hex --fresh-queries --sql-query='SELECT 987654321'", ("single-thread", ": '987654321'",)),
+        ("--technique=T --fresh-queries --sql-query='SELECT 987654321'", (": '987654321'",)),
+    ):
+        output = shellExec("python sqlmap.py -u http://%s:%d/?id=1 --batch %s" % (vulnserver.LISTEN_ADDRESS, vulnserver.LISTEN_PORT, options))
+        if not all(check in output for check in checks):
+            retVal = False
+
+        count += 1
+        status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
+        dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+
+    clearConsoleLine()
+    if retVal:
+        logger.info("vuln test final result: PASSED")
+    else:
+        logger.error("vuln test final result: FAILED")
 
 def smokeTest():
     """

@@ -53,7 +53,7 @@ _conn = None
 _cursor = None
 _server = None
 
-def init():
+def init(quiet=False):
     global _conn
     global _cursor
 
@@ -61,6 +61,14 @@ def init():
     _cursor = _conn.cursor()
 
     _cursor.executescript(SCHEMA)
+
+    if quiet:
+        global print
+
+        def _(*args, **kwargs):
+            pass
+
+        print = _
 
 class ThreadingServer(ThreadingMixIn, HTTPServer):
     def finish_request(self, *args, **kwargs):
@@ -129,6 +137,9 @@ class ReqHandler(BaseHTTPRequestHandler):
             data = unquote_plus(data.decode("utf8"))
             self.data = data
         self.do_REQUEST()
+
+    def log_message(self, format, *args):
+        return
 
 def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
     global _server
