@@ -10,7 +10,6 @@ import doctest
 import os
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import threading
@@ -54,7 +53,7 @@ def vulnTest():
     """
 
     retVal = True
-    count, length = 0, 5
+    count, length = 0, 6
 
     def _thread():
         vulnserver.init(quiet=True)
@@ -65,6 +64,7 @@ def vulnTest():
     thread.start()
 
     for options, checks in (
+        ("--version", ("1.", "#")),
         ("--flush-session", ("Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
         ("--banner --schema --dump -T users --binary-fields=surname --where 'id>3'", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all", ("5 entries", "luther", "blisset", "fluffy", "ming", "NULL", "nameisnull")),
@@ -84,6 +84,8 @@ def vulnTest():
         logger.info("vuln test final result: PASSED")
     else:
         logger.error("vuln test final result: FAILED")
+
+    return retVal
 
 def smokeTest():
     """

@@ -159,13 +159,13 @@ def main():
             # Postponed imports (faster start)
             if conf.smokeTest:
                 from lib.core.testing import smokeTest
-                smokeTest()
+                os._exitcode = 1 - (smokeTest() or 0)
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
-                vulnTest()
+                os._exitcode = 1 - (vulnTest() or 0)
             elif conf.liveTest:
                 from lib.core.testing import liveTest
-                liveTest()
+                os._exitcode = 1 - (liveTest() or 0)
             else:
                 from lib.controller.controller import start
                 if conf.profile and PY2:
@@ -176,6 +176,8 @@ def main():
                     try:
                         start()
                     except Exception as ex:
+                        os._exitcode = 1
+
                         if "can't start new thread" in getSafeExString(ex):
                             errMsg = "unable to start new threads. Please check OS (u)limits"
                             logger.critical(errMsg)
@@ -409,7 +411,9 @@ if __name__ == "__main__":
     finally:
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if threading.activeCount() > 1:
-            os._exit(0)
+            os._exit(getattr(os, "_exitcode", 0))
+        else:
+            sys.exit(getattr(os, "_exitcode", 0))
 else:
     # cancelling postponed imports (because of Travis CI checks)
     from lib.controller.controller import start
