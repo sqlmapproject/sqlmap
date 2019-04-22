@@ -729,7 +729,7 @@ def initTargetEnv():
             setattr(conf.data, UNENCODED_ORIGINAL_VALUE, original)
             kb.postSpaceToPlus = '+' in original
 
-    match = re.search(INJECT_HERE_REGEX, conf.data or "") or re.search(INJECT_HERE_REGEX, conf.url or "")
+    match = re.search(INJECT_HERE_REGEX, "%s %s %s" % (conf.url, conf.data, conf.httpHeaders))
     kb.customInjectionMark = match.group(0) if match else CUSTOM_INJECTION_MARK_CHAR
 
 def setupTargetEnv():
