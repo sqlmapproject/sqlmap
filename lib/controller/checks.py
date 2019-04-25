@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """
 Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
@@ -6,7 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 import copy
-import httplib
 import logging
 import os
 import random
@@ -22,6 +21,7 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
+from lib.core.common import filterNone
 from lib.core.common import findDynamicContent
 from lib.core.common import Format
 from lib.core.common import getFilteredPageContent
@@ -48,7 +48,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
-from lib.core.convert import unicodeencode
+from lib.core.compat import xrange
 from lib.core.defaults import defaults
 from lib.core.data import conf
 from lib.core.data import kb
@@ -99,6 +99,7 @@ from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.comparison import comparison
@@ -106,7 +107,8 @@ from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
-from lib.core.settings import INFERENCE_EQUALS_CHAR
+from thirdparty import six
+from thirdparty.six.moves import http_client as _http_client
 
 def checkSqlInjection(place, parameter, value):
     # Store here the details about boundaries and payload used to
@@ -580,7 +582,7 @@ def checkSqlInjection(place, parameter, value):
                                         else:
                                             errorSet = set()
 
-                                        candidates = filter(None, (_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet - errorSet)))
+                                        candidates = filterNone(_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet - errorSet))
 
                                         if candidates:
                                             candidates = sorted(candidates, key=lambda _: len(_))
@@ -594,7 +596,7 @@ def checkSqlInjection(place, parameter, value):
                                             logger.info(infoMsg)
 
                                         if not any((conf.string, conf.notString)):
-                                            candidates = filter(None, (_.strip() if _.strip() in falseRawResponse and _.strip() not in trueRawResponse else None for _ in (falseSet - trueSet)))
+                                            candidates = filterNone(_.strip() if _.strip() in falseRawResponse and _.strip() not in trueRawResponse else None for _ in (falseSet - trueSet))
 
                                             if candidates:
                                                 candidates = sorted(candidates, key=lambda _: len(_))
@@ -693,7 +695,7 @@ def checkSqlInjection(place, parameter, value):
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
-                            if isinstance(reqPayload, basestring):
+                            if isinstance(reqPayload, six.string_types):
                                 infoMsg = "%s parameter '%s' is '%s' injectable" % (paramType, parameter, title)
                                 logger.info(infoMsg)
 
@@ -920,17 +922,17 @@ def checkFalsePositives(injection):
 
             # Just in case if DBMS hasn't properly recovered from previous delayed request
             if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
-                checkBooleanExpression("%d%s%d" % (randInt1,INFERENCE_EQUALS_CHAR, randInt2))
+                checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt2))
 
-            if checkBooleanExpression("%d%s%d" % (randInt1,INFERENCE_EQUALS_CHAR, randInt3)):          # this must not be evaluated to True
+            if checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt3)):          # this must not be evaluated to True
                 retVal = False
                 break
 
-            elif checkBooleanExpression("%d%s%d" % (randInt3,INFERENCE_EQUALS_CHAR, randInt2)):        # this must not be evaluated to True
+            elif checkBooleanExpression("%d%s%d" % (randInt3, INFERENCE_EQUALS_CHAR, randInt2)):        # this must not be evaluated to True
                 retVal = False
                 break
 
-            elif not checkBooleanExpression("%d%s%d" % (randInt2,INFERENCE_EQUALS_CHAR, randInt2)):    # this must be evaluated to True
+            elif not checkBooleanExpression("%d%s%d" % (randInt2, INFERENCE_EQUALS_CHAR, randInt2)):    # this must be evaluated to True
                 retVal = False
                 break
 
@@ -1338,6 +1340,9 @@ def checkWaf():
     if any((conf.string, conf.notString, conf.regexp, conf.dummy, conf.offline, conf.skipWaf)):
         return None
 
+    if kb.originalCode == _http_client.NOT_FOUND:
+        return None
+
     _ = hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_RESULT, True)
     if _ is not None:
         if _:
@@ -1422,17 +1427,24 @@ def identifyWaf():
         page, headers, code = None, None, None
         try:
             pushValue(kb.redirectChoice)
+            pushValue(kb.resendPostOnRedirect)
+
             kb.redirectChoice = REDIRECTION.YES
+            kb.resendPostOnRedirect = True
+
             if kwargs.get("get"):
                 kwargs["get"] = urlencode(kwargs["get"])
             kwargs["raise404"] = False
             kwargs["silent"] = True
             kwargs["finalCode"] = True
+
             page, headers, code = Request.getPage(*args, **kwargs)
         except Exception:
             pass
         finally:
+            kb.resendPostOnRedirect = popValue()
             kb.redirectChoice = popValue()
+
         return page or "", headers or {}, code
 
     retVal = []
@@ -1498,46 +1510,59 @@ def checkNullConnection():
     if conf.data:
         return False
 
-    infoMsg = "testing NULL connection to the target URL"
-    logger.info(infoMsg)
+    _ = hashDBRetrieve(HASHDB_KEYS.CHECK_NULL_CONNECTION_RESULT, True)
+    if _ is not None:
+        kb.nullConnection = _
 
-    pushValue(kb.pageCompress)
-    kb.pageCompress = False
+        if _:
+            dbgMsg = "resuming NULL connection method '%s'" % _
+            logger.debug(dbgMsg)
 
-    try:
-        page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD, raise404=False)
+    else:
+        infoMsg = "testing NULL connection to the target URL"
+        logger.info(infoMsg)
 
-        if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
-            kb.nullConnection = NULLCONNECTION.HEAD
+        pushValue(kb.pageCompress)
+        kb.pageCompress = False
 
-            infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
-            logger.info(infoMsg)
-        else:
-            page, headers, _ = Request.getPage(auxHeaders={HTTP_HEADER.RANGE: "bytes=-1"})
+        try:
+            page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD, raise404=False)
 
-            if page and len(page) == 1 and HTTP_HEADER.CONTENT_RANGE in (headers or {}):
-                kb.nullConnection = NULLCONNECTION.RANGE
+            if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
+                kb.nullConnection = NULLCONNECTION.HEAD
 
-                infoMsg = "NULL connection is supported with GET method ('Range')"
+                infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
                 logger.info(infoMsg)
             else:
-                _, headers, _ = Request.getPage(skipRead=True)
+                page, headers, _ = Request.getPage(auxHeaders={HTTP_HEADER.RANGE: "bytes=-1"})
 
-                if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
-                    kb.nullConnection = NULLCONNECTION.SKIP_READ
+                if page and len(page) == 1 and HTTP_HEADER.CONTENT_RANGE in (headers or {}):
+                    kb.nullConnection = NULLCONNECTION.RANGE
 
-                    infoMsg = "NULL connection is supported with 'skip-read' method"
+                    infoMsg = "NULL connection is supported with GET method ('Range')"
                     logger.info(infoMsg)
+                else:
+                    _, headers, _ = Request.getPage(skipRead=True)
 
-    except SqlmapConnectionException:
-        pass
+                    if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
+                        kb.nullConnection = NULLCONNECTION.SKIP_READ
 
-    finally:
-        kb.pageCompress = popValue()
+                        infoMsg = "NULL connection is supported with 'skip-read' method"
+                        logger.info(infoMsg)
 
-    return kb.nullConnection is not None
+        except SqlmapConnectionException:
+            pass
+
+        finally:
+            kb.pageCompress = popValue()
+            kb.nullConnection = False if kb.nullConnection is None else kb.nullConnection
+            hashDBWrite(HASHDB_KEYS.CHECK_NULL_CONNECTION_RESULT, kb.nullConnection, True)
+
+    return kb.nullConnection in getPublicTypeMembers(NULLCONNECTION, True)
 
 def checkConnection(suppressOutput=False):
+    threadData = getCurrentThreadData()
+
     if not re.search(r"\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z", conf.hostname):
         if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
             try:
@@ -1562,8 +1587,7 @@ def checkConnection(suppressOutput=False):
 
     try:
         kb.originalPageTime = time.time()
-        page, headers, _ = Request.queryPage(content=True, noteResponseTime=False)
-        kb.originalPage = kb.pageTemplate = page
+        Request.queryPage(content=True, noteResponseTime=False)
 
         kb.errorIsNone = False
 
@@ -1586,10 +1610,8 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-        threadData = getCurrentThreadData()
-
         if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
-            if (threadData.lastRedirectURL[1] or "").startswith("https://") and unicodeencode(conf.hostname) in threadData.lastRedirectURL[1]:
+            if (threadData.lastRedirectURL[1] or "").startswith("https://") and conf.hostname in getUnicode(threadData.lastRedirectURL[1]):
                 conf.url = re.sub(r"https?://", "https://", conf.url)
                 match = re.search(r":(\d+)", threadData.lastRedirectURL[1])
                 port = match.group(1) if match else 443
@@ -1604,7 +1626,7 @@ def checkConnection(suppressOutput=False):
             warnMsg += "any addressing issues"
             singleTimeWarnMessage(warnMsg)
 
-        if any(code in kb.httpErrorCodes for code in (httplib.NOT_FOUND, )):
+        if any(code in kb.httpErrorCodes for code in (_http_client.NOT_FOUND, )):
             errMsg = getSafeExString(ex)
             logger.critical(errMsg)
 
@@ -1618,6 +1640,9 @@ def checkConnection(suppressOutput=False):
                 kb.ignoreNotFound = True
         else:
             raise
+    finally:
+        kb.originalPage = kb.pageTemplate = threadData.lastPage
+        kb.originalCode = threadData.lastCode
 
     return True
 
