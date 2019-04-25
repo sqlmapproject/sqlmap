@@ -623,11 +623,11 @@ VA==
 -----END CERTIFICATE-----
 ```
 
-### Ignore HTTP error 401 (Unauthorized)
+### Ignore (problematic) HTTP error code
 
-Switch `--ignore-401`
+Option `--ignore-code`
 
-In case that you want to test the site that occasionally returns HTTP error 401 (Unauthorized), while you want to ignore it and continue tests without providing proper credentials, you can use switch `--ignore-401`
+In case that you want to test the site that occasionally returns HTTP error code that causes problems to regular sqlmap run (e.g. 401 (Unauthorized)), while you want to ignore it and continue on with tests, you can use option `--ignore-code`
 
 ### HTTP(S) proxy
 
