@@ -99,6 +99,7 @@ from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
+from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.comparison import comparison
@@ -915,23 +916,23 @@ def checkFalsePositives(injection):
                 if randInt3 > randInt2 > randInt1:
                     break
 
-            if not checkBooleanExpression("%d=%d" % (randInt1, randInt1)):
+            if not checkBooleanExpression("%d%s%d" % (randInt1,INFERENCE_EQUALS_CHAR, randInt1)):
                 retVal = False
                 break
 
             # Just in case if DBMS hasn't properly recovered from previous delayed request
             if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
-                checkBooleanExpression("%d=%d" % (randInt1, randInt2))
+                checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt2))
 
-            if checkBooleanExpression("%d=%d" % (randInt1, randInt3)):          # this must not be evaluated to True
+            if checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt3)):          # this must not be evaluated to True
                 retVal = False
                 break
 
-            elif checkBooleanExpression("%d=%d" % (randInt3, randInt2)):        # this must not be evaluated to True
+            elif checkBooleanExpression("%d%s%d" % (randInt3, INFERENCE_EQUALS_CHAR, randInt2)):        # this must not be evaluated to True
                 retVal = False
                 break
 
-            elif not checkBooleanExpression("%d=%d" % (randInt2, randInt2)):    # this must be evaluated to True
+            elif not checkBooleanExpression("%d%s%d" % (randInt2, INFERENCE_EQUALS_CHAR, randInt2)):    # this must be evaluated to True
                 retVal = False
                 break
 
