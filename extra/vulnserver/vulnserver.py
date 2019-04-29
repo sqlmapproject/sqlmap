@@ -16,6 +16,7 @@ import traceback
 
 if sys.version_info >= (3, 0):
     from http.client import FOUND
+    from http.client import INTERNAL_SERVER_ERROR
     from http.client import NOT_FOUND
     from http.client import OK
     from http.server import BaseHTTPRequestHandler
@@ -27,6 +28,7 @@ else:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from BaseHTTPServer import HTTPServer
     from httplib import FOUND
+    from httplib import INTERNAL_SERVER_ERROR
     from httplib import NOT_FOUND
     from httplib import OK
     from SocketServer import ThreadingMixIn
@@ -84,6 +86,13 @@ class ReqHandler(BaseHTTPRequestHandler):
 
         if query:
             params.update(parse_qs(query))
+
+            if "<script>" in unquote_plus(query):
+                self.send_response(INTERNAL_SERVER_ERROR)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.wfile.write("CLOUDFLARE_ERROR_500S_BOX".encode("utf8"))
+                return
 
         if hasattr(self, "data"):
             params.update(parse_qs(self.data))

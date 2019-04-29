@@ -64,7 +64,7 @@ def vulnTest():
     thread.start()
 
     for options, checks in (
-        ("--version", ("1.", "#")),
+        ("--identify-waf", ("CloudFlare",)),
         ("--flush-session", ("Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
         ("--banner --schema --dump -T users --binary-fields=surname --where 'id>3'", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all", ("5 entries", "luther", "blisset", "fluffy", "ming", "NULL", "nameisnull")),
