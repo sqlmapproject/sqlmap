@@ -916,13 +916,12 @@ def checkFalsePositives(injection):
                 if randInt3 > randInt2 > randInt1:
                     break
 
-            if not checkBooleanExpression("%d%s%d" % (randInt1,INFERENCE_EQUALS_CHAR, randInt1)):
+            if not checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt1)):
                 retVal = False
                 break
 
-            # Just in case if DBMS hasn't properly recovered from previous delayed request
             if PAYLOAD.TECHNIQUE.BOOLEAN not in injection.data:
-                checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt2))
+                checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt2))          # just in case if DBMS hasn't properly recovered from previous delayed request
 
             if checkBooleanExpression("%d%s%d" % (randInt1, INFERENCE_EQUALS_CHAR, randInt3)):          # this must not be evaluated to True
                 retVal = False
@@ -936,7 +935,7 @@ def checkFalsePositives(injection):
                 retVal = False
                 break
 
-            elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):        # this must not be evaluated to True (invalid statement)
+            elif checkBooleanExpression("%d %d" % (randInt3, randInt2)):                                # this must not be evaluated to True (invalid statement)
                 retVal = False
                 break
 
