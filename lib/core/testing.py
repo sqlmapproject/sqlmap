@@ -97,9 +97,6 @@ def smokeTest():
     retVal = True
     count, length = 0, 0
 
-    if not checkIntegrity():
-        retVal = False
-
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
         if any(_ in root for _ in ("thirdparty", "extra")):
             continue

@@ -3526,7 +3526,7 @@ def getLatestRevision():
     """
     Retrieves latest revision from the offical repository
 
-    >>> from lib.core.settings import VERSION; getLatestRevision() == VERSION
+    >>> (getLatestRevision() or " ")[0].isdigit()
     True
     """
 
