@@ -12,6 +12,7 @@ from __future__ import print_function
 import re
 import sqlite3
 import sys
+import threading
 import traceback
 
 if sys.version_info >= (3, 0):
@@ -53,14 +54,17 @@ LISTEN_PORT = 8440
 
 _conn = None
 _cursor = None
+_lock = None
 _server = None
 
 def init(quiet=False):
     global _conn
     global _cursor
+    global _lock
 
     _conn = sqlite3.connect(":memory:", isolation_level=None, check_same_thread=False)
     _cursor = _conn.cursor()
+    _lock = threading.Lock()
 
     _cursor.executescript(SCHEMA)
 
@@ -116,11 +120,13 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
                 try:
-                    _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params.get("id", ""))
+                    with _lock:
+                        _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params.get("id", ""))
+                        results = _cursor.fetchall()
 
                     output = "<b>SQL results:</b>\n"
                     output += "<table border=\"1\">\n"
-                    for row in _cursor.fetchall():
+                    for row in results:
                         output += "<tr>"
                         for value in row:
                             output += "<td>%s</td>" % value

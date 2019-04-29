@@ -20,7 +20,6 @@ import traceback
 from extra.beep.beep import beep
 from extra.vulnserver import vulnserver
 from lib.controller.controller import start
-from lib.core.common import checkIntegrity
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import getUnicode
@@ -66,15 +65,16 @@ def vulnTest():
     thread.start()
 
     for options, checks in (
-        ("--identify-waf", ("CloudFlare",)),
+        ("--flush-session --identify-waf", ("CloudFlare",)),
         ("--flush-session", ("Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
         ("--banner --schema --dump -T users --binary-fields=surname --where 'id>3'", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all --tamper=between,randomcase", ("5 entries", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
-        ("--technique=B --hex --fresh-queries --sql-query='SELECT 987654321'", ("single-thread", ": '987654321'",)),
+        ("--technique=B --hex --fresh-queries --threads=4 --sql-query='SELECT 987654321'", ("length of query output", ": '987654321'",)),
         ("--technique=T --fresh-queries --sql-query='SELECT 1234'", (": '1234'",)),
     ):
         output = shellExec("python %s -u http://%s:%d/?id=1 --batch %s" % (os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options))
         if not all(check in output for check in checks):
+            print output
             retVal = False
 
         count += 1
