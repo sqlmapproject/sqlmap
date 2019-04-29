@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import codecs
 import doctest
 import os
+import random
 import re
 import shutil
 import sys
@@ -54,10 +55,11 @@ def vulnTest():
 
     retVal = True
     count, length = 0, 6
+    address, port = "127.0.0.10", random.randint(1025, 65535)
 
     def _thread():
         vulnserver.init(quiet=True)
-        vulnserver.run()
+        vulnserver.run(address=address, port=port)
 
     thread = threading.Thread(target=_thread)
     thread.daemon = True
@@ -69,9 +71,9 @@ def vulnTest():
         ("--banner --schema --dump -T users --binary-fields=surname --where 'id>3'", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all --tamper=between,randomcase", ("5 entries", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
         ("--technique=B --hex --fresh-queries --sql-query='SELECT 987654321'", ("single-thread", ": '987654321'",)),
-        ("--technique=T --fresh-queries --sql-query='SELECT 987654321'", (": '987654321'",)),
+        ("--technique=T --fresh-queries --sql-query='SELECT 1234'", (": '1234'",)),
     ):
-        output = shellExec("python sqlmap.py -u http://%s:%d/?id=1 --batch %s" % (vulnserver.LISTEN_ADDRESS, vulnserver.LISTEN_PORT, options))
+        output = shellExec("python %s -u http://%s:%d/?id=1 --batch %s" % (os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options))
         if not all(check in output for check in checks):
             retVal = False
 
