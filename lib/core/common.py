@@ -881,36 +881,36 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
         kb.singleLogFlags.add(flag)
         logger.log(level, message)
 
-def boldifyMessage(message):
+def boldifyMessage(message, istty=None):
     """
     Sets ANSI bold marking on entire message if parts found in predefined BOLD_PATTERNS
 
-    >>> boldifyMessage("Hello World")
+    >>> boldifyMessage("Hello World", istty=True)
     'Hello World'
 
-    >>> boldifyMessage("GET parameter id is not injectable")
+    >>> boldifyMessage("GET parameter id is not injectable", istty=True)
     '\\x1b[1mGET parameter id is not injectable\\x1b[0m'
     """
 
     retVal = message
 
     if any(_ in message for _ in BOLD_PATTERNS):
-        retVal = setColor(message, bold=True)
+        retVal = setColor(message, bold=True, istty=istty)
 
     return retVal
 
-def setColor(message, color=None, bold=False, level=None):
+def setColor(message, color=None, bold=False, level=None, istty=None):
     """
     Sets ANSI color codes
 
-    >>> setColor("Hello World", "red")
+    >>> setColor("Hello World", color="red", istty=True)
     '\\x1b[31mHello World\\x1b[0m'
     """
 
     retVal = message
     level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
-    if message and getattr(LOGGER_HANDLER, "is_tty", False):  # colorizing handler
+    if message and getattr(LOGGER_HANDLER, "is_tty", False) or istty:  # colorizing handler
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
@@ -1362,7 +1362,8 @@ def weAreFrozen():
     """
     Returns whether we are frozen via py2exe.
     This will affect how we find out where we are located.
-    Reference: http://www.py2exe.org/index.cgi/WhereAmI
+
+    # Reference: http://www.py2exe.org/index.cgi/WhereAmI
     """
 
     return hasattr(sys, "frozen")
@@ -2219,7 +2220,8 @@ def average(values):
 def stdev(values):
     """
     Computes standard deviation of a list of numbers.
-    Reference: http://www.goldb.org/corestats.html
+
+    # Reference: http://www.goldb.org/corestats.html
 
     >>> stdev([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
     0.06324555320336757
@@ -2487,7 +2489,8 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
 def longestCommonPrefix(*sequences):
     """
     Returns longest common prefix occuring in given sequences
-    Reference: http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
+
+    # Reference: http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 
     >>> longestCommonPrefix('foobar', 'fobar')
     'fo'
@@ -3447,7 +3450,8 @@ def decodeIntToUnicode(value):
 def md5File(filename):
     """
     Calculates MD5 digest of a file
-    Reference: http://stackoverflow.com/a/3431838
+
+    # Reference: http://stackoverflow.com/a/3431838
     """
 
     checkFile(filename)
@@ -3811,7 +3815,8 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 def normalizeUnicode(value):
     """
     Does an ASCII normalization of unicode strings
-    Reference: http://www.peterbe.com/plog/unicode-to-ascii
+
+    # Reference: http://www.peterbe.com/plog/unicode-to-ascii
 
     >>> normalizeUnicode(u'\u0161u\u0107uraj')
     'sucuraj'
@@ -3822,7 +3827,8 @@ def normalizeUnicode(value):
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
     Returns a safe representation of SQL identificator name (internal data format)
-    Reference: http://stackoverflow.com/questions/954884/what-special-characters-are-allowed-in-t-sql-column-retVal
+
+    # Reference: http://stackoverflow.com/questions/954884/what-special-characters-are-allowed-in-t-sql-column-retVal
     """
 
     retVal = name
@@ -4008,7 +4014,8 @@ def expandMnemonics(mnemonics, parser, args):
 def safeCSValue(value):
     """
     Returns value safe for CSV dumping
-    Reference: http://tools.ietf.org/html/rfc4180
+
+    # Reference: http://tools.ietf.org/html/rfc4180
 
     >>> safeCSValue(u'foo, bar')
     u'"foo, bar"'
@@ -4106,7 +4113,7 @@ def asciifyUrl(url, forceQuote=False):
 
     See also RFC 3987.
 
-    Reference: http://blog.elsdoerfer.name/2008/12/12/opening-iris-in-python/
+    # Reference: http://blog.elsdoerfer.name/2008/12/12/opening-iris-in-python/
 
     >>> asciifyUrl(u'http://www.\u0161u\u0107uraj.com')
     u'http://www.xn--uuraj-gxa24d.com'
@@ -4648,7 +4655,7 @@ def getRequestHeader(request, name):
     """
     Solving an issue with an urllib2 Request header case sensitivity
 
-    Reference: http://bugs.python.org/issue2275
+    # Reference: http://bugs.python.org/issue2275
     """
 
     retVal = None
