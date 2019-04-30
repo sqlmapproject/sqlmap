@@ -110,7 +110,7 @@ class Custom:
             output = self.sqlQuery(query)
 
             if output and output != "Quit":
-                conf.dumper.query(query, output)
+                conf.dumper.sqlQuery(query, output)
 
             elif not output:
                 pass
@@ -134,6 +134,6 @@ class Custom:
                 for query in (_ for _ in snippet.split(';' if ';' in snippet else '\n') if _):
                     query = query.strip()
                     if query:
-                        conf.dumper.query(query, self.sqlQuery(query))
+                        conf.dumper.sqlQuery(query, self.sqlQuery(query))
             else:
-                conf.dumper.query(snippet, self.sqlQuery(snippet))
+                conf.dumper.sqlQuery(snippet, self.sqlQuery(snippet))

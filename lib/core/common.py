@@ -1592,7 +1592,7 @@ def expandAsteriskForColumns(expression):
         db, conf.tbl = _.split('.', 1) if '.' in _ else (None, _)
 
         if db is None:
-            if expression != conf.query:
+            if expression != conf.sqlQuery:
                 conf.db = db
             else:
                 expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), "\g<1>%s.%s" % (conf.db, conf.tbl), expression)

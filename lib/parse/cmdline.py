@@ -448,7 +448,7 @@ def cmdLineParser(argv=None):
         enumeration.add_option("--last", dest="lastChar", type="int",
                                help="Last query output word character to retrieve")
 
-        enumeration.add_option("--sql-query", dest="query",
+        enumeration.add_option("--sql-query", dest="sqlQuery",
                                help="SQL statement to be executed")
 
         enumeration.add_option("--sql-shell", dest="sqlShell", action="store_true",

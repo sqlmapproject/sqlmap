@@ -704,7 +704,7 @@ class Dump(object):
 
             self.dbTableColumns(_)
 
-    def query(self, query, queryRes):
+    def sqlQuery(self, query, queryRes):
         self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
 
     def rFile(self, fileData):

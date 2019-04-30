@@ -176,8 +176,8 @@ def action():
         except:
             raise
 
-    if conf.query:
-        conf.dumper.query(conf.query, conf.dbmsHandler.sqlQuery(conf.query))
+    if conf.sqlQuery:
+        conf.dumper.sqlQuery(conf.sqlQuery, conf.dbmsHandler.sqlQuery(conf.sqlQuery))
 
     if conf.sqlShell:
         conf.dbmsHandler.sqlShell()

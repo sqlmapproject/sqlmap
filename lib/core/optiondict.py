@@ -150,7 +150,7 @@ optDict = {
         "limitStop": "integer",
         "firstChar": "integer",
         "lastChar": "integer",
-        "query": "string",
+        "sqlQuery": "string",
         "sqlShell": "boolean",
         "sqlFile": "string",
     },
