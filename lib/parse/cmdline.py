@@ -762,7 +762,7 @@ def cmdLineParser(argv=None):
             return retVal
 
         parser.formatter._format_option_strings = parser.formatter.format_option_strings
-        parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser, type(parser))
+        parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser)
 
         # Dirty hack for making a short option '-hh'
         option = parser.get_option("--hh")

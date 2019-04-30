@@ -315,7 +315,10 @@ class Agent(object):
             ("[HASH_REPLACE]", kb.chars.hash_),
             ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT)
         )
-        payload = reduce(lambda x, y: x.replace(y[0], y[1]), replacements, payload)
+
+        for value in re.findall(r"\[[A-Z_]+\]", payload):
+            if value in replacements:
+                payload = payload.replace(value, replacements[value])
 
         for _ in set(re.findall(r"(?i)\[RANDNUM(?:\d+)?\]", payload)):
             payload = payload.replace(_, str(randomInt()))

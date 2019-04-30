@@ -408,6 +408,9 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         pass
+    except:
+        if int(os.environ.get("SQLMAP_DREI", 0)):
+            traceback.print_exc()
     finally:
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if threading.activeCount() > 1:

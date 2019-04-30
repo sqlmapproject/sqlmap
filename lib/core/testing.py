@@ -73,6 +73,8 @@ def vulnTest():
         ("--technique=T --fresh-queries --sql-query='SELECT 1234'", (": '1234'",)),
     ):
         output = shellExec("python %s -u http://%s:%d/?id=1 --batch %s" % (os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options))
+        output = getUnicode(output)
+
         if not all(check in output for check in checks):
             retVal = False
 

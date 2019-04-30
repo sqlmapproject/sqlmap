@@ -12,19 +12,19 @@ class xrange(object):
     Advanced (re)implementation of xrange (supports slice/copy/etc.)
     Reference: http://code.activestate.com/recipes/521885-a-pythonic-implementation-of-xrange/
 
-    >>> list(xrange(1, 9)) == range(1, 9)
+    >>> list(xrange(1, 9)) == list(range(1, 9))
     True
-    >>> list(xrange(8, 0, -16)) == range(8, 0, -16)
+    >>> list(xrange(8, 0, -16)) == list(range(8, 0, -16))
     True
-    >>> list(xrange(0, 8, 16)) == range(0, 8, 16)
+    >>> list(xrange(0, 8, 16)) == list(range(0, 8, 16))
     True
-    >>> list(xrange(0, 4, 5)) == range(0, 4, 5)
+    >>> list(xrange(0, 4, 5)) == list(range(0, 4, 5))
     True
-    >>> list(xrange(4, 0, 3)) == range(4, 0, 3)
+    >>> list(xrange(4, 0, 3)) == list(range(4, 0, 3))
     True
-    >>> list(xrange(0, -3)) == range(0, -3)
+    >>> list(xrange(0, -3)) == list(range(0, -3))
     True
-    >>> list(xrange(0, 7, 2)) == range(0, 7, 2)
+    >>> list(xrange(0, 7, 2)) == list(range(0, 7, 2))
     True
     >>> foobar = xrange(1, 10)
     >>> 7 in foobar

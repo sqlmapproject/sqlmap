@@ -10,6 +10,7 @@ import hashlib
 import threading
 
 from lib.core.settings import MAX_CACHE_ITEMS
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.datatype import LRUDict
 from lib.core.threads import getCurrentThreadData
 
@@ -24,7 +25,7 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
 
     @functools.wraps(f)
     def _(*args, **kwargs):
-        key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs))).hexdigest(), 16) & 0x7fffffffffffffff
+        key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
 
         try:
             with _lock:

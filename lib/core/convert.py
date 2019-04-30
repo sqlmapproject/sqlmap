@@ -163,8 +163,10 @@ def htmlunescape(value):
 
     retVal = value
     if value and isinstance(value, six.string_types):
-        codes = (("&lt;", '<'), ("&gt;", '>'), ("&quot;", '"'), ("&nbsp;", ' '), ("&amp;", '&'), ("&apos;", "'"))
-        retVal = reduce(lambda x, y: x.replace(y[0], y[1]), codes, retVal)
+        replacements = (("&lt;", '<'), ("&gt;", '>'), ("&quot;", '"'), ("&nbsp;", ' '), ("&amp;", '&'), ("&apos;", "'"))
+        for code, value in replacements:
+            retVal = retVal.replace(code, value)
+
         try:
             retVal = re.sub(r"&#x([^ ;]+);", lambda match: unichr(int(match.group(1), 16)), retVal)
         except ValueError:
@@ -177,25 +179,26 @@ def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.flush()
 
 def stdoutencode(data):
-    retVal = None
+    retVal = data
 
-    try:
-        retVal = unicodeencode(data or "", sys.stdout.encoding)
+    if six.PY2:
+        try:
+            retVal = unicodeencode(data or "", sys.stdout.encoding)
 
-        # Reference: http://bugs.python.org/issue1602
-        if IS_WIN:
-            if '?' in retVal and '?' not in retVal:
-                warnMsg = "cannot properly display Unicode characters "
-                warnMsg += "inside Windows OS command prompt "
-                warnMsg += "(http://bugs.python.org/issue1602). All "
-                warnMsg += "unhandled occurrences will result in "
-                warnMsg += "replacement with '?' character. Please, find "
-                warnMsg += "proper character representation inside "
-                warnMsg += "corresponding output files. "
-                singleTimeWarnMessage(warnMsg)
+            # Reference: http://bugs.python.org/issue1602
+            if IS_WIN:
+                if '?' in retVal and '?' not in retVal:
+                    warnMsg = "cannot properly display Unicode characters "
+                    warnMsg += "inside Windows OS command prompt "
+                    warnMsg += "(http://bugs.python.org/issue1602). All "
+                    warnMsg += "unhandled occurrences will result in "
+                    warnMsg += "replacement with '?' character. Please, find "
+                    warnMsg += "proper character representation inside "
+                    warnMsg += "corresponding output files. "
+                    singleTimeWarnMessage(warnMsg)
 
-    except:
-        retVal = unicodeencode(data or "")
+        except:
+            retVal = unicodeencode(data or "")
 
     return retVal
 

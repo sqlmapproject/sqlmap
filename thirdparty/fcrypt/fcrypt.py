@@ -573,7 +573,7 @@ In practice, you would read the password using something like the
 getpass module, and generate the salt randomly:
 
   >>> import random, string
-  >>> saltchars = string.letters + string.digits + './'
+  >>> saltchars = string.ascii_letters + string.digits + './'
   >>> salt = random.choice(saltchars) + random.choice(saltchars)
 
 Note that other ASCII characters are accepted in the salt, but the

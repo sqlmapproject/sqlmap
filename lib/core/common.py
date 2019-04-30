@@ -950,16 +950,11 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
             if multiThreadMode:
                 logging._acquireLock()
 
-            if isinstance(data, six.text_type):
-                message = stdoutencode(data)
-            else:
-                message = data
-
             try:
                 if conf.get("api"):
-                    sys.stdout.write(clearColors(message), status, content_type)
+                    sys.stdout.write(stdoutencode(clearColors(data)), status, content_type)
                 else:
-                    sys.stdout.write(setColor(message, bold=bold))
+                    sys.stdout.write(stdoutencode(setColor(data, bold=bold)))
 
                 sys.stdout.flush()
             except IOError:
@@ -1069,7 +1064,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             elif default:
                 options = getUnicode(default, UNICODE_ENCODING)
             else:
-                options = unicode()
+                options = six.text_type()
 
             dataToStdout("%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
 
@@ -1113,9 +1108,8 @@ def randomRange(start=0, stop=1000, seed=None):
     """
     Returns random integer value in given range
 
-    >>> random.seed(0)
-    >>> randomRange(1, 500)
-    423
+    >>> randomRange(1, 500, seed=0)
+    9
     """
 
     if seed is not None:
@@ -1131,9 +1125,8 @@ def randomInt(length=4, seed=None):
     """
     Returns random integer value with provided number of digits
 
-    >>> random.seed(0)
-    >>> randomInt(6)
-    874254
+    >>> randomInt(6, seed=0)
+    181911
     """
 
     if seed is not None:
@@ -1149,9 +1142,8 @@ def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
     """
     Returns random string value with provided number of characters
 
-    >>> random.seed(0)
-    >>> randomStr(6)
-    'RNvnAv'
+    >>> randomStr(6, seed=0)
+    'aUfWgj'
     """
 
     if seed is not None:
@@ -1174,8 +1166,8 @@ def sanitizeStr(value):
     """
     Sanitizes string value in respect to newline and line-feed characters
 
-    >>> sanitizeStr('foo\\n\\rbar')
-    u'foo bar'
+    >>> sanitizeStr('foo\\n\\rbar') == 'foo bar'
+    True
     """
 
     return getUnicode(value).replace("\n", " ").replace("\r", "")
@@ -2096,8 +2088,8 @@ def shellExec(cmd):
     """
     Executes arbitrary shell command
 
-    >>> shellExec('echo 1').strip()
-    '1'
+    >>> shellExec('echo 1').strip() == b'1'
+    True
     """
 
     try:
@@ -2420,12 +2412,10 @@ def getUnicode(value, encoding=None, noneToNull=False):
     """
     Return the unicode representation of the supplied value:
 
-    >>> getUnicode(u'test')
-    u'test'
-    >>> getUnicode('test')
-    u'test'
-    >>> getUnicode(1)
-    u'1'
+    >>> getUnicode('test') == u'test'
+    True
+    >>> getUnicode(1) == u'1'
+    True
     """
 
     if noneToNull and value is None:
@@ -2436,11 +2426,11 @@ def getUnicode(value, encoding=None, noneToNull=False):
     elif isinstance(value, six.binary_type):
         # Heuristics (if encoding not explicitly specified)
         candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
-        if all(_ in value for _ in ('<', '>')):
+        if all(_ in value for _ in (b'<', b'>')):
             pass
-        elif any(_ in value for _ in (":\\", '/', '.')) and '\n' not in value:
+        elif any(_ in value for _ in (b":\\", b'/', b'.')) and b'\n' not in value:
             candidates = filterNone((encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
-        elif conf.get("encoding") and '\n' not in value:
+        elif conf.get("encoding") and b'\n' not in value:
             candidates = filterNone((encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
 
         for candidate in candidates:
@@ -2708,6 +2698,8 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
 
     >>> urldecode('AND%201%3E%282%2B3%29%23', convall=True)
     u'AND 1>(2+3)#'
+    >>> urldecode('AND%201%3E%282%2B3%29%23', convall=False)
+    u'AND 1>(2%2B3)#'
     """
 
     result = value
@@ -2722,17 +2714,19 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
             if convall:
                 result = _urllib.parse.unquote_plus(value) if spaceplus else _urllib.parse.unquote(value)
             else:
+                result = value
+                charset = set(string.printable) - set(unsafe)
+
                 def _(match):
-                    charset = reduce(lambda x, y: x.replace(y, ""), unsafe, string.printable)
                     char = chr(ord(match.group(1).decode("hex")))
                     return char if char in charset else match.group(0)
-                result = value
+
                 if spaceplus:
                     result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
+
                 result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
 
-    if isinstance(result, str):
-        result = unicode(result, encoding or UNICODE_ENCODING, "replace")
+            result = getUnicode(result, encoding or UNICODE_ENCODING)
 
     return result
 
@@ -2893,8 +2887,8 @@ def extractTextTagContent(page):
     """
     Returns list containing content from "textual" tags
 
-    >>> extractTextTagContent(u'<html><head><title>Title</title></head><body><pre>foobar</pre><a href="#link">Link</a></body></html>')
-    [u'Title', u'foobar']
+    >>> extractTextTagContent('<html><head><title>Title</title></head><body><pre>foobar</pre><a href="#link">Link</a></body></html>')
+    ['Title', 'foobar']
     """
 
     page = page or ""
@@ -2911,8 +2905,8 @@ def trimAlphaNum(value):
     """
     Trims alpha numeric characters from start and ending of a given value
 
-    >>> trimAlphaNum(u'AND 1>(2+3)-- foobar')
-    u' 1>(2+3)-- '
+    >>> trimAlphaNum('AND 1>(2+3)-- foobar')
+    ' 1>(2+3)-- '
     """
 
     while value and value[-1].isalnum():
@@ -3043,8 +3037,8 @@ def filterStringValue(value, charRegex, replacement=""):
     Returns string value consisting only of chars satisfying supplied
     regular expression (note: it has to be in form [...])
 
-    >>> filterStringValue(u'wzydeadbeef0123#', r'[0-9a-f]')
-    u'deadbeef0123'
+    >>> filterStringValue('wzydeadbeef0123#', r'[0-9a-f]')
+    'deadbeef0123'
     """
 
     retVal = value
@@ -3058,8 +3052,8 @@ def filterControlChars(value, replacement=' '):
     """
     Returns string value with control chars being supstituted with replacement character
 
-    >>> filterControlChars(u'AND 1>(2+3)\\n--')
-    u'AND 1>(2+3) --'
+    >>> filterControlChars('AND 1>(2+3)\\n--')
+    'AND 1>(2+3) --'
     """
 
     return filterStringValue(value, PRINTABLE_CHAR_REGEX, replacement)
@@ -3281,8 +3275,8 @@ def arrayizeValue(value):
     """
     Makes a list out of value if it is not already a list or tuple itself
 
-    >>> arrayizeValue(u'1')
-    [u'1']
+    >>> arrayizeValue('1')
+    ['1']
     """
 
     if not isListLike(value):
@@ -3294,8 +3288,8 @@ def unArrayizeValue(value):
     """
     Makes a value out of iterable if it is a list or tuple itself
 
-    >>> unArrayizeValue([u'1'])
-    u'1'
+    >>> unArrayizeValue(['1'])
+    '1'
     """
 
     if isListLike(value):
@@ -3313,8 +3307,8 @@ def flattenValue(value):
     """
     Returns an iterator representing flat representation of a given value
 
-    >>> [_ for _ in flattenValue([[u'1'], [[u'2'], u'3']])]
-    [u'1', u'2', u'3']
+    >>> [_ for _ in flattenValue([['1'], [['2'], '3']])]
+    ['1', '2', '3']
     """
 
     for i in iter(value):
@@ -3330,7 +3324,7 @@ def isListLike(value):
 
     >>> isListLike([1, 2, 3])
     True
-    >>> isListLike(u'2')
+    >>> isListLike('2')
     False
     """
 
@@ -3373,7 +3367,7 @@ def filterListValue(value, regex):
     """
 
     if isinstance(value, list) and regex:
-        retVal = filter(lambda _: re.search(regex, _, re.I), value)
+        retVal = [_ for _ in value if re.search(regex, _, re.I)]
     else:
         retVal = value
 
@@ -3416,10 +3410,10 @@ def decodeIntToUnicode(value):
     """
     Decodes inferenced integer value to an unicode character
 
-    >>> decodeIntToUnicode(35)
-    u'#'
-    >>> decodeIntToUnicode(64)
-    u'@'
+    >>> decodeIntToUnicode(35) == '#'
+    True
+    >>> decodeIntToUnicode(64) == '@'
+    True
     """
     retVal = value
 
@@ -3818,8 +3812,8 @@ def normalizeUnicode(value):
 
     # Reference: http://www.peterbe.com/plog/unicode-to-ascii
 
-    >>> normalizeUnicode(u'\u0161u\u0107uraj')
-    'sucuraj'
+    >>> normalizeUnicode(u'\u0161u\u0107uraj') == b'sucuraj'
+    True
     """
 
     return unicodedata.normalize("NFKD", value).encode("ascii", "ignore") if isinstance(value, six.text_type) else value
@@ -4017,10 +4011,10 @@ def safeCSValue(value):
 
     # Reference: http://tools.ietf.org/html/rfc4180
 
-    >>> safeCSValue(u'foo, bar')
-    u'"foo, bar"'
-    >>> safeCSValue(u'foobar')
-    u'foobar'
+    >>> safeCSValue('foo, bar')
+    '"foo, bar"'
+    >>> safeCSValue('foobar')
+    'foobar'
     """
 
     retVal = value
@@ -4043,7 +4037,7 @@ def filterPairValues(values):
     retVal = []
 
     if not isNoneValue(values) and hasattr(values, '__iter__'):
-        retVal = filter(lambda x: isinstance(x, (tuple, list, set)) and len(x) == 2, values)
+        retVal = [value for value in values if isinstance(value, (tuple, list, set)) and len(value) == 2]
 
     return retVal
 
@@ -4469,10 +4463,10 @@ def decodeHexValue(value, raw=False):
     """
     Returns value decoded from DBMS specific hexadecimal representation
 
-    >>> decodeHexValue('3132332031')
-    u'123 1'
-    >>> decodeHexValue(['0x31', '0x32'])
-    [u'1', u'2']
+    >>> decodeHexValue('3132332031') == u'123 1'
+    True
+    >>> decodeHexValue(['0x31', '0x32']) == [u'1', u'2']
+    True
     """
 
     retVal = value
@@ -4930,8 +4924,8 @@ def getSafeExString(ex, encoding=None):
     Safe way how to get the proper exception represtation as a string
     (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
 
-    >>> getSafeExString(SqlmapBaseException('foobar'))
-    u'foobar'
+    >>> getSafeExString(SqlmapBaseException('foobar')) == 'foobar'
+    True
     """
 
     retVal = None
