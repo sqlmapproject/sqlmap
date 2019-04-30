@@ -74,7 +74,6 @@ def vulnTest():
     ):
         output = shellExec("python %s -u http://%s:%d/?id=1 --batch %s" % (os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options))
         if not all(check in output for check in checks):
-            print output
             retVal = False
 
         count += 1

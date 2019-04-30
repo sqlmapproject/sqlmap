@@ -25,11 +25,10 @@ import mimetypes
 import os
 import stat
 import sys
-import urllib
-import urllib2
 
 from lib.core.compat import choose_boundary
 from lib.core.exception import SqlmapDataException
+from thirdparty.six.moves import urllib as _urllib
 
 class Callable:
     def __init__(self, anycallable):
@@ -40,8 +39,8 @@ class Callable:
 doseq = 1
 
 
-class MultipartPostHandler(urllib2.BaseHandler):
-    handler_order = urllib2.HTTPHandler.handler_order - 10 # needs to run first
+class MultipartPostHandler(_urllib.request.BaseHandler):
+    handler_order = _urllib.request.HTTPHandler.handler_order - 10 # needs to run first
 
     def http_request(self, request):
         data = request.get_data()
@@ -61,7 +60,7 @@ class MultipartPostHandler(urllib2.BaseHandler):
                 raise SqlmapDataException("not a valid non-string sequence or mapping object '%s'" % traceback)
 
             if len(v_files) == 0:
-                data = urllib.urlencode(v_vars, doseq)
+                data = _urllib.parse.urlencode(v_vars, doseq)
             else:
                 boundary, data = self.multipart_encode(v_vars, v_files)
                 contenttype = "multipart/form-data; boundary=%s" % boundary
