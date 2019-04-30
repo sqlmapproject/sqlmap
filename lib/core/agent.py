@@ -989,8 +989,7 @@ class Agent(object):
                     limitedQuery = limitedQuery.replace(" (SELECT TOP %s" % startTopNums, " (SELECT TOP %d" % num)
                     forgeNotIn = False
                 else:
-                    topNum = re.search(r"TOP\s+([\d]+)\s+", limitedQuery, re.I).group(1)
-                    limitedQuery = limitedQuery.replace("TOP %s " % topNum, "")
+                    limitedQuery = re.sub(r"\bTOP\s+\d+\s*", "", limitedQuery, flags=re.I)
 
             if forgeNotIn:
                 limitedQuery = limitedQuery.replace("SELECT ", (limitStr % 1), 1)
