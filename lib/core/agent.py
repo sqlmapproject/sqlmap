@@ -306,15 +306,15 @@ class Agent(object):
         if payload is None:
             return
 
-        replacements = (
-            ("[DELIMITER_START]", kb.chars.start),
-            ("[DELIMITER_STOP]", kb.chars.stop),
-            ("[AT_REPLACE]", kb.chars.at),
-            ("[SPACE_REPLACE]", kb.chars.space),
-            ("[DOLLAR_REPLACE]", kb.chars.dollar),
-            ("[HASH_REPLACE]", kb.chars.hash_),
-            ("[GENERIC_SQL_COMMENT]", GENERIC_SQL_COMMENT)
-        )
+        replacements = {
+            "[DELIMITER_START]": kb.chars.start,
+            "[DELIMITER_STOP]": kb.chars.stop,
+            "[AT_REPLACE]": kb.chars.at,
+            "[SPACE_REPLACE]": kb.chars.space,
+            "[DOLLAR_REPLACE]": kb.chars.dollar,
+            "[HASH_REPLACE]": kb.chars.hash_,
+            "[GENERIC_SQL_COMMENT]": GENERIC_SQL_COMMENT
+        }
 
         for value in re.findall(r"\[[A-Z_]+\]", payload):
             if value in replacements:
