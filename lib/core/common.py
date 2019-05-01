@@ -177,6 +177,7 @@ from thirdparty.magic import magic
 from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import configparser as _configparser
 from thirdparty.six.moves import http_client as _http_client
+from thirdparty.six.moves import input as _input
 from thirdparty.six.moves import urllib as _urllib
 from thirdparty.termcolor.termcolor import colored
 
@@ -942,8 +943,6 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
     Writes text to the stdout (console) stream
     """
 
-    message = ""
-
     if not kb.get("threadException"):
         if forceOutput or not (getCurrentThreadData().disableStdOut or kb.get("wizardMode")):
             multiThreadMode = isMultiThreadMode()
@@ -1082,7 +1081,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 dataToStdout("%s" % message, forceOutput=not kb.wizardMode, bold=True)
                 kb.prependFlag = False
 
-                retVal = raw_input().strip() or default
+                retVal = _input().strip() or default
                 retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
             except:
                 try:
@@ -2452,11 +2451,21 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
+def decodeHex(value):
+    """
+    Returns byte representation of provided hexadecimal value
+
+    >>> decodeHex("313233") == b"123"
+    True
+    """
+
+    return bytes.fromhex(value) if hasattr(bytes, "fromhex") else value.decode("hex")
+
 def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
     """
     Returns byte representation of provided Unicode value
 
-    >>> getBytes(getUnicode("foo\x01\x83\xffbar")) == "foo\x01\x83\xffbar"
+    >>> getBytes(getUnicode("foo\x01\x83\xffbar")) == b"foo\x01\x83\xffbar"
     True
     """
 
@@ -2468,11 +2477,10 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
                 value = value.replace(unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
 
             retVal = value.encode(encoding, errors)
-
-            retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: _.group(1).decode("hex"), retVal)
+            retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: decodeHex(_.group(1)), retVal)
         else:
             retVal = value.encode(encoding, errors)
-            retVal = re.sub(r"\\x([0-9a-f]{2})", lambda _: _.group(1).decode("hex"), retVal)
+            retVal = re.sub(b"\\\\x([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), retVal)
 
     return retVal
 
@@ -2876,6 +2884,9 @@ def extractRegexResult(regex, content, flags=0):
     retVal = None
 
     if regex and content and "?P<result>" in regex:
+        if isinstance(content, six.binary_type) and isinstance(regex, six.text_type):
+            regex = getBytes(regex)
+
         match = re.search(regex, content, flags)
 
         if match:
@@ -3812,11 +3823,11 @@ def normalizeUnicode(value):
 
     # Reference: http://www.peterbe.com/plog/unicode-to-ascii
 
-    >>> normalizeUnicode(u'\u0161u\u0107uraj') == b'sucuraj'
+    >>> normalizeUnicode(u'\u0161u\u0107uraj') == u'sucuraj'
     True
     """
 
-    return unicodedata.normalize("NFKD", value).encode("ascii", "ignore") if isinstance(value, six.text_type) else value
+    return getUnicode(unicodedata.normalize("NFKD", value).encode("ascii", "ignore")) if isinstance(value, six.text_type) else value
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
@@ -4656,7 +4667,7 @@ def getRequestHeader(request, name):
 
     if request and request.headers and name:
         _ = name.upper()
-        retVal = max(value if _ == key.upper() else None for key, value in request.header_items())
+        retVal = max(value if _ == key.upper() else "" for key, value in request.header_items()) or None
 
     return retVal
 

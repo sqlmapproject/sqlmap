@@ -14,6 +14,7 @@ import struct
 import zlib
 
 from lib.core.common import Backend
+from lib.core.common import decodeHex
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
@@ -155,6 +156,9 @@ def checkCharEncoding(encoding, warn=True):
     >>> checkCharEncoding('en_us', False)
     'utf8'
     """
+
+    if isinstance(encoding, six.binary_type):
+        encoding = getUnicode(encoding)
 
     if isListLike(encoding):
         encoding = unArrayizeValue(encoding)
@@ -316,16 +320,16 @@ def decodePage(page, contentEncoding, contentType):
     # can't do for all responses because we need to support binary files too
     if isinstance(page, six.binary_type) and "text/" in contentType:
         # e.g. &#x9;&#195;&#235;&#224;&#226;&#224;
-        if "&#" in page:
-            page = re.sub(r"&#x([0-9a-f]{1,2});", lambda _: (_.group(1) if len(_.group(1)) == 2 else "0%s" % _.group(1)).decode("hex"), page)
-            page = re.sub(r"&#(\d{1,3});", lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
+        if b"&#" in page:
+            page = re.sub(b"&#x([0-9a-f]{1,2});", lambda _: decodeHex(_.group(1) if len(_.group(1)) == 2 else "0%s" % _.group(1)), page)
+            page = re.sub(b"&#(\d{1,3});", lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
 
         # e.g. %20%28%29
-        if "%" in page:
-            page = re.sub(r"%([0-9a-fA-F]{2})", lambda _: _.group(1).decode("hex"), page)
+        if b"%" in page:
+            page = re.sub(b"%([0-9a-fA-F]{2})", lambda _: decodeHex(_.group(1)), page)
 
         # e.g. &amp;
-        page = re.sub(r"&([^;]+);", lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
+        page = re.sub(b"&([^;]+);", lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
 
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
 

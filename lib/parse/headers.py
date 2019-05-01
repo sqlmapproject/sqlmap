@@ -5,13 +5,13 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import itertools
 import os
 
 from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
+from thirdparty.six.moves import filter as _filter
 
 def headersParser(headers):
     """
@@ -30,7 +30,7 @@ def headersParser(headers):
             "x-powered-by": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml"),
         }
 
-    for header in itertools.ifilter(lambda _: _ in kb.headerPaths, headers):
+    for header in _filter(lambda _: _ in kb.headerPaths, headers):
         value = headers[header]
         xmlfile = kb.headerPaths[header]
         handler = FingerprintHandler(value, kb.headersFp)

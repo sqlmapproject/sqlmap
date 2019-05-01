@@ -21,8 +21,10 @@ from optparse import OptionParser
 if sys.version_info >= (3, 0):
     xrange = range
     text_type = str
+    string_types = (str,)
 else:
     text_type = unicode
+    string_types = (basestring,)
 
 # Regex used for recognition of hex encoded characters
 HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
@@ -54,7 +56,7 @@ def safecharencode(value):
 
     retVal = value
 
-    if isinstance(value, basestring):
+    if isinstance(value, string_types):
         if any(_ not in SAFE_CHARS for _ in value):
             retVal = retVal.replace(HEX_ENCODED_PREFIX, HEX_ENCODED_PREFIX_MARKER)
             retVal = retVal.replace('\\', SLASH_MARKER)
@@ -78,7 +80,7 @@ def safechardecode(value, binary=False):
     """
 
     retVal = value
-    if isinstance(value, basestring):
+    if isinstance(value, string_types):
         retVal = retVal.replace('\\\\', SLASH_MARKER)
 
         while True:

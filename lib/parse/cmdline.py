@@ -40,6 +40,7 @@ from lib.core.shell import autoCompletion
 from lib.core.shell import clearHistory
 from lib.core.shell import loadHistory
 from lib.core.shell import saveHistory
+from thirdparty.six.moves import input as _input
 
 def cmdLineParser(argv=None):
     """
@@ -54,7 +55,7 @@ def cmdLineParser(argv=None):
     # Reference: https://stackoverflow.com/a/4012683 (Note: previously used "...sys.getfilesystemencoding() or UNICODE_ENCODING")
     _ = getUnicode(os.path.basename(argv[0]), encoding=sys.stdin.encoding)
 
-    usage = "%s%s [options]" % ("python " if not IS_WIN else "", "\"%s\"" % _ if " " in _ else _)
+    usage = "%s%s [options]" % ("%s " % os.path.basename(sys.executable) if not IS_WIN else "", "\"%s\"" % _ if " " in _ else _)
     parser = OptionParser(usage=usage)
 
     try:
@@ -809,7 +810,7 @@ def cmdLineParser(argv=None):
                 command = None
 
                 try:
-                    command = raw_input("sqlmap-shell> ").strip()
+                    command = _input("sqlmap-shell> ").strip()
                     command = getUnicode(command, encoding=sys.stdin.encoding)
                 except (KeyboardInterrupt, EOFError):
                     print()
@@ -930,7 +931,7 @@ def cmdLineParser(argv=None):
         # Protection against Windows dummy double clicking
         if IS_WIN:
             dataToStdout("\nPress Enter to continue...")
-            raw_input()
+            _input()
         raise
 
     debugMsg = "parsing command line"

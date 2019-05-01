@@ -43,7 +43,7 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
     handler_order = _urllib.request.HTTPHandler.handler_order - 10 # needs to run first
 
     def http_request(self, request):
-        data = request.get_data()
+        data = request.data
 
         if isinstance(data, dict):
             v_files = []
@@ -68,7 +68,7 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
                 #    print "Replacing %s with %s" % (request.get_header("content-type"), "multipart/form-data")
                 request.add_unredirected_header("Content-Type", contenttype)
 
-            request.add_data(data)
+            request.data = data
         return request
 
     def multipart_encode(vars, files, boundary=None, buf=None):

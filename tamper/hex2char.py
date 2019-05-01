@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import re
 
+from lib.core.common import decodeHex
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
@@ -36,9 +37,9 @@ def tamper(payload, **kwargs):
     if payload:
         for match in re.finditer(r"\b0x([0-9a-f]+)\b", retVal):
             if len(match.group(1)) > 2:
-                result = "CONCAT(%s)" % ','.join("CHAR(%d)" % ord(_) for _ in match.group(1).decode("hex"))
+                result = "CONCAT(%s)" % ','.join("CHAR(%d)" % ord(_) for _ in decodeHex(match.group(1)))
             else:
-                result = "CHAR(%d)" % ord(match.group(1).decode("hex"))
+                result = "CHAR(%d)" % ord(decodeHex(match.group(1)))
             retVal = retVal.replace(match.group(0), result)
 
     return retVal

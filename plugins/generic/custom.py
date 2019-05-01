@@ -24,6 +24,7 @@ from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.shell import autoCompletion
 from lib.request import inject
+from thirdparty.six.moves import input as _input
 
 class Custom:
     """
@@ -88,7 +89,7 @@ class Custom:
             query = None
 
             try:
-                query = raw_input("sql-shell> ")
+                query = _input("sql-shell> ")
                 query = getUnicode(query, encoding=sys.stdin.encoding)
                 query = query.strip("; ")
             except KeyboardInterrupt:

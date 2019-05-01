@@ -72,7 +72,7 @@ def vulnTest():
         ("--technique=B --hex --fresh-queries --threads=4 --sql-query='SELECT 987654321'", ("length of query output", ": '987654321'",)),
         ("--technique=T --fresh-queries --sql-query='SELECT 1234'", (": '1234'",)),
     ):
-        output = shellExec("python %s -u http://%s:%d/?id=1 --batch %s" % (os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options))
+        output = shellExec("%s %s -u http://%s:%d/?id=1 --batch %s" % (sys.executable, os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options))
         output = getUnicode(output)
 
         if not all(check in output for check in checks):

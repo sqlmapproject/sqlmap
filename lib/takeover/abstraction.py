@@ -28,6 +28,7 @@ from lib.request import inject
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import XP_cmdshell
+from thirdparty.six.moves import input as _input
 
 class Abstraction(Web, UDF, XP_cmdshell):
     """
@@ -139,7 +140,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
             command = None
 
             try:
-                command = raw_input("os-shell> ")
+                command = _input("os-shell> ")
                 command = getUnicode(command, encoding=sys.stdin.encoding)
             except KeyboardInterrupt:
                 print()

@@ -57,6 +57,7 @@ from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
 from thirdparty.bottle.bottle import server_names
 from thirdparty.six.moves import http_client as _http_client
+from thirdparty.six.moves import input as _input
 from thirdparty.six.moves import urllib as _urllib
 
 # Global data storage
@@ -762,7 +763,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
     while True:
         try:
-            command = raw_input("api%s> " % (" (%s)" % taskid if taskid else "")).strip()
+            command = _input("api%s> " % (" (%s)" % taskid if taskid else "")).strip()
             command = re.sub(r"\A(\w+)", lambda match: match.group(1).lower(), command)
         except (EOFError, KeyboardInterrupt):
             print()
