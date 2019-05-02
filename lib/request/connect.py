@@ -58,6 +58,7 @@ from lib.core.common import wasLastResponseDelayed
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
+from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
@@ -517,6 +518,7 @@ class Connect(object):
                     code = (code or conn.code) if conn.code == kb.originalCode else conn.code  # do not override redirection code (for comparison purposes)
                     responseHeaders = conn.info()
                     responseHeaders[URI_HTTP_HEADER] = conn.geturl()
+                    patchHeaders(responseHeaders)
                     kb.serverHeader = responseHeaders.get(HTTP_HEADER.SERVER, kb.serverHeader)
                 else:
                     code = None
@@ -592,6 +594,7 @@ class Connect(object):
                 page = ex.read() if not skipRead else None
                 responseHeaders = ex.info()
                 responseHeaders[URI_HTTP_HEADER] = ex.geturl()
+                patchHeaders(responseHeaders)
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
@@ -1349,8 +1352,7 @@ class Connect(object):
             kb.permissionFlag = True
             singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
 
-        if not hasattr(headers, "headers"):
-            headers.headers = ["%s: %s\r\n" % (header, headers[header]) for header in headers]
+        patchHeaders(headers)
 
         if content or response:
             return page, headers, code

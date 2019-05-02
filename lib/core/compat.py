@@ -162,6 +162,10 @@ class WichmannHill(random.Random):
         z = (z + a) % 256 or 1
         self.__whseed(x, y, z)
 
+def patchHeaders(headers):
+    if not hasattr(headers, "headers"):
+        headers.headers = ["%s: %s\r\n" % (header, headers[header]) for header in headers]
+
 # Reference: https://github.com/urllib3/urllib3/blob/master/src/urllib3/filepost.py
 def choose_boundary():
     return uuid.uuid4().hex

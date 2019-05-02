@@ -1765,7 +1765,8 @@ def _cleanupOptions():
         conf.string = decodeStringEscape(conf.string)
 
     if conf.getAll:
-        map(lambda _: conf.__setitem__(_, True), WIZARD.ALL)
+        for _ in WIZARD.ALL:
+            conf.__setitem__(_, True)
 
     if conf.noCast:
         for _ in list(DUMP_REPLACEMENTS.keys()):

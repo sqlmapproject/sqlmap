@@ -64,7 +64,9 @@ def safecharencode(value):
             for char in SAFE_ENCODE_SLASH_REPLACEMENTS:
                 retVal = retVal.replace(char, repr(char).strip('\''))
 
-            retVal = reduce(lambda x, y: x + (y if (y in string.printable or isinstance(value, text_type) and ord(y) >= 160) else '\\x%02x' % ord(y)), retVal, type(value)())
+            for char in set(retVal):
+                if not (char in string.printable or isinstance(value, text_type) and ord(char) >= 160):
+                    retVal = retVal.replace(char, '\\x%02x' % ord(char))
 
             retVal = retVal.replace(SLASH_MARKER, "\\\\")
             retVal = retVal.replace(HEX_ENCODED_PREFIX_MARKER, HEX_ENCODED_PREFIX)

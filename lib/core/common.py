@@ -11,6 +11,7 @@ import collections
 import contextlib
 import copy
 import distutils
+import functools
 import getpass
 import hashlib
 import inspect
@@ -1849,7 +1850,7 @@ def safeFilepathEncode(filepath):
 
     retVal = filepath
 
-    if filepath and isinstance(filepath, six.text_type):
+    if filepath and six.PY2 and isinstance(filepath, six.text_type):
         retVal = filepath.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
 
     return retVal
@@ -1929,8 +1930,8 @@ def getFilteredPageContent(page, onlyText=True, split=" "):
     Returns filtered page content without script, style and/or comments
     or all HTML tags
 
-    >>> getFilteredPageContent(u'<html><title>foobar</title><body>test</body></html>')
-    u'foobar test'
+    >>> getFilteredPageContent(u'<html><title>foobar</title><body>test</body></html>') == "foobar test"
+    True
     """
 
     retVal = page
@@ -1947,8 +1948,8 @@ def getPageWordSet(page):
     """
     Returns word set used in page content
 
-    >>> sorted(getPageWordSet(u'<html><title>foobar</title><body>test</body></html>'))
-    [u'foobar', u'test']
+    >>> sorted(getPageWordSet(u'<html><title>foobar</title><body>test</body></html>')) == [u'foobar', u'test']
+    True
     """
 
     retVal = set()
@@ -2459,13 +2460,13 @@ def decodeHex(value):
     True
     """
 
-    return bytes.fromhex(value) if hasattr(bytes, "fromhex") else value.decode("hex")
+    return bytes.fromhex(getUnicode(value)) if hasattr(bytes, "fromhex") else value.decode("hex")
 
 def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
     """
     Returns byte representation of provided Unicode value
 
-    >>> getBytes(getUnicode("foo\x01\x83\xffbar")) == b"foo\x01\x83\xffbar"
+    >>> getBytes(getUnicode(b"foo\\x01\\x83\\xffbar")) == b"foo\\x01\\x83\\xffbar"
     True
     """
 
@@ -2488,9 +2489,9 @@ def getOrds(value):
     """
     Returns ORD(...) representation of provided string value
 
-    >>> getOrds(u'fo\xf6bar')
+    >>> getOrds(u'fo\\xf6bar')
     [102, 111, 246, 98, 97, 114]
-    >>> getOrds(b"fo\xc3\xb6bar")
+    >>> getOrds(b"fo\\xc3\\xb6bar")
     [102, 111, 195, 182, 98, 97, 114]
     """
 
@@ -2642,8 +2643,8 @@ def extractErrorMessage(page):
     """
     Returns reported error message from page if it founds one
 
-    >>> extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>')
-    u'oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated'
+    >>> extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>') == u'oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated'
+    True
     """
 
     retVal = None
@@ -2716,10 +2717,10 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
     """
     URL decodes given value
 
-    >>> urldecode('AND%201%3E%282%2B3%29%23', convall=True)
-    u'AND 1>(2+3)#'
-    >>> urldecode('AND%201%3E%282%2B3%29%23', convall=False)
-    u'AND 1>(2%2B3)#'
+    >>> urldecode('AND%201%3E%282%2B3%29%23', convall=True) == 'AND 1>(2+3)#'
+    True
+    >>> urldecode('AND%201%3E%282%2B3%29%23', convall=False) == 'AND 1>(2%2B3)#'
+    True
     """
 
     result = value
@@ -2738,7 +2739,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                 charset = set(string.printable) - set(unsafe)
 
                 def _(match):
-                    char = chr(ord(match.group(1).decode("hex")))
+                    char = getUnicode(decodeHex(match.group(1)))
                     return char if char in charset else match.group(0)
 
                 if spaceplus:
@@ -3020,13 +3021,15 @@ def findDynamicContent(firstPage, secondPage):
                 prefix = prefix[-DYNAMICITY_BOUNDARY_LENGTH:]
                 suffix = suffix[:DYNAMICITY_BOUNDARY_LENGTH]
 
-                infix = max(re.search(r"(?s)%s(.+)%s" % (re.escape(prefix), re.escape(suffix)), _) for _ in (firstPage, secondPage)).group(1)
-
-                if infix[0].isalnum():
-                    prefix = trimAlphaNum(prefix)
-
-                if infix[-1].isalnum():
-                    suffix = trimAlphaNum(suffix)
+                for _ in (firstPage, secondPage):
+                    match = re.search(r"(?s)%s(.+)%s" % (re.escape(prefix), re.escape(suffix)), _)
+                    if match:
+                        infix = match.group(1)
+                        if infix[0].isalnum():
+                            prefix = trimAlphaNum(prefix)
+                        if infix[-1].isalnum():
+                            suffix = trimAlphaNum(suffix)
+                        break
 
             kb.dynamicMarkings.append((prefix if prefix else None, suffix if suffix else None))
 
@@ -3557,7 +3560,7 @@ def getLatestRevision():
     req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py")
 
     try:
-        content = _urllib.request.urlopen(req).read()
+        content = getUnicode(_urllib.request.urlopen(req).read())
         retVal = extractRegexResult(r"VERSION\s*=\s*[\"'](?P<result>[\d.]+)", content)
     except:
         pass
@@ -4423,12 +4426,8 @@ def serializeObject(object_):
     """
     Serializes given object
 
-    >>> serializeObject([1, 2, 3, ('a', 'b')])
-    'gAJdcQEoSwFLAksDVQFhVQFihnECZS4='
-    >>> serializeObject(None)
-    'gAJOLg=='
-    >>> serializeObject('foobar')
-    'gAJVBmZvb2JhcnEBLg=='
+    >>> type(serializeObject([1, 2, 3, ('a', 'b')])) == six.binary_type
+    True
     """
 
     return base64pickle(object_)
@@ -4668,7 +4667,10 @@ def prioritySortColumns(columns):
     def _(column):
         return column and "id" in column.lower()
 
-    return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
+    if six.PY2:
+        return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
+    else:
+        return sorted(sorted(columns, key=len), key=functools.cmp_to_key(lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0))
 
 def getRequestHeader(request, name):
     """
@@ -4975,12 +4977,12 @@ def safeVariableNaming(value):
     """
     Returns escaped safe-representation of a given variable name that can be used in Python evaluated code
 
-    >>> safeVariableNaming("class.id")
-    'EVAL_636c6173732e6964'
+    >>> safeVariableNaming("class.id") == "EVAL_636c6173732e6964"
+    True
     """
 
     if value in keyword.kwlist or re.search(r"\A[^a-zA-Z]|[^\w]", value):
-        value = "%s%s" % (EVALCODE_ENCODED_PREFIX, value.encode(UNICODE_ENCODING).encode("hex"))
+        value = "%s%s" % (EVALCODE_ENCODED_PREFIX, getUnicode(binascii.hexlify(getBytes(value))))
 
     return value
 
@@ -4988,12 +4990,12 @@ def unsafeVariableNaming(value):
     """
     Returns unescaped safe-representation of a given variable name
 
-    >>> unsafeVariableNaming("EVAL_636c6173732e6964")
-    u'class.id'
+    >>> unsafeVariableNaming("EVAL_636c6173732e6964") == "class.id"
+    True
     """
 
     if value.startswith(EVALCODE_ENCODED_PREFIX):
-        value = value[len(EVALCODE_ENCODED_PREFIX):].decode("hex").decode(UNICODE_ENCODING)
+        value = getUnicode(decodeHex(value[len(EVALCODE_ENCODED_PREFIX):]))
 
     return value
 

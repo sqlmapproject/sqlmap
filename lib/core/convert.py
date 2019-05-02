@@ -11,6 +11,7 @@ except:
     import pickle
 
 import base64
+import binascii
 import json
 import re
 import sys
@@ -24,8 +25,8 @@ def base64decode(value):
     """
     Decodes string value from Base64 to plain format
 
-    >>> base64decode('Zm9vYmFy')
-    'foobar'
+    >>> base64decode('Zm9vYmFy') == b'foobar'
+    True
     """
 
     return base64.b64decode(unicodeencode(value))
@@ -34,8 +35,8 @@ def base64encode(value):
     """
     Encodes string value from plain to Base64 format
 
-    >>> base64encode('foobar')
-    'Zm9vYmFy'
+    >>> base64encode('foobar') == b'Zm9vYmFy'
+    True
     """
 
     return base64.b64encode(unicodeencode(value))
@@ -44,8 +45,8 @@ def base64pickle(value):
     """
     Serializes (with pickle) and encodes to Base64 format supplied (binary) value
 
-    >>> base64pickle('foobar')
-    'gAJVBmZvb2JhcnEBLg=='
+    >>> base64unpickle(base64pickle([1, 2, 3])) == [1, 2, 3]
+    True
     """
 
     retVal = None
@@ -68,8 +69,8 @@ def base64unpickle(value):
     """
     Decodes value from Base64 to plain format and deserializes (with pickle) its content
 
-    >>> base64unpickle('gAJVBmZvb2JhcnEBLg==')
-    'foobar'
+    >>> type(base64unpickle('gAJjX19idWlsdGluX18Kb2JqZWN0CnEBKYFxAi4=')) == object
+    True
     """
 
     retVal = None
@@ -85,8 +86,8 @@ def hexdecode(value):
     """
     Decodes string value from hex to plain format
 
-    >>> hexdecode('666f6f626172')
-    'foobar'
+    >>> hexdecode('666f6f626172') == b'foobar'
+    True
     """
 
     value = value.lower()
@@ -103,16 +104,12 @@ def hexencode(value, encoding=None):
     """
     Encodes string value from plain to hex format
 
-    >>> hexencode('foobar')
-    '666f6f626172'
+    >>> hexencode('foobar') == b'666f6f626172'
+    True
     """
 
     retVal = unicodeencode(value, encoding)
-
-    if six.PY2:
-        retVal = retVal.encode("hex")
-    else:
-        retVal = retVal.hex()
+    retVal = binascii.hexlify(retVal)
 
     return retVal
 
@@ -120,8 +117,8 @@ def unicodeencode(value, encoding=None):
     """
     Returns 8-bit string representation of the supplied unicode value
 
-    >>> unicodeencode(u'foobar')
-    'foobar'
+    >>> unicodeencode(u'foobar') == b'foobar'
+    True
     """
 
     retVal = value
@@ -138,8 +135,8 @@ def utf8encode(value):
     """
     Returns 8-bit string representation of the supplied UTF-8 value
 
-    >>> utf8encode(u'foobar')
-    'foobar'
+    >>> utf8encode(u'foobar') == b'foobar'
+    True
     """
 
     return unicodeencode(value, "utf-8")
@@ -148,11 +145,16 @@ def utf8decode(value):
     """
     Returns UTF-8 representation of the supplied 8-bit string representation
 
-    >>> utf8decode('foobar')
+    >>> utf8decode(b'foobar')
     u'foobar'
     """
 
-    return value.decode("utf-8")
+    retVal = value
+
+    if isinstance(value, six.binary_type):
+        retVal = value.decode("utf-8")
+
+    return retVal
 
 def htmlunescape(value):
     """
@@ -217,8 +219,8 @@ def dejsonize(data):
     """
     Returns JSON deserialized data
 
-    >>> dejsonize('{\\n    "foo": "bar"\\n}')
-    {u'foo': u'bar'}
+    >>> dejsonize('{\\n    "foo": "bar"\\n}') == {u'foo': u'bar'}
+    True
     """
 
     return json.loads(data)

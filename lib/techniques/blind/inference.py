@@ -158,7 +158,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             length = None
 
         showEta = conf.eta and isinstance(length, int)
-        numThreads = min(conf.threads, length) or 1
+        numThreads = min(conf.threads or 0, length or 0) or 1
 
         if showEta:
             progress = ProgressBar(maxValue=length)
@@ -198,8 +198,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 else:
                     posValue = ord(hintValue[idx - 1])
 
+                markingValue = "'%s'" % CHAR_INFERENCE_MARK
+                unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
                 forgedPayload = agent.extractPayload(payload)
-                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
+                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue)).replace(markingValue, unescapedCharValue)
                 result = Request.queryPage(agent.replacePayload(payload, forgedPayload), timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(kb.technique)
 
@@ -293,12 +295,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     lastChar = [_ for _ in threadData.shared.value if _ is not None][-1]
                                 except IndexError:
                                     lastChar = None
-                                if 'a' <= lastChar <= 'z':
-                                    position = charTbl.index(ord('a') - 1)  # 96
-                                elif 'A' <= lastChar <= 'Z':
-                                    position = charTbl.index(ord('A') - 1)  # 64
-                                elif '0' <= lastChar <= '9':
-                                    position = charTbl.index(ord('0') - 1)  # 47
+                                else:
+                                    if 'a' <= lastChar <= 'z':
+                                        position = charTbl.index(ord('a') - 1)  # 96
+                                    elif 'A' <= lastChar <= 'Z':
+                                        position = charTbl.index(ord('A') - 1)  # 64
+                                    elif '0' <= lastChar <= '9':
+                                        position = charTbl.index(ord('0') - 1)  # 47
                             except ValueError:
                                 pass
                             finally:
@@ -633,7 +636,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     dataToStdout(filterControlChars(val))
 
                 # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
-                if len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
+                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD, DBMS.DB2, DBMS.MAXDB) and len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
                     finalValue = partialValue[:-INFERENCE_BLANK_BREAK]
                     break
                 elif charsetType and partialValue[-1:].isspace():

@@ -34,6 +34,8 @@ def tamper(payload, **kwargs):
     '1 AND A NOT BETWEEN 0 AND B--'
     >>> tamper('1 AND A = B--')
     '1 AND A BETWEEN B AND B--'
+    >>> tamper('1 AND LAST_INSERT_ROWID()=LAST_INSERT_ROWID()')
+    '1 AND LAST_INSERT_ROWID() BETWEEN LAST_INSERT_ROWID() AND LAST_INSERT_ROWID()'
     """
 
     retVal = payload
@@ -48,7 +50,7 @@ def tamper(payload, **kwargs):
             retVal = re.sub(r"\s*>\s*(\d+|'[^']+'|\w+\(\d+\))", r" NOT BETWEEN 0 AND \g<1>", payload)
 
         if retVal == payload:
-            match = re.search(r"(?i)(\b(AND|OR)\b\s+)(?!.*\b(AND|OR)\b)([^=]+?)\s*=\s*(\w+)\s*", payload)
+            match = re.search(r"(?i)(\b(AND|OR)\b\s+)(?!.*\b(AND|OR)\b)([^=]+?)\s*=\s*([\w()]+)\s*", payload)
 
             if match:
                 _ = "%s %s BETWEEN %s AND %s" % (match.group(2), match.group(4), match.group(5), match.group(5))

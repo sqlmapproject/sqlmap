@@ -724,19 +724,20 @@ def attackDumpedTable():
 def hashRecognition(value):
     retVal = None
 
-    isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
+    if six.PY2:  # currently only supported on Python2
+        isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
-    if isinstance(value, six.string_types):
-        for name, regex in getPublicTypeMembers(HASH):
-            # Hashes for Oracle and old MySQL look the same hence these checks
-            if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
-                continue
-            elif regex == HASH.CRYPT_GENERIC:
-                if any((value.lower() == value, value.upper() == value)):
+        if isinstance(value, six.string_types):
+            for name, regex in getPublicTypeMembers(HASH):
+                # Hashes for Oracle and old MySQL look the same hence these checks
+                if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
                     continue
-            elif re.match(regex, value):
-                retVal = regex
-                break
+                elif regex == HASH.CRYPT_GENERIC:
+                    if any((value.lower() == value, value.upper() == value)):
+                        continue
+                elif re.match(regex, value):
+                    retVal = regex
+                    break
 
     return retVal
 
