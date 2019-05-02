@@ -2484,6 +2484,18 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
 
     return retVal
 
+def getOrds(value):
+    """
+    Returns ORD(...) representation of provided string value
+
+    >>> getOrds(u'fo\xf6bar')
+    [102, 111, 246, 98, 97, 114]
+    >>> getOrds(b"fo\xc3\xb6bar")
+    [102, 111, 195, 182, 98, 97, 114]
+    """
+
+    return [_ if isinstance(_, int) else ord(_) for _ in value]
+
 def longestCommonPrefix(*sequences):
     """
     Returns longest common prefix occuring in given sequences
@@ -3635,8 +3647,8 @@ def maskSensitiveData(msg):
     """
     Masks sensitive data in the supplied message
 
-    >>> maskSensitiveData('python sqlmap.py -u "http://www.test.com/vuln.php?id=1" --banner')
-    u'python sqlmap.py -u *********************************** --banner'
+    >>> maskSensitiveData('python sqlmap.py -u "http://www.test.com/vuln.php?id=1" --banner') == 'python sqlmap.py -u *********************************** --banner'
+    True
     """
 
     retVal = getUnicode(msg)

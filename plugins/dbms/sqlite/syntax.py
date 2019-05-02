@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import binascii
 
 from lib.core.common import getBytes
+from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
 from plugins.generic.syntax import Syntax as GenericSyntax
 
@@ -18,17 +19,17 @@ class Syntax(GenericSyntax):
         >>> from lib.core.common import Backend
         >>> Backend.setVersion('2')
         ['2']
-        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
-        "SELECT 'abcdefgh' FROM foobar"
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar") == "SELECT 'abcdefgh' FROM foobar"
+        True
         >>> Backend.setVersion('3')
         ['3']
-        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
-        "SELECT CAST(X'6162636465666768' AS TEXT) FROM foobar"
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar") == "SELECT CAST(X'6162636465666768' AS TEXT) FROM foobar"
+        True
         """
 
         def escaper(value):
             # Reference: http://stackoverflow.com/questions/3444335/how-do-i-quote-a-utf-8-string-literal-in-sqlite3
-            return "CAST(X'%s' AS TEXT)" % binascii.hexlify(getBytes(value))
+            return "CAST(X'%s' AS TEXT)" % getUnicode(binascii.hexlify(getBytes(value)))
 
         retVal = expression
 

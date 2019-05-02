@@ -11,8 +11,8 @@ class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):
         """
-        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar")
-        "SELECT 'abcdefgh' FROM foobar"
+        >>> Syntax.escape("SELECT 'abcdefgh' FROM foobar") == u"SELECT 'abcdefgh' FROM foobar"
+        True
         """
 
         return expression
