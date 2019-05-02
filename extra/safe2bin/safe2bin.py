@@ -34,7 +34,7 @@ HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"
 SAFE_ENCODE_SLASH_REPLACEMENTS = "\t\n\r\x0b\x0c"
 
 # Characters that don't need to be safe encoded
-SAFE_CHARS = "".join(filter(lambda _: _ not in SAFE_ENCODE_SLASH_REPLACEMENTS, string.printable.replace('\\', '')))
+SAFE_CHARS = "".join([_ for _ in string.printable.replace('\\', '') if _ not in SAFE_ENCODE_SLASH_REPLACEMENTS])
 
 # Prefix used for hex encoded values
 HEX_ENCODED_PREFIX = r"\x"

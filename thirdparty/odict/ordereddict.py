@@ -73,9 +73,9 @@ class OrderedDict(dict, DictMixin):
         if not self:
             raise KeyError('dictionary is empty')
         if last:
-            key = reversed(self).next()
+            key = next(reversed(self))
         else:
-            key = iter(self).next()
+            key = next(iter(self))
         value = self.pop(key)
         return key, value
 
@@ -104,7 +104,7 @@ class OrderedDict(dict, DictMixin):
     def __repr__(self):
         if not self:
             return '%s()' % (self.__class__.__name__,)
-        return '%s(%r)' % (self.__class__.__name__, self.items())
+        return '%s(%r)' % (self.__class__.__name__, list(self.items()))
 
     def copy(self):
         return self.__class__(self)

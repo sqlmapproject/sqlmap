@@ -1099,7 +1099,7 @@ def dictionaryAttack(attack_dict):
 
                         while not retVal.empty():
                             user, hash_, word = item = retVal.get(block=False)
-                            attack_info = filter(lambda _: _[0][0] != user or _[0][1] != hash_, attack_info)
+                            attack_info = [_ for _ in attack_info if _[0][0] != user or _[0][1] != hash_]
                             hashDBWrite(hash_, word)
                             results.append(item)
 

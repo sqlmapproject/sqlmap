@@ -533,7 +533,7 @@ def _setMetasploit():
                 retVal = None
 
                 try:
-                    from _winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
+                    from six.moves.winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
                     _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
                     _ = OpenKey(_, key)
                     retVal = QueryValueEx(_, value)[0]
@@ -2063,7 +2063,7 @@ def _useWizardInterface():
     message = "%s data (--data) [Enter for None]: " % ((conf.method if conf.method != HTTPMETHOD.GET else conf.method) or HTTPMETHOD.POST)
     conf.data = readInput(message, default=None)
 
-    if not (filter(lambda _: '=' in unicode(_), (conf.url, conf.data)) or '*' in conf.url):
+    if not (any('=' in _ for _ in (conf.url, conf.data)) or '*' in conf.url):
         warnMsg = "no GET and/or %s parameter(s) found for testing " % ((conf.method if conf.method != HTTPMETHOD.GET else conf.method) or HTTPMETHOD.POST)
         warnMsg += "(e.g. GET parameter 'id' in 'http://www.site.com/vuln.php?id=1'). "
         if not conf.crawlDepth and not conf.forms:
