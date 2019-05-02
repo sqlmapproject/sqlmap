@@ -26,6 +26,7 @@ import os
 import stat
 import sys
 
+from lib.core.common import getBytes
 from lib.core.compat import choose_boundary
 from lib.core.exception import SqlmapDataException
 from thirdparty.six.moves import urllib as _urllib
@@ -51,7 +52,7 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
 
             try:
                 for(key, value) in data.items():
-                    if isinstance(value, file) or hasattr(value, "file") or isinstance(value, io.IOBase):
+                    if hasattr(value, "fileno") or hasattr(value, "file") or isinstance(value, io.IOBase):
                         v_files.append((key, value))
                     else:
                         v_vars.append((key, value))
@@ -85,7 +86,7 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
                 buf += "\r\n\r\n" + value + "\r\n"
 
         for (key, fd) in files:
-            file_size = os.fstat(fd.fileno())[stat.ST_SIZE] if isinstance(fd, file) else fd.len
+            file_size = os.fstat(fd.fileno())[stat.ST_SIZE] if hasattr(fd, "fileno") else fd.len
             filename = fd.name.split("/")[-1] if "/" in fd.name else fd.name.split("\\")[-1]
             try:
                 contenttype = mimetypes.guess_type(filename)[0] or "application/octet-stream"
@@ -98,8 +99,8 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
             # buf += "Content-Length: %s\r\n" % file_size
             fd.seek(0)
 
-            buf = str(buf) if not isinstance(buf, unicode) else buf.encode("utf8")
-            buf += "\r\n%s\r\n" % fd.read()
+            buf = getBytes(buf)
+            buf += b"\r\n%s\r\n" % fd.read()
 
         buf += "--%s--\r\n\r\n" % boundary
 

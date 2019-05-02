@@ -10,4 +10,4 @@
 # unset SQLMAP_DREI
 # source `dirname "$0"`"/junk.sh"
 
-for i in $(find . -iname "*.py" | grep -v __init__); do pylint --py3k $i; done
+for i in $(find . -iname "*.py" | grep -v __init__); do timeout 10 pylint --py3k $i; done 2>&1 | grep -v -E 'absolute_import|No config file'
