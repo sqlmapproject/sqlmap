@@ -7,7 +7,8 @@ See the file 'LICENSE' for copying permission
 
 import binascii
 
-from lib.core.convert import utf8encode
+from lib.core.common import getBytes
+from lib.core.common import getUnicode
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
@@ -19,11 +20,6 @@ class Syntax(GenericSyntax):
         """
 
         def escaper(value):
-            retVal = None
-            try:
-                retVal = "0x%s" % binascii.hexlify(value)
-            except UnicodeEncodeError:
-                retVal = "CONVERT(0x%s USING utf8)" % "".join("%.2x" % ord(_) for _ in utf8encode(value))
-            return retVal
+            return "0x%s" % getUnicode(binascii.hexlify(getBytes(value)))
 
         return Syntax._escape(expression, quote, escaper)

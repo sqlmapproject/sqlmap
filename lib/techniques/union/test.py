@@ -168,7 +168,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
     validPayload = None
     vector = None
 
-    positions = range(0, count)
+    positions = [_ for _ in xrange(0, count)]
 
     # Unbiased approach for searching appropriate usable column
     random.shuffle(positions)

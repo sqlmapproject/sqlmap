@@ -34,7 +34,7 @@ def _size_of(object_):
     if isinstance(object_, dict):
         retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(object_.items()))
     elif hasattr(object_, "__iter__"):
-        retval += sum(_size_of(_) for _ in object_)
+        retval += sum(_size_of(_) for _ in object_ if _ != object_)
 
     return retval
 
@@ -55,7 +55,7 @@ class BigArray(list):
 
     def __init__(self, items=[]):
         self.chunks = [[]]
-        self.chunk_length = sys.maxint
+        self.chunk_length = sys.maxsize
         self.cache = None
         self.filenames = set()
         self._os_remove = os.remove
@@ -67,7 +67,7 @@ class BigArray(list):
     def append(self, value):
         self.chunks[-1].append(value)
 
-        if self.chunk_length == sys.maxint:
+        if self.chunk_length == sys.maxsize:
             self._size_counter += _size_of(value)
             if self._size_counter >= BIGARRAY_CHUNK_SIZE:
                 self.chunk_length = len(self.chunks[-1])

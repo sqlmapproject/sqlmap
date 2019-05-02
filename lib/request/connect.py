@@ -1349,6 +1349,9 @@ class Connect(object):
             kb.permissionFlag = True
             singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
 
+        if not hasattr(headers, "headers"):
+            headers.headers = ["%s: %s\r\n" % (header, headers[header]) for header in headers]
+
         if content or response:
             return page, headers, code
 
