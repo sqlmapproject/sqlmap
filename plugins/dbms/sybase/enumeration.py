@@ -27,6 +27,7 @@ from lib.utils.brute import columnExists
 from lib.utils.pivotdumptable import pivotDumpTable
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 from thirdparty import six
+from thirdparty.six.moves import zip as _zip
 
 class Enumeration(GenericEnumeration):
     def getUsers(self):
@@ -279,7 +280,7 @@ class Enumeration(GenericEnumeration):
                     table = {}
                     columns = {}
 
-                    for name, type_ in filterPairValues(zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
+                    for name, type_ in filterPairValues(_zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
                         columns[name] = SYBASE_TYPES.get(int(type_) if hasattr(type_, "isdigit") and type_.isdigit() else type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl, True)] = columns

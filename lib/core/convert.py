@@ -171,7 +171,7 @@ def htmlunescape(value):
             retVal = retVal.replace(code, value)
 
         try:
-            retVal = re.sub(r"&#x([^ ;]+);", lambda match: unichr(int(match.group(1), 16)), retVal)
+            retVal = re.sub(r"&#x([^ ;]+);", lambda match: six.unichr(int(match.group(1), 16)), retVal)
         except ValueError:
             pass
     return retVal

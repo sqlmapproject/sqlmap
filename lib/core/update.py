@@ -12,7 +12,6 @@ import shutil
 import subprocess
 import sys
 import time
-import urllib
 import zipfile
 
 from lib.core.common import dataToStdout
@@ -29,6 +28,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import VERSION
 from lib.core.settings import ZIPBALL_PAGE
 from lib.core.settings import UNICODE_ENCODING
+from thirdparty.six.moves import urllib as _urllib
 
 def update():
     if not conf.updateAll:
@@ -71,7 +71,7 @@ def update():
                     logger.error(errMsg)
                 else:
                     try:
-                        archive = urllib.urlretrieve(ZIPBALL_PAGE)[0]
+                        archive = _urllib.request.urlretrieve(ZIPBALL_PAGE)[0]
 
                         with zipfile.ZipFile(archive) as f:
                             for info in f.infolist():

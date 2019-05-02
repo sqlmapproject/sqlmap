@@ -50,6 +50,7 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import decodeBase64
 from lib.core.common import getBytes
 from lib.core.common import getFileItems
 from lib.core.common import getPublicTypeMembers
@@ -915,15 +916,15 @@ def dictionaryAttack(attack_dict):
                             hash_ = hash_.lower()
 
                         if hash_regex in (HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
-                            item = [(user, hash_.decode("base64").encode("hex")), {}]
+                            item = [(user, decodeBase64(hash_, binary=False).encode("hex")), {}]
                         elif hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
                             item = [(user, hash_), {}]
                         elif hash_regex in (HASH.SSHA,):
-                            item = [(user, hash_), {"salt": hash_.decode("base64")[20:]}]
+                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=False)[20:]}]
                         elif hash_regex in (HASH.SSHA256,):
-                            item = [(user, hash_), {"salt": hash_.decode("base64")[32:]}]
+                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=False)[32:]}]
                         elif hash_regex in (HASH.SSHA512,):
-                            item = [(user, hash_), {"salt": hash_.decode("base64")[64:]}]
+                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=False)[64:]}]
                         elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
                             item = [(user, hash_), {'username': user}]
                         elif hash_regex in (HASH.ORACLE,):

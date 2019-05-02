@@ -5,6 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import base64
 import binascii
 import codecs
 import collections
@@ -47,6 +48,8 @@ from extra.beep.beep import beep
 from extra.cloak.cloak import decloak
 from extra.safe2bin.safe2bin import safecharencode
 from lib.core.bigarray import BigArray
+from lib.core.compat import cmp
+from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
@@ -179,7 +182,9 @@ from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import configparser as _configparser
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import input as _input
+from thirdparty.six.moves import reload_module as _reload_module
 from thirdparty.six.moves import urllib as _urllib
+from thirdparty.six.moves import zip as _zip
 from thirdparty.termcolor.termcolor import colored
 
 class UnicodeRawConfigParser(_configparser.RawConfigParser):
@@ -610,7 +615,7 @@ def paramToDict(place, parameters=None):
                 if parameter in (conf.base64Parameter or []):
                     try:
                         oldValue = value
-                        value = value.decode("base64")
+                        value = decodeBase64(value, binary=False)
                         parameters = re.sub(r"\b%s\b" % re.escape(oldValue), value, parameters)
                     except:
                         errMsg = "parameter '%s' does not contain " % parameter
@@ -2278,7 +2283,7 @@ def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, un
 
     try:
         with openFile(filename, 'r', errors="ignore") if unicoded else open(filename, 'r') as f:
-            for line in (f.readlines() if unicoded else f.xreadlines()):  # xreadlines doesn't return unicode strings when codec.open() is used
+            for line in f:
                 if commentPrefix:
                     if line.find(commentPrefix) != -1:
                         line = line[:line.find(commentPrefix)]
@@ -2452,15 +2457,39 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
-def decodeHex(value):
+def decodeHex(value, binary=True):
     """
-    Returns byte representation of provided hexadecimal value
+    Returns a decoded representation of provided hexadecimal value
 
     >>> decodeHex("313233") == b"123"
     True
+    >>> decodeHex("313233", binary=False) == u"123"
+    True
     """
 
-    return bytes.fromhex(getUnicode(value)) if hasattr(bytes, "fromhex") else value.decode("hex")
+    retVal = codecs.decode(value, "hex")
+
+    if not binary:
+        retVal = getUnicode(retVal)
+
+    return retVal
+
+def decodeBase64(value, binary=True):
+    """
+    Returns a decoded representation of provided Base64 value
+
+    >>> decodeBase64("MTIz") == b"123"
+    True
+    >>> decodeBase64("MTIz", binary=False) == u"123"
+    True
+    """
+
+    retVal = base64.b64decode(value)
+
+    if not binary:
+        retVal = getUnicode(retVal)
+
+    return retVal
 
 def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
     """
@@ -2475,7 +2504,7 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
     if isinstance(value, six.text_type):
         if INVALID_UNICODE_PRIVATE_AREA:
             for char in xrange(0xF0000, 0xF00FF + 1):
-                value = value.replace(unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
+                value = value.replace(six.unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
 
             retVal = value.encode(encoding, errors)
             retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: decodeHex(_.group(1)), retVal)
@@ -2525,7 +2554,13 @@ def longestCommonPrefix(*sequences):
     return sequences[0]
 
 def commonFinderOnly(initial, sequence):
-    return longestCommonPrefix(*filter(lambda _: _.startswith(initial), sequence))
+    """
+    Returns parts of sequence which start with the given initial string
+
+    >>> commonFinderOnly("abcd", ["abcdefg", "foobar", "abcde"])
+    ['abcdefg', 'abcde']
+    """
+    return longestCommonPrefix([_ for _ in sequence if _.startswith(initial)])
 
 def pushValue(value):
     """
@@ -2811,13 +2846,13 @@ def runningAsAdmin():
     if PLATFORM in ("posix", "mac"):
         _ = os.geteuid()
 
-        isAdmin = isinstance(_, (int, float, long)) and _ == 0
+        isAdmin = isinstance(_, (float, six.integer_types)) and _ == 0
     elif IS_WIN:
         import ctypes
 
         _ = ctypes.windll.shell32.IsUserAnAdmin()
 
-        isAdmin = isinstance(_, (int, float, long)) and _ == 1
+        isAdmin = isinstance(_, (float, six.integer_types)) and _ == 1
     else:
         errMsg = "sqlmap is not able to check if you are running it "
         errMsg += "as an administrator account on this platform. "
@@ -3318,6 +3353,8 @@ def unArrayizeValue(value):
 
     >>> unArrayizeValue(['1'])
     '1'
+    >>> unArrayizeValue(['1', '2'])
+    '1'
     """
 
     if isListLike(value):
@@ -3326,8 +3363,8 @@ def unArrayizeValue(value):
         elif len(value) == 1 and not isListLike(value[0]):
             value = value[0]
         else:
-            _ = filter(lambda _: _ is not None, (_ for _ in flattenValue(value)))
-            value = _[0] if len(_) > 0 else None
+            value = [_ for _ in flattenValue(value) if _ is not None]
+            value = value[0] if len(value) > 0 else None
 
     return value
 
@@ -3459,7 +3496,7 @@ def decodeIntToUnicode(value):
                 elif Backend.isDbms(DBMS.MSSQL):
                     retVal = getUnicode(raw, "UTF-16-BE")
                 elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
-                    retVal = unichr(value)
+                    retVal = six.unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.encoding)
             else:
@@ -3600,7 +3637,7 @@ def createGithubIssue(errMsg, excMsg):
         choice = None
 
     if choice:
-        ex = None
+        _excMsg = None
         errMsg = errMsg[errMsg.find("\n"):]
 
         req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key))
@@ -3621,12 +3658,13 @@ def createGithubIssue(errMsg, excMsg):
             pass
 
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
-        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % GITHUB_REPORT_OAUTH_TOKEN.decode("base64")})
+        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False)})
 
         try:
             content = _urllib.request.urlopen(req).read()
         except Exception as ex:
             content = None
+            _excMsg = getSafeExString(ex)
 
         issueUrl = re.search(r"https://github.com/sqlmapproject/sqlmap/issues/\d+", content or "")
         if issueUrl:
@@ -3640,8 +3678,8 @@ def createGithubIssue(errMsg, excMsg):
                 pass
         else:
             warnMsg = "something went wrong while creating a Github issue"
-            if ex:
-                warnMsg += " ('%s')" % getSafeExString(ex)
+            if _excMsg:
+                warnMsg += " ('%s')" % _excMsg
             if "Unauthorized" in warnMsg:
                 warnMsg += ". Please update to the latest revision"
             logger.warn(warnMsg)
@@ -4403,7 +4441,7 @@ def checkSystemEncoding():
             warnMsg = "temporary switching to charset 'cp1256'"
             logger.warn(warnMsg)
 
-            reload(sys)
+            _reload_module(sys)
             sys.setdefaultencoding("cp1256")
 
 def evaluateCode(code, variables=None):
@@ -4741,7 +4779,7 @@ def splitFields(fields, delimiter=','):
     commas.extend(zeroDepthSearch(fields, ','))
     commas = sorted(commas)
 
-    return [fields[x + 1:y] for (x, y) in zip(commas, commas[1:])]
+    return [fields[x + 1:y] for (x, y) in _zip(commas, commas[1:])]
 
 def pollProcess(process, suppress_errors=False):
     """
@@ -4807,7 +4845,7 @@ def parseRequestFile(reqFile, checkParams=True):
                 for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
                     port, request = match.groups()
                     try:
-                        request = request.decode("base64")
+                        request = decodeBase64(request, binary=False)
                     except binascii.Error:
                         continue
                     _ = re.search(r"%s:.+" % re.escape(HTTP_HEADER.HOST), request)

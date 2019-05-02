@@ -5,7 +5,9 @@
 
 # Stress test against Python3
 
-export SQLMAP_DREI=1
-for i in $(find . -iname "*.py" | grep -v __init__); do python3 -c 'import '`echo $i | cut -d '.' -f 2 | cut -d '/' -f 2- | sed 's/\//./g'`''; done
-unset SQLMAP_DREI
-source `dirname "$0"`"/junk.sh"
+# export SQLMAP_DREI=1
+# for i in $(find . -iname "*.py" | grep -v __init__); do python3 -c 'import '`echo $i | cut -d '.' -f 2 | cut -d '/' -f 2- | sed 's/\//./g'`''; done
+# unset SQLMAP_DREI
+# source `dirname "$0"`"/junk.sh"
+
+for i in $(find . -iname "*.py" | grep -v __init__); do pylint --py3k $i; done

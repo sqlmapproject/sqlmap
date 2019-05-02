@@ -20,6 +20,7 @@ import tempfile
 import time
 
 from lib.core.common import dataToStdout
+from lib.core.common import decodeBase64
 from lib.core.common import getSafeExString
 from lib.core.common import saveConfig
 from lib.core.common import unArrayizeValue
@@ -294,7 +295,7 @@ def check_authentication():
         request.environ["PATH_INFO"] = "/error/401"
 
     try:
-        creds = match.group(1).decode("base64")
+        creds = decodeBase64(match.group(1), binary=False)
     except:
         request.environ["PATH_INFO"] = "/error/401"
     else:

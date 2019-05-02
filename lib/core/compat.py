@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import binascii
+import math
 import os
 import random
 import uuid
@@ -163,12 +164,43 @@ class WichmannHill(random.Random):
         self.__whseed(x, y, z)
 
 def patchHeaders(headers):
-    if not hasattr(headers, "headers"):
+    if headers is not None and not hasattr(headers, "headers"):
         headers.headers = ["%s: %s\r\n" % (header, headers[header]) for header in headers]
+
+def cmp(a, b):
+    """
+    >>> cmp("a", "b")
+    -1
+    >>> cmp(2, 1)
+    1
+    """
+
+    if a < b:
+        return -1
+    elif a > b:
+        return 1
+    else:
+        return 0
 
 # Reference: https://github.com/urllib3/urllib3/blob/master/src/urllib3/filepost.py
 def choose_boundary():
     return uuid.uuid4().hex
+
+# Reference: http://python3porting.com/differences.html
+def round(x, d=0):
+    """
+    >>> round(2.0)
+    2.0
+    >>> round(2.5)
+    3.0
+    """
+
+    p = 10 ** d
+    if x > 0:
+        return float(math.floor((x * p) + 0.5))/p
+    else:
+        return float(math.ceil((x * p) - 0.5))/p
+
 
 if sys.version_info >= (3, 0):
     xrange = range

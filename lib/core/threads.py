@@ -155,7 +155,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             try:
                 thread.start()
             except Exception as ex:
-                errMsg = "error occurred while starting new thread ('%s')" % ex.message
+                errMsg = "error occurred while starting new thread ('%s')" % ex
                 logger.critical(errMsg)
                 break
 
@@ -191,7 +191,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     except (SqlmapConnectionException, SqlmapValueException) as ex:
         print()
         kb.threadException = True
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
+        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), ex))
 
         if conf.get("verbose") > 1:
             traceback.print_exc()

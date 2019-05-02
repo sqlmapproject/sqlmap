@@ -26,6 +26,7 @@ from lib.core.common import getUnicode
 from lib.core.common import randomStr
 from lib.core.common import readXmlFile
 from lib.core.common import shellExec
+from lib.core.compat import round
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths

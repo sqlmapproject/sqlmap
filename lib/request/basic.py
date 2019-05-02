@@ -345,14 +345,14 @@ def decodePage(page, contentEncoding, contentType):
             def _(match):
                 retVal = match.group(0)
                 try:
-                    retVal = unichr(int(match.group(1)))
+                    retVal = six.unichr(int(match.group(1)))
                 except (ValueError, OverflowError):
                     pass
                 return retVal
             page = re.sub(r"&#(\d+);", _, page)
 
         # e.g. &zeta;
-        page = re.sub(r"&([^;]+);", lambda _: unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
+        page = re.sub(r"&([^;]+);", lambda _: six.unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
     return page
 

@@ -59,6 +59,7 @@ from lib.core.common import setOptimize
 from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
+from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
@@ -2096,11 +2097,14 @@ def _useWizardInterface():
             choice = readInput(message, default='1')
 
             if choice == '2':
-                map(lambda _: conf.__setitem__(_, True), WIZARD.INTERMEDIATE)
+                options = WIZARD.INTERMEDIATE
             elif choice == '3':
-                map(lambda _: conf.__setitem__(_, True), WIZARD.ALL)
+                options = WIZARD.ALL
             else:
-                map(lambda _: conf.__setitem__(_, True), WIZARD.BASIC)
+                options = WIZARD.BASIC
+
+            for _ in options:
+                conf.__setitem__(_, True)
 
     logger.debug("muting sqlmap.. it will do the magic for you")
     conf.verbose = 0

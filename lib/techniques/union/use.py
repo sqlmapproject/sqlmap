@@ -18,6 +18,7 @@ from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import decodeBase64
 from lib.core.common import extractRegexResult
 from lib.core.common import firstNotNone
 from lib.core.common import flattenValue
@@ -121,14 +122,14 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                                 break
 
                             try:
-                                value.decode("base64")
+                                decodeBase64(value)
                             except binascii.Error:
                                 base64 = False
                                 break
 
                         if base64:
                             for child in root:
-                                child.attrib[column] = child.attrib.get(column, "").decode("base64") or NULL
+                                child.attrib[column] = decodeBase64(child.attrib.get(column, ""), binary=False) or NULL
 
                     for child in root:
                         row = []

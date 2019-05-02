@@ -22,6 +22,7 @@ if sys.version_info >= (3, 0):
     xrange = range
     text_type = str
     string_types = (str,)
+    unichr = chr
 else:
     text_type = unicode
     string_types = (basestring,)
@@ -88,7 +89,7 @@ def safechardecode(value, binary=False):
         while True:
             match = re.search(HEX_ENCODED_CHAR_REGEX, retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), (unichr if isinstance(value, text_type) else chr)(ord(binascii.unhexlify(match.group("result").lstrip("\\x")))))
+                retVal = retVal.replace(match.group("result"), unichr(ord(binascii.unhexlify(match.group("result").lstrip("\\x")))))
             else:
                 break
 

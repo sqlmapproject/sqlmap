@@ -46,6 +46,7 @@ from lib.request import inject
 from lib.utils.hash import attackDumpedTable
 from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty import six
+from thirdparty.six.moves import zip as _zip
 
 class Entries:
     """
@@ -224,7 +225,7 @@ class Entries:
 
                                 if retVal:
                                     entries, _ = retVal
-                                    entries = zip(*[entries[colName] for colName in colList])
+                                    entries = _zip(*[entries[colName] for colName in colList])
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):

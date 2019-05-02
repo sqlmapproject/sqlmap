@@ -33,6 +33,7 @@ from lib.core.settings import MAX_INT
 from lib.core.settings import NULL
 from lib.core.unescaper import unescaper
 from lib.request import inject
+from thirdparty import six
 
 def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     lengths = {}
@@ -142,7 +143,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
                 if column == colList[0]:
                     if isNoneValue(value):
                         try:
-                            for pivotValue in filterNone(("  " if pivotValue == " " else None, "%s%s" % (pivotValue[0], unichr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None, unichr(ord(pivotValue[0]) + 1))):
+                            for pivotValue in filterNone(("  " if pivotValue == " " else None, "%s%s" % (pivotValue[0], six.unichr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None, six.unichr(ord(pivotValue[0]) + 1))):
                                 value = _(column, pivotValue)
                                 if not isNoneValue(value):
                                     break
