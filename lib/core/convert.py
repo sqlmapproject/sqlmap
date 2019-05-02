@@ -145,8 +145,8 @@ def utf8decode(value):
     """
     Returns UTF-8 representation of the supplied 8-bit string representation
 
-    >>> utf8decode(b'foobar')
-    u'foobar'
+    >>> utf8decode(b'foobar') == u'foobar'
+    True
     """
 
     retVal = value

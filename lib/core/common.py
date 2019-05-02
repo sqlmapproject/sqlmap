@@ -1758,7 +1758,7 @@ def getFileType(filePath):
     """
 
     try:
-        desc = magic.from_file(filePath) or ""
+        desc = getUnicode(magic.from_file(filePath) or "")
     except:
         return "unknown"
 

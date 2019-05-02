@@ -6,7 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 from lib.core.common import getOrds
-from lib.core.compat import xrange
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
