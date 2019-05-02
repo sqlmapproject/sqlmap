@@ -11,8 +11,9 @@ import zipfile
 from lib.core.common import getSafeExString
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapInstallationException
+from thirdparty import six
 
-class Wordlist(object):
+class Wordlist(six.Iterator):
     """
     Iterator for looping over a large dictionaries
     """
@@ -63,7 +64,7 @@ class Wordlist(object):
             self.fp.close()
             self.fp = None
 
-    def next(self):
+    def __next__(self):
         retVal = None
         while True:
             self.counter += 1

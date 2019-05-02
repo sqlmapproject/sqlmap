@@ -703,20 +703,19 @@ def attackDumpedTable():
 def hashRecognition(value):
     retVal = None
 
-    if six.PY2:  # currently only supported on Python2
-        isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
+    isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
-        if isinstance(value, six.string_types):
-            for name, regex in getPublicTypeMembers(HASH):
-                # Hashes for Oracle and old MySQL look the same hence these checks
-                if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
+    if isinstance(value, six.string_types):
+        for name, regex in getPublicTypeMembers(HASH):
+            # Hashes for Oracle and old MySQL look the same hence these checks
+            if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
+                continue
+            elif regex == HASH.CRYPT_GENERIC:
+                if any((value.lower() == value, value.upper() == value)):
                     continue
-                elif regex == HASH.CRYPT_GENERIC:
-                    if any((value.lower() == value, value.upper() == value)):
-                        continue
-                elif re.match(regex, value):
-                    retVal = regex
-                    break
+            elif re.match(regex, value):
+                retVal = regex
+                break
 
     return retVal
 
@@ -737,7 +736,9 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
             count += 1
 
-            if not isinstance(word, six.string_types):
+            if isinstance(word, six.binary_type):
+                word = getUnicode(word)
+            elif not isinstance(word, six.string_types):
                 continue
 
             if suffix:
@@ -812,7 +813,9 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
             count += 1
 
-            if not isinstance(word, six.string_types):
+            if isinstance(word, six.binary_type):
+                word = getUnicode(word)
+            elif not isinstance(word, six.string_types):
                 continue
 
             if suffix:
