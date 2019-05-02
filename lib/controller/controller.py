@@ -220,7 +220,7 @@ def _saveToHashDB():
             _[key] = injection
         else:
             _[key].data.update(injection.data)
-    hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, _.values(), True)
+    hashDBWrite(HASHDB_KEYS.KB_INJECTIONS, list(_.values()), True)
 
     _ = hashDBRetrieve(HASHDB_KEYS.KB_ABS_FILE_PATHS, True)
     hashDBWrite(HASHDB_KEYS.KB_ABS_FILE_PATHS, kb.absFilePaths | (_ if isinstance(_, set) else set()), True)

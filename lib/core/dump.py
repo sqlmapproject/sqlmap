@@ -194,7 +194,7 @@ class Dump(object):
             self._areAdmins = userSettings[1]
             userSettings = userSettings[0]
 
-        users = userSettings.keys()
+        users = list(userSettings.keys())
         users.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
 
         if conf.api:
@@ -288,7 +288,7 @@ class Dump(object):
 
                     colType = None
 
-                    colList = columns.keys()
+                    colList = list(columns.keys())
                     colList.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
 
                     for column in colList:
@@ -372,7 +372,7 @@ class Dump(object):
                 self._write("| Table%s | Entries%s |" % (blank1, blank2))
                 self._write("+%s+%s+" % (lines1, lines2))
 
-                sortedCounts = counts.keys()
+                sortedCounts = list(counts.keys())
                 sortedCounts.sort(reverse=True)
 
                 for count in sortedCounts:
@@ -484,7 +484,7 @@ class Dump(object):
         field = 1
         fields = len(tableValues) - 1
 
-        columns = prioritySortColumns(tableValues.keys())
+        columns = prioritySortColumns(list(tableValues.keys()))
 
         if conf.col:
             cols = conf.col.split(',')

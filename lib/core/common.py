@@ -3290,7 +3290,9 @@ def arrayizeValue(value):
     ['1']
     """
 
-    if not isListLike(value):
+    if isinstance(value, collections.KeysView):
+        value = [_ for _ in value]
+    elif not isListLike(value):
         value = [value]
 
     return value
@@ -3393,7 +3395,7 @@ def showHttpErrorCodes():
         warnMsg = "HTTP error codes detected during run:\n"
         warnMsg += ", ".join("%d (%s) - %d times" % (code, _http_client.responses[code] if code in _http_client.responses else '?', count) for code, count in kb.httpErrorCodes.items())
         logger.warn(warnMsg)
-        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes.keys()):
+        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes):
             msg = "too many 4xx and/or 5xx HTTP error codes "
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.debug(msg)

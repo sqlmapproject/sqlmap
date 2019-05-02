@@ -375,8 +375,12 @@ def main():
                         os.remove(filepath)
                     except OSError:
                         pass
+
             if not filterNone(filepath for filepath in glob.glob(os.path.join(kb.tempDir, '*')) if not any(filepath.endswith(_) for _ in ('.lock', '.exe', '_'))):
-                shutil.rmtree(kb.tempDir, ignore_errors=True)
+                try:
+                    shutil.rmtree(kb.tempDir, ignore_errors=True)
+                except OSError:
+                    pass
 
         if conf.get("hashDB"):
             conf.hashDB.flush(True)

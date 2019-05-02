@@ -16,6 +16,7 @@ import re
 import sys
 
 from lib.core.settings import IS_WIN
+from lib.core.settings import PICKLE_PROTOCOL
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
 
@@ -50,7 +51,7 @@ def base64pickle(value):
     retVal = None
 
     try:
-        retVal = base64encode(pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
+        retVal = base64encode(pickle.dumps(value, PICKLE_PROTOCOL))
     except:
         warnMsg = "problem occurred while serializing "
         warnMsg += "instance of a type '%s'" % type(value)
@@ -59,7 +60,7 @@ def base64pickle(value):
         try:
             retVal = base64encode(pickle.dumps(value))
         except:
-            retVal = base64encode(pickle.dumps(str(value), pickle.HIGHEST_PROTOCOL))
+            retVal = base64encode(pickle.dumps(str(value), PICKLE_PROTOCOL))
 
     return retVal
 

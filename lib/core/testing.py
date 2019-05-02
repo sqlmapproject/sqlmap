@@ -143,7 +143,7 @@ def smokeTest():
     return retVal
 
 def adjustValueType(tagName, value):
-    for family in optDict.keys():
+    for family in optDict:
         for name, type_ in optDict[family].items():
             if type(type_) == tuple:
                 type_ = type_[0]
