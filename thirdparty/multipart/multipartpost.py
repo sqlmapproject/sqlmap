@@ -26,8 +26,8 @@ import os
 import stat
 import sys
 
-from lib.core.common import getBytes
 from lib.core.compat import choose_boundary
+from lib.core.convert import getBytes
 from lib.core.exception import SqlmapDataException
 from thirdparty.six.moves import urllib as _urllib
 

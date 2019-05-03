@@ -8,8 +8,8 @@ See the file 'LICENSE' for copying permission
 import binascii
 
 from lib.core.common import Backend
-from lib.core.common import getBytes
 from lib.core.compat import xrange
+from lib.core.convert import getBytes
 from lib.core.data import logger
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject

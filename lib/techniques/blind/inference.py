@@ -14,7 +14,7 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
-from lib.core.common import decodeHexValue
+from lib.core.common import decodeDbmsHexValue
 from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
@@ -656,7 +656,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         retrievedLength = len(finalValue or "")
 
         if finalValue is not None:
-            finalValue = decodeHexValue(finalValue) if conf.hexConvert else finalValue
+            finalValue = decodeDbmsHexValue(finalValue) if conf.hexConvert else finalValue
             hashDBWrite(expression, finalValue)
         elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))

@@ -21,7 +21,7 @@ def tamper(payload, **kwargs):
     >>> import random
     >>> random.seed(0)
     >>> tamper('INSERT')
-    'I/**/N/**/SERT'
+    'I/**/NS/**/ERT'
     """
 
     retVal = payload

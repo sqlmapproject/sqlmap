@@ -34,7 +34,6 @@ from lib.core.common import evaluateCode
 from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import findMultipartPostBoundary
-from lib.core.common import getBytes
 from lib.core.common import getCurrentThreadData
 from lib.core.common import getHeader
 from lib.core.common import getHostHeader
@@ -60,6 +59,7 @@ from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
+from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

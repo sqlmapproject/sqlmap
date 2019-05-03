@@ -15,8 +15,8 @@ from lib.core.common import posixToNtSlashes
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.compat import xrange
-from lib.core.convert import base64encode
-from lib.core.convert import hexencode
+from lib.core.convert import encodeBase64
+from lib.core.convert import encodeHex
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
@@ -44,7 +44,7 @@ class Filesystem(GenericFilesystem):
             scrString = ""
 
             for lineChar in fileContent[fileLine:fileLine + lineLen]:
-                strLineChar = hexencode(lineChar, conf.encoding)
+                strLineChar = encodeHex(lineChar, binary=False)
 
                 if not scrString:
                     scrString = "e %x %s" % (lineAddr, strLineChar)
@@ -170,7 +170,7 @@ class Filesystem(GenericFilesystem):
         infoMsg += "to file '%s'" % dFile
         logger.info(infoMsg)
 
-        encodedFileContent = base64encode(wFileContent)
+        encodedFileContent = encodeBase64(wFileContent, binary=False)
         encodedBase64File = "tmpf%s.txt" % randomStr(lowercase=True)
         encodedBase64FilePath = "%s\\%s" % (tmpPath, encodedBase64File)
 
@@ -330,7 +330,7 @@ class Filesystem(GenericFilesystem):
         End Function""" % (randFilePath, dFile)
 
         vbs = vbs.replace("    ", "")
-        encodedFileContent = base64encode(wFileContent)
+        encodedFileContent = encodeBase64(wFileContent, binary=False)
 
         logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
 
@@ -359,7 +359,7 @@ class Filesystem(GenericFilesystem):
         randFile = "tmpf%s.txt" % randomStr(lowercase=True)
         randFilePath = "%s\\%s" % (tmpPath, randFile)
 
-        encodedFileContent = base64encode(wFileContent)
+        encodedFileContent = encodeBase64(wFileContent, binary=False)
 
         splittedEncodedFileContent = '\n'.join([encodedFileContent[i:i + chunkMaxSize] for i in xrange(0, len(encodedFileContent), chunkMaxSize)])
 

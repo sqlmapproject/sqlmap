@@ -13,7 +13,7 @@ from lib.core.common import dataToOutFile
 from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
-from lib.core.common import decodeHexValue
+from lib.core.common import decodeDbmsHexValue
 from lib.core.common import getUnicode
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isListLike
@@ -251,7 +251,7 @@ class Filesystem:
                 fileContent = newFileContent
 
             if fileContent is not None:
-                fileContent = decodeHexValue(fileContent, True)
+                fileContent = decodeDbmsHexValue(fileContent, True)
 
                 if fileContent:
                     localFilePath = dataToOutFile(remoteFile, fileContent)

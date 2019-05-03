@@ -8,12 +8,12 @@ See the file 'LICENSE' for copying permission
 import re
 
 from lib.core.common import extractRegexResult
-from lib.core.common import getBytes
 from lib.core.common import getFilteredPageContent
 from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
+from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

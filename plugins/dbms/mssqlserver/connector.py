@@ -14,7 +14,7 @@ except:
 import logging
 
 from lib.core.common import getSafeExString
-from lib.core.convert import utf8encode
+from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
@@ -58,7 +58,7 @@ class Connector(GenericConnector):
         retVal = False
 
         try:
-            self.cursor.execute(utf8encode(query))
+            self.cursor.execute(getBytes(query))
             retVal = True
         except (pymssql.OperationalError, pymssql.ProgrammingError) as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))

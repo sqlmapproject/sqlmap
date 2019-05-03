@@ -17,7 +17,6 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
-from lib.core.common import getBytes
 from lib.core.common import getSafeExString
 from lib.core.common import getUnicode
 from lib.core.common import isListLike
@@ -29,6 +28,7 @@ from lib.core.common import randomInt
 from lib.core.common import safeCSValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
+from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

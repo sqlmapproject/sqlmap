@@ -16,7 +16,7 @@ from lib.core.bigarray import BigArray
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import dataToStdout
-from lib.core.common import decodeHexValue
+from lib.core.common import decodeDbmsHexValue
 from lib.core.common import extractRegexResult
 from lib.core.common import firstNotNone
 from lib.core.common import getConsoleWidth
@@ -33,7 +33,7 @@ from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.compat import xrange
-from lib.core.convert import hexdecode
+from lib.core.convert import decodeHex
 from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
@@ -201,7 +201,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 hashDBWrite(expression, "%s%s" % (retVal, PARTIAL_VALUE_MARKER))
             raise
 
-        retVal = decodeHexValue(retVal) if conf.hexConvert else retVal
+        retVal = decodeDbmsHexValue(retVal) if conf.hexConvert else retVal
 
         if isinstance(retVal, six.string_types):
             retVal = htmlunescape(retVal).replace("<br>", "\n")
@@ -281,7 +281,7 @@ def _formatPartialContent(value):
 
     if value and isinstance(value, six.string_types):
         try:
-            value = hexdecode(value)
+            value = decodeHex(value, binary=False)
         except:
             pass
         finally:

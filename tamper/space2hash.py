@@ -36,7 +36,7 @@ def tamper(payload, **kwargs):
 
     >>> random.seed(0)
     >>> tamper('1 AND 9227=9227')
-    '1%23nVNaVoPYeva%0AAND%23ngNvzqu%0A9227=9227'
+    '1%23upgPydUzKpMX%0AAND%23RcDKhIr%0A9227=9227'
     """
 
     retVal = ""

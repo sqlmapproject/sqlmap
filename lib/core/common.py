@@ -5,7 +5,6 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import base64
 import binascii
 import codecs
 import collections
@@ -53,10 +52,12 @@ from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import base64pickle
 from lib.core.convert import base64unpickle
-from lib.core.convert import hexdecode
+from lib.core.convert import decodeBase64
+from lib.core.convert import decodeHex
+from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.convert import htmlunescape
 from lib.core.convert import stdoutencode
-from lib.core.convert import utf8encode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -127,7 +128,6 @@ from lib.core.settings import HOST_ALIASES
 from lib.core.settings import HTTP_CHUNKED_SPLIT_KEYWORDS
 from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
 from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_WIN
@@ -156,7 +156,6 @@ from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
-from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
 from lib.core.settings import STDIN_PIPE_DASH
@@ -1113,8 +1112,9 @@ def randomRange(start=0, stop=1000, seed=None):
     """
     Returns random integer value in given range
 
-    >>> randomRange(1, 500, seed=0)
-    9
+    >>> random.seed(0)
+    >>> randomRange(1, 500)
+    152
     """
 
     if seed is not None:
@@ -1130,8 +1130,9 @@ def randomInt(length=4, seed=None):
     """
     Returns random integer value with provided number of digits
 
-    >>> randomInt(6, seed=0)
-    181911
+    >>> random.seed(0)
+    >>> randomInt(6)
+    963638
     """
 
     if seed is not None:
@@ -1147,8 +1148,9 @@ def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
     """
     Returns random string value with provided number of characters
 
-    >>> randomStr(6, seed=0)
-    'aUfWgj'
+    >>> random.seed(0)
+    >>> randomStr(6)
+    'FUPGpY'
     """
 
     if seed is not None:
@@ -1685,7 +1687,7 @@ def parseUnionPage(page):
             entry = entry.split(kb.chars.delimiter)
 
             if conf.hexConvert:
-                entry = applyFunctionRecursively(entry, decodeHexValue)
+                entry = applyFunctionRecursively(entry, decodeDbmsHexValue)
 
             if kb.safeCharEncode:
                 entry = applyFunctionRecursively(entry, safecharencode)
@@ -1882,7 +1884,7 @@ def safeStringFormat(format_, params):
     Avoids problems with inappropriate string format strings
 
     >>> safeStringFormat('SELECT foo FROM %s LIMIT %d', ('bar', '1'))
-    u'SELECT foo FROM bar LIMIT 1'
+    'SELECT foo FROM bar LIMIT 1'
     """
 
     if format_.count(PAYLOAD_DELIMITER) == 2:
@@ -1895,7 +1897,7 @@ def safeStringFormat(format_, params):
     if isinstance(params, six.string_types):
         retVal = retVal.replace("%s", params, 1)
     elif not isListLike(params):
-        retVal = retVal.replace("%s", getUnicode(params), 1)
+        retVal = retVal.replace("%s", getText(params), 1)
     else:
         start, end = 0, len(retVal)
         match = re.search(r"%s(.+)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), retVal)
@@ -1904,7 +1906,7 @@ def safeStringFormat(format_, params):
         if retVal.count("%s", start, end) == len(params):
             for param in params:
                 index = retVal.find("%s", start)
-                retVal = retVal[:index] + getUnicode(param) + retVal[index + 2:]
+                retVal = retVal[:index] + getText(param) + retVal[index + 2:]
         else:
             if any('%s' in _ for _ in conf.parameters.values()):
                 parts = format_.split(' ')
@@ -2457,75 +2459,6 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
-def decodeHex(value, binary=True):
-    """
-    Returns a decoded representation of provided hexadecimal value
-
-    >>> decodeHex("313233") == b"123"
-    True
-    >>> decodeHex("313233", binary=False) == u"123"
-    True
-    """
-
-    retVal = codecs.decode(value, "hex")
-
-    if not binary:
-        retVal = getUnicode(retVal)
-
-    return retVal
-
-def decodeBase64(value, binary=True):
-    """
-    Returns a decoded representation of provided Base64 value
-
-    >>> decodeBase64("MTIz") == b"123"
-    True
-    >>> decodeBase64("MTIz", binary=False) == u"123"
-    True
-    """
-
-    retVal = base64.b64decode(value)
-
-    if not binary:
-        retVal = getUnicode(retVal)
-
-    return retVal
-
-def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
-    """
-    Returns byte representation of provided Unicode value
-
-    >>> getBytes(getUnicode(b"foo\\x01\\x83\\xffbar")) == b"foo\\x01\\x83\\xffbar"
-    True
-    """
-
-    retVal = value
-
-    if isinstance(value, six.text_type):
-        if INVALID_UNICODE_PRIVATE_AREA:
-            for char in xrange(0xF0000, 0xF00FF + 1):
-                value = value.replace(six.unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
-
-            retVal = value.encode(encoding, errors)
-            retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: decodeHex(_.group(1)), retVal)
-        else:
-            retVal = value.encode(encoding, errors)
-            retVal = re.sub(b"\\\\x([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), retVal)
-
-    return retVal
-
-def getOrds(value):
-    """
-    Returns ORD(...) representation of provided string value
-
-    >>> getOrds(u'fo\\xf6bar')
-    [102, 111, 246, 98, 97, 114]
-    >>> getOrds(b"fo\\xc3\\xb6bar")
-    [102, 111, 195, 182, 98, 97, 114]
-    """
-
-    return [_ if isinstance(_, int) else ord(_) for _ in value]
-
 def longestCommonPrefix(*sequences):
     """
     Returns longest common prefix occuring in given sequences
@@ -2774,7 +2707,7 @@ def urldecode(value, encoding=None, unsafe="%%&=;+%s" % CUSTOM_INJECTION_MARK_CH
                 charset = set(string.printable) - set(unsafe)
 
                 def _(match):
-                    char = getUnicode(decodeHex(match.group(1)))
+                    char = decodeHex(match.group(1), binary=False)
                     return char if char in charset else match.group(0)
 
                 if spaceplus:
@@ -2817,7 +2750,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
             value = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", value)
 
         while True:
-            result = _urllib.parse.quote(utf8encode(value), safe)
+            result = _urllib.parse.quote(getBytes(value), safe)
 
             if limit and len(result) > URLENCODE_CHAR_LIMIT:
                 if count >= len(URLENCODE_FAILSAFE_CHARS):
@@ -3488,7 +3421,7 @@ def decodeIntToUnicode(value):
                 _ = "%x" % value
                 if len(_) % 2 == 1:
                     _ = "0%s" % _
-                raw = hexdecode(_)
+                raw = decodeHex(_)
 
                 if Backend.isDbms(DBMS.MYSQL):
                     # Note: https://github.com/sqlmapproject/sqlmap/issues/1531
@@ -4113,9 +4046,9 @@ def randomizeParameterValue(value):
 
     >>> random.seed(0)
     >>> randomizeParameterValue('foobar')
-    'rnvnav'
+    'fupgpy'
     >>> randomizeParameterValue('17')
-    '83'
+    '36'
     """
 
     retVal = value
@@ -4175,8 +4108,8 @@ def asciifyUrl(url, forceQuote=False):
 
     # Reference: http://blog.elsdoerfer.name/2008/12/12/opening-iris-in-python/
 
-    >>> asciifyUrl(u'http://www.\u0161u\u0107uraj.com')
-    u'http://www.xn--uuraj-gxa24d.com'
+    >>> asciifyUrl(u'http://www.\\u0161u\\u0107uraj.com') == u'http://www.xn--uuraj-gxa24d.com'
+    True
     """
 
     parts = _urllib.parse.urlsplit(url)
@@ -4191,7 +4124,7 @@ def asciifyUrl(url, forceQuote=False):
     try:
         hostname = parts.hostname.encode("idna")
     except LookupError:
-        hostname = parts.hostname.encode(UNICODE_ENCODING)
+        hostname = parts.hostname.encode("punycode")
 
     # UTF8-quote the other parts. We check each part individually if
     # if needs to be quoted - that should catch some additional user
@@ -4203,7 +4136,7 @@ def asciifyUrl(url, forceQuote=False):
         #     _urllib.parse.quote(s.replace('%', '')) != s.replace('%', '')
         # which would trigger on all %-characters, e.g. "&".
         if getUnicode(s).encode("ascii", "replace") != s or forceQuote:
-            return _urllib.parse.quote(s.encode(UNICODE_ENCODING) if isinstance(s, six.text_type) else s, safe=safe)
+            s = _urllib.parse.quote(getBytes(s), safe=safe)
         return s
 
     username = quote(parts.username, '')
@@ -4212,7 +4145,7 @@ def asciifyUrl(url, forceQuote=False):
     query = quote(parts.query, safe="&=")
 
     # put everything back together
-    netloc = hostname
+    netloc = getText(hostname)
     if username or password:
         netloc = '@' + netloc
         if password:
@@ -4521,13 +4454,13 @@ def applyFunctionRecursively(value, function):
 
     return retVal
 
-def decodeHexValue(value, raw=False):
+def decodeDbmsHexValue(value, raw=False):
     """
     Returns value decoded from DBMS specific hexadecimal representation
 
-    >>> decodeHexValue('3132332031') == u'123 1'
+    >>> decodeDbmsHexValue('3132332031') == u'123 1'
     True
-    >>> decodeHexValue(['0x31', '0x32']) == [u'1', u'2']
+    >>> decodeDbmsHexValue(['0x31', '0x32']) == [u'1', u'2']
     True
     """
 
@@ -4537,10 +4470,10 @@ def decodeHexValue(value, raw=False):
         retVal = value
         if value and isinstance(value, six.string_types):
             if len(value) % 2 != 0:
-                retVal = "%s?" % hexdecode(value[:-1]) if len(value) > 1 else value
+                retVal = b"%s?" % decodeHex(value[:-1]) if len(value) > 1 else value
                 singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
             else:
-                retVal = hexdecode(value)
+                retVal = decodeHex(value)
 
             if not kb.binaryField and not raw:
                 if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
@@ -4680,7 +4613,7 @@ def decloakToTemp(filename):
 
     content = decloak(filename)
 
-    _ = utf8encode(os.path.split(filename[:-1])[-1])
+    _ = getBytes(os.path.split(filename[:-1])[-1])
 
     prefix, suffix = os.path.splitext(_)
     prefix = prefix.split(os.extsep)[0]
@@ -5033,7 +4966,7 @@ def unsafeVariableNaming(value):
     """
 
     if value.startswith(EVALCODE_ENCODED_PREFIX):
-        value = getUnicode(decodeHex(value[len(EVALCODE_ENCODED_PREFIX):]))
+        value = decodeHex(value[len(EVALCODE_ENCODED_PREFIX):], binary=False)
 
     return value
 
@@ -5060,7 +4993,7 @@ def chunkSplitPostData(data):
 
     >>> random.seed(0)
     >>> chunkSplitPostData("SELECT username,password FROM users")
-    '5;UAqFz\\r\\nSELEC\\r\\n8;sDK4F\\r\\nT userna\\r\\n3;UMp48\\r\\nme,\\r\\n8;3tT3Q\\r\\npassword\\r\\n4;gAL47\\r\\n FRO\\r\\n5;1qXIa\\r\\nM use\\r\\n2;yZPaE\\r\\nrs\\r\\n0\\r\\n\\r\\n'
+    '5;4Xe90\\r\\nSELEC\\r\\n3;irWlc\\r\\nT u\\r\\n1;eT4zO\\r\\ns\\r\\n5;YB4hM\\r\\nernam\\r\\n9;2pUD8\\r\\ne,passwor\\r\\n3;mp07y\\r\\nd F\\r\\n5;8RKXi\\r\\nROM u\\r\\n4;MvMhO\\r\\nsers\\r\\n0\\r\\n\\r\\n'
     """
 
     length = len(data)

@@ -22,7 +22,7 @@ from lib.core.common import parsePasswordHash
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
 from lib.core.compat import xrange
-from lib.core.convert import hexencode
+from lib.core.convert import encodeHex
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -239,7 +239,7 @@ class Users:
 
                 if retVal:
                     for user, password in filterPairValues(_zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.password" % kb.aliasName])):
-                        password = "0x%s" % hexencode(password, conf.encoding).upper()
+                        password = "0x%s" % encodeHex(password, binary=False).upper()
 
                         if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]

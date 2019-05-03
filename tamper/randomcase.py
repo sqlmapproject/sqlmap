@@ -36,7 +36,7 @@ def tamper(payload, **kwargs):
     >>> import random
     >>> random.seed(0)
     >>> tamper('INSERT')
-    'INseRt'
+    'InSeRt'
     """
 
     retVal = payload

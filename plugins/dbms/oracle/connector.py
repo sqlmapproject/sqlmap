@@ -15,7 +15,7 @@ import os
 import re
 
 from lib.core.common import getSafeExString
-from lib.core.convert import utf8encode
+from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
@@ -34,9 +34,9 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
         self.__dsn = cx_Oracle.makedsn(self.hostname, self.port, self.db)
-        self.__dsn = utf8encode(self.__dsn)
-        self.user = utf8encode(self.user)
-        self.password = utf8encode(self.password)
+        self.__dsn = getBytes(self.__dsn)
+        self.user = getBytes(self.user)
+        self.password = getBytes(self.password)
 
         try:
             self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
@@ -67,7 +67,7 @@ class Connector(GenericConnector):
         retVal = False
 
         try:
-            self.cursor.execute(utf8encode(query))
+            self.cursor.execute(getBytes(query))
             retVal = True
         except cx_Oracle.DatabaseError as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))

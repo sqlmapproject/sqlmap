@@ -7,8 +7,8 @@ See the file 'LICENSE' for copying permission
 
 import re
 
-from lib.core.common import decodeHex
-from lib.core.common import getOrds
+from lib.core.convert import decodeHex
+from lib.core.convert import getOrds
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL

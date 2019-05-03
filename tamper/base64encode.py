@@ -5,10 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import base64
-
+from lib.core.convert import encodeBase64
 from lib.core.enums import PRIORITY
-from lib.core.settings import UNICODE_ENCODING
 
 __priority__ = PRIORITY.LOW
 
@@ -23,4 +21,4 @@ def tamper(payload, **kwargs):
     'MScgQU5EIFNMRUVQKDUpIw=='
     """
 
-    return base64.b64encode(payload.encode(UNICODE_ENCODING)) if payload else payload
+    return encodeBase64(payload, binary=False) if payload else payload

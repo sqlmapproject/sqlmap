@@ -10,6 +10,7 @@ import re
 
 from lib.core.data import kb
 from lib.core.enums import PRIORITY
+from lib.core.datatype import OrderedSet
 
 __priority__ = PRIORITY.NORMAL
 
@@ -28,13 +29,13 @@ def tamper(payload, **kwargs):
 
     >>> random.seed(0)
     >>> tamper('1 UNION SELECT foobar')
-    '1    UNION     SELECT   foobar'
+    '1     UNION     SELECT     foobar'
     """
 
     retVal = payload
 
     if payload:
-        words = set()
+        words = OrderedSet()
 
         for match in re.finditer(r"\b[A-Za-z_]+\b", payload):
             word = match.group()
@@ -43,7 +44,7 @@ def tamper(payload, **kwargs):
                 words.add(word)
 
         for word in words:
-            retVal = re.sub(r"(?<=\W)%s(?=[^A-Za-z_(]|\Z)" % word, "%s%s%s" % (' ' * random.randrange(1, 4), word, ' ' * random.randrange(1, 4)), retVal)
-            retVal = re.sub(r"(?<=\W)%s(?=[(])" % word, "%s%s" % (' ' * random.randrange(1, 4), word), retVal)
+            retVal = re.sub(r"(?<=\W)%s(?=[^A-Za-z_(]|\Z)" % word, "%s%s%s" % (' ' * random.randint(1, 4), word, ' ' * random.randint(1, 4)), retVal)
+            retVal = re.sub(r"(?<=\W)%s(?=[(])" % word, "%s%s" % (' ' * random.randint(1, 4), word), retVal)
 
     return retVal

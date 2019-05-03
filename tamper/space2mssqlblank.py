@@ -34,7 +34,7 @@ def tamper(payload, **kwargs):
 
     >>> random.seed(0)
     >>> tamper('SELECT id FROM users')
-    'SELECT%0Eid%0DFROM%07users'
+    'SELECT%0Did%0DFROM%04users'
     """
 
     # ASCII table:
