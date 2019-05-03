@@ -640,7 +640,7 @@ class Metasploit:
             raise SqlmapFilePathException(errMsg)
 
         self._shellcodeFP = open(self._shellcodeFilePath, "rb")
-        self.shellcodeString = self._shellcodeFP.read()
+        self.shellcodeString = getText(self._shellcodeFP.read())
         self._shellcodeFP.close()
 
         os.unlink(self._shellcodeFilePath)
