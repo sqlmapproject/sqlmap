@@ -415,8 +415,7 @@ if __name__ == "__main__":
     except SystemExit:
         raise
     except:
-        if six.PY3:
-            traceback.print_exc()
+        traceback.print_exc()
     finally:
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
         if threading.activeCount() > 1:
