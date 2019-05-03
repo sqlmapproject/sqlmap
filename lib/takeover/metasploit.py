@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import print_function
 
+import errno
 import os
 import re
 import select
@@ -595,7 +596,13 @@ class Metasploit:
                     else:
                         proc.kill()
 
-            except (EOFError, IOError, select.error):
+            except select.error as ex:
+                # Reference: https://github.com/andymccurdy/redis-py/pull/743/commits/2b59b25bb08ea09e98aede1b1f23a270fc085a9f
+                if ex[0] == errno.EINTR:
+                    continue
+                else:
+                    return proc.returncode
+            except (EOFError, IOError):
                 return proc.returncode
             except KeyboardInterrupt:
                 pass
