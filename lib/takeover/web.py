@@ -96,11 +96,11 @@ class Web:
             if filepath.endswith('_'):
                 content = decloak(filepath)  # cloaked file
             else:
-                with open(filepath, "rb") as f:
+                with openFile(filepath, "rb", encoding=None) as f:
                     content = f.read()
 
         if content is not None:
-            stream = io.BytesIO(content)  # string content
+            stream = io.BytesIO(getBytes(content))  # string content
 
             # Reference: https://github.com/sqlmapproject/sqlmap/issues/3560
             # Reference: https://stackoverflow.com/a/4677542
@@ -131,7 +131,7 @@ class Web:
 
             page, _, _ = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
-            if "File uploaded" not in page:
+            if "File uploaded" not in (page or ""):
                 warnMsg = "unable to upload the file through the web file "
                 warnMsg += "stager to '%s'" % directory
                 logger.warn(warnMsg)

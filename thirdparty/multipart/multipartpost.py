@@ -28,12 +28,9 @@ import sys
 
 from lib.core.compat import choose_boundary
 from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.exception import SqlmapDataException
 from thirdparty.six.moves import urllib as _urllib
-
-class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
 
 # Controls how sequences are uncoded. If true, elements may be given
 # multiple values by assigning a sequence.
@@ -72,40 +69,38 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
             request.data = data
         return request
 
-    def multipart_encode(vars, files, boundary=None, buf=None):
+    def multipart_encode(self, vars, files, boundary=None, buf=None):
         if boundary is None:
             boundary = choose_boundary()
 
         if buf is None:
-            buf = ""
+            buf = b""
 
         for (key, value) in vars:
             if key is not None and value is not None:
-                buf += "--%s\r\n" % boundary
-                buf += "Content-Disposition: form-data; name=\"%s\"" % key
-                buf += "\r\n\r\n" + value + "\r\n"
+                buf += b"--%s\r\n" % getBytes(boundary)
+                buf += b"Content-Disposition: form-data; name=\"%s\"" % getBytes(key)
+                buf += b"\r\n\r\n" + getBytes(value) + b"\r\n"
 
         for (key, fd) in files:
-            file_size = os.fstat(fd.fileno())[stat.ST_SIZE] if hasattr(fd, "fileno") else fd.len
+            file_size = fd.len if hasattr(fd, "len") else os.fstat(fd.fileno())[stat.ST_SIZE]
             filename = fd.name.split("/")[-1] if "/" in fd.name else fd.name.split("\\")[-1]
             try:
-                contenttype = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+                contenttype = mimetypes.guess_type(filename)[0] or b"application/octet-stream"
             except:
                 # Reference: http://bugs.python.org/issue9291
-                contenttype = "application/octet-stream"
-            buf += "--%s\r\n" % boundary
-            buf += "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n" % (key, filename)
-            buf += "Content-Type: %s\r\n" % contenttype
-            # buf += "Content-Length: %s\r\n" % file_size
+                contenttype = b"application/octet-stream"
+            buf += b"--%s\r\n" % getBytes(boundary)
+            buf += b"Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n" % (getBytes(key), getBytes(filename))
+            buf += b"Content-Type: %s\r\n" % getBytes(contenttype)
+            # buf += b"Content-Length: %s\r\n" % file_size
             fd.seek(0)
 
-            buf = getBytes(buf)
             buf += b"\r\n%s\r\n" % fd.read()
 
-        buf += "--%s--\r\n\r\n" % boundary
+        buf += b"--%s--\r\n\r\n" % getBytes(boundary)
+        buf = getBytes(buf)
 
         return boundary, buf
-
-    multipart_encode = Callable(multipart_encode)
 
     https_request = http_request

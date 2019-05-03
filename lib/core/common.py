@@ -4108,8 +4108,8 @@ def asciifyUrl(url, forceQuote=False):
 
     # Reference: http://blog.elsdoerfer.name/2008/12/12/opening-iris-in-python/
 
-    >>> asciifyUrl(u'http://www.\\u0161u\\u0107uraj.com') == u'http://www.xn--uuraj-gxa24d.com'
-    True
+    >>> asciifyUrl(u'http://www.\\u0161u\\u0107uraj.com')
+    'http://www.xn--uuraj-gxa24d.com'
     """
 
     parts = _urllib.parse.urlsplit(url)

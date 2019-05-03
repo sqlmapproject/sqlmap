@@ -204,5 +204,7 @@ def round(x, d=0):
 
 if sys.version_info >= (3, 0):
     xrange = range
+    buffer = memoryview
 else:
     xrange = xrange
+    buffer = buffer

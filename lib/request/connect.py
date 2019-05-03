@@ -420,6 +420,7 @@ class Connect(object):
                     value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
                 headers[getBytes(key)] = getBytes(value.strip("\r\n"))
 
+            url = getBytes(url)
             post = getBytes(post)
 
             if websocket_:
@@ -671,6 +672,7 @@ class Connect(object):
         except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError):
             tbMsg = traceback.format_exc()
 
+            print(tbMsg)
             if checking:
                 return None, None, None
             elif "no host given" in tbMsg:

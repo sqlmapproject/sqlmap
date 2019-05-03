@@ -10,6 +10,7 @@ import os
 import subprocess
 import time
 
+from lib.core.compat import buffer
 from lib.core.settings import IS_WIN
 
 if IS_WIN:
@@ -26,7 +27,7 @@ else:
 def blockingReadFromFD(fd):
     # Quick twist around original Twisted function
     # Blocking read from a non-blocking file descriptor
-    output = ""
+    output = b""
 
     while True:
         try:
@@ -183,7 +184,7 @@ def recv_some(p, t=.1, e=1, tr=5, stderr=0):
             y.append(r)
         else:
             time.sleep(max((x - time.time()) / tr, 0))
-    return ''.join(y)
+    return b''.join(y)
 
 def send_all(p, data):
     if not data:
@@ -193,4 +194,4 @@ def send_all(p, data):
         sent = p.send(data)
         if not isinstance(sent, int):
             break
-        data = buffer(data, sent)
+        data = buffer(data[sent:])
