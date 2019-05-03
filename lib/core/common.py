@@ -1897,7 +1897,7 @@ def safeStringFormat(format_, params):
     if isinstance(params, six.string_types):
         retVal = retVal.replace("%s", params, 1)
     elif not isListLike(params):
-        retVal = retVal.replace("%s", getText(params), 1)
+        retVal = retVal.replace("%s", getUnicode(params), 1)
     else:
         start, end = 0, len(retVal)
         match = re.search(r"%s(.+)%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER), retVal)
@@ -1906,7 +1906,7 @@ def safeStringFormat(format_, params):
         if retVal.count("%s", start, end) == len(params):
             for param in params:
                 index = retVal.find("%s", start)
-                retVal = retVal[:index] + getText(param) + retVal[index + 2:]
+                retVal = retVal[:index] + getUnicode(param) + retVal[index + 2:]
         else:
             if any('%s' in _ for _ in conf.parameters.values()):
                 parts = format_.split(' ')
@@ -1930,6 +1930,9 @@ def safeStringFormat(format_, params):
                         count += 1
                 else:
                     break
+
+    retVal = getText(retVal)
+
     return retVal
 
 def getFilteredPageContent(page, onlyText=True, split=" "):
@@ -4115,10 +4118,10 @@ def asciifyUrl(url, forceQuote=False):
     parts = _urllib.parse.urlsplit(url)
     if not parts.scheme or not parts.netloc:
         # apparently not an url
-        return url
+        return getText(url)
 
     if all(char in string.printable for char in url):
-        return url
+        return getText(url)
 
     # idna-encode domain
     try:
@@ -4160,7 +4163,7 @@ def asciifyUrl(url, forceQuote=False):
     if port:
         netloc += ':' + str(port)
 
-    return _urllib.parse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment]) or url
+    return getText(_urllib.parse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment]) or url)
 
 def isAdminFromPrivileges(privileges):
     """
@@ -4193,9 +4196,9 @@ def isAdminFromPrivileges(privileges):
 
 def findPageForms(content, url, raise_=False, addToTargets=False):
     """
-    Parses given page content for possible forms
+    Parses given page content for possible forms (Note: still not implemented for Python3)
 
-    >>> findPageForms('<html><form action="/input.php" method="POST"><input type="text" name="id" value="1"><input type="submit" value="Submit"></form></html>', '')
+    >> findPageForms('<html><form action="/input.php" method="POST"><input type="text" name="id" value="1"><input type="submit" value="Submit"></form></html>', '')
     set([(u'/input.php', 'POST', u'id=1', None, None)])
     """
 
