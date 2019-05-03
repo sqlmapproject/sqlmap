@@ -922,7 +922,7 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
         elif level:
             try:
                 level = getattr(logging, level, None)
-            except UnicodeError:
+            except:
                 level = None
             retVal = LOGGER_HANDLER.colorize(message, level)
 

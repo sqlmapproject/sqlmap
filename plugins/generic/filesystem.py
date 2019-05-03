@@ -5,6 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import codecs
 import os
 import sys
 
@@ -21,6 +22,7 @@ from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.compat import xrange
+from lib.core.convert import getText
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -133,7 +135,7 @@ class Filesystem:
         retVal = []
 
         if encoding:
-            content = content.encode(encoding).replace("\n", "")
+            content = getText(codecs.encode(content, encoding)).replace("\n", "")
 
         if not single:
             if len(content) > chunkSize:

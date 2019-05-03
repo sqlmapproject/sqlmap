@@ -25,6 +25,7 @@ from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
+from lib.core.common import openFile
 from lib.core.common import parseFilePaths
 from lib.core.common import posixToNtSlashes
 from lib.core.common import randomInt
@@ -34,6 +35,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.compat import xrange
 from lib.core.convert import encodeHex
 from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -274,9 +276,9 @@ class Web:
             directories = _
 
         backdoorName = "tmpb%s.%s" % (randomStr(lowercase=True), self.webPlatform)
-        backdoorContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.%s_" % self.webPlatform))
+        backdoorContent = getText(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.%s_" % self.webPlatform)))
 
-        stagerContent = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webPlatform))
+        stagerContent = getText(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webPlatform)))
 
         for directory in directories:
             if not directory:
@@ -330,9 +332,9 @@ class Web:
                     handle, filename = tempfile.mkstemp()
                     os.close(handle)
 
-                    with open(filename, "w+b") as f:
-                        _ = decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webPlatform))
-                        _ = _.replace(SHELL_WRITABLE_DIR_TAG, getBytes(directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory))
+                    with openFile(filename, "w+b") as f:
+                        _ = getText(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webPlatform)))
+                        _ = _.replace(SHELL_WRITABLE_DIR_TAG, directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
                         f.write(_)
 
                     self.unionWriteFile(filename, self.webStagerFilePath, "text", forceCheck=True)
