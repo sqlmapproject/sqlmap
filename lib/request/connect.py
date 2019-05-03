@@ -420,7 +420,9 @@ class Connect(object):
                     value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
                 headers[getBytes(key)] = getBytes(value.strip("\r\n"))
 
-            url = getBytes(url)
+            if six.PY2:
+                url = getBytes(url)  # Note: Python3 requires text while Python2 has problems when mixing text with binary POST
+
             post = getBytes(post)
 
             if websocket_:
