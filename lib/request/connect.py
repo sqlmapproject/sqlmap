@@ -416,9 +416,10 @@ class Connect(object):
 
             for key, value in list(headers.items()):
                 del headers[key]
-                for char in (r"\r", r"\n"):
-                    value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
-                headers[getBytes(key)] = getBytes(value.strip("\r\n"))
+                if isinstance(value, six.string_types):
+                    for char in (r"\r", r"\n"):
+                        value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", value)
+                    headers[getBytes(key)] = getBytes(value.strip("\r\n"))
 
             if six.PY2:
                 url = getBytes(url)  # Note: Python3 requires text while Python2 has problems when mixing text with binary POST
