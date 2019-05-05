@@ -3497,6 +3497,28 @@ def getLatestRevision():
 
     return retVal
 
+def fetchRandomAgent():
+    """
+    Returns random HTTP User-Agent header value
+
+    >>> '(' in fetchRandomAgent()
+    True
+    """
+
+    if not kb.userAgents:
+        debugMsg = "loading random HTTP User-Agent header(s) from "
+        debugMsg += "file '%s'" % paths.USER_AGENTS
+        logger.debug(debugMsg)
+
+        try:
+            kb.userAgents = getFileItems(paths.USER_AGENTS)
+        except IOError:
+            errMsg = "unable to read HTTP User-Agent header "
+            errMsg += "file '%s'" % paths.USER_AGENTS
+            raise SqlmapSystemException(errMsg)
+
+    return random.sample(kb.userAgents, 1)[0]
+
 def createGithubIssue(errMsg, excMsg):
     """
     Automatically create a Github issue with unhandled exception information
@@ -3550,9 +3572,9 @@ def createGithubIssue(errMsg, excMsg):
         except:
             pass
 
-        userAgent = "curl/7.{curl_minor}.{curl_revision} (x86_64-pc-linux-gnu) libcurl/7.{curl_minor}.{curl_revision} OpenSSL/0.9.8{openssl_revision} zlib/1.2.{zlib_revision}".format(curl_minor=random.randint(8, 22), curl_revision=random.randint(1, 9), openssl_revision=random.choice(string.ascii_lowercase), zlib_revision=random.randint(2, 6))
+
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
-        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=getBytes(json.dumps(data)), headers={HTTP_HEADER.AUTHORIZATION: "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False), HTTP_HEADER.USER_AGENT: userAgent})
+        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=getBytes(json.dumps(data)), headers={HTTP_HEADER.AUTHORIZATION: "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False), HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
             content = _urllib.request.urlopen(req).read()

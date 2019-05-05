@@ -25,6 +25,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import decodeStringEscape
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
+from lib.core.common import fetchRandomAgent
 from lib.core.common import filterNone
 from lib.core.common import findLocalPort
 from lib.core.common import findPageForms
@@ -137,7 +138,6 @@ from lib.request.httpshandler import HTTPSHandler
 from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
-from lib.request.templates import getPageTemplate
 from lib.utils.har import HTTPCollectorFactory
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
@@ -1400,22 +1400,7 @@ def _setHTTPUserAgent():
             conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, DEFAULT_USER_AGENT))
 
     else:
-        if not kb.userAgents:
-            debugMsg = "loading random HTTP User-Agent header(s) from "
-            debugMsg += "file '%s'" % paths.USER_AGENTS
-            logger.debug(debugMsg)
-
-            try:
-                kb.userAgents = getFileItems(paths.USER_AGENTS)
-            except IOError:
-                warnMsg = "unable to read HTTP User-Agent header "
-                warnMsg += "file '%s'" % paths.USER_AGENTS
-                logger.warn(warnMsg)
-
-                conf.httpHeaders.append((HTTP_HEADER.USER_AGENT, DEFAULT_USER_AGENT))
-                return
-
-        userAgent = random.sample(kb.userAgents or [DEFAULT_USER_AGENT], 1)[0]
+        userAgent = fetchRandomAgent()
 
         infoMsg = "fetched random HTTP User-Agent header value '%s' from " % userAgent
         infoMsg += "file '%s'" % paths.USER_AGENTS
