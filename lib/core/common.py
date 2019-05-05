@@ -3516,7 +3516,7 @@ def createGithubIssue(errMsg, excMsg):
     _ = re.sub(r"(Unicode[^:]*Error:).+", r"\g<1>", _)
     _ = re.sub(r"= _", "= ", _)
 
-    key = hashlib.md5(_).hexdigest()[:8]
+    key = hashlib.md5(getBytes(_)).hexdigest()[:8]
 
     if key in issues:
         return
@@ -3551,7 +3551,7 @@ def createGithubIssue(errMsg, excMsg):
             pass
 
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
-        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=json.dumps(data), headers={"Authorization": "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False)})
+        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=getBytes(json.dumps(data)), headers={"Authorization": "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False)})
 
         try:
             content = _urllib.request.urlopen(req).read()
