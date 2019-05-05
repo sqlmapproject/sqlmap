@@ -7,9 +7,9 @@ See the file 'LICENSE' for copying permission
 
 import binascii
 
-from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.convert import getBytes
+from lib.core.convert import getUnicode
 from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):

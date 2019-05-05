@@ -56,6 +56,7 @@ from lib.core.convert import decodeBase64
 from lib.core.convert import decodeHex
 from lib.core.convert import getBytes
 from lib.core.convert import getText
+from lib.core.convert import getUnicode
 from lib.core.convert import htmlunescape
 from lib.core.convert import stdoutencode
 from lib.core.data import conf
@@ -2417,50 +2418,6 @@ def getPartRun(alias=True):
         return commonPartsDict[retVal][1] if isinstance(commonPartsDict.get(retVal), tuple) else retVal
     else:
         return retVal
-
-def getUnicode(value, encoding=None, noneToNull=False):
-    """
-    Return the unicode representation of the supplied value:
-
-    >>> getUnicode('test') == u'test'
-    True
-    >>> getUnicode(1) == u'1'
-    True
-    """
-
-    if noneToNull and value is None:
-        return NULL
-
-    if isinstance(value, six.text_type):
-        return value
-    elif isinstance(value, six.binary_type):
-        # Heuristics (if encoding not explicitly specified)
-        candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
-        if all(_ in value for _ in (b'<', b'>')):
-            pass
-        elif any(_ in value for _ in (b":\\", b'/', b'.')) and b'\n' not in value:
-            candidates = filterNone((encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
-        elif conf.get("encoding") and b'\n' not in value:
-            candidates = filterNone((encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
-
-        for candidate in candidates:
-            try:
-                return six.text_type(value, candidate)
-            except UnicodeDecodeError:
-                pass
-
-        try:
-            return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
-        except UnicodeDecodeError:
-            return six.text_type(value, UNICODE_ENCODING, errors="reversible")
-    elif isListLike(value):
-        value = list(getUnicode(_, encoding, noneToNull) for _ in value)
-        return value
-    else:
-        try:
-            return six.text_type(value)
-        except UnicodeDecodeError:
-            return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
 def longestCommonPrefix(*sequences):
     """

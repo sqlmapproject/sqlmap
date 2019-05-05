@@ -7,10 +7,10 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.common import checkFile
 from lib.core.common import getSafeExString
-from lib.core.common import getUnicode
 from lib.core.common import openFile
 from lib.core.common import unArrayizeValue
 from lib.core.common import UnicodeRawConfigParser
+from lib.core.convert import getUnicode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import logger

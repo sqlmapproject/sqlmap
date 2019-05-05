@@ -22,12 +22,12 @@ from extra.vulnserver import vulnserver
 from lib.controller.controller import start
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import getUnicode
 from lib.core.common import randomStr
 from lib.core.common import readXmlFile
 from lib.core.common import shellExec
 from lib.core.compat import round
 from lib.core.compat import xrange
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.data import paths

@@ -16,8 +16,11 @@ import json
 import re
 import sys
 
+from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
 from lib.core.settings import IS_WIN
+from lib.core.settings import NULL
 from lib.core.settings import PICKLE_PROTOCOL
 from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
@@ -89,6 +92,12 @@ def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.write("\n")
     sys.stdout.flush()
 
+def filterNone(values):  # Cross-referenced function
+    raise NotImplementedError
+
+def isListLike(value):  # Cross-referenced function
+    raise NotImplementedError
+
 def stdoutencode(data):
     retVal = data
 
@@ -146,7 +155,7 @@ def decodeHex(value, binary=True):
     retVal = value
 
     if isinstance(value, six.binary_type):
-        value = value.decode(UNICODE_ENCODING)
+        value = getText(value)
 
     if value.lower().startswith("0x"):
         value = value[2:]
@@ -250,6 +259,50 @@ def getOrds(value):
 
     return [_ if isinstance(_, int) else ord(_) for _ in value]
 
+def getUnicode(value, encoding=None, noneToNull=False):
+    """
+    Return the unicode representation of the supplied value:
+
+    >>> getUnicode('test') == u'test'
+    True
+    >>> getUnicode(1) == u'1'
+    True
+    """
+
+    if noneToNull and value is None:
+        return NULL
+
+    if isinstance(value, six.text_type):
+        return value
+    elif isinstance(value, six.binary_type):
+        # Heuristics (if encoding not explicitly specified)
+        candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
+        if all(_ in value for _ in (b'<', b'>')):
+            pass
+        elif any(_ in value for _ in (b":\\", b'/', b'.')) and b'\n' not in value:
+            candidates = filterNone((encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
+        elif conf.get("encoding") and b'\n' not in value:
+            candidates = filterNone((encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
+
+        for candidate in candidates:
+            try:
+                return six.text_type(value, candidate)
+            except UnicodeDecodeError:
+                pass
+
+        try:
+            return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
+        except UnicodeDecodeError:
+            return six.text_type(value, UNICODE_ENCODING, errors="reversible")
+    elif isListLike(value):
+        value = list(getUnicode(_, encoding, noneToNull) for _ in value)
+        return value
+    else:
+        try:
+            return six.text_type(value)
+        except UnicodeDecodeError:
+            return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
+
 def getText(value):
     """
     Returns textual value of a given value (Note: not necessary Unicode on Python2)
@@ -263,7 +316,7 @@ def getText(value):
     retVal = value
 
     if isinstance(value, six.binary_type):
-        retVal = value.decode(UNICODE_ENCODING)
+        retVal = getUnicode(value)
 
     if six.PY2:
         try:

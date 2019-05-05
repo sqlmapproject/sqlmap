@@ -7,8 +7,8 @@ See the file 'LICENSE' for copying permission
 
 import time
 
-from lib.core.common import getUnicode
 from lib.core.common import dataToStdout
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 

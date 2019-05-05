@@ -13,10 +13,10 @@ from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import extractExpectedValue
 from lib.core.common import getCurrentThreadData
-from lib.core.common import getUnicode
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import isListLike
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

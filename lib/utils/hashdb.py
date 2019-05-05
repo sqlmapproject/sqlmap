@@ -12,12 +12,12 @@ import threading
 import time
 
 from lib.core.common import getSafeExString
-from lib.core.common import getUnicode
 from lib.core.common import serializeObject
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unserializeObject
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
+from lib.core.convert import getUnicode
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES

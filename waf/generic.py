@@ -7,7 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import re
 
-from lib.core.common import getUnicode
+from lib.core.convert import getUnicode
 from lib.core.data import kb
 from lib.core.settings import GENERIC_PROTECTION_REGEX
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD

@@ -12,7 +12,6 @@ from lib.core.common import Backend
 from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import getSQLSnippet
-from lib.core.common import getUnicode
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -26,6 +25,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import zeroDepthSearch
 from lib.core.compat import xrange
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries

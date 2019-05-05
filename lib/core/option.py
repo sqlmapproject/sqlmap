@@ -17,13 +17,6 @@ import tempfile
 import threading
 import time
 
-import lib.controller.checks
-import lib.core.common
-import lib.core.threads
-import lib.core.convert
-import lib.request.connect
-import lib.utils.search
-
 from lib.controller.checks import checkConnection
 from lib.core.common import Backend
 from lib.core.common import boldifyMessage
@@ -32,7 +25,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import decodeStringEscape
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
-from lib.core.common import getUnicode
 from lib.core.common import filterNone
 from lib.core.common import findLocalPort
 from lib.core.common import findPageForms
@@ -61,6 +53,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
 from lib.core.compat import round
 from lib.core.compat import xrange
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -2621,15 +2614,6 @@ def _basicOptionValidation():
             errMsg = "cookies file '%s' does not exist" % conf.loadCookies
             raise SqlmapFilePathException(errMsg)
 
-def _resolveCrossReferences():
-    lib.core.threads.readInput = readInput
-    lib.core.common.getPageTemplate = getPageTemplate
-    lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
-    lib.request.connect.setHTTPHandlers = _setHTTPHandlers
-    lib.utils.search.setHTTPHandlers = _setHTTPHandlers
-    lib.controller.checks.setVerbosity = setVerbosity
-    lib.controller.checks.setWafFunctions = _setWafFunctions
-
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     _setConfAttributes()
     _setKnowledgeBaseAttributes()
@@ -2663,7 +2647,6 @@ def init():
     _setWafFunctions()
     _setTrafficOutputFP()
     _setupHTTPCollector()
-    _resolveCrossReferences()
     _setHttpChunked()
     _checkWebSocket()
 

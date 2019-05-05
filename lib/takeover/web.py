@@ -20,7 +20,6 @@ from lib.core.common import getAutoDirectories
 from lib.core.common import getManualDirectories
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
-from lib.core.common import getUnicode
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
@@ -36,6 +35,7 @@ from lib.core.compat import xrange
 from lib.core.convert import encodeHex
 from lib.core.convert import getBytes
 from lib.core.convert import getText
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

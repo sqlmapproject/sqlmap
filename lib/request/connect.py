@@ -39,7 +39,6 @@ from lib.core.common import getHeader
 from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
 from lib.core.common import getSafeExString
-from lib.core.common import getUnicode
 from lib.core.common import isMultiThreadMode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import pushValue
@@ -60,6 +59,7 @@ from lib.core.common import urlencode
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
+from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger

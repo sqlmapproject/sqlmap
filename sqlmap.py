@@ -45,11 +45,11 @@ try:
     from lib.core.common import filterNone
     from lib.core.common import getDaysFromLastUpdate
     from lib.core.common import getSafeExString
-    from lib.core.common import getUnicode
     from lib.core.common import maskSensitiveData
     from lib.core.common import openFile
     from lib.core.common import setPaths
     from lib.core.common import weAreFrozen
+    from lib.core.convert import getUnicode
     from lib.core.data import cmdLineOptions
     from lib.core.data import conf
     from lib.core.data import kb
@@ -63,6 +63,7 @@ try:
     from lib.core.option import initOptions
     from lib.core.option import init
     from lib.core.patch import dirtyPatches
+    from lib.core.patch import resolveCrossReferences
     from lib.core.settings import GIT_PAGE
     from lib.core.settings import IS_WIN
     from lib.core.settings import LAST_UPDATE_NAGGING_DAYS
@@ -127,6 +128,7 @@ def main():
 
     try:
         dirtyPatches()
+        resolveCrossReferences()
         checkEnvironment()
         setPaths(modulePath())
         banner()

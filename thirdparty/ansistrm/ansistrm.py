@@ -8,7 +8,6 @@ import os
 import re
 import sys
 
-from lib.core.convert import stdoutencode
 from lib.core.settings import IS_WIN
 
 if IS_WIN:
@@ -21,6 +20,8 @@ if IS_WIN:
     ctypes.windll.kernel32.SetConsoleTextAttribute.argtypes = [ctypes.wintypes.HANDLE, ctypes.wintypes.WORD]
     ctypes.windll.kernel32.SetConsoleTextAttribute.restype = ctypes.wintypes.BOOL
 
+def stdoutencode(data):  # Cross-referenced function
+    raise NotImplementedError
 
 class ColorizingStreamHandler(logging.StreamHandler):
     # color names to indices
