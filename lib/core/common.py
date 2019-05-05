@@ -3631,6 +3631,9 @@ def maskSensitiveData(msg):
     retVal = getUnicode(msg)
 
     for item in filterNone(conf.get(_) for _ in SENSITIVE_OPTIONS):
+        if isListLike(item):
+            item = listToStrValue(item)
+
         regex = SENSITIVE_DATA_REGEX % re.sub(r"(\W)", r"\\\1", getUnicode(item))
         while extractRegexResult(regex, retVal):
             value = extractRegexResult(regex, retVal)
