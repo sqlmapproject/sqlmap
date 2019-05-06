@@ -63,6 +63,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.datatype import OrderedSet
 from lib.core.decorators import cachedmethod
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
@@ -843,7 +844,15 @@ def getManualDirectories():
     return directories
 
 def getAutoDirectories():
-    retVal = set()
+    """
+    >>> pushValue(kb.absFilePaths)
+    >>> kb.absFilePaths = ["C:\\inetpub\\wwwroot\\index.asp", "/var/www/html"]
+    >>> getAutoDirectories()
+    ['C:/inetpub/wwwroot', '/var/www/html']
+    >>> kb.absFilePaths = popValue()
+    """
+
+    retVal = OrderedSet()
 
     if kb.absFilePaths:
         infoMsg = "retrieved web server absolute paths: "
@@ -1370,7 +1379,16 @@ def weAreFrozen():
 
 def parseTargetDirect():
     """
-    Parse target dbms and set some attributes into the configuration singleton.
+    Parse target dbms and set some attributes into the configuration singleton
+
+    >>> pushValue(conf.direct)
+    >>> conf.direct = "mysql://root:testpass@127.0.0.1:3306/testdb"
+    >>> parseTargetDirect()
+    >>> conf.dbmsDb
+    'testdb'
+    >>> conf.dbmsPass
+    'testpass'
+    >>> conf.direct = popValue()
     """
 
     if not conf.direct:
@@ -1410,6 +1428,9 @@ def parseTargetDirect():
             conf.parameters[None] = "direct connection"
 
             break
+
+    if kb.smokeMode:
+        return
 
     if not details:
         errMsg = "invalid target details, valid syntax is for instance "
@@ -1475,7 +1496,16 @@ def parseTargetDirect():
 
 def parseTargetUrl():
     """
-    Parse target URL and set some attributes into the configuration singleton.
+    Parse target URL and set some attributes into the configuration singleton
+
+    >>> pushValue(conf.url)
+    >>> conf.url = "https://www.test.com/?id=1"
+    >>> parseTargetUrl()
+    >>> conf.hostname
+    'www.test.com'
+    >>> conf.scheme
+    'https'
+    >>> conf.url = popValue()
     """
 
     if not conf.url:
@@ -1826,11 +1856,13 @@ def directoryPath(filepath):
 
     >>> directoryPath('/var/log/apache.log')
     '/var/log'
+    >>> directoryPath('/var/log')
+    '/var/log'
     """
 
     retVal = filepath
 
-    if filepath:
+    if filepath and os.path.splitext(filepath)[-1]:
         retVal = ntpath.dirname(filepath) if isWindowsDriveLetterPath(filepath) else posixpath.dirname(filepath)
 
     return retVal
@@ -3029,8 +3061,7 @@ def filterNone(values):
 
 def isDBMSVersionAtLeast(version):
     """
-    Checks if the recognized DBMS version is at least the version
-    specified
+    Checks if the recognized DBMS version is at least the version specified
     """
 
     retVal = None
@@ -3065,6 +3096,12 @@ def isDBMSVersionAtLeast(version):
 def parseSqliteTableSchema(value):
     """
     Parses table column names and types from specified SQLite table schema
+
+    >>> kb.data.cachedColumns = {}
+    >>> parseSqliteTableSchema("CREATE TABLE users\\n\\t\\tid INTEGER\\n\\t\\tname TEXT\\n);")
+    True
+    >>> repr(kb.data.cachedColumns).count(',') == 1
+    True
     """
 
     retVal = False
@@ -3091,8 +3128,13 @@ def getTechniqueData(technique=None):
 
 def isTechniqueAvailable(technique):
     """
-    Returns True if there is injection data which sqlmap could use for
-    technique specified
+    Returns True if there is injection data which sqlmap could use for technique specified
+
+    >>> pushValue(kb.injection.data)
+    >>> kb.injection.data[PAYLOAD.TECHNIQUE.ERROR] = [test for test in getSortedInjectionTests() if "error" in test["title"].lower()][0]
+    >>> isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR)
+    True
+    >>> kb.injection.data = popValue()
     """
 
     if conf.tech and isinstance(conf.tech, list) and technique not in conf.tech:
@@ -3103,6 +3145,12 @@ def isTechniqueAvailable(technique):
 def isStackingAvailable():
     """
     Returns True whether techniques using stacking are available
+
+    >>> pushValue(kb.injection.data)
+    >>> kb.injection.data[PAYLOAD.TECHNIQUE.STACKED] = [test for test in getSortedInjectionTests() if "stacked" in test["title"].lower()][0]
+    >>> isStackingAvailable()
+    True
+    >>> kb.injection.data = popValue()
     """
 
     retVal = False
@@ -3121,6 +3169,12 @@ def isStackingAvailable():
 def isInferenceAvailable():
     """
     Returns True whether techniques using inference technique are available
+
+    >>> pushValue(kb.injection.data)
+    >>> kb.injection.data[PAYLOAD.TECHNIQUE.BOOLEAN] = getSortedInjectionTests()[0]
+    >>> isInferenceAvailable()
+    True
+    >>> kb.injection.data = popValue()
     """
 
     return any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.STACKED, PAYLOAD.TECHNIQUE.TIME))
@@ -3290,8 +3344,13 @@ def isListLike(value):
 
 def getSortedInjectionTests():
     """
-    Returns prioritized test list by eventually detected DBMS from error
-    messages
+    Returns prioritized test list by eventually detected DBMS from error messages
+
+    >>> pushValue(kb.forcedDbms)
+    >>> kb.forcedDbms = DBMS.SQLITE
+    >>> [test for test in getSortedInjectionTests() if hasattr(test, "details") and hasattr(test.details, "dbms")][0].details.dbms == kb.forcedDbms
+    True
+    >>> kb.forcedDbms = popValue()
     """
 
     retVal = copy.deepcopy(conf.tests)
@@ -3317,8 +3376,7 @@ def getSortedInjectionTests():
 
 def filterListValue(value, regex):
     """
-    Returns list with items that have parts satisfying given regular
-    expression
+    Returns list with items that have parts satisfying given regular expression
 
     >>> filterListValue(['users', 'admins', 'logs'], r'(users|admins)')
     ['users', 'admins']
@@ -3348,6 +3406,9 @@ def showHttpErrorCodes():
 def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible", buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
     """
     Returns file handle of a given filename
+
+    >>> "openFile" in openFile(__file__).read()
+    True
     """
 
     if filename == STDIN_PIPE_DASH:
@@ -3399,22 +3460,6 @@ def decodeIntToUnicode(value):
 
     return retVal
 
-def md5File(filename):
-    """
-    Calculates MD5 digest of a file
-
-    # Reference: http://stackoverflow.com/a/3431838
-    """
-
-    checkFile(filename)
-
-    digest = hashlib.md5()
-    with open(filename, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), ""):
-            digest.update(chunk)
-
-    return digest.hexdigest()
-
 def checkIntegrity():
     """
     Checks integrity of code files during the unhandled exceptions
@@ -3441,6 +3486,9 @@ def checkIntegrity():
 def getDaysFromLastUpdate():
     """
     Get total number of days from last update
+
+    >>> getDaysFromLastUpdate() >= 0
+    True
     """
 
     if not paths:
@@ -3451,6 +3499,9 @@ def getDaysFromLastUpdate():
 def unhandledExceptionMessage():
     """
     Returns detailed message about occurred unhandled exception
+
+    >>> all(_ in unhandledExceptionMessage() for _ in ("unhandled exception occurred", "Operating system", "Command line"))
+    True
     """
 
     errMsg = "unhandled exception occurred in %s. It is recommended to retry your " % VERSION_STRING

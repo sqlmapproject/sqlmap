@@ -1987,6 +1987,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.serverHeader = None
     kb.singleLogFlags = set()
     kb.skipSeqMatcher = False
+    kb.smokeMode = False
     kb.reduceTests = None
     kb.tlsSNI = {}
     kb.stickyDBMS = False

@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import codecs
 import doctest
+import logging
 import os
 import random
 import re
@@ -29,6 +30,7 @@ from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import getUnicode
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import MKSTEMP_PREFIX
@@ -161,9 +163,14 @@ def smokeTest():
                     errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), ex)
                     logger.error(errMsg)
                 else:
-                    # Run doc tests
-                    # Reference: http://docs.python.org/library/doctest.html
+                    logger.setLevel(logging.CRITICAL)
+                    kb.smokeMode = True
+
                     (failure_count, test_count) = doctest.testmod(module)
+
+                    kb.smokeMode = False
+                    logger.setLevel(logging.INFO)
+
                     if failure_count > 0:
                         retVal = False
 

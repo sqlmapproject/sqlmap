@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 from lib.core.common import filterPairValues
+from lib.core.common import isListLike
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
@@ -47,7 +48,7 @@ class Enumeration(GenericEnumeration):
             retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
             if retVal:
-                kb.data.cachedUsers = retVal[0].values()[0]
+                kb.data.cachedUsers = list(retVal[0].values())[0]
                 break
 
         return kb.data.cachedUsers
@@ -102,7 +103,7 @@ class Enumeration(GenericEnumeration):
             retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
             if retVal:
-                kb.data.cachedDbs = retVal[0].values()[0]
+                kb.data.cachedDbs = list(retVal[0].values())[0]
                 break
 
         if kb.data.cachedDbs:
@@ -146,7 +147,7 @@ class Enumeration(GenericEnumeration):
                 retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
                 if retVal:
-                    for table in retVal[0].values()[0]:
+                    for table in list(retVal[0].values())[0]:
                         if db not in kb.data.cachedTables:
                             kb.data.cachedTables[db] = [table]
                         else:
@@ -195,9 +196,9 @@ class Enumeration(GenericEnumeration):
             self.getTables()
 
             if len(kb.data.cachedTables) > 0:
-                tblList = kb.data.cachedTables.values()
+                tblList = list(kb.data.cachedTables.values())
 
-                if isinstance(tblList[0], (set, tuple, list)):
+                if isListLike(tblList[0]):
                     tblList = tblList[0]
             else:
                 errMsg = "unable to retrieve the tables "

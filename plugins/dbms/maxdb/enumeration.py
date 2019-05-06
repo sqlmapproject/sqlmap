@@ -5,6 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from lib.core.common import isListLike
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -48,7 +49,7 @@ class Enumeration(GenericEnumeration):
         retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.schemaname' % kb.aliasName], blind=True)
 
         if retVal:
-            kb.data.cachedDbs = retVal[0].values()[0]
+            kb.data.cachedDbs = list(retVal[0].values())[0]
 
         if kb.data.cachedDbs:
             kb.data.cachedDbs.sort()
@@ -83,7 +84,7 @@ class Enumeration(GenericEnumeration):
             retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.tablename' % kb.aliasName], blind=True)
 
             if retVal:
-                for table in retVal[0].values()[0]:
+                for table in list(retVal[0].values())[0]:
                     if db not in kb.data.cachedTables:
                         kb.data.cachedTables[db] = [table]
                     else:
@@ -131,9 +132,9 @@ class Enumeration(GenericEnumeration):
             self.getTables()
 
             if len(kb.data.cachedTables) > 0:
-                tblList = kb.data.cachedTables.values()
+                tblList = list(kb.data.cachedTables.values())
 
-                if isinstance(tblList[0], (set, tuple, list)):
+                if isListLike(tblList[0]):
                     tblList = tblList[0]
             else:
                 errMsg = "unable to retrieve the tables "

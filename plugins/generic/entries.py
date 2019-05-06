@@ -93,9 +93,9 @@ class Entries:
             self.getTables()
 
             if len(kb.data.cachedTables) > 0:
-                tblList = kb.data.cachedTables.values()
+                tblList = list(kb.data.cachedTables.values())
 
-                if isinstance(tblList[0], (set, tuple, list)):
+                if isListLike(tblList[0]):
                     tblList = tblList[0]
             elif not conf.search:
                 errMsg = "unable to retrieve the tables "
