@@ -12,6 +12,9 @@ import subprocess
 def getRevisionNumber():
     """
     Returns abbreviated commit hash number as retrieved with "git rev-parse --short HEAD"
+
+    >>> len(getRevisionNumber() or (' ' * 7)) == 7
+    True
     """
 
     retVal = None

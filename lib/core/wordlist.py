@@ -16,10 +16,14 @@ from thirdparty import six
 class Wordlist(six.Iterator):
     """
     Iterator for looping over a large dictionaries
+
+    >>> from lib.core.option import paths
+    >>> isinstance(next(Wordlist(paths.SMALL_DICT)), six.string_types)
+    True
     """
 
     def __init__(self, filenames, proc_id=None, proc_count=None, custom=None):
-        self.filenames = filenames
+        self.filenames = [filenames] if isinstance(filenames, six.string_types) else filenames
         self.fp = None
         self.index = 0
         self.counter = -1

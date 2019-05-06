@@ -4646,19 +4646,20 @@ def resetCookieJar(cookieJar):
 def decloakToTemp(filename):
     """
     Decloaks content of a given file to a temporary file with similar name and extension
+
+    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.asp_"))
+    >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
+    True
     """
 
     content = decloak(filename)
 
-    _ = getBytes(os.path.split(filename[:-1])[-1])
-
-    prefix, suffix = os.path.splitext(_)
-    prefix = prefix.split(os.extsep)[0]
-
+    parts = getBytes(os.path.split(filename[:-1])[-1]).split(b'.')
+    prefix, suffix = parts[0], b".%s" % parts[-1]
     handle, filename = tempfile.mkstemp(prefix=prefix, suffix=suffix)
     os.close(handle)
 
-    with open(filename, "w+b") as f:
+    with openFile(filename, "w+b", encoding=None) as f:
         f.write(content)
 
     return filename

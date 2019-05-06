@@ -13,8 +13,7 @@ from thirdparty.odict import OrderedDict
 
 class AttribDict(dict):
     """
-    This class defines the sqlmap object, inheriting from Python data
-    type dictionary.
+    This class defines the dictionary with added capability to access members as attributes
 
     >>> foo = AttribDict()
     >>> foo.bar = 1
@@ -110,6 +109,19 @@ class InjectionDict(AttribDict):
 
 # Reference: https://www.kunxi.org/2014/05/lru-cache-in-python
 class LRUDict(object):
+    """
+    This class defines the LRU dictionary
+
+    >>> foo = LRUDict(capacity=2)
+    >>> foo["first"] = 1
+    >>> foo["second"] = 2
+    >>> foo["third"] = 3
+    >>> "first" in foo
+    False
+    >>> "third" in foo
+    True
+    """
+
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = OrderedDict()
@@ -144,6 +156,21 @@ class LRUDict(object):
 
 # Reference: https://code.activestate.com/recipes/576694/
 class OrderedSet(collections.MutableSet):
+    """
+    This class defines the set with ordered (as added) items
+
+    >>> foo = OrderedSet()
+    >>> foo.add(1)
+    >>> foo.add(2)
+    >>> foo.add(3)
+    >>> foo.pop()
+    3
+    >>> foo.pop()
+    2
+    >>> foo.pop()
+    1
+    """
+
     def __init__(self, iterable=None):
         self.end = end = []
         end += [None, end, end]         # sentinel node for doubly linked list

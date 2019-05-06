@@ -20,6 +20,16 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
     """
     Method with a cached content
 
+    >>> __ = cachedmethod(lambda _: _)
+    >>> __(1)
+    1
+    >>> __ = cachedmethod(lambda *args, **kwargs: args[0])
+    >>> __(2)
+    2
+    >>> __ = cachedmethod(lambda *args, **kwargs: list(kwargs.values())[0])
+    >>> __(foobar=3)
+    3
+
     Reference: http://code.activestate.com/recipes/325205-cache-decorator-in-python-24/
     """
 
@@ -43,6 +53,13 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
 def stackedmethod(f):
     """
     Method using pushValue/popValue functions (fallback function for stack realignment)
+
+    >>> threadData = getCurrentThreadData()
+    >>> original = len(threadData.valueStack)
+    >>> __ = stackedmethod(lambda _: threadData.valueStack.append(_))
+    >>> __(1)
+    >>> len(threadData.valueStack) == original
+    True
     """
 
     @functools.wraps(f)
