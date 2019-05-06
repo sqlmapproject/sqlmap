@@ -613,7 +613,7 @@ class Connect(object):
                 page = getUnicode(page)
 
             code = ex.code
-            status = getattr(ex, "reason", None) or getSafeExString(ex).split(": ", 1)[-1]
+            status = getUnicode(getattr(ex, "reason", None) or getSafeExString(ex).split(": ", 1)[-1])
 
             kb.originalCode = kb.originalCode or code
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
