@@ -4232,13 +4232,13 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     """
     Parses given page content for possible forms (Note: still not implemented for Python3)
 
-    >> findPageForms('<html><form action="/input.php" method="POST"><input type="text" name="id" value="1"><input type="submit" value="Submit"></form></html>', '')
-    set([(u'/input.php', 'POST', u'id=1', None, None)])
+    >>> findPageForms('<html><form action="/input.php" method="POST"><input type="text" name="id" value="1"><input type="submit" value="Submit"></form></html>', 'http://www.site.com') == set([('http://www.site.com/input.php', 'POST', 'id=1', None, None)])
+    True
     """
 
-    class _(io.BytesIO):
+    class _(six.StringIO):
         def __init__(self, content, url):
-            io.BytesIO.__init__(self, getBytes(content, kb.pageEncoding))
+            six.StringIO.__init__(self, content)
             self._url = url
 
         def geturl(self):
@@ -4303,7 +4303,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             else:
                 url = urldecode(request.get_full_url(), kb.pageEncoding)
                 method = request.get_method()
-                data = request.get_data() if request.has_data() else None
+                data = request.data
                 data = urldecode(data, kb.pageEncoding, spaceplus=False)
 
                 if not data and method and method.upper() == HTTPMETHOD.POST:

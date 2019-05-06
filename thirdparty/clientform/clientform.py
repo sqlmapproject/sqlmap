@@ -94,10 +94,12 @@ else:
         _logger.addHandler(handler)
 
 try:
+    from thirdparty import six
     from thirdparty.six.moves import cStringIO as _cStringIO
     from thirdparty.six.moves import html_entities as _html_entities
     from thirdparty.six.moves import urllib as _urllib
 except ImportError:
+    import six
     from six.moves import cStringIO as _cStringIO
     from six.moves import html_entities as _html_entities
     from six.moves import urllib as _urllib
@@ -173,7 +175,7 @@ string.
             # non-sequence items should not work with len()
             x = len(query)
             # non-empty strings will fail this
-            if len(query) and type(query[0]) != types.TupleType:
+            if len(query) and type(query[0]) != tuple:
                 raise TypeError()
             # zero-length sequences of all types will get here and succeed,
             # but that's a minor nit - since the original implementation
@@ -246,7 +248,7 @@ def unescape_charref(data, encoding):
         name, base= name[1:], 16
     elif not name.isdigit():
         base = 16
-    uc = unichr(int(name, base))
+    uc = six.unichr(int(name, base))
     if encoding is None:
         return uc
     else:
@@ -270,7 +272,7 @@ def get_entitydefs():
             entitydefs["&%s;" % name] = uc
     else:
         for name, codepoint in _html_entities.name2codepoint.items():
-            entitydefs["&%s;" % name] = unichr(codepoint)
+            entitydefs["&%s;" % name] = six.unichr(codepoint)
     return entitydefs
 
 
@@ -1126,7 +1128,7 @@ def _ParseFileEx(file, base_uri,
         if action is None:
             action = base_uri
         else:
-            action = unicode(action, "utf8") if action and not isinstance(action, unicode) else action
+            action = six.text_type(action, "utf8") if action and isinstance(action, six.binary_type) else action
             action = _urljoin(base_uri, action)
         # would be nice to make HTMLForm class (form builder) pluggable
         form = HTMLForm(
@@ -1321,8 +1323,8 @@ class ScalarControl(Control):
         self.__dict__["type"] = type.lower()
         self.__dict__["name"] = name
         self._value = attrs.get("value")
-        self.disabled = attrs.has_key("disabled")
-        self.readonly = attrs.has_key("readonly")
+        self.disabled = "disabled" in attrs
+        self.readonly = "readonly" in attrs
         self.id = attrs.get("id")
 
         self.attrs = attrs.copy()
@@ -3398,6 +3400,7 @@ class HTMLForm:
             return self._request_data()
         else:
             req_data = self._request_data()
+
             req = request_class(req_data[0], req_data[1])
             for key, val in req_data[2]:
                 add_hdr = req.add_header
