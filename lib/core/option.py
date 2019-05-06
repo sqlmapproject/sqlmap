@@ -1519,6 +1519,9 @@ def _createHomeDirectories():
 
             paths["SQLMAP_%s_PATH" % context.upper()] = tempDir
 
+def _pympTempLeakPatch(tempDir):  # Cross-referenced function
+    raise NotImplementedError
+
 def _createTemporaryDirectory():
     """
     Creates temporary directory for this run.
@@ -1569,6 +1572,9 @@ def _createTemporaryDirectory():
             errMsg = "there has been a problem while setting "
             errMsg += "temporary directory location ('%s')" % getSafeExString(ex)
             raise SqlmapSystemException(errMsg)
+
+    if six.PY3:
+        _pympTempLeakPatch(kb.tempDir)
 
 def _cleanupOptions():
     """

@@ -4650,6 +4650,7 @@ def decloakToTemp(filename):
     >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.asp_"))
     >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
     True
+    >>> os.remove(_)
     """
 
     content = decloak(filename)

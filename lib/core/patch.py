@@ -11,6 +11,7 @@ import lib.controller.checks
 import lib.core.common
 import lib.core.threads
 import lib.core.convert
+import lib.core.option
 import lib.request.connect
 import lib.utils.search
 import thirdparty.ansistrm.ansistrm
@@ -61,8 +62,20 @@ def resolveCrossReferences():
     lib.core.convert.filterNone = filterNone
     lib.core.convert.isListLike = isListLike
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
+    lib.core.option._pympTempLeakPatch = pympTempLeakPatch
     lib.request.connect.setHTTPHandlers = _setHTTPHandlers
     lib.utils.search.setHTTPHandlers = _setHTTPHandlers
     lib.controller.checks.setVerbosity = setVerbosity
     lib.controller.checks.setWafFunctions = _setWafFunctions
     thirdparty.ansistrm.ansistrm.stdoutencode = stdoutencode
+
+def pympTempLeakPatch(tempDir):
+    """
+    Patch for "pymp" leaking directories inside Python3
+    """
+
+    try:
+        import multiprocessing.util
+        multiprocessing.util.get_temp_dir = lambda: tempDir
+    except:
+        pass
