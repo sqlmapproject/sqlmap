@@ -31,14 +31,12 @@ class Connector:
 
     def printConnected(self):
         if self.hostname and self.port:
-            infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
-            infoMsg += ":%d established" % self.port
+            infoMsg = "connection to %s server '%s:%d' established" % (conf.dbms, self.hostname, self.port)
             logger.info(infoMsg)
 
     def closed(self):
         if self.hostname and self.port:
-            infoMsg = "connection to %s server %s" % (conf.dbms, self.hostname)
-            infoMsg += ":%d closed" % self.port
+            infoMsg = "connection to %s server '%s:%d' closed" % (conf.dbms, self.hostname, self.port)
             logger.info(infoMsg)
 
         self.connector = None

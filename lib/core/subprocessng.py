@@ -12,6 +12,7 @@ import time
 
 from lib.core.compat import buffer
 from lib.core.settings import IS_WIN
+from thirdparty import six
 
 if IS_WIN:
     try:
@@ -97,7 +98,7 @@ class Popen(subprocess.Popen):
             except ValueError:
                 return self._close('stdin')
             except (subprocess.pywintypes.error, Exception) as ex:
-                if ex[0] in (109, errno.ESHUTDOWN):
+                if (ex[0] if six.PY2 else ex.errno) in (109, errno.ESHUTDOWN):
                     return self._close('stdin')
                 raise
 
@@ -118,7 +119,7 @@ class Popen(subprocess.Popen):
             except (ValueError, NameError):
                 return self._close(which)
             except (subprocess.pywintypes.error, Exception) as ex:
-                if ex[0] in (109, errno.ESHUTDOWN):
+                if (ex[0] if six.PY2 else ex.errno) in (109, errno.ESHUTDOWN):
                     return self._close(which)
                 raise
 
@@ -136,7 +137,7 @@ class Popen(subprocess.Popen):
             try:
                 written = os.write(self.stdin.fileno(), input)
             except OSError as ex:
-                if ex[0] == errno.EPIPE:  # broken pipe
+                if (ex[0] if six.PY2 else ex.errno) == errno.EPIPE:  # broken pipe
                     return self._close('stdin')
                 raise
 

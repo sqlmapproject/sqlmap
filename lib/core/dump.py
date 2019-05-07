@@ -614,7 +614,7 @@ class Dump(object):
                     if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
                         try:
                             mimetype = magic.from_buffer(value, mime=True)
-                            if any(mimetype.startswith(_) for _ in ("application", "image")):
+                            if any(mimetype.startswith(_) for _ in (b"application", b"image")):
                                 if not os.path.isdir(dumpDbPath):
                                     os.makedirs(dumpDbPath)
 
