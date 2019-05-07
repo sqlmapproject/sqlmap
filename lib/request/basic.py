@@ -19,6 +19,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
+from lib.core.common import getText
 from lib.core.common import isListLike
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -322,14 +323,14 @@ def decodePage(page, contentEncoding, contentType):
         # e.g. &#x9;&#195;&#235;&#224;&#226;&#224;
         if b"&#" in page:
             page = re.sub(b"&#x([0-9a-f]{1,2});", lambda _: decodeHex(_.group(1) if len(_.group(1)) == 2 else "0%s" % _.group(1)), page)
-            page = re.sub(b"&#(\d{1,3});", lambda _: chr(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
+            page = re.sub(b"&#(\d{1,3});", lambda _: six.int2byte(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
 
         # e.g. %20%28%29
         if b"%" in page:
             page = re.sub(b"%([0-9a-fA-F]{2})", lambda _: decodeHex(_.group(1)), page)
 
         # e.g. &amp;
-        page = re.sub(b"&([^;]+);", lambda _: chr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 256) < 256 else _.group(0), page)
+        page = re.sub(b"&([^;]+);", lambda _: six.int2byte(htmlEntities[getText(_.group(1))]) if htmlEntities.get(getText(_.group(1)), 256) < 256 else _.group(0), page)
 
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
 

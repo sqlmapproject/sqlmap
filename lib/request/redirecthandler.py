@@ -37,10 +37,10 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         retVal = None
 
         if headers:
-            if "location" in headers:
-                retVal = headers.getheaders("location")[0]
-            elif "uri" in headers:
-                retVal = headers.getheaders("uri")[0]
+            if HTTP_HEADER.LOCATION in headers:
+                retVal = headers[HTTP_HEADER.LOCATION]
+            elif HTTP_HEADER.URI in headers:
+                retVal = headers[HTTP_HEADER.URI]
 
         return retVal
 
@@ -126,7 +126,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 delimiter = conf.cookieDel or DEFAULT_COOKIE_DELIMITER
                 last = None
 
-                for part in req.headers.get(HTTP_HEADER.COOKIE, "").split(delimiter) + headers.getheaders(HTTP_HEADER.SET_COOKIE):
+                for part in req.headers.get(HTTP_HEADER.COOKIE, "").split(delimiter) + ([headers[HTTP_HEADER.SET_COOKIE]] if HTTP_HEADER.SET_COOKIE in headers else []):
                     if '=' in part:
                         part = part.strip()
                         key, value = part.split('=', 1)
