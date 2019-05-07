@@ -725,8 +725,8 @@ def paramToDict(place, parameters=None):
             if value and not value.isdigit():
                 for encoding in ("hex", "base64"):
                     try:
-                        decoded = value.decode(encoding)
-                        if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in string.printable for _ in decoded):
+                        decoded = codecs.decode(value, encoding)
+                        if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in getBytes(string.printable) for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
                             warnMsg += "appears to be '%s' encoded" % encoding
                             logger.warn(warnMsg)
