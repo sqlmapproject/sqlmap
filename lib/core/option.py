@@ -961,7 +961,7 @@ def _setDNSCache():
 
 def _setSocketPreConnect():
     """
-    Makes a pre-connect version of socket.connect
+    Makes a pre-connect version of socket.create_connection
     """
 
     if conf.disablePrecon:
@@ -972,17 +972,9 @@ def _setSocketPreConnect():
             try:
                 for key in socket._ready:
                     if len(socket._ready[key]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
-                        family, type, proto, address = key
-                        s = socket.socket(family, type, proto)
-                        s._connect(address)
-                        try:
-                            if type == socket.SOCK_STREAM:
-                                # Reference: https://www.techrepublic.com/article/tcp-ip-options-for-high-performance-data-transmission/
-                                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                        except:
-                            pass
+                        s = socket.create_connection(*key[0], **dict(key[1]))
                         with kb.locks.socket:
-                            socket._ready[key].append((s._sock, time.time()))
+                            socket._ready[key].append((s, time.time()))
             except KeyboardInterrupt:
                 break
             except:
@@ -990,18 +982,18 @@ def _setSocketPreConnect():
             finally:
                 time.sleep(0.01)
 
-    def connect(self, address):
-        found = False
+    def create_connection(*args, **kwargs):
+        retVal = None
 
-        key = (self.family, self.type, self.proto, address)
+        key = (tuple(args), frozenset(kwargs.items()))
         with kb.locks.socket:
             if key not in socket._ready:
                 socket._ready[key] = []
+
             while len(socket._ready[key]) > 0:
                 candidate, created = socket._ready[key].pop(0)
                 if (time.time() - created) < PRECONNECT_CANDIDATE_TIMEOUT:
-                    self._sock = candidate
-                    found = True
+                    retVal = candidate
                     break
                 else:
                     try:
@@ -1010,13 +1002,15 @@ def _setSocketPreConnect():
                     except socket.error:
                         pass
 
-        if not found:
-            self._connect(address)
+        if not retVal:
+            retVal = socket._create_connection(*args, **kwargs)
 
-    if not hasattr(socket.socket, "_connect"):
+        return retVal
+
+    if not hasattr(socket.socket, "_create_connection"):
         socket._ready = {}
-        socket.socket._connect = socket.socket.connect
-        socket.socket.connect = connect
+        socket._create_connection = socket.create_connection
+        socket.create_connection = create_connection
 
         thread = threading.Thread(target=_thread)
         setDaemon(thread)
