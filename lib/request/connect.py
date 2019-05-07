@@ -455,7 +455,6 @@ class Connect(object):
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
             else:
                 if method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
-                    method = getBytes(method)
                     req = MethodRequest(url, post, headers)
                     req.set_method(method)
                 elif url is not None:
