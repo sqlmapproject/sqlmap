@@ -1441,6 +1441,8 @@ def parseTargetDirect():
     for dbmsName, data in DBMS_DICT.items():
         if dbmsName == conf.dbms or conf.dbms.lower() in data[0]:
             try:
+                conf.dbms = dbmsName
+
                 if dbmsName in (DBMS.ACCESS, DBMS.SQLITE, DBMS.FIREBIRD):
                     if remote:
                         warnMsg = "direct connection over the network for "
