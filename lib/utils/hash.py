@@ -917,15 +917,15 @@ def dictionaryAttack(attack_dict):
                             hash_ = hash_.lower()
 
                         if hash_regex in (HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
-                            item = [(user, decodeBase64(hash_, binary=False).encode("hex")), {}]
+                            item = [(user, encodeHex(decodeBase64(hash_, binary=True))), {}]
                         elif hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
                             item = [(user, hash_), {}]
                         elif hash_regex in (HASH.SSHA,):
-                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=False)[20:]}]
+                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=True)[20:]}]
                         elif hash_regex in (HASH.SSHA256,):
-                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=False)[32:]}]
+                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=True)[32:]}]
                         elif hash_regex in (HASH.SSHA512,):
-                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=False)[64:]}]
+                            item = [(user, hash_), {"salt": decodeBase64(hash_, binary=True)[64:]}]
                         elif hash_regex in (HASH.ORACLE_OLD, HASH.POSTGRES):
                             item = [(user, hash_), {'username': user}]
                         elif hash_regex in (HASH.ORACLE,):

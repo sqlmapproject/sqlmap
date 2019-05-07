@@ -3532,9 +3532,6 @@ def unhandledExceptionMessage():
 def getLatestRevision():
     """
     Retrieves latest revision from the offical repository
-
-    >>> (getLatestRevision() or " ")[0].isdigit()
-    True
     """
 
     retVal = None
