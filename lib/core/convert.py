@@ -103,7 +103,7 @@ def stdoutencode(data):
 
     if six.PY2:
         try:
-            retVal = getBytes(data or "", sys.stdout.encoding)
+            retVal = getBytes(data or "", sys.stdout.encoding, unsafe=False)
 
             # Reference: http://bugs.python.org/issue1602
             if IS_WIN:
@@ -118,7 +118,7 @@ def stdoutencode(data):
                     singleTimeWarnMessage(warnMsg)
 
         except:
-            retVal = getBytes(data or "")
+            retVal = getBytes(data or "", unsafe=False)
 
     return retVal
 
@@ -224,7 +224,7 @@ def encodeBase64(value, binary=True):
 
     return retVal
 
-def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
+def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
     """
     Returns byte representation of provided Unicode value
 
@@ -236,14 +236,19 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict"):
 
     if isinstance(value, six.text_type):
         if INVALID_UNICODE_PRIVATE_AREA:
-            for char in xrange(0xF0000, 0xF00FF + 1):
-                value = value.replace(six.unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
+            if unsafe:
+                for char in xrange(0xF0000, 0xF00FF + 1):
+                    value = value.replace(six.unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
 
             retVal = value.encode(encoding, errors)
-            retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: decodeHex(_.group(1)), retVal)
+
+            if unsafe:
+                retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: decodeHex(_.group(1)), retVal)
         else:
             retVal = value.encode(encoding, errors)
-            retVal = re.sub(b"\\\\x([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), retVal)
+
+            if unsafe:
+                retVal = re.sub(b"\\\\x([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), retVal)
 
     return retVal
 
