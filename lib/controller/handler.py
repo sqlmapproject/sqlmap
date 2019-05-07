@@ -113,7 +113,7 @@ def setHandler():
                     conf.dbmsConnector.connect()
                 except Exception as ex:
                     if exception:
-                        raise
+                        raise exception
                     else:
                         if not isinstance(ex, NameError):
                             raise
