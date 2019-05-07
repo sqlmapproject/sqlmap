@@ -4692,7 +4692,7 @@ def getRequestHeader(request, name):
 
     if request and request.headers and name:
         _ = name.upper()
-        retVal = max(value if _ == key.upper() else "" for key, value in request.header_items()) or None
+        retVal = max(value if _ == key.upper() else type(value)() for key, value in request.header_items()) or None
 
     return retVal
 

@@ -135,7 +135,7 @@ class ConnectionManager:
     def add(self, host, connection, ready):
         self._lock.acquire()
         try:
-            if not self._hostmap.has_key(host): self._hostmap[host] = []
+            if host not in self._hostmap: self._hostmap[host] = []
             self._hostmap[host].append(connection)
             self._connmap[connection] = host
             self._readymap[connection] = ready
@@ -165,7 +165,7 @@ class ConnectionManager:
         conn = None
         self._lock.acquire()
         try:
-            if self._hostmap.has_key(host):
+            if host in self._hostmap:
                 for c in self._hostmap[host]:
                     if self._readymap[c]:
                         self._readymap[c] = 0
@@ -312,16 +312,16 @@ class KeepAliveHandler:
 
     def _start_transaction(self, h, req):
         try:
-            if req.has_data():
+            if req.data:
                 data = req.data
                 if hasattr(req, 'selector'):
                     h.putrequest(req.get_method() or 'POST', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
                 else:
                     h.putrequest(req.get_method() or 'POST', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
-                if not req.headers.has_key('Content-type'):
+                if 'Content-type' not in req.headers:
                     h.putheader('Content-type',
                                 'application/x-www-form-urlencoded')
-                if not req.headers.has_key('Content-length'):
+                if 'Content-length' not in req.headers:
                     h.putheader('Content-length', '%d' % len(data))
             else:
                 if hasattr(req, 'selector'):
@@ -331,16 +331,16 @@ class KeepAliveHandler:
         except (socket.error, _http_client.HTTPException) as err:
             raise _urllib.error.URLError(err)
 
-        if not req.headers.has_key('Connection'):
+        if 'Connection' not in req.headers:
             req.headers['Connection'] = 'keep-alive'
 
         for args in self.parent.addheaders:
-            if not req.headers.has_key(args[0]):
+            if args[0] not in req.headers:
                 h.putheader(*args)
         for k, v in req.headers.items():
             h.putheader(k, v)
         h.endheaders()
-        if req.has_data():
+        if req.data:
             h.send(data)
 
     def _get_connection(self, host):
@@ -418,6 +418,10 @@ class HTTPResponse(_http_client.HTTPResponse):
             if self._handler:
                 self._handler._request_closed(self, self._host,
                                               self._connection)
+
+    # Note: Patch for Python3 (otherwise, connections won't be reusable)
+    def _close_conn(self):
+        self.close()
 
     def close_connection(self):
         self._handler._remove_connection(self._host, self._connection, close=1)
