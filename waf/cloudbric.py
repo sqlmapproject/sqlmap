@@ -14,7 +14,7 @@ def detect(get_page):
 
     for vector in WAF_ATTACK_VECTORS:
         page, headers, code = get_page(get=vector)
-        retval |= code >= 400 and all(_ in (page or "") for _ in ("Cloudbric", "Malicious Code Detected"))
+        retval |= (code or 0) >= 400 and all(_ in (page or "") for _ in ("Cloudbric", "Malicious Code Detected"))
         if retval:
             break
 

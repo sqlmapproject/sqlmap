@@ -5,6 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import functools
 import os
 import random
 import shutil
@@ -14,6 +15,7 @@ import string
 from lib.core.common import getSafeExString
 from lib.core.compat import xrange
 from lib.core.data import logger
+from thirdparty import six
 
 def purge(directory):
     """
@@ -66,7 +68,10 @@ def purge(directory):
         except:
             pass
 
-    dirpaths.sort(cmp=lambda x, y: y.count(os.path.sep) - x.count(os.path.sep))
+    if six.PY2:
+        dirpaths.sort(cmp=lambda x, y: y.count(os.path.sep) - x.count(os.path.sep))
+    else:
+        dirpaths.sort(key=functools.cmp_to_key(lambda x, y: y.count(os.path.sep) - x.count(os.path.sep)))
 
     logger.debug("renaming directory names to random values")
     for dirpath in dirpaths:

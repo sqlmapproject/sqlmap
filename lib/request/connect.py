@@ -803,7 +803,7 @@ class Connect(object):
                 responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = getUnicode("".join(responseHeaders.headers).strip() if six.PY2 else responseHeaders.__bytes__())
+                logHeaders = getUnicode("".join(responseHeaders.headers).strip())
 
             logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_CHUNK_SIZE]), start, time.time())
 
