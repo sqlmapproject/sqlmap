@@ -2346,7 +2346,7 @@ def _checkTor():
     except SqlmapConnectionException:
         page = None
 
-    if not page or 'Congratulations' not in page:
+    if not page or "Congratulations" not in page:
         errMsg = "it appears that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
         raise SqlmapConnectionException(errMsg)
     else:
