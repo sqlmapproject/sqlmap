@@ -594,8 +594,8 @@ class _AbstractFormParser:
 
         self._option = {}
         self._option.update(d)
-        if (self._optgroup and self._optgroup.has_key("disabled") and
-            not self._option.has_key("disabled")):
+        if (self._optgroup and "disabled" in self._optgroup and
+            "disabled" not in self._option):
             self._option["disabled"] = None
 
     def _end_option(self):
@@ -605,9 +605,9 @@ class _AbstractFormParser:
 
         contents = self._option.get("contents", "").strip()
         self._option["contents"] = contents
-        if not self._option.has_key("value"):
+        if "value" not in self._option:
             self._option["value"] = contents
-        if not self._option.has_key("label"):
+        if "label" not in self._option:
             self._option["label"] = contents
         # stuff dict of SELECT HTML attrs into a special private key
         #  (gets deleted again later)
@@ -695,7 +695,7 @@ class _AbstractFormParser:
         else:
             return
 
-        if data and not map.has_key(key):
+        if data and key not in map:
             # according to
             # http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 line break
             # immediately after start tags or immediately before end tags must
@@ -1624,7 +1624,7 @@ class Item:
             "_labels": label and [label] or [],
             "attrs": attrs,
             "_control": control,
-            "disabled": attrs.has_key("disabled"),
+            "disabled": "disabled" in attrs,
             "_selected": False,
             "id": attrs.get("id"),
             "_index": index,
@@ -2292,7 +2292,7 @@ class RadioControl(ListControl):
                              called_as_base_class=True, index=index)
         self.__dict__["multiple"] = False
         o = Item(self, attrs, index)
-        o.__dict__["_selected"] = attrs.has_key("checked")
+        o.__dict__["_selected"] = "checked" in attrs
 
     def fixup(self):
         ListControl.fixup(self)
@@ -2325,7 +2325,7 @@ class CheckboxControl(ListControl):
                              called_as_base_class=True, index=index)
         self.__dict__["multiple"] = True
         o = Item(self, attrs, index)
-        o.__dict__["_selected"] = attrs.has_key("checked")
+        o.__dict__["_selected"] = "checked" in attrs
 
     def get_labels(self):
         return []
@@ -2393,7 +2393,7 @@ class SelectControl(ListControl):
         self.attrs = attrs["__select"].copy()
         self.__dict__["_label"] = _get_label(self.attrs)
         self.__dict__["id"] = self.attrs.get("id")
-        self.__dict__["multiple"] = self.attrs.has_key("multiple")
+        self.__dict__["multiple"] = "multiple" in self.attrs
         # the majority of the contents, label, and value dance already happened
         contents = attrs.get("contents")
         attrs = attrs.copy()
@@ -2401,12 +2401,12 @@ class SelectControl(ListControl):
 
         ListControl.__init__(self, type, name, self.attrs, select_default,
                              called_as_base_class=True, index=index)
-        self.disabled = self.attrs.has_key("disabled")
-        self.readonly = self.attrs.has_key("readonly")
-        if attrs.has_key("value"):
+        self.disabled = "disabled" in self.attrs
+        self.readonly = "readonly" in self.attrs
+        if "value" in attrs:
             # otherwise it is a marker 'select started' token
             o = Item(self, attrs, index)
-            o.__dict__["_selected"] = attrs.has_key("selected")
+            o.__dict__["_selected"] = "selected" in attrs
             # add 'label' label and contents label, if different.  If both are
             # provided, the 'label' label is used for display in HTML 
             # 4.0-compliant browsers (and any lower spec? not sure) while the
