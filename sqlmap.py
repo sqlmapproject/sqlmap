@@ -298,7 +298,7 @@ def main():
 
         elif "must be pinned buffer, not bytearray" in excMsg:
             errMsg = "error occurred at Python interpreter which "
-            errMsg += "is fixed in 2.7.x. Please update accordingly "
+            errMsg += "is fixed in 2.7. Please update accordingly "
             errMsg += "(Reference: https://bugs.python.org/issue8104)"
             logger.critical(errMsg)
             raise SystemExit
