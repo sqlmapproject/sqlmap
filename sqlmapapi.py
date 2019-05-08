@@ -21,6 +21,8 @@ warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 from sqlmap import modulePath
 from lib.core.common import setPaths
 from lib.core.data import logger
+from lib.core.patch import dirtyPatches
+from lib.core.patch import resolveCrossReferences
 from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
@@ -31,6 +33,9 @@ def main():
     """
     REST-JSON API main function
     """
+
+    dirtyPatches()
+    resolveCrossReferences()
 
     # Set default logging level to debug
     logger.setLevel(logging.DEBUG)
