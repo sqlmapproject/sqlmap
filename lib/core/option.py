@@ -468,7 +468,7 @@ def _findPageForms():
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
-                page, _, _ = Request.getPage(url=target.strip(), crawling=True, raise404=False)
+                page, _, _ = Request.getPage(url=target.strip(), cookie=conf.cookie, crawling=True, raise404=False)
                 findPageForms(page, target, False, True)
 
                 if conf.verbose in (1, 2):
