@@ -37,12 +37,16 @@ def tamper(payload, **kwargs):
     >>> random.seed(0)
     >>> tamper('INSERT')
     'InSeRt'
+    >>> tamper('f()')
+    'f()'
+    >>> tamper('function()')
+    'FuNcTiOn()'
     """
 
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"\b[A-Za-z_]+\b", retVal):
+        for match in re.finditer(r"\b[A-Za-z_]{2,}\b", retVal):
             word = match.group()
 
             if word.upper() in kb.keywords or ("%s(" % word) in payload:
