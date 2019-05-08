@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """
 Script which takes one or more file paths and reports on their detected
 encodings
