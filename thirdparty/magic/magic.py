@@ -223,4 +223,4 @@ MAGIC_NO_CHECK_ASCII = 0x020000 # Don't check for ascii files
 MAGIC_NO_CHECK_TROFF = 0x040000 # Don't check ascii/troff
 MAGIC_NO_CHECK_FORTRAN = 0x080000 # Don't check ascii/fortran
 MAGIC_NO_CHECK_TOKENS = 0x100000 # Don't check ascii/tokens
-MAGIC_UNKNOWN_FILETYPE = "unknown"
+MAGIC_UNKNOWN_FILETYPE = b"unknown"

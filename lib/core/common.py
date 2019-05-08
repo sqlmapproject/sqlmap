@@ -1800,9 +1800,11 @@ def getFileType(filePath):
     """
 
     try:
-        desc = getUnicode(magic.from_file(filePath) or "")
+        desc = magic.from_file(filePath) or magic.MAGIC_UNKNOWN_FILETYPE
     except:
         desc = magic.MAGIC_UNKNOWN_FILETYPE
+    finally:
+        desc = getText(desc)
 
     if desc == magic.MAGIC_UNKNOWN_FILETYPE:
         content = openFile(filePath, "rb", encoding=None).read()
