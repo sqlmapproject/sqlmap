@@ -2293,7 +2293,7 @@ def initCommonOutputs():
     key = None
 
     with openFile(paths.COMMON_OUTPUTS, 'r') as f:
-        for line in f.readlines():  # xreadlines doesn't return unicode strings when codec.open() is used
+        for line in f:
             if line.find('#') != -1:
                 line = line[:line.find('#')]
 

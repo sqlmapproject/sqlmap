@@ -14,7 +14,7 @@ if __name__ == "__main__":
         items = list()
 
         with open(sys.argv[1], 'r') as f:
-            for item in f.readlines():
+            for item in f:
                 item = item.strip()
                 try:
                     str.encode(item)
