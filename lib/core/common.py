@@ -2012,14 +2012,17 @@ def getPageWordSet(page):
     retVal = set()
 
     # only if the page's charset has been successfully identified
-    if isinstance(page, six.text_type):
+    if isinstance(page, six.string_types):
         retVal = set(_.group(0) for _ in re.finditer(r"\w+", getFilteredPageContent(page)))
 
     return retVal
 
-def showStaticWords(firstPage, secondPage):
+def showStaticWords(firstPage, secondPage, minLength=3):
     """
     Prints words appearing in two different response pages
+
+    >>> showStaticWords("this is a test", "this is another test")
+    ['this']
     """
 
     infoMsg = "finding static words in longest matching part of dynamic page content"
@@ -2038,18 +2041,19 @@ def showStaticWords(firstPage, secondPage):
         commonWords = None
 
     if commonWords:
-        commonWords = list(commonWords)
-        commonWords.sort(lambda a, b: cmp(a.lower(), b.lower()))
+        commonWords = [_ for _ in commonWords if len(_) >= minLength]
+        commonWords.sort(key=functools.cmp_to_key(lambda a, b: cmp(a.lower(), b.lower())))
 
         for word in commonWords:
-            if len(word) > 2:
-                infoMsg += "'%s', " % word
+            infoMsg += "'%s', " % word
 
         infoMsg = infoMsg.rstrip(", ")
     else:
         infoMsg += "None"
 
     logger.info(infoMsg)
+
+    return commonWords
 
 def isWindowsDriveLetterPath(filepath):
     """
