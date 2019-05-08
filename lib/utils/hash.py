@@ -162,7 +162,7 @@ def mssql_passwd(password, salt, uppercase=False):
     """
 
     binsalt = decodeHex(salt)
-    unistr = b"".join(b"%s\0" % _.encode(UNICODE_ENCODING) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
 
     retVal = "0100%s%s" % (salt, sha1(unistr + binsalt).hexdigest())
 
@@ -180,7 +180,7 @@ def mssql_old_passwd(password, salt, uppercase=True):  # prior to version '2005'
     """
 
     binsalt = decodeHex(salt)
-    unistr = b"".join(b"%s\0" % _.encode(UNICODE_ENCODING) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
 
     retVal = "0100%s%s%s" % (salt, sha1(unistr + binsalt).hexdigest(), sha1(unistr.upper() + binsalt).hexdigest())
 
@@ -196,7 +196,7 @@ def mssql_new_passwd(password, salt, uppercase=False):
     """
 
     binsalt = decodeHex(salt)
-    unistr = b"".join(b"%s\0" % _.encode(UNICODE_ENCODING) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
 
     retVal = "0200%s%s" % (salt, sha512(unistr + binsalt).hexdigest())
 
@@ -231,7 +231,7 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
 
     IV, pad = "\0" * 8, "\0"
 
-    unistr = b"".join(b"\0%s" % _.encode(UNICODE_ENCODING) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in (username + password).upper())
+    unistr = b"".join((b"\0" + _.encode(UNICODE_ENCODING)) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in (username + password).upper())
 
     cipher = des(decodeHex("0123456789ABCDEF"), CBC, IV, pad)
     encrypted = cipher.encrypt(unistr)
@@ -434,7 +434,7 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     hash_ = hash_ + _encode64((int(ord(final[4:5])) << 16) | (int(ord(final[10:11])) << 8) | (int(ord(final[5:6]))), 4)
     hash_ = hash_ + _encode64((int(ord(final[11:12]))), 2)
 
-    return getText(b"%s%s$%s" % (magic, salt, getBytes(hash_)))
+    return getText(magic + salt + b'$' + getBytes(hash_))
 
 def joomla_passwd(password, salt, **kwargs):
     """
@@ -444,7 +444,7 @@ def joomla_passwd(password, salt, **kwargs):
     'e3d5794da74e917637332e0d21b76328:6GGlnaquVXI80b3HRmSyE3K1wEFFaBIf'
     """
 
-    return "%s:%s" % (md5(b"%s%s" % (getBytes(password), getBytes(salt))).hexdigest(), salt)
+    return "%s:%s" % (md5(getBytes(password) + getBytes(salt)).hexdigest(), salt)
 
 def django_md5_passwd(password, salt, **kwargs):
     """
@@ -454,7 +454,7 @@ def django_md5_passwd(password, salt, **kwargs):
     'md5$salt$972141bcbcb6a0acc96e92309175b3c5'
     """
 
-    return "md5$%s$%s" % (salt, md5(b"%s%s" % (getBytes(salt), getBytes(password))).hexdigest())
+    return "md5$%s$%s" % (salt, md5(getBytes(salt) + getBytes(password)).hexdigest())
 
 def django_sha1_passwd(password, salt, **kwargs):
     """
@@ -464,7 +464,7 @@ def django_sha1_passwd(password, salt, **kwargs):
     'sha1$salt$6ce0e522aba69d8baa873f01420fccd0250fc5b2'
     """
 
-    return "sha1$%s$%s" % (salt, sha1(b"%s%s" % (getBytes(salt), getBytes(password))).hexdigest())
+    return "sha1$%s$%s" % (salt, sha1(getBytes(salt) + getBytes(password)).hexdigest())
 
 def vbulletin_passwd(password, salt, **kwargs):
     """
@@ -474,7 +474,7 @@ def vbulletin_passwd(password, salt, **kwargs):
     '85c4d8ea77ebef2236fb7e9d24ba9482:salt'
     """
 
-    return "%s:%s" % (md5(b"%s%s" % (binascii.hexlify(md5(getBytes(password)).digest()), getBytes(salt))).hexdigest(), salt)
+    return "%s:%s" % (md5(binascii.hexlify(md5(getBytes(password)).digest()) + getBytes(salt)).hexdigest(), salt)
 
 def wordpress_passwd(password, salt, count, prefix, **kwargs):
     """

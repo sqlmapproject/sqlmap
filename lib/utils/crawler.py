@@ -20,6 +20,7 @@ from lib.core.common import readInput
 from lib.core.common import safeCSValue
 from lib.core.common import urldecode
 from lib.core.compat import xrange
+from lib.core.convert import htmlunescape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -90,7 +91,7 @@ def crawl(target):
                         tags = soup('a')
 
                         if not tags:
-                            tags = re.finditer(r'(?i)<a[^>]+href="(?P<href>[^>"]+)"', content)
+                            tags = re.finditer(r'(?i)<a[^>]+href=["\'](?P<href>[^>"\']+)', content)
 
                         for tag in tags:
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
@@ -98,7 +99,7 @@ def crawl(target):
                             if href:
                                 if threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
                                     current = threadData.lastRedirectURL[1]
-                                url = _urllib.parse.urljoin(current, href)
+                                url = _urllib.parse.urljoin(current, htmlunescape(href))
 
                                 # flag to know if we are dealing with the same target host
                                 _ = checkSameHost(url, target)

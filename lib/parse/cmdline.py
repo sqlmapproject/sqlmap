@@ -697,6 +697,9 @@ def cmdLineParser(argv=None):
         parser.add_option("--murphy-rate", dest="murphyRate", type="int",
                           help=SUPPRESS_HELP)
 
+        parser.add_option("--debug", dest="debug", action="store_true",
+                          help=SUPPRESS_HELP)
+
         parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
                           help=SUPPRESS_HELP)
 

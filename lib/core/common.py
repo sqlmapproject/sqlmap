@@ -1635,7 +1635,7 @@ def expandAsteriskForColumns(expression):
             if expression != conf.sqlQuery:
                 conf.db = db
             else:
-                expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), "\g<1>%s.%s" % (conf.db, conf.tbl), expression)
+                expression = re.sub(r"([^\w])%s" % re.escape(conf.tbl), r"\g<1>%s.%s" % (conf.db, conf.tbl), expression)
         else:
             conf.db = db
 
@@ -1795,12 +1795,24 @@ def getFileType(filePath):
 
     >>> getFileType(__file__)
     'text'
+    >>> getFileType(sys.executable)
+    'binary'
     """
 
     try:
         desc = getUnicode(magic.from_file(filePath) or "")
     except:
-        return "unknown"
+        desc = magic.MAGIC_UNKNOWN_FILETYPE
+
+    if desc == magic.MAGIC_UNKNOWN_FILETYPE:
+        content = openFile(filePath, "rb", encoding=None).read()
+
+        try:
+            content.decode()
+        except:
+            pass
+        else:
+            desc = "ascii"
 
     return "text" if any(_ in desc.lower() for _ in ("ascii", "text")) else "binary"
 
@@ -2053,8 +2065,8 @@ def isWindowsDriveLetterPath(filepath):
 
 def posixToNtSlashes(filepath):
     """
-    Replaces all occurrences of Posix slashes (/) in provided
-    filepath with NT ones (\)
+    Replaces all occurrences of Posix slashes in provided
+    filepath with NT backslashes
 
     >>> posixToNtSlashes('C:/Windows')
     'C:\\\\Windows'
@@ -2064,8 +2076,8 @@ def posixToNtSlashes(filepath):
 
 def ntToPosixSlashes(filepath):
     """
-    Replaces all occurrences of NT slashes (\) in provided
-    filepath with Posix ones (/)
+    Replaces all occurrences of NT backslashes in provided
+    filepath with Posix slashes
 
     >>> ntToPosixSlashes('C:\\Windows')
     'C:/Windows'
@@ -2954,7 +2966,7 @@ def findDynamicContent(firstPage, secondPage):
     infoMsg = "searching for dynamic content"
     singleTimeLogMessage(infoMsg)
 
-    blocks = SequenceMatcher(None, firstPage, secondPage).get_matching_blocks()
+    blocks = list(SequenceMatcher(None, firstPage, secondPage).get_matching_blocks())
     kb.dynamicMarkings = []
 
     # Removing too small matching blocks
@@ -4654,8 +4666,8 @@ def decloakToTemp(filename):
 
     content = decloak(filename)
 
-    parts = getBytes(os.path.split(filename[:-1])[-1]).split(b'.')
-    prefix, suffix = parts[0], b".%s" % parts[-1]
+    parts = os.path.split(filename[:-1])[-1].split('.')
+    prefix, suffix = parts[0], '.' + parts[-1]
     handle, filename = tempfile.mkstemp(prefix=prefix, suffix=suffix)
     os.close(handle)
 
@@ -4692,7 +4704,7 @@ def getRequestHeader(request, name):
 
     if request and request.headers and name:
         _ = name.upper()
-        retVal = max(value if _ == key.upper() else type(value)() for key, value in request.header_items()) or None
+        retVal = max(getBytes(value if _ == key.upper() else "") for key, value in request.header_items()) or None
 
     return retVal
 

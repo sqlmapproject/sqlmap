@@ -11,6 +11,7 @@ except:
     import pickle
 
 import base64
+import binascii
 import codecs
 import json
 import re
@@ -160,7 +161,10 @@ def decodeHex(value, binary=True):
     if value.lower().startswith("0x"):
         value = value[2:]
 
-    retVal = codecs.decode(value, "hex")
+    try:
+        retVal = codecs.decode(value, "hex")
+    except LookupError:
+        retVal = binascii.unhexlify(value)
 
     if not binary:
         retVal = getText(retVal)
@@ -180,7 +184,10 @@ def encodeHex(value, binary=True):
     if isinstance(value, six.text_type):
         value = value.encode(UNICODE_ENCODING)
 
-    retVal = codecs.encode(value, "hex")
+    try:
+        retVal = codecs.encode(value, "hex")
+    except LookupError:
+        retVal = binascii.hexlify(value)
 
     if not binary:
         retVal = getText(retVal)

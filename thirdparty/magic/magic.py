@@ -200,7 +200,7 @@ try:
     magic_compile.argtypes = [magic_t, c_char_p]
 
 except (ImportError, OSError):
-    from_file = from_buffer = lambda *args, **kwargs: "unknown"
+    from_file = from_buffer = lambda *args, **kwargs: MAGIC_UNKNOWN_FILETYPE
 
 MAGIC_NONE = 0x000000 # No flags
 MAGIC_DEBUG = 0x000001 # Turn on debugging
@@ -223,3 +223,4 @@ MAGIC_NO_CHECK_ASCII = 0x020000 # Don't check for ascii files
 MAGIC_NO_CHECK_TROFF = 0x040000 # Don't check ascii/troff
 MAGIC_NO_CHECK_FORTRAN = 0x080000 # Don't check ascii/fortran
 MAGIC_NO_CHECK_TOKENS = 0x100000 # Don't check ascii/tokens
+MAGIC_UNKNOWN_FILETYPE = "unknown"

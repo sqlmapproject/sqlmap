@@ -455,7 +455,7 @@ def _PERM_OP(a,b,n,m):
 def _set_key(password):
     """Generate DES key schedule from ASCII password."""
 
-    c,d = struct.unpack('<ii', password)
+    c,d = struct.unpack('<ii', password.encode("utf8") if not isinstance(password, bytes) else password)
     c = (c & 0x7f7f7f7f) << 1
     d = (d & 0x7f7f7f7f) << 1
 
@@ -606,7 +606,7 @@ crypt supported by the OpenBSD C library.
     # Convert to characters.
     for i in xrange(len(r)):
         r[i] = _cov_2char[r[i]]
-    return salt[:2] + string.join(r, '')
+    return salt[:2] + ''.join(r)
 
 def _test():
     """Run doctest on fcrypt module."""

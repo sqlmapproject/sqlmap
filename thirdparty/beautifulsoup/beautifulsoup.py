@@ -93,6 +93,7 @@ if sys.version_info >= (3, 0):
     xrange = range
     text_type = str
     binary_type = bytes
+    basestring = str
 else:
     text_type = unicode
     binary_type = str
@@ -673,7 +674,7 @@ class Tag(PageElement):
         """Calling a tag like a function is the same as calling its
         findAll() method. Eg. tag('a') returns a list of all the A tags
         found within this tag."""
-        return apply(self.findAll, args, kwargs)
+        return self.findAll(*args, **kwargs)
 
     def __getattr__(self, tag):
         #print "Getattr %s.%s" % (self.__class__, tag)
@@ -1332,7 +1333,7 @@ class BeautifulStoneSoup(Tag, sgmllib.SGMLParser):
             if (nestingResetTriggers is not None
                 and p.name in nestingResetTriggers) \
                 or (nestingResetTriggers is None and isResetNesting
-                    and self.RESET_NESTING_TAGS.has_key(p.name)):
+                    and p.name in self.RESET_NESTING_TAGS):
 
                 #If we encounter one of the nesting reset triggers
                 #peculiar to this tag, or we encounter another tag
