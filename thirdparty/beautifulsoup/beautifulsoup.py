@@ -449,9 +449,7 @@ class PageElement(object):
             s  = self.toEncoding(str(s), encoding or "utf8")
         return s
 
-    BARE_AMPERSAND_OR_BRACKET = re.compile("([<>]|"
-                                           + "&(?!#\d+;|#x[0-9a-fA-F]+;|\w+;)"
-                                           + ")")
+    BARE_AMPERSAND_OR_BRACKET = re.compile(r"([<>]|&(?!#\d+;|#x[0-9a-fA-F]+;|\w+;))")
 
     def _sub_entity(self, x):
         """Used with a regular expression to substitute the
@@ -574,7 +572,7 @@ class Tag(PageElement):
         # Convert any HTML, XML, or numeric entities in the attribute values.
         # Reference: https://github.com/pkrumins/xgoogle/pull/16/commits/3dba1165c436b0d6e5bdbd09e53ca0dbf8a043f8
         convert = lambda k_val: (k_val[0],
-                                 re.sub("&(#\d+|#x[0-9a-fA-F]+|\w+);",
+                                 re.sub(r"&(#\d+|#x[0-9a-fA-F]+|\w+);",
                                      self._convertEntities,
                                      k_val[1]))
         self.attrs = map(convert, self.attrs)
@@ -1079,9 +1077,9 @@ class BeautifulStoneSoup(Tag, sgmllib.SGMLParser):
     QUOTE_TAGS = {}
     PRESERVE_WHITESPACE_TAGS = []
 
-    MARKUP_MASSAGE = [(re.compile('(<[^<>]*)/>'),
+    MARKUP_MASSAGE = [(re.compile(r'(<[^<>]*)/>'),
                        lambda x: x.group(1) + ' />'),
-                      (re.compile('<!\s+([^<>]*)>'),
+                      (re.compile(r'<!\s+([^<>]*)>'),
                        lambda x: '<!' + x.group(1) + '>')
                       ]
 
@@ -1590,7 +1588,7 @@ class BeautifulSoup(BeautifulStoneSoup):
                                 NESTABLE_LIST_TAGS, NESTABLE_TABLE_TAGS)
 
     # Used to detect the charset in a META tag; see start_meta
-    CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)
+    CHARSET_RE = re.compile(r"((^|;)\s*charset=)([^;]*)", re.M)
 
     def start_meta(self, attrs):
         """Beautiful Soup can detect a charset included in a META tag,
@@ -1934,9 +1932,9 @@ class UnicodeDammit:
         except:
             xml_encoding_match = None
         xml_encoding_match = re.compile(
-            '^<\?.*encoding=[\'"](.*?)[\'"].*\?>').match(xml_data)
+            r'^<\?.*encoding=[\'"](.*?)[\'"].*\?>').match(xml_data)
         if not xml_encoding_match and isHTML:
-            regexp = re.compile('<\s*meta[^>]+charset=([^>]*?)[;\'">]', re.I)
+            regexp = re.compile(r'<\s*meta[^>]+charset=([^>]*?)[;\'">]', re.I)
             xml_encoding_match = regexp.search(xml_data)
         if xml_encoding_match is not None:
             xml_encoding = xml_encoding_match.groups()[0].lower()

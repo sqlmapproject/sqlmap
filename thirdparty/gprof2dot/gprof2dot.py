@@ -1042,7 +1042,7 @@ class CallgrindParser(LineParser):
     - http://valgrind.org/docs/manual/cl-Format.html
     """
 
-    _call_re = re.compile('^calls=\s*(\d+)\s+((\d+|\+\d+|-\d+|\*)\s+)+$')
+    _call_re = re.compile(r'^calls=\s*(\d+)\s+((\d+|\+\d+|-\d+|\*)\s+)+$')
 
     def __init__(self, infile):
         LineParser.__init__(self, infile)
@@ -1204,7 +1204,7 @@ class CallgrindParser(LineParser):
 
         return True
 
-    _position_re = re.compile('^(?P<position>c?(?:ob|fl|fi|fe|fn))=\s*(?:\((?P<id>\d+)\))?(?:\s*(?P<name>.+))?')
+    _position_re = re.compile(r'^(?P<position>c?(?:ob|fl|fi|fe|fn))=\s*(?:\((?P<id>\d+)\))?(?:\s*(?P<name>.+))?')
 
     _position_table_map = {
         'ob': 'ob',
@@ -2071,7 +2071,8 @@ class PstatsParser:
         self.profile = Profile()
         self.function_ids = {}
 
-    def get_function_name(self, (filename, line, name)):
+    def get_function_name(self, args):
+        filename, line, name = args
         module = os.path.splitext(filename)[0]
         module = os.path.basename(module)
         return "%s:%d:%s" % (module, line, name)
@@ -2406,7 +2407,8 @@ class DotWriter:
             raise TypeError
         self.write(s)
 
-    def color(self, (r, g, b)):
+    def color(self, args):
+        r, g, b = args
 
         def float2int(f):
             if f <= 0.0:
