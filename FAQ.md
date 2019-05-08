@@ -110,7 +110,9 @@ We get occasional rage bursts from unknown people. It should be emphasized that 
 
 ## When sqlmap will switch to Python 3?
 
-Currently there is no pressure on Python projects to switch to the new version of Python interpreter, as the process of switching, especially on larger projects can be cumbersome (due to the few backward incompatibilities). The switch will take place eventually, but currently it is a very [low priority task](https://github.com/sqlmapproject/sqlmap/issues/93).
+~~Currently there is no pressure on Python projects to switch to the new version of Python interpreter, as the process of switching, especially on larger projects can be cumbersome (due to the few backward incompatibilities). The switch will take place eventually, but currently it is a very [low priority task](https://github.com/sqlmapproject/sqlmap/issues/93).~~
+
+Done. Both Python 2 and 3 are supported from May of 2019.
 
 ## How can I shorten the payloads injected by sqlmap?
 
