@@ -12,6 +12,8 @@ import re
 import time
 
 from lib.core.bigarray import BigArray
+from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.settings import VERSION
 from thirdparty.six.moves import BaseHTTPServer as _BaseHTTPServer
 from thirdparty.six.moves import http_client as _http_client
@@ -48,8 +50,8 @@ class HTTPCollector:
 
 class RawPair:
     def __init__(self, request, response, startTime=None, endTime=None, extendedArguments=None):
-        self.request = request
-        self.response = response
+        self.request = getBytes(request)
+        self.response = getBytes(response)
         self.startTime = startTime
         self.endTime = endTime
         self.extendedArguments = extendedArguments or {}
@@ -119,20 +121,20 @@ class Request:
             "queryString": [],
             "headersSize": -1,
             "bodySize": -1,
-            "comment": self.comment,
+            "comment": getText(self.comment),
         }
 
         if self.postBody:
             contentType = self.headers.get("Content-Type")
             out["postData"] = {
                 "mimeType": contentType,
-                "text": self.postBody.rstrip("\r\n"),
+                "text": getText(self.postBody).rstrip("\r\n"),
             }
 
         return out
 
 class Response:
-    extract_status = re.compile(r'\((\d{3}) (.*)\)')
+    extract_status = re.compile(b'\\((\\d{3}) (.*)\\)')
 
     def __init__(self, httpVersion, status, statusText, headers, content, raw=None, comment=None):
         self.raw = raw
@@ -146,22 +148,22 @@ class Response:
     @classmethod
     def parse(cls, raw):
         altered = raw
-        comment = ""
+        comment = b""
 
-        if altered.startswith("HTTP response [") or altered.startswith("HTTP redirect ["):
-            stream = io.StringIO(raw)
+        if altered.startswith(b"HTTP response [") or altered.startswith(b"HTTP redirect ["):
+            stream = io.BytesIO(raw)
             first_line = stream.readline()
             parts = cls.extract_status.search(first_line)
-            status_line = "HTTP/1.0 %s %s" % (parts.group(1), parts.group(2))
+            status_line = b"HTTP/1.0 %s %s" % (parts.group(1), parts.group(2))
             remain = stream.read()
-            altered = status_line + "\r\n" + remain
+            altered = status_line + b"\r\n" + remain
             comment = first_line
 
         response = _http_client.HTTPResponse(FakeSocket(altered))
         response.begin()
 
         try:
-            content = response.read(-1)
+            content = response.read()
         except _http_client.IncompleteRead:
             content = raw[raw.find("\r\n\r\n") + 4:].rstrip("\r\n")
 
@@ -180,10 +182,12 @@ class Response:
             "size": len(self.content or "")
         }
 
-        binary = set(['\0', '\1'])
+        binary = set([b'\0', b'\1'])
         if any(c in binary for c in self.content):
             content["encoding"] = "base64"
-            content["text"] = base64.b64encode(self.content)
+            content["text"] = getText(base64.b64encode(self.content))
+        else:
+            content["text"] = getText(content["text"])
 
         return {
             "httpVersion": self.httpVersion,
@@ -195,7 +199,7 @@ class Response:
             "headersSize": -1,
             "bodySize": -1,
             "redirectURL": "",
-            "comment": self.comment,
+            "comment": getText(self.comment),
         }
 
 class FakeSocket:
@@ -203,7 +207,7 @@ class FakeSocket:
     # https://stackoverflow.com/questions/24728088/python-parse-http-response-string
 
     def __init__(self, response_text):
-        self._file = io.StringIO(response_text)
+        self._file = io.BytesIO(response_text)
 
     def makefile(self, *args, **kwargs):
         return self._file
@@ -214,10 +218,10 @@ class HTTPRequest(_BaseHTTPServer.BaseHTTPRequestHandler):
 
     def __init__(self, request_text):
         self.comment = None
-        self.rfile = io.StringIO(request_text)
+        self.rfile = io.BytesIO(request_text)
         self.raw_requestline = self.rfile.readline()
 
-        if self.raw_requestline.startswith("HTTP request ["):
+        if self.raw_requestline.startswith(b"HTTP request ["):
             self.comment = self.raw_requestline
             self.raw_requestline = self.rfile.readline()
 
