@@ -527,7 +527,7 @@ def checkSqlInjection(place, parameter, value):
                                             continue
                                     elif kb.heuristicPage and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
                                         _ = comparison(kb.heuristicPage, None, getRatioValue=True)
-                                        if _ > kb.matchRatio:
+                                        if (_ or 0) > (kb.matchRatio or 0):
                                             kb.matchRatio = _
                                             logger.debug("adjusting match ratio for current parameter to %.3f" % kb.matchRatio)
 
