@@ -391,7 +391,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         kb.originalTimeDelay = conf.timeSec
 
                                     threadData.validationRun = 0
-                                    if retried < MAX_REVALIDATION_STEPS:
+                                    if (retried or 0) < MAX_REVALIDATION_STEPS:
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 
