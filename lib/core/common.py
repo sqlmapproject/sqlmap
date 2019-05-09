@@ -3691,8 +3691,9 @@ def maskSensitiveData(msg):
     for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie|auth-\w+|proxy)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
-    # Fail-safe substitution
+    # Fail-safe substitutions
     retVal = re.sub(r"(?i)(Command line:.+)\b(https?://[^ ]+)", lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
+    retVal = re.sub(r"(?i)(\b\w:[\\/]+Users[\\/]+|[\\/]+home[\\/]+)([^\\/]+)", lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
 
     if getpass.getuser():
         retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), '*' * len(getpass.getuser()), retVal)
