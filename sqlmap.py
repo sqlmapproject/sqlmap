@@ -27,6 +27,7 @@ try:
     import re
     import shutil
     import sys
+    import tempfile
     import threading
     import time
     import traceback
@@ -281,6 +282,14 @@ def main():
 
         elif "_mkstemp_inner" in excMsg:
             errMsg = "there has been a problem while accessing temporary files"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif any(_ in excMsg for _ in ("tempfile.mkdtemp", "tempfile.mkstemp")):
+            errMsg = "unable to write to the temporary directory '%s'. " % tempfile.gettempdir()
+            errMsg += "Please make sure that your disk is not full and "
+            errMsg += "that you have sufficient write permissions to "
+            errMsg += "create temporary files and/or directories"
             logger.critical(errMsg)
             raise SystemExit
 

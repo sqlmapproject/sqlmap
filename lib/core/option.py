@@ -1499,15 +1499,7 @@ def _createHomeDirectories():
                 warnMsg = "using '%s' as the %s directory" % (directory, context)
                 logger.warn(warnMsg)
         except (OSError, IOError) as ex:
-            try:
-                tempDir = tempfile.mkdtemp(prefix="sqlmap%s" % context)
-            except Exception as _:
-                errMsg = "unable to write to the temporary directory ('%s'). " % _
-                errMsg += "Please make sure that your disk is not full and "
-                errMsg += "that you have sufficient write permissions to "
-                errMsg += "create temporary files and/or directories"
-                raise SqlmapSystemException(errMsg)
-
+            tempDir = tempfile.mkdtemp(prefix="sqlmap%s" % context)
             warnMsg = "unable to %s %s directory " % ("create" if not os.path.isdir(directory) else "write to the", context)
             warnMsg += "'%s' (%s). " % (directory, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)

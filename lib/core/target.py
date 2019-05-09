@@ -638,15 +638,7 @@ def _createTargetDirs():
         if not os.path.isdir(conf.outputPath):
             os.makedirs(conf.outputPath)
     except (OSError, IOError, TypeError) as ex:
-        try:
-            tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-        except Exception as _:
-            errMsg = "unable to write to the temporary directory ('%s'). " % _
-            errMsg += "Please make sure that your disk is not full and "
-            errMsg += "that you have sufficient write permissions to "
-            errMsg += "create temporary files and/or directories"
-            raise SqlmapSystemException(errMsg)
-
+        tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
         warnMsg = "unable to create output directory "
         warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
         warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
