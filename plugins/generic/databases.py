@@ -637,6 +637,7 @@ class Databases:
 
                     for columnData in values:
                         if not isNoneValue(columnData):
+                            columnData = [unArrayizeValue(_) for _ in columnData]
                             name = safeSQLIdentificatorNaming(columnData[0])
 
                             if name:

@@ -3322,6 +3322,10 @@ def unArrayizeValue(value):
     '1'
     >>> unArrayizeValue(['1', '2'])
     '1'
+    >>> unArrayizeValue([['a', 'b'], 'c'])
+    'a'
+    >>> unArrayizeValue(_ for _ in xrange(10))
+    0
     """
 
     if isListLike(value):
@@ -3332,6 +3336,8 @@ def unArrayizeValue(value):
         else:
             value = [_ for _ in flattenValue(value) if _ is not None]
             value = value[0] if len(value) > 0 else None
+    elif inspect.isgenerator(value):
+        value = unArrayizeValue([_ for _ in value])
 
     return value
 
