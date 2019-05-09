@@ -198,30 +198,39 @@ def round(x, d=0):
 
     p = 10 ** d
     if x > 0:
-        return float(math.floor((x * p) + 0.5))/p
+        return float(math.floor((x * p) + 0.5)) / p
     else:
-        return float(math.ceil((x * p) - 0.5))/p
+        return float(math.ceil((x * p) - 0.5)) / p
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     class K(object):
         __slots__ = ['obj']
+
         def __init__(self, obj, *args):
             self.obj = obj
+
         def __lt__(self, other):
             return mycmp(self.obj, other.obj) < 0
+
         def __gt__(self, other):
             return mycmp(self.obj, other.obj) > 0
+
         def __eq__(self, other):
             return mycmp(self.obj, other.obj) == 0
+
         def __le__(self, other):
             return mycmp(self.obj, other.obj) <= 0
+
         def __ge__(self, other):
             return mycmp(self.obj, other.obj) >= 0
+
         def __ne__(self, other):
             return mycmp(self.obj, other.obj) != 0
+
         def __hash__(self):
             raise TypeError('hash not implemented')
+
     return K
 
 # Note: patch for Python 2.6

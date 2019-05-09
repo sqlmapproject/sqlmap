@@ -174,7 +174,7 @@ class SGMLParser(markupbase.ParserBase):
                     k = self.parse_pi(i)
                     if k < 0:
                         break
-                    i = i+k
+                    i = i + k
                     continue
                 if rawdata.startswith("<!", i):
                     # This is some sort of declaration; in "HTML as
@@ -195,16 +195,16 @@ class SGMLParser(markupbase.ParserBase):
                     name = match.group(1)
                     self.handle_charref(name)
                     i = match.end(0)
-                    if rawdata[i-1] != ';':
-                        i = i-1
+                    if rawdata[i - 1] != ';':
+                        i = i - 1
                     continue
                 match = entityref.match(rawdata, i)
                 if match:
                     name = match.group(1)
                     self.handle_entityref(name)
                     i = match.end(0)
-                    if rawdata[i-1] != ';':
-                        i = i-1
+                    if rawdata[i - 1] != ';':
+                        i = i - 1
                     continue
             else:
                 self.error('neither < nor & ??')
@@ -233,15 +233,15 @@ class SGMLParser(markupbase.ParserBase):
     # Internal -- parse processing instr, return length or -1 if not terminated
     def parse_pi(self, i):
         rawdata = self.rawdata
-        if rawdata[i:i+2] != '<?':
+        if rawdata[i:i + 2] != '<?':
             self.error('unexpected call to parse_pi()')
-        match = piclose.search(rawdata, i+2)
+        match = piclose.search(rawdata, i + 2)
         if not match:
             return -1
         j = match.start(0)
-        self.handle_pi(rawdata[i+2: j])
+        self.handle_pi(rawdata[i + 2: j])
         j = match.end(0)
-        return j-i
+        return j - i
 
     def get_starttag_text(self):
         return self.__starttag_text
@@ -276,7 +276,7 @@ class SGMLParser(markupbase.ParserBase):
         j = match.start(0)
         # Now parse the data between i + 1 and j into a tag and attrs
         attrs = []
-        if rawdata[i:i+2] == '<>':
+        if rawdata[i:i + 2] == '<>':
             # SGML shorthand: <> == <last open tag seen>
             k = j
             tag = self.lasttag
@@ -327,7 +327,7 @@ class SGMLParser(markupbase.ParserBase):
         if not match:
             return -1
         j = match.start(0)
-        tag = rawdata[i+2:j].strip().lower()
+        tag = rawdata[i + 2:j].strip().lower()
         if rawdata[j] == '>':
             j = j + 1
         self.finish_endtag(tag)

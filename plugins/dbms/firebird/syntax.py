@@ -25,7 +25,7 @@ class Syntax(GenericSyntax):
         """
 
         def escaper(value):
-            return "||".join("ASCII_CHAR(%d)" %_ for _ in getOrds(value))
+            return "||".join("ASCII_CHAR(%d)" % _ for _ in getOrds(value))
 
         retVal = expression
 
