@@ -2265,8 +2265,8 @@ def average(values):
     """
     Computes the arithmetic mean of a list of numbers.
 
-    >>> round(average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9]), 1)
-    0.9
+    >>> "%.1f" % average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
+    '0.9'
     """
 
     return (1.0 * sum(values) / len(values)) if values else None
@@ -2278,8 +2278,8 @@ def stdev(values):
 
     # Reference: http://www.goldb.org/corestats.html
 
-    >>> round(stdev([0.9, 0.9, 0.9, 1.0, 0.8, 0.9]), 3)
-    0.063
+    >>> "%.3f" % stdev([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
+    '0.063'
     """
 
     if not values or len(values) < 2:
@@ -4701,10 +4701,7 @@ def prioritySortColumns(columns):
     def _(column):
         return column and "id" in column.lower()
 
-    if six.PY2:
-        return sorted(sorted(columns, key=len), lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0)
-    else:
-        return sorted(sorted(columns, key=len), key=functools.cmp_to_key(lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0))
+    return sorted(sorted(columns, key=len), key=functools.cmp_to_key(lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0))
 
 def getRequestHeader(request, name):
     """

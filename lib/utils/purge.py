@@ -68,10 +68,7 @@ def purge(directory):
         except:
             pass
 
-    if six.PY2:
-        dirpaths.sort(cmp=lambda x, y: y.count(os.path.sep) - x.count(os.path.sep))
-    else:
-        dirpaths.sort(key=functools.cmp_to_key(lambda x, y: y.count(os.path.sep) - x.count(os.path.sep)))
+    dirpaths.sort(key=functools.cmp_to_key(lambda x, y: y.count(os.path.sep) - x.count(os.path.sep)))
 
     logger.debug("renaming directory names to random values")
     for dirpath in dirpaths:
