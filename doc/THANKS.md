@@ -202,7 +202,7 @@ Tate Hansen, <tate(at)clearnetsec.com>
 Mario Heiderich, <mario.heiderich(at)gmail.com>
 Christian Matthies, <ch0012(at)gmail.com>
 Lars H. Strojny, <lars(at)strojny.net>
-* for their great tool PHPIDS included in sqlmap tree as a set of rules for testing payloads against IDS detection, http://php-ids.org
+* for their great tool PHPIDS included in sqlmap tree as a set of rules for testing payloads against IDS detection, https://github.com/PHPIDS/PHPIDS
 
 Kristian Erik Hermansen, <kristian.hermansen(at)gmail.com>
 * for reporting a bug

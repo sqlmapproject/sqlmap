@@ -16,7 +16,7 @@ _multiprocessing = None
 try:
     import multiprocessing
 
-    # problems on FreeBSD (Reference: http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
+    # problems on FreeBSD (Reference: https://web.archive.org/web/20110710041353/http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
     _ = multiprocessing.Queue()
 
     # problems with ctypes (Reference: https://github.com/sqlmapproject/sqlmap/issues/2952)
@@ -98,7 +98,7 @@ from thirdparty.six.moves import queue as _queue
 def mysql_passwd(password, uppercase=True):
     """
     Reference(s):
-        http://csl.sublevel3.org/mysql-password-function/
+        https://web.archive.org/web/20120215205312/http://csl.sublevel3.org/mysql-password-function/
 
     >>> mysql_passwd(password='testpass', uppercase=True)
     '*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'
@@ -113,8 +113,8 @@ def mysql_passwd(password, uppercase=True):
 def mysql_old_passwd(password, uppercase=True):  # prior to version '4.1'
     """
     Reference(s):
-        http://www.sfr-fresh.com/unix/privat/tpop3d-1.5.5.tar.gz:a/tpop3d-1.5.5/password.c
-        http://voidnetwork.org/5ynL0rd/darkc0de/python_script/darkMySQLi.html
+        https://web.archive.org/web/20091205000600/http://www.sfr-fresh.com/unix/privat/tpop3d-1.5.5.tar.gz:a/tpop3d-1.5.5/password.c
+        https://github.com/pwnieexpress/pwn_plug_sources/blob/master/src/darkmysqli/DarkMySQLi.py
 
     >>> mysql_old_passwd(password='testpass', uppercase=True)
     '7DCDA0D57290B453'

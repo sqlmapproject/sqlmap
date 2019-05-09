@@ -96,7 +96,7 @@ class Filesystem(GenericFilesystem):
         logger.debug("loading the content of file '%s' into support table" % rFile)
         inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (txtTbl, rFile, randomStr(10), randomStr(10)), silent=True)
 
-        # Reference: http://support.microsoft.com/kb/104829
+        # Reference: https://web.archive.org/web/20120211184457/http://support.microsoft.com/kb/104829
         binToHexQuery = """DECLARE @charset VARCHAR(16)
         DECLARE @counter INT
         DECLARE @hexstr VARCHAR(4096)

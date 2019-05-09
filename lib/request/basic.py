@@ -243,7 +243,11 @@ def checkCharEncoding(encoding, warn=True):
 def getHeuristicCharEncoding(page):
     """
     Returns page encoding charset detected by usage of heuristics
-    Reference: http://chardet.feedparser.org/docs/
+
+    Reference: https://chardet.readthedocs.io/en/latest/usage.html
+
+    >>> getHeuristicCharEncoding(b"<html></html>")
+    'ascii'
     """
 
     key = hash(page)
@@ -259,6 +263,9 @@ def getHeuristicCharEncoding(page):
 def decodePage(page, contentEncoding, contentType):
     """
     Decode compressed/charset HTTP response
+
+    >>> getText(decodePage(b"<html>foo&amp;bar</html>", None, "text/html; charset=utf-8"))
+    '<html>foo&bar</html>'
     """
 
     if not page or (conf.nullConnection and len(page) < 2):
