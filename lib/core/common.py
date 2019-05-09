@@ -2265,7 +2265,7 @@ def average(values):
     """
     Computes the arithmetic mean of a list of numbers.
 
-    >>> average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
+    >>> round(average([0.9, 0.9, 0.9, 1.0, 0.8, 0.9]), 1)
     0.9
     """
 
@@ -2278,8 +2278,8 @@ def stdev(values):
 
     # Reference: http://www.goldb.org/corestats.html
 
-    >>> stdev([0.9, 0.9, 0.9, 1.0, 0.8, 0.9])
-    0.06324555320336757
+    >>> round(stdev([0.9, 0.9, 0.9, 1.0, 0.8, 0.9]), 3)
+    0.063
     """
 
     if not values or len(values) < 2:
