@@ -397,8 +397,12 @@ def main():
             conf.hashDB.flush(True)
 
         if conf.get("harFile"):
-            with openFile(conf.harFile, "w+b") as f:
-                json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
+            try:
+                with openFile(conf.harFile, "w+b") as f:
+                    json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
+            except SqlmapBaseException as ex:
+                errMsg = getSafeExString(ex)
+                logger.critical(errMsg)
 
         if conf.get("api"):
             conf.databaseCursor.disconnect()
