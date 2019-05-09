@@ -2598,18 +2598,17 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     Provides tip for adjusting time delay in time-based data retrieval
     """
 
-    candidate = 1 + int(round(lowerStdLimit))
+    candidate = (1 if not isHeavyQueryBased() else 2) + int(round(lowerStdLimit))
 
-    if candidate:
-        kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
+    kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
 
-        if all((_ == candidate for _ in kb.delayCandidates)) and candidate < conf.timeSec:
-            if lastQueryDuration / (1.0 * conf.timeSec / candidate) > MIN_VALID_DELAYED_RESPONSE:  # Note: to prevent problems with fast responses for heavy-queries like RANDOMBLOB
-                conf.timeSec = candidate
+    if all((_ == candidate for _ in kb.delayCandidates)) and candidate < conf.timeSec:
+        if lastQueryDuration / (1.0 * conf.timeSec / candidate) > MIN_VALID_DELAYED_RESPONSE:  # Note: to prevent problems with fast responses for heavy-queries like RANDOMBLOB
+            conf.timeSec = candidate
 
-                infoMsg = "adjusting time delay to "
-                infoMsg += "%d second%s due to good response times" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                logger.info(infoMsg)
+            infoMsg = "adjusting time delay to "
+            infoMsg += "%d second%s due to good response times" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+            logger.info(infoMsg)
 
 def getLastRequestHTTPError():
     """
@@ -3161,6 +3160,27 @@ def isTechniqueAvailable(technique):
         return False
     else:
         return getTechniqueData(technique) is not None
+
+def isHeavyQueryBased():
+    """
+    Returns True whether time-based or stacked payloads are based on heavy queries
+
+    >>> pushValue(kb.injection.data)
+    >>> kb.injection.data[PAYLOAD.TECHNIQUE.STACKED] = [test for test in getSortedInjectionTests() if "heavy" in test["title"].lower()][0]
+    >>> isHeavyQueryBased()
+    True
+    >>> kb.injection.data = popValue()
+    """
+
+    retVal = False
+
+    for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
+        data = getTechniqueData(technique)
+        if data and "heavy query" in data["title"].lower():
+            retVal = True
+            break
+
+    return retVal
 
 def isStackingAvailable():
     """
