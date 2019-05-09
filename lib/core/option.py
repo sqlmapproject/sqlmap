@@ -5,6 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import functools
 import glob
 import inspect
 import logging
@@ -52,6 +53,7 @@ from lib.core.common import setOptimize
 from lib.core.common import setPaths
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
+from lib.core.compat import cmp
 from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import getUnicode
@@ -822,7 +824,7 @@ def _setTamperingFunctions():
             logger.warning(warnMsg)
 
         if resolve_priorities and priorities:
-            priorities.sort(reverse=True)
+            priorities.sort(key=functools.cmp_to_key(lambda a, b: cmp(a[0], b[0])), reverse=True)
             kb.tamperFunctions = []
 
             for _, function in priorities:
