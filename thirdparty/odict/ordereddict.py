@@ -120,7 +120,7 @@ class OrderedDict(dict, DictMixin):
         if isinstance(other, OrderedDict):
             if len(self) != len(other):
                 return False
-            for p, q in  zip(self.items(), other.items()):
+            for p, q in zip(self.items(), other.items()):
                 if p != q:
                     return False
             return True
