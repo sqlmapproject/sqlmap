@@ -3161,24 +3161,28 @@ def isTechniqueAvailable(technique):
     else:
         return getTechniqueData(technique) is not None
 
-def isHeavyQueryBased():
+def isHeavyQueryBased(technique=None):
     """
-    Returns True whether time-based or stacked payloads are based on heavy queries
+    Returns True whether current (kb.)technique is heavy-query based
 
     >>> pushValue(kb.injection.data)
-    >>> kb.injection.data[PAYLOAD.TECHNIQUE.STACKED] = [test for test in getSortedInjectionTests() if "heavy" in test["title"].lower()][0]
+    >>> pushValue(kb.technique)
+    >>> kb.technique = PAYLOAD.TECHNIQUE.STACKED
+    >>> kb.injection.data[kb.technique] = [test for test in getSortedInjectionTests() if "heavy" in test["title"].lower()][0]
     >>> isHeavyQueryBased()
     True
+    >>> kb.technique = popValue()
     >>> kb.injection.data = popValue()
     """
 
     retVal = False
 
-    for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
+    technique = technique or kb.technique
+
+    if isTechniqueAvailable(technique):
         data = getTechniqueData(technique)
         if data and "heavy query" in data["title"].lower():
             retVal = True
-            break
 
     return retVal
 
