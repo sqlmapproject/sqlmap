@@ -3653,7 +3653,7 @@ def createGithubIssue(errMsg, excMsg):
         _excMsg = None
         errMsg = errMsg[errMsg.find("\n"):]
 
-        req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key))
+        req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key), headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
             content = _urllib.request.urlopen(req).read()
