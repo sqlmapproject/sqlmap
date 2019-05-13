@@ -1009,7 +1009,7 @@ def _setSocketPreConnect():
 
         return retVal
 
-    if not hasattr(socket.socket, "_create_connection"):
+    if not hasattr(socket, "_create_connection"):
         socket._ready = {}
         socket._create_connection = socket.create_connection
         socket.create_connection = create_connection
