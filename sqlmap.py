@@ -280,6 +280,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "Invalid IPv6 URL" in excMsg:
+            errMsg = "invalid URL ('%s')" % excMsg.strip().split('\n')[-1]
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "_mkstemp_inner" in excMsg:
             errMsg = "there has been a problem while accessing temporary files"
             logger.critical(errMsg)
