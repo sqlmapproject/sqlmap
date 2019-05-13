@@ -10,6 +10,7 @@ import re
 import subprocess
 
 from lib.core.common import getText
+from lib.core.common import openFile
 
 def getRevisionNumber():
     """
@@ -36,7 +37,7 @@ def getRevisionNumber():
 
     while True:
         if filePath and os.path.isfile(filePath):
-            with open(filePath, "r") as f:
+            with openFile(filePath, "r") as f:
                 content = f.read()
                 filePath = None
                 if content.startswith("ref: "):

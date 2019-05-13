@@ -18,6 +18,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import getLatestRevision
 from lib.core.common import getText
+from lib.core.common import openFile
 from lib.core.common import pollProcess
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -82,7 +83,7 @@ def update():
 
                         filepath = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "core", "settings.py")
                         if os.path.isfile(filepath):
-                            with open(filepath, "rb") as f:
+                            with openFile(filepath, "rb") as f:
                                 version = re.search(r"(?m)^VERSION\s*=\s*['\"]([^'\"]+)", f.read()).group(1)
                                 logger.info("updated to the latest version '%s#dev'" % version)
                                 success = True

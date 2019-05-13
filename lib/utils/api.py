@@ -21,6 +21,7 @@ import time
 
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
+from lib.core.common import openFile
 from lib.core.common import saveConfig
 from lib.core.common import unArrayizeValue
 from lib.core.compat import xrange
@@ -648,9 +649,8 @@ def download(taskid, target, filename):
 
     if os.path.isfile(path):
         logger.debug("(%s) Retrieved content of file %s" % (taskid, target))
-        with open(path, 'rb') as inf:
-            file_content = inf.read()
-        return jsonize({"success": True, "file": encodeBase64(file_content, binary=False)})
+        content = openFile(path, "rb").read()
+        return jsonize({"success": True, "file": encodeBase64(content, binary=False)})
     else:
         logger.warning("[%s] File does not exist %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
