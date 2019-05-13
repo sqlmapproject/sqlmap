@@ -17,6 +17,7 @@ import zipfile
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import getLatestRevision
+from lib.core.common import getText
 from lib.core.common import pollProcess
 from lib.core.common import readInput
 from lib.core.data import conf
@@ -106,23 +107,25 @@ def update():
         dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
 
         try:
-            process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=paths.SQLMAP_ROOT_PATH.encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
+            process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH.encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
             pollProcess(process, True)
-            stdout, stderr = process.communicate()
+            output, _ = process.communicate()
             success = not process.returncode
         except (IOError, OSError) as ex:
             success = False
-            stderr = getSafeExString(ex)
+            output = getSafeExString(ex)
+        finally:
+            output = getText(output)
 
         if success:
-            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in stdout else "updated to", getRevisionNumber()))
+            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in output else "updated to", getRevisionNumber()))
         else:
-            if "Not a git repository" in stderr:
+            if "Not a git repository" in output:
                 errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
                 errMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
                 logger.error(errMsg)
             else:
-                logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", stderr).strip())
+                logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", output).strip())
 
     if not success:
         if IS_WIN:

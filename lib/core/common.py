@@ -2151,14 +2151,20 @@ def shellExec(cmd):
     """
     Executes arbitrary shell command
 
-    >>> shellExec('echo 1').strip() == b'1'
+    >>> shellExec('echo 1').strip() == '1'
     True
     """
 
+    retVal = ""
+
     try:
-        return subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0] or ""
+        retVal = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0] or ""
     except Exception as ex:
-        return six.text_type(ex)
+        retVal = getSafeExString(ex)
+    finally:
+        retVal = getText(retVal)
+
+    return retVal
 
 def clearConsoleLine(forceOutput=False):
     """

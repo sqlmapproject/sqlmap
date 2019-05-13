@@ -80,7 +80,6 @@ def vulnTest():
     ):
         cmd = "%s %s -u http://%s:%d/?id=1 --batch %s" % (sys.executable, os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py"), address, port, options)
         output = shellExec(cmd)
-        output = getUnicode(output)
 
         if not all(check in output for check in checks):
             dataToStdout("---\n\n$ %s\n" % cmd)
