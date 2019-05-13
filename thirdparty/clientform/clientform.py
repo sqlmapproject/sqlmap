@@ -109,7 +109,7 @@ try:
 except ImportError:
     from lib.utils import sgmllib
 
-import sys, types, copy, re, random
+import sys, re, random
 
 if sys.version_info >= (3, 0):
     xrange = range
@@ -149,6 +149,14 @@ def compress_text(text): return _compress_re.sub(" ", text.strip())
 def normalize_line_endings(text):
     return re.sub(r"(?:(?<!\r)\n)|(?:\r(?!\n))", "\r\n", text)
 
+def _quote_plus(value):
+    if not isinstance(value, six.string_types):
+        value = six.text_type(value)
+
+    if isinstance(value, six.text_type):
+        value = value.encode("utf8")
+
+    return _urllib.parse.quote_plus(value)
 
 # This version of urlencode is from my Python 1.5.2 back-port of the
 # Python 2.1 CVS maintenance branch of urllib.  It will accept a sequence
@@ -190,20 +198,14 @@ string.
     if not doseq:
         # preserve old behavior
         for k, v in query:
-            k = _urllib.parse.quote_plus(str(k))
-            v = _urllib.parse.quote_plus(str(v))
+            k = _quote_plus(k)
+            v = _quote_plus(v)
             l.append(k + '=' + v)
     else:
         for k, v in query:
-            k = _urllib.parse.quote_plus(str(k))
-            if type(v) == types.StringType:
-                v = _urllib.parse.quote_plus(v)
-                l.append(k + '=' + v)
-            elif type(v) == types.UnicodeType:
-                # is there a reasonable way to convert to ASCII?
-                # encode generates a string, but "replace" or "ignore"
-                # lose information and "strict" can raise UnicodeError
-                v = _urllib.parse.quote_plus(v.encode("ASCII","replace"))
+            k = _quote_plus(k)
+            if isinstance(v, six.string_types):
+                v = _quote_plus(v)
                 l.append(k + '=' + v)
             else:
                 try:
@@ -211,12 +213,12 @@ string.
                     x = len(v)
                 except TypeError:
                     # not a sequence
-                    v = _urllib.parse.quote_plus(str(v))
+                    v = _quote_plus(v)
                     l.append(k + '=' + v)
                 else:
                     # loop over the sequence
                     for elt in v:
-                        l.append(k + '=' + _urllib.parse.quote_plus(str(elt)))
+                        l.append(k + '=' + _quote_plus(elt))
     return '&'.join(l)
 
 def unescape(data, entities, encoding=DEFAULT_ENCODING):
