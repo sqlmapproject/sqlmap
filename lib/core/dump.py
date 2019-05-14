@@ -557,7 +557,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<th>%s</th>" % cgi.escape(column).encode("ascii", "xmlcharrefreplace"))
+                        dataToDumpFile(dumpFP, "<th>%s</th>" % getUnicode(cgi.escape(column).encode("ascii", "xmlcharrefreplace")))
 
                 field += 1
 
@@ -628,7 +628,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<td>%s</td>" % cgi.escape(value).encode("ascii", "xmlcharrefreplace"))
+                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(cgi.escape(value).encode("ascii", "xmlcharrefreplace")))
 
                     field += 1
 
