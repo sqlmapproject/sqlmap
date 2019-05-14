@@ -814,8 +814,8 @@ def cmdLineParser(argv=None):
                 command = None
 
                 try:
+                    # Note: in Python2 command should not be converted to Unicode before passing to shlex (Reference: https://bugs.python.org/issue1170)
                     command = _input("sqlmap-shell> ").strip()
-                    command = getUnicode(command, encoding=sys.stdin.encoding)
                 except (KeyboardInterrupt, EOFError):
                     print()
                     raise SqlmapShellQuitException
