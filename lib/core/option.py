@@ -1585,8 +1585,7 @@ def _cleanupOptions():
 
     if conf.testParameter:
         conf.testParameter = urldecode(conf.testParameter)
-        conf.testParameter = conf.testParameter.replace(" ", "")
-        conf.testParameter = re.split(PARAMETER_SPLITTING_REGEX, conf.testParameter)
+        conf.testParameter = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.testParameter)]
     else:
         conf.testParameter = []
 

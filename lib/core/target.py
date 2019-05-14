@@ -23,6 +23,7 @@ from lib.core.common import openFile
 from lib.core.common import paramToDict
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import removePostHintPrefix
 from lib.core.common import resetCookieJar
 from lib.core.common import urldecode
 from lib.core.compat import xrange
@@ -110,7 +111,7 @@ def _setRequestParams():
         def process(match, repl):
             retVal = match.group(0)
 
-            if not (conf.testParameter and match.group("name") not in conf.testParameter):
+            if not (conf.testParameter and match.group("name") not in [removePostHintPrefix(_) for _ in conf.testParameter]):
                 retVal = repl
                 while True:
                     _ = re.search(r"\\g<([^>]+)>", retVal)

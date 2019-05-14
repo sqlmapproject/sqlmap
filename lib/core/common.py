@@ -82,8 +82,9 @@ from lib.core.enums import LOGGING_LEVELS
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.enums import OPTION_TYPE
 from lib.core.enums import OS
-from lib.core.enums import PLACE
 from lib.core.enums import PAYLOAD
+from lib.core.enums import PLACE
+from lib.core.enums import POST_HINT
 from lib.core.enums import REFLECTIVE_COUNTER
 from lib.core.enums import SORT_ORDER
 from lib.core.exception import SqlmapBaseException
@@ -5070,6 +5071,18 @@ def firstNotNone(*args):
             break
 
     return retVal
+
+def removePostHintPrefix(value):
+    """
+    Remove POST hint prefix from a given value (name)
+
+    >>> removePostHintPrefix("JSON id")
+    'id'
+    >>> removePostHintPrefix("id")
+    'id'
+    """
+
+    return re.sub(r"\A(%s) " % '|'.join(re.escape(__) for __ in getPublicTypeMembers(POST_HINT, onlyValues=True)), "", value)
 
 def chunkSplitPostData(data):
     """
