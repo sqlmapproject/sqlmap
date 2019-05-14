@@ -2122,16 +2122,11 @@ def getConsoleWidth(default=80):
         width = int(os.getenv("COLUMNS"))
     else:
         try:
-            try:
-                FNULL = open(os.devnull, 'w')
-            except IOError:
-                FNULL = None
-            process = subprocess.Popen("stty size", shell=True, stdout=subprocess.PIPE, stderr=FNULL or subprocess.PIPE)
-            stdout, _ = process.communicate()
-            items = stdout.split()
+            output = shellExec("stty size")
+            match = re.search(r"\A\d+ (\d+)", output)
 
-            if len(items) == 2 and items[1].isdigit():
-                width = int(items[1])
+            if match:
+                width = int(match.group(1))
         except (OSError, MemoryError):
             pass
 
