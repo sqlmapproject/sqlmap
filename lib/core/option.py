@@ -1022,119 +1022,120 @@ def _setHTTPHandlers():
     """
     Check and set the HTTP/SOCKS proxy for all HTTP requests.
     """
-    global proxyHandler
 
-    for _ in ("http", "https"):
-        if hasattr(proxyHandler, "%s_open" % _):
-            delattr(proxyHandler, "%s_open" % _)
+    with kb.locks.handlers:
+        if conf.proxyList is not None:
+            if not conf.proxyList:
+                errMsg = "list of usable proxies is exhausted"
+                raise SqlmapNoneDataException(errMsg)
 
-    if conf.proxyList is not None:
-        if not conf.proxyList:
-            errMsg = "list of usable proxies is exhausted"
-            raise SqlmapNoneDataException(errMsg)
+            conf.proxy = conf.proxyList[0]
+            conf.proxyList = conf.proxyList[1:]
 
-        conf.proxy = conf.proxyList[0]
-        conf.proxyList = conf.proxyList[1:]
+            infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
+            logger.info(infoMsg)
 
-        infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
-        logger.info(infoMsg)
-
-    elif not conf.proxy:
-        if conf.hostname in ("localhost", "127.0.0.1") or conf.ignoreProxy:
-            proxyHandler.proxies = {}
-
-    if conf.proxy:
-        debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
-        logger.debug(debugMsg)
-
-        try:
-            _ = _urllib.parse.urlsplit(conf.proxy)
-        except Exception as ex:
-            errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
-            raise SqlmapSyntaxException(errMsg)
-
-        hostnamePort = _.netloc.split(":")
-
-        scheme = _.scheme.upper()
-        hostname = hostnamePort[0]
-        port = None
-        username = None
-        password = None
-
-        if len(hostnamePort) == 2:
-            try:
-                port = int(hostnamePort[1])
-            except:
-                pass  # drops into the next check block
-
-        if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
-            errMsg = "proxy value must be in format '(%s)://address:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
-            raise SqlmapSyntaxException(errMsg)
-
-        if conf.proxyCred:
-            _ = re.search(r"\A(.*?):(.*?)\Z", conf.proxyCred)
-            if not _:
-                errMsg = "proxy authentication credentials "
-                errMsg += "value must be in format username:password"
-                raise SqlmapSyntaxException(errMsg)
-            else:
-                username = _.group(1)
-                password = _.group(2)
-
-        if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
-            proxyHandler.proxies = {}
-
-            if scheme == PROXY_TYPE.SOCKS4:
-                warnMsg = "SOCKS4 does not support resolving (DNS) names (i.e. causing DNS leakage)"
-                singleTimeWarnMessage(warnMsg)
-
-            socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
-            socks.wrapmodule(_http_client)
-        else:
-            socks.unwrapmodule(_http_client)
-
-            if conf.proxyCred:
-                # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
-                proxyString = "%s@" % conf.proxyCred
-            else:
-                proxyString = ""
-
-            proxyString += "%s:%d" % (hostname, port)
-            proxyHandler.proxies = {"http": proxyString, "https": proxyString}
-
-        proxyHandler.__init__(proxyHandler.proxies)
-
-    debugMsg = "creating HTTP requests opener object"
-    logger.debug(debugMsg)
-
-    handlers = filterNone([multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
-
-    if not conf.dropSetCookie:
-        if not conf.loadCookies:
-            conf.cj = _http_cookiejar.CookieJar()
-        else:
-            conf.cj = _http_cookiejar.MozillaCookieJar()
-            resetCookieJar(conf.cj)
-
-        handlers.append(_urllib.request.HTTPCookieProcessor(conf.cj))
-
-    # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-    if conf.keepAlive:
-        warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-        warnMsg += "been disabled because of its incompatibility "
+        elif not conf.proxy:
+            if conf.hostname in ("localhost", "127.0.0.1") or conf.ignoreProxy:
+                proxyHandler.proxies = {}
 
         if conf.proxy:
-            warnMsg += "with HTTP(s) proxy"
-            logger.warn(warnMsg)
-        elif conf.authType:
-            warnMsg += "with authentication methods"
-            logger.warn(warnMsg)
-        else:
-            handlers.append(keepAliveHandler)
+            debugMsg = "setting the HTTP/SOCKS proxy for all HTTP requests"
+            logger.debug(debugMsg)
 
-    opener = _urllib.request.build_opener(*handlers)
-    opener.addheaders = []  # Note: clearing default "User-Agent: Python-urllib/X.Y"
-    _urllib.request.install_opener(opener)
+            try:
+                _ = _urllib.parse.urlsplit(conf.proxy)
+            except Exception as ex:
+                errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
+                raise SqlmapSyntaxException(errMsg)
+
+            hostnamePort = _.netloc.split(":")
+
+            scheme = _.scheme.upper()
+            hostname = hostnamePort[0]
+            port = None
+            username = None
+            password = None
+
+            if len(hostnamePort) == 2:
+                try:
+                    port = int(hostnamePort[1])
+                except:
+                    pass  # drops into the next check block
+
+            if not all((scheme, hasattr(PROXY_TYPE, scheme), hostname, port)):
+                errMsg = "proxy value must be in format '(%s)://address:port'" % "|".join(_[0].lower() for _ in getPublicTypeMembers(PROXY_TYPE))
+                raise SqlmapSyntaxException(errMsg)
+
+            if conf.proxyCred:
+                _ = re.search(r"\A(.*?):(.*?)\Z", conf.proxyCred)
+                if not _:
+                    errMsg = "proxy authentication credentials "
+                    errMsg += "value must be in format username:password"
+                    raise SqlmapSyntaxException(errMsg)
+                else:
+                    username = _.group(1)
+                    password = _.group(2)
+
+            if scheme in (PROXY_TYPE.SOCKS4, PROXY_TYPE.SOCKS5):
+                proxyHandler.proxies = {}
+
+                if scheme == PROXY_TYPE.SOCKS4:
+                    warnMsg = "SOCKS4 does not support resolving (DNS) names (i.e. causing DNS leakage)"
+                    singleTimeWarnMessage(warnMsg)
+
+                socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if scheme == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, hostname, port, username=username, password=password)
+                socks.wrapmodule(_http_client)
+            else:
+                socks.unwrapmodule(_http_client)
+
+                if conf.proxyCred:
+                    # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
+                    proxyString = "%s@" % conf.proxyCred
+                else:
+                    proxyString = ""
+
+                proxyString += "%s:%d" % (hostname, port)
+                proxyHandler.proxies = {"http": proxyString, "https": proxyString}
+
+            proxyHandler.__init__(proxyHandler.proxies)
+
+        if not proxyHandler.proxies:
+            for _ in ("http", "https"):
+                if hasattr(proxyHandler, "%s_open" % _):
+                    delattr(proxyHandler, "%s_open" % _)
+
+        debugMsg = "creating HTTP requests opener object"
+        logger.debug(debugMsg)
+
+        handlers = filterNone([multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
+
+        if not conf.dropSetCookie:
+            if not conf.loadCookies:
+                conf.cj = _http_cookiejar.CookieJar()
+            else:
+                conf.cj = _http_cookiejar.MozillaCookieJar()
+                resetCookieJar(conf.cj)
+
+            handlers.append(_urllib.request.HTTPCookieProcessor(conf.cj))
+
+        # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
+        if conf.keepAlive:
+            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
+            warnMsg += "been disabled because of its incompatibility "
+
+            if conf.proxy:
+                warnMsg += "with HTTP(s) proxy"
+                logger.warn(warnMsg)
+            elif conf.authType:
+                warnMsg += "with authentication methods"
+                logger.warn(warnMsg)
+            else:
+                handlers.append(keepAliveHandler)
+
+        opener = _urllib.request.build_opener(*handlers)
+        opener.addheaders = []  # Note: clearing default "User-Agent: Python-urllib/X.Y"
+        _urllib.request.install_opener(opener)
 
 def _setSafeVisit():
     """
@@ -1925,7 +1926,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "connError", "count", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
+    for _ in ("cache", "connError", "count", "handlers", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None

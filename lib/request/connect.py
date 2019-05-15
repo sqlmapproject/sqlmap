@@ -146,7 +146,7 @@ class Connect(object):
         threadData = getCurrentThreadData()
         threadData.retriesCount += 1
 
-        if conf.proxyList and threadData.retriesCount >= conf.retries:
+        if conf.proxyList and threadData.retriesCount >= conf.retries and not kb.locks.handlers.locked():
             warnMsg = "changing proxy"
             logger.warn(warnMsg)
 
