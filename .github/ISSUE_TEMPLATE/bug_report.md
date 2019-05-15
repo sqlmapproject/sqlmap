@@ -21,14 +21,15 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Running environment:**
- - OS: [e.g. Microsoft Windows 10]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 1.3.5.93#dev]
+ - sqlmap version [e.g. 1.3.5.93#dev]
+ - Installation method [e.g. git]
+ - Operating system: [e.g. Microsoft Windows 10]
+ - Python version [e.g. 3.5.2]
 
 **Target details:**
  - DBMS [e.g. Microsoft SQL Server]
  - SQLi techniques found by sqlmap [e.g. error-based and boolean-based blind]
- - WAF/IPS [e.g. ModSecurity]
+ - WAF/IPS [if any]
  - Relevant console output [if any]
  - Exception traceback [if any]
 
