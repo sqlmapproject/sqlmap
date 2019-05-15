@@ -4547,6 +4547,8 @@ def decodeDbmsHexValue(value, raw=False):
 
     >>> decodeDbmsHexValue('3132332031') == u'123 1'
     True
+    >>> decodeDbmsHexValue('313233203') == u'123 ?'
+    True
     >>> decodeDbmsHexValue(['0x31', '0x32']) == [u'1', u'2']
     True
     """
@@ -4568,11 +4570,13 @@ def decodeDbmsHexValue(value, raw=False):
                         retVal = retVal.decode("utf-16-le")
                     except UnicodeDecodeError:
                         pass
+
                 elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.H2):
                     try:
                         retVal = retVal.decode("utf-16-be")
                     except UnicodeDecodeError:
                         pass
+
                 if not isinstance(retVal, six.text_type):
                     retVal = getUnicode(retVal, conf.encoding or UNICODE_ENCODING)
 
