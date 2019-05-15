@@ -11,7 +11,6 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior:
 1. Run '...'
 2. See error
 
@@ -28,8 +27,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Target details:**
  - DBMS [e.g. Microsoft SQL Server]
- - WAF/IPS [e.g. ModSecurity]
  - SQLi techniques found by sqlmap [e.g. error-based and boolean-based blind]
+ - WAF/IPS [e.g. ModSecurity]
  - Relevant console output [if any]
  - Exception traceback [if any]
 
