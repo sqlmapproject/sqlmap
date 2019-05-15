@@ -26,6 +26,7 @@ from lib.core.settings import PICKLE_PROTOCOL
 from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
+from thirdparty.six import unichr as _unichr
 
 def base64pickle(value):
     """
@@ -83,7 +84,7 @@ def htmlunescape(value):
             retVal = retVal.replace(code, value)
 
         try:
-            retVal = re.sub(r"&#x([^ ;]+);", lambda match: six.unichr(int(match.group(1), 16)), retVal)
+            retVal = re.sub(r"&#x([^ ;]+);", lambda match: _unichr(int(match.group(1), 16)), retVal)
         except ValueError:
             pass
     return retVal
@@ -245,7 +246,7 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
         if INVALID_UNICODE_PRIVATE_AREA:
             if unsafe:
                 for char in xrange(0xF0000, 0xF00FF + 1):
-                    value = value.replace(six.unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
+                    value = value.replace(_unichr(char), "%s%02x" % (SAFE_HEX_MARKER, char - 0xF0000))
 
             retVal = value.encode(encoding, errors)
 

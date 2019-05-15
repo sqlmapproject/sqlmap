@@ -181,6 +181,7 @@ from thirdparty.clientform.clientform import ParseError
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict import OrderedDict
+from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import configparser as _configparser
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import input as _input
@@ -2425,7 +2426,7 @@ def goGoodSamaritan(prevValue, originalCharset):
         # Split the original charset into common chars (commonCharset)
         # and other chars (otherCharset)
         for ordChar in originalCharset:
-            if chr(ordChar) not in predictionSet:
+            if _unichr(ordChar) not in predictionSet:
                 otherCharset.append(ordChar)
             else:
                 commonCharset.append(ordChar)
@@ -3502,11 +3503,11 @@ def decodeIntToUnicode(value):
                 elif Backend.isDbms(DBMS.MSSQL):
                     retVal = getUnicode(raw, "UTF-16-BE")
                 elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
-                    retVal = six.unichr(value)
+                    retVal = _unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.encoding)
             else:
-                retVal = getUnicode(chr(value))
+                retVal = _unichr(value)
         except:
             retVal = INFERENCE_UNKNOWN_CHAR
 

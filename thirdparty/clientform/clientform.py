@@ -95,11 +95,13 @@ else:
 
 try:
     from thirdparty import six
+    from thirdparty.six import unichr as _unichr
     from thirdparty.six.moves import cStringIO as _cStringIO
     from thirdparty.six.moves import html_entities as _html_entities
     from thirdparty.six.moves import urllib as _urllib
 except ImportError:
     import six
+    from six import unichr as _unichr
     from six.moves import cStringIO as _cStringIO
     from six.moves import html_entities as _html_entities
     from six.moves import urllib as _urllib
@@ -250,7 +252,7 @@ def unescape_charref(data, encoding):
         name, base= name[1:], 16
     elif not name.isdigit():
         base = 16
-    uc = six.unichr(int(name, base))
+    uc = _unichr(int(name, base))
     if encoding is None:
         return uc
     else:
@@ -274,7 +276,7 @@ def get_entitydefs():
             entitydefs["&%s;" % name] = uc
     else:
         for name, codepoint in _html_entities.name2codepoint.items():
-            entitydefs["&%s;" % name] = six.unichr(codepoint)
+            entitydefs["&%s;" % name] = _unichr(codepoint)
     return entitydefs
 
 

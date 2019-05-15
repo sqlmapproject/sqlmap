@@ -124,6 +124,7 @@ from lib.request.comparison import comparison
 from lib.request.methodrequest import MethodRequest
 from thirdparty import six
 from thirdparty.odict import OrderedDict
+from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 from thirdparty.socks.socks import ProxyError
@@ -245,7 +246,8 @@ class Connect(object):
         elif conf.dummy or conf.murphyRate and randomInt() % conf.murphyRate == 0:
             if conf.murphyRate:
                 time.sleep(randomInt() % (MAX_MURPHY_SLEEP_TIME + 1))
-            return getUnicode(randomStr(int(randomInt()), alphabet=[chr(_) for _ in xrange(256)]), {}, int(randomInt())), None, None if not conf.murphyRate else randomInt(3)
+
+            return randomStr(int(randomInt()), alphabet=[_unichr(_) for _ in xrange(256)]), None, None if not conf.murphyRate else randomInt(3)
 
         threadData = getCurrentThreadData()
         with kb.locks.request:
@@ -1043,7 +1045,7 @@ class Connect(object):
 
                 match = re.search(r"String\.fromCharCode\(([\d+, ]+)\)", token.value)
                 if match:
-                    token.value = "".join(chr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
+                    token.value = "".join(_unichr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
 
             if not token:
                 if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == _http_client.OK:

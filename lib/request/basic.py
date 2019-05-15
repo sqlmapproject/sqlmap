@@ -52,6 +52,7 @@ from lib.utils.htmlentities import htmlEntities
 from thirdparty import six
 from thirdparty.chardet import detect
 from thirdparty.odict import OrderedDict
+from thirdparty.six import unichr as _unichr
 
 def forgeHeaders(items=None, base=None):
     """
@@ -353,14 +354,14 @@ def decodePage(page, contentEncoding, contentType):
             def _(match):
                 retVal = match.group(0)
                 try:
-                    retVal = six.unichr(int(match.group(1)))
+                    retVal = _unichr(int(match.group(1)))
                 except (ValueError, OverflowError):
                     pass
                 return retVal
             page = re.sub(r"&#(\d+);", _, page)
 
         # e.g. &zeta;
-        page = re.sub(r"&([^;]+);", lambda _: six.unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
+        page = re.sub(r"&([^;]+);", lambda _: _unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
 
     return page
 

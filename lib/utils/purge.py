@@ -13,8 +13,10 @@ import stat
 import string
 
 from lib.core.common import getSafeExString
+from lib.core.common import openFile
 from lib.core.compat import xrange
 from lib.core.data import logger
+from thirdparty.six import unichr as _unichr
 
 def purge(directory):
     """
@@ -47,8 +49,8 @@ def purge(directory):
     for filepath in filepaths:
         try:
             filesize = os.path.getsize(filepath)
-            with open(filepath, "w+b") as f:
-                f.write("".join(chr(random.randint(0, 255)) for _ in xrange(filesize)))
+            with openFile(filepath, "w+b") as f:
+                f.write("".join(_unichr(random.randint(0, 255)) for _ in xrange(filesize)))
         except:
             pass
 
