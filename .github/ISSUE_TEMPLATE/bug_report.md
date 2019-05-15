@@ -23,16 +23,17 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
+**Running environment:**
+ - OS: [e.g. Microsoft Windows 10]
  - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+ - Version [e.g. 1.3.5.93#dev]
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Target details:**
+ - DBMS [e.g. Microsoft SQL Server]
+ - WAF/IPS [e.g. ModSecurity]
+ - SQLi techniques found by sqlmap [e.g. error-based and boolean-based blind]
+ - Relevant console output [if any]
+ - Exception traceback [if any]
 
 **Additional context**
 Add any other context about the problem here.
