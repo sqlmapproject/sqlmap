@@ -352,7 +352,7 @@ def unionUse(expression, unpack=True, dump=False):
                                                     key = re.sub(r"[^A-Za-z0-9]", "", item).lower()
                                                     if key not in filtered or re.search(r"[^A-Za-z0-9]", item):
                                                         filtered[key] = item
-                                                items = list(filtered.values())
+                                                items = list(six.itervalues(filtered))
                                             items = [items]
                                         index = None
                                         for index in xrange(1 + len(threadData.shared.buffered)):

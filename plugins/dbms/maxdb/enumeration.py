@@ -49,7 +49,7 @@ class Enumeration(GenericEnumeration):
         retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.schemaname' % kb.aliasName], blind=True)
 
         if retVal:
-            kb.data.cachedDbs = list(retVal[0].values())[0]
+            kb.data.cachedDbs = six.itervalues(retVal[0]).next()
 
         if kb.data.cachedDbs:
             kb.data.cachedDbs.sort()
@@ -134,7 +134,7 @@ class Enumeration(GenericEnumeration):
             if len(kb.data.cachedTables) > 0:
                 tblList = list(kb.data.cachedTables.values())
 
-                if isListLike(tblList[0]):
+                if tblList and isListLike(tblList[0]):
                     tblList = tblList[0]
             else:
                 errMsg = "unable to retrieve the tables "

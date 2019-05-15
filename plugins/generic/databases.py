@@ -478,9 +478,9 @@ class Databases:
                 if conf.db in kb.data.cachedTables:
                     tblList = kb.data.cachedTables[conf.db]
                 else:
-                    tblList = list(kb.data.cachedTables.values())
+                    tblList = list(six.itervalues(kb.data.cachedTables))
 
-                if isListLike(tblList[0]):
+                if tblList and isListLike(tblList[0]):
                     tblList = tblList[0]
 
                 tblList = list(tblList)
