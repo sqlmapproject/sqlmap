@@ -4551,6 +4551,8 @@ def decodeDbmsHexValue(value, raw=False):
     True
     >>> decodeDbmsHexValue(['0x31', '0x32']) == [u'1', u'2']
     True
+    >>> decodeDbmsHexValue('5.1.41') == u'5.1.41'
+    True
     """
 
     retVal = value
@@ -4559,7 +4561,7 @@ def decodeDbmsHexValue(value, raw=False):
         retVal = value
         if value and isinstance(value, six.string_types):
             if len(value) % 2 != 0:
-                retVal = b"%s?" % decodeHex(value[:-1]) if len(value) > 1 else value
+                retVal = (decodeHex(value[:-1]) + b'?') if len(value) > 1 else value
                 singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)
             else:
                 retVal = decodeHex(value)

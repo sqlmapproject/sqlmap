@@ -154,9 +154,9 @@ class Response:
             stream = io.BytesIO(raw)
             first_line = stream.readline()
             parts = cls.extract_status.search(first_line)
-            status_line = b"HTTP/1.0 %s %s" % (parts.group(1), parts.group(2))
+            status_line = "HTTP/1.0 %s %s" % (getText(parts.group(1)), getText(parts.group(2)))
             remain = stream.read()
-            altered = status_line + b"\r\n" + remain
+            altered = getBytes(status_line) + b"\r\n" + remain
             comment = first_line
 
         response = _http_client.HTTPResponse(FakeSocket(altered))
