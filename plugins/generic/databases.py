@@ -293,31 +293,34 @@ class Databases:
                     values = [(dbs[0], _) for _ in values]
 
                 for db, table in filterPairValues(values):
-                    db = safeSQLIdentificatorNaming(db)
-                    table = safeSQLIdentificatorNaming(unArrayizeValue(table), True)
+                    table = unArrayizeValue(table)
 
-                    if conf.getComments:
-                        _ = queries[Backend.getIdentifiedDbms()].table_comment
-                        if hasattr(_, "query"):
-                            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-                                query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
+                    if not isNoneValue(table):
+                        db = safeSQLIdentificatorNaming(db)
+                        table = safeSQLIdentificatorNaming(table, True)
+
+                        if conf.getComments:
+                            _ = queries[Backend.getIdentifiedDbms()].table_comment
+                            if hasattr(_, "query"):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                    query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
+                                else:
+                                    query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
+
+                                comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
+                                if not isNoneValue(comment):
+                                    infoMsg = "retrieved comment '%s' for table '%s' " % (comment, unsafeSQLIdentificatorNaming(table))
+                                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                                    logger.info(infoMsg)
                             else:
-                                query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
+                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
+                                warnMsg += "possible to get column comments"
+                                singleTimeWarnMessage(warnMsg)
 
-                            comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
-                            if not isNoneValue(comment):
-                                infoMsg = "retrieved comment '%s' for table '%s' " % (comment, unsafeSQLIdentificatorNaming(table))
-                                infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
-                                logger.info(infoMsg)
+                        if db not in kb.data.cachedTables:
+                            kb.data.cachedTables[db] = [table]
                         else:
-                            warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                            warnMsg += "possible to get column comments"
-                            singleTimeWarnMessage(warnMsg)
-
-                    if db not in kb.data.cachedTables:
-                        kb.data.cachedTables[db] = [table]
-                    else:
-                        kb.data.cachedTables[db].append(table)
+                            kb.data.cachedTables[db].append(table)
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
