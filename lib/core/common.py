@@ -3892,7 +3892,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
     return retVal
 
-def normalizeUnicode(value):
+def normalizeUnicode(value, charset=string.printable[:string.printable.find(' ') + 1]):
     """
     Does an ASCII normalization of unicode strings
 
@@ -3900,14 +3900,13 @@ def normalizeUnicode(value):
 
     >>> normalizeUnicode(u'\u0161u\u0107uraj') == u'sucuraj'
     True
-    >>> normalizeUnicode(getUnicode(codecs.decode("666f6f00626172", "hex"))) == u'foobar'
+    >>> normalizeUnicode(getUnicode(decodeHex("666f6f00626172"))) == u'foobar'
     True
     """
 
     retVal = value
 
     if isinstance(value, six.text_type):
-        charset = string.printable[:string.printable.find(' ') + 1]
         retVal = unicodedata.normalize("NFKD", value)
         retVal = "".join(_ for _ in retVal if _ in charset)
 
