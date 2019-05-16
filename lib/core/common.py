@@ -3900,9 +3900,18 @@ def normalizeUnicode(value):
 
     >>> normalizeUnicode(u'\u0161u\u0107uraj') == u'sucuraj'
     True
+    >>> normalizeUnicode(getUnicode(codecs.decode("666f6f00626172", "hex"))) == u'foobar'
+    True
     """
 
-    return getUnicode(unicodedata.normalize("NFKD", value).encode("ascii", "ignore")) if isinstance(value, six.text_type) else value
+    retVal = value
+
+    if isinstance(value, six.text_type):
+        charset = string.printable[:string.printable.find(' ') + 1]
+        retVal = unicodedata.normalize("NFKD", value)
+        retVal = "".join(_ for _ in retVal if _ in charset)
+
+    return retVal
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
