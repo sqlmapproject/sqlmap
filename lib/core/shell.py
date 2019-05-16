@@ -14,6 +14,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import OS
+from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HISTORY_LENGTH
 
 try:
@@ -103,6 +104,11 @@ def loadHistory(completion=None):
         except IOError as ex:
             warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
             logger.warn(warnMsg)
+        except UnicodeError:
+            if IS_WIN:
+                warnMsg = "there was a problem loading the history file '%s'. " % historyPath
+                warnMsg += "More info can be found at 'https://github.com/pyreadline/pyreadline/issues/30'"
+                logger.warn(warnMsg)
 
 def autoCompletion(completion=None, os=None, commands=None):
     if not readlineAvailable():
