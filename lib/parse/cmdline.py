@@ -261,6 +261,9 @@ def cmdLineParser(argv=None):
         injection.add_option("--param-exclude", dest="paramExclude",
                              help="Regexp to exclude parameters from testing (e.g. \"ses\")")
 
+        injection.add_option("--param-filter", dest="paramFilter",
+                             help="Select testable parameter(s) by place (e.g. \"POST\")")
+
         injection.add_option("--dbms", dest="dbms",
                              help="Force back-end DBMS to provided value")
 

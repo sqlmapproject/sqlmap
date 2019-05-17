@@ -79,6 +79,7 @@ optDict = {
         "skip": "string",
         "skipStatic": "boolean",
         "paramExclude": "string",
+        "paramFilter": "string",
         "dbms": "string",
         "dbmsCred": "string",
         "os": "string",

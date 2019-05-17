@@ -1590,6 +1590,11 @@ def _cleanupOptions():
     else:
         conf.testParameter = []
 
+    if conf.paramFilter:
+        conf.paramFilter = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.paramFilter.upper())]
+    else:
+        conf.paramFilter = []
+
     if conf.base64Parameter:
         conf.base64Parameter = urldecode(conf.base64Parameter)
         conf.base64Parameter = conf.base64Parameter.replace(" ", "")
