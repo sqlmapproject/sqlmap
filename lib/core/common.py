@@ -3525,7 +3525,7 @@ def checkIntegrity():
 
     retVal = True
 
-    baseTime = os.path.getmtime(paths.SQLMAP_SETTINGS_PATH)
+    baseTime = os.path.getmtime(paths.SQLMAP_SETTINGS_PATH) + 3600  # First hour free parking :)
     for root, dirnames, filenames in os.walk(paths.SQLMAP_ROOT_PATH):
         for filename in filenames:
             if re.search(r"(\.py|\.xml|_)\Z", filename):
