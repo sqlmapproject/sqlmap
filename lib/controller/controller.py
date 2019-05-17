@@ -454,6 +454,9 @@ def start():
                     skip = (place == PLACE.USER_AGENT and conf.level < 3)
                     skip |= (place == PLACE.REFERER and conf.level < 3)
 
+                    # --param-filter
+                    skip |= (len(conf.paramFilter) > 0 and place.upper() not in conf.paramFilter)
+
                     # Test Host header only if
                     # --level >= 5
                     skip |= (place == PLACE.HOST and conf.level < 5)
@@ -465,8 +468,6 @@ def start():
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.COOKIE and intersect(PLACE.COOKIE, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.HOST and intersect(PLACE.HOST, conf.skip, True) not in ([], None))
-
-                    skip |= (conf.paramFilter and place.upper() not in conf.paramFilter)
 
                     skip &= not (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.testParameter, True))
                     skip &= not (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.testParameter, True))
