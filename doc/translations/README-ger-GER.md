@@ -4,8 +4,6 @@
 
 sqlmap ist ein quelloffenes Penetrationstest Werkzeug, das die Entdeckung, Ausnutzung und Übernahme von SQL injection Schwachstellen automatisiert. Es kommt mit einer mächtigen Erkennungs-Engine, vielen Nischenfunktionen für den ultimativen Penetrationstester und einem breiten Spektrum an Funktionen von Datenbankerkennung, abrufen von Daten aus der Datenbank, zugreifen auf das unterliegende Dateisystem bis hin zur Befehlsausführung auf dem Betriebssystem mit Hilfe von out-of-band Verbindungen.
 
-**Das sqlmap Projekt ist gesponsert von [Netsparker Web Application Security Scanner](https://www.netsparker.com/scan-website-security-issues/?utm_source=sqlmap.org&utm_medium=banner&utm_campaign=github).**
-
 Screenshots
 ---
 
