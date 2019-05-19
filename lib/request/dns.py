@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import binascii
-import codecs
 import os
 import re
 import socket
