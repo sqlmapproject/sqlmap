@@ -10,7 +10,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import time
 import zipfile
 
@@ -29,7 +28,6 @@ from lib.core.settings import GIT_REPOSITORY
 from lib.core.settings import IS_WIN
 from lib.core.settings import VERSION
 from lib.core.settings import ZIPBALL_PAGE
-from lib.core.settings import UNICODE_ENCODING
 from thirdparty.six.moves import urllib as _urllib
 
 def update():
@@ -108,11 +106,11 @@ def update():
         dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
 
         try:
-            process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH.encode(sys.getfilesystemencoding() or UNICODE_ENCODING))
+            process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
             pollProcess(process, True)
             output, _ = process.communicate()
             success = not process.returncode
-        except (IOError, OSError) as ex:
+        except Exception as ex:
             success = False
             output = getSafeExString(ex)
         finally:
