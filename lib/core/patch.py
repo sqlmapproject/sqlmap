@@ -14,11 +14,13 @@ import lib.core.convert
 import lib.core.option
 import lib.request.connect
 import lib.utils.search
+import lib.utils.sqlalchemy
 import thirdparty.ansistrm.ansistrm
 
 from lib.request.templates import getPageTemplate
 
 from lib.core.common import filterNone
+from lib.core.common import getSafeExString
 from lib.core.common import isListLike
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import readInput
@@ -67,6 +69,7 @@ def resolveCrossReferences():
     lib.utils.search.setHTTPHandlers = _setHTTPHandlers
     lib.controller.checks.setVerbosity = setVerbosity
     lib.controller.checks.setWafFunctions = _setWafFunctions
+    lib.utils.sqlalchemy.getSafeExString = getSafeExString
     thirdparty.ansistrm.ansistrm.stdoutencode = stdoutencode
 
 def pympTempLeakPatch(tempDir):

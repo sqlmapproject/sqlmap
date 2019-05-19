@@ -35,6 +35,9 @@ from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapMissingDependence
 from plugins.generic.connector import Connector as GenericConnector
 
+def getSafeExString(ex, encoding=None):  # Cross-referenced function
+    raise NotImplementedError
+
 class SQLAlchemy(GenericConnector):
     def __init__(self, dialect=None):
         GenericConnector.__init__(self)
@@ -77,7 +80,7 @@ class SQLAlchemy(GenericConnector):
             except SqlmapFilePathException:
                 raise
             except Exception as ex:
-                raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % ex.msg)
+                raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % getSafeExString(ex))
 
             self.printConnected()
         else:
@@ -90,16 +93,16 @@ class SQLAlchemy(GenericConnector):
                 retVal.append(tuple(row))
             return retVal
         except _sqlalchemy.exc.ProgrammingError as ex:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % ex.message if hasattr(ex, "message") else ex)
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             return None
 
     def execute(self, query):
         try:
             self.cursor = self.connector.execute(query)
         except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError) as ex:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % ex.message if hasattr(ex, "message") else ex)
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
         except _sqlalchemy.exc.InternalError as ex:
-            raise SqlmapConnectionException(ex[1])
+            raise SqlmapConnectionException(getSafeExString(ex))
 
     def select(self, query):
         self.execute(query)
