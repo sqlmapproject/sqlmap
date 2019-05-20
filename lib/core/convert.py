@@ -23,6 +23,7 @@ from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
 from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
 from lib.core.settings import PICKLE_PROTOCOL
+from lib.core.settings import PYVERSION
 from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
@@ -100,27 +101,34 @@ def filterNone(values):  # Cross-referenced function
 def isListLike(value):  # Cross-referenced function
     raise NotImplementedError
 
-def stdoutencode(data):
-    retVal = data
+def stdoutEncode(value):
+    value = value or ""
 
-    if six.PY2:
-        try:
-            retVal = getBytes(data or "", sys.stdout.encoding, unsafe=False)
+    if isinstance(value, six.text_type) and PYVERSION < "3.6":
+        encoding = sys.stdout.encoding or UNICODE_ENCODING
 
-            # Reference: http://bugs.python.org/issue1602
-            if IS_WIN:
-                if '?' in retVal and '?' not in retVal:
-                    warnMsg = "cannot properly display Unicode characters "
+        while True:
+            try:
+                retVal = value.encode(encoding)
+                break
+            except UnicodeEncodeError as ex:
+                value = value[:ex.start] + "?" + value[ex.end:]
+
+                if IS_WIN and PYVERSION < "3.6":
+                    warnMsg = "cannot properly display (some) Unicode characters "
                     warnMsg += "inside Windows OS command prompt "
-                    warnMsg += "(http://bugs.python.org/issue1602). All "
+                    warnMsg += "(https://bugs.python.org/issue1602). All "
                     warnMsg += "unhandled occurrences will result in "
                     warnMsg += "replacement with '?' character. Please, find "
                     warnMsg += "proper character representation inside "
                     warnMsg += "corresponding output files. "
                     singleTimeWarnMessage(warnMsg)
 
-        except:
-            retVal = getBytes(data or "", unsafe=False)
+        if six.PY3:
+            retVal = getUnicode(retVal, encoding)
+
+    else:
+        retVal = value
 
     return retVal
 

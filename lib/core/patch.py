@@ -24,7 +24,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import isListLike
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import readInput
-from lib.core.convert import stdoutencode
+from lib.core.convert import stdoutEncode
 from lib.core.option import _setHTTPHandlers
 from lib.core.option import setVerbosity
 from lib.core.option import _setWafFunctions
@@ -70,7 +70,7 @@ def resolveCrossReferences():
     lib.controller.checks.setVerbosity = setVerbosity
     lib.controller.checks.setWafFunctions = _setWafFunctions
     lib.utils.sqlalchemy.getSafeExString = getSafeExString
-    thirdparty.ansistrm.ansistrm.stdoutencode = stdoutencode
+    thirdparty.ansistrm.ansistrm.stdoutEncode = stdoutEncode
 
 def pympTempLeakPatch(tempDir):
     """

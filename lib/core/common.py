@@ -58,7 +58,7 @@ from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlunescape
-from lib.core.convert import stdoutencode
+from lib.core.convert import stdoutEncode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -968,9 +968,9 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
 
             try:
                 if conf.get("api"):
-                    sys.stdout.write(stdoutencode(clearColors(data)), status, content_type)
+                    sys.stdout.write(stdoutEncode(clearColors(data)), status, content_type)
                 else:
-                    sys.stdout.write(stdoutencode(setColor(data, bold=bold)))
+                    sys.stdout.write(stdoutEncode(setColor(data, bold=bold)))
 
                 sys.stdout.flush()
             except IOError:

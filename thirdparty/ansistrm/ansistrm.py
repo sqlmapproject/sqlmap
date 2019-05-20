@@ -20,7 +20,7 @@ if IS_WIN:
     ctypes.windll.kernel32.SetConsoleTextAttribute.argtypes = [ctypes.wintypes.HANDLE, ctypes.wintypes.WORD]
     ctypes.windll.kernel32.SetConsoleTextAttribute.restype = ctypes.wintypes.BOOL
 
-def stdoutencode(data):  # Cross-referenced function
+def stdoutEncode(data):  # Cross-referenced function
     raise NotImplementedError
 
 class ColorizingStreamHandler(logging.StreamHandler):
@@ -56,7 +56,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
     def emit(self, record):
         try:
-            message = stdoutencode(self.format(record))
+            message = stdoutEncode(self.format(record))
             stream = self.stream
 
             if not self.is_tty:
