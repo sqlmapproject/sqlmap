@@ -514,8 +514,8 @@ def checkSqlInjection(place, parameter, value):
                                     seqMatcher = getCurrentThreadData().seqMatcher
 
                                     for current in (kb.originalPage, kb.heuristicPage):
-                                        seqMatcher.set_seq1(current)
-                                        seqMatcher.set_seq2(falsePage)
+                                        seqMatcher.set_seq1(current or "")
+                                        seqMatcher.set_seq2(falsePage or "")
                                         ratio *= seqMatcher.quick_ratio()
 
                                     if ratio == 1.0:
