@@ -3824,7 +3824,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
                     # Note: naive approach
                     retVal = content.replace(payload, REFLECTED_VALUE_MARKER)
-                    retVal = content.replace(re.sub(r"\A\w+", "", payload), REFLECTED_VALUE_MARKER)
+                    retVal = retVal.replace(re.sub(r"\A\w+", "", payload), REFLECTED_VALUE_MARKER)
 
                     if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
                         regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS // 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS // 2:])))
