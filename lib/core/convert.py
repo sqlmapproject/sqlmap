@@ -70,11 +70,11 @@ def base64unpickle(value):
 
     return retVal
 
-def htmlunescape(value):
+def htmlUnescape(value):
     """
     Returns (basic conversion) HTML unescaped value
 
-    >>> htmlunescape('a&lt;b')
+    >>> htmlUnescape('a&lt;b')
     'a<b'
     """
 

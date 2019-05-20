@@ -42,7 +42,7 @@ from lib.core.compat import xrange
 from lib.core.convert import decodeBase64
 from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
-from lib.core.convert import htmlunescape
+from lib.core.convert import htmlUnescape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -147,7 +147,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
             # Special case when DBMS is Microsoft SQL Server and error message is used as a result of UNION injection
             if Backend.isDbms(DBMS.MSSQL) and wasLastResponseDBMSError():
-                retVal = htmlunescape(retVal).replace("<br>", "\n")
+                retVal = htmlUnescape(retVal).replace("<br>", "\n")
 
             hashDBWrite("%s%s" % (conf.hexConvert or False, expression), retVal)
 

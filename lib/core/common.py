@@ -57,7 +57,7 @@ from lib.core.convert import decodeHex
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
-from lib.core.convert import htmlunescape
+from lib.core.convert import htmlUnescape
 from lib.core.convert import stdoutEncode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -2001,7 +2001,7 @@ def getFilteredPageContent(page, onlyText=True, split=" "):
     if isinstance(page, six.text_type):
         retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), split, page)
         retVal = re.sub(r"%s{2,}" % split, split, retVal)
-        retVal = htmlunescape(retVal.strip().strip(split))
+        retVal = htmlUnescape(retVal.strip().strip(split))
 
     return retVal
 
@@ -2636,7 +2636,7 @@ def extractErrorMessage(page):
             match = re.search(regex, page, re.IGNORECASE)
 
             if match:
-                retVal = htmlunescape(match.group("result")).replace("<br>", "\n").strip()
+                retVal = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
                 break
 
     return retVal
