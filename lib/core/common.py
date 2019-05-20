@@ -1808,7 +1808,7 @@ def getFileType(filePath):
     finally:
         desc = getText(desc)
 
-    if desc == magic.MAGIC_UNKNOWN_FILETYPE:
+    if desc == getText(magic.MAGIC_UNKNOWN_FILETYPE):
         content = openFile(filePath, "rb", encoding=None).read()
 
         try:
