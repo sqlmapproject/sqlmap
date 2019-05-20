@@ -72,10 +72,10 @@ def vulnTest():
 
     for options, checks in (
         ("--flush-session --identify-waf", ("CloudFlare",)),
-        ("--flush-session --parse-errors", (": syntax error", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
+        ("--flush-session --parse-errors --eval=\"id2=2\" --referer=\"localhost\" --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e\"", (": syntax error", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
         ("--banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all --tamper=between,randomcase", ("5 entries", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
-        ("--technique=B --hex --fresh-queries --threads=4 --sql-query=\"SELECT 987654321\"", ("length of query output", ": '987654321'",)),
+        ("-z \"tec=B\" --hex --fresh-queries --threads=4 --sql-query=\"SELECT 987654321\"", ("length of query output", ": '987654321'",)),
         ("--technique=T --fresh-queries --sql-query=\"SELECT 1234\"", (": '1234'",)),
     ):
         cmd = "%s %s -u http://%s:%d/?id=1 --batch %s" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), address, port, options)
