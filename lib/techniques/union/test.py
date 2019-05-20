@@ -91,13 +91,15 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         kb.errorIsNone = False
         lowerCount, upperCount = conf.uColsStart, conf.uColsStop
 
-        if kb.orderByColumns is None and (lowerCount == 1 or conf.uCols):  # ORDER BY is not bullet-proof
+        if kb.orderByColumns is None and (lowerCount == 1 or conf.uCols):  # Note: ORDER BY is not bullet-proof
             found = _orderByTechnique(lowerCount, upperCount) if conf.uCols else _orderByTechnique()
             if found:
                 kb.orderByColumns = found
                 infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
                 singleTimeLogMessage(infoMsg)
                 return found
+            elif kb.futileUnion:
+                return None
 
         if abs(upperCount - lowerCount) < MIN_UNION_RESPONSES:
             upperCount = lowerCount + MIN_UNION_RESPONSES

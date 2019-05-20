@@ -345,15 +345,16 @@ def checkSqlInjection(place, parameter, value):
                 match = re.search(r"(\d+)-(\d+)", test.request.columns)
                 if match and not injection.data:
                     _ = test.request.columns.split('-')[-1]
-                    if conf.uCols is None and _.isdigit() and int(_) > 10:
+                    if conf.uCols is None and _.isdigit():
                         if kb.futileUnion is None:
-                            msg = "it is not recommended to perform "
-                            msg += "extended UNION tests if there is not "
+                            msg = "it is recommended to perform "
+                            msg += "only basic UNION tests if there is not "
                             msg += "at least one other (potential) "
-                            msg += "technique found. Do you want to skip? [Y/n] "
-                            kb.futileUnion = not readInput(msg, default='Y', boolean=True)
+                            msg += "technique found. Do you want to reduce "
+                            msg +="the number of requests? [Y/n] "
+                            kb.futileUnion = readInput(msg, default='Y', boolean=True)
 
-                        if kb.futileUnion is False:
+                        if kb.futileUnion and int(_) > 10:
                             debugMsg = "skipping test '%s'" % title
                             logger.debug(debugMsg)
                             continue
@@ -499,13 +500,30 @@ def checkSqlInjection(place, parameter, value):
 
                                 return cmpPayload
 
-                            # Useful to set kb.matchRatio at first based on
-                            # the False response content
+                            # Useful to set kb.matchRatio at first based on False response content
                             kb.matchRatio = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             Request.queryPage(genCmpPayload(), place, raise404=False)
                             falsePage, falseHeaders, falseCode = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders, threadData.lastComparisonCode
                             falseRawResponse = "%s%s" % (falseHeaders, falsePage)
+
+                            # Checking if there is difference between current FALSE, original and heuristics page (i.e. not used parameter)
+                            if not kb.negativeLogic:
+                                try:
+                                    ratio = 1.0
+                                    seqMatcher = getCurrentThreadData().seqMatcher
+
+                                    for current in (kb.originalPage, kb.heuristicPage):
+                                        seqMatcher.set_seq1(current)
+                                        seqMatcher.set_seq2(falsePage)
+                                        ratio *= seqMatcher.quick_ratio()
+
+                                    if ratio == 1.0:
+                                        continue
+                                except MemoryError:
+                                    pass
+
+                            kb.prevFalsePage = falsePage
 
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
