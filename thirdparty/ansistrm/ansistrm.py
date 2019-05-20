@@ -94,7 +94,6 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
         def output_colorized(self, message):
             parts = self.ansi_esc.split(message)
-            write = self.stream.write
             h = None
             fd = getattr(self.stream, 'fileno', None)
 
@@ -108,7 +107,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
                 text = parts.pop(0)
 
                 if text:
-                    write(text)
+                    self.stream.write(text)
+                    self.stream.flush()
 
                 if parts:
                     params = parts.pop(0)
