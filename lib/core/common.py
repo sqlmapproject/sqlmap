@@ -133,6 +133,7 @@ from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
+from lib.core.settings import IS_TTY
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import LOCALHOST
@@ -928,7 +929,7 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
     retVal = message
     level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
-    if message and getattr(LOGGER_HANDLER, "is_tty", False) or istty:  # colorizing handler
+    if message and IS_TTY or istty:  # colorizing handler
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
@@ -1064,7 +1065,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             elif answer is None and retVal:
                 retVal = "%s,%s" % (retVal, getUnicode(item, UNICODE_ENCODING))
 
-    if message and getattr(LOGGER_HANDLER, "is_tty", False):
+    if message and IS_TTY:
         message = "\r%s" % message
 
     if retVal:
@@ -1256,7 +1257,7 @@ def banner():
     if not any(_ in sys.argv for _ in ("--version", "--api")) and not conf.get("disableBanner"):
         _ = BANNER
 
-        if not getattr(LOGGER_HANDLER, "is_tty", False) or "--disable-coloring" in sys.argv:
+        if not IS_TTY or "--disable-coloring" in sys.argv:
             _ = clearColors(_)
         elif IS_WIN:
             coloramainit()
@@ -2168,7 +2169,7 @@ def clearConsoleLine(forceOutput=False):
     Clears current console line
     """
 
-    if getattr(LOGGER_HANDLER, "is_tty", False):
+    if IS_TTY:
         dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
 
     kb.prependFlag = False

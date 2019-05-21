@@ -20,6 +20,7 @@ import sys
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
+from lib.core.settings import IS_TTY
 from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
 from lib.core.settings import PICKLE_PROTOCOL
@@ -107,7 +108,7 @@ def shellExec(cmd):  # Cross-referenced function
 def stdoutEncode(value):
     value = value or ""
 
-    if IS_WIN and kb.get("codePage", -1) is None:
+    if IS_WIN and IS_TTY and kb.get("codePage", -1) is None:
         output = shellExec("chcp")
         match = re.search(r": (\d{3,})", output or "")
 
