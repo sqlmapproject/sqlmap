@@ -498,7 +498,7 @@ def start():
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
-                            infoMsg = "skipping previously processed %s parameter '%s'" % (paramType, parameter)
+                            infoMsg = "skipping previously processed %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif any(_ in conf.testParameter for _ in (parameter, removePostHintPrefix(parameter))):
@@ -507,19 +507,19 @@ def start():
                         elif parameter in conf.rParam:
                             testSqlInj = False
 
-                            infoMsg = "skipping randomizing %s parameter '%s'" % (paramType, parameter)
+                            infoMsg = "skipping randomizing %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
-                            infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
+                            infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.paramExclude and (re.search(conf.paramExclude, parameter, re.I) or kb.postHint and re.search(conf.paramExclude, parameter.split(' ')[-1], re.I)):
                             testSqlInj = False
 
-                            infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
+                            infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.csrfToken and re.search(conf.csrfToken, parameter, re.I):
@@ -532,23 +532,23 @@ def start():
                         elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or any(_ in parameter.lower() for _ in CSRF_TOKEN_PARAMETER_INFIXES) or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
                             testSqlInj = False
 
-                            infoMsg = "ignoring %s parameter '%s'" % (paramType, parameter)
+                            infoMsg = "ignoring %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.tech or conf.skipStatic:
                             check = checkDynParam(place, parameter, value)
 
                             if not check:
-                                warnMsg = "%s parameter '%s' does not appear to be dynamic" % (paramType, parameter)
+                                warnMsg = "%sparameter '%s' does not appear to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.warn(warnMsg)
 
                                 if conf.skipStatic:
-                                    infoMsg = "skipping static %s parameter '%s'" % (paramType, parameter)
+                                    infoMsg = "skipping static %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.info(infoMsg)
 
                                     testSqlInj = False
                             else:
-                                infoMsg = "%s parameter '%s' appears to be dynamic" % (paramType, parameter)
+                                infoMsg = "%sparameter '%s' appears to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
@@ -563,12 +563,11 @@ def start():
 
                                 if check != HEURISTIC_TEST.POSITIVE:
                                     if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
-                                        infoMsg = "skipping %s parameter '%s'" % (paramType, parameter)
+                                        infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                         logger.info(infoMsg)
                                         continue
 
-                                infoMsg = "testing for SQL injection on %s " % paramType
-                                infoMsg += "parameter '%s'" % parameter
+                                infoMsg = "testing for SQL injection on %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)
@@ -587,7 +586,7 @@ def start():
                                         if not proceed:
                                             break
 
-                                        msg = "%s parameter '%s' " % (injection.place, injection.parameter)
+                                        msg = "%sparameter '%s' " % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
                                         msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
 
                                         if not readInput(msg, default='N', boolean=True):
@@ -596,8 +595,7 @@ def start():
                                             kb.testedParams.add(paramKey)
 
                                 if not injectable:
-                                    warnMsg = "%s parameter '%s' does not seem to be " % (paramType, parameter)
-                                    warnMsg += "injectable"
+                                    warnMsg = "%sparameter '%s' does not seem to be injectable" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.warn(warnMsg)
 
                             finally:

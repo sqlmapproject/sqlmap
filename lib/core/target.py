@@ -407,7 +407,7 @@ def _setRequestParams():
 
             for parameter in conf.paramDict.get(place, {}):
                 if any(parameter.lower().count(_) for _ in CSRF_TOKEN_PARAMETER_INFIXES):
-                    message = "%s parameter '%s' appears to hold anti-CSRF token. " % (place, parameter)
+                    message = "%sparameter '%s' appears to hold anti-CSRF token. " % ("%s " % place if place != parameter else "", parameter)
                     message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
 
                     if readInput(message, default='N', boolean=True):

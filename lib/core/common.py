@@ -679,7 +679,7 @@ def paramToDict(place, parameters=None):
                                 walk(deserialized)
 
                                 if candidates:
-                                    message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                                    message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
                                     message += "is JSON deserializable. Do you want to inject inside? [y/N] "
 
                                     if readInput(message, default='N', boolean=True):
@@ -692,7 +692,7 @@ def paramToDict(place, parameters=None):
                                 pass
 
                             _ = re.sub(regex, r"\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())), testableParameters[parameter])
-                            message = "it appears that provided value for %s parameter '%s' " % (place, parameter)
+                            message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
 
                             if readInput(message, default='N', boolean=True):
