@@ -352,7 +352,10 @@ def main():
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):
             file_ = match.group(1)
-            file_ = os.path.relpath(file_, os.path.dirname(__file__))
+            try:
+                file_ = os.path.relpath(file_, os.path.dirname(__file__))
+            except ValueError:
+                pass
             file_ = file_.replace("\\", '/')
             if "../" in file_:
                 file_ = re.sub(r"(\.\./)+", '/', file_)
