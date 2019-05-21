@@ -24,6 +24,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import isListLike
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import readInput
+from lib.core.common import shellExec
 from lib.core.convert import stdoutEncode
 from lib.core.option import _setHTTPHandlers
 from lib.core.option import setVerbosity
@@ -63,6 +64,7 @@ def resolveCrossReferences():
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.filterNone = filterNone
     lib.core.convert.isListLike = isListLike
+    lib.core.convert.shellExec = shellExec
     lib.core.convert.singleTimeWarnMessage = singleTimeWarnMessage
     lib.core.option._pympTempLeakPatch = pympTempLeakPatch
     lib.request.connect.setHTTPHandlers = _setHTTPHandlers
