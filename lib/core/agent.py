@@ -298,6 +298,9 @@ class Agent(object):
             pass
 
         elif suffix and not comment:
+            if re.search(r"\w\Z", expression) and re.search(r"\A\w", suffix):
+                expression += " "
+
             expression += suffix.replace('\\', BOUNDARY_BACKSLASH_MARKER)
 
         return re.sub(r";\W*;", ";", expression)
