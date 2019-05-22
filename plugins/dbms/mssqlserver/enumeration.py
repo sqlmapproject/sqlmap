@@ -261,7 +261,7 @@ class Enumeration(GenericEnumeration):
                         kb.hintValue = tbl
                         foundTbls[db].append(tbl)
 
-        for db, tbls in foundTbls.items():
+        for db, tbls in list(foundTbls.items()):
             if len(tbls) == 0:
                 foundTbls.pop(db)
 
