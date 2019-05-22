@@ -46,8 +46,10 @@ class Fingerprint(GenericFingerprint):
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
-            banVer = Format.getDbms([banVer])
-            value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+
+            if banVer:
+                banVer = Format.getDbms([banVer])
+                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 

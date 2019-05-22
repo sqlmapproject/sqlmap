@@ -49,11 +49,12 @@ class Fingerprint(GenericFingerprint):
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
-            if re.search(r"-log$", kb.data.banner):
-                banVer += ", logging enabled"
+            if banVer:
+                if re.search(r"-log$", kb.data.banner or ""):
+                    banVer += ", logging enabled"
 
-            banVer = Format.getDbms([banVer] if banVer else None)
-            value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                banVer = Format.getDbms([banVer])
+                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
