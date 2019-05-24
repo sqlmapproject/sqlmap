@@ -23,7 +23,6 @@ import ssl
 import socket
 import string
 import struct
-import subprocess
 import sys
 import time
 import zlib
@@ -58,11 +57,8 @@ else:
     Request = urllib2.Request
     HTTPCookieProcessor = urllib2.HTTPCookieProcessor
 
-    # Reference: http://blog.mathieu-leplatre.info/python-utf-8-print-fails-when-redirecting-stdout.html
-    sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-
 NAME = "identYwaf"
-VERSION = "1.0.111"
+VERSION = "1.0.113"
 BANNER = """
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
@@ -358,6 +354,10 @@ def load_data():
 
 def init():
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
+
+    # Reference: http://blog.mathieu-leplatre.info/python-utf-8-print-fails-when-redirecting-stdout.html
+    if IS_TTY:
+        sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
     print(colorize("[o] initializing handlers..."))
 
