@@ -33,8 +33,6 @@ if sys.version_info >= (3, 0):
     import http.client as httplib
     import urllib.request
 
-    IS_WIN = subprocess._mswindows
-
     build_opener = urllib.request.build_opener
     install_opener = urllib.request.install_opener
     quote = urllib.parse.quote
@@ -51,8 +49,6 @@ else:
     import urllib
     import urllib2
 
-    IS_WIN = subprocess.mswindows
-
     build_opener = urllib2.build_opener
     install_opener = urllib2.install_opener
     quote = urllib.quote
@@ -66,7 +62,7 @@ else:
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 NAME = "identYwaf"
-VERSION = "1.0.110"
+VERSION = "1.0.111"
 BANNER = """
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
@@ -90,6 +86,7 @@ DATA_JSON = {}
 DATA_JSON_FILE = os.path.join(os.path.dirname(__file__), "data.json")
 MAX_HELP_OPTION_LENGTH = 18
 IS_TTY = sys.stdout.isatty()
+IS_WIN = os.name == "nt"
 COLORIZE = not IS_WIN and IS_TTY
 LEVEL_COLORS = {"o": "\033[00;94m", "x": "\033[00;91m", "!": "\033[00;93m", "i": "\033[00;95m", "=": "\033[00;93m", "+": "\033[00;92m", "-": "\033[00;91m"}
 VERIFY_OK_INTERVAL = 5
