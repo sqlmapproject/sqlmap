@@ -1890,6 +1890,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.ignoreCasted = None
     kb.ignoreNotFound = False
     kb.ignoreTimeout = False
+    kb.identifiedWafs = set()
     kb.injection = InjectionDict()
     kb.injections = []
     kb.laggingChecked = False
@@ -1970,7 +1971,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.tableExistsChoice = None
     kb.uChar = NULL
     kb.unionDuplicates = False
-    kb.wafSpecificResponse = None
     kb.wizardMode = False
     kb.xpCmdshellAvailable = False
 

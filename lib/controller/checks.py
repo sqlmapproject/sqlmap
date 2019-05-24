@@ -108,7 +108,6 @@ from lib.request.templates import getPageTemplate
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
 from thirdparty import six
-from thirdparty.identywaf import identYwaf
 from thirdparty.six.moves import http_client as _http_client
 
 def checkSqlInjection(place, parameter, value):
@@ -1403,49 +1402,22 @@ def checkWaf():
         kb.resendPostOnRedirect = popValue()
         kb.redirectChoice = popValue()
 
-    # TODO: today
     if retVal:
-        pass
-        # identYwaf
-        #if conf.timeout == defaults.timeout:
-            #logger.warning("dropping timeout to %d seconds (i.e. '--timeout=%d')" % (IDS_WAF_CHECK_TIMEOUT, IDS_WAF_CHECK_TIMEOUT))
-            #conf.timeout = IDS_WAF_CHECK_TIMEOUT
+        if not kb.identifiedWafs:
+            warnMsg = "heuristics detected that the target "
+            warnMsg += "is protected by some kind of WAF/IPS"
+            logger.critical(warnMsg)
 
-        # identYwaf
+        message = "are you sure that you want to "
+        message += "continue with further target testing? [y/N] "
+        choice = readInput(message, default='N', boolean=True)
 
-        #def _(*args, **kwargs):
-            #page, headers, code = None, None, None
-            #try:
-                #pushValue(kb.redirectChoice)
-                #pushValue(kb.resendPostOnRedirect)
+        if not conf.tamper:
+            warnMsg = "please consider usage of tamper scripts (option '--tamper')"
+            singleTimeWarnMessage(warnMsg)
 
-                #kb.redirectChoice = REDIRECTION.YES
-                #kb.resendPostOnRedirect = True
-
-                #if kwargs.get("get"):
-                    #kwargs["get"] = urlencode(kwargs["get"])
-                #kwargs["raise404"] = False
-                #kwargs["silent"] = True
-                #kwargs["finalCode"] = True
-
-                #page, headers, code = Request.getPage(*args, **kwargs)
-            #except Exception:
-                #pass
-            #finally:
-                #kb.resendPostOnRedirect = popValue()
-                #kb.redirectChoice = popValue()
-
-
-        #message = "are you sure that you want to "
-        #message += "continue with further target testing? [y/N] "
-        #choice = readInput(message, default='N', boolean=True)
-
-        #if not conf.tamper:
-            #warnMsg = "please consider usage of tamper scripts (option '--tamper')"
-            #singleTimeWarnMessage(warnMsg)
-
-        #if not choice:
-            #raise SqlmapUserQuitException
+        if not choice:
+            raise SqlmapUserQuitException
 
     hashDBWrite(HASHDB_KEYS.CHECK_WAF_RESULT, retVal, True)
 

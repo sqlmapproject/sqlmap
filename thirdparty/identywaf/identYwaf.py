@@ -66,7 +66,7 @@ else:
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 NAME = "identYwaf"
-VERSION = "1.0.108"
+VERSION = "1.0.110"
 BANNER = """
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
@@ -396,7 +396,7 @@ def init():
 def format_name(waf):
     return "%s%s" % (DATA_JSON["wafs"][waf]["name"], (" (%s)" % DATA_JSON["wafs"][waf]["company"]) if DATA_JSON["wafs"][waf]["name"] != DATA_JSON["wafs"][waf]["company"] else "")
 
-def non_blind_check(raw):
+def non_blind_check(raw, silent=False):
     retval = False
     match = re.search(WAF_RECOGNITION_REGEX, raw or "")
     if match:
@@ -405,7 +405,8 @@ def non_blind_check(raw):
             if match.group(_):
                 waf = re.sub(r"\Awaf_", "", _)
                 non_blind.add(waf)
-                single_print(colorize("[+] non-blind match: '%s'%s" % (format_name(waf), 20 * ' ')))
+                if not silent:
+                    single_print(colorize("[+] non-blind match: '%s'%s" % (format_name(waf), 20 * ' ')))
     return retval
 
 def run():

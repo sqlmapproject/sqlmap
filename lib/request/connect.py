@@ -795,7 +795,7 @@ class Connect(object):
 
             socket.setdefaulttimeout(conf.timeout)
 
-        processResponse(page, responseHeaders, status)
+        processResponse(page, responseHeaders, code, status)
 
         if not skipLogTraffic:
             if conn and getattr(conn, "redurl", None):

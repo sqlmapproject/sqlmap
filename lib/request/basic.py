@@ -51,8 +51,10 @@ from lib.parse.html import htmlParser
 from lib.utils.htmlentities import htmlEntities
 from thirdparty import six
 from thirdparty.chardet import detect
+from thirdparty.identywaf import identYwaf
 from thirdparty.odict import OrderedDict
 from thirdparty.six import unichr as _unichr
+from thirdparty.six.moves import http_client as _http_client
 
 def forgeHeaders(items=None, base=None):
     """
@@ -365,7 +367,7 @@ def decodePage(page, contentEncoding, contentType):
 
     return page
 
-def processResponse(page, responseHeaders, status=None):
+def processResponse(page, responseHeaders, code=None, status=None):
     kb.processResponseCounter += 1
 
     page = page or ""
@@ -382,6 +384,16 @@ def processResponse(page, responseHeaders, status=None):
 
         if msg:
             logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
+
+    rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(responseHeaders.headers), page)
+
+    identYwaf.non_blind.clear()
+    if identYwaf.non_blind_check(rawResponse, silent=True):
+        for waf in identYwaf.non_blind:
+            if waf not in kb.identifiedWafs:
+                kb.identifiedWafs.add(waf)
+                errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
+                singleTimeLogMessage(errMsg, logging.CRITICAL)
 
     if kb.originalPage is None:
         for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):

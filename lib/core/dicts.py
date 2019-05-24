@@ -290,6 +290,7 @@ DEPRECATED_OPTIONS = {
     "--purge-output": "use '--purge' instead",
     "--check-payload": None,
     "--check-waf": None,
+    "--identify-waf": None,
     "--pickled-options": "use '--api -c ...' instead",
 }
 
