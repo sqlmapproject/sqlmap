@@ -105,52 +105,6 @@ def isListLike(value):  # Cross-referenced function
 def shellExec(cmd):  # Cross-referenced function
     raise NotImplementedError
 
-def stdoutEncode(value):
-    value = value or ""
-
-    if IS_WIN and IS_TTY and kb.get("codePage", -1) is None:
-        output = shellExec("chcp")
-        match = re.search(r": (\d{3,})", output or "")
-
-        if match:
-            try:
-                candidate = "cp%s" % match.group(1)
-                codecs.lookup(candidate)
-            except LookupError:
-                pass
-            else:
-                kb.codePage = candidate
-
-        kb.codePage = kb.codePage or ""
-
-    if isinstance(value, six.text_type) and PYVERSION < "3.6":
-        encoding = kb.get("codePage") or sys.stdout.encoding or UNICODE_ENCODING
-
-        while True:
-            try:
-                retVal = value.encode(encoding)
-                break
-            except UnicodeEncodeError as ex:
-                value = value[:ex.start] + "?" + value[ex.end:]
-
-                if IS_WIN and PYVERSION < "3.6":
-                    warnMsg = "cannot properly display (some) Unicode characters "
-                    warnMsg += "inside Windows OS command prompt "
-                    warnMsg += "(https://bugs.python.org/issue1602). All "
-                    warnMsg += "unhandled occurrences will result in "
-                    warnMsg += "replacement with '?' character. Please, find "
-                    warnMsg += "proper character representation inside "
-                    warnMsg += "corresponding output files. "
-                    singleTimeWarnMessage(warnMsg)
-
-        if six.PY3:
-            retVal = getUnicode(retVal, encoding)
-
-    else:
-        retVal = value
-
-    return retVal
-
 def jsonize(data):
     """
     Returns JSON serialized data
@@ -363,5 +317,53 @@ def getText(value):
             retVal = str(retVal)
         except:
             pass
+
+    return retVal
+
+def stdoutEncode(value):
+    """
+    Returns binary representation of a given Unicode value safe for writing to stdout
+    """
+
+    value = value or ""
+
+    if IS_WIN and IS_TTY and kb.get("codePage", -1) is None:
+        output = shellExec("chcp")
+        match = re.search(r": (\d{3,})", output or "")
+
+        if match:
+            try:
+                candidate = "cp%s" % match.group(1)
+                codecs.lookup(candidate)
+            except LookupError:
+                pass
+            else:
+                kb.codePage = candidate
+
+        kb.codePage = kb.codePage or ""
+
+    if isinstance(value, six.text_type):
+        encoding = kb.get("codePage") or sys.stdout.encoding or UNICODE_ENCODING
+
+        while True:
+            try:
+                retVal = value.encode(encoding)
+                break
+            except UnicodeEncodeError as ex:
+                value = value[:ex.start] + "?" * (ex.end - ex.start) + value[ex.end:]
+
+                warnMsg = "cannot properly display (some) Unicode characters "
+                warnMsg += "inside your terminal ('%s') environment. All " % encoding
+                warnMsg += "unhandled occurrences will result in "
+                warnMsg += "replacement with '?' character. Please, find "
+                warnMsg += "proper character representation inside "
+                warnMsg += "corresponding output files"
+                singleTimeWarnMessage(warnMsg)
+
+        if six.PY3:
+            retVal = getUnicode(retVal, encoding)
+
+    else:
+        retVal = value
 
     return retVal
