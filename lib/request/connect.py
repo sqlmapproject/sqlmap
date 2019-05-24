@@ -236,23 +236,8 @@ class Connect(object):
         the target URL page content
         """
 
-        start = time.time()
-
-        if isinstance(conf.delay, (int, float)) and conf.delay > 0:
-            time.sleep(conf.delay)
-
         if conf.offline:
             return None, None, None
-        elif conf.dummy or conf.murphyRate and randomInt() % conf.murphyRate == 0:
-            if conf.murphyRate:
-                time.sleep(randomInt() % (MAX_MURPHY_SLEEP_TIME + 1))
-
-            return randomStr(int(randomInt()), alphabet=[_unichr(_) for _ in xrange(256)]), None, None if not conf.murphyRate else randomInt(3)
-
-        threadData = getCurrentThreadData()
-        with kb.locks.request:
-            kb.requestCounter += 1
-            threadData.lastRequestUID = kb.requestCounter
 
         url = kwargs.get("url", None) or conf.url
         get = kwargs.get("get", None)
@@ -277,6 +262,27 @@ class Connect(object):
         skipRead = kwargs.get("skipRead", False)
         finalCode = kwargs.get("finalCode", False)
         chunked = kwargs.get("chunked", False) or conf.chunked
+
+        start = time.time()
+
+        if isinstance(conf.delay, (int, float)) and conf.delay > 0:
+            time.sleep(conf.delay)
+
+        threadData = getCurrentThreadData()
+        with kb.locks.request:
+            kb.requestCounter += 1
+            threadData.lastRequestUID = kb.requestCounter
+
+        if conf.dummy or conf.murphyRate and randomInt() % conf.murphyRate == 0:
+            if conf.murphyRate:
+                time.sleep(randomInt() % (MAX_MURPHY_SLEEP_TIME + 1))
+
+            page, headers, code = randomStr(int(randomInt()), alphabet=[_unichr(_) for _ in xrange(256)]), None, None if not conf.murphyRate else randomInt(3)
+
+            threadData.lastPage = page
+            threadData.lastCode = code
+
+            return page, headers, code
 
         if multipart:
             post = multipart
