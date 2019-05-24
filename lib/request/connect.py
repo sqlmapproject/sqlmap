@@ -286,13 +286,13 @@ class Connect(object):
 
         if multipart:
             post = multipart
+        else:
+            if not post:
+                chunked = False
 
-        if not post:
-            chunked = False
-
-        elif chunked:
-            post = _urllib.parse.unquote(post)
-            post = chunkSplitPostData(post)
+            elif chunked:
+                post = _urllib.parse.unquote(post)
+                post = chunkSplitPostData(post)
 
         websocket_ = url.lower().startswith("ws")
 
