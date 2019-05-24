@@ -7,13 +7,11 @@ See the file 'LICENSE' for copying permission
 
 import copy
 import logging
-import os
 import random
 import re
 import socket
 import subprocess
 import sys
-import tempfile
 import time
 
 from extra.beep.beep import beep
@@ -33,7 +31,6 @@ from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import intersect
 from lib.core.common import listToStrValue
-from lib.core.common import openFile
 from lib.core.common import parseFilePaths
 from lib.core.common import popValue
 from lib.core.common import pushValue
@@ -44,18 +41,15 @@ from lib.core.common import showStaticWords
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
-from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.compat import xrange
 from lib.core.convert import getUnicode
-from lib.core.defaults import defaults
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
-from lib.core.decorators import cachedmethod
 from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
@@ -63,7 +57,6 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
-from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.enums import NOTE
 from lib.core.enums import NULLCONNECTION
 from lib.core.enums import PAYLOAD
@@ -81,7 +74,6 @@ from lib.core.settings import CANDIDATE_SENTENCE_MIN_LENGTH
 from lib.core.settings import CHECK_INTERNET_ADDRESS
 from lib.core.settings import CHECK_INTERNET_VALUE
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
@@ -1387,6 +1379,7 @@ def checkWaf():
     pushValue(kb.resendPostOnRedirect)
     pushValue(conf.timeout)
 
+    kb.identYwaf = True
     kb.redirectChoice = REDIRECTION.YES
     kb.resendPostOnRedirect = False
     conf.timeout = IDS_WAF_CHECK_TIMEOUT
@@ -1396,11 +1389,14 @@ def checkWaf():
     except SqlmapConnectionException:
         retVal = True
     finally:
+        kb.identYwaf = False
         kb.matchRatio = None
 
         conf.timeout = popValue()
         kb.resendPostOnRedirect = popValue()
         kb.redirectChoice = popValue()
+
+    hashDBWrite(HASHDB_KEYS.CHECK_WAF_RESULT, retVal, True)
 
     if retVal:
         if not kb.identifiedWafs:
@@ -1409,17 +1405,15 @@ def checkWaf():
             logger.critical(warnMsg)
 
         message = "are you sure that you want to "
-        message += "continue with further target testing? [y/N] "
-        choice = readInput(message, default='N', boolean=True)
-
-        if not conf.tamper:
-            warnMsg = "please consider usage of tamper scripts (option '--tamper')"
-            singleTimeWarnMessage(warnMsg)
+        message += "continue with further target testing? [Y/n] "
+        choice = readInput(message, default='Y', boolean=True)
 
         if not choice:
             raise SqlmapUserQuitException
-
-    hashDBWrite(HASHDB_KEYS.CHECK_WAF_RESULT, retVal, True)
+        else:
+            if not conf.tamper:
+                warnMsg = "please consider usage of tamper scripts (option '--tamper')"
+                singleTimeWarnMessage(warnMsg)
 
     return retVal
 

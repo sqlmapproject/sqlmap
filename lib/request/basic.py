@@ -387,13 +387,14 @@ def processResponse(page, responseHeaders, code=None, status=None):
 
     rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(responseHeaders.headers), page)
 
-    identYwaf.non_blind.clear()
-    if identYwaf.non_blind_check(rawResponse, silent=True):
-        for waf in identYwaf.non_blind:
-            if waf not in kb.identifiedWafs:
-                kb.identifiedWafs.add(waf)
-                errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
-                singleTimeLogMessage(errMsg, logging.CRITICAL)
+    if kb.identYwaf:
+        identYwaf.non_blind.clear()
+        if identYwaf.non_blind_check(rawResponse, silent=True):
+            for waf in identYwaf.non_blind:
+                if waf not in kb.identifiedWafs:
+                    kb.identifiedWafs.add(waf)
+                    errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
+                    singleTimeLogMessage(errMsg, logging.CRITICAL)
 
     if kb.originalPage is None:
         for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):

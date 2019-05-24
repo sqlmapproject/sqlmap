@@ -280,7 +280,7 @@ POST_HINT_CONTENT_TYPES = {
     POST_HINT.ARRAY_LIKE: "application/x-www-form-urlencoded; charset=utf-8",
 }
 
-DEPRECATED_OPTIONS = {
+OLD_OPTIONS = {
     "--replicate": "use '--dump-format=SQLITE' instead",
     "--no-unescape": "use '--no-escape' instead",
     "--binary": "use '--binary-fields' instead",
