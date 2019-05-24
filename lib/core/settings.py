@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.5.129"
+VERSION = "1.3.5.130"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -776,6 +776,9 @@ LOBLKSIZE = 2048
 
 # Prefix used to mark special variables (e.g. keywords, having special chars, etc.)
 EVALCODE_ENCODED_PREFIX = "EVAL_"
+
+# Reference: https://en.wikipedia.org/wiki/Zip_(file_format)
+ZIP_HEADER = b"\x50\x4b\x03\x04"
 
 # Reference: http://www.cookiecentral.com/faq/#3.5
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."

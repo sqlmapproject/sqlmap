@@ -55,6 +55,7 @@ from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
+from lib.core.common import isZipFile
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import paths
@@ -1003,7 +1004,7 @@ def dictionaryAttack(attack_dict):
                     for dictPath in dictPaths:
                         checkFile(dictPath)
 
-                        if os.path.splitext(dictPath)[1].lower() == ".zip":
+                        if isZipFile(dictPath):
                             _ = zipfile.ZipFile(dictPath, 'r')
                             if len(_.namelist()) == 0:
                                 errMsg = "no file(s) inside '%s'" % dictPath

@@ -173,6 +173,7 @@ from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import VERSION_STRING
+from lib.core.settings import ZIP_HEADER
 from lib.core.settings import WEBSCARAB_SPLITTER
 from lib.core.threads import getCurrentThreadData
 from lib.utils.sqlalchemy import _sqlalchemy
@@ -1215,6 +1216,18 @@ def checkPipedInput():
 
     return not os.isatty(sys.stdin.fileno())
 
+def isZipFile(filename):
+    """
+    Checks if file contains zip compressed content
+
+    >>> isZipFile(paths.WORDLIST)
+    True
+    """
+
+    checkFile(filename)
+
+    return openFile(filename, "rb", encoding=None).read(len(ZIP_HEADER)) == ZIP_HEADER
+
 def checkFile(filename, raiseOnError=True):
     """
     Checks for file existence and readability
@@ -1314,17 +1327,41 @@ def setPaths(rootPath):
     paths.SQLMAP_ROOT_PATH = rootPath
 
     # sqlmap paths
+    paths.SQLMAP_DATA_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "data")
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
-    paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "procs")
-    paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "shell")
     paths.SQLMAP_SETTINGS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "core", "settings.py")
     paths.SQLMAP_TAMPER_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "tamper")
     paths.SQLMAP_WAF_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "waf")
-    paths.SQLMAP_TXT_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "txt")
-    paths.SQLMAP_UDF_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "udf")
-    paths.SQLMAP_XML_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "xml")
+
+    paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "procs")
+    paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "shell")
+    paths.SQLMAP_TXT_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "txt")
+    paths.SQLMAP_UDF_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "udf")
+    paths.SQLMAP_XML_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "xml")
     paths.SQLMAP_XML_BANNER_PATH = os.path.join(paths.SQLMAP_XML_PATH, "banner")
     paths.SQLMAP_XML_PAYLOADS_PATH = os.path.join(paths.SQLMAP_XML_PATH, "payloads")
+
+    # sqlmap files
+    paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
+    paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
+    paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
+    paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
+    paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
+    paths.WORDLIST = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.tx_")
+    paths.ERRORS_XML = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
+    paths.BOUNDARIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "boundaries.xml")
+    paths.LIVE_TESTS_XML = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
+    paths.QUERIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
+    paths.GENERIC_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
+    paths.MSSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")
+    paths.MYSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
+    paths.ORACLE_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
+    paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
+
+    for path in paths.values():
+        if any(path.endswith(_) for _ in (".txt", ".xml", ".tx_")):
+            checkFile(path)
 
     if IS_WIN:
         if os.getenv("LOCALAPPDATA"):
@@ -1347,28 +1384,6 @@ def setPaths(rootPath):
     paths.SQL_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "sql.hst")
     paths.SQLMAP_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "sqlmap.hst")
     paths.GITHUB_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "github.hst")
-
-    # sqlmap files
-    paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
-    paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
-    paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
-    paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
-    paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
-    paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
-    paths.WORDLIST = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.zip")
-    paths.ERRORS_XML = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
-    paths.BOUNDARIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "boundaries.xml")
-    paths.LIVE_TESTS_XML = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
-    paths.QUERIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
-    paths.GENERIC_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
-    paths.MSSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")
-    paths.MYSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
-    paths.ORACLE_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
-    paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
-
-    for path in paths.values():
-        if any(path.endswith(_) for _ in (".txt", ".xml", ".zip")):
-            checkFile(path)
 
 def weAreFrozen():
     """

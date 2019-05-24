@@ -9,6 +9,7 @@ import os
 import zipfile
 
 from lib.core.common import getSafeExString
+from lib.core.common import isZipFile
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapInstallationException
 from thirdparty import six
@@ -45,7 +46,7 @@ class Wordlist(six.Iterator):
             self.iter = iter(self.custom)
         else:
             self.current = self.filenames[self.index]
-            if os.path.splitext(self.current)[1].lower() == ".zip":
+            if isZipFile(self.current):
                 try:
                     _ = zipfile.ZipFile(self.current, 'r')
                 except zipfile.error as ex:
