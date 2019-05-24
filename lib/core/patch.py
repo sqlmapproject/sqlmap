@@ -28,7 +28,6 @@ from lib.core.common import shellExec
 from lib.core.convert import stdoutEncode
 from lib.core.option import _setHTTPHandlers
 from lib.core.option import setVerbosity
-from lib.core.option import _setWafFunctions
 from lib.core.settings import IS_WIN
 from thirdparty.six.moves import http_client as _http_client
 
@@ -70,7 +69,6 @@ def resolveCrossReferences():
     lib.request.connect.setHTTPHandlers = _setHTTPHandlers
     lib.utils.search.setHTTPHandlers = _setHTTPHandlers
     lib.controller.checks.setVerbosity = setVerbosity
-    lib.controller.checks.setWafFunctions = _setWafFunctions
     lib.utils.sqlalchemy.getSafeExString = getSafeExString
     thirdparty.ansistrm.ansistrm.stdoutEncode = stdoutEncode
 

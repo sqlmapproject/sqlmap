@@ -270,7 +270,6 @@ paths:
                   tmpPath: null 
                   titles: false 
                   getSchema: false 
-                  identifyWaf: false 
                   paramDel: null 
                   safeReqFile: null 
                   regKey: null 

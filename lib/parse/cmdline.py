@@ -652,9 +652,6 @@ def cmdLineParser(argv=None):
         miscellaneous.add_option("--gpage", dest="googlePage", type="int",
                                  help="Use Google dork results from specified page number")
 
-        miscellaneous.add_option("--identify-waf", dest="identifyWaf", action="store_true",
-                                 help="Make a thorough testing for a WAF/IPS protection")
-
         miscellaneous.add_option("--list-tampers", dest="listTampers", action="store_true",
                                  help="Display list of available tamper scripts")
 

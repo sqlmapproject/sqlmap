@@ -20,7 +20,6 @@ from lib.controller.checks import checkInternet
 from lib.controller.checks import checkNullConnection
 from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
-from lib.controller.checks import identifyWaf
 from lib.core.agent import agent
 from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
@@ -422,9 +421,6 @@ def start():
                 continue
 
             checkWaf()
-
-            if conf.identifyWaf:
-                identifyWaf()
 
             if conf.nullConnection:
                 checkNullConnection()
