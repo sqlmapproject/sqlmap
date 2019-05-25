@@ -385,9 +385,9 @@ def processResponse(page, responseHeaders, code=None, status=None):
         if msg:
             logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
 
-    rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(responseHeaders.headers), page)
-
     if kb.identYwaf:
+        rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(responseHeaders.headers if responseHeaders else []), page)
+
         identYwaf.non_blind.clear()
         if identYwaf.non_blind_check(rawResponse, silent=True):
             for waf in identYwaf.non_blind:
