@@ -13,6 +13,7 @@ except:
 import base64
 import binascii
 import codecs
+import collections
 import json
 import re
 import sys
@@ -24,7 +25,6 @@ from lib.core.settings import IS_TTY
 from lib.core.settings import IS_WIN
 from lib.core.settings import NULL
 from lib.core.settings import PICKLE_PROTOCOL
-from lib.core.settings import PYVERSION
 from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
@@ -97,7 +97,7 @@ def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.flush()
 
 def filterNone(values):  # Cross-referenced function
-    raise NotImplementedError
+    return [_ for _ in values if _] if isinstance(values, collections.Iterable) else values
 
 def isListLike(value):  # Cross-referenced function
     raise NotImplementedError
