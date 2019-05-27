@@ -512,7 +512,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     if ratio == 1.0:
                                         continue
-                                except MemoryError:
+                                except (MemoryError, OverflowError):
                                     pass
 
                             kb.prevFalsePage = falsePage
