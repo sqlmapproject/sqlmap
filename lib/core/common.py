@@ -2522,9 +2522,10 @@ def commonFinderOnly(initial, sequence):
     Returns parts of sequence which start with the given initial string
 
     >>> commonFinderOnly("abcd", ["abcdefg", "foobar", "abcde"])
-    ['abcdefg', 'abcde']
+    'abcde'
     """
-    return longestCommonPrefix([_ for _ in sequence if _.startswith(initial)])
+
+    return longestCommonPrefix(*[_ for _ in sequence if _.startswith(initial)])
 
 def pushValue(value):
     """
