@@ -19,7 +19,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSafeExString
-from lib.core.common import getText
 from lib.core.common import isListLike
 from lib.core.common import randomStr
 from lib.core.common import readInput
@@ -29,6 +28,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.convert import decodeHex
 from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
