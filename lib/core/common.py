@@ -68,7 +68,7 @@ from lib.core.decorators import cachedmethod
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEFAULT_DOC_ROOTS
-from lib.core.dicts import OLD_OPTIONS
+from lib.core.dicts import OBSOLETE_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CONTENT_STATUS
@@ -4457,19 +4457,17 @@ def getHostHeader(url):
 
     return retVal
 
-def checkOldOptions(args):
+def checkObsoleteOptions(args):
     """
-    Checks for deprecated/obsolete options
+    Checks for obsolete options
     """
 
     for _ in args:
         _ = _.split('=')[0].strip()
-        if _ in OLD_OPTIONS:
-            if OLD_OPTIONS[_]:
-                errMsg = "switch/option '%s' is deprecated" % _
-                errMsg += " (hint: %s)" % OLD_OPTIONS[_]
-            else:
-                errMsg = "switch/option '%s' is obsolete" % _
+        if _ in OBSOLETE_OPTIONS:
+            errMsg = "switch/option '%s' is obsolete" % _
+            if OBSOLETE_OPTIONS[_]:
+                errMsg += " (hint: %s)" % OBSOLETE_OPTIONS[_]
             raise SqlmapSyntaxException(errMsg)
 
 def checkSystemEncoding():
