@@ -80,15 +80,17 @@ def htmlUnescape(value):
     """
 
     retVal = value
+
     if value and isinstance(value, six.string_types):
         replacements = (("&lt;", '<'), ("&gt;", '>'), ("&quot;", '"'), ("&nbsp;", ' '), ("&amp;", '&'), ("&apos;", "'"))
         for code, value in replacements:
             retVal = retVal.replace(code, value)
 
         try:
-            retVal = re.sub(r"&#x([^ ;]+);", lambda match: _unichr(int(match.group(1), 16)), retVal)
+            retVal = getText(re.sub(r"&#x([^ ;]+);", lambda match: _unichr(int(match.group(1), 16)), retVal))
         except ValueError:
             pass
+
     return retVal
 
 def singleTimeWarnMessage(message):  # Cross-referenced function

@@ -2642,7 +2642,9 @@ def extractErrorMessage(page):
     """
     Returns reported error message from page if it founds one
 
-    >>> extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>') == u'oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated'
+    >>> extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>') 
+    'oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated'
+    >>> extractErrorMessage('Warning: This is only a dummy foobar test') is None
     True
     """
 
@@ -2653,8 +2655,10 @@ def extractErrorMessage(page):
             match = re.search(regex, page, re.IGNORECASE)
 
             if match:
-                retVal = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
-                break
+                candidate = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
+                if re.search(r"\b([a-z]+ ){5}", candidate) is None:  # check for legitimate (e.g. Warning:...) text
+                    retVal = candidate
+                    break
 
     return retVal
 
