@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.5.149"
+VERSION = "1.3.5.150"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -101,6 +101,9 @@ PRECONNECT_CANDIDATE_TIMEOUT = 10
 
 # Servers known to cause issue with pre-connection mechanism (because of lack of multi-threaded support)
 PRECONNECT_INCOMPATIBLE_SERVERS = ("SimpleHTTP", "BaseHTTP")
+
+# Identify WAF/IPS inside limited number of responses (Note: for optimization purposes)
+IDENTYWAF_PARSE_LIMIT = 10
 
 # Maximum sleep time in "Murphy" (testing) mode
 MAX_MURPHY_SLEEP_TIME = 3

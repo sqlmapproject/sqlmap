@@ -41,6 +41,7 @@ from lib.core.exception import SqlmapCompressionException
 from lib.core.settings import BLOCKED_IP_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
+from lib.core.settings import IDENTYWAF_PARSE_LIMIT
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
@@ -385,7 +386,7 @@ def processResponse(page, responseHeaders, code=None, status=None):
         if msg:
             logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
 
-    if kb.identYwaf:
+    if kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
         rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", getUnicode("".join(responseHeaders.headers if responseHeaders else [])), page)
 
         identYwaf.non_blind.clear()

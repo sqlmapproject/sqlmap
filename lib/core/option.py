@@ -1886,7 +1886,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.hintValue = None
     kb.htmlFp = []
     kb.httpErrorCodes = {}
-    kb.identYwaf = False
     kb.inferenceMode = False
     kb.ignoreCasted = None
     kb.ignoreNotFound = False

@@ -1379,7 +1379,6 @@ def checkWaf():
     pushValue(kb.resendPostOnRedirect)
     pushValue(conf.timeout)
 
-    kb.identYwaf = True
     kb.redirectChoice = REDIRECTION.YES
     kb.resendPostOnRedirect = False
     conf.timeout = IDS_WAF_CHECK_TIMEOUT
@@ -1389,7 +1388,6 @@ def checkWaf():
     except SqlmapConnectionException:
         retVal = True
     finally:
-        kb.identYwaf = False
         kb.matchRatio = None
 
         conf.timeout = popValue()
