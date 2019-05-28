@@ -103,7 +103,7 @@ class Enumeration(GenericEnumeration):
             retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
             if retVal:
-                kb.data.cachedDbs = six.itervalues(retVal[0]).next()
+                kb.data.cachedDbs = next(six.itervalues(retVal[0]))
                 break
 
         if kb.data.cachedDbs:
@@ -147,7 +147,7 @@ class Enumeration(GenericEnumeration):
                 retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
                 if retVal:
-                    for table in six.itervalues(retVal[0]).next():
+                    for table in next(six.itervalues(retVal[0])):
                         if db not in kb.data.cachedTables:
                             kb.data.cachedTables[db] = [table]
                         else:

@@ -49,7 +49,7 @@ class Enumeration(GenericEnumeration):
         retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.schemaname' % kb.aliasName], blind=True)
 
         if retVal:
-            kb.data.cachedDbs = six.itervalues(retVal[0]).next()
+            kb.data.cachedDbs = next(six.itervalues(retVal[0]))
 
         if kb.data.cachedDbs:
             kb.data.cachedDbs.sort()
