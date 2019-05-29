@@ -5,7 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-class PRIORITY:
+class PRIORITY(object):
     LOWEST = -100
     LOWER = -50
     LOW = -10
@@ -14,7 +14,7 @@ class PRIORITY:
     HIGHER = 50
     HIGHEST = 100
 
-class SORT_ORDER:
+class SORT_ORDER(object):
     FIRST = 0
     SECOND = 1
     THIRD = 2
@@ -23,7 +23,7 @@ class SORT_ORDER:
     LAST = 100
 
 # Reference: https://docs.python.org/2/library/logging.html#logging-levels
-class LOGGING_LEVELS:
+class LOGGING_LEVELS(object):
     NOTSET = 0
     DEBUG = 10
     INFO = 20
@@ -31,7 +31,7 @@ class LOGGING_LEVELS:
     ERROR = 40
     CRITICAL = 50
 
-class DBMS:
+class DBMS(object):
     ACCESS = "Microsoft Access"
     DB2 = "IBM DB2"
     FIREBIRD = "Firebird"
@@ -46,7 +46,7 @@ class DBMS:
     H2 = "H2"
     INFORMIX = "Informix"
 
-class DBMS_DIRECTORY_NAME:
+class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
     DB2 = "db2"
     FIREBIRD = "firebird"
@@ -61,16 +61,16 @@ class DBMS_DIRECTORY_NAME:
     H2 = "h2"
     INFORMIX = "informix"
 
-class CUSTOM_LOGGING:
+class CUSTOM_LOGGING(object):
     PAYLOAD = 9
     TRAFFIC_OUT = 8
     TRAFFIC_IN = 7
 
-class OS:
+class OS(object):
     LINUX = "Linux"
     WINDOWS = "Windows"
 
-class PLACE:
+class PLACE(object):
     GET = "GET"
     POST = "POST"
     URI = "URI"
@@ -81,7 +81,7 @@ class PLACE:
     CUSTOM_POST = "(custom) POST"
     CUSTOM_HEADER = "(custom) HEADER"
 
-class POST_HINT:
+class POST_HINT(object):
     SOAP = "SOAP"
     JSON = "JSON"
     JSON_LIKE = "JSON-like"
@@ -89,7 +89,7 @@ class POST_HINT:
     XML = "XML (generic)"
     ARRAY_LIKE = "Array-like"
 
-class HTTPMETHOD:
+class HTTPMETHOD(object):
     GET = "GET"
     POST = "POST"
     HEAD = "HEAD"
@@ -100,28 +100,28 @@ class HTTPMETHOD:
     CONNECT = "CONNECT"
     PATCH = "PATCH"
 
-class NULLCONNECTION:
+class NULLCONNECTION(object):
     HEAD = "HEAD"
     RANGE = "Range"
     SKIP_READ = "skip-read"
 
-class REFLECTIVE_COUNTER:
+class REFLECTIVE_COUNTER(object):
     MISS = "MISS"
     HIT = "HIT"
 
-class CHARSET_TYPE:
+class CHARSET_TYPE(object):
     BINARY = 1
     DIGITS = 2
     HEXADECIMAL = 3
     ALPHA = 4
     ALPHANUM = 5
 
-class HEURISTIC_TEST:
+class HEURISTIC_TEST(object):
     CASTED = 1
     NEGATIVE = 2
     POSITIVE = 3
 
-class HASH:
+class HASH(object):
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
     MYSQL_OLD = r'(?i)\A(?![0-9]+\Z)[0-9a-f]{16}\Z'
     POSTGRES = r'(?i)\Amd5[0-9a-f]{32}\Z'
@@ -155,7 +155,7 @@ class HASH:
     SHA512_BASE64 = r'\A[a-zA-Z0-9+/]{86}==\Z'
 
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
-class MOBILES:
+class MOBILES(object):
     BLACKBERRY = ("BlackBerry Z10", "Mozilla/5.0 (BB10; Kbd) AppleWebKit/537.35+ (KHTML, like Gecko) Version/10.3.3.2205 Mobile Safari/537.35+")
     GALAXY = ("Samsung Galaxy S7", "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36")
     HP = ("HP iPAQ 6365", "Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; PPC; 240x320; HP iPAQ h6300)")
@@ -168,23 +168,23 @@ class MOBILES:
     PIXEL = ("Google Pixel", "Mozilla/5.0 (Linux; Android 8.0.0; Pixel Build/OPR3.170623.013) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36")
     XIAOMI = ("Xiaomi Mi 3", "Mozilla/5.0 (Linux; U; Android 4.4.4; en-gb; MI 3W Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/39.0.0.0 Mobile Safari/537.36 XiaoMi/MiuiBrowser/2.1.1")
 
-class PROXY_TYPE:
+class PROXY_TYPE(object):
     HTTP = "HTTP"
     HTTPS = "HTTPS"
     SOCKS4 = "SOCKS4"
     SOCKS5 = "SOCKS5"
 
-class REGISTRY_OPERATION:
+class REGISTRY_OPERATION(object):
     READ = "read"
     ADD = "add"
     DELETE = "delete"
 
-class DUMP_FORMAT:
+class DUMP_FORMAT(object):
     CSV = "CSV"
     HTML = "HTML"
     SQLITE = "SQLITE"
 
-class HTTP_HEADER:
+class HTTP_HEADER(object):
     ACCEPT = "Accept"
     ACCEPT_CHARSET = "Accept-Charset"
     ACCEPT_ENCODING = "Accept-Encoding"
@@ -217,17 +217,17 @@ class HTTP_HEADER:
     X_POWERED_BY = "X-Powered-By"
     X_DATA_ORIGIN = "X-Data-Origin"
 
-class EXPECTED:
+class EXPECTED(object):
     BOOL = "bool"
     INT = "int"
 
-class OPTION_TYPE:
+class OPTION_TYPE(object):
     BOOLEAN = "boolean"
     INTEGER = "integer"
     FLOAT = "float"
     STRING = "string"
 
-class HASHDB_KEYS:
+class HASHDB_KEYS(object):
     DBMS = "DBMS"
     DBMS_FORK = "DBMS_FORK"
     CHECK_WAF_RESULT = "CHECK_WAF_RESULT"
@@ -243,11 +243,11 @@ class HASHDB_KEYS:
     KB_XP_CMDSHELL_AVAILABLE = "KB_XP_CMDSHELL_AVAILABLE"
     OS = "OS"
 
-class REDIRECTION:
+class REDIRECTION(object):
     YES = "Y"
     NO = "N"
 
-class PAYLOAD:
+class PAYLOAD(object):
     SQLINJECTION = {
         1: "boolean-based blind",
         2: "error-based",
@@ -286,13 +286,13 @@ class PAYLOAD:
         9: "Pre-WHERE (non-query)",
     }
 
-    class METHOD:
+    class METHOD(object):
         COMPARISON = "comparison"
         GREP = "grep"
         TIME = "time"
         UNION = "union"
 
-    class TECHNIQUE:
+    class TECHNIQUE(object):
         BOOLEAN = 1
         ERROR = 2
         QUERY = 3
@@ -300,28 +300,28 @@ class PAYLOAD:
         TIME = 5
         UNION = 6
 
-    class WHERE:
+    class WHERE(object):
         ORIGINAL = 1
         NEGATIVE = 2
         REPLACE = 3
 
-class WIZARD:
+class WIZARD(object):
     BASIC = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba")
     INTERMEDIATE = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema", "excludeSysDbs")
     ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes", "getPrivileges", "getRoles", "dumpAll")
 
-class ADJUST_TIME_DELAY:
+class ADJUST_TIME_DELAY(object):
     DISABLE = -1
     NO = 0
     YES = 1
 
-class WEB_PLATFORM:
+class WEB_PLATFORM(object):
     PHP = "php"
     ASP = "asp"
     ASPX = "aspx"
     JSP = "jsp"
 
-class CONTENT_TYPE:
+class CONTENT_TYPE(object):
     TARGET = 0
     TECHNIQUES = 1
     DBMS_FINGERPRINT = 2
@@ -350,26 +350,26 @@ class CONTENT_TYPE:
     REG_READ = 25
     STATEMENTS = 26
 
-class CONTENT_STATUS:
+class CONTENT_STATUS(object):
     IN_PROGRESS = 0
     COMPLETE = 1
 
-class AUTH_TYPE:
+class AUTH_TYPE(object):
     BASIC = "basic"
     DIGEST = "digest"
     NTLM = "ntlm"
     PKI = "pki"
 
-class AUTOCOMPLETE_TYPE:
+class AUTOCOMPLETE_TYPE(object):
     SQL = 0
     OS = 1
     SQLMAP = 2
     API = 3
 
-class NOTE:
+class NOTE(object):
     FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"
 
-class MKSTEMP_PREFIX:
+class MKSTEMP_PREFIX(object):
     HASHES = "sqlmaphashes-"
     CRAWLER = "sqlmapcrawler-"
     IPC = "sqlmapipc-"
@@ -381,11 +381,11 @@ class MKSTEMP_PREFIX:
     SPECIFIC_RESPONSE = "sqlmapresponse-"
     PREPROCESS = "sqlmappreprocess-"
 
-class TIMEOUT_STATE:
+class TIMEOUT_STATE(object):
     NORMAL = 0
     EXCEPTION = 1
     TIMEOUT = 2
 
-class HINT:
+class HINT(object):
     PREPEND = 0
     APPEND = 1

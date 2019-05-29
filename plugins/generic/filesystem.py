@@ -35,7 +35,7 @@ from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
-class Filesystem:
+class Filesystem(object):
     """
     This class defines generic OS file system functionalities for plugins.
     """

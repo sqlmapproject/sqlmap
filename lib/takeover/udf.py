@@ -29,7 +29,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
-class UDF:
+class UDF(object):
     """
     This class defines methods to deal with User-Defined Functions for
     plugins.

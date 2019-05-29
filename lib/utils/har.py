@@ -21,14 +21,14 @@ from thirdparty.six.moves import http_client as _http_client
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
 #            http://www.softwareishard.com/har/viewer/
 
-class HTTPCollectorFactory:
+class HTTPCollectorFactory(object):
     def __init__(self, harFile=False):
         self.harFile = harFile
 
     def create(self):
         return HTTPCollector()
 
-class HTTPCollector:
+class HTTPCollector(object):
     def __init__(self):
         self.messages = BigArray()
         self.extendedArguments = {}
@@ -48,7 +48,7 @@ class HTTPCollector:
             "entries": [pair.toEntry().toDict() for pair in self.messages],
         }}
 
-class RawPair:
+class RawPair(object):
     def __init__(self, request, response, startTime=None, endTime=None, extendedArguments=None):
         self.request = getBytes(request)
         self.response = getBytes(response)
@@ -61,7 +61,7 @@ class RawPair:
                      startTime=self.startTime, endTime=self.endTime,
                      extendedArguments=self.extendedArguments)
 
-class Entry:
+class Entry(object):
     def __init__(self, request, response, startTime, endTime, extendedArguments):
         self.request = request
         self.response = response
@@ -85,7 +85,7 @@ class Entry:
         out.update(self.extendedArguments)
         return out
 
-class Request:
+class Request(object):
     def __init__(self, method, path, httpVersion, headers, postBody=None, raw=None, comment=None):
         self.method = method
         self.path = path
@@ -133,7 +133,7 @@ class Request:
 
         return out
 
-class Response:
+class Response(object):
     extract_status = re.compile(b'\\((\\d{3}) (.*)\\)')
 
     def __init__(self, httpVersion, status, statusText, headers, content, raw=None, comment=None):
@@ -202,7 +202,7 @@ class Response:
             "comment": getText(self.comment),
         }
 
-class FakeSocket:
+class FakeSocket(object):
     # Original source:
     # https://stackoverflow.com/questions/24728088/python-parse-http-response-string
 

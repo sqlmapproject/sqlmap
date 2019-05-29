@@ -45,7 +45,7 @@ from lib.utils.hash import storeHashesToFile
 from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty.six.moves import zip as _zip
 
-class Users:
+class Users(object):
     """
     This class defines users' enumeration functionalities for plugins.
     """

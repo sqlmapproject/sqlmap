@@ -22,7 +22,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import SqlmapDataException
 
-class ICMPsh:
+class ICMPsh(object):
     """
     This class defines methods to call icmpsh for plugins.
     """

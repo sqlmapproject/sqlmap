@@ -51,7 +51,7 @@ from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
 from thirdparty import six
 
-class Databases:
+class Databases(object):
     """
     This class defines databases' enumeration functionalities for plugins.
     """

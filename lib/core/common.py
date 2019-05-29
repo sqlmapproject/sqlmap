@@ -328,8 +328,7 @@ class Format(object):
         else:
             return infoStr.lstrip()
 
-class Backend:
-    # Set methods
+class Backend(object):
     @staticmethod
     def setDbms(dbms):
         dbms = aliasToDbmsEnum(dbms)
@@ -3547,7 +3546,7 @@ def checkIntegrity():
     retVal = True
 
     baseTime = os.path.getmtime(paths.SQLMAP_SETTINGS_PATH) + 3600  # First hour free parking :)
-    for root, dirnames, filenames in os.walk(paths.SQLMAP_ROOT_PATH):
+    for root, _, filenames in os.walk(paths.SQLMAP_ROOT_PATH):
         for filename in filenames:
             if re.search(r"(\.py|\.xml|_)\Z", filename):
                 filepath = os.path.join(root, filename)

@@ -53,7 +53,7 @@ from thirdparty import six
 if IS_WIN:
     import msvcrt
 
-class Metasploit:
+class Metasploit(object):
     """
     This class defines methods to call Metasploit for plugins.
     """

@@ -37,7 +37,7 @@ from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
 from thirdparty import six
 
-class Search:
+class Search(object):
     """
     This class defines search functionalities for plugins.
     """

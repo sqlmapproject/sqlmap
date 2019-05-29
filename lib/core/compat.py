@@ -110,7 +110,7 @@ class WichmannHill(random.Random):
         period.
         """
 
-        if not n >= 0:
+        if n < 0:
             raise ValueError("n must be >= 0")
         x, y, z = self._seed
         x = int(x * pow(171, n, 30269)) % 30269

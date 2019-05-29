@@ -48,7 +48,7 @@ from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty import six
 from thirdparty.six.moves import zip as _zip
 
-class Entries:
+class Entries(object):
     """
     This class defines entries' enumeration functionalities for plugins.
     """

@@ -26,7 +26,7 @@ from lib.core.shell import autoCompletion
 from lib.request import inject
 from thirdparty.six.moves import input as _input
 
-class Custom:
+class Custom(object):
     """
     This class defines custom enumeration functionalities for plugins.
     """

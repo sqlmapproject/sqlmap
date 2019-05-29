@@ -32,7 +32,7 @@ class Replication(object):
             errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)
 
-    class DataType:
+    class DataType(object):
         """
         Using this class we define auxiliary objects
         used for representing sqlite data types.
@@ -47,7 +47,7 @@ class Replication(object):
         def __repr__(self):
             return "<DataType: %s>" % self
 
-    class Table:
+    class Table(object):
         """
         This class defines methods used to manipulate table objects.
         """

@@ -56,7 +56,7 @@ from lib.core.settings import VIEWSTATE_REGEX
 from lib.request.connect import Connect as Request
 from thirdparty.six.moves import urllib as _urllib
 
-class Web:
+class Web(object):
     """
     This class defines web-oriented OS takeover functionalities for
     plugins.
