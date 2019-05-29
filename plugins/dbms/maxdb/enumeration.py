@@ -230,3 +230,9 @@ class Enumeration(GenericEnumeration):
     def getHostname(self):
         warnMsg = "on SAP MaxDB it is not possible to enumerate the hostname"
         logger.warn(warnMsg)
+
+    def getStatements(self):
+        warnMsg = "on SAP MaxDB it is not possible to enumerate the SQL statements"
+        logger.warn(warnMsg)
+
+        return []

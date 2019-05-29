@@ -417,6 +417,9 @@ def cmdLineParser(argv=None):
         enumeration.add_option("--comments", dest="getComments", action="store_true",
                                help="Check for DBMS comments during enumeration")
 
+        enumeration.add_option("--statements", dest="getStatements", action="store_true",
+                               help="Retrieve SQL statements being run on DBMS")
+
         enumeration.add_option("-D", dest="db",
                                help="DBMS database to enumerate")
 

@@ -47,3 +47,9 @@ class Enumeration(GenericEnumeration):
         logger.warn(warnMsg)
 
         return {}
+
+    def getStatements(self):
+        warnMsg = "on H2 it is not possible to enumerate the SQL statements"
+        logger.warn(warnMsg)
+
+        return []

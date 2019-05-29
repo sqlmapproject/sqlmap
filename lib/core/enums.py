@@ -348,6 +348,7 @@ class CONTENT_TYPE:
     FILE_WRITE = 23
     OS_CMD = 24
     REG_READ = 25
+    STATEMENTS = 26
 
 class CONTENT_STATUS:
     IN_PROGRESS = 0

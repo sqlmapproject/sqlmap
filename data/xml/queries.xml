@@ -41,6 +41,10 @@
             <blind query="SELECT DISTINCT(privilege_type) FROM INFORMATION_SCHEMA.USER_PRIVILEGES WHERE grantee %s '%s' LIMIT %d,1" query2="SELECT select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM INFORMATION_SCHEMA.USER_PRIVILEGES WHERE grantee %s '%s'" count2="SELECT COUNT(*) FROM mysql.user WHERE user='%s'"/>
         </privileges>
         <roles/>
+        <statements>
+            <inband query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST"/>
+            <blind query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST ORDER BY ID LIMIT %d,1" query2="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST WHERE ID=%d" query3="SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST LIMIT %d,1" count="SELECT COUNT(DISTINCT(INFO)) FROM INFORMATION_SCHEMA.PROCESSLIST"/>
+        </statements>
         <dbs>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA" query2="SELECT db FROM mysql.db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
@@ -112,6 +116,10 @@
             <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
         </privileges>
         <roles/>
+        <statements>
+            <inband query="SELECT query FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
+            <blind query="SELECT DISTINCT(query) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(query)) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
+        </statements>
         <dbs>
             <inband query="SELECT schemaname FROM pg_tables"/>
             <blind query="SELECT DISTINCT(schemaname) FROM pg_tables OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
@@ -180,6 +188,10 @@
         <!-- NOTE: in Microsoft SQL Server there is no query to enumerate DBMS users privileges -->
         <privileges/>
         <roles/>
+        <statements>
+            <inband query="SELECT st.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) st"/>
+            <blind query="SELECT TOP 1 a.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) a WHERE a.text NOT IN (SELECT TOP %d b.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) b ORDER BY b.text) ORDER BY a.text" count="SELECT LTRIM(STR(COUNT(st.text))) FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) st"/>
+        </statements>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases" query2="SELECT DB_NAME(%d)"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
@@ -268,6 +280,10 @@
             <inband query="SELECT GRANTEE,GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME,GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
             <blind query="SELECT GRANTED_ROLE FROM (SELECT GRANTED_ROLE,ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT GRANTED_ROLE FROM (SELECT GRANTED_ROLE,ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(GRANTED_ROLE) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(GRANTED_ROLE) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
         </roles>
+        <statements>
+            <inband query="SELECT SQL_TEXT FROM V$SQL"/>
+            <blind query="SELECT SQL_TEXT FROM (SELECT SQL_TEXT,ROWNUM AS LIMIT FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%') WHERE LIMIT=%d" count="SELECT COUNT(SQL_TEXT) FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%'"/>
+        </statements>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)"/>
@@ -332,6 +348,7 @@
         <passwords/>
         <privileges/>
         <roles/>
+        <statements/>
         <dbs/>
         <tables>
             <inband query="SELECT tbl_name FROM sqlite_master WHERE type='table'"/>
@@ -392,6 +409,7 @@
         <users/>
         <privileges/>
         <roles/>
+        <statements/>
         <search_db/>
         <search_table/>
         <search_column/>
@@ -435,6 +453,7 @@
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$PRIVILEGE) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'" count="SELECT COUNT(DISTINCT(RDB$PRIVILEGE)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'"/>
         </privileges>
         <roles/>
+        <statements/>
         <dbs/>
         <columns>
             <!--<inband query="SELECT r.RDB$FIELD_NAME,CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->
@@ -504,6 +523,7 @@
             <inband query="SELECT owner,role FROM domain.roles" condition="owner"/>
             <blind/>
         </roles>
+        <statements/>
         <dump_table>
             <inband query="SELECT %s FROM %%s"/>
             <blind query="SELECT MIN(%s) FROM %s WHERE CHR(%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CHR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s) AS qq"/>
@@ -549,6 +569,7 @@
             <inband query="SELECT name,srid FROM master..syslogins,master..sysloginroles" condition="name"/>
             <blind/>
         </roles>
+        <statements/>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases"/>
             <blind/>
@@ -620,6 +641,7 @@
             <blind query="SELECT tabschema||'.'||tabname||','||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS qq WHERE LIMIT=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
         </privileges>
         <roles/>
+        <statements/>
         <!-- NOTE: in DB2 schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT schemaname FROM syscat.schemata"/>
@@ -690,6 +712,7 @@
         </passwords>
         <privileges/>
         <roles/>
+        <statements/>
         <dbs>
             <blind query="SELECT LIMIT %d 1 DISTINCT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS ORDER BY table_schem" count="SELECT COUNT(table_schem) FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS"/>
             <inband query="SELECT table_schem FROM INFORMATION_SCHEMA.SYSTEM_SCHEMAS ORDER BY table_schem" />
@@ -753,6 +776,7 @@
         <passwords/>
         <privileges/>
         <roles/>
+        <statements/>
         <dbs>
             <inband query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA"/>
             <blind query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA OFFSET %d LIMIT 1" count="SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA"/>
@@ -825,6 +849,7 @@
             <blind query="SELECT USERTYPE FROM SYSUSERS WHERE USERNAME='%s'"/>
         </privileges>
         <roles/>
+        <statements/>
         <dbs>
             <inband query="SELECT NAME FROM SYSMASTER:SYSDATABASES"/>
             <blind query="SELECT SKIP %d LIMIT 1 NAME FROM SYSMASTER:SYSDATABASES ORDER BY NAME" count="SELECT COUNT(NAME) FROM SYSMASTER:SYSDATABASES"/>

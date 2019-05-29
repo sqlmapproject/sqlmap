@@ -41,3 +41,9 @@ class Enumeration(GenericEnumeration):
 
     def getCurrentDb(self):
         return HSQLDB_DEFAULT_SCHEMA
+
+    def getStatements(self):
+        warnMsg = "on HSQLDB it is not possible to enumerate the SQL statements"
+        logger.warn(warnMsg)
+
+        return []

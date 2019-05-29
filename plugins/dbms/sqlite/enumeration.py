@@ -61,3 +61,9 @@ class Enumeration(GenericEnumeration):
     def getHostname(self):
         warnMsg = "on SQLite it is not possible to enumerate the hostname"
         logger.warn(warnMsg)
+
+    def getStatements(self):
+        warnMsg = "on SQLite it is not possible to enumerate the SQL statements"
+        logger.warn(warnMsg)
+
+        return []

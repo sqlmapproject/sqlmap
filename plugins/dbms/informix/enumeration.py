@@ -30,3 +30,9 @@ class Enumeration(GenericEnumeration):
     def search(self):
         warnMsg = "on Informix search option is not available"
         logger.warn(warnMsg)
+
+    def getStatements(self):
+        warnMsg = "on Informix it is not possible to enumerate the SQL statements"
+        logger.warn(warnMsg)
+
+        return []

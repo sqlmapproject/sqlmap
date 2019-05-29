@@ -188,6 +188,9 @@ class Dump(object):
     def users(self, users):
         self.lister("database management system users", users, content_type=CONTENT_TYPE.USERS)
 
+    def statements(self, statements):
+        self.lister("SQL statements", statements, content_type=CONTENT_TYPE.STATEMENTS)
+
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
 

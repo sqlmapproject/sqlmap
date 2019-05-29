@@ -44,6 +44,7 @@ from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
+from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.request import inject
 from lib.techniques.union.use import unionUse
 from lib.utils.brute import columnExists
@@ -62,6 +63,7 @@ class Databases:
         kb.data.cachedColumns = {}
         kb.data.cachedCounts = {}
         kb.data.dumpedTable = {}
+        kb.data.cachedStatements = []
 
     def getCurrentDb(self):
         infoMsg = "fetching current database"
@@ -142,9 +144,10 @@ class Databases:
                         query = rootQuery.blind.query2 % index
                     else:
                         query = rootQuery.blind.query % index
+
                     db = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
-                    if db:
+                    if not isNoneValue(db):
                         kb.data.cachedDbs.append(safeSQLIdentificatorNaming(db))
 
         if not kb.data.cachedDbs and Backend.isDbms(DBMS.MSSQL):
@@ -375,6 +378,7 @@ class Databases:
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
 
                     table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
                     if not isNoneValue(table):
                         kb.hintValue = table
                         table = safeSQLIdentificatorNaming(table, True)
@@ -761,6 +765,7 @@ class Databases:
                             while True:
                                 query = rootQuery.blind.query3 % (conf.db, unsafeSQLIdentificatorNaming(tbl), index)
                                 value = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
                                 if isNoneValue(value) or value == " ":
                                     break
                                 else:
@@ -834,8 +839,8 @@ class Databases:
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl), column)
 
                             colType = unArrayizeValue(inject.getValue(query, union=False, error=False))
-
                             key = int(colType) if hasattr(colType, "isdigit") and colType.isdigit() else colType
+
                             if Backend.isDbms(DBMS.FIREBIRD):
                                 colType = FIREBIRD_TYPES.get(key, colType)
                             elif Backend.isDbms(DBMS.INFORMIX):
@@ -960,3 +965,70 @@ class Databases:
                     self._tableGetCount(db, table)
 
         return kb.data.cachedCounts
+
+    def getStatements(self):
+        infoMsg = "fetching SQL statements"
+        logger.info(infoMsg)
+
+        rootQuery = queries[Backend.getIdentifiedDbms()].statements
+
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            query = rootQuery.inband.query
+
+            while True:
+                values = inject.getValue(query, blind=False, time=False)
+
+                if not isNoneValue(values):
+                    kb.data.cachedStatements = []
+                    for value in arrayizeValue(values):
+                        value = (unArrayizeValue(value) or "").strip()
+                        if not isNoneValue(value):
+                            kb.data.cachedStatements.append(value.strip())
+
+                elif Backend.isDbms(DBMS.PGSQL) and "current_query" not in query:
+                    query = query.replace("query", "current_query")
+                    continue
+
+                break
+
+        if not kb.data.cachedStatements and isInferenceAvailable() and not conf.direct:
+            infoMsg = "fetching number of statements"
+            logger.info(infoMsg)
+
+            query = rootQuery.blind.count
+            count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
+            if count == 0:
+                return kb.data.cachedStatements
+            elif not isNumPosStrValue(count):
+                errMsg = "unable to retrieve the number of statements"
+                raise SqlmapNoneDataException(errMsg)
+
+            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+            indexRange = getLimitRange(count, plusOne=plusOne)
+
+            for index in indexRange:
+                value = None
+
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):  # case with multiple processes
+                    query = rootQuery.blind.query3 % index
+                    identifier = unArrayizeValue(inject.getValue(query, union=False, error=False, expected=EXPECTED.INT))
+
+                    if not isNoneValue(identifier):
+                        query = rootQuery.blind.query2 % identifier
+                        value = unArrayizeValue(inject.getValue(query, union=False, error=False, expected=EXPECTED.INT))
+
+                if isNoneValue(value):
+                    query = rootQuery.blind.query % index
+                    value = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                if not isNoneValue(value):
+                    kb.data.cachedStatements.append(value)
+
+        if not kb.data.cachedStatements:
+            errMsg = "unable to retrieve the statements"
+            logger.error(errMsg)
+        else:
+            kb.data.cachedStatements = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedStatements]
+
+        return kb.data.cachedStatements

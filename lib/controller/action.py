@@ -72,6 +72,9 @@ def action():
     if conf.getUsers:
         conf.dumper.users(conf.dbmsHandler.getUsers())
 
+    if conf.getStatements:
+        conf.dumper.statements(conf.dbmsHandler.getStatements())
+
     if conf.getPasswordHashes:
         try:
             conf.dumper.userSettings("database management system users password hashes", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
