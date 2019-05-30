@@ -2328,22 +2328,21 @@ def initCommonOutputs():
     kb.commonOutputs = {}
     key = None
 
-    with openFile(paths.COMMON_OUTPUTS, 'r') as f:
-        for line in f:
-            if line.find('#') != -1:
-                line = line[:line.find('#')]
+    for line in openFile(paths.COMMON_OUTPUTS, 'r'):
+        if line.find('#') != -1:
+            line = line[:line.find('#')]
 
-            line = line.strip()
+        line = line.strip()
 
-            if len(line) > 1:
-                if line.startswith('[') and line.endswith(']'):
-                    key = line[1:-1]
-                elif key:
-                    if key not in kb.commonOutputs:
-                        kb.commonOutputs[key] = set()
+        if len(line) > 1:
+            if line.startswith('[') and line.endswith(']'):
+                key = line[1:-1]
+            elif key:
+                if key not in kb.commonOutputs:
+                    kb.commonOutputs[key] = set()
 
-                    if line not in kb.commonOutputs[key]:
-                        kb.commonOutputs[key].add(line)
+                if line not in kb.commonOutputs[key]:
+                    kb.commonOutputs[key].add(line)
 
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
@@ -3921,7 +3920,7 @@ def normalizeUnicode(value, charset=string.printable[:string.printable.find(' ')
 
     # Reference: http://www.peterbe.com/plog/unicode-to-ascii
 
-    >>> normalizeUnicode(u'\u0161u\u0107uraj') == u'sucuraj'
+    >>> normalizeUnicode(u'\\u0161u\\u0107uraj') == u'sucuraj'
     True
     >>> normalizeUnicode(getUnicode(decodeHex("666f6f00626172"))) == u'foobar'
     True
@@ -4096,7 +4095,7 @@ def expandMnemonics(mnemonics, parser, args):
                 debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
                 logger.debug(debugMsg)
             else:
-                found = sorted(options.keys(), key=lambda x: len(x))[0]
+                found = sorted(options.keys(), key=len)[0]
                 warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (name, ", ".join("'%s'" % key for key in options))
                 warnMsg += "Resolved to shortest of those ('%s')" % found
                 logger.warn(warnMsg)
@@ -5043,7 +5042,6 @@ def parseRequestFile(reqFile, checkParams=True):
 def getSafeExString(ex, encoding=None):
     """
     Safe way how to get the proper exception represtation as a string
-    (Note: errors to be avoided: 1) "%s" % Exception(u'\u0161') and 2) "%s" % str(Exception(u'\u0161'))
 
     >>> getSafeExString(SqlmapBaseException('foobar')) == 'foobar'
     True

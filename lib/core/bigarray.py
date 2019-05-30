@@ -53,7 +53,7 @@ class BigArray(list):
     List-like class used for storing large amounts of data (disk cached)
     """
 
-    def __init__(self, items=[]):
+    def __init__(self, items=None):
         self.chunks = [[]]
         self.chunk_length = sys.maxsize
         self.cache = None
@@ -61,7 +61,7 @@ class BigArray(list):
         self._os_remove = os.remove
         self._size_counter = 0
 
-        for item in items:
+        for item in (items or []):
             self.append(item)
 
     def append(self, value):
@@ -138,12 +138,6 @@ class BigArray(list):
     def __setstate__(self, state):
         self.__init__()
         self.chunks, self.filenames = state
-
-    def __getslice__(self, i, j):
-        i = max(0, len(self) + i if i < 0 else i)
-        j = min(len(self), len(self) + j if j < 0 else j)
-
-        return BigArray(self[_] for _ in xrange(i, j))
 
     def __getitem__(self, y):
         if y < 0:

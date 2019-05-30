@@ -468,8 +468,7 @@ class Dump(object):
                                 shutil.copyfile(dumpFileName, candidate)
                             except IOError:
                                 pass
-                            finally:
-                                break
+                            break
                         else:
                             count += 1
 

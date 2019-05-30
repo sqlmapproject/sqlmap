@@ -561,7 +561,7 @@ def checkSqlInjection(place, parameter, value):
                                         candidates = trueSet - falseSet - errorSet
 
                                         if candidates:
-                                            candidates = sorted(candidates, key=lambda _: len(_))
+                                            candidates = sorted(candidates, key=len)
                                             for candidate in candidates:
                                                 if re.match(r"\A[\w.,! ]+\Z", candidate) and ' ' in candidate and candidate.strip() and len(candidate) > CANDIDATE_SENTENCE_MIN_LENGTH:
                                                     conf.string = candidate
@@ -595,7 +595,7 @@ def checkSqlInjection(place, parameter, value):
                                         candidates = filterNone(_.strip() if _.strip() in trueRawResponse and _.strip() not in falseRawResponse else None for _ in (trueSet - falseSet - errorSet))
 
                                         if candidates:
-                                            candidates = sorted(candidates, key=lambda _: len(_))
+                                            candidates = sorted(candidates, key=len)
                                             for candidate in candidates:
                                                 if re.match(r"\A\w+\Z", candidate):
                                                     break
@@ -609,7 +609,7 @@ def checkSqlInjection(place, parameter, value):
                                             candidates = filterNone(_.strip() if _.strip() in falseRawResponse and _.strip() not in trueRawResponse else None for _ in (falseSet - trueSet))
 
                                             if candidates:
-                                                candidates = sorted(candidates, key=lambda _: len(_))
+                                                candidates = sorted(candidates, key=len)
                                                 for candidate in candidates:
                                                     if re.match(r"\A\w+\Z", candidate):
                                                         break

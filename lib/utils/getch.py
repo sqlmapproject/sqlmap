@@ -57,10 +57,10 @@ class _GetchMacCarbon(object):
     """
     def __init__(self):
         import Carbon
-        Carbon.Evt  # see if it has this (in Unix, it doesn't)
+
+        _ = Carbon.Evt  # see if it has this (in Unix, it doesn't)
 
     def __call__(self):
-        import Carbon
         if Carbon.Evt.EventAvail(0x0008)[0] == 0:  # 0x0008 is the keyDownMask
             return ''
         else:

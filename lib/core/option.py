@@ -838,6 +838,7 @@ def _setPreprocessFunctions():
     if conf.preprocess:
         for script in re.split(PARAMETER_SPLITTING_REGEX, conf.preprocess):
             found = False
+            function = None
 
             script = safeFilepathEncode(script.strip())
 

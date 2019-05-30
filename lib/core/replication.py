@@ -79,9 +79,9 @@ class Replication(object):
                 errMsg = "wrong number of columns used in replicating insert"
                 raise SqlmapValueException(errMsg)
 
-        def execute(self, sql, parameters=[]):
+        def execute(self, sql, parameters=None):
             try:
-                self.parent.cursor.execute(sql, parameters)
+                self.parent.cursor.execute(sql, parameters or [])
             except sqlite3.OperationalError as ex:
                 errMsg = "problem occurred ('%s') while accessing sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
