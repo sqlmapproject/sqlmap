@@ -1161,7 +1161,7 @@ def dictionaryAttack(attack_dict):
                             warnMsg += "not supported on this platform"
                             singleTimeWarnMessage(warnMsg)
 
-                            class Value():
+                            class Value(object):
                                 pass
 
                             retVal = _queue.Queue()
