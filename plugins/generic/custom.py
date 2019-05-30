@@ -54,11 +54,11 @@ class Custom(object):
 
                 return output
             elif not isStackingAvailable() and not conf.direct:
-                    warnMsg = "execution of non-query SQL statements is only "
-                    warnMsg += "available when stacked queries are supported"
-                    logger.warn(warnMsg)
+                warnMsg = "execution of non-query SQL statements is only "
+                warnMsg += "available when stacked queries are supported"
+                logger.warn(warnMsg)
 
-                    return None
+                return None
             else:
                 if sqlType:
                     debugMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)

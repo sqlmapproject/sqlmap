@@ -18,7 +18,7 @@ class Enumeration(GenericEnumeration):
         warnMsg = "on SQLite it is not possible to get name of the current database"
         logger.warn(warnMsg)
 
-    def isDba(self):
+    def isDba(self, *args, **kwargs):
         warnMsg = "on SQLite the current user has all privileges"
         logger.warn(warnMsg)
 
@@ -36,7 +36,7 @@ class Enumeration(GenericEnumeration):
 
         return {}
 
-    def getPrivileges(self, *args):
+    def getPrivileges(self, *args, **kwargs):
         warnMsg = "on SQLite it is not possible to enumerate the user privileges"
         logger.warn(warnMsg)
 

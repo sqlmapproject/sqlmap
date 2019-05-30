@@ -54,7 +54,7 @@ def tamper(payload, **kwargs):
     retVal = ""
 
     if payload:
-        payload = re.sub(r"(?<=\W)(?P<word>[A-Za-z_]+)(?=\W|\Z)", lambda match: process(match), payload)
+        payload = re.sub(r"(?<=\W)(?P<word>[A-Za-z_]+)(?=\W|\Z)", process, payload)
 
         for i in xrange(len(payload)):
             if payload[i].isspace():

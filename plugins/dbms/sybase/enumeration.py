@@ -53,7 +53,7 @@ class Enumeration(GenericEnumeration):
 
         return kb.data.cachedUsers
 
-    def getPrivileges(self, *args):
+    def getPrivileges(self, *args, **kwargs):
         warnMsg = "on Sybase it is not possible to fetch "
         warnMsg += "database users privileges, sqlmap will check whether "
         warnMsg += "or not the database users are database administrators"
