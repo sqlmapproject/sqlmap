@@ -7,6 +7,8 @@ See the file 'LICENSE' for copying permission
 
 import re
 
+from lib.core.convert import getBytes
+from lib.core.data import conf
 from lib.core.exception import SqlmapUndefinedMethod
 
 class Syntax(object):
@@ -23,9 +25,14 @@ class Syntax(object):
 
         if quote:
             for item in re.findall(r"'[^']*'+", expression):
-                _ = item[1:-1]
-                if _:
-                    retVal = retVal.replace(item, escaper(_))
+                original = item[1:-1]
+                if original:
+                    replacement = escaper(original) if not conf.noEscape else original
+
+                    if replacement != original:
+                        retVal = retVal.replace(item, replacement)
+                    elif len(original) != len(getBytes(original)) and "n'%s'" % original not in retVal:
+                        retVal = retVal.replace("'%s'" % original, "n'%s'" % original)
         else:
             retVal = escaper(expression)
 

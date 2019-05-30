@@ -12,9 +12,6 @@ from lib.core.settings import EXCLUDE_UNESCAPE
 
 class Unescaper(AttribDict):
     def escape(self, expression, quote=True, dbms=None):
-        if conf.noEscape:
-            return expression
-
         if expression is None:
             return expression
 
