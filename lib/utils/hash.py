@@ -637,6 +637,7 @@ def attackDumpedTable():
         col_passwords = set()
         attack_dict = {}
         binary_fields = OrderedSet()
+        replacements = {}
 
         for column in sorted(columns, key=len, reverse=True):
             if column and column.lower() in COMMON_USER_COLUMNS:
@@ -668,7 +669,9 @@ def attackDumpedTable():
                 value = table[column]["values"][i]
 
                 if column in binary_fields and re.search(HASH_BINARY_COLUMNS_REGEX, column) is not None:
+                    previous = value
                     value = encodeHex(getBytes(value), binary=False)
+                    replacements[value] = previous
 
                 if hashRecognition(value):
                     found = True
@@ -703,7 +706,8 @@ def attackDumpedTable():
 
             for (_, hash_, password) in results:
                 if hash_:
-                    lut[hash_.lower()] = password
+                    key = hash_ if hash_ not in replacements else replacements[hash_]
+                    lut[key.lower()] = password
 
             debugMsg = "post-processing table dump"
             logger.debug(debugMsg)

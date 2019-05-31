@@ -16,6 +16,7 @@ import lib.request.connect
 import lib.utils.search
 import lib.utils.sqlalchemy
 import thirdparty.ansistrm.ansistrm
+import thirdparty.chardet.universaldetector
 
 from lib.request.templates import getPageTemplate
 
@@ -53,6 +54,9 @@ def dirtyPatches():
 
         _http_client.LineAndFileWrapper._readline = _http_client.LineAndFileWrapper.readline
         _http_client.LineAndFileWrapper.readline = _
+
+    # to prevent too much "guessing" in case of binary data retrieval
+    thirdparty.chardet.universaldetector.MINIMUM_THRESHOLD = 0.90
 
 def resolveCrossReferences():
     """
