@@ -2640,7 +2640,7 @@ def extractErrorMessage(page):
     """
     Returns reported error message from page if it founds one
 
-    >>> extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>') 
+    >>> getText(extractErrorMessage(u'<html><title>Test</title>\\n<b>Warning</b>: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated<br><p>Only a test page</p></html>') )
     'oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated'
     >>> extractErrorMessage('Warning: This is only a dummy foobar test') is None
     True
