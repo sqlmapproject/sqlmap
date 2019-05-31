@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.5.157"
+VERSION = "1.3.5.158"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -638,6 +638,9 @@ SLOW_ORDER_COUNT_THRESHOLD = 10000
 
 # Give up on hash recognition if nothing was found in first given number of rows
 HASH_RECOGNITION_QUIT_THRESHOLD = 10000
+
+# Regular expression used for automatic hex conversion and hash cracking of (RAW) binary column values
+HASH_BINARY_COLUMNS_REGEX = r"(?i)pass|psw|hash"
 
 # Maximum number of redirections to any single URL - this is needed because of the state that cookies introduce
 MAX_SINGLE_URL_REDIRECTIONS = 4
