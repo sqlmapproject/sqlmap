@@ -668,7 +668,7 @@ def attackDumpedTable():
                 value = table[column]["values"][i]
 
                 if column in binary_fields and re.search(HASH_BINARY_COLUMNS_REGEX, column) is not None:
-                    value = encodeHex(value, binary=False)
+                    value = encodeHex(getBytes(value), binary=False)
 
                 if hashRecognition(value):
                     found = True
