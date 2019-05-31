@@ -708,7 +708,7 @@ class Connect(object):
                 warnMsg = "connection reset to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
                 warnMsg = "unable to connect to the target URL"
-                match = re.search(r"Errno \d+\] ([^>]+)", tbMsg)
+                match = re.search(r"Errno \d+\] ([^>\n]+)", tbMsg)
                 if match:
                     warnMsg += " ('%s')" % match.group(1).strip()
             elif "NTLM" in tbMsg:
