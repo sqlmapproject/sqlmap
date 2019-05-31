@@ -7,8 +7,6 @@ See the file 'LICENSE' for copying permission
 
 import numbers
 
-from lib.core.compat import cmp
-
 class xrange(object):
     """
     Advanced (re)implementation of xrange (supports slice/copy/etc.)

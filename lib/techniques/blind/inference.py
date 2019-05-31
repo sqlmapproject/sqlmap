@@ -279,7 +279,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     return None
 
             maxChar = maxValue = charTbl[-1]
-            minChar = minValue = charTbl[0]
+            minValue = charTbl[0]
             firstCheck = False
             lastCheck = False
             unexpectedCode = False
