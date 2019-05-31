@@ -651,7 +651,7 @@ def attackDumpedTable():
 
         if binary_fields:
             _ = ','.join(binary_fields)
-            warnMsg = "potential binary fields detected ('%s'). You are " % _
+            warnMsg = "potential binary fields detected ('%s'). In case of any problems you are " % _
             warnMsg += "advised to rerun table dump with '--fresh-queries --binary-fields=\"%s\"'" % _
             logger.warn(warnMsg)
 
