@@ -317,7 +317,7 @@ class Databases(object):
                                     logger.info(infoMsg)
                             else:
                                 warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                warnMsg += "possible to get column comments"
+                                warnMsg += "possible to get table comments"
                                 singleTimeWarnMessage(warnMsg)
 
                         if db not in kb.data.cachedTables:
@@ -399,7 +399,7 @@ class Databases(object):
                                     logger.info(infoMsg)
                             else:
                                 warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                warnMsg += "possible to get column comments"
+                                warnMsg += "possible to get table comments"
                                 singleTimeWarnMessage(warnMsg)
 
                 if tables:
