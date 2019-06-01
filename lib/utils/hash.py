@@ -645,8 +645,8 @@ def attackDumpedTable():
                 break
 
         for column in columns:
-            if column != "__infos__":
-                if all(INVALID_UNICODE_CHAR_FORMAT.split('%')[0] in value for value in table[column]["values"]):
+            if column != "__infos__" and table[column]["values"]:
+                if all(INVALID_UNICODE_CHAR_FORMAT.split('%')[0] in (value or "") for value in table[column]["values"]):
                     binary_fields.add(column)
 
         if binary_fields:
