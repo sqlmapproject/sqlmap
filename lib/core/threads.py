@@ -50,14 +50,14 @@ class _ThreadData(threading.local):
         self.lastComparisonHeaders = None
         self.lastComparisonCode = None
         self.lastComparisonRatio = None
-        self.lastErrorPage = None
+        self.lastErrorPage = tuple()
         self.lastHTTPError = None
         self.lastRedirectMsg = None
         self.lastQueryDuration = 0
         self.lastPage = None
         self.lastRequestMsg = None
         self.lastRequestUID = 0
-        self.lastRedirectURL = None
+        self.lastRedirectURL = tuple()
         self.random = WichmannHill()
         self.resumed = False
         self.retriesCount = 0

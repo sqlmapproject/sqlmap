@@ -1476,7 +1476,7 @@ def parseTargetDirect():
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
                     __import__("_mssql")
-                    import pymssql
+                    pymssql = __import__("pymssql")
 
                     if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
                         errMsg = "'%s' third-party library must be " % data[1]
@@ -4316,9 +4316,9 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     True
     """
 
-    class _(six.StringIO):
+    class _(six.StringIO, object):
         def __init__(self, content, url):
-            six.StringIO.__init__(self, content)
+            super(_, self).__init__(content)
             self._url = url
 
         def geturl(self):

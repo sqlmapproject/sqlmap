@@ -21,7 +21,7 @@ def checkDependencies():
             if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
                 __import__("_mssql")
 
-                import pymssql
+                pymssql = __import__("pymssql")
                 if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
                     warnMsg = "'%s' third-party library must be " % data[1]
                     warnMsg += "version >= 1.0.2 to work properly. "
