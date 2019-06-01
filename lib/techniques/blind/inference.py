@@ -24,6 +24,7 @@ from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
+from lib.core.common import readInput
 from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
@@ -163,12 +164,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         if showEta:
             progress = ProgressBar(maxValue=length)
 
-        if timeBasedCompare and conf.threads > 1 and not conf.forceThreads:
-            warnMsg = "multi-threading is considered unsafe in time-based data retrieval. Going to switch it off automatically"
-            singleTimeWarnMessage(warnMsg)
+        if timeBasedCompare and conf.threads > 1 and kb.forceThreads is None:
+            msg = "multi-threading is considered unsafe in "
+            msg += "time-based data retrieval. Are you sure "
+            msg += "of your choice (breaking warranty) [y/N] "
+
+            kb.forceThreads = readInput(msg, default='N', boolean=True)
 
         if numThreads > 1:
-            if not timeBasedCompare or conf.forceThreads:
+            if not timeBasedCompare or kb.forceThreads:
                 debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
                 logger.debug(debugMsg)
             else:

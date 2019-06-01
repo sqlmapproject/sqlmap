@@ -1875,6 +1875,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.followSitemapRecursion = None
     kb.forcedDbms = None
     kb.forcePartialUnion = False
+    kb.forceThreads = None
     kb.forceWhere = None
     kb.futileUnion = None
     kb.heavilyDynamic = False

@@ -721,9 +721,6 @@ def cmdLineParser(argv=None):
         parser.add_option("--force-pivoting", dest="forcePivoting", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--force-threads", dest="forceThreads", action="store_true",
-                          help=SUPPRESS_HELP)
-
         parser.add_option("--smoke-test", dest="smokeTest", action="store_true",
                           help=SUPPRESS_HELP)
 
