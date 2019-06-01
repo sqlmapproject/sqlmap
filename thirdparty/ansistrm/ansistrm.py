@@ -187,14 +187,19 @@ class ColorizingStreamHandler(logging.StreamHandler):
                                 string = match.group(1)
                                 message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                         else:
-                            match = re.search(r" \('(.+)'\)\Z", message)
+                            match = re.search(r"\bresumed: '(.+\.\.\.)", message)
                             if match:
                                 string = match.group(1)
-                                message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                                message = message.replace("'%s" % string, "'%s" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                             else:
-                                for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
+                                match = re.search(r" \('(.+)'\)\Z", message)
+                                if match:
                                     string = match.group(1)
                                     message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                                else:
+                                    for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
+                                        string = match.group(1)
+                                        message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                 else:
                     message = ''.join((self.csi, ';'.join(params), 'm', message, self.reset))
 
