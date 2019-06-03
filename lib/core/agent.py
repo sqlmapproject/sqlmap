@@ -265,7 +265,7 @@ class Agent(object):
 
         return query
 
-    def suffixQuery(self, expression, comment=None, suffix=None, where=None):
+    def suffixQuery(self, expression, comment=None, suffix=None, where=None, trimEmpty=True):
         """
         This method appends the DBMS comment to the
         SQL injection request
@@ -303,7 +303,7 @@ class Agent(object):
 
             expression += suffix.replace('\\', BOUNDARY_BACKSLASH_MARKER)
 
-        return re.sub(r";\W*;", ";", expression)
+        return re.sub(r";\W*;", ";", expression) if trimEmpty else expression
 
     def cleanupPayload(self, payload, origValue=None):
         if payload is None:
