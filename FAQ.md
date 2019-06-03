@@ -95,7 +95,7 @@ We already support the major and some minor databases. We do have plans to exten
 
 Please use that other tool.
 
-## Which tamper script to use to bypass a (WAF/IDS/IPS) protection?
+## Which tamper script to use to bypass a (WAF/IPS) protection?
 
 Don't use tamper scripts if you are not able to manually assess the target. Tamper scripts are used only in cases when the penetration tester knows how to bypass the protection in the first place (most probably after hours of request/response inspection). Blind usage and combination of numerous tamper scripts without the comprehension is always a bad idea.
 
@@ -158,7 +158,7 @@ Question(s):
 
 ## I am getting `[CRITICAL] connection timed` while I am able to browse the site normally?
 
-There are few IDSes that filter out all sqlmap requests based on its default `User-Agent` HTTP header (e.g. `User-agent: sqlmap/1.0-dev`). To prevent this
+There are few WAF/IPS-es that filter out all sqlmap requests based on its default `User-Agent` HTTP header (e.g. `User-agent: sqlmap/1.0-dev`). To prevent this
 kind of situations you are advised to use switch `--random-agent`.
 If you are getting those kind of messages for all targets then you most probably need to properly set up your proxy settings (switches `--proxy`
 and/or `--ignore-proxy`).
