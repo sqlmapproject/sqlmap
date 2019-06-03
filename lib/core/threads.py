@@ -77,8 +77,6 @@ def getCurrentThreadData():
     Returns current thread's local data
     """
 
-    global ThreadData
-
     return ThreadData
 
 def getCurrentThreadName():

@@ -27,8 +27,6 @@ def configFileProxy(section, option, datatype):
     advanced dictionary.
     """
 
-    global config
-
     if config.has_option(section, option):
         try:
             if datatype == OPTION_TYPE.BOOLEAN:
