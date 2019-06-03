@@ -343,7 +343,7 @@ def checkSqlInjection(place, parameter, value):
                             msg += "only basic UNION tests if there is not "
                             msg += "at least one other (potential) "
                             msg += "technique found. Do you want to reduce "
-                            msg +="the number of requests? [Y/n] "
+                            msg += "the number of requests? [Y/n] "
                             kb.futileUnion = readInput(msg, default='Y', boolean=True)
 
                         if kb.futileUnion and int(_) > 10:

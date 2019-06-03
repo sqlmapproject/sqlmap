@@ -9,10 +9,10 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
-    def readFile(self, rFile):
+    def readFile(self, remoteFile):
         errMsg = "on Firebird it is not possible to read files"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
-    def writeFile(self, wFile, dFile, fileType=None, forceCheck=False):
+    def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
         errMsg = "on Firebird it is not possible to write files"
         raise SqlmapUnsupportedFeatureException(errMsg)

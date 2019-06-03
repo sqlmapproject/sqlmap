@@ -203,12 +203,12 @@ class Filesystem(object):
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod(errMsg)
 
-    def readFile(self, remoteFiles):
+    def readFile(self, remoteFile):
         localFilePaths = []
 
         self.checkDbmsOs()
 
-        for remoteFile in remoteFiles.split(','):
+        for remoteFile in remoteFile.split(','):
             fileContent = None
             kb.fileReadMode = True
 
