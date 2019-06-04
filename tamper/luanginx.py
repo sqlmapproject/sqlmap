@@ -5,8 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import string
 import random
+import string
 
 from lib.core.compat import xrange
 from lib.core.enums import HINT

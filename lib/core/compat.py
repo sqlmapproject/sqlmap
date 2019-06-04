@@ -12,8 +12,8 @@ import functools
 import math
 import os
 import random
-import uuid
 import sys
+import uuid
 
 class WichmannHill(random.Random):
     """

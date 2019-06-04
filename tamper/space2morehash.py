@@ -6,8 +6,8 @@ See the file 'LICENSE' for copying permission
 """
 
 import os
-import re
 import random
+import re
 import string
 
 from lib.core.common import singleTimeWarnMessage

@@ -54,15 +54,15 @@ try:
     from lib.core.data import cmdLineOptions
     from lib.core.data import conf
     from lib.core.data import kb
-    from lib.core.common import unhandledExceptionMessage
     from lib.core.common import MKSTEMP_PREFIX
     from lib.core.common import setColor
+    from lib.core.common import unhandledExceptionMessage
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
     from lib.core.exception import SqlmapSilentQuitException
     from lib.core.exception import SqlmapUserQuitException
-    from lib.core.option import initOptions
     from lib.core.option import init
+    from lib.core.option import initOptions
     from lib.core.patch import dirtyPatches
     from lib.core.patch import resolveCrossReferences
     from lib.core.settings import GIT_PAGE

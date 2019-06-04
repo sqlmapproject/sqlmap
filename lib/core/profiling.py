@@ -6,8 +6,8 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
-import os
 import cProfile
+import os
 
 from lib.core.common import getSafeExString
 from lib.core.data import logger
