@@ -158,6 +158,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
             if params and message:
                 match = re.search(r"\A(\s+)", message)
                 prefix = match.group(1) if match else ""
+                message = message[len(prefix):]
 
                 match = re.search(r"\[([A-Z ]+)\]", message)  # log level
                 if match:
