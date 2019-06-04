@@ -44,14 +44,16 @@ def _search(dork):
     if not dork:
         return None
 
+    page = None
     data = None
-    headers = {}
+    requestHeaders = {}
+    responseHeaders = {}
 
-    headers[HTTP_HEADER.USER_AGENT] = dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT)
-    headers[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
+    requestHeaders[HTTP_HEADER.USER_AGENT] = dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT)
+    requestHeaders[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
 
     try:
-        req = _urllib.request.Request("https://www.google.com/ncr", headers=headers)
+        req = _urllib.request.Request("https://www.google.com/ncr", headers=requestHeaders)
         conn = _urllib.request.urlopen(req)
     except Exception as ex:
         errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
@@ -66,7 +68,7 @@ def _search(dork):
     url += "&start=%d" % ((gpage - 1) * 100)
 
     try:
-        req = _urllib.request.Request(url, headers=headers)
+        req = _urllib.request.Request(url, headers=requestHeaders)
         conn = _urllib.request.urlopen(req)
 
         requestMsg = "HTTP request:\nGET %s" % url
@@ -77,7 +79,6 @@ def _search(dork):
         code = conn.code
         status = conn.msg
         responseHeaders = conn.info()
-        page = decodePage(page, responseHeaders.get("Content-Encoding"), responseHeaders.get("Content-Type"))
 
         responseMsg = "HTTP response (%s - %d):\n" % (status, code)
 
@@ -90,6 +91,7 @@ def _search(dork):
     except _urllib.error.HTTPError as ex:
         try:
             page = ex.read()
+            responseHeaders = ex.info()
         except Exception as _:
             warnMsg = "problem occurred while trying to get "
             warnMsg += "an error page information (%s)" % getSafeExString(_)
@@ -98,6 +100,8 @@ def _search(dork):
     except (_urllib.error.URLError, _http_client.error, socket.error, socket.timeout, socks.ProxyError):
         errMsg = "unable to connect to Google"
         raise SqlmapConnectionException(errMsg)
+
+    page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
 
     retVal = [_urllib.parse.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
 
