@@ -21,8 +21,8 @@ from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getCounter
-from lib.core.common import goGoodSamaritan
 from lib.core.common import getPartRun
+from lib.core.common import goGoodSamaritan
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
@@ -39,11 +39,11 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
-from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_EQUALS_CHAR
+from lib.core.settings import INFERENCE_GREATER_CHAR
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
+from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import MAX_BISECTION_LENGTH
 from lib.core.settings import MAX_REVALIDATION_STEPS
 from lib.core.settings import NULL

@@ -14,8 +14,8 @@ import time
 import zipfile
 
 from lib.core.common import dataToStdout
-from lib.core.common import getSafeExString
 from lib.core.common import getLatestRevision
+from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.common import pollProcess
 from lib.core.common import readInput

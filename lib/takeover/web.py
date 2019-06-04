@@ -20,10 +20,10 @@ from lib.core.common import getAutoDirectories
 from lib.core.common import getManualDirectories
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
-from lib.core.common import ntToPosixSlashes
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
+from lib.core.common import ntToPosixSlashes
 from lib.core.common import openFile
 from lib.core.common import parseFilePaths
 from lib.core.common import posixToNtSlashes

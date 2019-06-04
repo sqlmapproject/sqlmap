@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.6.11"
+VERSION = "1.3.6.12"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -46,10 +46,10 @@ DIFF_TOLERANCE = 0.05
 CONSTANT_RATIO = 0.9
 
 # Ratio used in heuristic check for WAF/IPS protected targets
-IDS_WAF_CHECK_RATIO = 0.5
+IPS_WAF_CHECK_RATIO = 0.5
 
 # Timeout used in heuristic check for WAF/IPS protected targets
-IDS_WAF_CHECK_TIMEOUT = 10
+IPS_WAF_CHECK_TIMEOUT = 10
 
 # Lower and upper values for match ratio in case of stable page
 LOWER_RATIO_BOUND = 0.02

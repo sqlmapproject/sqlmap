@@ -26,8 +26,6 @@ from lib.core.common import boldifyMessage
 from lib.core.common import checkFile
 from lib.core.common import dataToStdout
 from lib.core.common import decodeStringEscape
-from lib.core.common import getPublicTypeMembers
-from lib.core.common import getSafeExString
 from lib.core.common import fetchRandomAgent
 from lib.core.common import filterNone
 from lib.core.common import findLocalPort
@@ -35,6 +33,8 @@ from lib.core.common import findPageForms
 from lib.core.common import getConsoleWidth
 from lib.core.common import getFileItems
 from lib.core.common import getFileType
+from lib.core.common import getPublicTypeMembers
+from lib.core.common import getSafeExString
 from lib.core.common import intersect
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
@@ -134,19 +134,19 @@ from lib.parse.payloads import loadBoundaries
 from lib.parse.payloads import loadPayloads
 from lib.parse.sitemap import parseSitemap
 from lib.request.basic import checkCharEncoding
-from lib.request.connect import Connect as Request
-from lib.request.dns import DNSServer
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.chunkedhandler import ChunkedHandler
+from lib.request.connect import Connect as Request
+from lib.request.dns import DNSServer
 from lib.request.httpshandler import HTTPSHandler
 from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
-from lib.utils.har import HTTPCollectorFactory
 from lib.utils.crawler import crawl
 from lib.utils.deps import checkDependencies
-from lib.utils.search import search
+from lib.utils.har import HTTPCollectorFactory
 from lib.utils.purge import purge
+from lib.utils.search import search
 from thirdparty import six
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost

@@ -5,8 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-from plugins.generic.syntax import Syntax as GenericSyntax
 from lib.core.convert import getOrds
+from plugins.generic.syntax import Syntax as GenericSyntax
 
 class Syntax(GenericSyntax):
     @staticmethod

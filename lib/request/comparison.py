@@ -23,11 +23,11 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import HTML_TITLE_REGEX
-from lib.core.settings import MIN_RATIO
+from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import MAX_RATIO
+from lib.core.settings import MIN_RATIO
 from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import LOWER_RATIO_BOUND
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData

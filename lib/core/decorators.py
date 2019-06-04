@@ -9,9 +9,9 @@ import functools
 import hashlib
 import threading
 
+from lib.core.datatype import LRUDict
 from lib.core.settings import MAX_CACHE_ITEMS
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.datatype import LRUDict
 from lib.core.threads import getCurrentThreadData
 
 _lock = threading.Lock()

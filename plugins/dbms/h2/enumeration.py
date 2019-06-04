@@ -5,15 +5,15 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-from plugins.generic.enumeration import Enumeration as GenericEnumeration
+from lib.core.common import unArrayizeValue
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.common import unArrayizeValue
 from lib.core.enums import DBMS
 from lib.core.settings import H2_DEFAULT_SCHEMA
 from lib.request import inject
+from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getBanner(self):

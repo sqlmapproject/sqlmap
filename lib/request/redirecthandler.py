@@ -9,14 +9,14 @@ import io
 import time
 import types
 
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
 from lib.core.common import getHostHeader
 from lib.core.common import getSafeExString
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
 from lib.core.convert import getUnicode
+from lib.core.data import conf
+from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD

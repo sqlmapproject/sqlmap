@@ -9,18 +9,18 @@ from __future__ import division
 
 import time
 
+from lib.core.common import Backend
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import filterListValue
 from lib.core.common import getFileItems
-from lib.core.common import Backend
 from lib.core.common import getPageWordSet
 from lib.core.common import hashDBWrite
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
-from lib.core.common import safeStringFormat
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import safeStringFormat
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb

@@ -21,7 +21,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import firstNotNone
 from lib.core.common import flattenValue
-from lib.core.common import safeStringFormat
 from lib.core.common import getConsoleWidth
 from lib.core.common import getPartRun
 from lib.core.common import hashDBRetrieve
@@ -34,6 +33,7 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
+from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue

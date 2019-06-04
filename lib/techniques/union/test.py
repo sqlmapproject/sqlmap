@@ -32,14 +32,14 @@ from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import PAYLOAD
 from lib.core.settings import LIMITED_ROWS_TEST_NUMBER
-from lib.core.settings import UNION_MIN_RESPONSE_CHARS
-from lib.core.settings import UNION_STDEV_COEFF
-from lib.core.settings import MIN_RATIO
 from lib.core.settings import MAX_RATIO
+from lib.core.settings import MIN_RATIO
 from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
 from lib.core.settings import NULL
 from lib.core.settings import ORDER_BY_STEP
+from lib.core.settings import UNION_MIN_RESPONSE_CHARS
+from lib.core.settings import UNION_STDEV_COEFF
 from lib.core.unescaper import unescaper
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request

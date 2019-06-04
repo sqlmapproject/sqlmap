@@ -63,9 +63,9 @@ from lib.core.common import readInput
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.compat import xrange
-from lib.core.convert import encodeHex
 from lib.core.convert import decodeBase64
 from lib.core.convert import decodeHex
+from lib.core.convert import encodeHex
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
@@ -90,13 +90,13 @@ from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import IS_WIN
 from lib.core.settings import ITOA64
 from lib.core.settings import NULL
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import ROTATING_CHARS
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.wordlist import Wordlist
 from thirdparty import six
 from thirdparty.colorama.initialise import init as coloramainit
-from thirdparty.pydes.pyDes import des
 from thirdparty.pydes.pyDes import CBC
+from thirdparty.pydes.pyDes import des
 from thirdparty.six.moves import queue as _queue
 
 def mysql_passwd(password, uppercase=True):

@@ -12,14 +12,14 @@ import re
 import time
 
 from lib.controller.action import action
-from lib.controller.checks import checkSqlInjection
-from lib.controller.checks import checkDynParam
-from lib.controller.checks import checkStability
-from lib.controller.checks import checkString
-from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkConnection
+from lib.controller.checks import checkDynParam
 from lib.controller.checks import checkInternet
 from lib.controller.checks import checkNullConnection
+from lib.controller.checks import checkRegexp
+from lib.controller.checks import checkSqlInjection
+from lib.controller.checks import checkStability
+from lib.controller.checks import checkString
 from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
 from lib.core.agent import agent
@@ -40,8 +40,8 @@ from lib.core.common import readInput
 from lib.core.common import removePostHintPrefix
 from lib.core.common import safeCSValue
 from lib.core.common import showHttpErrorCodes
-from lib.core.common import urlencode
 from lib.core.common import urldecode
+from lib.core.common import urlencode
 from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
@@ -61,16 +61,16 @@ from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSkipTargetException
 from lib.core.exception import SqlmapSystemException
-from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
 from lib.core.settings import CSRF_TOKEN_PARAMETER_INFIXES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
-from lib.core.settings import IGNORE_PARAMETERS
-from lib.core.settings import LOW_TEXT_PERCENT
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
 from lib.core.settings import HOST_ALIASES
+from lib.core.settings import IGNORE_PARAMETERS
+from lib.core.settings import LOW_TEXT_PERCENT
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.target import initTargetEnv

@@ -13,6 +13,7 @@ import shutil
 import tempfile
 import threading
 
+from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
@@ -39,8 +40,8 @@ from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import DUMP_FORMAT
 from lib.core.exception import SqlmapGenericException
-from lib.core.exception import SqlmapValueException
 from lib.core.exception import SqlmapSystemException
+from lib.core.exception import SqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import DUMP_FILE_BUFFER_SIZE
 from lib.core.settings import HTML_DUMP_CSS_STYLE
@@ -54,8 +55,6 @@ from lib.core.settings import VERSION_STRING
 from lib.core.settings import WINDOWS_RESERVED_NAMES
 from thirdparty import six
 from thirdparty.magic import magic
-
-from extra.safe2bin.safe2bin import safechardecode
 
 class Dump(object):
     """

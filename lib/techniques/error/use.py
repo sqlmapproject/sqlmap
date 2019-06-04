@@ -45,8 +45,8 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTP_HEADER
 from lib.core.exception import SqlmapDataException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
-from lib.core.settings import MIN_ERROR_CHUNK_LENGTH
 from lib.core.settings import MAX_ERROR_CHUNK_LENGTH
+from lib.core.settings import MIN_ERROR_CHUNK_LENGTH
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import ROTATING_CHARS

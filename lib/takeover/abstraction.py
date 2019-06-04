@@ -10,8 +10,8 @@ from __future__ import print_function
 import sys
 
 from extra.safe2bin.safe2bin import safechardecode
-from lib.core.common import dataToStdout
 from lib.core.common import Backend
+from lib.core.common import dataToStdout
 from lib.core.common import getSQLSnippet
 from lib.core.common import isStackingAvailable
 from lib.core.common import readInput

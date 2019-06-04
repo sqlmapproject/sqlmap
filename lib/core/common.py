@@ -73,8 +73,8 @@ from lib.core.dicts import DEFAULT_DOC_ROOTS
 from lib.core.dicts import OBSOLETE_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
-from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import CHARSET_TYPE
+from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import HEURISTIC_TEST
@@ -92,9 +92,9 @@ from lib.core.enums import SORT_ORDER
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapGenericException
-from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
@@ -110,9 +110,9 @@ from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_TARGET_MARK
 from lib.core.settings import BURP_REQUEST_REGEX
 from lib.core.settings import BURP_XML_HISTORY_REGEX
-from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
 from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
+from lib.core.settings import DBMS_DIRECTORY_DICT
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA

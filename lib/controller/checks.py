@@ -78,9 +78,10 @@ from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
+from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
-from lib.core.settings import IDS_WAF_CHECK_RATIO
-from lib.core.settings import IDS_WAF_CHECK_TIMEOUT
+from lib.core.settings import IPS_WAF_CHECK_RATIO
+from lib.core.settings import IPS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
 from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
@@ -89,9 +90,8 @@ from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import UPPER_RATIO_BOUND
-from lib.core.settings import INFERENCE_EQUALS_CHAR
+from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from lib.request.connect import Connect as Request
 from lib.request.comparison import comparison
@@ -1381,10 +1381,10 @@ def checkWaf():
 
     kb.redirectChoice = REDIRECTION.YES
     kb.resendPostOnRedirect = False
-    conf.timeout = IDS_WAF_CHECK_TIMEOUT
+    conf.timeout = IPS_WAF_CHECK_TIMEOUT
 
     try:
-        retVal = (Request.queryPage(place=place, value=value, getRatioValue=True, noteResponseTime=False, silent=True, raise404=False, disableTampering=True)[1] or 0) < IDS_WAF_CHECK_RATIO
+        retVal = (Request.queryPage(place=place, value=value, getRatioValue=True, noteResponseTime=False, silent=True, raise404=False, disableTampering=True)[1] or 0) < IPS_WAF_CHECK_RATIO
     except SqlmapConnectionException:
         retVal = True
     finally:
