@@ -931,7 +931,7 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
     retVal = message
     level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
-    if message and IS_TTY or istty:  # colorizing handler
+    if message and (IS_TTY or istty) and not conf.get("disableColoring"):  # colorizing handler
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
