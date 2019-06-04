@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import division
+
 import binascii
 import codecs
 import collections
@@ -2530,7 +2532,7 @@ def pushValue(value):
     Push value to the stack (thread dependent)
     """
 
-    _ = None
+    exception = None
     success = False
 
     for i in xrange(PUSH_VALUE_EXCEPTION_RETRY_COUNT):
@@ -2539,13 +2541,13 @@ def pushValue(value):
             success = True
             break
         except Exception as ex:
-            _ = ex
+            exception = ex
 
     if not success:
         getCurrentThreadData().valueStack.append(None)
 
-        if _:
-            raise _
+        if exception:
+            raise exception
 
 def popValue():
     """
@@ -5045,6 +5047,8 @@ def getSafeExString(ex, encoding=None):
 
     >>> getSafeExString(SqlmapBaseException('foobar')) == 'foobar'
     True
+    >>> getSafeExString(OSError(0, 'foobar')) == 'OSError: foobar'
+    True
     """
 
     retVal = None
@@ -5053,10 +5057,11 @@ def getSafeExString(ex, encoding=None):
         retVal = ex.message
     elif getattr(ex, "msg", None):
         retVal = ex.msg
-    elif isinstance(ex, (list, tuple)) and len(ex) > 1 and isinstance(ex[1], six.string_types):
-        retVal = ex[1]
-    elif isinstance(ex, (list, tuple)) and len(ex) > 0 and isinstance(ex[0], six.string_types):
-        retVal = ex[0]
+    elif getattr(ex, "args", None):
+        for candidate in ex.args[::-1]:
+            if isinstance(candidate, six.string_types):
+                retVal = candidate
+                break
 
     if retVal is None:
         retVal = str(ex)

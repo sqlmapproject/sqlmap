@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import division
+
 import functools
 import glob
 import inspect
@@ -1885,7 +1887,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.heuristicMode = False
     kb.heuristicPage = False
     kb.heuristicTest = None
-    kb.hintValue = None
+    kb.hintValue = ""
     kb.htmlFp = []
     kb.httpErrorCodes = {}
     kb.inferenceMode = False

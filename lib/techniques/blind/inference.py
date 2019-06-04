@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from __future__ import division
+
 import re
 import threading
 import time
@@ -196,7 +198,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             with hintlock:
                 hintValue = kb.hintValue
 
-            if payload is not None and hintValue is not None and len(hintValue) >= idx:
+            if payload is not None and len(hintValue or "") > 0 and len(hintValue) >= idx:
                 if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
                     posValue = hintValue[idx - 1]
                 else:
@@ -213,7 +215,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     return hintValue[idx - 1]
 
             with hintlock:
-                kb.hintValue = None
+                kb.hintValue = ""
 
             return None
 
