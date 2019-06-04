@@ -83,6 +83,7 @@ from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IPS_WAF_CHECK_RATIO
 from lib.core.settings import IPS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
+from lib.core.settings import MAX_STABILITY_DELAY
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
 from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
 from lib.core.settings import SINGLE_QUOTE_MARKER
@@ -1222,8 +1223,8 @@ def checkStability():
 
     firstPage = kb.originalPage  # set inside checkConnection()
 
-    delay = 1 - (time.time() - (kb.originalPageTime or 0))
-    delay = max(0, min(1, delay))
+    delay = MAX_STABILITY_DELAY - (time.time() - (kb.originalPageTime or 0))
+    delay = max(0, min(MAX_STABILITY_DELAY, delay))
     time.sleep(delay)
 
     secondPage, _, _ = Request.queryPage(content=True, noteResponseTime=False, raise404=False)

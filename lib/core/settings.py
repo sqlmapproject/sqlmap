@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.6.15"
+VERSION = "1.3.6.16"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -647,6 +647,9 @@ MAX_SINGLE_URL_REDIRECTIONS = 4
 
 # Maximum total number of redirections (regardless of URL) - before assuming we're in a loop
 MAX_TOTAL_REDIRECTIONS = 10
+
+# Maximum (deliberate) delay used in page stability check
+MAX_STABILITY_DELAY = 0.5
 
 # Reference: http://www.tcpipguide.com/free/t_DNSLabelsNamesandSyntaxRules.htm
 MAX_DNS_LABEL = 63
