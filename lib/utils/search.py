@@ -132,7 +132,7 @@ def _search(dork):
             regex = DUCKDUCKGO_REGEX
 
         try:
-            req = _urllib.request.Request(url, data=data, headers=headers)
+            req = _urllib.request.Request(url, data=data, headers=requestHeaders)
             conn = _urllib.request.urlopen(req)
 
             requestMsg = "HTTP request:\nGET %s" % url
