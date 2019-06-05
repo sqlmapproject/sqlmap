@@ -345,7 +345,7 @@ def stdoutEncode(value):
         kb.codePage = kb.codePage or ""
 
     if isinstance(value, six.text_type):
-        encoding = kb.get("codePage") or sys.stdout.encoding or UNICODE_ENCODING
+        encoding = kb.get("codePage") or getattr(sys.stdout, "encoding", None) or UNICODE_ENCODING
 
         while True:
             try:

@@ -62,11 +62,11 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user:    'root@"/>
-            <item value="current database:    'testdb'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user: 'root@"/>
+            <item value="current database: 'testdb'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@'"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29.+clear-text password: testpass'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
@@ -106,11 +106,11 @@
         <parse>
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user:    'root@"/>
-            <item value="current database:    'testdb'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user: 'root@"/>
+            <item value="current database: 'testdb'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@'"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
@@ -150,11 +150,11 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user:    'root@"/>
-            <item value="current database:    'testdb'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user: 'root@"/>
+            <item value="current database: 'testdb'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@'"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
@@ -194,11 +194,11 @@
         <parse>
             <item value="Type: UNION query"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user:    'root@"/>
-            <item value="current database:    'testdb'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user: 'root@"/>
+            <item value="current database: 'testdb'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@'"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
@@ -220,8 +220,8 @@
         </switches>
         <parse>
             <item value="Title: MySQL &gt;= 5.0.12 AND time-based blind"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="MySQL inline queries multi-threaded enumeration - all entries">
@@ -252,11 +252,11 @@
         <parse>
             <item value="Title: MySQL inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user:    'root@"/>
-            <item value="current database:    'testdb'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user: 'root@"/>
+            <item value="current database: 'testdb'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@'"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
@@ -295,10 +295,10 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="r'current user:[^\w]+(postgres|testuser)'"/>
-            <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="current schema (equivalent to database on PostgreSQL): 'public'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+postgres'"/>
             <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4.+clear-text password: testpass'"/>
             <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
@@ -338,10 +338,10 @@
         <parse>
             <item value="Title: PostgreSQL AND error-based - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="r'current user:[^\w]+(postgres|testuser)'"/>
-            <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="current schema (equivalent to database on PostgreSQL): 'public'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+postgres'"/>
             <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
             <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
@@ -381,10 +381,10 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="r'current user:[^\w]+(postgres|testuser)'"/>
-            <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="current schema (equivalent to database on PostgreSQL): 'public'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+postgres'"/>
             <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
             <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
@@ -424,10 +424,10 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="r'current user:[^\w]+(postgres|testuser)'"/>
-            <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="current schema (equivalent to database on PostgreSQL): 'public'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+postgres'"/>
             <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
             <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
@@ -449,8 +449,8 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 AND time-based blind"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="PostgreSQL stacked queries single-threaded enumeration - all entries">
@@ -463,8 +463,8 @@
         </switches>
         <parse>
             <item value="Title: PostgreSQL &gt; 8.1 stacked queries"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="PostgreSQL inline queries multi-threaded enumeration - all entries">
@@ -495,10 +495,10 @@
         <parse>
             <item value="Title: PostgreSQL inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: PostgreSQL &gt;= 8.3.0 and &lt; 8.4.0'"/>
-            <item value="banner:    'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
+            <item value="banner: 'PostgreSQL 8.3.9 on i486-pc-linux-gnu, compiled by GCC gcc-4.3.real (Debian 4.3.2-1.1) 4.3.2"/>
             <item value="r'current user:[^\w]+(postgres|testuser)'"/>
-            <item value="current schema (equivalent to database on PostgreSQL):    'public'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="current schema (equivalent to database on PostgreSQL): 'public'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+postgres'"/>
             <item value="r'database management system users password hashes:.+postgres \[.+password hash: md5d7d880f96044b72d0bba108ace96d1e4'"/>
             <item value="r'database management system users privileges:.+postgres.+\(administrator\).+privilege: super'"/>
@@ -536,11 +536,11 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g"/>
-            <item value="current user:    'SYS'"/>
-            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'Oracle Database 10g"/>
+            <item value="current user: 'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle): 'SYS'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+clear-text password: ORACLE.+DBSNMP \[.+password hash: E066D214D5421CCC.+clear-text password: DBSNMP.+SYS \[.+password hash: 2D5A0C491B634F1B.+clear-text password: TESTPASS'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
@@ -578,11 +578,11 @@
         <parse>
             <item value="Title: Oracle AND error-based - WHERE or HAVING clause (XMLType)"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g"/>
-            <item value="current user:    'SYS'"/>
-            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'Oracle Database 10g"/>
+            <item value="current user: 'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle): 'SYS'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
@@ -621,11 +621,11 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g"/>
-            <item value="current user:    'SYS'"/>
-            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'Oracle Database 10g"/>
+            <item value="current user: 'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle): 'SYS'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
@@ -665,11 +665,11 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g"/>
-            <item value="current user:    'SYS'"/>
-            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'Oracle Database 10g"/>
+            <item value="current user: 'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle): 'SYS'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
@@ -691,8 +691,8 @@
         </switches>
         <parse>
             <item value="Title: Oracle AND time-based blind"/>
-            <item value="banner:    'Oracle Database 10g"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'Oracle Database 10g"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="Oracle inline queries multi-threaded enumeration - all entries">
@@ -722,11 +722,11 @@
         <parse>
             <item value="Title: Oracle inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: Oracle 10g'"/>
-            <item value="banner:    'Oracle Database 10g"/>
-            <item value="current user:    'SYS'"/>
-            <item value="current schema (equivalent to database on Oracle):    'SYS'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'Oracle Database 10g"/>
+            <item value="current user: 'SYS'"/>
+            <item value="current schema (equivalent to database on Oracle): 'SYS'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+ANONYMOUS.+SYS.+XDB'"/>
             <item value="r'database management system users password hashes:.+CTXSYS \[.+password hash: D1D21CA56994CAB6.+DBSNMP \[.+password hash: E066D214D5421CCC.+SYS \[.+password hash: 2D5A0C491B634F1B'"/>
             <item value="r'database management system users privileges:.+CTXSYS.+ALTER SESSION.+ SYS .+ALTER ANY EVALUATION CONTEXT'"/>
@@ -765,11 +765,11 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: IBM DB2 9.5'"/>
-            <item value="banner:    'DB2 v9.5.0.0'"/>
-            <item value="current user:    'DB2INST1'"/>
-            <item value="current database:    'TESTDB'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: 'DB2 v9.5.0.0'"/>
+            <item value="current user: 'DB2INST1'"/>
+            <item value="current database: 'TESTDB'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+DB2INST1'"/>
             <item value="r'database management system users privileges:.+DB2INST1.+privilege: DB2INST1.USERS.+privilege: SYSTOOLS.POLICY'"/>
             <item value="r'database management system users roles:.+DB2INST1.+role: DB2INST1.USERS.+role: SYSTOOLS.POLICY'"/>
@@ -808,7 +808,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
-            <item value="banner:    '2.8.17'"/>
+            <item value="banner: '2.8.17'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
@@ -841,7 +841,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
-            <item value="banner:    '2.8.17'"/>
+            <item value="banner: '2.8.17'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+user agent.+'"/>
@@ -873,7 +873,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
-            <item value="banner:    '2.8.17'"/>
+            <item value="banner: '2.8.17'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+user agent.+'"/>
@@ -907,7 +907,7 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 3'"/>
-            <item value="banner:    '3.7.13'"/>
+            <item value="banner: '3.7.13'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
@@ -940,7 +940,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 3'"/>
-            <item value="banner:    '3.7.13'"/>
+            <item value="banner: '3.7.13'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+user agent.+'"/>
@@ -972,7 +972,7 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 3'"/>
-            <item value="banner:    '3.7.13'"/>
+            <item value="banner: '3.7.13'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+user agent.+'"/>
@@ -990,7 +990,7 @@
         <parse>
             <item value="Title: SQLite &gt; 2.0 AND time-based blind (heavy query)"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 3'"/>
-            <item value="banner:    '3.7.13'"/>
+            <item value="banner: '3.7.13'"/>
         </parse>
     </case>
     <!-- NOTE: SQLite 2 driver on Debian 7 does not work
@@ -1020,7 +1020,7 @@
         <parse>
             <item value="Title: SQLite inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: SQLite 2'"/>
-            <item value="banner:    '2.8.17'"/>
+            <item value="banner: '2.8.17'"/>
             <item value="r'Database: SQLite_masterdb.+1 table.+users'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+3 columns.+surname.+TEXT'"/>
             <item value="r'Database: SQLite_masterdb.+Table: users.+5 entries.+luther.+nameisnull.+'"/>
@@ -1053,10 +1053,10 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
-            <item value="banner:    '2.5.2'"/>
-            <item value="current user:    'SYSDBA'"/>
-            <item value="r'current database:    '/'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '2.5.2'"/>
+            <item value="current user: 'SYSDBA'"/>
+            <item value="r'current database: '/'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
             <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
@@ -1092,10 +1092,10 @@
         <parse>
             <item value="Title: AND boolean-based blind - WHERE or HAVING clause"/>
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
-            <item value="banner:    '2.5.2'"/>
-            <item value="current user:    'SYSDBA'"/>
-            <item value="r'current database:    '/'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '2.5.2'"/>
+            <item value="current user: 'SYSDBA'"/>
+            <item value="r'current database: '/'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
             <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
@@ -1131,10 +1131,10 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
-            <item value="banner:    '2.5.2'"/>
-            <item value="current user:    'SYSDBA'"/>
-            <item value="r'current database:    '/'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '2.5.2'"/>
+            <item value="current user: 'SYSDBA'"/>
+            <item value="r'current database: '/'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
             <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
@@ -1170,10 +1170,10 @@
         <parse>
             <item value="Title: Generic UNION query (NULL) - 3 columns"/>
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
-            <item value="banner:    '2.5.2'"/>
-            <item value="current user:    'SYSDBA'"/>
-            <item value="r'current database:    '/'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '2.5.2'"/>
+            <item value="current user: 'SYSDBA'"/>
+            <item value="r'current database: '/'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
             <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
@@ -1195,8 +1195,8 @@
         </switches>
         <parse>
             <item value="Title: Firebird AND time-based blind (heavy query)"/>
-            <item value="banner:    '2.5.2'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '2.5.2'"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="Firebird inline queries multi-threaded enumeration - all entries">
@@ -1225,10 +1225,10 @@
         <parse>
             <item value="Title: Firebird inline queries"/>
             <item value="r'back-end DBMS: active fingerprint: Firebird 2.1 \(dialect 3\)'"/>
-            <item value="banner:    '2.5.2'"/>
-            <item value="current user:    'SYSDBA'"/>
-            <item value="r'current database:    '/'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '2.5.2'"/>
+            <item value="current user: 'SYSDBA'"/>
+            <item value="r'current database: '/'"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+PUBLIC.+SYSDBA'"/>
             <item value="r'database management system users privileges:.+PUBLIC.+privilege: SELECT.+SYSDBA.+privilege: DELETE.+privilege: UPDATE'"/>
             <item value="r'database management system users roles:.+PUBLIC.+role: SELECT.+SYSDBA.+role: DELETE.+role: UPDATE'"/>
@@ -3258,7 +3258,7 @@
             <answers value="what do you want to use for writable directory=2,please provide a comma separate list of absolute directory paths=/var/www/test"/>
         </switches>
         <parse>
-            <item value="command standard output:    'uid="/>
+            <item value="command standard output: 'uid="/>
         </parse>
     </case>
     <case name="MySQL shell via Metasploit integration - command execution">
@@ -3281,7 +3281,7 @@
             <answers value="do you want to overwrite it=Y"/>
         </switches>
         <parse>
-            <item value="command standard output:    'uid="/>
+            <item value="command standard output: 'uid="/>
         </parse>
     </case>
     <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (boolean)">
@@ -3335,8 +3335,8 @@
         </switches>
         <parse>
             <item value="Title: OR boolean-based blind - WHERE or HAVING clause"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="Page protected by custom (weak) filter">
@@ -3371,7 +3371,7 @@
             <tbl value="international"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
             <item value="r'Database: testdb.+Table: international.+3 entries.+šućuraj.+长江.+река Москва'"/>
         </parse>
     </case>
@@ -3429,8 +3429,8 @@
         <parse>
             <item value="Type: UNION query"/>
             <item value="r'Payload: id=[\d]+\.[\d]+ UNION'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <case name="Invalid logical">
@@ -3444,8 +3444,8 @@
         <parse>
             <item value="Type: UNION query"/>
             <item value="r'Payload: id=1 AND [\d]+=[\d]+ UNION'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user is DBA: True"/>
         </parse>
     </case>
     <!-- End of corner cases -->
@@ -3460,7 +3460,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="HTTP digest authentication">
@@ -3472,7 +3472,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Boolean-based predict output enumeration">
@@ -3484,7 +3484,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
@@ -3498,7 +3498,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
             <item value="r'performed 112 queries'" console_output="True"/>
         </parse>
     </case>
@@ -3511,7 +3511,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
             <item value="r'performed 126 queries'" console_output="True"/>
         </parse>
     </case>
@@ -3544,11 +3544,11 @@
         <parse>
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
             <item value="r'back-end DBMS: active fingerprint: MySQL &gt;= 5.1.12 and &lt; 5.5.0'"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
-            <item value="current user:    'root@"/>
-            <item value="current database:    'testdb'"/>
-            <item value="hostname:    'debian"/>
-            <item value="current user is DBA:    True"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
+            <item value="current user: 'root@"/>
+            <item value="current database: 'testdb'"/>
+            <item value="hostname: 'debian"/>
+            <item value="current user is DBA: True"/>
             <item value="r'database management system users \[.+'debian-sys-maint'@'localhost'.+'root'@'"/>
             <item value="r'database management system users password hashes:.+root \[.+password hash: \*00E247AC5F9AF26AE0194B41E1E769DEE1429A29'"/>
             <item value="r'database management system users privileges:.+debian-sys-maint.+\(administrator\).+root.+\(administrator\).+privilege: SUPER'"/>
@@ -3568,7 +3568,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Custom POST data injection mark">
@@ -3580,7 +3580,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Custom HTTP header (UA) injection mark">
@@ -3592,7 +3592,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Custom FROM table in UNION query">
@@ -3605,7 +3605,7 @@
         </switches>
         <parse>
             <item value="r'VERSION\(\).+FROM INFORMATION_SCHEMA\.COLLATIONS'" console_output="True"/>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
         </parse>
     </case>
     <case name="Estimated time of arrival">
@@ -3617,7 +3617,7 @@
             <getBanner value="True"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
             <item value="r'100\% \[===.+=\] 17\/17'" console_output="True"/>
         </parse>
     </case>
@@ -3629,7 +3629,7 @@
             <answers value="Do you want to keep testing the others=Y"/>
         </switches>
         <parse>
-            <item value="banner:    '5.1.41-3~bpo50+1'"/>
+            <item value="banner: '5.1.41-3~bpo50+1'"/>
             <item value="testing for SQL injection on GET parameter 'pAram'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 's'" console_output="True"/>
             <item value="testing for SQL injection on GET parameter 'id'" console_output="True"/>
