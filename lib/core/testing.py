@@ -36,6 +36,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
+from lib.core.data import queries
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapNotVulnerableException
@@ -182,6 +183,27 @@ def smokeTest():
                 count += 1
                 status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
                 dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+
+    def _(node):
+        for __ in dir(node):
+            if not __.startswith('_'):
+                candidate = getattr(node, __)
+                if isinstance(candidate, str):
+                    if '\\' in candidate:
+                        try:
+                            re.compile(candidate)
+                        except:
+                            errMsg = "smoke test failed at compiling '%s'" % candidate
+                            logger.error(errMsg)
+                            raise
+                else:
+                    _(candidate)
+
+    for dbms in queries:
+        try:
+            _(queries[dbms])
+        except:
+            retVal = False
 
     clearConsoleLine()
     if retVal:

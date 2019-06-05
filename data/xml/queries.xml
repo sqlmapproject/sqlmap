@@ -421,7 +421,7 @@
         <length query="CHAR_LENGTH(TRIM(%s))"/>
         <delimiter query="||"/>
         <limit query="ROWS %d TO %d"/>
-        <limitregexp query="\s+ROWS\s+([\d]+)(\s+\TO\s+([\d]+))?"/>
+        <limitregexp query="\s+ROWS\s+([\d]+)(\s+TO\s+([\d]+))?"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" ROWS "/>
