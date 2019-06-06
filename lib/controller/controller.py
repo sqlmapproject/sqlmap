@@ -604,6 +604,14 @@ def start():
                 if kb.vainRun and not conf.multipleTargets:
                     errMsg = "no parameter(s) found for testing in the provided data "
                     errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
+                    if kb.originalPage:
+                        advice = []
+                        if not conf.forms and re.search(r"<form", kb.originalPage) is not None:
+                            advice.append("--forms")
+                        if not conf.crawlDepth and re.search(r"href=[\"']/?\w", kb.originalPage) is not None:
+                            advice.append("--crawl=2")
+                        if advice:
+                            errMsg += ". You are advised to rerun with '%s'" % ' '.join(advice)
                     raise SqlmapNoneDataException(errMsg)
                 else:
                     errMsg = "all tested parameters do not appear to be injectable."
