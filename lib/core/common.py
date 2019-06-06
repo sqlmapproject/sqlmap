@@ -4240,7 +4240,7 @@ def asciifyUrl(url, forceQuote=False):
     """
 
     parts = _urllib.parse.urlsplit(url)
-    if not parts.scheme or not parts.netloc:
+    if not all((parts.scheme, parts.netloc, parts.hostname)):
         # apparently not an url
         return getText(url)
 
