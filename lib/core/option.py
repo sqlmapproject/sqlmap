@@ -1597,7 +1597,7 @@ def _cleanupOptions():
         conf.delay = float(conf.delay)
 
     if conf.url:
-        conf.url = conf.url.strip()
+        conf.url = conf.url.strip().lstrip('/')
         if not re.search(r"\A\w+://", conf.url):
             conf.url = "http://%s" % conf.url
 
