@@ -140,6 +140,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import LOCALHOST
 from lib.core.settings import MIN_ENCODED_LEN_CHECK
+from lib.core.settings import MIN_ERROR_PARSING_NON_WRITING_RATIO
 from lib.core.settings import MIN_TIME_RESPONSES
 from lib.core.settings import MIN_VALID_DELAYED_RESPONSE
 from lib.core.settings import NETSCAPE_FORMAT_HEADER_COOKIES
@@ -2659,7 +2660,7 @@ def extractErrorMessage(page):
 
             if match:
                 candidate = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
-                if re.search(r"\b([a-z]+ ){5}", candidate) is not None:  # check for legitimate (e.g. Warning:...) text
+                if (1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate))) / len(candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO:
                     retVal = candidate
                     break
 
