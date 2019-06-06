@@ -17,7 +17,7 @@ from optparse import OptionGroup
 from optparse import OptionParser
 from optparse import SUPPRESS_HELP
 
-from lib.core.common import checkObsoleteOptions
+from lib.core.common import checkOldOptions
 from lib.core.common import checkSystemEncoding
 from lib.core.common import dataToStdout
 from lib.core.common import expandMnemonics
@@ -28,6 +28,7 @@ from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.defaults import defaults
+from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.exception import SqlmapShellQuitException
 from lib.core.exception import SqlmapSyntaxException
@@ -789,7 +790,7 @@ def cmdLineParser(argv=None):
             _.append(getUnicode(arg, encoding=sys.stdin.encoding))
 
         argv = _
-        checkObsoleteOptions(argv)
+        checkOldOptions(argv)
 
         prompt = "--sqlmap-shell" in argv
 
@@ -854,6 +855,8 @@ def cmdLineParser(argv=None):
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
                 raise SystemExit
+            elif argv[i] in DEPRECATED_OPTIONS:
+                argv[i] = ""
             elif argv[i].startswith("--tamper"):
                 if tamperIndex is None:
                     tamperIndex = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)

@@ -70,6 +70,7 @@ from lib.core.decorators import cachedmethod
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DEFAULT_DOC_ROOTS
+from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.dicts import OBSOLETE_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
@@ -4466,9 +4467,9 @@ def getHostHeader(url):
 
     return retVal
 
-def checkObsoleteOptions(args):
+def checkOldOptions(args):
     """
-    Checks for obsolete options
+    Checks for obsolete/deprecated options
     """
 
     for _ in args:
@@ -4478,6 +4479,11 @@ def checkObsoleteOptions(args):
             if OBSOLETE_OPTIONS[_]:
                 errMsg += " (hint: %s)" % OBSOLETE_OPTIONS[_]
             raise SqlmapSyntaxException(errMsg)
+        elif _ in DEPRECATED_OPTIONS:
+            warnMsg = "switch/option '%s' is deprecated" % _
+            if DEPRECATED_OPTIONS[_]:
+                warnMsg += " (hint: %s)" % DEPRECATED_OPTIONS[_]
+            logger.warn(warnMsg)
 
 def checkSystemEncoding():
     """

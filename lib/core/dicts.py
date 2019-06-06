@@ -290,8 +290,11 @@ OBSOLETE_OPTIONS = {
     "--purge-output": "use '--purge' instead",
     "--check-payload": None,
     "--check-waf": None,
-    "--identify-waf": "functionality being done automatically",
     "--pickled-options": "use '--api -c ...' instead",
+}
+
+DEPRECATED_OPTIONS = {
+    "--identify-waf": "functionality being done automatically",
 }
 
 DUMP_DATA_PREPROCESS = {
