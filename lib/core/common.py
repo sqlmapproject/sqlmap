@@ -1541,7 +1541,7 @@ def parseTargetUrl():
         errMsg += "on this platform"
         raise SqlmapGenericException(errMsg)
 
-    if not re.search(r"^https?://", conf.url, re.I) and not re.search(r"^wss?://", conf.url, re.I):
+    if not re.search(r"^(http|ws)s?://", conf.url, re.I):
         if re.search(r":443\b", conf.url):
             conf.url = "https://%s" % conf.url
         else:
@@ -1560,9 +1560,12 @@ def parseTargetUrl():
 
     hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
-    conf.scheme = (urlSplit.scheme.strip().lower() or "http") if not conf.forceSSL else "https"
+    conf.scheme = (urlSplit.scheme.strip().lower() or "http")
     conf.path = urlSplit.path.strip()
     conf.hostname = hostnamePort[0].strip()
+
+    if conf.forceSSL:
+        conf.scheme = re.sub(r"(?i)\A(http|ws)\Z", r"\g<1>s", conf.scheme)
 
     conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
     conf.hostname = conf.hostname.strip("[]").replace(kb.customInjectionMark, "")
@@ -1585,7 +1588,7 @@ def parseTargetUrl():
         except:
             errMsg = "invalid target URL"
             raise SqlmapSyntaxException(errMsg)
-    elif conf.scheme == "https":
+    elif conf.scheme in ("https", "wss"):
         conf.port = 443
     else:
         conf.port = 80
