@@ -452,7 +452,7 @@ def errorUse(expression, dump=False):
         value = _errorFields(expression, expressionFields, expressionFieldsList)
 
     if value and isListLike(value):
-        if len(value) == 1 and isinstance(value[0], six.string_types):
+        if len(value) == 1 and isinstance(value[0], (six.string_types, type(None))):
             value = unArrayizeValue(value)
         elif len(value) > 1 and stopLimit == 1:
             value = [value]

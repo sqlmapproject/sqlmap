@@ -9,6 +9,7 @@ from lib.core.agent import agent
 from lib.core.common import dataToOutFile
 from lib.core.common import decodeDbmsHexValue
 from lib.core.common import getSQLSnippet
+from lib.core.common import isNoneValue
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
@@ -38,16 +39,15 @@ class Filesystem(GenericFilesystem):
             fileContent = inject.getValue("SELECT RAWTOHEX(OSREADFILE('%s')) FROM DUAL" % remoteFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
             kb.fileReadMode = False
 
-            if fileContent is not None:
+            if not isNoneValue(fileContent):
                 fileContent = decodeDbmsHexValue(fileContent, True)
 
                 if fileContent:
                     localFilePath = dataToOutFile(remoteFile, fileContent)
-
                     localFilePaths.append(localFilePath)
-                else:
-                    errMsg = "no data retrieved"
-                    logger.error(errMsg)
+            else:
+                errMsg = "no data retrieved"
+                logger.error(errMsg)
 
         return localFilePaths
 
