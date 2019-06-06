@@ -2651,12 +2651,15 @@ def extractErrorMessage(page):
     retVal = None
 
     if isinstance(page, six.string_types):
+        if wasLastResponseDBMSError():
+            page = re.sub(r"<[^>]+>", "", page)
+
         for regex in ERROR_PARSING_REGEXES:
             match = re.search(regex, page, re.IGNORECASE)
 
             if match:
                 candidate = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
-                if re.search(r"\b([a-z]+ ){5}", candidate) is None:  # check for legitimate (e.g. Warning:...) text
+                if re.search(r"\b([a-z]+ ){5}", candidate) is not None:  # check for legitimate (e.g. Warning:...) text
                     retVal = candidate
                     break
 
