@@ -328,8 +328,8 @@ def cmdLineParser(argv=None):
         # Techniques options
         techniques = OptionGroup(parser, "Techniques", "These options can be used to tweak testing of specific SQL injection techniques")
 
-        techniques.add_option("--technique", dest="tech",
-                              help="SQL injection techniques to use (default \"%s\")" % defaults.tech)
+        techniques.add_option("--technique", dest="technique",
+                              help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
 
         techniques.add_option("--time-sec", dest="timeSec", type="int",
                               help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)

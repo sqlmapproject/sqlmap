@@ -458,9 +458,9 @@ def _resumeHashDBValues():
 
     for injection in hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True) or []:
         if isinstance(injection, InjectionDict) and injection.place in conf.paramDict and injection.parameter in conf.paramDict[injection.place]:
-            if not conf.tech or intersect(conf.tech, injection.data.keys()):
-                if intersect(conf.tech, injection.data.keys()):
-                    injection.data = dict(_ for _ in injection.data.items() if _[0] in conf.tech)
+            if not conf.technique or intersect(conf.technique, injection.data.keys()):
+                if intersect(conf.technique, injection.data.keys()):
+                    injection.data = dict(_ for _ in injection.data.items() if _[0] in conf.technique)
                 if injection not in kb.injections:
                     kb.injections.append(injection)
 

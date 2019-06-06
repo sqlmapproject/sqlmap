@@ -20,7 +20,7 @@ _defaults = {
     "level": 1,
     "risk": 1,
     "dumpFormat": "CSV",
-    "tech": "BEUSTQ",
+    "technique": "BEUSTQ",
     "torType": "SOCKS5",
 }
 

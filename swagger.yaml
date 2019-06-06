@@ -402,7 +402,7 @@ paths:
                   googleDork: null 
                   saveConfig: null 
                   sqlShell: false 
-                  tech: BEUSTQ 
+                  technique: BEUSTQ
                   textOnly: false 
                   cookieDel: null 
                   commonColumns: false 

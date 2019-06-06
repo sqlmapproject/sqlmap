@@ -18,7 +18,7 @@
     <case name="PostgreSQL cleanup from sqlmap temporary tables and user-defined functions (UDFs)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
-            <tech value="US"/>
+            <technique value="US"/>
             <verbose value="2"/>
             <cleanup value="True"/>
         </switches>
@@ -39,7 +39,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -82,7 +82,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -126,7 +126,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -170,7 +170,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -213,7 +213,7 @@
     <case name="MySQL time-based single-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_nooutput.php?id=1"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -228,7 +228,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_inline.php?id=1"/>
             <threads value="4"/>
-            <tech value="Q"/>
+            <technique value="Q"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -272,7 +272,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -314,7 +314,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -357,7 +357,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -400,7 +400,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -442,7 +442,7 @@
     <case name="PostgreSQL time-based single-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -456,7 +456,7 @@
     <case name="PostgreSQL stacked queries single-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_nooutput.php?id=1"/>
-            <tech value="S"/>
+            <technique value="S"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -471,7 +471,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int_inline.php?id=1"/>
             <threads value="4"/>
-            <tech value="Q"/>
+            <technique value="Q"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -514,7 +514,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -555,7 +555,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -598,7 +598,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -641,7 +641,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <dbms value="Oracle"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
@@ -684,7 +684,7 @@
     <case name="Oracle time-based single-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int_nooutput.php?id=1"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <timeSec value="2"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -699,7 +699,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int_inline.php?id=1"/>
             <threads value="4"/>
-            <tech value="Q"/>
+            <technique value="Q"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -742,7 +742,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -785,7 +785,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -818,7 +818,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -851,7 +851,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -884,7 +884,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -917,7 +917,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -950,7 +950,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3_partialunion.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -981,7 +981,7 @@
     <case name="SQLite 3 time-based single-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3_nooutput.php?id=1"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <extensiveFp value="True"/>
             <level value="3"/>
             <risk value="2"/>
@@ -998,7 +998,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_inline.php?id=1"/>
             <threads value="4"/>
-            <tech value="Q"/>
+            <technique value="Q"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -1031,7 +1031,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -1071,7 +1071,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -1110,7 +1110,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -1148,7 +1148,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int_partialunion.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <dbms value="Firebird"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
@@ -1186,7 +1186,7 @@
     <case name="Firebird time-based single-threaded enumeration - all entries">
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int_nooutput.php?id=1"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <level value="4"/>
             <risk value="2"/>
             <timeSec value="2"/>
@@ -1203,7 +1203,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int_inline.php?id=1"/>
             <threads value="4"/>
-            <tech value="Q"/>
+            <technique value="Q"/>
             <level value="2"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
@@ -1245,7 +1245,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <db value="testdb"/>
@@ -1263,7 +1263,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <db value="testdb"/>
@@ -1281,7 +1281,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <dumpTable value="True"/>
             <db value="testdb"/>
             <tbl value="users"/>
@@ -1297,7 +1297,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <db value="public"/>
@@ -1315,7 +1315,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <db value="public"/>
@@ -1333,7 +1333,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <dumpTable value="True"/>
             <db value="public"/>
             <tbl value="users"/>
@@ -1349,7 +1349,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <db value="sys"/>
@@ -1367,7 +1367,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <db value="sys"/>
@@ -1385,7 +1385,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <dumpTable value="True"/>
             <db value="sys"/>
             <tbl value="users"/>
@@ -1401,7 +1401,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <dumpTable value="True"/>
             <db value="db2inst1"/>
             <tbl value="users"/>
@@ -1418,7 +1418,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <tbl value="users"/>
@@ -1435,7 +1435,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <dumpTable value="True"/>
             <tbl value="users"/>
             <firstChar value="3"/>
@@ -1451,7 +1451,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <getSchema value="True"/>
             <dumpTable value="True"/>
             <tbl value="users"/>
@@ -1468,7 +1468,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <dumpTable value="True"/>
             <tbl value="users"/>
             <firstChar value="3"/>
@@ -1486,7 +1486,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1498,7 +1498,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <db value="testdb"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1511,7 +1511,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1523,7 +1523,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <db value="testdb"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1536,7 +1536,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1548,7 +1548,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <db value="testdb"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1561,7 +1561,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1573,7 +1573,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <db value="public"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1586,7 +1586,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1598,7 +1598,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <db value="public"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1611,7 +1611,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1623,7 +1623,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <db value="public"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1636,7 +1636,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1648,7 +1648,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <db value="sys"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1661,7 +1661,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1673,7 +1673,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <db value="sys"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1686,7 +1686,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1698,7 +1698,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <db value="sys"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1711,7 +1711,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1723,7 +1723,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <db value="db2inst1"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
@@ -1736,7 +1736,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1748,7 +1748,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int_3.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1760,7 +1760,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1772,7 +1772,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <commonTables value="True"/>
             <answers value="are you sure you want to continue=Y"/>
         </switches>
@@ -1788,7 +1788,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="e"/>
         </switches>
@@ -1800,7 +1800,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="e"/>
         </switches>
@@ -1812,7 +1812,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="e"/>
         </switches>
@@ -1824,7 +1824,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="testdb"/>
             <tbl value="foo,se,bar"/>
@@ -1838,7 +1838,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="testdb"/>
             <tbl value="foo,se,bar"/>
@@ -1852,7 +1852,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="testdb"/>
             <tbl value="foo,se,bar"/>
@@ -1866,7 +1866,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -1879,7 +1879,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -1892,7 +1892,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -1905,7 +1905,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <col value="name"/>
             <excludeSysDbs value="True"/>
@@ -1919,7 +1919,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <col value="name"/>
             <excludeSysDbs value="True"/>
@@ -1933,7 +1933,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <col value="name"/>
             <excludeSysDbs value="True"/>
@@ -1947,7 +1947,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="mysql,testdb"/>
             <col value="name"/>
@@ -1962,7 +1962,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="mysql,testdb"/>
             <col value="name"/>
@@ -1977,7 +1977,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="mysql,testdb"/>
             <col value="name"/>
@@ -1992,7 +1992,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="users,plugin"/>
             <col value="name"/>
@@ -2007,7 +2007,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <tbl value="users,plugin"/>
             <col value="name"/>
@@ -2022,7 +2022,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="users,plugin"/>
             <col value="name"/>
@@ -2037,7 +2037,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="mysql,testdb"/>
             <tbl value="users"/>
@@ -2052,7 +2052,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="mysql,testdb"/>
             <tbl value="users"/>
@@ -2067,7 +2067,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="mysql,testdb"/>
             <tbl value="users"/>
@@ -2082,7 +2082,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="te"/>
         </switches>
@@ -2094,7 +2094,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="te"/>
         </switches>
@@ -2106,7 +2106,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="te"/>
         </switches>
@@ -2118,7 +2118,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="public"/>
             <tbl value="foo,se,bar"/>
@@ -2132,7 +2132,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="public"/>
             <tbl value="foo,se,bar"/>
@@ -2146,7 +2146,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="public"/>
             <tbl value="foo,se,bar"/>
@@ -2160,7 +2160,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2173,7 +2173,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2186,7 +2186,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2199,7 +2199,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <col value="name"/>
             <excludeSysDbs value="True"/>
@@ -2213,7 +2213,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <col value="name"/>
             <excludeSysDbs value="True"/>
@@ -2227,7 +2227,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <col value="name"/>
             <excludeSysDbs value="True"/>
@@ -2241,7 +2241,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="information_schema,public"/>
             <col value="name"/>
@@ -2256,7 +2256,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="information_schema,public"/>
             <col value="name"/>
@@ -2271,7 +2271,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="information_schema,public"/>
             <col value="name"/>
@@ -2286,7 +2286,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="users,sql_parts"/>
             <col value="name"/>
@@ -2301,7 +2301,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <tbl value="users,sql_parts"/>
             <col value="name"/>
@@ -2316,7 +2316,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="users,sql_parts"/>
             <col value="name"/>
@@ -2331,7 +2331,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="public,information_schema"/>
             <tbl value="users,sql_parts"/>
@@ -2347,7 +2347,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="public,information_schema"/>
             <tbl value="users,sql_parts"/>
@@ -2363,7 +2363,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="public,information_schema"/>
             <tbl value="users,sql_parts"/>
@@ -2379,7 +2379,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="sys"/>
         </switches>
@@ -2391,7 +2391,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="sys"/>
         </switches>
@@ -2403,7 +2403,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="sys"/>
         </switches>
@@ -2415,7 +2415,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="sys"/>
             <tbl value="user,aux,wrong"/>
@@ -2429,7 +2429,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="sys"/>
             <tbl value="user,aux,wrong"/>
@@ -2444,7 +2444,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="sys"/>
             <tbl value="user,aux,wrong"/>
@@ -2459,7 +2459,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="users"/>
             <answers value="do you want to dump=N"/>
@@ -2472,7 +2472,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <tbl value="users"/>
             <answers value="do you want to dump=N"/>
@@ -2485,7 +2485,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="users"/>
             <answers value="do you want to dump=N"/>
@@ -2498,7 +2498,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <col value="surname,foobar"/>
             <answers value="do you want to dump=N"/>
@@ -2511,7 +2511,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <col value="surname,foobar"/>
             <answers value="do you want to dump=N"/>
@@ -2524,7 +2524,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <col value="surname,foobar"/>
             <answers value="do you want to dump=N"/>
@@ -2537,7 +2537,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="sys,foobar"/>
             <col value="surname"/>
@@ -2551,7 +2551,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="sys,foobar"/>
             <col value="surname"/>
@@ -2565,7 +2565,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="sys,foobar"/>
             <col value="surname"/>
@@ -2579,7 +2579,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="users,foobar"/>
             <col value="surname"/>
@@ -2593,7 +2593,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <tbl value="users,foobar"/>
             <col value="surname"/>
@@ -2607,7 +2607,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="users,foobar"/>
             <col value="surname"/>
@@ -2621,7 +2621,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="sys,foobar"/>
             <tbl value="users"/>
@@ -2636,7 +2636,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <search value="True"/>
             <db value="sys,foobar"/>
             <tbl value="users"/>
@@ -2651,7 +2651,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <db value="sys,foobar"/>
             <tbl value="users"/>
@@ -2666,7 +2666,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="d"/>
         </switches>
@@ -2678,7 +2678,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="db2inst1"/>
             <tbl value="user,wrong"/>
@@ -2692,7 +2692,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="users"/>
             <answers value="do you want to dump=N"/>
@@ -2705,7 +2705,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <col value="surname,foobar"/>
             <answers value="do you want to dump=N"/>
@@ -2718,7 +2718,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="db2inst1,foobar"/>
             <col value="surname"/>
@@ -2732,7 +2732,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="users,foobar"/>
             <col value="surname"/>
@@ -2746,7 +2746,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <db value="db2inst1,foobar"/>
             <tbl value="users"/>
@@ -2773,7 +2773,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2786,7 +2786,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2811,7 +2811,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2824,7 +2824,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <search value="True"/>
             <tbl value="user"/>
             <answers value="do you want to dump=N"/>
@@ -2840,7 +2840,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
@@ -2851,7 +2851,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
@@ -2862,7 +2862,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
@@ -2873,7 +2873,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -2884,7 +2884,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -2895,7 +2895,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -2907,7 +2907,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
@@ -2918,7 +2918,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
@@ -2929,7 +2929,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users OFFSET 0 LIMIT 2"/>
         </switches>
         <parse>
@@ -2940,7 +2940,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -2951,7 +2951,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -2962,7 +2962,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -2974,7 +2974,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
         </switches>
         <parse>
@@ -2985,7 +2985,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
         </switches>
         <parse>
@@ -2996,7 +2996,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users WHERE ROWNUM=1"/>
         </switches>
         <parse>
@@ -3007,7 +3007,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3018,7 +3018,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3029,7 +3029,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/oracle/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3040,7 +3040,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM db2inst1.users"/>
         </switches>
         <parse>
@@ -3051,7 +3051,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/db2/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM db2inst1.users ORDER BY name"/>
         </switches>
         <parse>
@@ -3063,7 +3063,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
@@ -3074,7 +3074,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users LIMIT 0, 2"/>
         </switches>
         <parse>
@@ -3085,7 +3085,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3096,7 +3096,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/sqlite/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3108,7 +3108,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users"/>
         </switches>
         <parse>
@@ -3119,7 +3119,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users"/>
         </switches>
         <parse>
@@ -3130,7 +3130,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3141,7 +3141,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/firebird/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <query value="SELECT * FROM users ORDER BY name"/>
         </switches>
         <parse>
@@ -3155,7 +3155,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
         </switches>
         <parse>
@@ -3166,7 +3166,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
         </switches>
         <parse>
@@ -3177,7 +3177,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
         </switches>
         <parse>
@@ -3189,7 +3189,7 @@
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <wFile value="/etc/passwd"/>
             <dFile value="/tmp/passwd-${random}"/>
         </switches>
@@ -3201,7 +3201,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="BS"/>
+            <technique value="BS"/>
             <timeSec value="2"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
             <answers value="do you want to overwrite it=Y"/>
@@ -3214,7 +3214,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="ES"/>
+            <technique value="ES"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
             <answers value="do you want to overwrite it=Y"/>
         </switches>
@@ -3226,7 +3226,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="US"/>
+            <technique value="US"/>
             <rFile value="/etc/hosts,/tmp/invalidfile"/>
             <answers value="do you want to overwrite it=Y"/>
         </switches>
@@ -3253,7 +3253,7 @@
     <case name="MySQL web shell - command execution">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <osCmd value="id"/>
             <answers value="what do you want to use for writable directory=2,please provide a comma separate list of absolute directory paths=/var/www/test"/>
         </switches>
@@ -3264,7 +3264,7 @@
     <case name="MySQL shell via Metasploit integration - command execution">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
-            <tech value="BU"/>
+            <technique value="BU"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
             <answers value="what do you want to use for writable directory=2,please provide a comma separate list of absolute directory paths=/var/www/test"/>
@@ -3276,7 +3276,7 @@
     <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (UNION)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
-            <tech value="US"/>
+            <technique value="US"/>
             <osCmd value="id"/>
             <answers value="do you want to overwrite it=Y"/>
         </switches>
@@ -3287,7 +3287,7 @@
     <case name="PostgreSQL User-Defined Function (UDF) injection - command execution (boolean)">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
-            <tech value="BS"/>
+            <technique value="BS"/>
             <osCmd value="ls -1"/>
             <answers value="do you want to overwrite it=Y"/>
         </switches>
@@ -3298,7 +3298,7 @@
     <case name="PostgreSQL shell via Metasploit integration - command execution">
         <switches>
             <url value="http://debiandev/sqlmap/pgsql/get_int.php?id=1"/>
-            <tech value="US"/>
+            <technique value="US"/>
             <osPwn value="True"/>
             <msfPath value="/usr/local/bin/"/>
             <answers value="do you want to overwrite it=Y,which connection type do you want to use=2"/>
@@ -3314,7 +3314,7 @@
     <case name="Time-based (heavy query)">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_benchmark.php?id=1"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <level value="2"/>
             <risk value="2"/>
             <timeSec value="2"/>
@@ -3328,7 +3328,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <testFilter value="OR boolean"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -3342,7 +3342,7 @@
     <case name="Page protected by custom (weak) filter">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_filtered.php?id=1"/>
-            <tech value="BE"/>
+            <technique value="BE"/>
             <level value="3"/>
         </switches>
         <parse>
@@ -3353,7 +3353,7 @@
     <case name="GROUP BY clause">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_groupby.php?id=1"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <level value="3"/>
         </switches>
         <parse>
@@ -3364,7 +3364,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_international.php?id=1"/>
             <threads value="4"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <getBanner value="True"/>
             <dumpTable value="True"/>
             <db value="testdb"/>
@@ -3401,7 +3401,7 @@
     <case name="Page that returns an image">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_img.php?id=1"/>
-            <tech value="BT"/>
+            <technique value="BT"/>
             <timeSec value="2"/>
         </switches>
         <parse>
@@ -3412,7 +3412,7 @@
     <case name="302 redirect page when SQL statement returns output">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_redirected_true.php?id=1"/>
-            <tech value="E"/>
+            <technique value="E"/>
         </switches>
         <parse>
             <item value="Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause"/>
@@ -3421,7 +3421,7 @@
     <case name="Invalid bignum">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <invalidBignum value="True"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -3436,7 +3436,7 @@
     <case name="Invalid logical">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <invalidLogical value="True"/>
             <getBanner value="True"/>
             <isDba value="True"/>
@@ -3454,7 +3454,7 @@
     <case name="HTTP basic authentication">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/basic/get_int.php?id=1"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <authType value="Basic"/>
             <authCred value="testuser:testpass"/>
             <getBanner value="True"/>
@@ -3466,7 +3466,7 @@
     <case name="HTTP digest authentication">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/digest/get_int.php?id=1"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <authType value="Digest"/>
             <authCred value="testuser:testpass"/>
             <getBanner value="True"/>
@@ -3480,7 +3480,7 @@
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <predictOutput value="True"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <getBanner value="True"/>
         </switches>
         <parse>
@@ -3493,7 +3493,7 @@
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int_orderby.php?id=1"/>
             <predictOutput value="True"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <testFilter value="boolean-based blind - GROUP BY and ORDER BY clauses"/>
             <getBanner value="True"/>
         </switches>
@@ -3507,7 +3507,7 @@
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <predictOutput value="True"/>
-            <tech value="T"/>
+            <technique value="T"/>
             <getBanner value="True"/>
         </switches>
         <parse>
@@ -3519,7 +3519,7 @@
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
             <threads value="4"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <extensiveFp value="True"/>
             <getBanner value="True"/>
             <getCurrentUser value="True"/>
@@ -3564,7 +3564,7 @@
         <switches>
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1*"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <getBanner value="True"/>
         </switches>
         <parse>
@@ -3576,7 +3576,7 @@
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/post_int.php"/>
             <data value="id=1*"/>
-            <tech value="E"/>
+            <technique value="E"/>
             <getBanner value="True"/>
         </switches>
         <parse>
@@ -3588,7 +3588,7 @@
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/header_str.php"/>
             <headers value="User-Agent: 1*"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <getBanner value="True"/>
         </switches>
         <parse>
@@ -3599,7 +3599,7 @@
         <switches>
             <verbose value="3"/>
             <url value="http://debiandev/sqlmap/mysql/get_int_partialunion.php?id=1"/>
-            <tech value="U"/>
+            <technique value="U"/>
             <uFrom value="INFORMATION_SCHEMA.COLLATIONS"/>
             <getBanner value="True"/>
         </switches>
@@ -3612,7 +3612,7 @@
         <switches>
             <verbose value="2"/>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?id=1"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <eta value="True"/>
             <getBanner value="True"/>
         </switches>
@@ -3624,7 +3624,7 @@
     <case name="Multiple parameters">
         <switches>
             <url value="http://debiandev/sqlmap/mysql/get_int.php?pAram=value&amp;s=3&amp;id=1&amp;Par=VALUE"/>
-            <tech value="B"/>
+            <technique value="B"/>
             <getBanner value="True"/>
             <answers value="Do you want to keep testing the others=Y"/>
         </switches>

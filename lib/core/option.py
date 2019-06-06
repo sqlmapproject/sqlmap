@@ -662,10 +662,10 @@ def _setTechnique():
     validTechniques = sorted(getPublicTypeMembers(PAYLOAD.TECHNIQUE), key=lambda x: x[1])
     validLetters = [_[0][0].upper() for _ in validTechniques]
 
-    if conf.tech and isinstance(conf.tech, six.string_types):
+    if conf.technique and isinstance(conf.technique, six.string_types):
         _ = []
 
-        for letter in conf.tech.upper():
+        for letter in conf.technique.upper():
             if letter not in validLetters:
                 errMsg = "value for --technique must be a string composed "
                 errMsg += "by the letters %s. Refer to the " % ", ".join(validLetters)
@@ -677,7 +677,7 @@ def _setTechnique():
                     _.append(validInt)
                     break
 
-        conf.tech = _
+        conf.technique = _
 
 def _setDBMS():
     """
@@ -2476,7 +2476,7 @@ def _basicOptionValidation():
         errMsg = "option '-d' is incompatible with switch '--tor'"
         raise SqlmapSyntaxException(errMsg)
 
-    if not conf.tech:
+    if not conf.technique:
         errMsg = "option '--technique' can't be empty"
         raise SqlmapSyntaxException(errMsg)
 

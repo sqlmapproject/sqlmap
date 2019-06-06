@@ -3188,7 +3188,7 @@ def isTechniqueAvailable(technique):
     >>> kb.injection.data = popValue()
     """
 
-    if conf.tech and isinstance(conf.tech, list) and technique not in conf.tech:
+    if conf.technique and isinstance(conf.technique, list) and technique not in conf.technique:
         return False
     else:
         return getTechniqueData(technique) is not None
