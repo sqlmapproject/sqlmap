@@ -13,12 +13,13 @@ __import__("lib.utils.versioncheck")  # this has to be the first non-standard im
 
 import logging
 import optparse
+import os
 import warnings
 
 warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-from sqlmap import modulePath
+from lib.core.common import getUnicode
 from lib.core.common import setPaths
 from lib.core.data import logger
 from lib.core.patch import dirtyPatches
@@ -26,8 +27,15 @@ from lib.core.patch import resolveCrossReferences
 from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
+from lib.core.settings import UNICODE_ENCODING
 from lib.utils.api import client
 from lib.utils.api import server
+
+try:
+    from sqlmap import modulePath
+except ImportError:
+    def modulePath():
+        return getUnicode(os.path.dirname(os.path.realpath(__file__)), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
 
 def main():
     """
