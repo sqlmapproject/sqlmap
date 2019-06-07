@@ -463,6 +463,7 @@ def _resumeHashDBValues():
                     injection.data = dict(_ for _ in injection.data.items() if _[0] in conf.technique)
                 if injection not in kb.injections:
                     kb.injections.append(injection)
+                    kb.vulnHosts.add(conf.hostname)
 
     _resumeDBMS()
     _resumeOS()
