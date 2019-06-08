@@ -12,7 +12,6 @@ import codecs
 import collections
 import contextlib
 import copy
-import distutils
 import functools
 import getpass
 import hashlib
@@ -176,6 +175,7 @@ from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import VERSION_COMPARISON_CORRECTION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import ZIP_HEADER
 from lib.core.settings import WEBSCARAB_SPLITTER
@@ -517,7 +517,7 @@ class Backend(object):
 
     @staticmethod
     def getVersion():
-        versions = filterNone(flattenValue(kb.dbmsVersion))
+        versions = filterNone(flattenValue(kb.dbmsVersion)) if not isinstance(kb.dbmsVersion, six.string_types) else [kb.dbmsVersion]
         if not isNoneValue(versions):
             return versions[0]
         else:
@@ -525,7 +525,7 @@ class Backend(object):
 
     @staticmethod
     def getVersionList():
-        versions = filterNone(flattenValue(kb.dbmsVersion))
+        versions = filterNone(flattenValue(kb.dbmsVersion)) if not isinstance(kb.dbmsVersion, six.string_types) else [kb.dbmsVersion]
         if not isNoneValue(versions):
             return versions
         else:
@@ -3110,37 +3110,63 @@ def filterNone(values):
 
     return retVal
 
-def isDBMSVersionAtLeast(version):
+def isDBMSVersionAtLeast(minimum):
     """
     Checks if the recognized DBMS version is at least the version specified
+
+    >>> pushValue(kb.dbmsVersion)
+    >>> kb.dbmsVersion = "2"
+    >>> isDBMSVersionAtLeast("1.3.4.1.4")
+    True
+    >>> isDBMSVersionAtLeast(2.1)
+    False
+    >>> isDBMSVersionAtLeast(">2")
+    False
+    >>> isDBMSVersionAtLeast(">=2.0")
+    True
+    >>> kb.dbmsVersion = "<2"
+    >>> isDBMSVersionAtLeast("2")
+    False
+    >>> isDBMSVersionAtLeast("1.5")
+    True
+    >>> kb.dbmsVersion = popValue()
     """
 
     retVal = None
 
-    if Backend.getVersion() and Backend.getVersion() != UNKNOWN_DBMS_VERSION:
-        value = Backend.getVersion().replace(" ", "").rstrip('.')
+    if not any(isNoneValue(_) for _ in (Backend.getVersion(), minimum)) and Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+        version = Backend.getVersion().replace(" ", "").rstrip('.')
 
-        while True:
-            index = value.find('.', value.find('.') + 1)
+        if '.' in version:
+            parts = version.split('.', 1)
+            parts[1] = filterStringValue(parts[1], '[0-9]')
+            version = '.'.join(parts)
 
-            if index > -1:
-                value = value[0:index] + value[index + 1:]
-            else:
-                break
+        correction = 0.0
+        if ">=" in version:
+            pass
+        elif '>' in version:
+            correction = VERSION_COMPARISON_CORRECTION
+        elif '<' in version:
+            correction = -VERSION_COMPARISON_CORRECTION
 
-        value = filterStringValue(value, '[0-9.><=]')
+        version = float(filterStringValue(version, '[0-9.]')) + correction
 
-        if value and isinstance(value, six.string_types):
-            if value.startswith(">="):
-                value = float(value.replace(">=", ""))
-            elif value.startswith(">"):
-                value = float(value.replace(">", "")) + 0.01
-            elif value.startswith("<="):
-                value = float(value.replace("<=", ""))
-            elif value.startswith(">"):
-                value = float(value.replace("<", "")) - 0.01
+        if isinstance(minimum, six.string_types):
+            if '.' in minimum:
+                parts = minimum.split('.', 1)
+                parts[1] = filterStringValue(parts[1], '[0-9]')
+                minimum = '.'.join(parts)
 
-            retVal = distutils.version.LooseVersion(getUnicode(value)) >= distutils.version.LooseVersion(getUnicode(version))
+            correction = 0.0
+            if minimum.startswith(">="):
+                pass
+            elif minimum.startswith(">"):
+                correction = VERSION_COMPARISON_CORRECTION
+
+            minimum = float(filterStringValue(minimum, '[0-9.]')) + correction
+
+        retVal = version >= minimum
 
     return retVal
 

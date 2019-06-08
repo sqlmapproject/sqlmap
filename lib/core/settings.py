@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.6.34"
+VERSION = "1.3.6.35"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -499,6 +499,9 @@ DEFAULT_TOR_HTTP_PORTS = (8123, 8118)
 
 # Percentage below which comparison engine could have problems
 LOW_TEXT_PERCENT = 20
+
+# Auxiliary value used in isDBMSVersionAtLeast() version comparison correction cases
+VERSION_COMPARISON_CORRECTION = 0.0001
 
 # These MySQL keywords can't go (alone) into versioned comment form (/*!...*/)
 # Reference: http://dev.mysql.com/doc/refman/5.1/en/function-resolution.html
