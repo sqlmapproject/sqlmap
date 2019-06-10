@@ -69,7 +69,7 @@ def cmdLineParser(argv=None):
                           action="store_true",
                           help="Show program's version number and exit")
 
-        parser.add_option("-v", dest="verbose", type="int",
+        parser.add_option("-v", dest="verbose", type=int,
                           help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
 
         # Target options
@@ -150,7 +150,7 @@ def cmdLineParser(argv=None):
         request.add_option("--auth-file", dest="authFile",
                            help="HTTP authentication PEM cert/private key file")
 
-        request.add_option("--ignore-code", dest="ignoreCode", type="int",
+        request.add_option("--ignore-code", dest="ignoreCode", type=int,
                            help="Ignore (problematic) HTTP error code (e.g. 401)")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
@@ -183,13 +183,13 @@ def cmdLineParser(argv=None):
         request.add_option("--check-tor", dest="checkTor", action="store_true",
                            help="Check to see if Tor is used properly")
 
-        request.add_option("--delay", dest="delay", type="float",
+        request.add_option("--delay", dest="delay", type=float,
                            help="Delay in seconds between each HTTP request")
 
-        request.add_option("--timeout", dest="timeout", type="float",
+        request.add_option("--timeout", dest="timeout", type=float,
                            help="Seconds to wait before timeout connection (default %d)" % defaults.timeout)
 
-        request.add_option("--retries", dest="retries", type="int",
+        request.add_option("--retries", dest="retries", type=int,
                            help="Retries when the connection timeouts (default %d)" % defaults.retries)
 
         request.add_option("--randomize", dest="rParam",
@@ -204,7 +204,7 @@ def cmdLineParser(argv=None):
         request.add_option("--safe-req", dest="safeReqFile",
                            help="Load safe HTTP request from a file")
 
-        request.add_option("--safe-freq", dest="safeFreq", type="int",
+        request.add_option("--safe-freq", dest="safeFreq", type=int,
                            help="Test requests between two visits to a given safe URL")
 
         request.add_option("--skip-urlencode", dest="skipUrlEncode", action="store_true",
@@ -243,7 +243,7 @@ def cmdLineParser(argv=None):
         optimization.add_option("--null-connection", dest="nullConnection", action="store_true",
                                 help="Retrieve page length without actual HTTP response body")
 
-        optimization.add_option("--threads", dest="threads", type="int",
+        optimization.add_option("--threads", dest="threads", type=int,
                                 help="Max number of concurrent HTTP(s) "
                                 "requests (default %d)" % defaults.threads)
 
@@ -301,10 +301,10 @@ def cmdLineParser(argv=None):
         # Detection options
         detection = OptionGroup(parser, "Detection", "These options can be used to customize the detection phase")
 
-        detection.add_option("--level", dest="level", type="int",
+        detection.add_option("--level", dest="level", type=int,
                              help="Level of tests to perform (1-5, default %d)" % defaults.level)
 
-        detection.add_option("--risk", dest="risk", type="int",
+        detection.add_option("--risk", dest="risk", type=int,
                              help="Risk of tests to perform (1-3, default %d)" % defaults.risk)
 
         detection.add_option("--string", dest="string",
@@ -316,7 +316,7 @@ def cmdLineParser(argv=None):
         detection.add_option("--regexp", dest="regexp",
                              help="Regexp to match when query is evaluated to True")
 
-        detection.add_option("--code", dest="code", type="int",
+        detection.add_option("--code", dest="code", type=int,
                              help="HTTP code to match when query is evaluated to True")
 
         detection.add_option("--text-only", dest="textOnly", action="store_true",
@@ -331,7 +331,7 @@ def cmdLineParser(argv=None):
         techniques.add_option("--technique", dest="technique",
                               help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
 
-        techniques.add_option("--time-sec", dest="timeSec", type="int",
+        techniques.add_option("--time-sec", dest="timeSec", type=int,
                               help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 
         techniques.add_option("--union-cols", dest="uCols",
@@ -445,16 +445,16 @@ def cmdLineParser(argv=None):
         enumeration.add_option("--where", dest="dumpWhere",
                                help="Use WHERE condition while table dumping")
 
-        enumeration.add_option("--start", dest="limitStart", type="int",
+        enumeration.add_option("--start", dest="limitStart", type=int,
                                help="First dump table entry to retrieve")
 
-        enumeration.add_option("--stop", dest="limitStop", type="int",
+        enumeration.add_option("--stop", dest="limitStop", type=int,
                                help="Last dump table entry to retrieve")
 
-        enumeration.add_option("--first", dest="firstChar", type="int",
+        enumeration.add_option("--first", dest="firstChar", type=int,
                                help="First query output word character to retrieve")
 
-        enumeration.add_option("--last", dest="lastChar", type="int",
+        enumeration.add_option("--last", dest="lastChar", type=int,
                                help="Last query output word character to retrieve")
 
         enumeration.add_option("--sql-query", dest="sqlQuery",
@@ -566,7 +566,7 @@ def cmdLineParser(argv=None):
         general.add_option("--check-internet", dest="checkInternet", action="store_true",
                            help="Check Internet connection before assessing the target")
 
-        general.add_option("--crawl", dest="crawlDepth", type="int",
+        general.add_option("--crawl", dest="crawlDepth", type=int,
                            help="Crawl the website starting from the target URL")
 
         general.add_option("--crawl-exclude", dest="crawlExclude",
@@ -653,7 +653,7 @@ def cmdLineParser(argv=None):
         miscellaneous.add_option("--disable-coloring", dest="disableColoring", action="store_true",
                                  help="Disable console output coloring")
 
-        miscellaneous.add_option("--gpage", dest="googlePage", type="int",
+        miscellaneous.add_option("--gpage", dest="googlePage", type=int,
                                  help="Use Google dork results from specified page number")
 
         miscellaneous.add_option("--list-tampers", dest="listTampers", action="store_true",
@@ -698,7 +698,7 @@ def cmdLineParser(argv=None):
         parser.add_option("--dummy", dest="dummy", action="store_true",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--murphy-rate", dest="murphyRate", type="int",
+        parser.add_option("--murphy-rate", dest="murphyRate", type=int,
                           help=SUPPRESS_HELP)
 
         parser.add_option("--debug", dest="debug", action="store_true",
