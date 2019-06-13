@@ -23,7 +23,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
-from lib.core.settings import MAX_CONNECTION_CHUNK_SIZE
+from lib.core.settings import MAX_CONNECTION_READ_SIZE
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import MAX_SINGLE_URL_REDIRECTIONS
 from lib.core.settings import MAX_TOTAL_REDIRECTIONS
@@ -101,7 +101,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
         redirectMsg += logHeaders
         if content:
-            redirectMsg += "\r\n\r\n%s" % getUnicode(content[:MAX_CONNECTION_CHUNK_SIZE])
+            redirectMsg += "\r\n\r\n%s" % getUnicode(content[:MAX_CONNECTION_READ_SIZE])
 
         logHTTPTraffic(threadData.lastRequestMsg, redirectMsg, start, time.time())
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
