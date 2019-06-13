@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.6.39"
+VERSION = "1.3.6.40"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -691,7 +691,7 @@ MAX_DIFFLIB_SEQUENCE_LENGTH = 10 * 1024 * 1024
 MAX_BISECTION_LENGTH = 50 * 1024 * 1024
 
 # Mark used for trimming unnecessary content in large connection reads
-LARGE_CHUNK_TRIM_MARKER = "__TRIMMED_CONTENT__"
+LARGE_READ_TRIM_MARKER = "__TRIMMED_CONTENT__"
 
 # Generic SQL comment formation
 GENERIC_SQL_COMMENT = "-- [RANDSTR]"
