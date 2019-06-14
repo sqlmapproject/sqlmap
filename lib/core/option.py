@@ -1159,7 +1159,7 @@ def _setSafeVisit():
             else:
                 conf.safeUrl = "http://" + conf.safeUrl
 
-    if conf.safeFreq <= 0:
+    if (conf.safeFreq or 0) <= 0:
         errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe visit features"
         raise SqlmapSyntaxException(errMsg)
 
