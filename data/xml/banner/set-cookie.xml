@@ -27,7 +27,7 @@
         <info technology="WebSphere"/>
     </regexp>
 
-    <regexp value="PHPSESSION">
+    <regexp value="PHPSESS">
         <info technology="PHP"/>
     </regexp>
 
@@ -49,5 +49,17 @@
 
     <regexp value="CFID|CFTOKEN|CFMAGIC|CFGLOBALS">
         <info technology="ColdFusion"/>
+    </regexp>
+
+    <regexp value="WebLogicSession">
+        <info technology="WebLogic"/>
+    </regexp>
+
+    <regexp value="MoodleSession">
+        <info technology="Moodle"/>
+    </regexp>
+
+    <regexp value="\bwp_">
+        <info technology="WordPress"/>
     </regexp>
 </root>
