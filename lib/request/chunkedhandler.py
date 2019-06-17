@@ -14,12 +14,12 @@ class ChunkedHandler(_urllib.request.HTTPHandler):
     """
 
     def _http_request(self, request):
-        host = request.get_host()
+        host = request.get_host() if hasattr(request, "get_host") else request.host
         if not host:
             raise _urllib.error.URLError("no host given")
 
-        if request.has_data():  # POST
-            data = request.get_data()
+        if request.data is not None:  # POST
+            data = request.data
             if not request.has_header("Content-type"):
                 request.add_unredirected_header(
                     "Content-type",
