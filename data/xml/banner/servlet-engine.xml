@@ -7,6 +7,14 @@
         <info technology="Tomcat" tech_version="1"/>
     </regexp>
 
+    <regexp value="Enhydra Application Server/([\d\.]+)">
+        <info technology="Enhydra" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Jetty/([\d\.]+)">
+        <info technology="Jetty" tech_version="1"/>
+    </regexp>
+
     <regexp value="JSP[\-\_\/\ ]([\d\.]+)">
         <info technology="JSP" tech_version="1"/>
     </regexp>
