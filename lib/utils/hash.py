@@ -78,6 +78,7 @@ from lib.core.enums import HASH
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.patch import resolveCrossReferences
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DEV_EMAIL_ADDRESS

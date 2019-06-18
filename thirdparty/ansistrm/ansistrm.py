@@ -21,7 +21,7 @@ if IS_WIN:
     ctypes.windll.kernel32.SetConsoleTextAttribute.restype = ctypes.wintypes.BOOL
 
 def stdoutEncode(data):  # Cross-referenced function
-    raise NotImplementedError
+    return data
 
 class ColorizingStreamHandler(logging.StreamHandler):
     # color names to indices
