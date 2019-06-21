@@ -581,15 +581,22 @@ class Databases(object):
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
+
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
+
                 elif Backend.isDbms(DBMS.MSSQL):
                     query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
                                                       conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
                     query += condQuery.replace("[DB]", conf.db)
+
                 elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                     query = rootQuery.inband.query % unsafeSQLIdentificatorNaming(tbl)
+
+                elif Backend.isDbms(DBMS.INFORMIX):
+                    query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                    query += condQuery
 
                 if dumpMode and colList:
                     values = [(_,) for _ in colList]
