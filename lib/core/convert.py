@@ -18,6 +18,7 @@ import json
 import re
 import sys
 
+from lib.core.bigarray import BigArray
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
@@ -102,7 +103,7 @@ def filterNone(values):  # Cross-referenced function
     return [_ for _ in values if _] if isinstance(values, collections.Iterable) else values
 
 def isListLike(value):  # Cross-referenced function
-    raise NotImplementedError
+    return isinstance(value, (list, tuple, set, BigArray))
 
 def shellExec(cmd):  # Cross-referenced function
     raise NotImplementedError
