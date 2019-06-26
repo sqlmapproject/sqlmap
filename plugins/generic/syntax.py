@@ -26,7 +26,7 @@ class Syntax(object):
         if quote:
             for item in re.findall(r"'[^']*'+", expression):
                 original = item[1:-1]
-                if original:
+                if original and re.search(r"\[(SLEEPTIME|RAND)", original) is None:  # e.g. '[SLEEPTIME]' marker
                     replacement = escaper(original) if not conf.noEscape else original
 
                     if replacement != original:
