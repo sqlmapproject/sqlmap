@@ -205,6 +205,9 @@ class Entries(object):
                                                 value = inject.getValue(query, blind=False, time=False, dump=True) or ""
                                                 row.append(value)
 
+                                            if not entries and isNoneValue(row):
+                                                break
+
                                             entries.append(row)
 
                                     except KeyboardInterrupt:
@@ -213,7 +216,7 @@ class Entries(object):
                                         warnMsg = "Ctrl+C detected in dumping phase"
                                         logger.warn(warnMsg)
 
-                            if not entries and not kb.dumpKeyboardInterrupt:
+                            if isNoneValue(entries) and not kb.dumpKeyboardInterrupt:
                                 try:
                                     retVal = pivotDumpTable(table, colList, blind=False)
                                 except KeyboardInterrupt:
@@ -225,7 +228,7 @@ class Entries(object):
 
                                 if retVal:
                                     entries, _ = retVal
-                                    entries = _zip(*[entries[colName] for colName in colList])
+                                    entries = BigArray(_zip(*[entries[colName] for colName in colList]))
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
