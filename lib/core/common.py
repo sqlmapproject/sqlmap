@@ -2664,7 +2664,7 @@ def extractErrorMessage(page):
 
             if match:
                 candidate = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
-                if (1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate))) / len(candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO:
+                if candidate and (1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate)) / len(candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO):
                     retVal = candidate
                     break
 
