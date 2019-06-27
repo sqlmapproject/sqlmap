@@ -1346,6 +1346,7 @@ def setPaths(rootPath):
 
     # sqlmap files
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
+    paths.COMMON_FILES = os.path.join(paths.SQLMAP_TXT_PATH, "common-files.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
@@ -4637,6 +4638,8 @@ def decodeDbmsHexValue(value, raw=False):
     def _(value):
         retVal = value
         if value and isinstance(value, six.string_types):
+            value = value.strip()
+
             if len(value) % 2 != 0:
                 retVal = (decodeHex(value[:-1]) + b'?') if len(value) > 1 else value
                 singleTimeWarnMessage("there was a problem decoding value '%s' from expected hexadecimal form" % value)

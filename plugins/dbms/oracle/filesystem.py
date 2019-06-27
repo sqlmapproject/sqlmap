@@ -32,8 +32,9 @@ class Filesystem(GenericFilesystem):
             Request.queryPage(payload, content=False, raise404=False, silent=True, noteResponseTime=False)
 
         for remoteFile in remoteFile.split(','):
-            infoMsg = "fetching file: '%s'" % remoteFile
-            logger.info(infoMsg)
+            if not kb.bruteMode:
+                infoMsg = "fetching file: '%s'" % remoteFile
+                logger.info(infoMsg)
 
             kb.fileReadMode = True
             fileContent = inject.getValue("SELECT RAWTOHEX(OSREADFILE('%s')) FROM DUAL" % remoteFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
@@ -42,10 +43,11 @@ class Filesystem(GenericFilesystem):
             if not isNoneValue(fileContent):
                 fileContent = decodeDbmsHexValue(fileContent, True)
 
-                if fileContent:
+                if fileContent.strip():
                     localFilePath = dataToOutFile(remoteFile, fileContent)
                     localFilePaths.append(localFilePath)
-            else:
+
+            elif not kb.bruteMode:
                 errMsg = "no data retrieved"
                 logger.error(errMsg)
 

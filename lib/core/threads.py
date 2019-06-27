@@ -204,7 +204,6 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         traceback.print_exc()
 
     finally:
-        kb.bruteMode = False
         kb.threadContinue = True
         kb.threadException = False
 

@@ -312,6 +312,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     return validPayload, vector
 
+@stackedmethod
 def unionTest(comment, place, parameter, value, prefix, suffix):
     """
     This method tests if the target URL is affected by an union

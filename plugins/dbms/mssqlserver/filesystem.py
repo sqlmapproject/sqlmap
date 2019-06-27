@@ -18,6 +18,7 @@ from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
 from lib.core.convert import encodeHex
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import EXPECTED
@@ -82,8 +83,9 @@ class Filesystem(GenericFilesystem):
         return chunkName
 
     def stackedReadFile(self, remoteFile):
-        infoMsg = "fetching file: '%s'" % remoteFile
-        logger.info(infoMsg)
+        if not kb.bruteMode:
+            infoMsg = "fetching file: '%s'" % remoteFile
+            logger.info(infoMsg)
 
         result = []
         txtTbl = self.fileTblName

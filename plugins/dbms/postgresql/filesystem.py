@@ -9,6 +9,7 @@ import os
 
 from lib.core.common import randomInt
 from lib.core.compat import xrange
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import LOBLKSIZE
@@ -23,8 +24,9 @@ class Filesystem(GenericFilesystem):
         GenericFilesystem.__init__(self)
 
     def stackedReadFile(self, remoteFile):
-        infoMsg = "fetching file: '%s'" % remoteFile
-        logger.info(infoMsg)
+        if not kb.bruteMode:
+            infoMsg = "fetching file: '%s'" % remoteFile
+            logger.info(infoMsg)
 
         self.initEnv()
 

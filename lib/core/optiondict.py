@@ -160,6 +160,7 @@ optDict = {
     "Brute": {
         "commonTables": "boolean",
         "commonColumns": "boolean",
+        "commonFiles": "boolean",
     },
 
     "User-defined function": {

@@ -586,7 +586,7 @@ def _createFilesDir():
     Create the file directory.
     """
 
-    if not conf.fileRead:
+    if not any((conf.fileRead, conf.commonFiles)):
         return
 
     conf.filePath = paths.SQLMAP_FILES_PATH % conf.hostname

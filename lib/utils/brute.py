@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import division
 
+import logging
 import time
 
 from lib.core.common import Backend
@@ -16,20 +17,26 @@ from lib.core.common import filterListValue
 from lib.core.common import getFileItems
 from lib.core.common import getPageWordSet
 from lib.core.common import hashDBWrite
+from lib.core.common import isNoneValue
+from lib.core.common import popValue
+from lib.core.common import pushValue
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import safeStringFormat
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.decorators import stackedmethod
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
+from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
 from lib.core.settings import METADB_SUFFIX
@@ -136,7 +143,6 @@ def tableExists(tableFile, regex=None):
 
     try:
         runThreads(conf.threads, tableExistsThread, threadChoice=True)
-
     except KeyboardInterrupt:
         warnMsg = "user aborted during table existence "
         warnMsg += "check. sqlmap will display partial output"
@@ -252,11 +258,12 @@ def columnExists(columnFile, regex=None):
 
     try:
         runThreads(conf.threads, columnExistsThread, threadChoice=True)
-
     except KeyboardInterrupt:
         warnMsg = "user aborted during column existence "
         warnMsg += "check. sqlmap will display partial output"
         logger.warn(warnMsg)
+    finally:
+        kb.bruteMode = False
 
     clearConsoleLine(True)
     dataToStdout("\n")
@@ -287,3 +294,81 @@ def columnExists(columnFile, regex=None):
         hashDBWrite(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
 
     return kb.data.cachedColumns
+
+@stackedmethod
+def fileExists(pathFile):
+    retVal = []
+    paths = getFileItems(pathFile, unique=True)
+
+    kb.bruteMode = True
+
+    try:
+        conf.dbmsHandler.readFile(randomStr())
+    except SqlmapNoneDataException:
+        pass
+    except:
+        kb.bruteMode = False
+        raise
+
+    threadData = getCurrentThreadData()
+    threadData.shared.count = 0
+    threadData.shared.limit = len(paths)
+    threadData.shared.value = []
+
+    def fileExistsThread():
+        threadData = getCurrentThreadData()
+
+        while kb.threadContinue:
+            kb.locks.count.acquire()
+            if threadData.shared.count < threadData.shared.limit:
+                path = paths[threadData.shared.count]
+                threadData.shared.count += 1
+                kb.locks.count.release()
+            else:
+                kb.locks.count.release()
+                break
+
+            try:
+                result = unArrayizeValue(conf.dbmsHandler.readFile(path))
+            except SqlmapNoneDataException:
+                result = None
+
+            kb.locks.io.acquire()
+
+            if not isNoneValue(result):
+                threadData.shared.value.append(result)
+
+                if conf.verbose in (1, 2) and not conf.api:
+                    clearConsoleLine(True)
+                    infoMsg = "[%s] [INFO] retrieved: '%s'\n" % (time.strftime("%X"), path)
+                    dataToStdout(infoMsg, True)
+
+            if conf.verbose in (1, 2):
+                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+
+            kb.locks.io.release()
+
+    try:
+        pushValue(logger.getEffectiveLevel())
+        logger.setLevel(logging.CRITICAL)
+
+        runThreads(conf.threads, fileExistsThread, threadChoice=True)
+    except KeyboardInterrupt:
+        warnMsg = "user aborted during file existence "
+        warnMsg += "check. sqlmap will display partial output"
+        logger.warn(warnMsg)
+    finally:
+        kb.bruteMode = False
+        logger.setLevel(popValue())
+
+    clearConsoleLine(True)
+    dataToStdout("\n")
+
+    if not threadData.shared.value:
+        warnMsg = "no file(s) found"
+        logger.warn(warnMsg)
+    else:
+        retVal = threadData.shared.value
+
+    return retVal

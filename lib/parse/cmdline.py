@@ -502,6 +502,9 @@ def cmdLineParser(argv=None):
         brute.add_argument("--common-columns", dest="commonColumns", action="store_true",
                          help="Check existence of common columns")
 
+        brute.add_argument("--common-files", dest="commonFiles", action="store_true",
+                         help="Check existence of common files")
+
         # User-defined function options
         udf = parser.add_argument_group("User-defined function injection", "These options can be used to create custom user-defined functions")
 

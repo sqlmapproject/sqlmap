@@ -174,12 +174,13 @@ class Filesystem(object):
         return True
 
     def askCheckReadFile(self, localFile, remoteFile):
-        message = "do you want confirmation that the remote file '%s' " % remoteFile
-        message += "has been successfully downloaded from the back-end "
-        message += "DBMS file system? [Y/n] "
+        if not kb.bruteMode:
+            message = "do you want confirmation that the remote file '%s' " % remoteFile
+            message += "has been successfully downloaded from the back-end "
+            message += "DBMS file system? [Y/n] "
 
-        if readInput(message, default='Y', boolean=True):
-            return self._checkFileLength(localFile, remoteFile, True)
+            if readInput(message, default='Y', boolean=True):
+                return self._checkFileLength(localFile, remoteFile, True)
 
         return None
 
@@ -255,7 +256,7 @@ class Filesystem(object):
             if fileContent is not None:
                 fileContent = decodeDbmsHexValue(fileContent, True)
 
-                if fileContent:
+                if fileContent.strip():
                     localFilePath = dataToOutFile(remoteFile, fileContent)
 
                     if not Backend.isDbms(DBMS.PGSQL):
@@ -269,7 +270,7 @@ class Filesystem(object):
                         localFilePath += " (size differs from remote file)"
 
                     localFilePaths.append(localFilePath)
-                else:
+                elif not kb.bruteMode:
                     errMsg = "no data retrieved"
                     logger.error(errMsg)
 

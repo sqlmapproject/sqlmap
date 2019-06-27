@@ -31,16 +31,18 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
     def nonStackedReadFile(self, rFile):
-        infoMsg = "fetching file: '%s'" % rFile
-        logger.info(infoMsg)
+        if not kb.bruteMode:
+            infoMsg = "fetching file: '%s'" % rFile
+            logger.info(infoMsg)
 
         result = inject.getValue("HEX(LOAD_FILE('%s'))" % rFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
         return result
 
     def stackedReadFile(self, remoteFile):
-        infoMsg = "fetching file: '%s'" % remoteFile
-        logger.info(infoMsg)
+        if not kb.bruteMode:
+            infoMsg = "fetching file: '%s'" % remoteFile
+            logger.info(infoMsg)
 
         self.createSupportTbl(self.fileTblName, self.tblField, "longtext")
         self.getRemoteTempPath()
@@ -64,8 +66,9 @@ class Filesystem(GenericFilesystem):
             warnMsg += "file '%s'" % remoteFile
 
             if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                warnMsg += ", going to fall-back to simpler UNION technique"
-                logger.warn(warnMsg)
+                if not kb.bruteMode:
+                    warnMsg += ", going to fall-back to simpler UNION technique"
+                    logger.warn(warnMsg)
                 result = self.nonStackedReadFile(remoteFile)
             else:
                 raise SqlmapNoneDataException(warnMsg)

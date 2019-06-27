@@ -17,6 +17,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
 from lib.utils.brute import columnExists
+from lib.utils.brute import fileExists
 from lib.utils.brute import tableExists
 
 def action():
@@ -198,6 +199,14 @@ def action():
 
     if conf.fileWrite:
         conf.dbmsHandler.writeFile(conf.fileWrite, conf.fileDest, conf.fileWriteType)
+
+    if conf.commonFiles:
+        try:
+            conf.dumper.rFile(fileExists(paths.COMMON_FILES))
+        except SqlmapNoneDataException as ex:
+            logger.critical(ex)
+        except:
+            raise
 
     # Operating system options
     if conf.osCmd:

@@ -109,7 +109,7 @@ class UDF(object):
         return output
 
     def udfCheckNeeded(self):
-        if (not conf.fileRead or (conf.fileRead and not Backend.isDbms(DBMS.PGSQL))) and "sys_fileread" in self.sysUdfs:
+        if (not any((conf.fileRead, conf.commonFiles)) or (any((conf.fileRead, conf.commonFiles)) and not Backend.isDbms(DBMS.PGSQL))) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:
