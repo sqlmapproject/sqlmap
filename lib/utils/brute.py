@@ -18,6 +18,7 @@ from lib.core.common import getFileItems
 from lib.core.common import getPageWordSet
 from lib.core.common import hashDBWrite
 from lib.core.common import isNoneValue
+from lib.core.common import ntToPosixSlashes
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomInt
@@ -298,6 +299,19 @@ def columnExists(columnFile, regex=None):
 @stackedmethod
 def fileExists(pathFile):
     retVal = []
+
+    message = "which common files file do you want to use?\n"
+    message += "[1] default '%s' (press Enter)\n" % pathFile
+    message += "[2] custom"
+    choice = readInput(message, default='1')
+
+    if choice == '2':
+        message = "what's the custom common files file location?\n"
+        pathFile = readInput(message) or pathFile
+
+    infoMsg = "checking files existence using items from '%s'" % pathFile
+    logger.info(infoMsg)
+
     paths = getFileItems(pathFile, unique=True)
 
     kb.bruteMode = True
@@ -321,7 +335,7 @@ def fileExists(pathFile):
         while kb.threadContinue:
             kb.locks.count.acquire()
             if threadData.shared.count < threadData.shared.limit:
-                path = paths[threadData.shared.count]
+                path = ntToPosixSlashes(paths[threadData.shared.count])
                 threadData.shared.count += 1
                 kb.locks.count.release()
             else:

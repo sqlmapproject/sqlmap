@@ -89,7 +89,7 @@ class Filesystem(GenericFilesystem):
 
         result = []
         txtTbl = self.fileTblName
-        hexTbl = "%shex" % self.fileTblName
+        hexTbl = "%s%shex" % (self.fileTblName, randomStr())
 
         self.createSupportTbl(txtTbl, self.tblField, "text")
         inject.goStacked("DROP TABLE %s" % hexTbl)
