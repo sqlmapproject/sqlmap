@@ -21,6 +21,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import firstNotNone
 from lib.core.common import getConsoleWidth
 from lib.core.common import getPartRun
+from lib.core.common import getTechnique
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
@@ -43,7 +44,6 @@ from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTP_HEADER
-from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import MAX_ERROR_CHUNK_LENGTH
@@ -124,7 +124,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                         nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, kb.errorChunkLength)
 
                 # Forge the error-based SQL injection request
-                vector = kb.injection.data[PAYLOAD.TECHNIQUE.ERROR].vector
+                vector = kb.injection.data[getTechnique()].vector
                 query = agent.prefixQuery(vector)
                 query = agent.suffixQuery(query)
                 injExpression = expression.replace(field, nulledCastedField, 1) if field else expression
@@ -135,7 +135,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 # Perform the request
                 page, headers, _ = Request.queryPage(payload, content=True, raise404=False)
 
-                incrementCounter(PAYLOAD.TECHNIQUE.ERROR)
+                incrementCounter(getTechnique())
 
                 if page and conf.noEscape:
                     page = re.sub(r"('|\%%27)%s('|\%%27).*?('|\%%27)%s('|\%%27)" % (kb.chars.start, kb.chars.stop), "", page)
@@ -299,7 +299,7 @@ def errorUse(expression, dump=False):
     SQL injection vulnerability on the affected parameter.
     """
 
-    initTechnique(PAYLOAD.TECHNIQUE.ERROR)
+    initTechnique(getTechnique())
 
     abortedFlag = False
     count = None
@@ -461,7 +461,7 @@ def errorUse(expression, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d queries in %.2f seconds" % (kb.counters[PAYLOAD.TECHNIQUE.ERROR], duration)
+        debugMsg = "performed %d queries in %.2f seconds" % (kb.counters[getTechnique()], duration)
         logger.debug(debugMsg)
 
     return value

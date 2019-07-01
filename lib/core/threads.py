@@ -63,6 +63,7 @@ class _ThreadData(threading.local):
         self.retriesCount = 0
         self.seqMatcher = difflib.SequenceMatcher(None)
         self.shared = shared
+        self.technique = None
         self.validationRun = 0
         self.valueStack = []
 
@@ -113,6 +114,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
     kb.threadContinue = True
     kb.threadException = False
+    kb.technique = ThreadData.technique
 
     if threadChoice and numThreads == 1 and not (kb.injection.data and not any(_ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in kb.injection.data)):
         while True:
@@ -206,6 +208,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     finally:
         kb.threadContinue = True
         kb.threadException = False
+        kb.technique = None
 
         for lock in kb.locks.values():
             if lock.locked():

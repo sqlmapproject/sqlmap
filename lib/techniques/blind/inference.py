@@ -22,6 +22,7 @@ from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getCounter
 from lib.core.common import getPartRun
+from lib.core.common import getTechnique
 from lib.core.common import goGoodSamaritan
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -80,7 +81,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         asciiTbl = getCharset(charsetType)
 
     threadData = getCurrentThreadData()
-    timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
+    timeBasedCompare = (getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
     retVal = hashDBRetrieve(expression, checkConf=True)
 
     if retVal:
@@ -201,7 +202,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 forgedPayload = agent.extractPayload(payload)
                 forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue)).replace(markingValue, unescapedCharValue)
                 result = Request.queryPage(agent.replacePayload(payload, forgedPayload), timeBasedCompare=timeBasedCompare, raise404=False)
-                incrementCounter(kb.technique)
+                incrementCounter(getTechnique())
 
                 if result:
                     return hintValue[idx - 1]
@@ -228,13 +229,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
-            if result and timeBasedCompare and kb.injection.data[kb.technique].trueCode:
-                result = threadData.lastCode == kb.injection.data[kb.technique].trueCode
+            if result and timeBasedCompare and kb.injection.data[getTechnique()].trueCode:
+                result = threadData.lastCode == kb.injection.data[getTechnique()].trueCode
                 if not result:
-                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, kb.injection.data[kb.technique].trueCode)
+                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, kb.injection.data[getTechnique()].trueCode)
                     singleTimeWarnMessage(warnMsg)
 
-            incrementCounter(kb.technique)
+            incrementCounter(getTechnique())
 
             return result
 
@@ -269,7 +270,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             elif len(charTbl) == 1:
                 forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-                incrementCounter(kb.technique)
+                incrementCounter(getTechnique())
 
                 if result:
                     return decodeIntToUnicode(charTbl[0])
@@ -338,10 +339,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             kb.responseTimePayload = None
 
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-                    incrementCounter(kb.technique)
+                    incrementCounter(getTechnique())
 
                     if not timeBasedCompare:
-                        unexpectedCode |= threadData.lastCode not in (kb.injection.data[kb.technique].falseCode, kb.injection.data[kb.technique].trueCode)
+                        unexpectedCode |= threadData.lastCode not in (kb.injection.data[getTechnique()].falseCode, kb.injection.data[getTechnique()].trueCode)
                         if unexpectedCode:
                             warnMsg = "unexpected HTTP code '%s' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
                             singleTimeWarnMessage(warnMsg)
@@ -439,7 +440,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                     forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, "&%d%s" % (mask, INFERENCE_GREATER_CHAR)), (expressionUnescaped, idx, 0))
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-                    incrementCounter(kb.technique)
+                    incrementCounter(getTechnique())
 
                     if result:
                         candidates = [_ for _ in candidates if _ & mask > 0]
@@ -451,7 +452,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if candidates:
                     forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, candidates[0]))
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
-                    incrementCounter(kb.technique)
+                    incrementCounter(getTechnique())
 
                     if result:
                         return decodeIntToUnicode(candidates[0])
@@ -569,12 +570,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # One-shot query containing equals commonValue
                         testValue = unescaper.escape("'%s'" % commonValue) if "'" not in commonValue else unescaper.escape("%s" % commonValue, quote=False)
 
-                        query = kb.injection.data[kb.technique].vector
+                        query = kb.injection.data[getTechnique()].vector
                         query = agent.prefixQuery(query.replace(INFERENCE_MARKER, "(%s)%s%s" % (expressionUnescaped, INFERENCE_EQUALS_CHAR, testValue)))
                         query = agent.suffixQuery(query)
 
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
-                        incrementCounter(kb.technique)
+                        incrementCounter(getTechnique())
 
                         # Did we have luck?
                         if result:
@@ -593,12 +594,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         subquery = queries[Backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
                         testValue = unescaper.escape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.escape("%s" % commonPattern, quote=False)
 
-                        query = kb.injection.data[kb.technique].vector
+                        query = kb.injection.data[getTechnique()].vector
                         query = agent.prefixQuery(query.replace(INFERENCE_MARKER, "(%s)=%s" % (subquery, testValue)))
                         query = agent.suffixQuery(query)
 
                         result = Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False)
-                        incrementCounter(kb.technique)
+                        incrementCounter(getTechnique())
 
                         # Did we have luck?
                         if result:
@@ -678,7 +679,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
     _ = finalValue or partialValue
 
-    return getCounter(kb.technique), safecharencode(_) if kb.safeCharEncode else _
+    return getCounter(getTechnique()), safecharencode(_) if kb.safeCharEncode else _
 
 def queryOutputLength(expression, payload):
     """

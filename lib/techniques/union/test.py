@@ -20,6 +20,7 @@ from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removeReflectiveValues
+from lib.core.common import setTechnique
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
@@ -323,7 +324,7 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
         return
 
     negativeLogic = kb.negativeLogic
-    kb.technique = PAYLOAD.TECHNIQUE.UNION
+    setTechnique(PAYLOAD.TECHNIQUE.UNION)
 
     try:
         if negativeLogic:

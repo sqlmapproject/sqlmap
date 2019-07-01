@@ -19,6 +19,7 @@ from lib.core.common import expandAsteriskForColumns
 from lib.core.common import extractExpectedValue
 from lib.core.common import filterNone
 from lib.core.common import getPublicTypeMembers
+from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -31,6 +32,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
+from lib.core.common import setTechnique
 from lib.core.common import singleTimeWarnMessage
 from lib.core.compat import xrange
 from lib.core.data import conf
@@ -88,7 +90,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
     if value is not None:
         return value
 
-    timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
+    timeBasedCompare = (getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     if timeBasedCompare and conf.threads > 1 and kb.forceThreads is None:
         msg = "multi-threading is considered unsafe in "
@@ -160,9 +162,9 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
     parameter through a bisection algorithm.
     """
 
-    initTechnique(kb.technique)
+    initTechnique(getTechnique())
 
-    query = agent.prefixQuery(kb.injection.data[kb.technique].vector)
+    query = agent.prefixQuery(kb.injection.data[getTechnique()].vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
     count = None
@@ -307,10 +309,10 @@ def _goBooleanProxy(expression):
     Retrieve the output of a boolean based SQL query
     """
 
-    initTechnique(kb.technique)
+    initTechnique(getTechnique())
 
     if conf.dnsDomain:
-        query = agent.prefixQuery(kb.injection.data[kb.technique].vector)
+        query = agent.prefixQuery(kb.injection.data[getTechnique()].vector)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
         output = _goDns(payload, expression)
@@ -318,13 +320,13 @@ def _goBooleanProxy(expression):
         if output is not None:
             return output
 
-    vector = kb.injection.data[kb.technique].vector
+    vector = kb.injection.data[getTechnique()].vector
     vector = vector.replace(INFERENCE_MARKER, expression)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
 
-    timeBasedCompare = kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
+    timeBasedCompare = getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
     output = hashDBRetrieve(expression, checkConf=True)
 
@@ -401,7 +403,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
             if not conf.forceDns:
                 if union and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                    kb.technique = PAYLOAD.TECHNIQUE.UNION
+                    setTechnique(PAYLOAD.TECHNIQUE.UNION)
                     kb.forcePartialUnion = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector[8]
                     fallback = not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL and not kb.forcePartialUnion
 
@@ -433,7 +435,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                             singleTimeWarnMessage(warnMsg)
 
                 if error and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) and not found:
-                    kb.technique = PAYLOAD.TECHNIQUE.ERROR if isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) else PAYLOAD.TECHNIQUE.QUERY
+                    setTechnique(PAYLOAD.TECHNIQUE.ERROR if isTechniqueAvailable(PAYLOAD.TECHNIQUE.ERROR) else PAYLOAD.TECHNIQUE.QUERY)
                     value = errorUse(forgeCaseExpression if expected == EXPECTED.BOOL else query, dump)
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
@@ -446,7 +448,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     singleTimeWarnMessage(warnMsg)
 
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
-                kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
+                setTechnique(PAYLOAD.TECHNIQUE.BOOLEAN)
 
                 if expected == EXPECTED.BOOL:
                     value = _goBooleanProxy(booleanExpression)
@@ -461,9 +463,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 kb.responseTimeMode = "%s|%s" % (match.group(1), match.group(2)) if match else None
 
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
-                    kb.technique = PAYLOAD.TECHNIQUE.TIME
+                    setTechnique(PAYLOAD.TECHNIQUE.TIME)
                 else:
-                    kb.technique = PAYLOAD.TECHNIQUE.STACKED
+                    setTechnique(PAYLOAD.TECHNIQUE.STACKED)
 
                 if expected == EXPECTED.BOOL:
                     value = _goBooleanProxy(booleanExpression)
@@ -505,12 +507,12 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
 def goStacked(expression, silent=False):
     if PAYLOAD.TECHNIQUE.STACKED in kb.injection.data:
-        kb.technique = PAYLOAD.TECHNIQUE.STACKED
+        setTechnique(PAYLOAD.TECHNIQUE.STACKED)
     else:
         for technique in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True):
             _ = getTechniqueData(technique)
             if _ and "stacked" in _["title"].lower():
-                kb.technique = technique
+                setTechnique(technique)
                 break
 
     expression = cleanQuery(expression)

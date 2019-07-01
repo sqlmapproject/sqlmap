@@ -1125,6 +1125,20 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
     return retVal or ""
 
+def setTechnique(technique):
+    """
+    Thread-safe setting of currently used technique (Note: dealing with cases of per-thread technique switching)
+    """
+
+    getCurrentThreadData().technique = technique
+
+def getTechnique():
+    """
+    Thread-safe getting of currently used technique
+    """
+
+    return getCurrentThreadData().technique or kb.technique
+
 def randomRange(start=0, stop=1000, seed=None):
     """
     Returns random integer value in given range
@@ -3231,18 +3245,16 @@ def isHeavyQueryBased(technique=None):
     Returns True whether current (kb.)technique is heavy-query based
 
     >>> pushValue(kb.injection.data)
-    >>> pushValue(kb.technique)
-    >>> kb.technique = PAYLOAD.TECHNIQUE.STACKED
-    >>> kb.injection.data[kb.technique] = [test for test in getSortedInjectionTests() if "heavy" in test["title"].lower()][0]
+    >>> setTechnique(PAYLOAD.TECHNIQUE.STACKED)
+    >>> kb.injection.data[getTechnique()] = [test for test in getSortedInjectionTests() if "heavy" in test["title"].lower()][0]
     >>> isHeavyQueryBased()
     True
-    >>> kb.technique = popValue()
     >>> kb.injection.data = popValue()
     """
 
     retVal = False
 
-    technique = technique or kb.technique
+    technique = technique or getTechnique()
 
     if isTechniqueAvailable(technique):
         data = getTechniqueData(technique)
@@ -3630,7 +3642,7 @@ def unhandledExceptionMessage():
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % platform.platform()
     errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
-    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, kb.technique) if kb.get("technique") else ("DIRECT" if conf.get("direct") else None))
+    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS:"
 
     if Backend.getDbms() is not None:

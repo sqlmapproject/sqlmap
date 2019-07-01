@@ -20,6 +20,7 @@ from lib.core.common import getAutoDirectories
 from lib.core.common import getManualDirectories
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
+from lib.core.common import getTechnique
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
@@ -147,8 +148,8 @@ class Web(object):
         uplQuery = getUnicode(fileContent).replace(SHELL_WRITABLE_DIR_TAG, directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
         query = ""
 
-        if isTechniqueAvailable(kb.technique):
-            where = kb.injection.data[kb.technique].where
+        if isTechniqueAvailable(getTechnique()):
+            where = kb.injection.data[getTechnique()].where
 
             if where == PAYLOAD.WHERE.NEGATIVE:
                 randInt = randomInt()
